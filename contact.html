@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact | VoiceToWebsite</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="bg-canvas" class="bg-canvas" aria-hidden="true"></canvas>
+  <div class="bg-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark">VW</span>
+      <div class="brand-text">
+        <strong>VoiceToWebsite</strong>
+        <span>Contact</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="appstore.html">App Store</a>
+      <a href="store.html">Store</a>
+      <a href="livestream.html">Live</a>
+      <a href="/admin">Admin</a>
+      <a href="legal.html">Legal</a>
+      <a href="contact.html" aria-current="page">Contact</a>
+    </nav>
+    <button class="ghost-button">Book a Demo</button>
+  </header>
+
+  <main class="page" style="padding: 4rem 6vw;">
+    <section class="section glass" style="max-width: 840px; margin: 0 auto;">
+      <h1>Contact</h1>
+      <p class="muted">Reach out for support, partnerships, or licensing.</p>
+      <form class="contact-form" style="margin-top: 1.5rem;">
+        <label>Name<input type="text" placeholder="Your name" /></label>
+        <label>Email<input type="email" placeholder="you@example.com" /></label>
+        <label>Phone<input type="tel" placeholder="+1 555 123 4567" /></label>
+        <label>Message<textarea rows="4" placeholder="Tell us what you need"></textarea></label>
+        <button type="submit" class="primary">Send</button>
+      </form>
+      <div style="margin-top: 1.5rem;">
+        <p class="muted">Email: support@voicetowebsite.com</p>
+        <p class="muted">Owner: Mr. J.W. Swain</p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="nav.js"></script>
+</body>
+</html>
