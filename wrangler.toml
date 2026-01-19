@@ -1,0 +1,37 @@
+name = "voicetowebsite"
+main = "worker.js"
+compatibility_date = "2026-01-17"
+account_id = "d6ec056b27a57bcf807a46b2e3379d60"
+
+# Serve the built site directly from Cloudflare (no origin) and keep the API path routed to the Worker.
+routes = [
+  "voicetowebsite.com/*",
+  "www.voicetowebsite.com/*",
+]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "D1"
+database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
+
+# [[kv_namespaces]]
+# binding = "LEARN"
+# id = "e61605d144ac4348a72b7e85afc6c185"
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+  [observability.logs]
+  enabled = true
+  head_sampling_rate = 1
+  persist = true
+  invocation_logs = true
+
+  [observability.traces]
+  enabled = true
+  persist = true
+  head_sampling_rate = 1

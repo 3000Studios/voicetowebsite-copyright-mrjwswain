@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VoiceToWebsite Admin</title>
+  <meta name="description" content="Voice-driven admin console for VoiceToWebsite." />
+  <link rel="stylesheet" href="./admin.css" />
+</head>
+<body>
+  <div class="admin-video-bg" aria-hidden="true">
+    <video src="https://cdn.coverr.co/videos/coverr-glowing-wireframe-6067/1080p.mp4" autoplay muted loop playsinline></video>
+  </div>
+  <header class="site-nav">
+    <div class="brand">
+      <span class="brand-mark">VW</span>
+      <div class="brand-text">
+        <strong>VoiceToWebsite</strong>
+        <span>Revenue Engine</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="/index.html">Home</a>
+      <a href="/admin">Admin</a>
+      <a href="#" id="nav-contact">Contact</a>
+    </nav>
+  </header>
+
+  <div class="lock-screen" id="lock-screen">
+    <div class="lock-card">
+      <h2>Enter access code</h2>
+      <p>Unlock to use the voice editor.</p>
+      <div class="lock-row">
+        <input type="password" id="lock-input" placeholder="Access code" />
+        <button id="lock-button" class="primary">Unlock</button>
+      </div>
+      <p class="muted" id="lock-error"></p>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <header class="admin-header">
+      <div>
+        <h1>VoiceToWebsite Voice Command Center</h1>
+        <p>Secure admin console for hands-free site edits and deploys.</p>
+      </div>
+      <div class="admin-actions">
+        <span class="pill">Cloudflare secured</span>
+      </div>
+    </header>
+    <nav class="admin-subnav">
+      <a href="#control-card">Voice Commands</a>
+      <a href="#analytics">Web Analytics</a>
+      <a href="#livestream-setup">Live Stream Setup</a>
+      <a href="#app-manager">App Store Manager</a>
+      <a href="#store-manager">Store Manager</a>
+    </nav>
+
+    <main class="admin-grid">
+      <section class="card wide" id="control-card">
+        <h2>Command Center</h2>
+        <p class="muted" id="status">Locked</p>
+        <div class="control-box">
+          <div class="control-main">
+            <textarea id="command" rows="6" placeholder="Speak or type a command..."></textarea>
+            <div class="button-row">
+              <button id="start" class="primary">Start Listening</button>
+              <button id="stop" class="secondary">Stop</button>
+              <button id="plan" class="ghost">Generate Plan</button>
+              <button id="apply" class="primary">Apply Live</button>
+            </div>
+            <p class="muted">Mic: <span id="mic-state">Idle</span></p>
+            <p class="muted">Example: "Update the headline to blue and rounded" or "Create a new page for /partners".</p>
+          </div>
+          <div class="response-panel">
+            <h3>Response</h3>
+            <pre id="response">{}</pre>
+            <div class="button-row">
+              <button id="refresh-logs" class="ghost">Refresh History</button>
+            </div>
+            <ul class="activity-list" id="activity-list"></ul>
+            <p class="muted" id="activity-status"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card wide" id="preview-card">
+        <h2>Live Preview</h2>
+        <p class="muted">Local preview updates instantly from your commands.</p>
+        <div class="preview-shell">
+          <div class="preview-controls">
+            <div class="button-row">
+              <button id="preview-reset" class="ghost">Reset Preview</button>
+              <button id="preview-speak" class="secondary">Play Summary</button>
+            </div>
+          </div>
+          <div class="preview-stage solo" id="preview-stage">
+            <div class="preview-extras" id="preview-extras"></div>
+            <iframe id="preview-frame" title="Homepage preview" src="/index.html"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="analytics">
+        <h2>Web Analytics</h2>
+        <p class="muted">Full-site stats dashboard placeholder. Connect your analytics source here.</p>
+      </section>
+
+      <section class="card" id="livestream-setup">
+        <h2>Live Stream Setup</h2>
+        <p class="muted">Configure your live stream destinations and embeds.</p>
+      </section>
+
+      <section class="card" id="app-manager">
+        <h2>App Store Manager</h2>
+        <p class="muted">Manage app listings, pricing, and publishing.</p>
+      </section>
+
+      <section class="card" id="store-manager">
+        <h2>Store Manager</h2>
+        <p class="muted">Manage products, pricing, and offers.</p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>
