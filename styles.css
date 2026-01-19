@@ -1308,3 +1308,12 @@ body { animation: scrollColors 10s infinite; } @keyframes scrollColors { 0% { ba
 
 /* Voice-injected styles */
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } } .high-tiger { animation: bounce 1s infinite; }
+/* full-screen canvas wallpaper */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}

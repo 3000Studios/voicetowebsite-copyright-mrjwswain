@@ -12,9 +12,7 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=__ADSENSE_PUBLISHER__" crossorigin="anonymous"></script>
 </head>
 <body>
-  <div class="video-bg" aria-hidden="true">
-    <video src="https://cdn.coverr.co/videos/coverr-future-is-calling-3845/1080p.mp4" autoplay muted loop playsinline></video>
-  </div>
+  <canvas id="bg-canvas" class="bg-canvas" aria-hidden="true"></canvas>
   <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
   <div class="bg-noise" aria-hidden="true"></div>
   <div class="edge-glow" aria-hidden="true"></div>
@@ -213,6 +211,490 @@
   </div>
 
   <button class="audio-toggle" id="audio-toggle" aria-label="Next track">🔊</button>
+
+
+<script>
+  // 3D canvas wallpaper for VoiceToWebsite.com
+  const canvas = document.getElementById("bg-canvas");
+  const ctx = canvas.getContext("2d");
+
+  let w;
+  let h;
+  const mouse = { x: 0, y: 0 };
+  const tilt = { x: 0, y: 0 };
+  let dots = [];
+  let waves = [];
+  let starbursts = [];
+  let time = 0;
+  const textOffset = { x: 0, y: 0 };
+
+  function resize() {
+    w = (canvas.width = window.innerWidth * 2);
+    h = (canvas.height = window.innerHeight * 2);
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(2, 2);
+  }
+
+  class Dot {
+    constructor(chaseMouse = false) {
+      this.chaseMouse = chaseMouse;
+      this.reset();
+    }
+
+    reset() {
+      this.x = Math.random() * (w / 2);
+      this.y = Math.random() * (h / 2);
+      this.vx = (Math.random() - 0.5) * 2;
+      this.vy = (Math.random() - 0.5) * 2;
+      this.radius = Math.random() * 3 + 2;
+      this.opacity = Math.random() * 0.5 + 0.5;
+    }
+
+    update() {
+      const wReal = w / 2;
+      const hReal = h / 2;
+
+      if (this.chaseMouse) {
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > 5) {
+          this.vx += dx * 0.0001;
+          this.vy += dy * 0.0001;
+        }
+
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+      }
+
+      this.vx += tilt.x * 0.05;
+      this.vy += tilt.y * 0.05;
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (this.x < -10) this.x = wReal + 10;
+      if (this.x > wReal + 10) this.x = -10;
+      if (this.y < -10) this.y = hReal + 10;
+      if (this.y > hReal + 10) this.y = -10;
+
+      if (!this.chaseMouse) {
+        if (this.x < 0 || this.x > wReal) this.vx *= -0.8;
+        if (this.y < 0 || this.y > hReal) this.vy *= -0.8;
+      }
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      const gradient = ctx.createRadialGradient(
+        this.x,
+        this.y,
+        0,
+        this.x,
+        this.y,
+        this.radius
+      );
+      gradient.addColorStop(
+        0,
+        `rgba(100, 200, 255, ${this.opacity.toFixed(3)})`
+      );
+      gradient.addColorStop(
+        1,
+        `rgba(100, 200, 255, ${(this.opacity * 0.3).toFixed(3)})`
+      );
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+  }
+
+  class Starburst {
+    constructor() {
+      this.x = Math.random() * (w / 2);
+      this.y = Math.random() * (h / 2);
+      this.life = 1;
+      this.maxLife = 60 + Math.random() * 40;
+      this.particles = [];
+      this.rays = 8 + Math.floor(Math.random() * 8);
+
+      for (let i = 0; i < this.rays; i += 1) {
+        const angle = (Math.PI * 2 * i) / this.rays;
+        this.particles.push({
+          angle,
+          length: 0,
+          maxLength: 20 + Math.random() * 30,
+        });
+      }
+    }
+
+    update() {
+      this.life += 1;
+      return this.life < this.maxLife;
+    }
+
+    draw() {
+      const progress = this.life / this.maxLife;
+      const opacity =
+        progress < 0.3 ? progress / 0.3 : (1 - progress) / 0.7;
+
+      ctx.save();
+      ctx.translate(this.x, this.y);
+
+      this.particles.forEach((p) => {
+        const currentLength = p.maxLength * Math.min(progress * 2, 1);
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        const x = Math.cos(p.angle) * currentLength;
+        const y = Math.sin(p.angle) * currentLength;
+        ctx.lineTo(x, y);
+
+        const gradient = ctx.createLinearGradient(0, 0, x, y);
+        gradient.addColorStop(
+          0,
+          `rgba(255, 220, 100, ${(opacity * 0.8).toFixed(3)})`
+        );
+        gradient.addColorStop(1, "rgba(255, 180, 50, 0)");
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 3 * (1 - progress * 0.5), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 255, 200, ${opacity.toFixed(3)})`;
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
+  class SoundWave {
+    constructor(z) {
+      this.z = z;
+      this.points = 60;
+      this.amplitude = 40 + Math.random() * 60;
+      this.frequency = 0.01 + Math.random() * 0.02;
+      this.speed = 0.02 + Math.random() * 0.03;
+      this.offset = Math.random() * Math.PI * 2;
+      this.color =
+        z > 0
+          ? "rgba(100, 200, 255, 0.4)"
+          : "rgba(80, 180, 255, 0.3)";
+      this.thickness = 2 + Math.random() * 2;
+    }
+
+    draw(currentTime, mouseInfluence) {
+      ctx.save();
+
+      const wReal = w / 2;
+      const hReal = h / 2;
+      const scale = 1 + this.z * 0.3;
+      const opacity =
+        this.z > 0 ? 0.6 - this.z * 0.2 : 0.4 + this.z * 0.2;
+
+      ctx.beginPath();
+
+      for (let i = 0; i <= this.points; i += 1) {
+        const t = i / this.points;
+        const x = t * wReal;
+
+        const wave1 =
+          Math.sin(t * Math.PI * 4 + currentTime * this.speed + this.offset) *
+          this.amplitude;
+        const wave2 =
+          Math.sin(t * Math.PI * 8 + currentTime * this.speed * 0.5) *
+          this.amplitude *
+          0.5;
+
+        const dx = x - mouse.x;
+        const dy = hReal / 2 - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const mouseBend =
+          mouseInfluence * (200 / (dist + 100)) * (dy / (dist + 1));
+
+        const tiltBend = tilt.y * 50 * this.z;
+
+        const y = hReal / 2 + (wave1 + wave2) * scale + mouseBend + tiltBend;
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+
+      const gradient = ctx.createLinearGradient(
+        0,
+        h / 4 - 100,
+        0,
+        h / 4 + 100
+      );
+      const op1 = (opacity * 0.8).toFixed(3);
+      const op2 = opacity.toFixed(3);
+      const op3 = (opacity * 0.6).toFixed(3);
+      gradient.addColorStop(0, this.color.replace("0.4", op1));
+      gradient.addColorStop(0.5, this.color.replace("0.4", op2));
+      gradient.addColorStop(1, this.color.replace("0.4", op3));
+
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = this.thickness * scale;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
+  function initWallpaper() {
+    dots = [];
+    waves = [];
+    const totalDots = 150;
+    const chasersCount = Math.floor(totalDots * 0.2);
+
+    for (let i = 0; i < totalDots; i += 1) {
+      dots.push(new Dot(i < chasersCount));
+    }
+
+    for (let i = 0; i < 8; i += 1) {
+      waves.push(new SoundWave((i - 4) / 4));
+    }
+
+    waves.sort((a, b) => a.z - b.z);
+  }
+
+  function drawWireframe() {
+    ctx.save();
+    const wReal = w / 2;
+    const hReal = h / 2;
+    const wireSize = Math.min(wReal, hReal) * 0.5;
+    const x = wReal / 2 - wireSize / 2;
+    const y = hReal / 2 - wireSize / 2;
+
+    ctx.strokeStyle = "rgba(100, 150, 200, 0.15)";
+    ctx.lineWidth = 2;
+
+    ctx.strokeRect(x, y, wireSize, wireSize);
+    ctx.strokeRect(x + 20, y + 20, wireSize - 40, 40);
+
+    const cols = 3;
+    const rows = 4;
+    const cellW = (wireSize - 40) / cols;
+    const cellH = (wireSize - 120) / rows;
+
+    for (let i = 1; i < cols; i += 1) {
+      ctx.beginPath();
+      ctx.moveTo(x + 20 + cellW * i, y + 80);
+      ctx.lineTo(x + 20 + cellW * i, y + wireSize - 20);
+      ctx.stroke();
+    }
+
+    for (let i = 1; i < rows; i += 1) {
+      ctx.beginPath();
+      ctx.moveTo(x + 20, y + 80 + cellH * i);
+      ctx.lineTo(x + wireSize - 20, y + 80 + cellH * i);
+      ctx.stroke();
+    }
+
+    for (let i = 0; i < rows; i += 1) {
+      for (let j = 0; j < cols; j += 1) {
+        const cx = x + 20 + cellW * j + cellW / 2;
+        const cy = y + 80 + cellH * i + cellH / 2;
+        const pad = 10;
+        ctx.fillStyle = "rgba(80, 120, 180, 0.1)";
+        ctx.fillRect(
+          cx - cellW / 2 + pad,
+          cy - cellH / 2 + pad,
+          cellW - pad * 2,
+          cellH - pad * 2
+        );
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function getMarbleColor(currentTime) {
+    const r1 = Math.sin(currentTime * 0.001) * 0.5 + 0.5;
+    const r2 = Math.sin(currentTime * 0.0015 + 2) * 0.5 + 0.5;
+    const r3 = Math.sin(currentTime * 0.0008 + 4) * 0.5 + 0.5;
+
+    const black = { r: 20, g: 20, b: 30 };
+    const darkBlue = { r: 10, g: 20, b: 50 };
+    const darkGreen = { r: 10, g: 40, b: 30 };
+
+    const r = Math.floor(black.r * r1 + darkBlue.r * r2 + darkGreen.r * r3);
+    const g = Math.floor(black.g * r1 + darkBlue.g * r2 + darkGreen.g * r3);
+    const b = Math.floor(black.b * r1 + darkBlue.b * r2 + darkGreen.b * r3);
+
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  function draw3DText() {
+    ctx.save();
+
+    const wReal = w / 2;
+    const hReal = h / 2;
+
+    textOffset.x = Math.sin(time * 0.02) * 3;
+    textOffset.y = Math.cos(time * 0.025) * 2;
+
+    const tiltOffsetX = tilt.x * 15;
+    const tiltOffsetY = tilt.y * 15;
+
+    const text = "VoiceToWebsite.com";
+    const fontSize = Math.min(wReal / 15, 80);
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const centerX = wReal / 2 + textOffset.x + tiltOffsetX;
+    const centerY = hReal / 2 + textOffset.y + tiltOffsetY;
+
+    const depth = 25;
+    for (let i = depth; i > 0; i -= 1) {
+      const ratio = i / depth;
+      const offsetX = i * 1.5;
+      const offsetY = i * 1.5;
+
+      ctx.fillStyle = `rgba(20, 20, 30, ${(0.6 * ratio).toFixed(3)})`;
+      ctx.fillText(text, centerX + offsetX, centerY + offsetY);
+    }
+
+    ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetX = 15;
+    ctx.shadowOffsetY = 15;
+
+    const gradient = ctx.createLinearGradient(
+      centerX - 400,
+      centerY - 50,
+      centerX + 400,
+      centerY + 50
+    );
+    gradient.addColorStop(0, "#D4AF37");
+    gradient.addColorStop(0.2, "#FFD700");
+    gradient.addColorStop(0.4, "#FFF8DC");
+    gradient.addColorStop(0.6, "#FFD700");
+    gradient.addColorStop(0.8, "#D4AF37");
+    gradient.addColorStop(1, "#B8860B");
+
+    ctx.fillStyle = gradient;
+    ctx.fillText(text, centerX, centerY);
+
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    const highlight = ctx.createLinearGradient(
+      centerX,
+      centerY - fontSize / 2,
+      centerX,
+      centerY - fontSize / 4
+    );
+    highlight.addColorStop(0, "rgba(255, 255, 255, 0.5)");
+    highlight.addColorStop(1, "rgba(255, 255, 255, 0)");
+    ctx.fillStyle = highlight;
+    ctx.fillText(text, centerX, centerY - 2);
+
+    ctx.strokeStyle = "rgba(139, 69, 19, 0.3)";
+    ctx.lineWidth = 1;
+    ctx.strokeText(text, centerX, centerY);
+
+    ctx.restore();
+  }
+
+  function animate() {
+    time += 1;
+
+    const wReal = w / 2;
+    const hReal = h / 2;
+
+    ctx.fillStyle = getMarbleColor(time);
+    ctx.fillRect(0, 0, wReal, hReal);
+
+    for (let i = 0; i < 3; i += 1) {
+      const x = (Math.sin(time * 0.0005 + i) * 0.5 + 0.5) * wReal;
+      const y = (Math.cos(time * 0.0007 + i) * 0.5 + 0.5) * hReal;
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, wReal * 0.5);
+      gradient.addColorStop(0, "rgba(10, 30, 50, 0.1)");
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, wReal, hReal);
+    }
+
+    drawWireframe();
+
+    const mouseInfluence =
+      Math.min(
+        Math.abs(mouse.x - wReal / 2) + Math.abs(mouse.y - hReal / 2),
+        500
+      ) / 500;
+
+    waves.forEach((wave) => {
+      if (wave.z <= 0) {
+        wave.draw(time, mouseInfluence * 50);
+      }
+    });
+
+    draw3DText();
+
+    waves.forEach((wave) => {
+      if (wave.z > 0) {
+        wave.draw(time, mouseInfluence * 50);
+      }
+    });
+
+    starbursts = starbursts.filter((burst) => {
+      const alive = burst.update();
+      if (alive) burst.draw();
+      return alive;
+    });
+
+    if (Math.random() < 0.02) {
+      starbursts.push(new Starburst());
+    }
+
+    dots.forEach((dot) => {
+      dot.update();
+      dot.draw();
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener("resize", () => {
+    resize();
+    initWallpaper();
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  window.addEventListener("touchmove", (e) => {
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+  });
+
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener("deviceorientation", (e) => {
+      tilt.x = Math.max(-1, Math.min(1, (e.gamma || 0) / 90));
+      tilt.y = Math.max(-1, Math.min(1, (e.beta || 0) / 90));
+    });
+  }
+
+  resize();
+  initWallpaper();
+  animate();
+</script>
+
 
   <script type="module" src="app.js"></script>
   <script type="module" src="nav.js"></script>
