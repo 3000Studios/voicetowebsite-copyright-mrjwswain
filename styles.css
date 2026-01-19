@@ -1319,12 +1319,11 @@ body { animation: scrollColors 10s infinite; } @keyframes scrollColors { 0% { ba
 }
 
 .alt-nav {
-  position: sticky;
-  top: 0;
+  position: relative;
   width: 100%;
   z-index: 20;
-  height: 120px;
-  overflow: visible;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .alt-nav input[type="radio"] {
@@ -1425,10 +1424,13 @@ body { animation: scrollColors 10s infinite; } @keyframes scrollColors { 0% { ba
 
 .nav-videos {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  height: 120px;
+  height: 100vh;
   z-index: 18;
   overflow: hidden;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
@@ -1443,10 +1445,13 @@ body { animation: scrollColors 10s infinite; } @keyframes scrollColors { 0% { ba
 
 .alt-menu {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 19;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   backdrop-filter: blur(8px);
   background: linear-gradient(120deg, rgba(0,0,0,0.6), rgba(0,0,0,0.35));
@@ -1460,12 +1465,12 @@ body { animation: scrollColors 10s infinite; } @keyframes scrollColors { 0% { ba
 
 .alt-menu ul {
   list-style: none;
-  display: flex;
-  gap: clamp(12px, 2vw, 24px);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   margin: 0;
-  padding: 0 24px;
-  flex-wrap: wrap;
-  justify-content: center;
+  padding: clamp(12px, 3vw, 32px);
+  width: 100%;
+  gap: 10px;
 }
 
 .alt-menu a {
@@ -1483,6 +1488,8 @@ body { animation: scrollColors 10s infinite; } @keyframes scrollColors { 0% { ba
     inset 0 1px 0 rgba(255,255,255,0.12),
     0 10px 20px rgba(0,0,0,0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+  width: 100%;
 }
 
 .alt-menu a:hover {
@@ -1495,20 +1502,62 @@ body { animation: scrollColors 10s infinite; } @keyframes scrollColors { 0% { ba
 
 @media (max-width: 720px) {
   .alt-nav {
-    height: 100px;
-  }
-  .nav-videos {
-    height: 100px;
+    height: 100vh;
   }
   .nav-toggle {
     width: 64px;
     height: 56px;
   }
   .alt-menu ul {
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
   }
-  .alt-menu a {
-    font-size: 15px;
+}
+
+.nav-title {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Playfair Display", "Manrope", serif;
+  font-size: clamp(28px, 6vw, 56px);
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #c0c7d3;
+  text-shadow:
+    0 6px 16px rgba(0,0,0,0.6),
+    0 0 18px rgba(255,255,255,0.3);
+  background: linear-gradient(135deg, #e5e7ea, #bfc4ce, #f5f6fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-title::after {
+  content: attr(data-text);
+}
+
+.nav-title::before {
+  content: "VoiceToWebsite";
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.6);
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: title-draw 2.8s ease forwards, title-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes title-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes title-glow {
+  from {
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  }
+  to {
+    text-shadow: 0 0 24px rgba(255,255,255,0.7);
   }
 }
 
