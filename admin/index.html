@@ -67,10 +67,16 @@
               <button id="start" class="primary">Start Listening</button>
               <button id="stop" class="secondary">Stop</button>
               <button id="plan" class="ghost">Generate Plan</button>
-              <button id="apply" class="primary">Apply Live</button>
+              <button id="apply" class="primary" disabled>Apply Live</button>
+              <button id="undo" class="secondary">Undo Last Deploy</button>
             </div>
             <p class="muted">Mic: <span id="mic-state">Idle</span></p>
             <p class="muted">Example: "Update the headline to blue and rounded" or "Create a new page for /partners".</p>
+            <div class="plan-summary">
+              <p class="muted">Plan summary: <span id="plan-summary">No plan yet.</span></p>
+              <p class="muted">Type "ship it" to enable Apply:</p>
+              <input id="plan-confirm" type="text" placeholder="ship it" />
+            </div>
           </div>
           <div class="response-panel">
             <h3>Response</h3>

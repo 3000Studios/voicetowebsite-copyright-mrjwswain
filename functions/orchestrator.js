@@ -363,6 +363,29 @@ export async function onRequestPost(context) {
     return { commitSha: newCommit.sha };
   };
 
+  const revertLastCommit = async () => {
+    const { owner, repo } = getRepoParts();
+    const headRef = await githubRequest(`/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`);
+    const headSha = headRef.object.sha;
+    const headCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits/${headSha}`);
+    const parentSha = headCommit.parents?.[0]?.sha;
+    if (!parentSha) throw new Error("No parent commit to revert to.");
+    const parentCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits/${parentSha}`);
+    const revertCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits`, {
+      method: "POST",
+      body: JSON.stringify({
+        message: `Revert: ${headCommit.message || "latest deploy"}`,
+        tree: parentCommit.tree.sha,
+        parents: [headSha],
+      }),
+    });
+    await githubRequest(`/repos/${owner}/${repo}/git/refs/heads/${GITHUB_BASE_BRANCH}`, {
+      method: "PATCH",
+      body: JSON.stringify({ sha: revertCommit.sha }),
+    });
+    return { revertedTo: parentSha, revertCommit: revertCommit.sha };
+  };
+
   const logToDB = async ({ command, actions, files, commit }) => {
     const db = env.D1 || env.DB;
     if (!db) return;
@@ -525,6 +548,11 @@ export async function onRequestPost(context) {
     const payload = await request.json();
     const mode = payload.mode || "plan";
     const command = payload.command || "";
+
+    if (mode === "rollback_last") {
+      const result = await revertLastCommit();
+      return new Response(JSON.stringify({ mode, result }), { headers: { "Content-Type": "application/json" } });
+    }
 
     if (!OPENAI_API) {
       throw new Error("Missing OPENAI_API. Set the Cloudflare Worker secret: wrangler secret put OPENAI_API");

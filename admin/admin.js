@@ -6,6 +6,7 @@ const startBtn = document.getElementById("start");
 const stopBtn = document.getElementById("stop");
 const planBtn = document.getElementById("plan");
 const applyBtn = document.getElementById("apply");
+const undoBtn = document.getElementById("undo");
 const lockScreen = document.getElementById("lock-screen");
 const lockInput = document.getElementById("lock-input");
 const lockButton = document.getElementById("lock-button");
@@ -18,6 +19,8 @@ const previewFrame = document.getElementById("preview-frame");
 const activityList = document.getElementById("activity-list");
 const activityStatus = document.getElementById("activity-status");
 const refreshLogs = document.getElementById("refresh-logs");
+const planSummary = document.getElementById("plan-summary");
+const planConfirm = document.getElementById("plan-confirm");
 
 let recognition;
 let listening = false;
@@ -267,12 +270,22 @@ const callOrchestrator = async (payload) => {
 
 const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true";
 
+const updateApplyGate = () => {
+  const ok = (planConfirm?.value || "").trim().toLowerCase() === "ship it";
+  if (applyBtn) applyBtn.disabled = !ok;
+};
+
 const setLockedUI = (locked) => {
   lockScreen.style.display = locked ? "grid" : "none";
   adminShell.style.filter = locked ? "blur(8px)" : "none";
   [startBtn, stopBtn, planBtn, applyBtn, commandEl].forEach((el) => {
     if (el) el.disabled = locked;
   });
+  if (locked) {
+    if (applyBtn) applyBtn.disabled = true;
+  } else {
+    updateApplyGate();
+  }
   setStatus(locked ? "Locked" : "Unlocked");
 };
 
@@ -385,6 +398,7 @@ planBtn.addEventListener("click", async () => {
     const data = await callOrchestrator({ mode: "plan", command });
     lastPlan = data;
     setResponse(data);
+    if (planSummary) planSummary.textContent = data?.plan?.summary || "No summary";
     if (data.plan?.actions) {
       applyActionsPreview(data.plan.actions);
     }
@@ -411,6 +425,11 @@ applyBtn.addEventListener("click", async () => {
       }
       const data = await callOrchestrator({ mode: "plan", command: fallbackCommand });
       lastPlan = data;
+    }
+    if ((planConfirm?.value || "").trim().toLowerCase() !== "ship it") {
+      setResponse({ error: 'Type "ship it" to enable Apply.' });
+      speak("Type ship it to enable apply");
+      return;
     }
     setResponse({ status: "Applying live to production..." });
     const data = await callOrchestrator({ mode: "apply", plan: lastPlan.plan, command: lastPlan.command });
@@ -452,3 +471,26 @@ document.addEventListener("click", (event) => {
 });
 
 initPasscodeGate();
+updateApplyGate();
+if (planConfirm) {
+  planConfirm.addEventListener("input", updateApplyGate);
+}
+
+if (undoBtn) {
+  undoBtn.addEventListener("click", async () => {
+    try {
+      if (!isUnlocked()) {
+        setResponse({ error: "Unlock with the access code before undo." });
+        speak("Unlock required");
+        return;
+      }
+      setResponse({ status: "Reverting last deploy..." });
+      const data = await callOrchestrator({ mode: "rollback_last" });
+      setResponse(data);
+      speak("Revert complete");
+    } catch (err) {
+      setResponse({ error: err.message });
+      speak("Revert failed");
+    }
+  });
+}
