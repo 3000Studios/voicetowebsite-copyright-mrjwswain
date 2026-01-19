@@ -20,6 +20,7 @@
   <div class="bg-orb orb-1" aria-hidden="true"></div>
   <div class="bg-orb orb-2" aria-hidden="true"></div>
   <div class="bg-grid" aria-hidden="true"></div>
+
   <header class="site-header">
     <div class="nav-video">
       <video src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4" autoplay muted loop playsinline></video>
@@ -38,8 +39,8 @@
       <a href="store.html">Store</a>
       <a href="livestream.html">Live</a>
       <a href="/admin">Admin</a>
-      <a href="#legal">Legal</a>
-      <a href="#" id="contact-link">Contact</a>
+      <a href="legal.html">Legal</a>
+      <a href="contact.html">Contact</a>
     </nav>
     <div class="mobile-drawer" id="mobile-drawer">
       <video src="https://cdn.coverr.co/videos/coverr-future-is-calling-3845/1080p.mp4" autoplay muted loop playsinline></video>
@@ -48,172 +49,13 @@
       <a href="store.html">Store</a>
       <a href="livestream.html">Live</a>
       <a href="/admin">Admin</a>
-      <a href="#legal">Legal</a>
-      <a href="#" id="contact-link-mobile">Contact</a>
+      <a href="legal.html">Legal</a>
+      <a href="contact.html">Contact</a>
     </div>
     <button class="ghost-button">Book a Demo</button>
   </header>
 
-  <main class="page">
-    <section class="hero" id="offer">
-      <div class="hero-copy">
-        <p class="eyebrow" id="eyebrow"></p>
-        <h1 id="headline">get the CSS on the whole web site !!</h1>
-        <p class="subhead" id="subhead"></p>
-      </div>
-    </section>
-  
-    <section class="section custom-block" id="king-crown">
-      <h2>King's Crown</h2>
-      <p><img src="https://example.com/kings-crown.jpg" alt="King's Crown" /></p>
-    </section>
-  
-    <section class="section video-block" id="home-video">
-      <h2>Home Page Video</h2>
-      <video controls playsinline poster="https://img.youtube.com/vi/nvlTJrNJ5lA/hqdefault.jpg" style="width:100%;border-radius:16px;">
-        <source src="https://www.youtube.com/embed/nvlTJrNJ5lA?autoplay=1" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-    </section>
-  
-    <section class="section custom-block" id="microphone-settings">
-      <h2>Microphone Settings</h2>
-      <p>The microphone will remain active unless there is over 10 seconds of silence or the user presses 'Stop Listening'.</p>
-    </section>
-
-    <section class="section control reveal" id="control">
-      <div class="section-heading">
-        <p class="eyebrow">Command Center</p>
-        <h2>Voice Bot + Layout Lab</h2>
-        <p class="subhead">Search the web, drop media, animate text, and place blocks anywhere without pasting links.</p>
-      </div>
-
-      <div class="control-lock" id="control-lock">
-        <p><strong>Locked.</strong> Enter the access code to unlock live controls.</p>
-        <div class="control-lock-row">
-          <input type="password" id="control-password" placeholder="Access code" />
-          <button class="primary" id="unlock-control">Unlock</button>
-        </div>
-        <p class="control-lock-note" id="control-lock-note"></p>
-      </div>
-
-      <div class="control-grid" id="control-grid">
-        <div class="control-panel">
-          <h3>Commands</h3>
-          <p class="muted">Examples: "search for neon ui inspiration", "play a chill video about space", "animate the headline with glow", "add a hero section on partners page".</p>
-          <div class="panel-section">
-            <label for="command-input">Command</label>
-            <textarea id="command-input" rows="3" placeholder="Search for... / Play... / Style the headline..."></textarea>
-          </div>
-          <div class="panel-actions">
-            <button class="primary" id="start-voice">Start listening</button>
-            <button class="secondary" id="stop-voice">Stop</button>
-            <button class="ghost" id="run-command">Run</button>
-          </div>
-          <div class="panel-section field-grid">
-            <label>Headline<input id="headline-input" type="text" placeholder="Headline" /></label>
-            <label>Subhead<input id="subhead-input" type="text" placeholder="Subhead" /></label>
-            <label>CTA<input id="cta-input" type="text" placeholder="Button copy" /></label>
-            <label>Price<input id="price-input" type="text" placeholder="e.g. $199" /></label>
-          </div>
-          <div class="panel-section field-grid">
-            <label>Theme
-              <select id="theme-input">
-                <option value="ember">Ember</option>
-                <option value="ocean">Ocean</option>
-                <option value="volt">Volt</option>
-                <option value="midnight">Midnight</option>
-              </select>
-            </label>
-            <label>Metric 1<input id="metric1-input" type="text" placeholder="Metric 1" /></label>
-            <label>Metric 2<input id="metric2-input" type="text" placeholder="Metric 2" /></label>
-            <label>Metric 3<input id="metric3-input" type="text" placeholder="Metric 3" /></label>
-          </div>
-          <div class="panel-actions">
-            <button class="primary" id="apply">Apply text + metrics</button>
-          </div>
-          <p class="muted transcript" id="transcript">Idle</p>
-        </div>
-
-        <div class="control-panel">
-          <h3>Search & Media</h3>
-          <div class="panel-section">
-            <label for="placement-target">Place results into</label>
-            <div class="placement-row">
-              <select id="placement-target">
-                <option value="command-canvas">Command canvas</option>
-                <option value="main">Main page</option>
-                <option value="hero">Hero</option>
-                <option value="footer">Footer</option>
-              </select>
-              <input type="text" id="placement-custom" placeholder="Custom selector (e.g. #home-video)" />
-            </div>
-          </div>
-          <div class="search-results" id="search-results">
-            <p class="muted">Search results will appear here and auto-drop onto the canvas.</p>
-          </div>
-          <div class="media-player">
-            <div class="media-stage" id="media-stage">
-              <p class="muted">Media (video, audio, embeds) will load here.</p>
-            </div>
-            <div class="media-queue" id="media-queue"></div>
-          </div>
-        </div>
-
-        <div class="control-panel">
-          <h3>Layout Drops</h3>
-          <p class="muted">Anything you add can be placed on any section or page placeholder.</p>
-          <div class="layout-canvas" id="command-canvas"></div>
-          <div class="control-log">
-            <ul id="command-log"></ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-  <div>
-    <strong>VoiceToWebsite</strong>
-    <p>Revenue systems that never sleep.</p>
-    <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">
-      &copy; 2026 Mr. jwswain. All rights reserved.
-    </p>
-    <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem; max-width: 600px;">
-      The first ever voice-to-website system that goes the whole life cycle from idea to live site deployment all by voice.
-    </p>
-  </div>
-  <div class="footer-links">
-    <a href="#offer">Offer</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#control">Control Panel</a>
-    <a href="#" id="contact-footer">Contact</a>
-  </div>
-</footer>
-
-
-  <div class="modal" id="contact-modal" aria-hidden="true">
-    <div class="modal-inner">
-      <button class="modal-close" id="contact-close">&times;</button>
-      <h2>Contact VoiceToWebsite</h2>
-      <form class="contact-form">
-        <label>Name<input type="text" placeholder="Your name" /></label>
-        <label>Email<input type="email" placeholder="you@example.com" /></label>
-        <label>Phone<input type="tel" placeholder="+1 555 123 4567" /></label>
-        <label>Message<textarea rows="4" placeholder="Tell us what you need"></textarea></label>
-        <button type="submit" class="primary">Send</button>
-      </form>
-    </div>
-  </div>
-
-  <div class="ticker" id="ticker" aria-live="polite">
-    <span id="ticker-data">Loading markets...</span>
-  </div>
-
-  <button class="audio-toggle" id="audio-toggle" aria-label="Next track">🔊</button>
-
-
-<script>
+  <script>
   // 3D canvas wallpaper for VoiceToWebsite.com
   const canvas = document.getElementById("bg-canvas");
   const ctx = canvas.getContext("2d");
@@ -695,8 +537,6 @@
   animate();
 </script>
 
-
-  <script type="module" src="app.js"></script>
   <script type="module" src="nav.js"></script>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </body>

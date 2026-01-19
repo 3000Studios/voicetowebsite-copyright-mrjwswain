@@ -364,9 +364,10 @@ export async function onRequestPost(context) {
   };
 
   const logToDB = async ({ command, actions, files, commit }) => {
-    if (!env.DB) return;
+    const db = env.D1 || env.DB;
+    if (!db) return;
     try {
-      await env.DB.prepare(
+      await db.prepare(
         `CREATE TABLE IF NOT EXISTS commands (
            id INTEGER PRIMARY KEY AUTOINCREMENT,
            ts DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -376,7 +377,7 @@ export async function onRequestPost(context) {
            commit TEXT
          );`
       ).run();
-      await env.DB.prepare(
+      await db.prepare(
         "INSERT INTO commands (command, actions, files, commit) VALUES (?, ?, ?, ?)"
       )
         .bind(command, JSON.stringify(actions || []), JSON.stringify(files || []), commit || "")

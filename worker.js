@@ -45,11 +45,11 @@ export default {
 
     // Admin activity logs (read-only)
     if (url.pathname === "/admin/logs" && request.method === "GET") {
-      if (!env.DB) {
+      if (!env.D1) {
         return jsonResponse(503, { error: "D1 database not available." });
       }
       try {
-        await env.DB.prepare(
+        await env.D1.prepare(
           `CREATE TABLE IF NOT EXISTS commands (
              id INTEGER PRIMARY KEY AUTOINCREMENT,
              ts DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -60,7 +60,7 @@ export default {
            );`
         ).run();
 
-        const data = await env.DB.prepare(
+        const data = await env.D1.prepare(
           "SELECT id, ts, command, actions, files, commit FROM commands ORDER BY ts DESC LIMIT 20"
         ).all();
 

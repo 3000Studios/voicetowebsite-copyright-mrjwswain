@@ -17,9 +17,9 @@ binding = "ASSETS"
 binding = "D1"
 database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
 
-# [[kv_namespaces]]
-# binding = "LEARN"
-# id = "e61605d144ac4348a72b7e85afc6c185"
+[[kv_namespaces]]
+binding = "KV"
+id = "e61605d144ac4348a72b7e85afc6c185"
 
 [observability]
 enabled = false
