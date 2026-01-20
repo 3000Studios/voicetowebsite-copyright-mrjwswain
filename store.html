@@ -42,6 +42,46 @@
   </header>
 
   <main class="page">
+    <section class="section commerce-dashboard">
+      <div class="dashboard-top">
+        <div>
+          <p class="eyebrow">Store Control</p>
+          <h2>Commerce Dashboard</h2>
+          <p class="subhead">Search across Store plans and App Store drops without leaving this page.</p>
+        </div>
+      </div>
+      <div class="dash-kpis">
+        <div class="kpi-card">
+          <span class="kpi-label">Store SKUs</span>
+          <span class="kpi-value">4 live</span>
+          <span class="kpi-sub">Plans on this page</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">App Store</span>
+          <span class="kpi-value">4 apps</span>
+          <span class="kpi-sub">Available to ship</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Checkout</span>
+          <span class="kpi-value">PayPal + Stripe</span>
+          <span class="kpi-sub">Ready to route</span>
+        </div>
+      </div>
+      <div class="search-panels">
+        <div class="search-card">
+          <div class="search-label">Store search</div>
+          <input id="storeSearch" type="search" placeholder="Search store plans (Starter, Growth, Enterprise, Lifetime)" />
+          <p class="search-hint">Filters the Store pricing cards below in real time.</p>
+        </div>
+        <div class="search-card">
+          <div class="search-label">App Store search</div>
+          <input id="appSearch" type="search" placeholder="Search App Store inventory (Platinum Voice, Automation Kit...)" />
+          <div id="appSearchResults" class="search-results">
+            <p class="muted">Start typing to surface App Store offers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
     <section class="section">
       <h2>Storefront</h2>
       <p class="subhead">Subscription-ready plans and one-time app purchase options.</p>
@@ -204,6 +244,61 @@
     document.querySelectorAll(".pay-btn").forEach((btn) => {
       btn.addEventListener("click", () => handlePayPal(btn));
     });
+
+    const storeSearch = document.getElementById("storeSearch");
+    const storeCards = Array.from(document.querySelectorAll(".pricing-deck .card"));
+    const deck = document.querySelector(".pricing-deck");
+    const filterStore = () => {
+      if (!storeSearch) return;
+      const term = storeSearch.value.trim().toLowerCase();
+      let visible = 0;
+      storeCards.forEach((card) => {
+        const match = term === "" || card.innerText.toLowerCase().includes(term);
+        card.style.display = match ? "" : "none";
+        if (match) visible += 1;
+      });
+      if (deck) {
+        deck.dataset.matches = String(visible);
+      }
+    };
+    storeSearch?.addEventListener("input", filterStore);
+    filterStore();
+
+    const appSearch = document.getElementById("appSearch");
+    const appResults = document.getElementById("appSearchResults");
+    const appInventory = [
+      { name: "Platinum Voice Site", price: "$199/mo", link: "appstore.html" },
+      { name: "Automation Kit", price: "$149/mo", link: "appstore.html" },
+      { name: "Livestream Pack", price: "$89/mo", link: "appstore.html" },
+      { name: "Support Retainer", price: "$99/mo", link: "appstore.html" },
+    ];
+
+    const renderAppResults = (term = "") => {
+      if (!appResults) return;
+      const query = term.trim().toLowerCase();
+      const matches = query
+        ? appInventory.filter((item) => item.name.toLowerCase().includes(query))
+        : appInventory;
+      if (!matches.length) {
+        appResults.innerHTML = `<p class="muted">No App Store items match yet.</p>`;
+        return;
+      }
+      appResults.innerHTML = matches
+        .map(
+          (item) => `
+          <div class="search-result">
+            <div>
+              <div class="result-title">${item.name}</div>
+              <div class="result-price">${item.price}</div>
+            </div>
+            <a class="result-link" href="${item.link}">Open</a>
+          </div>`
+        )
+        .join("");
+    };
+
+    appSearch?.addEventListener("input", (e) => renderAppResults(e.target.value));
+    renderAppResults();
   </script>
   <script type="module" src="nav.js"></script>
 </body>

@@ -5,48 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>VoiceToWebsite Admin</title>
   <meta name="description" content="Voice-driven admin console for VoiceToWebsite." />
+  <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="./admin.css" />
 </head>
 <body>
-  <input type="checkbox" id="admin-nav-toggle" class="admin-nav-toggle" aria-hidden="true" />
   <div class="admin-video-bg" aria-hidden="true">
-    <video src="https://cdn.coverr.co/videos/coverr-glowing-wireframe-6067/1080p.mp4" autoplay muted loop playsinline></video>
+    <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" autoplay muted loop playsinline></video>
   </div>
-  <header class="site-nav">
-    <div class="brand">
-      <span class="brand-mark">VW</span>
-      <div class="brand-text">
-        <strong>VoiceToWebsite</strong>
-        <span>Revenue Engine</span>
-      </div>
-    </div>
-    <label class="admin-nav-btn" for="admin-nav-toggle" aria-label="Toggle navigation">
-      <span></span>
-    </label>
-    <nav class="nav">
-      <a href="/index.html">Home</a>
-      <a href="/admin">Admin</a>
-      <a href="/contact.html" id="nav-contact">Contact</a>
-    </nav>
-  </header>
-
-  <section class="status-grid" aria-live="polite">
-    <div class="status-card">
-      <div class="status-label">Session</div>
-      <div class="status-value" id="session-state">Locked</div>
-      <p class="muted small">Unlock with the access code to enable commands.</p>
-    </div>
-    <div class="status-card">
-      <div class="status-label">Voice Orchestrator</div>
-      <div class="status-value" id="orchestrator-state">Checking...</div>
-      <p class="muted small">Cloud + local fallback awareness.</p>
-    </div>
-    <div class="status-card">
-      <div class="status-label">Preview Mode</div>
-      <div class="status-value" id="preview-mode">Idle</div>
-      <p class="muted small">Shows whether cloud or local preview is active.</p>
-    </div>
-  </section>
 
   <div class="lock-screen" id="lock-screen">
     <div class="lock-card">
@@ -80,8 +45,16 @@
 
     <main class="admin-grid">
       <section class="card wide" id="control-card">
-        <h2>Command Center</h2>
-        <p class="muted" id="status">Locked</p>
+        <div class="card-head">
+          <div>
+            <h2>Command Center</h2>
+            <p class="muted" id="status">Locked</p>
+          </div>
+          <div class="status-strip">
+            <span class="status-chip" id="mic-state">Idle</span>
+            <span class="status-chip warn" id="preview-mode">Preview idle</span>
+          </div>
+        </div>
         <div class="quick-commands" id="quick-commands">
           <span class="quick-label">Templates:</span>
           <button class="chip" type="button" data-command="Update the headline to a neon gradient and set theme ocean.">Hero refresh</button>
@@ -91,31 +64,35 @@
         </div>
         <div class="control-box">
           <div class="control-main">
+            <label class="field-label" for="command">Speak or type a command</label>
             <textarea id="command" rows="6" placeholder="Speak or type a command..."></textarea>
-            <div class="button-row">
+            <div class="button-grid">
               <button id="start" class="primary">Start Listening</button>
               <button id="stop" class="secondary">Stop</button>
               <button id="plan" class="ghost">Generate Plan</button>
               <button id="apply" class="primary" disabled>Apply Live</button>
               <button id="undo" class="secondary">Undo Last Deploy</button>
             </div>
-            <p class="muted">Mic: <span id="mic-state">Idle</span></p>
-            <p class="muted">Example: "Update the headline to blue and rounded" or "Create a new page for /partners".</p>
-            <div class="plan-summary">
-              <p class="muted">Plan summary: <span id="plan-summary">No plan yet.</span></p>
-              <p class="muted">Type "ship it" to enable Apply:</p>
-              <input id="plan-confirm" type="text" placeholder="ship it" />
+            <div class="help-grid">
+              <div class="help-card">
+                <div class="hint-title">Examples</div>
+                <p class="muted">"Update the headline to blue and rounded" or "Create a new page for /partners".</p>
+              </div>
+              <div class="help-card">
+                <div class="hint-title">Plan gating</div>
+                <p class="muted">Plan summary: <span id="plan-summary">No plan yet.</span></p>
+                <label class="muted" for="plan-confirm">Type "ship it" to enable Apply:</label>
+                <input id="plan-confirm" type="text" placeholder="ship it" />
+              </div>
             </div>
           </div>
           <div class="response-panel">
-            <div class="response-meta">
-              <span class="status-chip" id="response-source">Awaiting command</span>
+            <div class="panel-head">
+              <span class="status-chip warn" id="response-source">Awaiting command</span>
+              <button class="ghost small" id="refresh-logs">Refresh History</button>
             </div>
             <h3>Response</h3>
             <pre id="response">{}</pre>
-            <div class="button-row">
-              <button id="refresh-logs" class="ghost">Refresh History</button>
-            </div>
             <ul class="activity-list" id="activity-list"></ul>
             <p class="muted" id="activity-status"></p>
           </div>
@@ -205,5 +182,6 @@
   </div>
 
   <script type="module" src="./admin.js"></script>
+  <script type="module" src="/nav.js"></script>
 </body>
 </html>
