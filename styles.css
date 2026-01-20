@@ -2,17 +2,23 @@
 
 :root {
   color-scheme: dark;
-  --bg: #050505;
-  --card: rgba(16, 16, 16, 0.65);
-  --glass: rgba(0, 0, 0, 0.45);
-  --border: rgba(255, 255, 255, 0.1);
-  --text: #c9ced7;
-  --muted: #aab1bd;
-  --shine: linear-gradient(135deg, #ffffff, #94a3b8, #ffffff);
-  --accent: #ff63c8;
-  --spectral-card: rgba(10, 12, 18, 0.82);
-  --spectral-cyan: #00f2ff;
-  --spectral-purple: #7000ff;
+  --bg: #05070a;
+  --card: rgba(12, 15, 20, 0.72);
+  --glass: rgba(6, 12, 18, 0.55);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #f5f3ee;
+  --muted: #9aa3ad;
+  --shine: linear-gradient(135deg, #fdfcf8, #d4af37, #fdfcf8);
+  --accent: #d4af37;
+  --accent-white: #fdfcf8;
+  --accent-gold: #d4af37;
+  --accent-emerald: #0f5e4a;
+  --accent-emerald-bright: #1ccf9c;
+  --stone-gray: #6f7780;
+  --ash: #4d545a;
+  --spectral-card: rgba(10, 13, 18, 0.86);
+  --spectral-cyan: #fdfcf8;
+  --spectral-purple: #d4af37;
 }
 
 *,
@@ -24,10 +30,43 @@
 body {
   margin: 0;
   font-family: "Playfair Display", serif;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(10, 30, 45, 0.5), transparent 45%),
+    radial-gradient(circle at 85% 10%, rgba(6, 18, 30, 0.6), transparent 50%),
+    linear-gradient(135deg, rgba(3, 6, 10, 0.95), rgba(7, 14, 24, 0.9));
   color: var(--text);
   overflow-x: hidden;
+  position: relative;
+  line-height: 1.55;
   text-shadow: 0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.04), transparent 55%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 7px);
+  opacity: 0.65;
+  z-index: -3;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(28, 207, 156, 0.18) 0%, transparent 30%),
+    radial-gradient(circle at 75% 20%, rgba(15, 94, 74, 0.2) 0%, transparent 34%),
+    radial-gradient(circle at 35% 75%, rgba(28, 207, 156, 0.12) 0%, transparent 36%);
+  opacity: 0.6;
+  mix-blend-mode: screen;
+  animation: fizz-drift 18s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
 }
 
 h1,
@@ -72,9 +111,10 @@ h3,
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, rgba(5, 9, 14, 0.92), rgba(15, 24, 34, 0.72));
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
   mask-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12.21 10.57'%3E%3Cpath fill='%23ffffff' d='M6.1 0h6.11L9.16 5.29 6.1 10.57 3.05 5.29 0 0h6.1z'/%3E%3C/svg%3E"),
     linear-gradient(black calc(100% - 28px), transparent calc(100% - 10px));
@@ -116,8 +156,8 @@ h3,
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 12px #fff;
+  background: var(--accent-white);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.7);
 }
 
 .nav-links {
@@ -126,6 +166,20 @@ h3,
   gap: 1.2rem;
   font-size: 0.95rem;
   justify-self: center;
+}
+
+.page {
+  padding: clamp(5.5rem, 10vw, 7.5rem) 6vw 4rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.section {
+  width: 100%;
+}
+
+.section + .section {
+  margin-top: 1.5rem;
 }
 
 body:not(.nav-ready) .glass-nav,
@@ -873,7 +927,7 @@ body:not(.nav-ready) .site-header {
   top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(90deg, #00f0ff, #4cc9ff, #00f0ff);
+  background: linear-gradient(90deg, var(--accent-white), var(--accent-gold), var(--accent-white));
   background-size: 200% 100%;
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition: width 0.3s ease, box-shadow 0.3s ease;
@@ -887,28 +941,28 @@ body:not(.nav-ready) .site-header {
 .nav-links a:hover::before {
   top: -0.2em;
   left: 0;
-  color: #00e1ff;
+  color: var(--accent-gold);
 }
 
 .nav-links a:hover::after {
   width: 120%;
   box-shadow:
-    0 0 12px rgba(0, 225, 255, 0.7),
-    0 0 24px rgba(0, 225, 255, 0.35);
+    0 0 12px rgba(212, 175, 55, 0.7),
+    0 0 24px rgba(255, 255, 255, 0.35);
   animation: spark-move 0.6s linear infinite;
 }
 
 .nav-links a.electrify {
   animation: nav-electrify 1s ease-in-out;
   text-shadow:
-    0 0 12px #00e1ff,
-    0 0 22px #ff63c8;
+    0 0 12px var(--accent-white),
+    0 0 22px var(--accent-gold);
 }
 
 @keyframes nav-electrify {
-  0% { text-shadow: 0 0 6px #00e1ff; }
-  50% { text-shadow: 0 0 16px #ff63c8, 0 0 28px #00e1ff; }
-  100% { text-shadow: 0 0 6px #00e1ff; }
+  0% { text-shadow: 0 0 6px var(--accent-white); }
+  50% { text-shadow: 0 0 16px var(--accent-gold), 0 0 28px var(--accent-white); }
+  100% { text-shadow: 0 0 6px var(--accent-white); }
 }
 
 @keyframes spark-move {
