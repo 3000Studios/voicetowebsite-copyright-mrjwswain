@@ -102,6 +102,7 @@
   const init = () => {
     injectNav();
     electrifyLinks();
+    spectralizeCards();
   };
 
   const electrifyLinks = () => {
@@ -115,6 +116,54 @@
       setTimeout(tick, 2400 + Math.random() * 1200);
     };
     setTimeout(tick, 1800);
+  };
+
+  const cardSelectors = [
+    ".feature-card",
+    ".step-card",
+    ".lineup-card",
+    ".lineup-grid article",
+    ".blog-card",
+    ".story-card",
+    ".price-card",
+    ".card.luxe",
+    ".card-3000",
+    ".cards-3000 .card-3000",
+    ".race-card",
+    ".kpi-card",
+    ".search-card",
+    ".secret-card",
+    ".help-card",
+    ".appstore .product-card",
+    ".admin-grid .card",
+    ".lock-card",
+    ".crystal-card",
+  ];
+
+  const spectralizeCards = () => {
+    const seen = new Set();
+    cardSelectors.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((el) => {
+        if (seen.has(el)) return;
+        seen.add(el);
+        el.classList.add("spectral-card");
+        el.addEventListener("mousemove", handleGlow, { passive: true });
+        el.addEventListener("mouseleave", resetGlow, { passive: true });
+      });
+    });
+  };
+
+  const handleGlow = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    event.currentTarget.style.setProperty("--glow-x", `${x}%`);
+    event.currentTarget.style.setProperty("--glow-y", `${y}%`);
+  };
+
+  const resetGlow = (event) => {
+    event.currentTarget.style.removeProperty("--glow-x");
+    event.currentTarget.style.removeProperty("--glow-y");
   };
 
   if (document.readyState === "loading") {
