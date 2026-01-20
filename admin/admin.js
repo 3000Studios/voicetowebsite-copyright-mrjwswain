@@ -31,6 +31,15 @@ const adminLiveUrl = document.getElementById("admin-live-url");
 const adminLiveLoad = document.getElementById("admin-live-load");
 const adminLiveSave = document.getElementById("admin-live-save");
 const adminLiveClips = document.getElementById("admin-live-clips");
+const appTableBody = document.getElementById("app-table-body");
+const appForm = document.getElementById("app-form");
+const appClear = document.getElementById("app-clear");
+const appsReset = document.getElementById("apps-reset");
+const appsCount = document.getElementById("apps-count");
+const appsSales = document.getElementById("apps-sales");
+const kpiApps = document.getElementById("kpi-apps");
+const kpiMrr = document.getElementById("kpi-mrr");
+const kpiNew = document.getElementById("kpi-new");
 
 let recognition;
 let listening = false;
@@ -673,3 +682,92 @@ if (undoBtn) {
     }
   });
 }
+
+// App Store manager (local storage placeholders)
+const loadApps = () => JSON.parse(localStorage.getItem("vtw-apps") || "[]");
+const saveApps = (apps) => localStorage.setItem("vtw-apps", JSON.stringify(apps.slice(0, 50)));
+
+const seedApps = () => ([
+  { title: "Platinum Voice Site", price: 199, tag: "Voice", sales: 128, desc: "Full voice-first website with admin console.", link: "store.html#platinum", ts: new Date().toISOString() },
+  { title: "Automation Kit", price: 149, tag: "Automation", sales: 96, desc: "Lead capture and CRM sync automations.", link: "store.html#automation", ts: new Date().toISOString() },
+  { title: "Livestream Pack", price: 89, tag: "Media", sales: 62, desc: "Streaming embeds, promo blocks, and scheduling.", link: "store.html#livestream", ts: new Date().toISOString() },
+]);
+
+const renderApps = () => {
+  if (!appTableBody) return;
+  const apps = loadApps();
+  appTableBody.innerHTML = "";
+  apps.forEach((app, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div class="app-title">${app.title}</div>
+        <div class="muted small">${app.desc || ""}</div>
+      </td>
+      <td>$${Number(app.price || 0).toFixed(0)}</td>
+      <td>${app.tag || "—"}</td>
+      <td>${app.sales || 0}</td>
+      <td><button class="ghost small" data-remove="${idx}">Remove</button></td>
+    `;
+    appTableBody.appendChild(tr);
+  });
+  if (!apps.length) {
+    appTableBody.innerHTML = `<tr><td colspan="5" class="muted">No apps yet.</td></tr>`;
+  }
+  updateAppKpis(apps);
+};
+
+const updateAppKpis = (apps = loadApps()) => {
+  const count = apps.length;
+  const mrr = apps.reduce((sum, app) => sum + Number(app.price || 0), 0);
+  const sales = apps.reduce((sum, app) => sum + Number(app.sales || 0), 0);
+  if (appsCount) appsCount.textContent = `${count} apps`;
+  if (appsSales) appsSales.textContent = `$${sales} sales`;
+  if (kpiApps) kpiApps.textContent = count;
+  if (kpiMrr) kpiMrr.textContent = `$${mrr}`;
+  if (kpiNew) kpiNew.textContent = Math.max(0, Math.min(count, 3));
+};
+
+appTableBody?.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-remove]");
+  if (!btn) return;
+  const idx = Number(btn.getAttribute("data-remove"));
+  const apps = loadApps().filter((_, i) => i !== idx);
+  saveApps(apps);
+  renderApps();
+});
+
+appForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const formData = new FormData(appForm);
+  const app = {
+    title: formData.get("title")?.toString() || "",
+    price: Number(formData.get("price") || 0),
+    tag: formData.get("tag")?.toString() || "",
+    sales: Number(formData.get("sales") || 0),
+    desc: formData.get("desc")?.toString() || "",
+    link: formData.get("link")?.toString() || "",
+    ts: new Date().toISOString(),
+  };
+  const apps = loadApps();
+  apps.unshift(app);
+  saveApps(apps);
+  renderApps();
+  appForm.reset();
+  updateAppKpis(apps);
+});
+
+appClear?.addEventListener("click", () => {
+  appForm?.reset();
+});
+
+appsReset?.addEventListener("click", () => {
+  saveApps(seedApps());
+  renderApps();
+});
+
+// init app manager defaults
+if (!loadApps().length) {
+  saveApps(seedApps());
+}
+renderApps();
