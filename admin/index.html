@@ -44,8 +44,31 @@
       <a href="#store-manager">Store Manager</a>
     </nav>
 
+    <section class="admin-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Admin landing</p>
+        <h2>Welcome back, Admin</h2>
+        <p class="muted">Quick-launch the consoles you need. Backgrounds are tailored per workspace.</p>
+      </div>
+      <div class="menu" id="admin-menu">
+        <div class="btn trigger">
+          <span class="line"></span>
+        </div>
+        <div class="icons">
+          <div class="rotater"><a class="btn btn-icon" href="#control-card" aria-label="Voice Commands">🎙️</a></div>
+          <div class="rotater"><a class="btn btn-icon" href="#analytics" aria-label="Web Analytics">📊</a></div>
+          <div class="rotater"><a class="btn btn-icon" href="/admin/analytics.html" aria-label="Analytics full page">🛰️</a></div>
+          <div class="rotater"><a class="btn btn-icon" href="#livestream-setup" aria-label="Live Stream Setup">📡</a></div>
+          <div class="rotater"><a class="btn btn-icon" href="#app-manager" aria-label="App Store Manager">🛍️</a></div>
+          <div class="rotater"><a class="btn btn-icon" href="#store-manager" aria-label="Store Manager">🏪</a></div>
+          <div class="rotater"><a class="btn btn-icon" href="/the3000.html" aria-label="3000 Portal">💎</a></div>
+          <div class="rotater"><a class="btn btn-icon" href="/race3000.html" aria-label="Race to 3000">🎮</a></div>
+        </div>
+      </div>
+    </section>
+
     <main class="admin-grid">
-      <section class="card wide" id="control-card">
+      <section class="card wide" id="control-card" style="background-image:linear-gradient(rgba(0,0,0,0.65),rgba(0,0,0,0.65)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4');background-size:cover;background-position:center;">
         <div class="card-head">
           <div>
             <h2>Command Center</h2>
@@ -117,12 +140,12 @@
         </div>
       </section>
 
-      <section class="card" id="analytics">
+      <section class="card" id="analytics" style="background-image:linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)),url('https://res.cloudinary.com/dj92eb97f/image/upload/v1768852097/Firefly_Gemini_Flash_Create_the_best_logo_that_is_ultra_hi_resolution_3d_text_with_no_background_with_the_172544_ihg0wl.png');background-size:cover;background-position:center;">
         <h2>Web Analytics</h2>
         <p class="muted">Full-site stats dashboard placeholder. Connect your analytics source here.</p>
       </section>
 
-      <section class="card" id="livestream-setup">
+      <section class="card" id="livestream-setup" style="background-image:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.55)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986161/Fire_jlrw9r.mp4');background-size:cover;background-position:center;">
         <h2>Live Stream Setup</h2>
         <p class="muted">Configure your live stream destinations and embeds.</p>
         <div class="live-admin">
@@ -142,7 +165,7 @@
         </div>
       </section>
 
-      <section class="card wide" id="app-manager">
+      <section class="card wide" id="app-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4');background-size:cover;background-position:center;">
         <div class="card-head">
           <div>
             <p class="eyebrow">Apps</p>
@@ -231,7 +254,7 @@
         </div>
       </section>
 
-      <section class="card" id="store-manager">
+      <section class="card" id="store-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986144/bluechain_rzflnz.mp4');background-size:cover;background-position:center;">
         <h2>Store Manager</h2>
         <p class="muted">Manage products, pricing, and offers.</p>
       </section>
@@ -239,6 +262,15 @@
   </div>
 
   <script type="module" src="./admin.js"></script>
+  <script>
+    (() => {
+      const menu = document.getElementById("admin-menu");
+      const trigger = menu?.querySelector(".trigger");
+      trigger?.addEventListener("click", () => {
+        menu.classList.toggle("active");
+      });
+    })();
+  </script>
   <script type="module" src="/nav.js"></script>
 </body>
 </html>
