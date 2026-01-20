@@ -760,3 +760,91 @@ h3,
     grid-template-columns: 1fr;
   }
 }
+
+/* App Store product highlight */
+.appstore .product-highlight {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 0;
+}
+
+.appstore .product-card {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.6rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+}
+
+.appstore .product-card .pill.sale {
+  display: inline-flex;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff63c8, #f1b35a);
+  color: #0b0b0b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+
+.appstore .price-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin: 0.8rem 0 1rem;
+}
+
+.appstore .price {
+  font-size: 2.4rem;
+  font-weight: 800;
+}
+
+.appstore .unit {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.appstore .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.4rem 0 1.2rem;
+}
+
+.appstore .primary {
+  background: var(--shine);
+  color: #0b0b0b;
+  border-radius: 12px;
+  border: 0;
+  padding: 0.75rem 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.appstore .ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.appstore .product-points {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.appstore .product-points li::before {
+  content: "•";
+  margin-right: 0.4rem;
+  color: #ff63c8;
+}

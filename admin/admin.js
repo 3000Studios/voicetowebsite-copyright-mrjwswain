@@ -21,11 +21,17 @@ const activityStatus = document.getElementById("activity-status");
 const refreshLogs = document.getElementById("refresh-logs");
 const planSummary = document.getElementById("plan-summary");
 const planConfirm = document.getElementById("plan-confirm");
+const sessionStateEl = document.getElementById("session-state");
+const orchestratorStateEl = document.getElementById("orchestrator-state");
+const previewModeEl = document.getElementById("preview-mode");
+const responseSourceEl = document.getElementById("response-source");
+const quickCommandsEl = document.getElementById("quick-commands");
 
 let recognition;
 let listening = false;
 let inactivityTimer = null;
 let lastPlan = null;
+let orchestratorHealthy = true;
 
 const PASSCODE = "5555";
 const UNLOCK_KEY = "yt-admin-unlocked";
@@ -51,6 +57,30 @@ const setStatus = (text) => {
 
 const setResponse = (payload) => {
   if (responseEl) responseEl.textContent = JSON.stringify(payload, null, 2);
+};
+
+const setStatusChip = (el, text, tone = "ok") => {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove("ok", "warn", "alert");
+  if (tone) el.classList.add(tone);
+};
+
+const setPreviewMode = (mode = "Idle", tone = "warn") => {
+  setStatusChip(previewModeEl, mode, tone);
+};
+
+const markResponseSource = (data) => {
+  const local = Boolean(data?.local);
+  if (local) {
+    setStatusChip(responseSourceEl, "Local preview (offline)", "warn");
+    setPreviewMode("Local preview", "warn");
+    setStatusChip(orchestratorStateEl, "Offline (fallback)", "warn");
+  } else {
+    setStatusChip(responseSourceEl, "Cloud orchestrator", "ok");
+    setPreviewMode("Cloud preview", "ok");
+    setStatusChip(orchestratorStateEl, "Online", "ok");
+  }
 };
 
 const speak = (text) => {
@@ -332,10 +362,16 @@ const callOrchestrator = async (payload) => {
     if (!res.ok) {
       throw new Error(data.error || text || "Request failed");
     }
+    orchestratorHealthy = true;
+    setStatusChip(orchestratorStateEl, "Online", "ok");
     return data;
   } catch (err) {
+    orchestratorHealthy = false;
     console.warn("Orchestrator unavailable, using local plan:", err.message);
-    return buildLocalPlan(payload);
+    setStatusChip(orchestratorStateEl, "Offline (fallback)", "warn");
+    const fallback = buildLocalPlan(payload);
+    setPreviewMode("Local preview", "warn");
+    return fallback;
   }
 };
 
@@ -354,8 +390,10 @@ const setLockedUI = (locked) => {
   });
   if (locked) {
     if (applyBtn) applyBtn.disabled = true;
+    setStatusChip(sessionStateEl, "Locked", "warn");
   } else {
     updateApplyGate();
+    setStatusChip(sessionStateEl, "Unlocked", "ok");
   }
   setStatus(locked ? "Locked" : "Unlocked");
 };
@@ -467,6 +505,7 @@ planBtn.addEventListener("click", async () => {
     setResponse({ status: "Planning..." });
     applyLocalPreview(command);
     const data = await callOrchestrator({ mode: "plan", command });
+    markResponseSource(data);
     lastPlan = data;
     setResponse(data);
     if (planSummary) planSummary.textContent = data?.plan?.summary || "No summary";
@@ -495,6 +534,7 @@ applyBtn.addEventListener("click", async () => {
         return;
       }
       const data = await callOrchestrator({ mode: "plan", command: fallbackCommand });
+      markResponseSource(data);
       lastPlan = data;
     }
     if ((planConfirm?.value || "").trim().toLowerCase() !== "ship it") {
@@ -504,6 +544,7 @@ applyBtn.addEventListener("click", async () => {
     }
     setResponse({ status: "Applying live to production..." });
     const data = await callOrchestrator({ mode: "apply", plan: lastPlan.plan, command: lastPlan.command });
+    markResponseSource(data);
     setResponse(data);
     logActivity();
   } catch (err) {
@@ -551,6 +592,22 @@ document.addEventListener("click", (event) => {
     });
   });
 })();
+
+if (quickCommandsEl) {
+  quickCommandsEl.querySelectorAll("[data-command]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const cmd = btn.getAttribute("data-command") || "";
+      commandEl.value = cmd;
+      commandEl.focus();
+      applyLocalPreview(cmd);
+      setStatusChip(responseSourceEl, "Template loaded", "ok");
+    });
+  });
+}
+
+setStatusChip(orchestratorStateEl, "Checking...", "warn");
+setPreviewMode("Idle", "warn");
+setStatusChip(responseSourceEl, "Awaiting command", "warn");
 
 initPasscodeGate();
 updateApplyGate();

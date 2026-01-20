@@ -30,6 +30,24 @@
     </nav>
   </header>
 
+  <section class="status-grid" aria-live="polite">
+    <div class="status-card">
+      <div class="status-label">Session</div>
+      <div class="status-value" id="session-state">Locked</div>
+      <p class="muted small">Unlock with the access code to enable commands.</p>
+    </div>
+    <div class="status-card">
+      <div class="status-label">Voice Orchestrator</div>
+      <div class="status-value" id="orchestrator-state">Checking...</div>
+      <p class="muted small">Cloud + local fallback awareness.</p>
+    </div>
+    <div class="status-card">
+      <div class="status-label">Preview Mode</div>
+      <div class="status-value" id="preview-mode">Idle</div>
+      <p class="muted small">Shows whether cloud or local preview is active.</p>
+    </div>
+  </section>
+
   <div class="lock-screen" id="lock-screen">
     <div class="lock-card">
       <h2>Enter access code</h2>
@@ -64,6 +82,13 @@
       <section class="card wide" id="control-card">
         <h2>Command Center</h2>
         <p class="muted" id="status">Locked</p>
+        <div class="quick-commands" id="quick-commands">
+          <span class="quick-label">Templates:</span>
+          <button class="chip" type="button" data-command="Update the headline to a neon gradient and set theme ocean.">Hero refresh</button>
+          <button class="chip" type="button" data-command="Add a livestream embed from https://www.youtube.com/embed/dQw4w9WgXcQ">Add livestream</button>
+          <button class="chip" type="button" data-command="Change the CTA to Book a demo and set the background video to https://cdn.coverr.co/videos/coverr-flying-over-the-mountains-1259/1080p.mp4">CTA + background</button>
+          <button class="chip" type="button" data-command="Update the font to Space Grotesk and set the subhead to Built with AI in real-time.">Font + copy</button>
+        </div>
         <div class="control-box">
           <div class="control-main">
             <textarea id="command" rows="6" placeholder="Speak or type a command..."></textarea>
@@ -83,6 +108,9 @@
             </div>
           </div>
           <div class="response-panel">
+            <div class="response-meta">
+              <span class="status-chip" id="response-source">Awaiting command</span>
+            </div>
             <h3>Response</h3>
             <pre id="response">{}</pre>
             <div class="button-row">
