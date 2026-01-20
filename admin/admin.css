@@ -26,7 +26,35 @@ body {
   background: linear-gradient(180deg, rgba(5, 7, 10, 0.72), rgba(5, 7, 10, 0.45)), var(--bg);
   color: var(--text);
   min-height: 100vh;
+  line-height: 1.55;
   text-shadow: 0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.04), transparent 55%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 7px);
+  opacity: 0.55;
+  z-index: -1;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(28, 207, 156, 0.18) 0%, transparent 30%),
+    radial-gradient(circle at 75% 20%, rgba(15, 94, 74, 0.2) 0%, transparent 34%),
+    radial-gradient(circle at 35% 75%, rgba(28, 207, 156, 0.12) 0%, transparent 36%);
+  opacity: 0.6;
+  mix-blend-mode: screen;
+  animation: fizz-drift 18s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .admin-video-bg {
@@ -173,7 +201,7 @@ body {
   height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(135deg, #5873fe, #871cde);
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
   cursor: pointer;
   justify-content: center;
   align-items: center;
@@ -220,7 +248,7 @@ body {
 }
 
 .admin-shell {
-  padding: 4.5rem 4vw 4rem;
+  padding: 6rem 4vw 4rem;
   position: relative;
   z-index: 2;
 }
@@ -822,12 +850,12 @@ pre {
 }
 
 .status-chip.ok {
-  border-color: rgba(102, 224, 211, 0.5);
-  color: #66e0d3;
+  border-color: rgba(28, 207, 156, 0.5);
+  color: var(--accent-emerald-bright);
 }
 
 .status-chip.warn {
-  border-color: rgba(241, 179, 90, 0.5);
+  border-color: rgba(212, 175, 55, 0.5);
   color: var(--accent);
 }
 
@@ -837,12 +865,12 @@ pre {
 }
 
 .status-chip.ok {
-  border-color: rgba(102, 224, 211, 0.5);
-  color: #66e0d3;
+  border-color: rgba(28, 207, 156, 0.5);
+  color: var(--accent-emerald-bright);
 }
 
 .status-chip.warn {
-  border-color: rgba(241, 179, 90, 0.5);
+  border-color: rgba(212, 175, 55, 0.5);
   color: var(--accent);
 }
 
@@ -1037,7 +1065,7 @@ pre {
     left: 0;
     right: 0;
     padding: 1rem 1.25rem 1.4rem;
-    background: linear-gradient(135deg, #5873fe, #871cde);
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
     mask-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12.21 10.57'%3E%3Cpath fill='%23ffffff' d='M6.1 0h6.11L9.16 5.29 6.1 10.57 3.05 5.29 0 0h6.1z'/%3E%3C/svg%3E"),
       linear-gradient(black calc(100% - 28px), transparent calc(100% - 10px));
@@ -1062,7 +1090,7 @@ pre {
     top: 100%;
     right: 0;
     left: 0;
-    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 55%), #12092b;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 55%), rgba(8, 12, 18, 0.95);
     padding: 1rem 1.25rem 1.5rem;
     display: grid;
     gap: 0.8rem;
@@ -1107,5 +1135,17 @@ pre {
   .sub-nav {
     top: 58px;
     flex-wrap: wrap;
+  }
+}
+
+@keyframes fizz-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-2%, 2%, 0);
+  }
+  100% {
+    transform: translate3d(2%, -2%, 0);
   }
 }

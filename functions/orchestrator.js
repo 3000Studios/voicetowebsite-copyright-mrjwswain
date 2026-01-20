@@ -554,10 +554,6 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ mode, result }), { headers: { "Content-Type": "application/json" } });
     }
 
-    if (!OPENAI_API) {
-      throw new Error("Missing OPENAI_API. Set the Cloudflare Worker secret: wrangler secret put OPENAI_API");
-    }
-
     if (mode === "rollback") {
       throw new Error("Rollback disabled for live apply mode.");
     }
@@ -570,7 +566,9 @@ export async function onRequestPost(context) {
     if (!plan) {
       if (!OPENAI_API) {
         const fallback = buildFallbackPlan(command);
-        if (!fallback.actions.length) throw new Error("Missing OPENAI_API.");
+        if (!fallback.actions.length) {
+          throw new Error("Missing OPENAI_API. Set the Cloudflare Worker secret: wrangler secret put OPENAI_API");
+        }
         plan = fallback;
       } else {
         try {
