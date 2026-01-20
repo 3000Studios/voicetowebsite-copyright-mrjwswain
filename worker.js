@@ -70,7 +70,42 @@ export default {
       }
     }
 
-    if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) {
+    // Cloudflare zone analytics proxy (real data only)
+    if (url.pathname === "/api/analytics/overview" && request.method === "GET") {
+      const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
+      if (!env.CF_API_TOKEN || !zoneId) {
+        return jsonResponse(501, { error: "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (and optionally CF_ZONE_ID)." });
+      }
+      try {
+        const since = "-43200"; // last 12 hours; supports relative values
+        const apiUrl = `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`;
+        const cfRes = await fetch(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${env.CF_API_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await cfRes.json();
+        if (!cfRes.ok || !data?.success) {
+          return jsonResponse(cfRes.status || 500, { error: data?.errors || data?.messages || "Analytics fetch failed." });
+        }
+        return jsonResponse(200, { result: data.result });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
+    if (url.pathname === "/admin") {
+      const adminUrl = new URL("/admin/index.html", url.origin);
+      const res = await env.ASSETS.fetch(new Request(adminUrl, request));
+      return addSecurityHeaders(res);
+    }
+
+    if (url.pathname.startsWith("/admin/")) {
+      const adminRes = await env.ASSETS.fetch(request);
+      if (adminRes.status !== 404) {
+        return addSecurityHeaders(adminRes);
+      }
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await env.ASSETS.fetch(new Request(adminUrl, request));
       return addSecurityHeaders(res);

@@ -698,6 +698,16 @@ pre {
   color: #ff8181;
 }
 
+.status-chip.ok {
+  border-color: rgba(102, 224, 211, 0.5);
+  color: #66e0d3;
+}
+
+.status-chip.warn {
+  border-color: rgba(241, 179, 90, 0.5);
+  color: var(--accent);
+}
+
 .live-admin {
   display: grid;
   gap: 1rem;
@@ -849,6 +859,32 @@ pre {
 
 .app-form .button-grid {
   margin-top: 0.5rem;
+}
+
+.analytics-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 800;
 }
 
 @media (max-width: 720px) {
