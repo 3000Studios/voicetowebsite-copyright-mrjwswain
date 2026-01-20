@@ -284,7 +284,7 @@ const logActivity = async () => {
       const li = document.createElement("li");
       li.innerHTML = `
         <div class="cmd">${row.command || "(no command)"}</div>
-        <div class="meta">Actions: ${row.actions || "[]"} | Files: ${row.files || "[]"} | Commit: ${row.commit || ""} | ${row.ts || ""}</div>
+        <div class="meta">Actions: ${row.actions || "[]"} | Files: ${row.files || "[]"} | Commit: ${row.commit_sha || ""} | ${row.ts || ""}</div>
       `;
       if (activityList) activityList.appendChild(li);
     });
