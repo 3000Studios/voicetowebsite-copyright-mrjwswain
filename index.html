@@ -49,13 +49,21 @@
   </div>
 
   <header class="hero">
-    <h1 class="hero-title reveal" id="headline" style="transition-delay:100ms;">VOICE TO<br />WEBSITE</h1>
+    <div class="hero-headline">
+      <h1 class="hero-title hero-fire reveal" id="headline" style="transition-delay:100ms;">Hi Super</h1>
+      <div class="hero-tiger" tabindex="0" aria-label="Roaring tiger">
+        <img id="tiger-image" src="https://images.unsplash.com/photo-1591825729269-caeb344f6df2?auto=format&fit=crop&w=600&q=80" alt="Roaring tiger" />
+      </div>
+    </div>
     <p class="hero-subhead reveal" id="subhead" style="transition-delay:200ms;">
       Your Voice. Your Website.
     </p>
     <div class="viz reveal">
       <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
+    <audio id="tiger-roar" preload="auto">
+      <source src="https://assets.mixkit.co/sfx/preview/mixkit-tiger-roar-1929.mp3" type="audio/mpeg" />
+    </audio>
   </header>
 
   <section id="how-it-works" class="marketing-section reveal">
@@ -403,6 +411,23 @@
       navLinks.forEach((link) => {
         link.addEventListener("mouseenter", playSizzle);
       });
+    })();
+
+    // Tiger hover roar
+    (() => {
+      const tiger = document.querySelector(".hero-tiger");
+      const roar = document.getElementById("tiger-roar");
+      if (!tiger || !roar) return;
+      const playRoar = () => {
+        try {
+          roar.currentTime = 0;
+          roar.play();
+        } catch (_) {
+          // ignore autoplay restrictions
+        }
+      };
+      tiger.addEventListener("mouseenter", playRoar);
+      tiger.addEventListener("focus", playRoar);
     })();
 
     // Audio playlist (persists selection per session)
