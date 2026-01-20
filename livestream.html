@@ -37,7 +37,7 @@
       <a href="projects.html">Projects</a>
       <a href="studio3000.html">3000 Studios</a>
       <a href="/admin">Admin</a>
-      <a href="#">Contact</a>
+      <a href="contact.html">Contact</a>
     </nav>
   </header>
 
@@ -71,6 +71,34 @@
              data-ad-slot="__ADSENSE_SLOT__"
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
+      </div>
+    </section>
+
+    <section class="section blog-feed" id="live-blog">
+      <div class="lineup-header">
+        <div>
+          <p class="eyebrow">Auto Blog</p>
+          <h2>Latest Web Build Signals</h2>
+          <p class="muted">Fresh pulls from the web dev community, rendered live.</p>
+        </div>
+        <a class="pill-link" href="blog.html">View archive</a>
+      </div>
+      <div class="blog-grid" id="live-blog-grid">
+        <article class="blog-card skeleton">
+          <div class="skeleton-line w-60"></div>
+          <div class="skeleton-line w-80"></div>
+          <div class="skeleton-line w-40"></div>
+        </article>
+        <article class="blog-card skeleton">
+          <div class="skeleton-line w-70"></div>
+          <div class="skeleton-line w-60"></div>
+          <div class="skeleton-line w-50"></div>
+        </article>
+        <article class="blog-card skeleton">
+          <div class="skeleton-line w-65"></div>
+          <div class="skeleton-line w-75"></div>
+          <div class="skeleton-line w-30"></div>
+        </article>
       </div>
     </section>
   </main>
@@ -109,6 +137,47 @@
       await saveStream({ url, title: streamTitleInput.value || "Untitled", ts: new Date().toISOString() });
       liveStatus.textContent = "Stream saved and live.";
     });
+
+    // live page blog feed
+    const liveBlogGrid = document.getElementById("live-blog-grid");
+    const renderLivePosts = (posts = []) => {
+      if (!liveBlogGrid) return;
+      liveBlogGrid.innerHTML = "";
+      posts.slice(0, 3).forEach((post) => {
+        const card = document.createElement("article");
+        card.className = "blog-card";
+        card.innerHTML = `
+          <p class="eyebrow">${post.tag || "Web"}</p>
+          <h3>${post.title}</h3>
+          <p class="muted">${post.desc}</p>
+          <a class="pill-link" href="${post.url}" target="_blank" rel="noreferrer">Read →</a>
+        `;
+        liveBlogGrid.appendChild(card);
+      });
+    };
+
+    const loadLiveBlog = async () => {
+      try {
+        const res = await fetch("https://dev.to/api/articles?tag=webdev&per_page=3");
+        if (!res.ok) throw new Error("bad status");
+        const data = await res.json();
+        const posts = data.map((p) => ({
+          title: p.title,
+          desc: p.description || "Latest from DEV.",
+          url: p.url,
+          tag: (p.tag_list && p.tag_list[0]) || "webdev",
+        }));
+        renderLivePosts(posts);
+      } catch (err) {
+        renderLivePosts([
+          { title: "Design systems that ship", desc: "Patterns to keep velocity high while staying on-brand.", url: "https://developer.mozilla.org/", tag: "design" },
+          { title: "AI-first launch checklists", desc: "Prep prompts, telemetry, and fallbacks before go-live.", url: "https://ai.googleblog.com/", tag: "ai" },
+          { title: "Streaming UI patterns", desc: "Livestream embeds, chat overlays, and moderation hooks.", url: "https://vercel.com/blog", tag: "stream" },
+        ]);
+      }
+    };
+
+    loadLiveBlog();
   </script>
   <script type="module" src="nav.js"></script>
 </body>

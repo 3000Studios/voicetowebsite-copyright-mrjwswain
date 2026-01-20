@@ -12,11 +12,16 @@
 <body class="antialiased">
   <input type="checkbox" id="mobileNavToggle" class="mobile-toggle" aria-hidden="true" />
   <video autoplay muted loop playsinline class="video-bg">
-    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4" type="video/mp4" />
+    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" type="video/mp4" />
   </video>
   <div class="noise-overlay" aria-hidden="true"></div>
 
   <nav class="glass-nav">
+    <div class="nav-video-mask" aria-hidden="true">
+      <video autoplay muted loop playsinline>
+        <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4" type="video/mp4" />
+      </video>
+    </div>
     <div class="brand">
       <span class="brand-dot"></span>
       <span class="brand-name">VoiceToWebsite</span>
@@ -28,7 +33,6 @@
       <a href="appstore.html" data-name="App Store">App Store</a>
       <a href="livestream.html" data-name="Live">Live</a>
     </div>
-    <button class="nav-cta">Initialize</button>
     <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">
       <span></span>
     </label>
@@ -45,44 +49,56 @@
   </div>
 
   <header class="hero">
-    <div class="status-pill reveal">
-      <span class="dot pulse"></span>
-      System Online v2.0
-    </div>
-    <h1 class="hero-title reveal" style="transition-delay:100ms;">VOICE TO<br />REALITY</h1>
+    <h1 class="hero-title reveal" style="transition-delay:100ms;">VOICE TO<br />WEBSITE</h1>
     <p class="hero-subhead reveal" style="transition-delay:200ms;">
-      Architect high-fidelity digital experiences using natural language. No code. Pure sound.
+      Your Voice. Your Website.
     </p>
-    <div class="hero-actions reveal" style="transition-delay:300ms;">
-      <button class="btn btn-platinum">Begin Recording</button>
-      <button class="btn ghost">Explore Gallery</button>
-    </div>
     <div class="viz reveal">
       <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
   </header>
 
-  <section class="portal-grid reveal">
-    <a href="index.html" class="portal-card">
-      <div class="portal-thumb" style="--thumb:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80');"></div>
-      <div class="portal-label">Home</div>
-    </a>
-    <a href="store.html" class="portal-card">
-      <div class="portal-thumb" style="--thumb:url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80');"></div>
-      <div class="portal-label">Store</div>
-    </a>
-    <a href="/admin" class="portal-card">
-      <div class="portal-thumb" style="--thumb:url('https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80');"></div>
-      <div class="portal-label">Admin</div>
-    </a>
-    <a href="appstore.html" class="portal-card">
-      <div class="portal-thumb" style="--thumb:url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80');"></div>
-      <div class="portal-label">App Store</div>
-    </a>
-    <a href="livestream.html" class="portal-card">
-      <div class="portal-thumb" style="--thumb:url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80');"></div>
-      <div class="portal-label">Live</div>
-    </a>
+  <section id="how-it-works" class="marketing-section reveal">
+    <div class="marketing-content">
+      <p class="eyebrow">Appointments Only</p>
+      <h2>Why VoiceToWebsite</h2>
+      <p class="muted">Built for creators, teams, and people who can’t or don’t want to code — including customers with limited mobility who benefit from voice-first controls.</p>
+      <ul class="marketing-points">
+        <li>Hands-free: speak your site into existence, no keyboard mastery required.</li>
+        <li>Confidence: we guide businesses from zero to live without technical blockers.</li>
+        <li>Equity: accessible by voice for customers with minimal functional appendages.</li>
+        <li>White-glove: appointments only to ensure we fit your brand and goals.</li>
+      </ul>
+      <div class="cta-row">
+        <a class="btn btn-platinum" href="appstore.html">Book Appointment</a>
+        <div class="note-info">
+          <strong>Included:</strong> software license + 1,000 notes (1 command = 1 note; 2 commands in one sentence = 2 notes) and a 15 min live demo.
+        </div>
+      </div>
+    </div>
+    <div class="marketing-steps">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div>
+          <h3>Vocalization</h3>
+          <p>Dictate the parameters — brand, tone, layout, and flows — no typing needed.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div>
+          <h3>Synthesis</h3>
+          <p>We construct multiple high-fidelity prototypes in parallel while you talk.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div>
+          <h3>Deployment</h3>
+          <p>Refine via conversation, then publish to edge networks instantly.</p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="product-lineup reveal">
@@ -206,45 +222,28 @@
 
   <section class="review-marquee" aria-label="Customer reviews">
     <div class="marquee-track">
-      <span>“VoiceToWebsite shipped our launch in 48 hours.” — Nova Labs</span>
-      <span>“PayPal + Stripe were live with zero code.” — Ember Collective</span>
-      <span>“Auto blog keeps our board in the loop.” — Acme Ventures</span>
-      <span>“Livestream pack just works.” — StreamRoom</span>
-      <span>“Admin clips saved us hours.” — Signal Studio</span>
+      <span>★★★★★ “I spoke my site and it matched my vision exactly.” — Nova Labs</span>
+      <span>★★★★★ “Setup was a breeze—payments live in minutes.” — Ember Collective</span>
+      <span>★★★★★ “Accessibility win: built hands-free for our founder.” — AbleTech</span>
+      <span>★★★★★ “Booking and onboarding took 15 minutes tops.” — Acme Ventures</span>
+      <span>★★★★★ “We launched without touching a keyboard.” — StreamRoom</span>
     </div>
   </section>
 
-  <section id="how-it-works" class="process">
-    <h2 class="text-platinum reveal">The Process</h2>
-    <div class="process-steps">
-      <div class="process-step reveal">
-        <div class="step-number">01</div>
-        <div>
-          <h3>Vocalization</h3>
-          <p>Dictate the parameters. “A minimalist portfolio with dark mode and serif fonts.”</p>
-        </div>
-      </div>
-      <div class="process-step reveal">
-        <div class="step-number">02</div>
-        <div>
-          <h3>Synthesis</h3>
-          <p>We construct multiple high-fidelity prototypes in parallel.</p>
-        </div>
-      </div>
-      <div class="process-step reveal">
-        <div class="step-number">03</div>
-        <div>
-          <h3>Deployment</h3>
-          <p>Refine via conversation. Publish to edge networks instantly.</p>
-        </div>
-      </div>
-    </div>
+  <section class="adsense-safe" aria-label="Sponsored">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="__ADSENSE_PUBLISHER__"
+         data-ad-slot="__ADSENSE_SLOT__"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
   </section>
 
   <footer class="footer">
     <div>
       <div class="brand-name">VoiceToWebsite</div>
       <p class="muted">Build with sound.</p>
+      <p class="muted">© 2026 VoiceToWebsite. All software rights reserved.</p>
     </div>
     <div class="footer-links">
       <a href="mailto:owner@voicetowebsite.com">owner@voicetowebsite.com</a>
@@ -364,6 +363,11 @@
         playSafe();
       });
     })();
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=__ADSENSE_PUBLISHER__" crossorigin="anonymous"></script>
+  <script>
+    // Initialize AdSense safely
+    (adsbygoogle = window.adsbygoogle || []).push({});
   </script>
 </body>
 </html>
