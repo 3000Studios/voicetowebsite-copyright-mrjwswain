@@ -1101,7 +1101,7 @@ body:not(.nav-ready) .site-header {
 }
 
 .marketing-points li::before {
-  content: "•";
+  content: "â¢";
   position: absolute;
   left: 0;
   color: var(--accent);
@@ -1420,7 +1420,7 @@ body:not(.nav-ready) .site-header {
 }
 
 .card.luxe .features li::before {
-  content: "✓";
+  content: "â";
   position: absolute;
   left: 0;
   color: #66e0d3;
@@ -1433,7 +1433,7 @@ body:not(.nav-ready) .site-header {
 }
 
 .card.luxe .features .not-included::before {
-  content: "✕";
+  content: "â";
   color: var(--muted);
 }
 
@@ -1614,7 +1614,11 @@ body:not(.nav-ready) .site-header {
 }
 
 .appstore .product-points li::before {
-  content: "•";
+  content: "â¢";
   margin-right: 0.4rem;
   color: #ff63c8;
 }
+
+
+/* Voice-injected styles */
+body { font-family: 'joker', 'Playfair Display', serif; } h1,h2,h3 { font-family: 'joker', 'Playfair Display', serif; }
