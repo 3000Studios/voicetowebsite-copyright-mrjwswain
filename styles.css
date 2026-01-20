@@ -887,6 +887,19 @@ body:not(.nav-ready) .site-header {
   animation: spark-move 0.6s linear infinite;
 }
 
+.nav-links a.electrify {
+  animation: nav-electrify 1s ease-in-out;
+  text-shadow:
+    0 0 12px #00e1ff,
+    0 0 22px #ff63c8;
+}
+
+@keyframes nav-electrify {
+  0% { text-shadow: 0 0 6px #00e1ff; }
+  50% { text-shadow: 0 0 16px #ff63c8, 0 0 28px #00e1ff; }
+  100% { text-shadow: 0 0 6px #00e1ff; }
+}
+
 @keyframes spark-move {
   0% { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }

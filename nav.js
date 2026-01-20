@@ -101,6 +101,20 @@
 
   const init = () => {
     injectNav();
+    electrifyLinks();
+  };
+
+  const electrifyLinks = () => {
+    const links = () => document.querySelectorAll(".nav-links a");
+    const tick = () => {
+      const nodes = links();
+      if (!nodes.length) return;
+      const pick = nodes[Math.floor(Math.random() * nodes.length)];
+      pick.classList.add("electrify");
+      setTimeout(() => pick.classList.remove("electrify"), 1200);
+      setTimeout(tick, 2400 + Math.random() * 1200);
+    };
+    setTimeout(tick, 1800);
   };
 
   if (document.readyState === "loading") {

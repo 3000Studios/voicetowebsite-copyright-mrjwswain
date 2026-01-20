@@ -216,7 +216,7 @@ body {
 }
 
 .admin-shell {
-  padding: 3rem 4vw 4rem;
+  padding: 4.5rem 4vw 4rem;
   position: relative;
   z-index: 2;
 }
@@ -262,6 +262,7 @@ body {
   align-items: center;
   margin-bottom: 1.4rem;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .admin-header h1 {

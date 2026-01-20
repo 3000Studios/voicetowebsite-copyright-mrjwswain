@@ -465,6 +465,10 @@ const initSpeech = () => {
     if (listening) scheduleInactivity();
 
     const lower = transcript.toLowerCase();
+    if (lower.includes("ship it") && planConfirm) {
+      planConfirm.value = "ship it";
+      updateApplyGate();
+    }
     if (positiveWords.some((p) => lower.includes(p)) && lastPlan) {
       applyBtn.click();
     }
