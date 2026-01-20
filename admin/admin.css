@@ -2,14 +2,18 @@
 
 :root {
   color-scheme: dark;
-  --bg: #0b0c10;
-  --surface: #141922;
-  --surface-2: #1b2230;
-  --text: #c9ced7;
-  --muted: #aab1bd;
-  --accent: #f1b35a;
-  --accent-2: #66e0d3;
-  --ring: rgba(241, 179, 90, 0.35);
+  --bg: #05070a;
+  --surface: #0f141b;
+  --surface-2: #121a22;
+  --text: #f5f3ee;
+  --muted: #9aa3ad;
+  --accent: #d4af37;
+  --accent-2: #0f5e4a;
+  --accent-white: #fdfcf8;
+  --accent-emerald-bright: #1ccf9c;
+  --stone-gray: #6f7780;
+  --ash: #4d545a;
+  --ring: rgba(212, 175, 55, 0.35);
 }
 
 * {
@@ -19,7 +23,7 @@
 body {
   margin: 0;
   font-family: "Playfair Display", serif;
-  background: linear-gradient(180deg, rgba(5, 5, 5, 0.65), rgba(5, 5, 5, 0.45)), var(--bg);
+  background: linear-gradient(180deg, rgba(5, 7, 10, 0.72), rgba(5, 7, 10, 0.45)), var(--bg);
   color: var(--text);
   min-height: 100vh;
   text-shadow: 0 3px 8px rgba(0, 0, 0, 0.55);
