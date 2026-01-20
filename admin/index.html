@@ -3,20 +3,264 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>VoiceToWebsite Admin</title>
-  <meta name="description" content="Voice-driven admin console for VoiceToWebsite." />
+  <title>VoiceToWebsite | Admin</title>
+  <meta name="description" content="Admin landing navigation for VoiceToWebsite." />
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="./admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --neon-blue: #00f2ff;
+      --electric-purple: #7000ff;
+      --ferro-black: #050505;
+      --sizzle-color: rgba(0, 242, 255, 0.6);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--ferro-black);
+      overflow: hidden;
+      font-family: "Syncopate", sans-serif;
+      color: white;
+    }
+
+    .glass-nav {
+      z-index: 200;
+    }
+
+    .admin-landing-shell {
+      padding: 0;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    .lock-screen {
+      z-index: 300;
+    }
+
+    #canvas-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .ui-wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+    }
+
+    .goo-filter {
+      position: absolute;
+      visibility: hidden;
+    }
+
+    .portal-container {
+      filter: url("#goo");
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .mic-trigger {
+      position: absolute;
+      width: 80px;
+      height: 120px;
+      background: linear-gradient(145deg, #1a1a1a, #000);
+      border-radius: 40px;
+      cursor: pointer;
+      z-index: 50;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 1), inset 0 2px 5px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      appearance: none;
+    }
+
+    .mic-trigger:focus-visible {
+      outline: 2px solid var(--neon-blue);
+      outline-offset: 4px;
+    }
+
+    .mic-head {
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle at 30% 30%, #444, #111);
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .mic-head::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, #333 1px, transparent 1px);
+      background-size: 4px 4px;
+      opacity: 0.5;
+    }
+
+    .mic-trigger.active {
+      transform: scale(0.9);
+      animation: sizzle 0.1s infinite;
+    }
+
+    .mic-trigger.active .mic-head {
+      animation: electric-zoom 0.5s infinite alternate;
+      box-shadow: 0 0 30px var(--neon-blue), inset 0 0 15px var(--neon-blue);
+    }
+
+    .nav-items {
+      position: absolute;
+      display: flex;
+      gap: 20px;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 10;
+    }
+
+    .nav-items.open {
+      opacity: 1;
+      pointer-events: all;
+      gap: 15px;
+    }
+
+    .video-box {
+      width: 0px;
+      height: 450px;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      transition: width 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), box-shadow 0.3s ease;
+      box-shadow: 0 0 0px var(--neon-blue);
+      border: 0px solid var(--neon-blue);
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .video-box:focus-visible {
+      outline: 2px solid var(--neon-blue);
+      outline-offset: 4px;
+    }
+
+    .nav-items.open .video-box {
+      width: 220px;
+      box-shadow: 0 0 25px rgba(0, 242, 255, 0.4);
+      border: 2px solid var(--neon-blue);
+    }
+
+    .video-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .video-box:hover video {
+      opacity: 1;
+    }
+
+    .video-box:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 0 40px var(--neon-blue);
+    }
+
+    .overlay-text {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 20;
+      pointer-events: none;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
+    .overlay-text span {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 0 10px #000;
+      pointer-events: auto;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .instruction {
+      position: fixed;
+      bottom: 30px;
+      font-family: "Space Mono", monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      opacity: 0.4;
+    }
+
+    @keyframes sizzle {
+      0% { transform: scale(0.9) translate(1px, 1px); }
+      50% { transform: scale(0.9) translate(-1px, -1px); }
+      100% { transform: scale(0.9) translate(1px, -1px); }
+    }
+
+    @keyframes electric-zoom {
+      from { filter: brightness(1) contrast(1); }
+      to { filter: brightness(2) contrast(1.5) drop-shadow(0 0 10px var(--neon-blue)); }
+    }
+
+    @media (max-width: 1100px) {
+      .nav-items.open {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .nav-items.open .video-box {
+        width: 190px;
+        height: 320px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .nav-items.open .video-box {
+        width: 80vw;
+        height: 240px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="admin-video-bg" aria-hidden="true">
-    <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" autoplay muted loop playsinline></video>
-  </div>
+  <video autoplay muted loop playsinline class="video-bg">
+    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" type="video/mp4" />
+  </video>
+  <div class="noise-overlay" aria-hidden="true"></div>
 
   <div class="lock-screen" id="lock-screen">
     <div class="lock-card">
       <h2>Enter access code</h2>
-      <p>Unlock to use the voice editor.</p>
+      <p>Unlock to access admin tools.</p>
       <div class="lock-row">
         <input type="password" id="lock-input" placeholder="Access code" />
         <button id="lock-button" class="primary">Unlock</button>
@@ -25,252 +269,215 @@
     </div>
   </div>
 
-  <div class="admin-shell">
-    <header class="admin-header">
-      <div>
-        <h1>VoiceToWebsite Voice Command Center</h1>
-        <p>Secure admin console for hands-free site edits and deploys.</p>
-      </div>
-      <div class="admin-actions">
-        <span class="pill">Cloudflare secured</span>
-      </div>
-    </header>
-    <nav class="admin-subnav">
-      <a href="#control-card">Voice Commands</a>
-      <a href="#analytics">Web Analytics</a>
-      <a href="/admin/analytics.html">Analytics (full page)</a>
-      <a href="#livestream-setup">Live Stream Setup</a>
-      <a href="#app-manager">App Store Manager</a>
-      <a href="#store-manager">Store Manager</a>
-    </nav>
+  <div class="admin-shell admin-landing-shell">
+    <canvas id="canvas-particles"></canvas>
 
-    <section class="admin-hero">
-      <div class="hero-copy">
-        <p class="eyebrow">Admin landing</p>
-        <h2>Welcome back, Admin</h2>
-        <p class="muted">Quick-launch the consoles you need. Backgrounds are tailored per workspace.</p>
-      </div>
-      <div class="menu" id="admin-menu">
-        <div class="btn trigger">
-          <span class="line"></span>
-        </div>
-        <div class="icons">
-          <div class="rotater"><a class="btn btn-icon" href="#control-card" aria-label="Voice Commands">🎙️</a></div>
-          <div class="rotater"><a class="btn btn-icon" href="#analytics" aria-label="Web Analytics">📊</a></div>
-          <div class="rotater"><a class="btn btn-icon" href="/admin/analytics.html" aria-label="Analytics full page">🛰️</a></div>
-          <div class="rotater"><a class="btn btn-icon" href="#livestream-setup" aria-label="Live Stream Setup">📡</a></div>
-          <div class="rotater"><a class="btn btn-icon" href="#app-manager" aria-label="App Store Manager">🛍️</a></div>
-          <div class="rotater"><a class="btn btn-icon" href="#store-manager" aria-label="Store Manager">🏪</a></div>
-          <div class="rotater"><a class="btn btn-icon" href="/the3000.html" aria-label="3000 Portal">💎</a></div>
-          <div class="rotater"><a class="btn btn-icon" href="/race3000.html" aria-label="Race to 3000">🎮</a></div>
+    <div class="ui-wrapper">
+      <div class="portal-container">
+        <button class="mic-trigger" id="micBtn" type="button" aria-label="Toggle admin navigation">
+          <div class="mic-head"></div>
+          <div style="width:4px; height:40px; background:rgba(255,255,255,0.1); margin-top:10px; border-radius:2px;"></div>
+        </button>
+
+        <div class="nav-items" id="navItems">
+          <a class="video-box" href="/admin/voice-commands.html" aria-label="Voice Commands">
+            <div class="overlay-text" data-text="--Voice Commands--"></div>
+            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1767037191/blue_block_text_mm1www.mp4" loop muted playsinline></video>
+          </a>
+
+          <a class="video-box" href="/admin/analytics.html" aria-label="Web Analytics">
+            <div class="overlay-text" data-text="--Web Analytics--"></div>
+            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766986203/slow_tunnel_v0hpc8.mp4" loop muted playsinline></video>
+          </a>
+
+          <a class="video-box" href="/admin/live-stream.html" aria-label="Live Stream Setup">
+            <div class="overlay-text" data-text="--Live Stream Setup--"></div>
+            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768820953/254781_small_x8r39m.mp4" loop muted playsinline></video>
+          </a>
+
+          <a class="video-box" href="/admin/store-manager.html" aria-label="Store Manager">
+            <div class="overlay-text" data-text="--Store Manager--"></div>
+            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4" loop muted playsinline></video>
+          </a>
+
+          <a class="video-box" href="/admin/app-store-manager.html" aria-label="App Store Manager">
+            <div class="overlay-text" data-text="--App Store Manager--"></div>
+            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766986142/3dweb_azplaj.mp4" loop muted playsinline></video>
+          </a>
         </div>
       </div>
-    </section>
+    </div>
 
-    <main class="admin-grid">
-      <section class="card wide" id="control-card" style="background-image:linear-gradient(rgba(0,0,0,0.65),rgba(0,0,0,0.65)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4');background-size:cover;background-position:center;">
-        <div class="card-head">
-          <div>
-            <h2>Command Center</h2>
-            <p class="muted" id="status">Locked</p>
-          </div>
-          <div class="status-strip">
-            <span class="status-chip" id="mic-state">Idle</span>
-            <span class="status-chip warn" id="preview-mode">Preview idle</span>
-          </div>
-        </div>
-        <div class="quick-commands" id="quick-commands">
-          <span class="quick-label">Templates:</span>
-          <button class="chip" type="button" data-command="Update the headline to a neon gradient and set theme ocean.">Hero refresh</button>
-          <button class="chip" type="button" data-command="Add a livestream embed from https://www.youtube.com/embed/dQw4w9WgXcQ">Add livestream</button>
-          <button class="chip" type="button" data-command="Change the CTA to Book a demo and set the background video to https://cdn.coverr.co/videos/coverr-flying-over-the-mountains-1259/1080p.mp4">CTA + background</button>
-          <button class="chip" type="button" data-command="Update the font to Space Grotesk and set the subhead to Built with AI in real-time.">Font + copy</button>
-        </div>
-        <div class="control-box">
-          <div class="control-main">
-            <label class="field-label" for="command">Speak or type a command</label>
-            <textarea id="command" rows="6" placeholder="Speak or type a command..."></textarea>
-            <div class="button-grid">
-              <button id="start" class="primary">Start Listening</button>
-              <button id="stop" class="secondary">Stop</button>
-              <button id="plan" class="ghost">Generate Plan</button>
-              <button id="apply" class="primary" disabled>Apply Live</button>
-              <button id="undo" class="secondary">Undo Last Deploy</button>
-            </div>
-            <div class="help-grid">
-              <div class="help-card">
-                <div class="hint-title">Examples</div>
-                <p class="muted">"Update the headline to blue and rounded" or "Create a new page for /partners".</p>
-              </div>
-              <div class="help-card">
-                <div class="hint-title">Plan gating</div>
-                <p class="muted">Plan summary: <span id="plan-summary">No plan yet.</span></p>
-                <label class="muted" for="plan-confirm">Type "ship it" to enable Apply:</label>
-                <input id="plan-confirm" type="text" placeholder="ship it" />
-              </div>
-            </div>
-          </div>
-          <div class="response-panel">
-            <div class="panel-head">
-              <span class="status-chip warn" id="response-source">Awaiting command</span>
-              <button class="ghost small" id="refresh-logs">Refresh History</button>
-            </div>
-            <h3>Response</h3>
-            <pre id="response">{}</pre>
-            <ul class="activity-list" id="activity-list"></ul>
-            <p class="muted" id="activity-status"></p>
-          </div>
-        </div>
-      </section>
+    <div class="instruction">Sonic Ferro-Dust Resonance // Click to Engage</div>
 
-      <section class="card wide" id="preview-card">
-        <h2>Live Preview</h2>
-        <p class="muted">Local preview updates instantly from your commands.</p>
-        <div class="preview-shell">
-          <div class="preview-controls">
-            <div class="button-row">
-              <button id="preview-reset" class="ghost">Reset Preview</button>
-              <button id="preview-speak" class="secondary">Play Summary</button>
-            </div>
-          </div>
-          <div class="preview-stage solo" id="preview-stage">
-            <div class="preview-extras" id="preview-extras"></div>
-            <iframe id="preview-frame" title="Homepage preview" src="/index.html"></iframe>
-          </div>
-        </div>
-      </section>
-
-      <section class="card" id="analytics" style="background-image:linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)),url('https://res.cloudinary.com/dj92eb97f/image/upload/v1768852097/Firefly_Gemini_Flash_Create_the_best_logo_that_is_ultra_hi_resolution_3d_text_with_no_background_with_the_172544_ihg0wl.png');background-size:cover;background-position:center;">
-        <h2>Web Analytics</h2>
-        <p class="muted">Full-site stats dashboard placeholder. Connect your analytics source here.</p>
-      </section>
-
-      <section class="card" id="livestream-setup" style="background-image:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.55)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986161/Fire_jlrw9r.mp4');background-size:cover;background-position:center;">
-        <h2>Live Stream Setup</h2>
-        <p class="muted">Configure your live stream destinations and embeds.</p>
-        <div class="live-admin">
-          <div class="live-admin__player">
-            <h4>Current Stream</h4>
-            <video id="admin-live-player" controls muted style="width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.1);" src=""></video>
-            <div class="live-admin__controls">
-              <input type="url" id="admin-live-url" placeholder="https://www.youtube.com/embed/..." />
-              <button class="primary" id="admin-live-load">Load Stream</button>
-              <button class="secondary" id="admin-live-save">Save Clip</button>
-            </div>
-          </div>
-          <div class="live-admin__clips">
-            <h4>Saved Clips</h4>
-            <ul id="admin-live-clips" class="clip-list"></ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="card wide" id="app-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4');background-size:cover;background-position:center;">
-        <div class="card-head">
-          <div>
-            <p class="eyebrow">Apps</p>
-            <h2>App Store Manager</h2>
-            <p class="muted">Control listings, track sales, and push apps directly to the Store.</p>
-          </div>
-          <div class="status-strip">
-            <span class="status-chip" id="apps-count">0 apps</span>
-            <span class="status-chip" id="apps-sales">$0 sales</span>
-          </div>
-        </div>
-        <div class="app-grid">
-          <div class="app-block">
-            <div class="kpi-row" id="app-kpis">
-              <div class="kpi-card">
-                <div class="kpi-label">Apps live</div>
-                <div class="kpi-value" id="kpi-apps">0</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-label">MRR</div>
-                <div class="kpi-value" id="kpi-mrr">$0</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-label">New this week</div>
-                <div class="kpi-value" id="kpi-new">0</div>
-              </div>
-            </div>
-            <div class="table-shell">
-              <div class="table-head">
-                <h3>Listings</h3>
-                <button class="ghost small" id="apps-reset">Reset sample data</button>
-              </div>
-              <table class="app-table">
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Price</th>
-                    <th>Tag</th>
-                    <th>Sales</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="app-table-body">
-                  <tr><td colspan="5" class="muted">No apps yet.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="app-block">
-            <h3>Add or Upload App</h3>
-            <p class="muted">Create a listing that will sync to the Store page.</p>
-            <form id="app-form" class="app-form">
-              <div class="form-grid">
-                <label>
-                  <span class="form-label">Title</span>
-                  <input type="text" name="title" placeholder="Voice Studio Pro" required />
-                </label>
-                <label>
-                  <span class="form-label">Price (USD)</span>
-                  <input type="number" name="price" min="0" step="1" placeholder="99" required />
-                </label>
-                <label>
-                  <span class="form-label">Tag</span>
-                  <input type="text" name="tag" placeholder="Automation" />
-                </label>
-                <label>
-                  <span class="form-label">Sales</span>
-                  <input type="number" name="sales" min="0" step="1" placeholder="0" />
-                </label>
-              </div>
-              <label>
-                <span class="form-label">Description</span>
-                <textarea name="desc" rows="3" placeholder="One-line value prop for the app."></textarea>
-              </label>
-              <label>
-                <span class="form-label">Store link (optional)</span>
-                <input type="url" name="link" placeholder="https://voicetowebsite.com/store.html" />
-              </label>
-              <div class="button-grid">
-                <button type="submit" class="primary">Save to Store</button>
-                <button type="button" class="ghost" id="app-clear">Clear</button>
-              </div>
-              <p class="muted small">Saved apps appear in the table and sync to the Store in a future API hook.</p>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <section class="card" id="store-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986144/bluechain_rzflnz.mp4');background-size:cover;background-position:center;">
-        <h2>Store Manager</h2>
-        <p class="muted">Manage products, pricing, and offers.</p>
-      </section>
-    </main>
+    <svg class="goo-filter">
+      <defs>
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+        </filter>
+      </defs>
+    </svg>
   </div>
 
-  <script type="module" src="./admin.js"></script>
   <script>
-    (() => {
-      const menu = document.getElementById("admin-menu");
-      const trigger = menu?.querySelector(".trigger");
-      trigger?.addEventListener("click", () => {
-        menu.classList.toggle("active");
+    const micBtn = document.getElementById("micBtn");
+    const navItems = document.getElementById("navItems");
+    const videos = document.querySelectorAll(".nav-items video");
+    const canvas = document.getElementById("canvas-particles");
+    const ctx = canvas.getContext("2d");
+
+    let isOpen = false;
+    let mouse = { x: -1000, y: -1000 };
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playClickSound(freq, type = "sine") {
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playStatic() {
+      if (!isOpen) return;
+      const bufferSize = audioCtx.sampleRate * 0.05;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.005, audioCtx.currentTime);
+      noise.connect(gain);
+      gain.connect(audioCtx.destination);
+      noise.start();
+    }
+
+    document.querySelectorAll(".overlay-text").forEach((box) => {
+      const text = box.getAttribute("data-text");
+      box.innerHTML = text
+        .split("")
+        .map((char) => `<span>${char === " " ? "&nbsp;" : char}</span>`)
+        .join("");
+
+      box.querySelectorAll("span").forEach((span) => {
+        span.addEventListener("mouseenter", () => {
+          const rx = (Math.random() - 0.5) * 40;
+          const ry = (Math.random() - 0.5) * 40;
+          span.style.transform = `translate3d(${rx}px, ${ry}px, 0) rotate(${rx}deg)`;
+          playClickSound(800 + Math.random() * 400, "square");
+          setTimeout(() => {
+            span.style.transform = "translate3d(0,0,0) rotate(0deg)";
+          }, 600);
+        });
       });
-    })();
+    });
+
+    micBtn.addEventListener("click", () => {
+      isOpen = !isOpen;
+      micBtn.classList.toggle("active");
+      navItems.classList.toggle("open");
+
+      if (isOpen) {
+        playClickSound(150, "sawtooth");
+        videos.forEach((v) => v.play());
+      } else {
+        playClickSound(100, "sine");
+        setTimeout(() => {
+          if (!isOpen) videos.forEach((v) => v.pause());
+        }, 600);
+      }
+    });
+
+    let particles = [];
+    class Particle {
+      constructor() {
+        this.init();
+      }
+      init() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 1.5 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 2;
+        this.speedY = (Math.random() - 0.5) * 2;
+        this.color = Math.random() > 0.5 ? "#00f2ff" : "#ffffff";
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          this.x += dx * 0.05;
+          this.y += dy * 0.05;
+          if (dist < 20 && Math.random() > 0.95) {
+            playStatic();
+          }
+        }
+
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (Math.random() > 0.98) {
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y);
+          ctx.lineTo(this.x + (Math.random() - 0.5) * 20, this.y + (Math.random() - 0.5) * 20);
+          ctx.stroke();
+        }
+      }
+    }
+
+    function initParticles() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = [];
+      for (let i = 0; i < 150; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p) => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("resize", initParticles);
+    window.addEventListener("mousemove", (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    initParticles();
+    animate();
   </script>
+
+  <script type="module" src="./admin.js"></script>
   <script type="module" src="/nav.js"></script>
 </body>
 </html>

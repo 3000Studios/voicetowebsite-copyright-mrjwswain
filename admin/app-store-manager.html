@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VoiceToWebsite | App Store Manager</title>
+  <meta name="description" content="Admin app store manager." />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="./admin.css" />
+</head>
+<body>
+  <video autoplay muted loop playsinline class="video-bg">
+    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" type="video/mp4" />
+  </video>
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <div class="lock-screen" id="lock-screen">
+    <div class="lock-card">
+      <h2>Enter access code</h2>
+      <p>Unlock to access admin tools.</p>
+      <div class="lock-row">
+        <input type="password" id="lock-input" placeholder="Access code" />
+        <button id="lock-button" class="primary">Unlock</button>
+      </div>
+      <p class="muted" id="lock-error"></p>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <main class="admin-grid">
+      <section class="card wide" id="app-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4');background-size:cover;background-position:center;">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Apps</p>
+            <h2>App Store Manager</h2>
+            <p class="muted">Control listings, track sales, and push apps directly to the Store.</p>
+          </div>
+          <div class="status-strip">
+            <span class="status-chip" id="apps-count">0 apps</span>
+            <span class="status-chip" id="apps-sales">$0 sales</span>
+          </div>
+        </div>
+        <div class="app-grid">
+          <div class="app-block">
+            <div class="kpi-row" id="app-kpis">
+              <div class="kpi-card">
+                <div class="kpi-label">Apps live</div>
+                <div class="kpi-value" id="kpi-apps">0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">MRR</div>
+                <div class="kpi-value" id="kpi-mrr">$0</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">New this week</div>
+                <div class="kpi-value" id="kpi-new">0</div>
+              </div>
+            </div>
+            <div class="table-shell">
+              <div class="table-head">
+                <h3>Listings</h3>
+                <button class="ghost small" id="apps-reset">Reset sample data</button>
+              </div>
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Tag</th>
+                    <th>Sales</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="app-table-body">
+                  <tr><td colspan="5" class="muted">No apps yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="app-block">
+            <h3>Add or Upload App</h3>
+            <p class="muted">Create a listing that will sync to the Store page.</p>
+            <form id="app-form" class="app-form">
+              <div class="form-grid">
+                <label>
+                  <span class="form-label">Title</span>
+                  <input type="text" name="title" placeholder="Voice Studio Pro" required />
+                </label>
+                <label>
+                  <span class="form-label">Price (USD)</span>
+                  <input type="number" name="price" min="0" step="1" placeholder="99" required />
+                </label>
+                <label>
+                  <span class="form-label">Tag</span>
+                  <input type="text" name="tag" placeholder="Automation" />
+                </label>
+                <label>
+                  <span class="form-label">Sales</span>
+                  <input type="number" name="sales" min="0" step="1" placeholder="0" />
+                </label>
+              </div>
+              <label>
+                <span class="form-label">Description</span>
+                <textarea name="desc" rows="3" placeholder="One-line value prop for the app."></textarea>
+              </label>
+              <label>
+                <span class="form-label">Store link (optional)</span>
+                <input type="url" name="link" placeholder="https://voicetowebsite.com/store.html" />
+              </label>
+              <div class="button-grid">
+                <button type="submit" class="primary">Save to Store</button>
+                <button type="button" class="ghost" id="app-clear">Clear</button>
+              </div>
+              <p class="muted small">Saved apps appear in the table and sync to the Store in a future API hook.</p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./admin.js"></script>
+  <script type="module" src="/nav.js"></script>
+</body>
+</html>

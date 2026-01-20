@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VoiceToWebsite | Store Manager</title>
+  <meta name="description" content="Admin store manager." />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="./admin.css" />
+</head>
+<body>
+  <video autoplay muted loop playsinline class="video-bg">
+    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" type="video/mp4" />
+  </video>
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <div class="lock-screen" id="lock-screen">
+    <div class="lock-card">
+      <h2>Enter access code</h2>
+      <p>Unlock to access admin tools.</p>
+      <div class="lock-row">
+        <input type="password" id="lock-input" placeholder="Access code" />
+        <button id="lock-button" class="primary">Unlock</button>
+      </div>
+      <p class="muted" id="lock-error"></p>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <main class="admin-grid">
+      <section class="card" id="store-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986144/bluechain_rzflnz.mp4');background-size:cover;background-position:center;">
+        <h2>Store Manager</h2>
+        <p class="muted">Manage products, pricing, and offers.</p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./admin.js"></script>
+  <script type="module" src="/nav.js"></script>
+</body>
+</html>

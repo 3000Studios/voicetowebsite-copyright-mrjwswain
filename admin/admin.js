@@ -437,6 +437,9 @@ const initPasscodeGate = () => {
 
 const initSpeech = () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!micStateEl || !commandEl) {
+    return null;
+  }
   if (!SpeechRecognition) {
     micStateEl.textContent = "Speech recognition not supported in this browser.";
     return;
@@ -489,29 +492,35 @@ const initSpeech = () => {
 
 const speechController = initSpeech();
 
-startBtn.addEventListener("click", () => {
-  if (!recognition) return;
-  listening = true;
-  recognition.start();
-  if (speechController?.scheduleInactivity) speechController.scheduleInactivity();
-  micStateEl.textContent = "Listening...";
-});
+if (startBtn) {
+  startBtn.addEventListener("click", () => {
+    if (!recognition) return;
+    listening = true;
+    recognition.start();
+    if (speechController?.scheduleInactivity) speechController.scheduleInactivity();
+    if (micStateEl) micStateEl.textContent = "Listening...";
+  });
+}
 
-stopBtn.addEventListener("click", () => {
-  if (!recognition) return;
-  listening = false;
-  recognition.stop();
-  micStateEl.textContent = "Microphone idle.";
-  if (inactivityTimer) clearTimeout(inactivityTimer);
-});
+if (stopBtn) {
+  stopBtn.addEventListener("click", () => {
+    if (!recognition) return;
+    listening = false;
+    recognition.stop();
+    if (micStateEl) micStateEl.textContent = "Microphone idle.";
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+  });
+}
 
-commandEl.addEventListener("input", () => {
-  const command = commandEl.value.trim();
-  if (!command) return;
-  applyLocalPreview(command);
-});
+if (commandEl) {
+  commandEl.addEventListener("input", () => {
+    const command = commandEl.value.trim();
+    if (!command) return;
+    applyLocalPreview(command);
+  });
+}
 
-planBtn.addEventListener("click", async () => {
+if (planBtn) planBtn.addEventListener("click", async () => {
   try {
     if (!isUnlocked()) {
       setResponse({ error: "Unlock with the access code before generating a plan." });
@@ -537,7 +546,7 @@ planBtn.addEventListener("click", async () => {
   }
 });
 
-applyBtn.addEventListener("click", async () => {
+if (applyBtn) applyBtn.addEventListener("click", async () => {
   try {
     speak("Hell ya Boss man, I'm making those changes for you right now");
     if (!isUnlocked()) {

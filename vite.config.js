@@ -7,6 +7,11 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "index.html"),
         admin: resolve(__dirname, "admin/index.html"),
+        adminVoice: resolve(__dirname, "admin/voice-commands.html"),
+        adminAnalytics: resolve(__dirname, "admin/analytics.html"),
+        adminLive: resolve(__dirname, "admin/live-stream.html"),
+        adminStore: resolve(__dirname, "admin/store-manager.html"),
+        adminAppStore: resolve(__dirname, "admin/app-store-manager.html"),
         store: resolve(__dirname, "store.html"),
         appstore: resolve(__dirname, "appstore.html"),
         blog: resolve(__dirname, "blog.html"),
