@@ -192,6 +192,48 @@
     </div>
   </section>
 
+  <section class="section crystal-section">
+    <div class="crystal-header">
+      <div>
+        <p class="eyebrow">Signature Modules</p>
+        <h2>Crystalline Control Cards</h2>
+        <p class="muted">Touch-friendly, voice-ready modules you can preview and deploy instantly.</p>
+      </div>
+    </div>
+    <div class="crystal-grid">
+      <div class="crystal-wrapper">
+        <div class="crystal-card" style="--accent:#00f0ff;">
+          <div class="geometry"></div>
+          <div class="crystal-content">
+            <span class="crystal-tag">Module // 01</span>
+            <h3 class="crystal-title">Quantum Refraction</h3>
+            <p class="crystal-desc">Live-transform hero visuals with adaptive lighting tuned to your brand palette.</p>
+          </div>
+        </div>
+      </div>
+      <div class="crystal-wrapper">
+        <div class="crystal-card" style="--accent:#ff007a;">
+          <div class="geometry"></div>
+          <div class="crystal-content">
+            <span class="crystal-tag">Module // 02</span>
+            <h3 class="crystal-title">Kinetic Buoyancy</h3>
+            <p class="crystal-desc">Floating CTAs that respond to scroll and voice cues without breaking layout.</p>
+          </div>
+        </div>
+      </div>
+      <div class="crystal-wrapper">
+        <div class="crystal-card" style="--accent:#00ff88;">
+          <div class="geometry"></div>
+          <div class="crystal-content">
+            <span class="crystal-tag">Module // 03</span>
+            <h3 class="crystal-title">Prismatic Architecture</h3>
+            <p class="crystal-desc">Data-forward grids that balance density and readability for live analytics.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="review-marquee" aria-label="Customer reviews">
     <div class="marquee-track">
       <span>★★★★★ “I spoke my site and it matched my vision exactly.” — Nova Labs</span>
@@ -225,6 +267,30 @@
   </footer>
 
   <button class="audio-toggle" id="audio-toggle" aria-label="Next track">🔊</button>
+  <button class="secret-btn" id="secret-btn" aria-label="Open secret portal"></button>
+
+  <div class="secret-modal" id="secret-modal" aria-hidden="true">
+    <div class="secret-card" id="secret-step-password">
+      <h3>Enter Access Code</h3>
+      <p class="muted">This portal is protected. Enter the 4-digit code to continue.</p>
+      <input type="password" id="secret-code" maxlength="4" placeholder="****" />
+      <div class="button-row">
+        <button class="primary" id="secret-submit">Unlock</button>
+        <button class="ghost" id="secret-close">Cancel</button>
+      </div>
+      <p class="muted small" id="secret-error" aria-live="polite"></p>
+    </div>
+    <div class="secret-card" id="secret-step-video" style="display:none; max-width:560px;">
+      <h3>Click the video to enter</h3>
+      <div class="secret-video">
+        <video id="secret-video" src="https://res.cloudinary.com/dj92eb97f/video/upload/v1767186672/Click_me_video_qcl0op.mp4" autoplay muted loop playsinline></video>
+      </div>
+      <p class="muted small">Tap/click the video to continue to the portal.</p>
+      <div class="button-row">
+        <button class="ghost" id="secret-back">Back</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // reveal on scroll
@@ -237,6 +303,84 @@
       });
     }, { threshold: 0.15 });
     document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+    // crystal card interactions
+    (() => {
+      const wrappers = document.querySelectorAll(".crystal-wrapper");
+      if (!wrappers.length) return;
+      const reveal = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+            reveal.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+      wrappers.forEach((card) => reveal.observe(card));
+
+      document.querySelectorAll(".crystal-card").forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          card.style.setProperty("--mouse-x", `${x}%`);
+          card.style.setProperty("--mouse-y", `${y}%`);
+        });
+      });
+    })();
+
+    // secret portal
+    (() => {
+      const btn = document.getElementById("secret-btn");
+      const modal = document.getElementById("secret-modal");
+      const codeInput = document.getElementById("secret-code");
+      const submit = document.getElementById("secret-submit");
+      const close = document.getElementById("secret-close");
+      const error = document.getElementById("secret-error");
+      const videoStep = document.getElementById("secret-step-video");
+      const passwordStep = document.getElementById("secret-step-password");
+      const back = document.getElementById("secret-back");
+      const gateVideo = document.getElementById("secret-video");
+      const unlock = () => {
+        passwordStep.style.display = "none";
+        videoStep.style.display = "grid";
+      };
+      const hideModal = () => {
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden", "true");
+        passwordStep.style.display = "grid";
+        videoStep.style.display = "none";
+        error.textContent = "";
+        codeInput.value = "";
+      };
+      btn?.addEventListener("click", () => {
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+        codeInput.focus();
+      });
+      close?.addEventListener("click", hideModal);
+      back?.addEventListener("click", () => {
+        passwordStep.style.display = "grid";
+        videoStep.style.display = "none";
+      });
+      submit?.addEventListener("click", () => {
+        if (codeInput.value.trim() === "3000") {
+          unlock();
+        } else {
+          error.textContent = "Incorrect code.";
+        }
+      });
+      codeInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submit.click();
+        if (e.key === "Escape") hideModal();
+      });
+      modal?.addEventListener("click", (e) => {
+        if (e.target === modal) hideModal();
+      });
+      gateVideo?.addEventListener("click", () => {
+        window.location.href = "/the3000.html";
+      });
+    })();
 
     // mobile nav (close overlay when a link is tapped)
     const mobileToggle = document.getElementById("mobileNavToggle");
