@@ -204,6 +204,9 @@ const applyActionsPreview = (actions = []) => {
       block.innerHTML = `<h4>${action.title || "Livestream"}</h4><div class="embed"><iframe src="${action.url}" style="width:100%;height:200px;border:0;border-radius:12px;" allowfullscreen></iframe></div>`;
       previewExtras.appendChild(block);
     }
+    if (action.type === "update_font") {
+      setFrameStyle("#headline", { fontFamily: `'${action.family}', "Playfair Display", serif` });
+    }
     if (action.type === "add_product" && previewExtras) {
       const block = document.createElement("div");
       block.className = "preview-extra-card";
@@ -247,25 +250,93 @@ const logActivity = async () => {
   }
 };
 
+const buildLocalActions = (command = "") => {
+  const actions = [];
+  const text = command.toLowerCase();
+  const urlMatch = command.match(/https?:\/\/\S+/);
+  const url = urlMatch ? urlMatch[0] : "";
+  const sayMatch = command.match(/say\s+(.+)/i);
+  const headlineMatch = command.match(/headline(?:\s+to|\s+is)?\s+(.+)/i);
+  const subheadMatch = command.match(/subhead(?:\s+to|\s+is)?\s+(.+)/i);
+  const ctaMatch = command.match(/(cta|button)(?:\s+to|\s+is)?\s+(.+)/i);
+  const titleMatch = command.match(/title(?:\s+to|\s+is)?\s+(.+)/i);
+  const descMatch = command.match(/description(?:\s+to|\s+is)?\s+(.+)/i);
+  const themeMatch = command.match(/theme(?:\s+to|\s+is)?\s+(ember|ocean|volt|midnight)/i);
+  const fontMatch = command.match(/font(?:\s+to|\s+is)?\s+([a-zA-Z0-9\s-]+)/i);
+
+  if (sayMatch) actions.push({ type: "update_copy", field: "headline", value: sayMatch[1].trim() });
+  else if (headlineMatch) actions.push({ type: "update_copy", field: "headline", value: headlineMatch[1].trim() });
+  if (subheadMatch) actions.push({ type: "update_copy", field: "subhead", value: subheadMatch[1].trim() });
+  if (ctaMatch) actions.push({ type: "update_copy", field: "cta", value: ctaMatch[2].trim() });
+  if (titleMatch || descMatch) {
+    actions.push({ type: "update_meta", title: titleMatch?.[1]?.trim(), description: descMatch?.[1]?.trim() });
+  }
+  if (themeMatch) actions.push({ type: "update_theme", theme: themeMatch[1] });
+  if (fontMatch) actions.push({ type: "update_font", family: fontMatch[1].trim() });
+  if (text.includes("background video") && url) actions.push({ type: "update_background_video", src: url });
+  if ((text.includes("wallpaper") || text.includes("background image")) && url) {
+    actions.push({ type: "update_wallpaper", src: url });
+  }
+  if (text.includes("avatar") && url) actions.push({ type: "update_avatar", src: url });
+  if ((text.includes("video") || text.includes("music video")) && url) {
+    actions.push({ type: "insert_video", src: url, title: "Featured Video" });
+  }
+  if ((text.includes("livestream") || text.includes("stream")) && url) {
+    actions.push({ type: "insert_stream", url, title: "Live Stream" });
+  }
+  return actions;
+};
+
+const buildLocalPlan = (payload) => {
+  if (!payload) return { error: "No payload" };
+  if (payload.mode === "plan") {
+    return {
+      local: true,
+      command: payload.command,
+      plan: {
+        summary: "Local preview plan (offline or API unavailable)",
+        actions: buildLocalActions(payload.command || ""),
+      },
+    };
+  }
+  if (payload.mode === "apply") {
+    return {
+      local: true,
+      status: "Local apply simulated",
+      plan: payload.plan || { actions: buildLocalActions(payload.command || "") },
+      command: payload.command,
+    };
+  }
+  if (payload.mode === "rollback_last") {
+    return { local: true, status: "Local rollback simulated" };
+  }
+  return { local: true, error: "Unsupported mode" };
+};
+
 const callOrchestrator = async (payload) => {
-  const res = await fetch("/api/orchestrator", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-  const text = await res.text();
-  let data = {};
   try {
-    data = text ? JSON.parse(text) : {};
-  } catch (_) {
-    data = { error: text || "Request failed" };
+    const res = await fetch("/api/orchestrator", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const text = await res.text();
+    let data = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (_) {
+      data = { error: text || "Request failed" };
+    }
+    if (!res.ok) {
+      throw new Error(data.error || text || "Request failed");
+    }
+    return data;
+  } catch (err) {
+    console.warn("Orchestrator unavailable, using local plan:", err.message);
+    return buildLocalPlan(payload);
   }
-  if (!res.ok) {
-    throw new Error(data.error || text || "Request failed");
-  }
-  return data;
 };
 
 const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true";
@@ -469,6 +540,17 @@ document.addEventListener("click", (event) => {
     clickSound();
   }
 });
+
+// mobile nav toggle (admin)
+(() => {
+  const toggle = document.getElementById("admin-nav-toggle");
+  if (!toggle) return;
+  document.querySelectorAll(".nav a").forEach((link) => {
+    link.addEventListener("click", () => {
+      if (toggle.checked) toggle.checked = false;
+    });
+  });
+})();
 
 initPasscodeGate();
 updateApplyGate();

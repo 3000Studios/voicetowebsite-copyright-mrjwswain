@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./admin.css" />
 </head>
 <body>
+  <input type="checkbox" id="admin-nav-toggle" class="admin-nav-toggle" aria-hidden="true" />
   <div class="admin-video-bg" aria-hidden="true">
     <video src="https://cdn.coverr.co/videos/coverr-glowing-wireframe-6067/1080p.mp4" autoplay muted loop playsinline></video>
   </div>
@@ -19,6 +20,9 @@
         <span>Revenue Engine</span>
       </div>
     </div>
+    <label class="admin-nav-btn" for="admin-nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+    </label>
     <nav class="nav">
       <a href="/index.html">Home</a>
       <a href="/admin">Admin</a>

@@ -10,8 +10,9 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="antialiased">
+  <input type="checkbox" id="mobileNavToggle" class="mobile-toggle" aria-hidden="true" />
   <video autoplay muted loop playsinline class="video-bg">
-    <source src="https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-2336-large.mp4" type="video/mp4" />
+    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" type="video/mp4" />
   </video>
   <div class="noise-overlay" aria-hidden="true"></div>
 
@@ -21,24 +22,27 @@
       <span class="brand-name">VoiceToWebsite</span>
     </div>
     <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="store.html">Store</a>
-      <a href="/admin">Admin</a>
-      <a href="appstore.html">App Store</a>
-      <a href="livestream.html">Live</a>
+      <a href="index.html" data-name="Home">Home</a>
+      <a href="store.html" data-name="Store">Store</a>
+      <a href="/admin" data-name="Admin">Admin</a>
+      <a href="appstore.html" data-name="App Store">App Store</a>
+      <a href="livestream.html" data-name="Live">Live</a>
     </div>
     <button class="nav-cta">Initialize</button>
-    <button class="nav-toggle" id="navToggle" aria-label="Open menu">☰</button>
+    <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">
+      <span></span>
+    </label>
   </nav>
 
-  <aside class="mobile-drawer" id="mobileDrawer">
-    <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
-    <a href="index.html">Home</a>
-    <a href="store.html">Store</a>
-    <a href="/admin">Admin</a>
-    <a href="appstore.html">App Store</a>
-    <a href="livestream.html">Live</a>
-  </aside>
+  <div class="mobile-overlay" id="mobileOverlay">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="store.html">Store</a></li>
+      <li><a href="/admin">Admin</a></li>
+      <li><a href="appstore.html">App Store</a></li>
+      <li><a href="livestream.html">Live</a></li>
+    </ul>
+  </div>
 
   <header class="hero">
     <div class="status-pill reveal">
@@ -186,12 +190,13 @@
     }, { threshold: 0.15 });
     document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
-    // mobile nav
-    const navToggle = document.getElementById("navToggle");
-    const drawer = document.getElementById("mobileDrawer");
-    const drawerClose = document.getElementById("drawerClose");
-    navToggle.addEventListener("click", () => drawer.classList.add("show"));
-    drawerClose.addEventListener("click", () => drawer.classList.remove("show"));
+    // mobile nav (close overlay when a link is tapped)
+    const mobileToggle = document.getElementById("mobileNavToggle");
+    if (mobileToggle) {
+      document.querySelectorAll(".mobile-overlay a").forEach((link) => {
+        link.addEventListener("click", () => { mobileToggle.checked = false; });
+      });
+    }
 
     // Audio playlist (persists selection per session)
     (() => {
