@@ -56,12 +56,12 @@ export default {
              command TEXT,
              actions TEXT,
              files TEXT,
-             commit TEXT
+             commit_sha TEXT
            );`
         ).run();
 
         const data = await env.D1.prepare(
-          "SELECT id, ts, command, actions, files, commit FROM commands ORDER BY ts DESC LIMIT 20"
+          "SELECT id, ts, command, actions, files, commit_sha as commit FROM commands ORDER BY ts DESC LIMIT 20"
         ).all();
 
         return jsonResponse(200, { logs: data.results || [] });

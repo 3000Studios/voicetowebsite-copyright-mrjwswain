@@ -146,6 +146,20 @@ export async function onRequestPost(context) {
     return content.replace(pattern, `${field}: '${safeValue}'`);
   };
 
+  const escapeHtml = (value) =>
+    value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+  const updateElementById = (content, id, value) => {
+    if (!value) return content;
+    const safeValue = escapeHtml(value).replace(/\n/g, "<br />");
+    const pattern = new RegExp(`(<[^>]*id=["']${id}["'][^>]*>)([\\s\\S]*?)(</[^>]+>)`, "i");
+    if (!pattern.test(content)) return content;
+    return content.replace(pattern, `$1${safeValue}$3`);
+  };
+
   const updateTheme = (content, theme) => {
     const safeValue = toSafeJsString(theme);
     return content.replace(/theme:\s*'[^']*'/, `theme: '${safeValue}'`);
@@ -397,11 +411,11 @@ export async function onRequestPost(context) {
            command TEXT,
            actions TEXT,
            files TEXT,
-           commit TEXT
+           commit_sha TEXT
          );`
       ).run();
       await db.prepare(
-        "INSERT INTO commands (command, actions, files, commit) VALUES (?, ?, ?, ?)"
+        "INSERT INTO commands (command, actions, files, commit_sha) VALUES (?, ?, ?, ?)"
       )
         .bind(command, JSON.stringify(actions || []), JSON.stringify(files || []), commit || "")
         .run();
@@ -419,6 +433,7 @@ export async function onRequestPost(context) {
 
     const needsIndex = actions.some((action) =>
       [
+        "update_copy",
         "update_meta",
         "add_page",
         "insert_monetization",
@@ -448,8 +463,16 @@ export async function onRequestPost(context) {
 
     for (const action of actions) {
       auditLog.push(action.type);
-      if (action.type === "update_copy" && appJs) {
-        appJs = updateAppState(appJs, action.field, action.value);
+      if (action.type === "update_copy") {
+        if (indexHtml) {
+          const target = action.field;
+          if (target && allowedFields.includes(target)) {
+            indexHtml = updateElementById(indexHtml, target, action.value || "");
+          }
+        }
+        if (appJs) {
+          appJs = updateAppState(appJs, action.field, action.value);
+        }
       }
       if (action.type === "update_theme" && appJs) {
         appJs = updateTheme(appJs, action.theme);
