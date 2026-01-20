@@ -74,30 +74,35 @@
       </div>
     </section>
 
-    <section class="section blog-feed" id="live-blog">
+    <section class="section story-feed" id="live-blog">
       <div class="lineup-header">
         <div>
-          <p class="eyebrow">Auto Blog</p>
           <h2>Latest Web Build Signals</h2>
-          <p class="muted">Fresh pulls from the web dev community, rendered live.</p>
+          <p class="muted">SEO-rich, voice-first success stories for livestream viewers.</p>
         </div>
         <a class="pill-link" href="blog.html">View archive</a>
       </div>
-      <div class="blog-grid" id="live-blog-grid">
-        <article class="blog-card skeleton">
-          <div class="skeleton-line w-60"></div>
-          <div class="skeleton-line w-80"></div>
-          <div class="skeleton-line w-40"></div>
+      <div class="story-grid" id="live-story-grid">
+        <article class="story-card skeleton">
+          <div class="story-bg skeleton-line w-80"></div>
+          <div class="story-copy">
+            <h3 class="skeleton-line w-60"></h3>
+            <p class="skeleton-line w-90"></p>
+          </div>
         </article>
-        <article class="blog-card skeleton">
-          <div class="skeleton-line w-70"></div>
-          <div class="skeleton-line w-60"></div>
-          <div class="skeleton-line w-50"></div>
+        <article class="story-card skeleton">
+          <div class="story-bg skeleton-line w-80"></div>
+          <div class="story-copy">
+            <h3 class="skeleton-line w-70"></h3>
+            <p class="skeleton-line w-90"></p>
+          </div>
         </article>
-        <article class="blog-card skeleton">
-          <div class="skeleton-line w-65"></div>
-          <div class="skeleton-line w-75"></div>
-          <div class="skeleton-line w-30"></div>
+        <article class="story-card skeleton">
+          <div class="story-bg skeleton-line w-80"></div>
+          <div class="story-copy">
+            <h3 class="skeleton-line w-65"></h3>
+            <p class="skeleton-line w-90"></p>
+          </div>
         </article>
       </div>
     </section>
@@ -138,21 +143,24 @@
       liveStatus.textContent = "Stream saved and live.";
     });
 
-    // live page blog feed
-    const liveBlogGrid = document.getElementById("live-blog-grid");
-    const renderLivePosts = (posts = []) => {
-      if (!liveBlogGrid) return;
-      liveBlogGrid.innerHTML = "";
+    // live page story feed
+    const liveStoryGrid = document.getElementById("live-story-grid");
+    const renderLiveStories = (posts = []) => {
+      if (!liveStoryGrid) return;
+      liveStoryGrid.innerHTML = "";
       posts.slice(0, 3).forEach((post) => {
         const card = document.createElement("article");
-        card.className = "blog-card";
+        card.className = "story-card";
         card.innerHTML = `
-          <p class="eyebrow">${post.tag || "Web"}</p>
-          <h3>${post.title}</h3>
-          <p class="muted">${post.desc}</p>
-          <a class="pill-link" href="${post.url}" target="_blank" rel="noreferrer">Read →</a>
+          <div class="story-bg" style="background-image:url('${post.image || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80"}');"></div>
+          <div class="story-copy">
+            <p class="eyebrow">${post.tag || "Web"}</p>
+            <h3>${post.title}</h3>
+            <p class="muted">${post.desc}</p>
+            <a class="pill-link" href="${post.url}" target="_blank" rel="noreferrer">Read →</a>
+          </div>
         `;
-        liveBlogGrid.appendChild(card);
+        liveStoryGrid.appendChild(card);
       });
     };
 
@@ -163,16 +171,35 @@
         const data = await res.json();
         const posts = data.map((p) => ({
           title: p.title,
-          desc: p.description || "Latest from DEV.",
+          desc: p.description || "SEO-rich web dev insights for your next build.",
           url: p.url,
           tag: (p.tag_list && p.tag_list[0]) || "webdev",
+          image: p.cover_image || p.social_image,
         }));
-        renderLivePosts(posts);
+        renderLiveStories(posts);
       } catch (err) {
-        renderLivePosts([
-          { title: "Design systems that ship", desc: "Patterns to keep velocity high while staying on-brand.", url: "https://developer.mozilla.org/", tag: "design" },
-          { title: "AI-first launch checklists", desc: "Prep prompts, telemetry, and fallbacks before go-live.", url: "https://ai.googleblog.com/", tag: "ai" },
-          { title: "Streaming UI patterns", desc: "Livestream embeds, chat overlays, and moderation hooks.", url: "https://vercel.com/blog", tag: "stream" },
+        renderLiveStories([
+          {
+            title: "Hands-free site builds",
+            desc: "How voice-first flows ship accessible sites for everyone.",
+            url: "https://developer.mozilla.org/",
+            tag: "accessibility",
+            image: "https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?auto=format&fit=crop&w=900&q=80",
+          },
+          {
+            title: "Speed to launch",
+            desc: "From appointment to live deploy in under a day.",
+            url: "https://vercel.com/blog",
+            tag: "shipping",
+            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",
+          },
+          {
+            title: "Voice SEO wins",
+            desc: "Structured content that ranks while you talk.",
+            url: "https://ai.googleblog.com/",
+            tag: "seo",
+            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",
+          },
         ]);
       }
     };

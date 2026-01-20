@@ -158,7 +158,8 @@ h3,
   top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--accent);
+  background: linear-gradient(90deg, #00f0ff, #4cc9ff, #00f0ff);
+  background-size: 200% 100%;
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition: width 0.3s ease, box-shadow 0.3s ease;
 }
@@ -171,12 +172,20 @@ h3,
 .nav-links a:hover::before {
   top: -0.2em;
   left: 0;
-  color: var(--accent);
+  color: #00e1ff;
 }
 
 .nav-links a:hover::after {
   width: 120%;
-  box-shadow: 0 0 0 4px rgba(5, 5, 5, 0.65);
+  box-shadow:
+    0 0 12px rgba(0, 225, 255, 0.7),
+    0 0 24px rgba(0, 225, 255, 0.35);
+  animation: spark-move 0.6s linear infinite;
+}
+
+@keyframes spark-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
 .nav-cta {
@@ -990,6 +999,50 @@ h3,
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+.story-feed {
+  position: relative;
+  overflow: hidden;
+}
+
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.story-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 260px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.story-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.55);
+  transform: scale(1.05);
+  transition: transform 0.6s ease;
+}
+
+.story-card:hover .story-bg {
+  transform: scale(1);
+}
+
+.story-copy {
+  position: relative;
+  padding: 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.8));
 }
 
 /* Store page */
