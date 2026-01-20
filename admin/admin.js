@@ -43,7 +43,6 @@ const kpiNew = document.getElementById("kpi-new");
 
 let recognition;
 let listening = false;
-let inactivityTimer = null;
 let lastPlan = null;
 let orchestratorHealthy = true;
 
@@ -450,13 +449,6 @@ const initSpeech = () => {
   recognition.lang = "en-US";
   recognition.interimResults = false;
 
-  const scheduleInactivity = () => {
-    if (inactivityTimer) clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-      stopBtn.click();
-    }, 5000);
-  };
-
   recognition.onresult = (event) => {
     if (!event.results || event.results.length === 0) return;
     const last = event.results[event.results.length - 1];
@@ -465,7 +457,6 @@ const initSpeech = () => {
     commandEl.value = transcript;
     micStateEl.textContent = `Captured: "${transcript}"`;
     applyLocalPreview(transcript);
-    if (listening) scheduleInactivity();
 
     const lower = transcript.toLowerCase();
     if (lower.includes("ship it") && planConfirm) {
@@ -487,7 +478,7 @@ const initSpeech = () => {
     }
   };
 
-  return { scheduleInactivity };
+  return {};
 };
 
 const speechController = initSpeech();
@@ -497,7 +488,6 @@ if (startBtn) {
     if (!recognition) return;
     listening = true;
     recognition.start();
-    if (speechController?.scheduleInactivity) speechController.scheduleInactivity();
     if (micStateEl) micStateEl.textContent = "Listening...";
   });
 }
@@ -508,7 +498,6 @@ if (stopBtn) {
     listening = false;
     recognition.stop();
     if (micStateEl) micStateEl.textContent = "Microphone idle.";
-    if (inactivityTimer) clearTimeout(inactivityTimer);
   });
 }
 
@@ -573,6 +562,9 @@ if (applyBtn) applyBtn.addEventListener("click", async () => {
     const data = await callOrchestrator({ mode: "apply", plan: lastPlan.plan, command: lastPlan.command });
     markResponseSource(data);
     setResponse(data);
+    if (lastPlan?.plan?.actions) {
+      applyActionsPreview(lastPlan.plan.actions);
+    }
     logActivity();
   } catch (err) {
     setResponse({ error: err.message });

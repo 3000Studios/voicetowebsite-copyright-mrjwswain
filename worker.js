@@ -73,15 +73,16 @@ export default {
     // Cloudflare zone analytics proxy (real data only)
     if (url.pathname === "/api/analytics/overview" && request.method === "GET") {
       const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
-      if (!env.CF_API_TOKEN || !zoneId) {
-        return jsonResponse(501, { error: "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (and optionally CF_ZONE_ID)." });
+      const apiToken = env.CF_API_TOKEN || env.CF_API_TOKEN2;
+      if (!apiToken || !zoneId) {
+        return jsonResponse(501, { error: "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (or CF_API_TOKEN2) and optionally CF_ZONE_ID." });
       }
       try {
         const since = "-43200"; // last 12 hours; supports relative values
         const apiUrl = `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`;
         const cfRes = await fetch(apiUrl, {
           headers: {
-            Authorization: `Bearer ${env.CF_API_TOKEN}`,
+            Authorization: `Bearer ${apiToken}`,
             "Content-Type": "application/json",
           },
         });
