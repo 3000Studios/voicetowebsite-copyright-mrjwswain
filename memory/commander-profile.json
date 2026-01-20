@@ -1,0 +1,11 @@
+{
+  "owner": "Mr J W Swain",
+  "project": "Voice To Website Editor",
+  "role": "Commander",
+  "interaction_mode": "commands only",
+  "coding_rules": "full production scripts only",
+  "testing_policy": "always test and auto-fix",
+  "execution_policy": "never stop early",
+  "priority": "completion over explanation",
+  "learned_patterns": []
+}
