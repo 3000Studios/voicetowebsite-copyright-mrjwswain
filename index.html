@@ -95,6 +95,55 @@
     </a>
   </section>
 
+  <section class="product-lineup reveal">
+    <div class="lineup-header">
+      <div>
+        <p class="eyebrow">For Sale</p>
+        <h2>Signature Drops</h2>
+        <p class="muted">High-intent offers, ready to check out or demo.</p>
+      </div>
+      <a class="pill-link" href="store.html">Open Store</a>
+    </div>
+    <div class="lineup-grid">
+      <article class="lineup-card">
+        <span class="pill sale">New</span>
+        <h3>Platinum Voice Site</h3>
+        <p>Full voice-first website with live deploys and admin console.</p>
+        <div class="price-row">
+          <span class="price-tag">$199</span><span class="price-unit">/mo</span>
+        </div>
+        <a class="btn small" href="store.html">Buy now</a>
+      </article>
+      <article class="lineup-card">
+        <span class="pill sale">Bundle</span>
+        <h3>Automation Kit</h3>
+        <p>Lead capture, CRM sync, alerts, and AI responses wired in.</p>
+        <div class="price-row">
+          <span class="price-tag">$149</span><span class="price-unit">/mo</span>
+        </div>
+        <a class="btn ghost small" href="store.html">View bundle</a>
+      </article>
+      <article class="lineup-card">
+        <span class="pill sale">Live</span>
+        <h3>Livestream Pack</h3>
+        <p>Stream embeds, scheduling, and promo blocks shipped for you.</p>
+        <div class="price-row">
+          <span class="price-tag">$89</span><span class="price-unit">/mo</span>
+        </div>
+        <a class="btn ghost small" href="store.html">Add to cart</a>
+      </article>
+      <article class="lineup-card">
+        <span class="pill sale">Pro</span>
+        <h3>Support Retainer</h3>
+        <p>Priority edits, AI prompt tuning, and uptime watch.</p>
+        <div class="price-row">
+          <span class="price-tag">$99</span><span class="price-unit">/mo</span>
+        </div>
+        <a class="btn small" href="store.html">Book</a>
+      </article>
+    </div>
+  </section>
+
   <section id="features" class="features">
     <div class="feature-grid">
       <div class="feature-card feature-large reveal">
@@ -134,6 +183,34 @@
         <h4>Instant Deploy</h4>
         <p>Publish to the global edge with a single voice command.</p>
       </div>
+    </div>
+  </section>
+
+  <section class="blog-feed reveal" id="blog">
+    <div class="lineup-header">
+      <div>
+        <p class="eyebrow">Auto Blog</p>
+        <h2>Latest Web Build Signals</h2>
+        <p class="muted">Fresh pulls from the web dev community, rendered live.</p>
+      </div>
+      <a class="pill-link" href="blog.html">View archive</a>
+    </div>
+    <div class="blog-grid" id="blog-grid">
+      <article class="blog-card skeleton">
+        <div class="skeleton-line w-60"></div>
+        <div class="skeleton-line w-80"></div>
+        <div class="skeleton-line w-40"></div>
+      </article>
+      <article class="blog-card skeleton">
+        <div class="skeleton-line w-70"></div>
+        <div class="skeleton-line w-60"></div>
+        <div class="skeleton-line w-50"></div>
+      </article>
+      <article class="blog-card skeleton">
+        <div class="skeleton-line w-65"></div>
+        <div class="skeleton-line w-75"></div>
+        <div class="skeleton-line w-30"></div>
+      </article>
     </div>
   </section>
 
@@ -197,6 +274,47 @@
         link.addEventListener("click", () => { mobileToggle.checked = false; });
       });
     }
+
+    // blog feed (auto-populated)
+    const blogGrid = document.getElementById("blog-grid");
+    const renderPosts = (posts = []) => {
+      if (!blogGrid) return;
+      blogGrid.innerHTML = "";
+      posts.slice(0, 3).forEach((post) => {
+        const card = document.createElement("article");
+        card.className = "blog-card";
+        card.innerHTML = `
+          <p class="eyebrow">${post.tag || "Web"}</p>
+          <h3>${post.title}</h3>
+          <p class="muted">${post.desc}</p>
+          <a class="pill-link" href="${post.url}" target="_blank" rel="noreferrer">Read →</a>
+        `;
+        blogGrid.appendChild(card);
+      });
+    };
+
+    const loadBlog = async () => {
+      try {
+        const res = await fetch("https://dev.to/api/articles?tag=webdev&per_page=3");
+        if (!res.ok) throw new Error("bad status");
+        const data = await res.json();
+        const posts = data.map((p) => ({
+          title: p.title,
+          desc: p.description || "Latest from DEV.",
+          url: p.url,
+          tag: (p.tag_list && p.tag_list[0]) || "webdev",
+        }));
+        renderPosts(posts);
+      } catch (err) {
+        renderPosts([
+          { title: "Design systems that ship", desc: "Patterns to keep velocity high while staying on-brand.", url: "https://developer.mozilla.org/", tag: "design" },
+          { title: "AI-first launch checklists", desc: "How to prep prompts, telemetry, and fallbacks.", url: "https://ai.googleblog.com/", tag: "ai" },
+          { title: "Streaming UI patterns", desc: "Livestream embeds, chat overlays, and moderation hooks.", url: "https://vercel.com/blog", tag: "stream" },
+        ]);
+      }
+    };
+
+    loadBlog();
 
     // Audio playlist (persists selection per session)
     (() => {
