@@ -5,279 +5,275 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Race to 3000</title>
   <link rel="stylesheet" href="/styles.css" />
+  <style>
+    :root {
+      --font-display: "Playfair Display", "Space Grotesk", "Inter", sans-serif;
+      --bg-deep: #01030a;
+      --scrim: rgba(2, 2, 15, 0.85);
+      --card-bg: rgba(5, 5, 20, 0.85);
+      --glow: rgba(255, 215, 0, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-display);
+      background: radial-gradient(circle at top, #121531, #05050f 60%);
+      color: #fff;
+    }
+
+    .page-3000 {
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-video-3000 {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .scrim-3000 {
+      position: fixed;
+      inset: 0;
+      background: var(--scrim);
+      z-index: 1;
+    }
+
+    #race-root {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+    }
+
+    .login-shell,
+    .game-shell {
+      min-height: 100vh;
+      padding: 3rem 1.5rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .login-card,
+    .dashboard-panel,
+    .player-grid,
+    .message-panel,
+    .grid-stage {
+      border-radius: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-card {
+      max-width: 780px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .login-card h1 {
+      margin-top: 0;
+      margin-bottom: 2rem;
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      letter-spacing: -0.04em;
+      background: linear-gradient(45deg, #ffd700, #ffed4e, #ff8c00, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+      animation: shimmer 4s ease infinite;
+    }
+
+    .player-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+
+    .player-card {
+      border-radius: 1.25rem;
+      padding: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.02);
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.2em;
+      height: 120px;
+    }
+
+    .player-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .player-card span {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .player-card.active {
+      box-shadow: 0 0 20px var(--glow);
+      transform: translateY(-6px);
+    }
+
+    .login-card input,
+    .login-card .action-row button {
+      width: 100%;
+    }
+
+    .login-card input {
+      font-size: 1.4rem;
+      border-radius: 1.25rem;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(15, 15, 30, 0.9);
+      color: #fff;
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    .action-row button {
+      border: none;
+      border-radius: 1.25rem;
+      padding: 1rem 2rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #ffd700, #ffed4e);
+      color: #020409;
+      cursor: pointer;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      transition: transform 0.25s ease;
+    }
+
+    .action-row button:hover {
+      transform: translateY(-2px);
+    }
+
+    .grid-stage {
+      display: grid;
+      gap: 0.4rem;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      padding: 0.75rem;
+    }
+
+    .grid-cell {
+      background: linear-gradient(145deg, #111328, #0f1420);
+      border-radius: 0.75rem;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+      cursor: pointer;
+      color: #fff;
+      height: 72px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .grid-cell.active {
+      border-color: #ffd700;
+      box-shadow: 0 0 18px rgba(255, 215, 0, 0.7);
+      transform: translateY(-6px) scale(1.02);
+    }
+
+    .dashboard-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .dashboard-panel strong {
+      font-size: 1.8rem;
+    }
+
+    .dashboard-panel .controls {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .control-dot {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.5rem;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .message-panel h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .message-history {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .message-entry {
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 0.9rem;
+      font-size: 0.95rem;
+    }
+
+    .combo-toast {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      z-index: 20;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      text-shadow: 0 0 25px var(--glow);
+    }
+
+    @keyframes shimmer {
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-stage {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+    }
+  </style>
 </head>
 <body class="page-3000">
   <video class="bg-video-3000" autoplay muted loop playsinline>
-    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766972500/3000_studios_back_dop_nldai9.mp4" type="video/mp4" />
+    <source
+      src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766972500/3000_studios_back_dop_nldai9.mp4"
+      type="video/mp4"
+    />
   </video>
   <div class="scrim-3000"></div>
-
-  <div class="race-shell">
-    <h1>Race to 3000</h1>
-    <div class="race-hud">
-      <div>
-        <label class="form-label">Enter your code (daughter / son / mom / dad)</label>
-        <div class="button-row">
-          <input id="login-code" type="password" placeholder="Enter code" />
-          <button class="primary" id="login-btn">Start Turn</button>
-        </div>
-        <p class="muted" id="race-status">Login to begin.</p>
-      </div>
-      <div class="race-scores" id="race-scores"></div>
-      <div>
-        <p class="muted">Turns left: <span id="turns-left">0</span></p>
-        <p class="muted">Current: <span id="current-player">—</span></p>
-      </div>
-    </div>
-
-    <div class="race-grid" id="race-grid" aria-label="Match grid"></div>
-
-    <div class="race-hud">
-      <div class="race-card">
-        <strong>Messages</strong>
-        <div id="race-messages" class="muted"></div>
-      </div>
-    </div>
-  </div>
-
+  <div id="race-root"></div>
+  <script type="module" src="/race3000.jsx"></script>
   <script type="module" src="/nav.js"></script>
-  <script>
-    const GRID_WIDTH = 9;
-    const GRID_HEIGHT = 15;
-    const PIECES = ["🎮", "🧹", "🧽", "🔌", "📱", "💅", "💻", "🚚", "🔊", "🛠️"];
-    const WIN_SCORE = 3000;
-    const TURNS_PER_PLAYER = 20;
-    const PLAYERS = [
-      { name: "Jerica", code: "daughter", color: "#FF1493" },
-      { name: "Jadon", code: "son", color: "#00BFFF" },
-      { name: "Mom", code: "mom", color: "#9370DB" },
-      { name: "Dad", code: "dad", color: "#32CD32" },
-    ];
-
-    const gridEl = document.getElementById("race-grid");
-    const loginBtn = document.getElementById("login-btn");
-    const codeInput = document.getElementById("login-code");
-    const statusEl = document.getElementById("race-status");
-    const scoresEl = document.getElementById("race-scores");
-    const turnsEl = document.getElementById("turns-left");
-    const currentEl = document.getElementById("current-player");
-    const messagesEl = document.getElementById("race-messages");
-
-    let grid = [];
-    let selected = null;
-    let currentPlayer = null;
-    let turnsLeft = 0;
-    const scores = {};
-    PLAYERS.forEach((p) => (scores[p.name] = 0));
-
-    const clickSound = (f = 440) => {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.frequency.value = f;
-        gain.gain.value = 0.08;
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.08);
-      } catch (_) {}
-    };
-
-    const renderScores = () => {
-      scoresEl.innerHTML = "";
-      PLAYERS.forEach((p) => {
-        const card = document.createElement("div");
-        card.className = "race-card";
-        card.style.borderColor = p.color;
-        card.innerHTML = `<div style="color:${p.color};font-weight:700;">${p.name}</div><div class="muted">Score: ${scores[p.name] || 0}</div>`;
-        scoresEl.appendChild(card);
-      });
-    };
-
-    const createGrid = () => {
-      const g = [];
-      for (let y = 0; y < GRID_HEIGHT; y++) {
-        const row = [];
-        for (let x = 0; x < GRID_WIDTH; x++) {
-          row.push(PIECES[Math.floor(Math.random() * PIECES.length)]);
-        }
-        g.push(row);
-      }
-      return g;
-    };
-
-    const drawGrid = () => {
-      gridEl.innerHTML = "";
-      grid.forEach((row, y) => {
-        row.forEach((piece, x) => {
-          const cell = document.createElement("div");
-          cell.className = "race-cell";
-          if (selected && selected.x === x && selected.y === y) cell.classList.add("selected");
-          cell.textContent = piece;
-          cell.addEventListener("click", () => handleCellClick(x, y));
-          gridEl.appendChild(cell);
-        });
-      });
-    };
-
-    const findMatches = (g) => {
-      const matches = [];
-      // rows
-      for (let y = 0; y < GRID_HEIGHT; y++) {
-        let run = 1;
-        for (let x = 1; x <= GRID_WIDTH; x++) {
-          if (x < GRID_WIDTH && g[y][x] === g[y][x - 1]) run++;
-          else {
-            if (run >= 3) {
-              for (let i = 0; i < run; i++) matches.push({ x: x - 1 - i, y });
-            }
-            run = 1;
-          }
-        }
-      }
-      // cols
-      for (let x = 0; x < GRID_WIDTH; x++) {
-        let run = 1;
-        for (let y = 1; y <= GRID_HEIGHT; y++) {
-          if (y < GRID_HEIGHT && g[y][x] === g[y - 1][x]) run++;
-          else {
-            if (run >= 3) {
-              for (let i = 0; i < run; i++) matches.push({ x, y: y - 1 - i });
-            }
-            run = 1;
-          }
-        }
-      }
-      return matches;
-    };
-
-    const removeMatches = (g, matches) => {
-      const copy = g.map((row) => [...row]);
-      matches.forEach(({ x, y }) => (copy[y][x] = null));
-      return copy;
-    };
-
-    const applyGravity = (g) => {
-      for (let x = 0; x < GRID_WIDTH; x++) {
-        let write = GRID_HEIGHT - 1;
-        for (let y = GRID_HEIGHT - 1; y >= 0; y--) {
-          if (g[y][x] !== null) {
-            g[write][x] = g[y][x];
-            if (write !== y) g[y][x] = null;
-            write--;
-          }
-        }
-        for (let y = write; y >= 0; y--) {
-          g[y][x] = PIECES[Math.floor(Math.random() * PIECES.length)];
-        }
-      }
-      return g;
-    };
-
-    const processMatches = (g) => {
-      let temp = g;
-      let total = 0;
-      let guard = 0;
-      while (guard < 10) {
-        const matches = findMatches(temp);
-        if (!matches.length) break;
-        total += matches.length * 10;
-        temp = applyGravity(removeMatches(temp, matches));
-        guard++;
-      }
-      grid = temp;
-      if (total && currentPlayer) {
-        scores[currentPlayer.name] = (scores[currentPlayer.name] || 0) + total;
-        addMessage(`${currentPlayer.name} scored ${total} points!`);
-      }
-      renderScores();
-      checkWinner();
-    };
-
-    const swapCells = (a, b) => {
-      const temp = grid[a.y][a.x];
-      grid[a.y][a.x] = grid[b.y][b.x];
-      grid[b.y][b.x] = temp;
-    };
-
-    const handleCellClick = (x, y) => {
-      if (!currentPlayer || turnsLeft <= 0) return;
-      if (!selected) {
-        selected = { x, y };
-        clickSound(520);
-        drawGrid();
-        return;
-      }
-      const dx = Math.abs(selected.x - x);
-      const dy = Math.abs(selected.y - y);
-      if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-        swapCells(selected, { x, y });
-        selected = null;
-        turnsLeft--;
-        turnsEl.textContent = turnsLeft;
-        clickSound(360);
-        processMatches(grid);
-        drawGrid();
-        if (turnsLeft <= 0) endTurn();
-      } else {
-        selected = { x, y };
-        drawGrid();
-      }
-    };
-
-    const addMessage = (msg) => {
-      const span = document.createElement("div");
-      span.textContent = msg;
-      messagesEl.appendChild(span);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    };
-
-    const checkWinner = () => {
-      const winner = Object.entries(scores).find(([_, score]) => score >= WIN_SCORE);
-      if (winner) {
-        statusEl.textContent = `${winner[0]} wins!`;
-        currentPlayer = null;
-        turnsLeft = 0;
-        turnsEl.textContent = turnsLeft;
-      }
-    };
-
-    const endTurn = () => {
-      addMessage(`${currentPlayer?.name} finished their turn.`);
-      currentPlayer = null;
-      turnsLeft = 0;
-      turnsEl.textContent = turnsLeft;
-      currentEl.textContent = "—";
-      statusEl.textContent = "Login to continue.";
-    };
-
-    const login = () => {
-      const code = codeInput.value.trim().toLowerCase();
-      const player = PLAYERS.find((p) => p.code === code);
-      if (!player) {
-        statusEl.textContent = "Invalid code.";
-        clickSound(220);
-        return;
-      }
-      currentPlayer = player;
-      turnsLeft = TURNS_PER_PLAYER;
-      turnsEl.textContent = turnsLeft;
-      currentEl.textContent = player.name;
-      statusEl.textContent = `${player.name} turn started.`;
-      grid = createGrid();
-      selected = null;
-      drawGrid();
-      clickSound(660);
-    };
-
-    loginBtn.addEventListener("click", login);
-    codeInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") login();
-    });
-
-    renderScores();
-    drawGrid();
-  </script>
 </body>
 </html>
