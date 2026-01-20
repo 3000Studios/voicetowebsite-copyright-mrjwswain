@@ -55,7 +55,10 @@
             <li>Live deploys with rollback</li>
             <li>Edge hosting (KV + D1 ready)</li>
           </ul>
-          <button class="primary">Buy with PayPal</button>
+          <div class="button-row">
+            <button class="primary pay-btn" data-product="platinum" data-amount="19900" data-label="Platinum Voice Site">PayPal</button>
+            <button class="ghost stripe-btn" data-product="platinum" data-amount="19900" data-label="Platinum Voice Site">Stripe</button>
+          </div>
         </div>
         <div class="price-card">
           <span class="pill sale">Bundle</span>
@@ -66,7 +69,10 @@
             <li>Alerting and AI responses</li>
             <li>Weekly optimization</li>
           </ul>
-          <button class="primary">Buy with PayPal</button>
+          <div class="button-row">
+            <button class="primary pay-btn" data-product="automation-kit" data-amount="14900" data-label="Automation Kit">PayPal</button>
+            <button class="ghost stripe-btn" data-product="automation-kit" data-amount="14900" data-label="Automation Kit">Stripe</button>
+          </div>
         </div>
         <div class="price-card">
           <span class="pill sale">Live</span>
@@ -77,7 +83,10 @@
             <li>Promo blocks + schedule</li>
             <li>Moderation hooks</li>
           </ul>
-          <button class="primary">Add to Cart</button>
+          <div class="button-row">
+            <button class="primary pay-btn" data-product="livestream-pack" data-amount="8900" data-label="Livestream Pack">PayPal</button>
+            <button class="ghost stripe-btn" data-product="livestream-pack" data-amount="8900" data-label="Livestream Pack">Stripe</button>
+          </div>
         </div>
         <div class="price-card">
           <span class="pill sale">Pro</span>
@@ -88,7 +97,10 @@
             <li>Prompt tuning</li>
             <li>Uptime watch</li>
           </ul>
-          <button class="primary">Talk to Sales</button>
+          <div class="button-row">
+            <button class="primary pay-btn" data-product="support-retainer" data-amount="9900" data-label="Support Retainer">PayPal</button>
+            <button class="ghost stripe-btn" data-product="support-retainer" data-amount="9900" data-label="Support Retainer">Stripe</button>
+          </div>
         </div>
       </div>
       <div class="adsense-slot">
@@ -102,6 +114,48 @@
     </section>
   </main>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <script src="https://js.stripe.com/v3"></script>
+  <script>
+    const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
+    const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
+
+    const handleStripe = async (btn) => {
+      const amount = btn.dataset.amount;
+      const product = btn.dataset.product;
+      const label = btn.dataset.label;
+      try {
+        const stripe = Stripe(STRIPE_PK);
+        const res = await fetch("/api/stripe/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount, product, label, source: "store" }),
+        });
+        const data = await res.json();
+        if (!data.sessionId) throw new Error("No session");
+        await stripe.redirectToCheckout({ sessionId: data.sessionId });
+      } catch (err) {
+        alert("Stripe checkout not configured. Please set STRIPE_PUBLISHABLE_KEY and backend endpoint.");
+        console.warn(err);
+      }
+    };
+
+    const handlePayPal = (btn) => {
+      const amount = btn.dataset.amount;
+      const product = btn.dataset.product;
+      if (PAYPAL_CLIENT === "__PAYPAL_CLIENT_ID__") {
+        alert("PayPal client ID missing. Configure PAYPAL_CLIENT_ID to enable checkout.");
+        return;
+      }
+      window.location.href = `https://www.paypal.com/checkoutnow?token=${encodeURIComponent(product)}-${amount}`;
+    };
+
+    document.querySelectorAll(".stripe-btn").forEach((btn) => {
+      btn.addEventListener("click", () => handleStripe(btn));
+    });
+    document.querySelectorAll(".pay-btn").forEach((btn) => {
+      btn.addEventListener("click", () => handlePayPal(btn));
+    });
+  </script>
   <script type="module" src="nav.js"></script>
 </body>
 </html>

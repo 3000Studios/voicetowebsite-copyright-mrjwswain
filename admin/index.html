@@ -147,6 +147,21 @@
       <section class="card" id="livestream-setup">
         <h2>Live Stream Setup</h2>
         <p class="muted">Configure your live stream destinations and embeds.</p>
+        <div class="live-admin">
+          <div class="live-admin__player">
+            <h4>Current Stream</h4>
+            <video id="admin-live-player" controls muted style="width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.1);" src=""></video>
+            <div class="live-admin__controls">
+              <input type="url" id="admin-live-url" placeholder="https://www.youtube.com/embed/..." />
+              <button class="primary" id="admin-live-load">Load Stream</button>
+              <button class="secondary" id="admin-live-save">Save Clip</button>
+            </div>
+          </div>
+          <div class="live-admin__clips">
+            <h4>Saved Clips</h4>
+            <ul id="admin-live-clips" class="clip-list"></ul>
+          </div>
+        </div>
       </section>
 
       <section class="card" id="app-manager">

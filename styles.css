@@ -479,11 +479,14 @@ h3,
   text-decoration: none;
 }
 
-.portal-card video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(1.15) contrast(1.05) brightness(0.9);
+.portal-thumb {
+  position: absolute;
+  inset: 0;
+  background-image: var(--thumb, linear-gradient(135deg, #111, #333));
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.05) contrast(1.05) brightness(0.9);
+  transform: scale(1.02);
 }
 
 .portal-label {
@@ -789,6 +792,36 @@ h3,
   padding: 2rem 1.5rem;
 }
 
+.app-hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.app-hero-media img {
+  width: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+}
+
+.app-hero-copy h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.app-hero .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.6rem 0 1rem;
+}
+
 .lineup-header {
   display: flex;
   justify-content: space-between;
@@ -942,6 +975,46 @@ h3,
 
 .price-card .primary {
   justify-self: start;
+}
+
+.live-form {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.6rem 0 0;
+}
+
+.live-form input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  color: var(--text);
+}
+
+.review-marquee {
+  position: relative;
+  overflow: hidden;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.marquee-track {
+  display: inline-flex;
+  gap: 2rem;
+  white-space: nowrap;
+  animation: marquee 18s linear infinite;
+  padding-left: 2rem;
+}
+
+.review-marquee span {
+  color: var(--muted);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* App Store product highlight */

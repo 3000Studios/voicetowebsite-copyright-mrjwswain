@@ -26,6 +26,11 @@ const orchestratorStateEl = document.getElementById("orchestrator-state");
 const previewModeEl = document.getElementById("preview-mode");
 const responseSourceEl = document.getElementById("response-source");
 const quickCommandsEl = document.getElementById("quick-commands");
+const adminLivePlayer = document.getElementById("admin-live-player");
+const adminLiveUrl = document.getElementById("admin-live-url");
+const adminLiveLoad = document.getElementById("admin-live-load");
+const adminLiveSave = document.getElementById("admin-live-save");
+const adminLiveClips = document.getElementById("admin-live-clips");
 
 let recognition;
 let listening = false;
@@ -576,6 +581,39 @@ if (refreshLogs) {
   refreshLogs.addEventListener("click", () => logActivity());
 }
 
+// Admin live clips: store in localStorage (or future DB)
+const loadClips = () => JSON.parse(localStorage.getItem("vtw-live-clips") || "[]");
+const saveClips = (clips) => localStorage.setItem("vtw-live-clips", JSON.stringify(clips));
+
+const renderClips = () => {
+  if (!adminLiveClips) return;
+  const clips = loadClips();
+  adminLiveClips.innerHTML = "";
+  clips.forEach((c, idx) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${c.title || "Clip"} — ${new Date(c.ts).toLocaleString()}</span><a href="${c.url}" target="_blank" rel="noreferrer">Open</a>`;
+    adminLiveClips.appendChild(li);
+  });
+  if (!clips.length) adminLiveClips.innerHTML = "<li>No clips yet.</li>";
+};
+
+adminLiveLoad?.addEventListener("click", () => {
+  if (!adminLiveUrl?.value) return;
+  if (adminLivePlayer) {
+    adminLivePlayer.src = adminLiveUrl.value;
+    adminLivePlayer.load();
+  }
+});
+
+adminLiveSave?.addEventListener("click", async () => {
+  if (!adminLiveUrl?.value) return;
+  const clips = loadClips();
+  const entry = { url: adminLiveUrl.value, title: adminLiveUrl.value.slice(0, 40), ts: new Date().toISOString() };
+  clips.unshift(entry);
+  saveClips(clips.slice(0, 20));
+  renderClips();
+});
+
 document.addEventListener("click", (event) => {
   if (event.target.closest("button, a")) {
     clickSound();
@@ -614,6 +652,8 @@ updateApplyGate();
 if (planConfirm) {
   planConfirm.addEventListener("input", updateApplyGate);
 }
+
+renderClips();
 
 if (undoBtn) {
   undoBtn.addEventListener("click", async () => {
