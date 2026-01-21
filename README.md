@@ -1,32 +1,104 @@
-# VoiceToWebsite
+PROPRIETARY INTELLECTUAL PROPERTY LICENSE
+NON-ENABLING DISCLOSURE
+Version 1.1
 
-© 2026 Mr. jwswain. All rights reserved. Patent Pending. This codebase is proprietary and not licensed for redistribution or reuse without written permission.
+--------------------------------------------------
 
-## Overview
-Voice-driven site + admin console served by a Cloudflare Worker (`worker.js`) with static assets from `dist`. Routes in `wrangler.toml` target `voicetowebsite.com/*` and `www.voicetowebsite.com/*`. Admin lives at `/admin`; orchestration endpoint is `/api/orchestrator` (`functions/orchestrator.js`).
+Copyright © 2026
+Mr.Jwswain
+Owner@voicetowebsite.com
+All Rights Reserved.
 
-## Runtime secrets (Worker)
-- `OPENAI_API`
-- `OPENAI_MODEL` (optional, default: gpt-4o-mini)
-- `GITHUB_TOKEN` / `GH_TOKEN` / `GH_BOT_TOKEN` (repo write scope)
-- `GITHUB_REPO` (owner/repo)
-- `GITHUB_BASE_BRANCH` (default: main)
-- `ADMIN_ROLE` (optional)
-- `PAYPAL_CLIENT_ID_PROD` (optional)
-- `ADSENSE_PUBLISHER` (optional)
-- `ADSENSE_SLOT` (optional)
-- `DB` (D1 binding) for command logs
+--------------------------------------------------
 
-## Deploy
-```bash
-npm install
-npm run build
-wrangler publish
-```
+NOTICE OF INVENTION
 
-Ensure `wrangler.toml` has your `account_id`, `zone_id`, and routes for `voicetowebsite.com/*`.
+This repository documents the existence of a proprietary software system
+known as "VoiceToWebsite™", including associated methods, workflows,
+and system architecture.
 
-## Ownership files
-- `OWNER.md`
-- `COPYRIGHT`
-- `PATENT_PREP.md`
+This repository is published for purposes of:
+- Authorship verification
+- Prior art positioning
+- Patent examination support
+- Legal due diligence
+
+--------------------------------------------------
+
+NO LICENSE GRANTED
+
+No license, express or implied, is granted under this document.
+
+This includes, without limitation, any license to:
+- Make
+- Use
+- Sell
+- Offer for sale
+- Import
+- Modify
+- Distribute
+- Reverse engineer
+- Train artificial intelligence systems
+- Create derivative works
+
+--------------------------------------------------
+
+NON-ENABLING DISCLOSURE
+
+The contents of this repository are intentionally incomplete and abstract.
+
+No reasonable person skilled in the art would be able to reproduce,
+implement, or practice the invention based solely on the materials
+contained herein.
+
+This repository shall not be considered an enabling disclosure.
+
+--------------------------------------------------
+
+RESTRICTIONS
+
+You may NOT:
+
+- Use this material in any commercial or competitive system
+- Incorporate this material into any product or service
+- Use this material to train or fine-tune AI or ML models
+- Derive system behavior or architecture from this repository
+- Claim ownership or inventorship of related systems
+
+--------------------------------------------------
+
+INFRINGEMENT & ENFORCEMENT
+
+Unauthorized use may constitute:
+
+- Copyright infringement
+- Trade secret misappropriation
+- Unfair competition
+- Patent infringement (pending or future)
+
+The rights holder reserves all legal remedies.
+
+--------------------------------------------------
+
+NO WARRANTY
+
+THIS MATERIAL IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED.
+
+--------------------------------------------------
+
+GOVERNING LAW
+
+This License shall be governed by the laws of the
+United States of America and the State of Georgia.
+
+--------------------------------------------------
+
+CONTACT
+
+3000 Studios  
+https://VoiceToWebsite.com
+
+--------------------------------------------------
+
+END OF LICENSE
