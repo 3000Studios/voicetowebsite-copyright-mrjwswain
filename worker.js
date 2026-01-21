@@ -56,12 +56,30 @@ export default {
              command TEXT,
              actions TEXT,
              files TEXT,
-             commit_sha TEXT
+             commit_sha TEXT,
+             intent_json TEXT,
+             deployment_id TEXT,
+             deployment_status TEXT,
+             deployment_message TEXT
            );`
         ).run();
+        const columns = await env.D1.prepare("PRAGMA table_info(commands);").all();
+        const columnNames = new Set((columns.results || []).map((col) => col.name));
+        if (!columnNames.has("intent_json")) {
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
+        }
+        if (!columnNames.has("deployment_id")) {
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
+        }
+        if (!columnNames.has("deployment_status")) {
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
+        }
+        if (!columnNames.has("deployment_message")) {
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
+        }
 
         const data = await env.D1.prepare(
-          "SELECT id, ts, command, actions, files, commit_sha FROM commands ORDER BY ts DESC LIMIT 20"
+          "SELECT id, ts, command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message FROM commands ORDER BY ts DESC LIMIT 20"
         ).all();
 
         return jsonResponse(200, { logs: data.results || [] });

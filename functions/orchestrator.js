@@ -111,6 +111,134 @@ export async function onRequestPost(context) {
     };
   };
 
+  const actionFileMap = {
+    update_copy: ["index.html", "app.js"],
+    update_meta: ["index.html"],
+    update_theme: ["app.js"],
+    add_page: ["index.html"],
+    insert_monetization: ["index.html", "styles.css"],
+    update_background_video: ["index.html"],
+    update_wallpaper: ["styles.css"],
+    update_avatar: ["index.html"],
+    insert_section: ["index.html"],
+    add_product: ["index.html"],
+    insert_video: ["index.html"],
+    insert_stream: ["index.html"],
+    inject_css: ["styles.css"],
+  };
+
+  const structuralActions = new Set([
+    "add_page",
+    "insert_monetization",
+    "insert_section",
+    "insert_video",
+    "insert_stream",
+    "add_product",
+    "update_wallpaper",
+    "update_background_video",
+    "inject_css",
+  ]);
+
+  const buildActionPreview = (action) => {
+    switch (action.type) {
+      case "update_copy":
+        return `Update ${action.field || "copy"} to "${action.value || ""}"`;
+      case "update_meta":
+        return `Update meta title/description`;
+      case "update_theme":
+        return `Set theme to ${action.theme}`;
+      case "add_page":
+        return `Add page ${action.title || action.slug}`;
+      case "insert_monetization":
+        return `Insert monetization block`;
+      case "update_background_video":
+        return `Update background video`;
+      case "update_wallpaper":
+        return `Update wallpaper image`;
+      case "update_avatar":
+        return `Update avatar image`;
+      case "insert_section":
+        return `Insert section ${action.title || action.id}`;
+      case "add_product":
+        return `Add product ${action.name || "New Product"}`;
+      case "insert_video":
+        return `Insert video ${action.title || "Video"}`;
+      case "insert_stream":
+        return `Insert livestream ${action.title || "Live Stream"}`;
+      case "inject_css":
+        return `Inject custom CSS`;
+      default:
+        return `Apply ${action.type}`;
+    }
+  };
+
+  const getActionScope = (action) => {
+    const files = new Set(actionFileMap[action.type] || []);
+    if (action.type === "add_page" && action.slug) {
+      files.add(`${action.slug}.html`);
+    }
+    const sections = [];
+    if (action.type === "update_copy" && action.field) sections.push(action.field);
+    if (["insert_section", "insert_video", "insert_stream"].includes(action.type)) {
+      sections.push(action.id || action.title || action.type);
+    }
+    if (action.type === "insert_monetization") sections.push("monetization");
+    if (action.type === "add_product") sections.push("store");
+    return { files: Array.from(files), sections };
+  };
+
+  const buildIntent = (plan, command) => {
+    const actions = plan.actions || [];
+    const actionTypes = actions.map((action) => action.type);
+    const scope = { files: [], sections: [], components: [] };
+    const previewItems = [];
+    const diffLines = [];
+    let requiresConfirmation = false;
+
+    actions.forEach((action) => {
+      const actionScope = getActionScope(action);
+      scope.files.push(...actionScope.files);
+      scope.sections.push(...actionScope.sections);
+      if (structuralActions.has(action.type)) requiresConfirmation = true;
+      const previewText = buildActionPreview(action);
+      previewItems.push({ action: action.type, summary: previewText, files: actionScope.files });
+      const fileTargets = actionScope.files.length ? actionScope.files.join(", ") : "(no file changes)";
+      diffLines.push(`+ ${fileTargets}: ${previewText}`);
+    });
+
+    const safetyLevel = requiresConfirmation ? "high" : actions.length ? "medium" : "low";
+    const safetyRationale = requiresConfirmation
+      ? "Structural/layout changes detected; explicit confirmation required."
+      : "Content or configuration update.";
+
+    return {
+      actionTypes: Array.from(new Set(actionTypes)),
+      scope: {
+        files: Array.from(new Set(scope.files)),
+        sections: Array.from(new Set(scope.sections)),
+        components: Array.from(new Set(scope.components)),
+      },
+      preview: {
+        summary: plan.summary || "Planned updates",
+        changes: previewItems,
+        diff: diffLines.join("\n"),
+      },
+      safety: {
+        level: safetyLevel,
+        rationale: safetyRationale,
+      },
+      confirmation: {
+        required: requiresConfirmation,
+        phrase: "ship it",
+      },
+      rollback: {
+        supported: true,
+        mode: "rollback_last",
+      },
+      command,
+    };
+  };
+
   const githubRequest = async (path, options = {}) => {
     if (!GITHUB_TOKEN || !GITHUB_REPO) throw new Error("Missing GITHUB_TOKEN or GITHUB_REPO.");
     const res = await fetch(`https://api.github.com${path}`, {
@@ -400,7 +528,7 @@ export async function onRequestPost(context) {
     return { revertedTo: parentSha, revertCommit: revertCommit.sha };
   };
 
-  const logToDB = async ({ command, actions, files, commit }) => {
+  const logToDB = async ({ command, actions, files, commit, intent, deployment }) => {
     const db = env.D1 || env.DB;
     if (!db) return;
     try {
@@ -411,20 +539,76 @@ export async function onRequestPost(context) {
            command TEXT,
            actions TEXT,
            files TEXT,
-           commit_sha TEXT
+           commit_sha TEXT,
+           intent_json TEXT,
+           deployment_id TEXT,
+           deployment_status TEXT,
+           deployment_message TEXT
          );`
       ).run();
+      const columns = await db.prepare("PRAGMA table_info(commands);").all();
+      const columnNames = new Set((columns.results || []).map((col) => col.name));
+      if (!columnNames.has("intent_json")) {
+        await db.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
+      }
+      if (!columnNames.has("deployment_id")) {
+        await db.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
+      }
+      if (!columnNames.has("deployment_status")) {
+        await db.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
+      }
+      if (!columnNames.has("deployment_message")) {
+        await db.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
+      }
       await db.prepare(
-        "INSERT INTO commands (command, actions, files, commit_sha) VALUES (?, ?, ?, ?)"
+        "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
-        .bind(command, JSON.stringify(actions || []), JSON.stringify(files || []), commit || "")
+        .bind(
+          command,
+          JSON.stringify(actions || []),
+          JSON.stringify(files || []),
+          commit || "",
+          JSON.stringify(intent || {}),
+          deployment?.deploymentId || "",
+          deployment?.status || "",
+          deployment?.message || ""
+        )
         .run();
     } catch (_) {
       // ignore logging errors
     }
   };
 
-  const applyActions = async (actions, command) => {
+  const triggerDeployment = async (commitSha, intent) => {
+    const hookUrl = env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK;
+    if (!hookUrl) {
+      return { status: "skipped", deploymentId: "", message: "No deploy hook configured." };
+    }
+    try {
+      const res = await fetch(hookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ commit: commitSha, intent }),
+      });
+      const text = await res.text();
+      let deploymentId = "";
+      try {
+        const parsed = text ? JSON.parse(text) : {};
+        deploymentId = parsed?.id || parsed?.deploymentId || parsed?.deployment_id || "";
+      } catch (_) {
+        deploymentId = res.headers.get("cf-ray") || "";
+      }
+      return {
+        status: res.ok ? "triggered" : "failed",
+        deploymentId,
+        message: text.slice(0, 300),
+      };
+    } catch (err) {
+      return { status: "failed", deploymentId: "", message: err.message };
+    }
+  };
+
+  const applyActions = async (actions, command, intent) => {
     const updates = {};
     let indexHtml = null;
     let appJs = null;
@@ -541,9 +725,17 @@ export async function onRequestPost(context) {
 
     const message = `Live update: ${command.slice(0, 60)}`;
     const { commitSha } = await createCommitOnMain(updates, message);
+    const deployment = await triggerDeployment(commitSha, intent);
 
     // Log to D1 if available; fallback to KV
-    await logToDB({ command, actions: auditLog, files: Object.keys(updates), commit: commitSha });
+    await logToDB({
+      command,
+      actions: auditLog,
+      files: Object.keys(updates),
+      commit: commitSha,
+      intent,
+      deployment,
+    });
 
     // Optional: log to KV if binding exists
     if (env.LEARN && typeof env.LEARN.put === "function") {
@@ -564,7 +756,11 @@ export async function onRequestPost(context) {
       }
     }
 
-    return { commitSha, files: Object.keys(updates) };
+    return {
+      commitSha,
+      files: Object.keys(updates),
+      deployment,
+    };
   };
 
   try {
@@ -651,12 +847,18 @@ Only include supported actions. Keep values concise and suitable for production.
       }
     }
 
+    const intent = buildIntent(plan, command);
+    plan.intent = intent;
+
     if (mode === "plan") {
       return new Response(JSON.stringify({ mode, command, plan }), { headers: { "Content-Type": "application/json" } });
     }
 
     const actions = plan.actions || [];
-    const applied = await applyActions(actions, command);
+    if (intent?.confirmation?.required && payload.confirmation !== intent.confirmation.phrase) {
+      throw new Error(`Confirmation required. Send confirmation phrase: ${intent.confirmation.phrase}`);
+    }
+    const applied = await applyActions(actions, command, intent);
     return new Response(JSON.stringify({ mode, command, plan, ...applied }), {
       headers: { "Content-Type": "application/json" },
     });

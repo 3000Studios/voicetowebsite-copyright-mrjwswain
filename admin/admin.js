@@ -18,6 +18,8 @@ const previewExtras = document.getElementById("preview-extras");
 const previewFrame = document.getElementById("preview-frame");
 const activityList = document.getElementById("activity-list");
 const activityStatus = document.getElementById("activity-status");
+const transcriptList = document.getElementById("transcript-list");
+const transcriptStatus = document.getElementById("transcript-status");
 const refreshLogs = document.getElementById("refresh-logs");
 const planSummary = document.getElementById("plan-summary");
 const planConfirm = document.getElementById("plan-confirm");
@@ -266,6 +268,38 @@ const applyActionsPreview = (actions = []) => {
   speak("Preview updated");
 };
 
+const TRANSCRIPT_KEY = "vtw-transcripts";
+
+const loadTranscripts = () => JSON.parse(localStorage.getItem(TRANSCRIPT_KEY) || "[]");
+const saveTranscripts = (entries) => localStorage.setItem(TRANSCRIPT_KEY, JSON.stringify(entries.slice(0, 40)));
+
+const renderTranscripts = () => {
+  if (!transcriptList || !transcriptStatus) return;
+  const transcripts = loadTranscripts();
+  transcriptList.innerHTML = "";
+  if (!transcripts.length) {
+    transcriptStatus.textContent = "No transcripts yet.";
+    return;
+  }
+  transcripts.forEach((entry) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div class="cmd">${entry.text}</div>
+      <div class="meta">${entry.source || "voice"} | ${new Date(entry.ts).toLocaleString()}</div>
+    `;
+    transcriptList.appendChild(li);
+  });
+  transcriptStatus.textContent = `Loaded ${transcripts.length} transcripts.`;
+};
+
+const logTranscript = (text, source = "voice") => {
+  if (!text) return;
+  const transcripts = loadTranscripts();
+  transcripts.unshift({ text, source, ts: new Date().toISOString() });
+  saveTranscripts(transcripts);
+  renderTranscripts();
+};
+
 const logActivity = async () => {
   if (!activityStatus) return;
   activityStatus.textContent = "Loading history...";
@@ -280,10 +314,23 @@ const logActivity = async () => {
       return;
     }
     logs.forEach((row) => {
+      let safetyLabel = "";
+      try {
+        const intentPreview = row.intent_json ? JSON.parse(row.intent_json) : null;
+        if (intentPreview?.safety?.level) safetyLabel = ` | Safety: ${intentPreview.safety.level}`;
+      } catch (_) {
+        // ignore parse issues
+      }
+      const deploymentStatus = row.deployment_status ? `${row.deployment_status}` : "";
+      const deploymentId = row.deployment_id ? ` ${row.deployment_id}` : "";
+      const deployment = deploymentStatus || deploymentId
+        ? ` | Deploy: ${deploymentStatus}${deploymentId}`.trim()
+        : "";
+      const detail = row.deployment_message ? ` (${row.deployment_message})` : "";
       const li = document.createElement("li");
       li.innerHTML = `
         <div class="cmd">${row.command || "(no command)"}</div>
-        <div class="meta">Actions: ${row.actions || "[]"} | Files: ${row.files || "[]"} | Commit: ${row.commit_sha || ""} | ${row.ts || ""}</div>
+        <div class="meta">Actions: ${row.actions || "[]"} | Files: ${row.files || "[]"} | Commit: ${row.commit_sha || ""}${deployment}${detail}${safetyLabel} | ${row.ts || ""}</div>
       `;
       if (activityList) activityList.appendChild(li);
     });
@@ -457,6 +504,7 @@ const initSpeech = () => {
     commandEl.value = transcript;
     micStateEl.textContent = `Captured: "${transcript}"`;
     applyLocalPreview(transcript);
+    logTranscript(transcript, "voice");
 
     const lower = transcript.toLowerCase();
     if (lower.includes("ship it") && planConfirm) {
@@ -519,6 +567,7 @@ if (planBtn) planBtn.addEventListener("click", async () => {
     const command = commandEl.value.trim();
     if (!command) return;
     setResponse({ status: "Planning..." });
+    logTranscript(command, "text");
     applyLocalPreview(command);
     const data = await callOrchestrator({ mode: "plan", command });
     markResponseSource(data);
@@ -559,7 +608,13 @@ if (applyBtn) applyBtn.addEventListener("click", async () => {
       return;
     }
     setResponse({ status: "Applying live to production..." });
-    const data = await callOrchestrator({ mode: "apply", plan: lastPlan.plan, command: lastPlan.command });
+    const confirmation = (planConfirm?.value || "").trim().toLowerCase();
+    const data = await callOrchestrator({
+      mode: "apply",
+      plan: lastPlan.plan,
+      command: lastPlan.command,
+      confirmation,
+    });
     markResponseSource(data);
     setResponse(data);
     if (lastPlan?.plan?.actions) {
@@ -668,6 +723,7 @@ if (planConfirm) {
 }
 
 renderClips();
+renderTranscripts();
 
 if (undoBtn) {
   undoBtn.addEventListener("click", async () => {
