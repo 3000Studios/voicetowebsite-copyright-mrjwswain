@@ -1,0 +1,7 @@
+{
+  "name": "VoiceToWebsite - Cinematic Interface",
+  "description": "An immersive, cinematic web experience where voice commands, reactive typography, and high-resolution visuals merge into a living interface.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

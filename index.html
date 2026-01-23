@@ -1,475 +1,102 @@
-<!doctype html>
-<html lang="en" class="scroll-smooth">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>VoiceToWebsite | Your Voice. Your Website.</title>
-  <meta name="description" content="Build and deploy a website using only your voice. Accessible, fast, and code-free." />
-  <meta property="og:title" content="VoiceToWebsite" />
-  <meta property="og:description" content="Build and deploy a website using only your voice. Accessible, fast, and code-free." />
-  <meta property="og:image" content="https://res.cloudinary.com/dj92eb97f/image/upload/v1767046287/new_logo-min_zd44u2.png" />
-  <meta property="og:url" content="https://voicetowebsite.com" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body class="antialiased">
-  <input type="checkbox" id="mobileNavToggle" class="mobile-toggle" aria-hidden="true" />
-  <video autoplay muted loop playsinline class="video-bg">
-    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" type="video/mp4" />
-  </video>
-  <div class="noise-overlay" aria-hidden="true"></div>
-
-  <nav class="glass-nav">
-    <div class="nav-video-mask" aria-hidden="true">
-      <video autoplay muted loop playsinline>
-        <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4" type="video/mp4" />
-      </video>
-    </div>
-    <div class="brand">
-      <span class="brand-dot"></span>
-      <span class="brand-name">VoiceToWebsite</span>
-    </div>
-    <div class="nav-links">
-      <a href="index.html" data-name="Home">Home</a>
-      <a href="store.html" data-name="Store">Store</a>
-      <a href="/admin" data-name="Admin">Admin</a>
-      <a href="appstore.html" data-name="App Store">App Store</a>
-      <a href="livestream.html" data-name="Live">Live</a>
-    </div>
-    <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">
-      <span></span>
-    </label>
-  </nav>
-
-  <div class="mobile-overlay" id="mobileOverlay">
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="store.html">Store</a></li>
-      <li><a href="/admin">Admin</a></li>
-      <li><a href="appstore.html">App Store</a></li>
-      <li><a href="livestream.html">Live</a></li>
-    </ul>
-  </div>
-
-  <header class="hero">
-    <h1 class="hero-title reveal" id="headline" style="transition-delay:100ms;">VOICE TO<br />WEBSITE</h1>
-    <p class="hero-subhead reveal" id="subhead" style="transition-delay:200ms;">
-      Your Voice. Your Website.
-    </p>
-    <div class="viz reveal">
-      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-    </div>
-  </header>
-
-  <section id="how-it-works" class="marketing-section reveal">
-    <div class="marketing-content">
-      <p class="eyebrow" id="eyebrow">Appointments Only</p>
-      <h2>Why VoiceToWebsite</h2>
-      <p class="muted">Built for creators, teams, and people who can’t or don’t want to code — including customers with limited mobility who benefit from voice-first controls.</p>
-      <ul class="marketing-points">
-        <li>Hands-free: speak your site into existence, no keyboard mastery required.</li>
-        <li>Confidence: we guide businesses from zero to live without technical blockers.</li>
-        <li>Equity: accessible by voice for customers with minimal functional appendages.</li>
-        <li>White-glove: appointments only to ensure we fit your brand and goals.</li>
-      </ul>
-      <div class="cta-row">
-        <a class="btn btn-platinum" id="cta" href="appstore.html">Book Appointment</a>
-        <div class="note-info">
-          <strong>Included:</strong> software license + 1,000 notes (1 command = 1 note; 2 commands in one sentence = 2 notes) and a 15 min live demo.
-        </div>
-      </div>
-    </div>
-    <div class="marketing-steps">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <div>
-          <h3>Vocalization</h3>
-          <p>Dictate the parameters — brand, tone, layout, and flows — no typing needed.</p>
-        </div>
-      </div>
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <div>
-          <h3>Synthesis</h3>
-          <p>We construct multiple high-fidelity prototypes in parallel while you talk.</p>
-        </div>
-      </div>
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <div>
-          <h3>Deployment</h3>
-          <p>Refine via conversation, then publish to edge networks instantly.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="product-lineup reveal">
-    <div class="lineup-header">
-      <div>
-        <p class="eyebrow">For Sale</p>
-        <h2>Signature Drops</h2>
-        <p class="muted">High-intent offers, ready to check out or demo.</p>
-      </div>
-      <a class="pill-link" href="store.html">Open Store</a>
-    </div>
-    <div class="lineup-grid">
-      <article class="lineup-card">
-        <span class="pill sale">New</span>
-        <h3>Platinum Voice Site</h3>
-        <p>Full voice-first website with live deploys and admin console.</p>
-        <div class="price-row">
-          <span class="price-tag">$199</span><span class="price-unit">/mo</span>
-        </div>
-        <a class="btn small" href="store.html">Buy now</a>
-      </article>
-      <article class="lineup-card">
-        <span class="pill sale">Bundle</span>
-        <h3>Automation Kit</h3>
-        <p>Lead capture, CRM sync, alerts, and AI responses wired in.</p>
-        <div class="price-row">
-          <span class="price-tag">$149</span><span class="price-unit">/mo</span>
-        </div>
-        <a class="btn ghost small" href="store.html">View bundle</a>
-      </article>
-      <article class="lineup-card">
-        <span class="pill sale">Live</span>
-        <h3>Livestream Pack</h3>
-        <p>Stream embeds, scheduling, and promo blocks shipped for you.</p>
-        <div class="price-row">
-          <span class="price-tag">$89</span><span class="price-unit">/mo</span>
-        </div>
-        <a class="btn ghost small" href="store.html">Add to cart</a>
-      </article>
-      <article class="lineup-card">
-        <span class="pill sale">Pro</span>
-        <h3>Support Retainer</h3>
-        <p>Priority edits, AI prompt tuning, and uptime watch.</p>
-        <div class="price-row">
-          <span class="price-tag">$99</span><span class="price-unit">/mo</span>
-        </div>
-        <a class="btn small" href="store.html">Book</a>
-      </article>
-    </div>
-  </section>
-
-  <section id="features" class="features">
-    <div class="feature-grid">
-      <div class="feature-card feature-large reveal">
-        <div>
-          <div class="icon-circle">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-            </svg>
-          </div>
-          <h3>Semantic Engine</h3>
-          <p>Our linguistic model deconstructs design intent from speech and turns it into live components.</p>
-        </div>
-        <div class="mock-window">
-          <div class="window-bar">
-            <span></span><span></span><span></span>
-          </div>
-          <div class="window-body">
-            <div class="window-title"></div>
-            <div class="window-sub"></div>
-            <div class="window-grid">
-              <div></div><div></div><div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="feature-card reveal" style="transition-delay:100ms;">
-        <div class="metric-lg">0.4s</div>
-        <h4>Latency</h4>
-        <p>Edge-rendered responses keep interactions instant.</p>
-      </div>
-      <div class="feature-card reveal" style="transition-delay:200ms;">
-        <div class="icon-square">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <h4>Instant Deploy</h4>
-        <p>Publish to the global edge with a single voice command.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section crystal-section">
-    <div class="crystal-header">
-      <div>
-        <p class="eyebrow">Signature Modules</p>
-        <h2>Crystalline Control Cards</h2>
-        <p class="muted">Touch-friendly, voice-ready modules you can preview and deploy instantly.</p>
-      </div>
-    </div>
-    <div class="crystal-grid">
-      <div class="crystal-wrapper">
-        <div class="crystal-card" style="--accent:#d4af37;">
-          <div class="geometry"></div>
-          <div class="crystal-content">
-            <span class="crystal-tag">Module // 01</span>
-            <h3 class="crystal-title">Quantum Refraction</h3>
-            <p class="crystal-desc">Live-transform hero visuals with adaptive lighting tuned to your brand palette.</p>
-          </div>
-        </div>
-      </div>
-      <div class="crystal-wrapper">
-        <div class="crystal-card" style="--accent:#ff007a;">
-          <div class="geometry"></div>
-          <div class="crystal-content">
-            <span class="crystal-tag">Module // 02</span>
-            <h3 class="crystal-title">Kinetic Buoyancy</h3>
-            <p class="crystal-desc">Floating CTAs that respond to scroll and voice cues without breaking layout.</p>
-          </div>
-        </div>
-      </div>
-      <div class="crystal-wrapper">
-        <div class="crystal-card" style="--accent:#1ccf9c;">
-          <div class="geometry"></div>
-          <div class="crystal-content">
-            <span class="crystal-tag">Module // 03</span>
-            <h3 class="crystal-title">Prismatic Architecture</h3>
-            <p class="crystal-desc">Data-forward grids that balance density and readability for live analytics.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="review-marquee" aria-label="Customer reviews">
-    <div class="marquee-track">
-      <span>★★★★★ “I spoke my site and it matched my vision exactly.” — Nova Labs</span>
-      <span>★★★★★ “Setup was a breeze—payments live in minutes.” — Ember Collective</span>
-      <span>★★★★★ “Accessibility win: built hands-free for our founder.” — AbleTech</span>
-      <span>★★★★★ “Booking and onboarding took 15 minutes tops.” — Acme Ventures</span>
-      <span>★★★★★ “We launched without touching a keyboard.” — StreamRoom</span>
-    </div>
-  </section>
-
-  <section class="adsense-safe" aria-label="Sponsored">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="__ADSENSE_PUBLISHER__"
-         data-ad-slot="__ADSENSE_SLOT__"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-  </section>
-
-  <footer class="footer">
-    <div>
-      <div class="brand-name">VoiceToWebsite</div>
-      <p class="muted">Build with sound.</p>
-      <p class="muted">© 2026 VoiceToWebsite. All software rights reserved.</p>
-    </div>
-    <div class="footer-links">
-      <a href="mailto:owner@voicetowebsite.com">owner@voicetowebsite.com</a>
-      <a href="mailto:support@voicetowebsite.com">support@voicetowebsite.com</a>
-      <a href="mailto:legal@voicetowebsite.com">legal@voicetowebsite.com</a>
-    </div>
-  </footer>
-
-  <button class="audio-toggle" id="audio-toggle" aria-label="Next track">🔊</button>
-  <button class="secret-btn" id="secret-btn" aria-label="Open secret portal"></button>
-
-  <div class="secret-modal" id="secret-modal" aria-hidden="true">
-    <div class="secret-card" id="secret-step-password">
-      <h3>Enter Access Code</h3>
-      <p class="muted">This portal is protected. Enter the 4-digit code to continue.</p>
-      <input type="password" id="secret-code" maxlength="4" placeholder="****" />
-      <div class="button-row">
-        <button class="primary" id="secret-submit">Unlock</button>
-        <button class="ghost" id="secret-close">Cancel</button>
-      </div>
-      <p class="muted small" id="secret-error" aria-live="polite"></p>
-    </div>
-    <div class="secret-card" id="secret-step-video" style="display:none; max-width:560px;">
-      <h3>Click the video to enter</h3>
-      <div class="secret-video">
-        <video id="secret-video" src="https://res.cloudinary.com/dj92eb97f/video/upload/v1767186672/Click_me_video_qcl0op.mp4" autoplay muted loop playsinline></video>
-      </div>
-      <p class="muted small">Tap/click the video to continue to the portal.</p>
-      <div class="button-row">
-        <button class="ghost" id="secret-back">Back</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // reveal on scroll
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("active");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-
-    // crystal card interactions
-    (() => {
-      const wrappers = document.querySelectorAll(".crystal-wrapper");
-      if (!wrappers.length) return;
-      const reveal = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("revealed");
-            reveal.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
-      wrappers.forEach((card) => reveal.observe(card));
-
-      document.querySelectorAll(".crystal-card").forEach((card) => {
-        card.addEventListener("mousemove", (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = ((e.clientX - rect.left) / rect.width) * 100;
-          const y = ((e.clientY - rect.top) / rect.height) * 100;
-          card.style.setProperty("--mouse-x", `${x}%`);
-          card.style.setProperty("--mouse-y", `${y}%`);
-        });
-      });
-    })();
-
-    // secret portal
-    (() => {
-      const btn = document.getElementById("secret-btn");
-      const modal = document.getElementById("secret-modal");
-      const codeInput = document.getElementById("secret-code");
-      const submit = document.getElementById("secret-submit");
-      const close = document.getElementById("secret-close");
-      const error = document.getElementById("secret-error");
-      const videoStep = document.getElementById("secret-step-video");
-      const passwordStep = document.getElementById("secret-step-password");
-      const back = document.getElementById("secret-back");
-      const gateVideo = document.getElementById("secret-video");
-      const unlock = () => {
-        passwordStep.style.display = "none";
-        videoStep.style.display = "grid";
-      };
-      const hideModal = () => {
-        modal.classList.remove("show");
-        modal.setAttribute("aria-hidden", "true");
-        passwordStep.style.display = "grid";
-        videoStep.style.display = "none";
-        error.textContent = "";
-        codeInput.value = "";
-      };
-      btn?.addEventListener("click", () => {
-        modal.classList.add("show");
-        modal.setAttribute("aria-hidden", "false");
-        codeInput.focus();
-      });
-      close?.addEventListener("click", hideModal);
-      back?.addEventListener("click", () => {
-        passwordStep.style.display = "grid";
-        videoStep.style.display = "none";
-      });
-      submit?.addEventListener("click", () => {
-        if (codeInput.value.trim() === "3000") {
-          unlock();
-        } else {
-          error.textContent = "Incorrect code.";
-        }
-      });
-      codeInput?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submit.click();
-        if (e.key === "Escape") hideModal();
-      });
-      modal?.addEventListener("click", (e) => {
-        if (e.target === modal) hideModal();
-      });
-      gateVideo?.addEventListener("click", () => {
-        window.location.href = "/the3000.html";
-      });
-    })();
-
-    // mobile nav (close overlay when a link is tapped)
-    const mobileToggle = document.getElementById("mobileNavToggle");
-    if (mobileToggle) {
-      document.querySelectorAll(".mobile-overlay a").forEach((link) => {
-        link.addEventListener("click", () => { mobileToggle.checked = false; });
-      });
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoiceToWebsite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      cursor: none;
+    }
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .font-syncopate { font-family: 'Syncopate', sans-serif; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    
+    /* Extreme 3D Gold & Platinum Gloss Typography */
+    .gold-platinum-text {
+      background: linear-gradient(
+        135deg, 
+        #4e3500 0%, 
+        #b8860b 10%, 
+        #ffd700 25%, 
+        #ffffff 45%, 
+        #f8f8f8 50%, 
+        #ffffff 55%, 
+        #d1d5db 75%, 
+        #b8860b 90%, 
+        #4e3500 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 
+        0px 1px 0px rgba(255, 255, 255, 0.3),
+        0px 2px 0px rgba(0, 0, 0, 0.4),
+        0px 3px 0px rgba(0, 0, 0, 0.5),
+        0px 4px 0px rgba(0, 0, 0, 0.6),
+        0px 5px 10px rgba(0, 0, 0, 0.9);
+      filter: 
+        drop-shadow(0 2px 1px rgba(255, 255, 255, 0.5))
+        drop-shadow(0 15px 10px rgba(0, 0, 0, 1))
+        drop-shadow(0 25px 30px rgba(0, 0, 0, 0.7));
+      animation: gloss-shine 3s ease-in-out infinite;
     }
 
-    // nav hover sizzle sound
-    (() => {
-      const sizzleSrc = "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038696/electricity-315581_ngtb0j.mp3";
-      const navLinks = document.querySelectorAll(".nav-links a");
-      if (!navLinks.length) return;
-      const playSizzle = () => {
-        const audio = new Audio(sizzleSrc);
-        audio.volume = 0.18;
-        audio.play().catch(() => {});
-      };
-      navLinks.forEach((link) => {
-        link.addEventListener("mouseenter", playSizzle);
-      });
-    })();
+    /* Gooey Liquid Button Styles */
+    .liquid-container {
+      filter: url('#goo');
+    }
+    .metallic-goo {
+      background: radial-gradient(circle at 30% 30%, #fff, #9ca3af 20%, #4b5563 50%, #111827 100%);
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.5), 0 10px 30px rgba(0,0,0,0.8);
+    }
 
-    // Audio playlist (persists selection per session)
-    (() => {
-      const playlist = [
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038696/electricity-315581_ngtb0j.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038695/mrketid-127881_vz7wop.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038695/upbeat-future-bass-138706_nrfkt5.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038695/house-114914_mie0io.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038694/lounge-house-music-348882_fbmwtq.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038693/funky-house-221081_rxgd2b.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038693/high-novelty-tech-solution-191634_he6uhx.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038692/digital-abstract-technology-lift-me-up-131534_tktfna.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038692/black-box-mana-of-artificial-intelligence-130408_mapnzt.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038694/sweet-life-luxury-chill-438146_jclnty.mp3",
-        "https://res.cloudinary.com/dj92eb97f/video/upload/v1767038693/i-got-your-mind-342855_iq27b2.mp3"
-      ];
-      const audioBtn = document.getElementById("audio-toggle");
-      if (!audioBtn) return;
-
-      const storageKey = "vtw-audio-index";
-      const audio = new Audio();
-      audio.loop = true;
-      audio.volume = 0.18;
-
-      const pickIndex = () => {
-        const stored = parseInt(sessionStorage.getItem(storageKey) || "0", 10);
-        return Number.isInteger(stored) && stored >= 0 && stored < playlist.length
-          ? stored
-          : Math.floor(Math.random() * playlist.length);
-      };
-
-      let current = pickIndex();
-      const load = (i) => {
-        current = i % playlist.length;
-        sessionStorage.setItem(storageKey, String(current));
-        audio.src = playlist[current];
-      };
-
-      const playSafe = async () => {
-        try { await audio.play(); } catch (_) { /* wait for gesture */ }
-      };
-
-      load(current);
-      playSafe();
-      audioBtn.addEventListener("click", () => {
-        load(current + 1);
-        playSafe();
-      });
-    })();
-  </script>
-  <script type="module" src="nav.js"></script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=__ADSENSE_PUBLISHER__" crossorigin="anonymous"></script>
-  <script>
-    // Initialize AdSense safely
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-
-  <div class="premium-banner">
-    <span>🚀 Unlock Pro Features: Zero latency + AI assistance.</span>
-    <a href="store.html" class="btn small">Go Pro</a>
-  </div>
+    @keyframes gloss-shine {
+      0% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+      100% { background-position: 0% center; }
+    }
+    
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #333; }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "framer-motion": "https://esm.sh/framer-motion@^12.29.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <!-- SVG Filter for Gooey Effect -->
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none;">
+    <defs>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+      </filter>
+    </defs>
+  </svg>
+  <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>

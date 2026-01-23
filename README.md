@@ -1,104 +1,20 @@
-PROPRIETARY INTELLECTUAL PROPERTY LICENSE
-NON-ENABLING DISCLOSURE
-Version 1.1
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
---------------------------------------------------
+# Run and deploy your AI Studio app
 
-Copyright © 2026
-Mr.Jwswain
-Owner@voicetowebsite.com
-All Rights Reserved.
+This contains everything you need to run your app locally.
 
---------------------------------------------------
+View your app in AI Studio: https://ai.studio/apps/drive/1I3qTXyVt3RNukDnsjXUKODevtK7YrDWF
 
-NOTICE OF INVENTION
+## Run Locally
 
-This repository documents the existence of a proprietary software system
-known as "VoiceToWebsite™", including associated methods, workflows,
-and system architecture.
+**Prerequisites:**  Node.js
 
-This repository is published for purposes of:
-- Authorship verification
-- Prior art positioning
-- Patent examination support
-- Legal due diligence
 
---------------------------------------------------
-
-NO LICENSE GRANTED
-
-No license, express or implied, is granted under this document.
-
-This includes, without limitation, any license to:
-- Make
-- Use
-- Sell
-- Offer for sale
-- Import
-- Modify
-- Distribute
-- Reverse engineer
-- Train artificial intelligence systems
-- Create derivative works
-
---------------------------------------------------
-
-NON-ENABLING DISCLOSURE
-
-The contents of this repository are intentionally incomplete and abstract.
-
-No reasonable person skilled in the art would be able to reproduce,
-implement, or practice the invention based solely on the materials
-contained herein.
-
-This repository shall not be considered an enabling disclosure.
-
---------------------------------------------------
-
-RESTRICTIONS
-
-You may NOT:
-
-- Use this material in any commercial or competitive system
-- Incorporate this material into any product or service
-- Use this material to train or fine-tune AI or ML models
-- Derive system behavior or architecture from this repository
-- Claim ownership or inventorship of related systems
-
---------------------------------------------------
-
-INFRINGEMENT & ENFORCEMENT
-
-Unauthorized use may constitute:
-
-- Copyright infringement
-- Trade secret misappropriation
-- Unfair competition
-- Patent infringement (pending or future)
-
-The rights holder reserves all legal remedies.
-
---------------------------------------------------
-
-NO WARRANTY
-
-THIS MATERIAL IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED.
-
---------------------------------------------------
-
-GOVERNING LAW
-
-This License shall be governed by the laws of the
-United States of America and the State of Georgia.
-
---------------------------------------------------
-
-CONTACT
-
-3000 Studios  
-https://VoiceToWebsite.com
-
---------------------------------------------------
-
-END OF LICENSE
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
