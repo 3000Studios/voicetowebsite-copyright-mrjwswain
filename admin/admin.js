@@ -408,6 +408,8 @@ const callOrchestrator = async (payload) => {
     setStatusChip(orchestratorStateEl, "Offline (fallback)", "warn");
     const fallback = buildLocalPlan(payload);
     setPreviewMode("Local preview", "warn");
+    setResponse({ error: err.message, fallback });
+    console.error("Orchestrator failed:", err);
     return fallback;
   }
 };
@@ -480,7 +482,7 @@ const initSpeech = () => {
     const transcript = last[0].transcript.trim();
     commandEl.value = transcript;
     micStateEl.textContent = `Captured: "${transcript}"`;
-    applyLocalPreview(transcript);
+    // applyLocalPreview(transcript);
     logTranscript(transcript, "voice");
 
     const lower = transcript.toLowerCase();
