@@ -2349,3 +2349,40 @@ body:not(.nav-ready) .site-header {
 
 /* Voice-injected styles */
 body { font-family: 'joker', 'Playfair Display', serif; } h1,h2,h3 { font-family: 'joker', 'Playfair Display', serif; }
+
+/* Premium Sticky Banner */
+.premium-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(10, 10, 14, 0.95);
+  border-top: 1px solid var(--accent-gold);
+  padding: 0.8rem 1.5rem;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  transform: translateY(100%);
+  animation: slideUp 0.8s ease-out 2s forwards;
+}
+
+@keyframes slideUp {
+  to { transform: translateY(0); }
+}
+
+.premium-banner span {
+  font-weight: 600;
+  color: #fff;
+}
+
+.premium-banner .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background: var(--accent-gold);
+  color: #000;
+  border: none;
+}

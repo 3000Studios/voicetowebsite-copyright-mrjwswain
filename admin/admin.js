@@ -163,35 +163,8 @@ const resetPreview = () => {
 
 const applyLocalPreview = (command) => {
   if (!command) return;
-  const doc = getFrameDoc();
-  if (!doc) return;
-  const text = command.toLowerCase();
-  const urlMatch = command.match(/https?:\/\/\S+/);
-  const hexMatch = command.match(/#([0-9a-fA-F]{3,6})/);
-  const sayMatch = command.match(/say\s+(.+)/i);
-  const fontMatch = command.match(/font\s+(to|is|=)?\s*([a-zA-Z0-9\s-]+)/i);
-
-  if (sayMatch) setFrameText("#headline", sayMatch[1].trim());
-  if (text.includes("headline")) setFrameText("#headline", command);
-  if (text.includes("subhead")) setFrameText("#subhead", command);
-  if (text.includes("cta")) setFrameText("#cta", command);
-
-  if (hexMatch) setFrameStyle("#headline", { color: `#${hexMatch[1]}` });
-  if (fontMatch) {
-    setFrameStyle("#headline", { fontFamily: `'${fontMatch[2].trim()}', "Playfair Display", serif` });
-  }
-
-  if (text.includes("blue")) {
-    doc.body.style.backgroundImage = "linear-gradient(135deg, rgba(80,120,255,0.15), rgba(20,30,60,0.6))";
-  }
-
-  if (previewExtras) previewExtras.innerHTML = "";
-  if (previewExtras && urlMatch) {
-    const block = document.createElement("div");
-    block.className = "preview-extra-card";
-    block.innerHTML = `<h4>Media</h4><p>${command}</p>`;
-    previewExtras.appendChild(block);
-  }
+  const actions = buildLocalActions(command);
+  applyActionsPreview(actions);
 };
 
 const clearExtras = () => {
@@ -345,6 +318,7 @@ const buildLocalActions = (command = "") => {
   const text = command.toLowerCase();
   const urlMatch = command.match(/https?:\/\/\S+/);
   const url = urlMatch ? urlMatch[0] : "";
+  const hexMatch = command.match(/#([0-9a-fA-F]{3,6})/);
   const sayMatch = command.match(/say\s+(.+)/i);
   const headlineMatch = command.match(/headline(?:\s+to|\s+is)?\s+(.+)/i);
   const subheadMatch = command.match(/subhead(?:\s+to|\s+is)?\s+(.+)/i);
@@ -363,6 +337,9 @@ const buildLocalActions = (command = "") => {
   }
   if (themeMatch) actions.push({ type: "update_theme", theme: themeMatch[1] });
   if (fontMatch) actions.push({ type: "update_font", family: fontMatch[1].trim() });
+  if (hexMatch) actions.push({ type: "update_header_color", color: `#${hexMatch[1]}` });
+  if (text.includes("blue")) actions.push({ type: "update_blue_theme" });
+
   if (text.includes("background video") && url) actions.push({ type: "update_background_video", src: url });
   if ((text.includes("wallpaper") || text.includes("background image")) && url) {
     actions.push({ type: "update_wallpaper", src: url });
