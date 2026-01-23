@@ -532,7 +532,7 @@ if (commandEl) {
   commandEl.addEventListener("input", () => {
     const command = commandEl.value.trim();
     if (!command) return;
-    applyLocalPreview(command);
+    // applyLocalPreview(command);
   });
 }
 
