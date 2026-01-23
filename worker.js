@@ -143,13 +143,33 @@ export default {
     const contentType = assetRes.headers.get("Content-Type") || "";
     if (contentType.includes("text/html")) {
       const text = await assetRes.text();
+      
+      // Prepare environment variables for client-side injection via window.__ENV
+      const envInjection = `
+        <script>
+          window.__ENV = {
+            PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || ''}",
+            ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ''}",
+            ADSENSE_SLOT: "${env.ADSENSE_SLOT || ''}",
+            CONTROL_PASSWORD: "${env.CONTROL_PASSWORD || ''}"
+          };
+        </script>
+      `;
+
+      // Inject strict replacements for legacy placeholders + new __ENV
+      /* 
+       * Note: We inject __ENV before the closing </head> or <body> for availability.
+       * We also continue to support direct text replacement for HTML-embedded tokens.
+       */
       const injected = text
         .replace(/__PAYPAL_CLIENT_ID__/g, env.PAYPAL_CLIENT_ID_PROD || "")
         .replace(/__ADSENSE_PUBLISHER__/g, env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "")
-        .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "");
+        .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
+        .replace('</head>', `${envInjection}</head>`); // Inject variables early
+
       const headers = new Headers(assetRes.headers);
       headers.set("Content-Type", "text/html; charset=utf-8");
-      headers.set("Cache-Control", "no-store");
+      headers.set("Cache-Control", "no-store"); // Dynamic injection requires no-store or private cache
       return addSecurityHeaders(
         new Response(injected, {
           status: assetRes.status,

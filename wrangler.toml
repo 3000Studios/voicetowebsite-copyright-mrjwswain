@@ -9,6 +9,16 @@ routes = [
   "www.voicetowebsite.com/*",
 ]
 
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Placeholder for environment variables to be set in Cloudflare Dashboard
+# OPENAI_API = ""
+# PAYPAL_CLIENT_ID_PROD = ""
+# ADSENSE_PUBLISHER = ""
+# ADSENSE_SLOT = ""
+# CONTROL_PASSWORD = ""
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"

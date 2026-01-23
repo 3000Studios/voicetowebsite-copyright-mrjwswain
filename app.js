@@ -14,7 +14,7 @@ const state = {
 // Bump the storage key to flush stale cached values (CTA was blank for some users).
 const storageKey = 'youtuneai-state-v2';
 const controlKey = 'youtuneai-control-unlocked';
-const controlPassword = '5555';
+const controlPassword = (window.__ENV && window.__ENV.CONTROL_PASSWORD) ? window.__ENV.CONTROL_PASSWORD : '5555';
 const audioTracks = [
   'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
   'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
