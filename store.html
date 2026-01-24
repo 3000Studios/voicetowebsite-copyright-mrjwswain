@@ -7,7 +7,6 @@
   <meta name="description" content="Store - VoiceToWebsite" />
   <link rel="stylesheet" href="styles.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=__ADSENSE_PUBLISHER__" crossorigin="anonymous"></script>
-  <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD"></script>
 </head>
 <body>
   <div class="video-bg" aria-hidden="true">
@@ -83,114 +82,10 @@
     </section>
     <section class="section">
       <h2>Storefront</h2>
-      <p class="subhead">Subscription-ready plans and one-time app purchase options.</p>
-      <div class="pricing-deck">
-        <div class="card luxe" data-tier="starter">
-          <div class="card-header">
-            <div class="tier">Starter Site</div>
-            <div class="price">
-              <span class="currency">$</span>
-              <span class="amount">39</span>
-              <span class="period">/month</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <ul class="features">
-              <li>Single brand with AI edits</li>
-              <li>3 live pages + contact</li>
-              <li>Weekly deploys</li>
-              <li>Email support</li>
-              <li class="not-included">Livestream pack</li>
-              <li class="not-included">Team seats</li>
-            </ul>
-            <div class="button-row">
-              <button class="primary pay-btn" data-product="starter" data-amount="3900" data-label="Starter Site">PayPal</button>
-              <button class="ghost stripe-btn" data-product="starter" data-amount="3900" data-label="Starter Site">Stripe</button>
-            </div>
-          </div>
-          <div class="shine"></div>
-        </div>
-
-        <div class="card luxe premium" data-tier="growth">
-          <div class="popular-tag">Most Popular</div>
-          <div class="card-header">
-            <div class="tier">Growth Voice</div>
-            <div class="price">
-              <span class="currency">$</span>
-              <span class="amount">99</span>
-              <span class="period">/month</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <ul class="features">
-              <li>Up to 3 brands</li>
-              <li>Unlimited pages & variants</li>
-              <li>Livestream pack included</li>
-              <li>Daily deploys + rollback</li>
-              <li>Slack priority support</li>
-              <li class="not-included">Dedicated engineer</li>
-            </ul>
-            <div class="button-row">
-              <button class="primary pay-btn" data-product="growth" data-amount="9900" data-label="Growth Voice">PayPal</button>
-              <button class="ghost stripe-btn" data-product="growth" data-amount="9900" data-label="Growth Voice">Stripe</button>
-            </div>
-          </div>
-          <div class="shine"></div>
-        </div>
-
-        <div class="card luxe" data-tier="enterprise">
-          <div class="card-header">
-            <div class="tier">Enterprise Edge</div>
-            <div class="price">
-              <span class="currency">$</span>
-              <span class="amount">249</span>
-              <span class="period">/month</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <ul class="features">
-              <li>Unlimited brands & seats</li>
-              <li>Custom data & KV/D1 setup</li>
-              <li>Live ops desk 24/7</li>
-              <li>Governed deploy approvals</li>
-              <li>Dedicated engineer</li>
-              <li>Custom branding & SSO</li>
-            </ul>
-            <div class="button-row">
-              <button class="primary pay-btn" data-product="enterprise" data-amount="24900" data-label="Enterprise Edge">PayPal</button>
-              <button class="ghost stripe-btn" data-product="enterprise" data-amount="24900" data-label="Enterprise Edge">Stripe</button>
-            </div>
-          </div>
-          <div class="shine"></div>
-        </div>
-
-        <div class="card luxe" data-tier="lifetime">
-          <div class="popular-tag">One-Time</div>
-          <div class="card-header">
-            <div class="tier">Lifetime App Buyout</div>
-            <div class="price">
-              <span class="currency">$</span>
-              <span class="amount">499</span>
-              <span class="period">one-time</span>
-            </div>
-          </div>
-          <div class="card-content">
-            <ul class="features">
-              <li>Full VoiceToWebsite app</li>
-              <li>Self-host or edge-host</li>
-              <li>White-label rights</li>
-              <li>1 year updates</li>
-              <li>Priority onboarding</li>
-              <li>Optional support retainer</li>
-            </ul>
-            <div class="button-row">
-              <button class="primary pay-btn" data-product="lifetime" data-amount="49900" data-label="Lifetime App">PayPal</button>
-              <button class="ghost stripe-btn" data-product="lifetime" data-amount="49900" data-label="Lifetime App">Stripe</button>
-            </div>
-          </div>
-          <div class="shine"></div>
-        </div>
-      </div>
+      <p class="subhead">Products are managed in Admin → Store Manager and rendered here automatically.</p>
+      <section class="store-products" aria-label="Products">
+        <div class="store-product-scene" id="store-product-scene"></div>
+      </section>
       <div class="adsense-slot">
         <ins class="adsbygoogle"
              style="display:block"
@@ -202,74 +97,25 @@
     </section>
   </main>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  <script src="https://js.stripe.com/v3"></script>
   <script>
-    const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
-    const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
-
-    const handleStripe = async (btn) => {
-      const amount = btn.dataset.amount;
-      const product = btn.dataset.product;
-      const label = btn.dataset.label;
-      try {
-        const stripe = Stripe(STRIPE_PK);
-        const res = await fetch("/api/stripe/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount, product, label, source: "store" }),
-        });
-        const data = await res.json();
-        if (!data.sessionId) throw new Error("No session");
-        await stripe.redirectToCheckout({ sessionId: data.sessionId });
-      } catch (err) {
-        alert("Stripe checkout not configured. Please set STRIPE_PUBLISHABLE_KEY and backend endpoint.");
-        console.warn(err);
-      }
-    };
-
-    const handlePayPal = (btn) => {
-      const amount = btn.dataset.amount;
-      const product = btn.dataset.product;
-      if (PAYPAL_CLIENT === "__PAYPAL_CLIENT_ID__") {
-        alert("PayPal client ID missing. Configure PAYPAL_CLIENT_ID to enable checkout.");
-        return;
-      }
-      window.location.href = `https://www.paypal.com/checkoutnow?token=${encodeURIComponent(product)}-${amount}`;
-    };
-
-    document.querySelectorAll(".stripe-btn").forEach((btn) => {
-      btn.addEventListener("click", () => handleStripe(btn));
-    });
-    document.querySelectorAll(".pay-btn").forEach((btn) => {
-      btn.addEventListener("click", () => handlePayPal(btn));
-    });
-
     const storeSearch = document.getElementById("storeSearch");
-    const storeCards = Array.from(document.querySelectorAll(".pricing-deck .card"));
-    const deck = document.querySelector(".pricing-deck");
     const filterStore = () => {
       if (!storeSearch) return;
       const term = storeSearch.value.trim().toLowerCase();
-      let visible = 0;
-      storeCards.forEach((card) => {
+      document.querySelectorAll("#store-product-scene .vt-store-card").forEach((card) => {
         const match = term === "" || card.innerText.toLowerCase().includes(term);
         card.style.display = match ? "" : "none";
-        if (match) visible += 1;
       });
-      if (deck) {
-        deck.dataset.matches = String(visible);
-      }
     };
     storeSearch?.addEventListener("input", filterStore);
-    filterStore();
 
     const appSearch = document.getElementById("appSearch");
     const appResults = document.getElementById("appSearchResults");
     const appInventory = [
-      { name: "Platinum Voice Site", price: "$199/mo", link: "appstore.html" },
-      { name: "Automation Kit", price: "$149/mo", link: "appstore.html" },
-      { name: "Livestream Pack", price: "$89/mo", link: "appstore.html" },
-      { name: "Support Retainer", price: "$99/mo", link: "appstore.html" },
+      { name: "VoiceToWebsite", price: "$19", link: "appstore.html" },
+      { name: "Rush Percussion", price: "$4.99", link: "rush-percussion.html" },
+      { name: "Revenue Bot", price: "Free", link: "appstore.html" },
+      { name: "Command Center", price: "Included", link: "appstore.html" },
     ];
 
     const renderAppResults = (term = "") => {
@@ -299,6 +145,7 @@
     appSearch?.addEventListener("input", (e) => renderAppResults(e.target.value));
     renderAppResults();
   </script>
+  <script type="module" src="store-products.js"></script>
   <script type="module" src="nav.js"></script>
 </body>
 </html>

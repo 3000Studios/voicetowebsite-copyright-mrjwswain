@@ -44,6 +44,13 @@ const kpiApps = document.getElementById("kpi-apps");
 const kpiMrr = document.getElementById("kpi-mrr");
 const kpiNew = document.getElementById("kpi-new");
 
+// Store manager (products)
+const productTableBody = document.getElementById("product-table-body");
+const productForm = document.getElementById("product-form");
+const productClear = document.getElementById("product-clear");
+const productsReset = document.getElementById("products-reset");
+const productsCount = document.getElementById("products-count");
+
 let recognition;
 let listening = false;
 let lastPlan = null;
@@ -821,3 +828,111 @@ if (!loadApps().length) {
   saveApps(seedApps());
 }
 renderApps();
+
+// Store products manager (local storage placeholders)
+const loadProducts = () => JSON.parse(localStorage.getItem("vtw-products") || "[]");
+const saveProducts = (products) => localStorage.setItem("vtw-products", JSON.stringify(products.slice(0, 100)));
+
+const seedProducts = () => ([
+  {
+    id: "lexicon-pro",
+    label: "Architecture / 01",
+    title: "Lexicon Pro",
+    desc: "High-signal product copy + landing modules tuned for conversion.",
+    price: 149,
+    tag: "License",
+    ts: new Date().toISOString(),
+  },
+  {
+    id: "lumina-pro",
+    label: "Visuals / 02",
+    title: "Lumina Pro",
+    desc: "Spectral creative kit for branded media blocks and UI surfaces.",
+    price: 89,
+    tag: "Toolkit",
+    ts: new Date().toISOString(),
+  },
+  {
+    id: "vertex-node",
+    label: "Protocol / 03",
+    title: "Vertex Node",
+    desc: "Private indexing + content routing pack for multi-page ecosystems.",
+    price: 210,
+    tag: "Bundle",
+    ts: new Date().toISOString(),
+  },
+]);
+
+const updateProductKpis = (products = loadProducts()) => {
+  if (!productsCount) return;
+  productsCount.textContent = `${products.length} products`;
+};
+
+const renderProducts = () => {
+  if (!productTableBody) return;
+  const products = loadProducts();
+  productTableBody.innerHTML = "";
+  products.forEach((product, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div class="app-title">${product.title}</div>
+        <div class="muted small">${product.desc || ""}</div>
+      </td>
+      <td>${product.label || "—"}</td>
+      <td>$${Number(product.price || 0).toFixed(2)}</td>
+      <td>${product.tag || "—"}</td>
+      <td><button class="ghost small" data-product-remove="${idx}">Remove</button></td>
+    `;
+    productTableBody.appendChild(tr);
+  });
+  if (!products.length) {
+    productTableBody.innerHTML = `<tr><td colspan="5" class="muted">No products yet.</td></tr>`;
+  }
+  updateProductKpis(products);
+};
+
+productTableBody?.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-product-remove]");
+  if (!btn) return;
+  const idx = Number(btn.getAttribute("data-product-remove"));
+  const products = loadProducts().filter((_, i) => i !== idx);
+  saveProducts(products);
+  renderProducts();
+});
+
+productForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const formData = new FormData(productForm);
+  const title = formData.get("title")?.toString() || "";
+  const product = {
+    id: (formData.get("id")?.toString() || title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || `product-${Date.now()}`),
+    label: formData.get("label")?.toString() || "",
+    title,
+    desc: formData.get("desc")?.toString() || "",
+    price: Number(formData.get("price") || 0),
+    tag: formData.get("tag")?.toString() || "",
+    ts: new Date().toISOString(),
+  };
+
+  const products = loadProducts();
+  products.unshift(product);
+  saveProducts(products);
+  renderProducts();
+  productForm.reset();
+  updateProductKpis(products);
+});
+
+productClear?.addEventListener("click", () => {
+  productForm?.reset();
+});
+
+productsReset?.addEventListener("click", () => {
+  saveProducts(seedProducts());
+  renderProducts();
+});
+
+if (productTableBody && !loadProducts().length) {
+  saveProducts(seedProducts());
+}
+renderProducts();

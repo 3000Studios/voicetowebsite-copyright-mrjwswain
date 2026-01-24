@@ -58,9 +58,84 @@
 
   <div class="admin-shell">
     <main class="admin-grid">
-      <section class="card" id="store-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986144/bluechain_rzflnz.mp4');background-size:cover;background-position:center;">
-        <h2>Store Manager</h2>
-        <p class="muted">Manage products, pricing, and offers.</p>
+      <section class="card wide" id="store-manager" style="background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986144/bluechain_rzflnz.mp4');background-size:cover;background-position:center;">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Products</p>
+            <h2>Store Manager</h2>
+            <p class="muted">Add products here. The Store page will render these as cards automatically (this device/browser).</p>
+          </div>
+          <div class="status-strip">
+            <span class="status-chip" id="products-count">0 products</span>
+            <button class="ghost small" id="products-reset" type="button">Seed</button>
+          </div>
+        </div>
+
+        <div class="app-grid">
+          <div class="app-block">
+            <div class="table-shell">
+              <div class="table-head">
+                <h3>Live products</h3>
+                <p class="muted">Rendered on `store.html` using the new glass cards.</p>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Label</th>
+                    <th>Price</th>
+                    <th>Tag</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="product-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="app-block">
+            <form id="product-form" class="app-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Title</label>
+                  <input name="title" placeholder="Aether OS" required />
+                </div>
+                <div class="form-group">
+                  <label>Price (USD)</label>
+                  <input name="price" type="number" step="0.01" placeholder="149" required />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Label</label>
+                  <input name="label" placeholder="Architecture / 01" />
+                </div>
+                <div class="form-group">
+                  <label>Tag</label>
+                  <input name="tag" placeholder="License" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Description</label>
+                <textarea name="desc" rows="3" placeholder="What the buyer gets..." required></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Product ID (optional)</label>
+                  <input name="id" placeholder="aether-os" />
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button class="primary" type="submit">Add product</button>
+                <button class="ghost" type="button" id="product-clear">Clear</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </section>
     </main>
   </div>
