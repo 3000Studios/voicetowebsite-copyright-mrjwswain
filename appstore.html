@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>App Store | YoutuneAI - Conductive Membrane Flux</title>
+    <link rel="stylesheet" href="styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -298,25 +299,6 @@
         <div class="conduction-lines"></div>
     </div>
 
-    <header class="site-header">
-        <div class="brand">
-            <span class="brand-mark">YT</span>
-            <div class="brand-text">
-                <strong>YoutuneAI</strong>
-                <span>Command Center</span>
-            </div>
-        </div>
-        <nav class="nav">
-            <a href="index.html">Home</a>
-            <a href="appstore.html" class="active">App Store</a>
-            <a href="gallery.html">Gallery</a>
-            <a href="store.html">Store</a>
-            <a href="blog.html">Blog</a>
-            <a href="contact.html">Contact</a>
-        </nav>
-        <a class="ghost-button" href="/admin">ADMIN</a>
-    </header>
-
     <main class="page">
         <section class="hero">
             <h1>The App Flux</h1>
@@ -371,15 +353,20 @@
                     <span class="monetization">TOKENS</span>
                 </div>
             </div>
+
+            <div class="app-card">
+                <div>
+                    <div class="status-pill live">New Drop</div>
+                    <h3>Rush Percussion</h3>
+                    <p>Tap-to-sync resin runner built for high-retention engagement. Includes the playable web build.</p>
+                </div>
+                <div class="card-actions">
+                    <a class="primary-btn" href="rush-percussion.html">PLAY DEMO</a>
+                    <span class="monetization">GAME / $4.99</span>
+                </div>
+            </div>
         </div>
     </main>
-
-    <footer class="footer">
-        <div>
-            <strong>YoutuneAI™</strong>
-            <p>Conductive systems for the autonomous era.</p>
-        </div>
-    </footer>
 
     <script>
         document.addEventListener('mousemove', (e) => {
@@ -401,5 +388,6 @@
             }, 100 * index);
         });
     </script>
+    <script type="module" src="nav.js"></script>
 </body>
 </html>

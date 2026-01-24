@@ -7,6 +7,21 @@
     { href: "livestream.html", label: "Live" },
   ];
 
+  const footerLinks = {
+    platform: [
+      { href: "/neural-engine.html", label: "Neural Engine" },
+      { href: "/strata-design-system.html", label: "Strata Design System" },
+      { href: "/api-documentation.html", label: "API Documentation" },
+      { href: "/voice-to-json.html", label: "Voice-to-JSON" },
+    ],
+    company: [
+      { href: "/blog.html", label: "The Monolith Blog" },
+      { href: "/geological-studies.html", label: "Geological Studies" },
+      { href: "/privacy.html", label: "Privacy Protocol" },
+      { href: "/terms.html", label: "Terms of Service" },
+    ],
+  };
+
   const navVideoSrc = "https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4";
 
   const beep = () => {
@@ -101,8 +116,121 @@
 
   const init = () => {
     injectNav();
+    injectFooter();
+    initFooterTimestamp();
+    initFooterParallax();
     electrifyLinks();
     spectralizeCards();
+  };
+
+  const injectFooter = () => {
+    const existing = document.querySelector(".vt-footer");
+    if (existing) return;
+
+    const footer = document.createElement("footer");
+    footer.className = "vt-footer";
+
+    const platformLinks = footerLinks.platform
+      .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
+      .join("");
+    const companyLinks = footerLinks.company
+      .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
+      .join("");
+
+    footer.innerHTML = `
+      <div class="footer-container">
+        <div class="strata-cell">
+          <div class="etched-brand">VOICE<br>TO<br>WEBSITE</div>
+          <p class="vt-footer-tagline">
+            Erosion-resistant digital infrastructure for the vocal era.
+          </p>
+        </div>
+
+        <div class="strata-cell">
+          <h4 class="strata-heading">Platform</h4>
+          <ul class="footer-links">
+            ${platformLinks}
+          </ul>
+        </div>
+
+        <div class="strata-cell">
+          <h4 class="strata-heading">Company</h4>
+          <ul class="footer-links">
+            ${companyLinks}
+          </ul>
+        </div>
+
+        <div class="strata-cell">
+          <h4 class="strata-heading">Trending Now</h4>
+          <a href="/lexicon-pro.html" class="hot-product-card">
+            <div>
+              <div class="hot-tag">NEW RELEASE</div>
+              <div class="product-name">LEXICON PRO</div>
+              <p class="hot-product-desc">
+                Real-time site stratification from live audio feeds.
+              </p>
+            </div>
+            <div class="product-cta">ACQUIRE LICENSE</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div class="live-indicator">
+          <div class="pulse-stack">
+            <div class="pulse" aria-hidden="true"></div>
+            <span>SYSTEMS NOMINAL</span>
+          </div>
+          <span>LATENCY: 14MS</span>
+          <span class="timestamp" id="vt-footer-timestamp"></span>
+        </div>
+        <div>
+          &copy; ${new Date().getFullYear()} VOICETOWEBSITE.COM // ALL RIGHTS RESERVED
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(footer);
+  };
+
+  const initFooterTimestamp = () => {
+    const stamp = document.getElementById("vt-footer-timestamp");
+    if (!stamp) return;
+
+    const updateTime = () => {
+      const now = new Date();
+      const timeString = now.toISOString().replace("T", " ").substring(0, 19);
+      stamp.textContent = `UTC: ${timeString}`;
+    };
+
+    updateTime();
+    window.setInterval(updateTime, 1000);
+  };
+
+  const initFooterParallax = () => {
+    const cells = document.querySelectorAll(".vt-footer .strata-cell");
+    if (!cells.length) return;
+
+    cells.forEach((cell) => {
+      cell.addEventListener(
+        "mousemove",
+        (e) => {
+          const rect = cell.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          cell.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(59, 130, 246, 0.05) 0%, var(--bg-obsidian) 80%)`;
+        },
+        { passive: true },
+      );
+
+      cell.addEventListener(
+        "mouseleave",
+        () => {
+          cell.style.background = "var(--bg-obsidian)";
+        },
+        { passive: true },
+      );
+    });
   };
 
   const electrifyLinks = () => {

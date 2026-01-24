@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;800&family=Space+Mono&display=swap");
 
 :root {
   color-scheme: dark;
@@ -2385,4 +2386,248 @@ body { font-family: 'joker', 'Playfair Display', serif; } h1,h2,h3 { font-family
   background: var(--accent-gold);
   color: #000;
   border: none;
+}
+
+/* Global footer (vt-footer) */
+.vt-footer {
+  --bg-obsidian: #050505;
+  --strata-1: #0a0a0a;
+  --etch-line: rgba(255, 255, 255, 0.08);
+  --accent-glow: #3b82f6;
+  --text-main: #e5e5e5;
+  --text-dim: #737373;
+  --mono-font: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sans-font: "Inter", system-ui, sans-serif;
+
+  background-color: var(--bg-obsidian);
+  color: var(--text-main);
+  font-family: var(--sans-font);
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--etch-line);
+  margin-top: 6rem;
+}
+
+.vt-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 100%),
+    repeating-linear-gradient(0deg, var(--etch-line) 0px, transparent 1px, transparent 40px);
+  pointer-events: none;
+}
+
+.vt-footer .footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+  gap: 2px;
+  background-color: var(--etch-line);
+  border-left: 1px solid var(--etch-line);
+  border-right: 1px solid var(--etch-line);
+  position: relative;
+  z-index: 1;
+}
+
+.vt-footer .strata-cell {
+  background-color: var(--bg-obsidian);
+  padding: 4rem 2rem;
+  position: relative;
+  transition: background-color 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.vt-footer .strata-cell:hover {
+  background-color: var(--strata-1);
+}
+
+.vt-footer .etched-brand {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--text-dim);
+  transition: all 0.5s ease;
+}
+
+.vt-footer .strata-cell:hover .etched-brand {
+  color: var(--text-main);
+  -webkit-text-stroke: 1px transparent;
+  text-shadow: 0 0 30px rgba(255,255,255,0.1);
+}
+
+.vt-footer .vt-footer-tagline {
+  margin-top: 2rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  max-width: 250px;
+}
+
+.vt-footer .strata-heading {
+  font-family: var(--mono-font);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vt-footer .strata-heading::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--accent-glow);
+  display: inline-block;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.vt-footer .footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vt-footer .footer-links li {
+  margin-bottom: 0.75rem;
+}
+
+.vt-footer .footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: inline-block;
+}
+
+.vt-footer .footer-links a:hover {
+  color: var(--text-main);
+  transform: translateX(5px);
+}
+
+.vt-footer .hot-product-card {
+  background: linear-gradient(145deg, #111, #050505);
+  border: 1px solid var(--etch-line);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 200px;
+  transition: transform 0.4s ease, border-color 0.4s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.vt-footer .hot-product-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-glow);
+}
+
+.vt-footer .hot-tag {
+  font-family: var(--mono-font);
+  font-size: 0.6rem;
+  background: var(--accent-glow);
+  color: white;
+  padding: 2px 8px;
+  width: fit-content;
+  margin-bottom: 1rem;
+}
+
+.vt-footer .product-name {
+  font-weight: 800;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.vt-footer .hot-product-desc {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.vt-footer .product-cta {
+  font-family: var(--mono-font);
+  font-size: 0.8rem;
+  color: var(--accent-glow);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.vt-footer .product-cta::after {
+  content: "→";
+  transition: transform 0.3s ease;
+}
+
+.vt-footer .hot-product-card:hover .product-cta::after {
+  transform: translateX(5px);
+}
+
+.vt-footer .status-bar {
+  border-top: 1px solid var(--etch-line);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono-font);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  background: var(--bg-obsidian);
+  position: relative;
+  z-index: 1;
+}
+
+.vt-footer .live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.vt-footer .pulse-stack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vt-footer .pulse {
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: vt-footer-pulse-ring 2s infinite;
+}
+
+@keyframes vt-footer-pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+@media (max-width: 1024px) {
+  .vt-footer .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .vt-footer .footer-container {
+    grid-template-columns: 1fr;
+  }
+  .vt-footer .etched-brand {
+    font-size: 2.5rem;
+  }
+  .vt-footer .strata-cell {
+    padding: 2rem;
+  }
 }
