@@ -28,6 +28,7 @@ body {
   min-height: 100vh;
   line-height: 1.55;
   text-shadow: 0 3px 8px rgba(0, 0, 0, 0.55);
+  overflow-y: auto;
 }
 
 body::before {
@@ -251,6 +252,9 @@ body::after {
   padding: 6rem 4vw 4rem;
   position: relative;
   z-index: 2;
+  max-height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .lock-screen {
@@ -435,6 +439,10 @@ body::after {
 .menu.active .rotater:nth-child(6) .btn-icon { transform: translateY(-10em) rotate(-202.5deg); }
 .menu.active .rotater:nth-child(7) .btn-icon { transform: translateY(-10em) rotate(-247.5deg); }
 .menu.active .rotater:nth-child(8) .btn-icon { transform: translateY(-10em) rotate(-292.5deg); }
+
+.menu {
+  display: none;
+}
 
 .admin-actions {
   display: flex;
