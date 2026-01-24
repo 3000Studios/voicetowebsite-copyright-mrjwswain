@@ -590,7 +590,7 @@ export default function AppStore() {
         >
           <div className="cart-count">🛒 {cart.length} items</div>
           <div className="cart-total">${totalPrice.toFixed(2)}</div>
-          <button className="checkout-btn" onClick={() => alert('Checkout coming soon!')}>
+          <button className="checkout-btn" onClick={() => setShowCheckout(true)}>
             Checkout
           </button>
         </motion.div>
@@ -651,6 +651,19 @@ export default function AppStore() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showCheckout && (
+        <Checkout
+          items={cart.map((id) => {
+            const app = APPS.find((a) => a.id === id)!;
+            return { id: app.id, name: app.name, price: app.price };
+          })}
+          onClose={() => {
+            setShowCheckout(false);
+            setCart([]);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1661,7 +1661,7 @@ body:not(.nav-ready) .site-header {
 }
 
 .marketing-points li::before {
-  content: "â¢";
+  content: "Ã¢ÂÂ¢";
   position: absolute;
   left: 0;
   color: var(--accent);
@@ -1980,7 +1980,7 @@ body:not(.nav-ready) .site-header {
 }
 
 .card.luxe .features li::before {
-  content: "â";
+  content: "Ã¢ÂÂ";
   position: absolute;
   left: 0;
   color: var(--accent-emerald-bright);
@@ -1993,7 +1993,7 @@ body:not(.nav-ready) .site-header {
 }
 
 .card.luxe .features .not-included::before {
-  content: "â";
+  content: "Ã¢ÂÂ";
   color: var(--muted);
 }
 
@@ -2174,7 +2174,7 @@ body:not(.nav-ready) .site-header {
 }
 
 .appstore .product-points li::before {
-  content: "â¢";
+  content: "Ã¢ÂÂ¢";
   margin-right: 0.4rem;
   color: var(--accent-gold);
 }
@@ -2631,3 +2631,7 @@ body { font-family: 'joker', 'Playfair Display', serif; } h1,h2,h3 { font-family
     padding: 2rem;
   }
 }
+
+/* Voice-injected styles */
+body { font-family: 'style 3d with shadow', 'Playfair Display', serif; }
+h1, h2, h3 { font-family: 'style 3d with shadow', 'Playfair Display', serif; }
