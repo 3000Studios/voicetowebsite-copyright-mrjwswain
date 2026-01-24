@@ -1,195 +1,405 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>VoiceToWebsite App Store</title>
-  <meta name="description" content="App Store - VoiceToWebsite" />
-  <link rel="stylesheet" href="styles.css" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=__ADSENSE_PUBLISHER__" crossorigin="anonymous"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>App Store | YoutuneAI - Conductive Membrane Flux</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030305;
+            --membrane-fill: rgba(15, 15, 25, 0.65);
+            --conductive-cyan: #00f2ff;
+            --conductive-purple: #7000ff;
+            --flux-gradient: linear-gradient(135deg, var(--conductive-cyan), var(--conductive-purple));
+            --text-main: #e0e0e0;
+            --text-dim: #94a3b8;
+            --border-membrane: rgba(255, 255, 255, 0.08);
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        .flux-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #0a0a1a 0%, #030305 100%);
+            overflow: hidden;
+        }
+
+        .flux-membrane {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(112, 0, 255, 0.08) 0%, transparent 40%);
+            filter: blur(80px);
+            animation: membrane-shift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes membrane-shift {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(5%, 5%) rotate(5deg); }
+        }
+
+        .conduction-lines {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 4rem;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-membrane);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-mark {
+            width: 40px;
+            height: 40px;
+            background: var(--flux-gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .brand-text strong { font-size: 1.2rem; display: block; letter-spacing: -0.5px; }
+        .brand-text span { font-size: 0.75rem; text-transform: uppercase; color: var(--conductive-cyan); letter-spacing: 2px; }
+
+        .nav {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav a:hover, .nav a.active { color: var(--conductive-cyan); }
+
+        .ghost-button {
+            background: transparent;
+            border: 1px solid var(--border-membrane);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .ghost-button:hover {
+            border-color: var(--conductive-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 6rem;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subhead {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .app-card {
+            position: relative;
+            background: var(--membrane-fill);
+            border: 1px solid var(--border-membrane);
+            padding: 2.5rem;
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(0, 242, 255, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 242, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .app-card:hover::before { transform: translateX(100%); }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 100px;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-membrane);
+        }
+
+        .status-pill.live { color: var(--conductive-cyan); border-color: rgba(0, 242, 255, 0.2); }
+        .status-pill.live::before { content: ''; width: 6px; height: 6px; background: var(--conductive-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--conductive-cyan); }
+
+        .app-card h3 { font-size: 1.75rem; margin-bottom: 1rem; font-weight: 700; }
+
+        .app-card p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .primary-btn {
+            flex: 1;
+            padding: 1rem;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .primary-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .monetization {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--conductive-cyan);
+            opacity: 0.8;
+        }
+
+        .footer {
+            margin-top: 8rem;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border-membrane);
+            text-align: center;
+        }
+
+        .footer strong {
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer p { color: var(--text-dim); font-size: 0.9rem; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .site-header { padding: 1.5rem; }
+            .nav { display: none; }
+        }
+    </style>
 </head>
-<body class="appstore">
-  <div class="video-bg" aria-hidden="true">
-    <video src="https://cdn.coverr.co/videos/coverr-cyber-squares-4618/1080p.mp4" autoplay muted loop playsinline></video>
-  </div>
-  <div class="edge-glow" aria-hidden="true"></div>
-  <div class="edge-frame" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="nav-video">
-      <video src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4" autoplay muted loop playsinline></video>
-    </div>
-    <div class="brand">
-      <span class="brand-mark">VW</span>
-      <div class="brand-text">
-        <strong>VoiceToWebsite</strong>
-        <span>Revenue Engine</span>
-      </div>
-    </div>
-    <nav class="nav">
-      <a href="index.html">Home</a>
-      <a href="store.html">Store</a>
-      <a href="appstore.html">App Store</a>
-      <a href="blog.html">Blog</a>
-      <a href="livestream.html">Live Stream</a>
-      <a href="referrals.html">Referrals</a>
-      <a href="projects.html">Projects</a>
-      <a href="studio3000.html">3000 Studios</a>
-      <a href="/admin">Admin</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </header>
+<body>
 
-  <main class="page">
-    <section class="section product-lineup">
-      <div class="lineup-header">
+    <div class="flux-container" aria-hidden="true">
+        <div class="flux-membrane"></div>
+        <div class="conduction-lines"></div>
+    </div>
+
+    <header class="site-header">
+        <div class="brand">
+            <span class="brand-mark">YT</span>
+            <div class="brand-text">
+                <strong>YoutuneAI</strong>
+                <span>Command Center</span>
+            </div>
+        </div>
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="appstore.html" class="active">App Store</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="store.html">Store</a>
+            <a href="blog.html">Blog</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+        <a class="ghost-button" href="/admin">ADMIN</a>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <h1>The App Flux</h1>
+            <p class="subhead">Deploy autonomous modules that build, monetize, and scale your digital ecosystem in real-time.</p>
+        </section>
+
+        <div class="app-grid">
+            <div class="app-card">
+                <div>
+                    <div class="status-pill live">System Active</div>
+                    <h3>VoiceToWebsite</h3>
+                    <p>High-fidelity neural interface that converts natural language into production-ready web deployments.</p>
+                </div>
+                <div class="card-actions">
+                    <a class="primary-btn" href="index.html">LAUNCH APP</a>
+                    <span class="monetization">PRO / $19</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div>
+                    <div class="status-pill live">System Active</div>
+                    <h3>Revenue Bot</h3>
+                    <p>Conductive monetization layer that automates lead capture and affiliate conversion cycles.</p>
+                </div>
+                <div class="card-actions">
+                    <button class="primary-btn" type="button" disabled>ACTIVATE</button>
+                    <span class="monetization">FREE</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div>
+                    <div class="status-pill">Beta 0.9</div>
+                    <h3>Command Center</h3>
+                    <p>The central nervous system for your digital assets. Visual control over data flows and UI state.</p>
+                </div>
+                <div class="card-actions">
+                    <button class="primary-btn" type="button" disabled>INITIALIZE</button>
+                    <span class="monetization">INCLUDED</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div>
+                    <div class="status-pill">Experimental</div>
+                    <h3>Game Zone</h3>
+                    <p>Physics-driven interactive modules designed for high-retention user engagement and play-to-earn.</p>
+                </div>
+                <div class="card-actions">
+                    <button class="primary-btn" type="button" disabled>ENTER</button>
+                    <span class="monetization">TOKENS</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
         <div>
-          <p class="eyebrow">For Sale</p>
-          <h2>Signature Drops</h2>
-          <p class="muted">High-intent offers, ready to check out or demo.</p>
+            <strong>YoutuneAI™</strong>
+            <p>Conductive systems for the autonomous era.</p>
         </div>
-      </div>
-      <div class="lineup-grid">
-        <article class="lineup-card">
-          <span class="pill sale">New</span>
-          <h3>Platinum Voice Site</h3>
-          <p>Full voice-first website with live deploys and admin console.</p>
-          <div class="price-row">
-            <span class="price-tag">$199</span><span class="price-unit">/mo</span>
-          </div>
-          <a class="btn small" href="store.html">Buy now</a>
-        </article>
-        <article class="lineup-card">
-          <span class="pill sale">Bundle</span>
-          <h3>Automation Kit</h3>
-          <p>Lead capture, CRM sync, alerts, and AI responses wired in.</p>
-          <div class="price-row">
-            <span class="price-tag">$149</span><span class="price-unit">/mo</span>
-          </div>
-          <a class="btn ghost small" href="store.html">View bundle</a>
-        </article>
-        <article class="lineup-card">
-          <span class="pill sale">Live</span>
-          <h3>Livestream Pack</h3>
-          <p>Stream embeds, scheduling, and promo blocks shipped for you.</p>
-          <div class="price-row">
-            <span class="price-tag">$89</span><span class="price-unit">/mo</span>
-          </div>
-          <a class="btn ghost small" href="store.html">Add to cart</a>
-        </article>
-        <article class="lineup-card">
-          <span class="pill sale">Pro</span>
-          <h3>Support Retainer</h3>
-          <p>Priority edits, AI prompt tuning, and uptime watch.</p>
-          <div class="price-row">
-            <span class="price-tag">$99</span><span class="price-unit">/mo</span>
-          </div>
-          <a class="btn small" href="store.html">Book</a>
-        </article>
-      </div>
-    </section>
+    </footer>
 
-    <section class="section app-hero">
-      <div class="app-hero-media">
-        <img src="https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1400&q=80" alt="Featured app workspace" loading="lazy" />
-      </div>
-      <div class="app-hero-copy">
-        <p class="eyebrow">Featured Build</p>
-        <h1>VoiceToWebsite Platinum</h1>
-        <p class="subhead">Own the voice-first engine with live deploys, admin console, integrations, and payments prewired.</p>
-        <div class="price-tag">
-          <span class="price">$199</span><span class="unit">/mo</span>
-        </div>
-        <div class="button-row">
-          <button class="primary pay-btn" data-product="platinum" data-amount="19900" data-label="VoiceToWebsite Platinum">Buy with PayPal</button>
-          <button class="ghost stripe-btn" data-product="platinum" data-amount="19900" data-label="VoiceToWebsite Platinum">Pay with Stripe</button>
-        </div>
-        <ul class="product-points">
-          <li>Unlimited voice deploys with rollback</li>
-          <li>Cloud + local fallback command center</li>
-          <li>Edge-hosted assets with KV + D1 storage</li>
-          <li>Livestream and app embed ready</li>
-        </ul>
-      </div>
-    </section>
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
 
-    <section class="section">
-      <h2>Apps & Integrations</h2>
-      <p class="subhead">Drop your Google AI Studio or custom app links and publish instantly.</p>
-      <div class="grid">
-        <article class="feature-card">
-          <h3>AI Studio Widget</h3>
-          <p>Embed your AI Studio projects with one link.</p>
-          <button class="primary pay-btn" data-product="ai-widget" data-amount="14900" data-label="AI Studio Widget">Add App</button>
-          <button class="ghost stripe-btn" data-product="ai-widget" data-amount="14900" data-label="AI Studio Widget">Pay with Stripe</button>
-        </article>
-        <article class="feature-card">
-          <h3>Automation Kit</h3>
-          <p>Prebuilt flows for lead capture, CRM sync, and alerts.</p>
-          <button class="primary pay-btn" data-product="automation-kit" data-amount="9900" data-label="Automation Kit">Buy with PayPal</button>
-          <button class="ghost stripe-btn" data-product="automation-kit" data-amount="9900" data-label="Automation Kit">Pay with Stripe</button>
-        </article>
-        <article class="feature-card">
-          <h3>Checkout Booster</h3>
-          <p>Dynamic pricing tests with instant rollout.</p>
-          <button class="primary pay-btn" data-product="checkout-booster" data-amount="8900" data-label="Checkout Booster">Add App</button>
-          <button class="ghost stripe-btn" data-product="checkout-booster" data-amount="8900" data-label="Checkout Booster">Pay with Stripe</button>
-        </article>
-      </div>
-      <div class="adsense-slot">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="__ADSENSE_PUBLISHER__"
-             data-ad-slot="__ADSENSE_SLOT__"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      </div>
-    </section>
-  </main>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  <script src="https://js.stripe.com/v3"></script>
-  <script>
-    const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
-    const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
-
-    const handleStripe = async (btn) => {
-      const amount = btn.dataset.amount;
-      const product = btn.dataset.product;
-      const label = btn.dataset.label;
-      try {
-        const stripe = Stripe(STRIPE_PK);
-        const res = await fetch("/api/stripe/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount, product, label, source: "appstore" }),
+            const membrane = document.querySelector('.flux-membrane');
+            if (!membrane) return;
+            membrane.style.transform = `translate(${x * 20}px, ${y * 20}px) rotate(${x * 5}deg)`;
         });
-        const data = await res.json();
-        if (!data.sessionId) throw new Error("No session");
-        await stripe.redirectToCheckout({ sessionId: data.sessionId });
-      } catch (err) {
-        alert("Stripe checkout not configured. Please set STRIPE_PUBLISHABLE_KEY and backend endpoint.");
-        console.warn(err);
-      }
-    };
 
-    const handlePayPal = async (btn) => {
-      const amount = btn.dataset.amount;
-      const product = btn.dataset.product;
-      const label = btn.dataset.label;
-      if (PAYPAL_CLIENT === "__PAYPAL_CLIENT_ID__") {
-        alert("PayPal client ID missing. Configure PAYPAL_CLIENT_ID to enable checkout.");
-        return;
-      }
-      // Simple PayPal redirect stub (replace with Buttons SDK flow)
-      window.location.href = `https://www.paypal.com/checkoutnow?token=${encodeURIComponent(product)}-${amount}`;
-    };
-
-    document.querySelectorAll(".stripe-btn").forEach((btn) => {
-      btn.addEventListener("click", () => handleStripe(btn));
-    });
-    document.querySelectorAll(".pay-btn").forEach((btn) => {
-      btn.addEventListener("click", () => handlePayPal(btn));
-    });
-  </script>
-  <script type="module" src="nav.js"></script>
+        document.querySelectorAll('.app-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    </script>
 </body>
 </html>

@@ -257,16 +257,46 @@
   </video>
   <div class="noise-overlay" aria-hidden="true"></div>
 
-  <div class="lock-screen" id="lock-screen">
-    <div class="lock-card">
-      <h2>Enter access code</h2>
-      <p>Unlock to access admin tools.</p>
-      <div class="lock-row">
-        <input type="password" id="lock-input" placeholder="Access code" />
-        <button id="lock-button" class="primary">Unlock</button>
-      </div>
-      <p class="muted" id="lock-error"></p>
+  <div class="lock-screen admin-lock" id="lock-screen">
+    <div class="plasma-chamber" aria-hidden="true">
+      <div class="ion ion-1"></div>
+      <div class="ion ion-2"></div>
+      <div class="ion ion-3"></div>
     </div>
+
+    <main class="login-suspension" aria-label="Admin login">
+      <div class="scanner-line" aria-hidden="true"></div>
+
+      <header class="header-section">
+        <span class="id-label">Security Protocol // Ionized</span>
+        <h1>Neural Gate</h1>
+      </header>
+
+      <form id="auth-form">
+        <div class="input-group">
+          <span class="input-tag">01_IDENTIFIER</span>
+          <input type="email" id="lock-email" placeholder="USER_NAME@DOMAIN" autocomplete="username" />
+          <div class="input-focus-line"></div>
+        </div>
+
+        <div class="input-group">
+          <span class="input-tag">02_PASS_KEY</span>
+          <input type="password" id="lock-input" placeholder="••••••••••••" autocomplete="current-password" required />
+          <div class="input-focus-line"></div>
+        </div>
+
+        <button type="submit" class="ignition-trigger" id="lock-button">
+          Initialize Session
+        </button>
+      </form>
+
+      <div class="meta-actions">
+        <a href="/" aria-label="Return to site">Return</a>
+        <a href="/contact.html" aria-label="Contact support">Request Uplink</a>
+      </div>
+
+      <p class="muted" id="lock-error" role="status" aria-live="polite"></p>
+    </main>
   </div>
 
   <div class="admin-shell admin-landing-shell">

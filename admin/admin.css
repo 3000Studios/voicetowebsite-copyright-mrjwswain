@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
 :root {
   color-scheme: dark;
@@ -29,6 +30,238 @@ body {
   line-height: 1.55;
   text-shadow: 0 3px 8px rgba(0, 0, 0, 0.55);
   overflow-y: auto;
+}
+
+/* Ionized admin lock modal */
+.lock-screen.admin-lock {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.25rem;
+  background: rgba(5, 5, 8, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.lock-screen.admin-lock[hidden] {
+  display: none;
+}
+
+.admin-lock .plasma-chamber {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  filter: blur(100px) contrast(1.2);
+  opacity: 0.55;
+  animation: admin-pulse-chamber 10s infinite alternate;
+}
+
+.admin-lock .ion {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  animation: admin-float-ion 20s infinite ease-in-out;
+}
+
+.admin-lock .ion-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 242, 255, 0.8) 0%, transparent 70%);
+  top: -10%;
+  left: -10%;
+}
+
+.admin-lock .ion-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(112, 0, 255, 0.8) 0%, transparent 70%);
+  bottom: -5%;
+  right: -5%;
+  animation-delay: -5s;
+}
+
+.admin-lock .ion-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 0, 200, 0.75) 0%, transparent 70%);
+  top: 40%;
+  left: 50%;
+  animation-delay: -10s;
+}
+
+.admin-lock .login-suspension {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: 40px;
+  background: rgba(10, 10, 15, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.admin-lock .scanner-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.8), transparent);
+  opacity: 0.2;
+  animation: admin-scan 4s linear infinite;
+}
+
+.admin-lock .id-label {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(0, 242, 255, 0.9);
+  margin-bottom: 8px;
+  display: block;
+  opacity: 0.85;
+}
+
+.admin-lock h1 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+  background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,0.4) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-lock .header-section {
+  margin-bottom: 40px;
+}
+
+.admin-lock .input-group {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.admin-lock .input-tag {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  position: absolute;
+  top: -18px;
+  left: 0;
+}
+
+.admin-lock input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 12px 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 1rem;
+  color: white;
+  outline: none;
+}
+
+.admin-lock input:focus {
+  border-bottom-color: rgba(0, 242, 255, 0.9);
+}
+
+.admin-lock .input-focus-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: rgba(0, 242, 255, 0.9);
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.85);
+  transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.admin-lock input:focus + .input-focus-line {
+  width: 100%;
+}
+
+.admin-lock .ignition-trigger {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  margin-top: 12px;
+  background: transparent;
+  border: 1px solid rgba(0, 242, 255, 0.9);
+  color: rgba(0, 242, 255, 0.9);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.admin-lock .ignition-trigger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.admin-lock .ignition-trigger:hover {
+  background: rgba(0, 242, 255, 0.9);
+  color: #050508;
+  box-shadow: 0 0 30px rgba(0, 242, 255, 0.25);
+}
+
+.admin-lock .ignition-trigger:hover::before {
+  left: 100%;
+}
+
+.admin-lock .meta-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 22px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.admin-lock .meta-actions a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-lock .meta-actions a:hover {
+  color: #fff;
+}
+
+.admin-lock #lock-error {
+  margin-top: 14px;
+  min-height: 1.25em;
+}
+
+@keyframes admin-float-ion {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(100px, 50px) scale(1.1); }
+  66% { transform: translate(-50px, 100px) scale(0.9); }
+}
+
+@keyframes admin-pulse-chamber {
+  0% { opacity: 0.45; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes admin-scan {
+  0% { top: 0%; opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { top: 100%; opacity: 0; }
 }
 
 .admin-video-bg {

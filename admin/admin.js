@@ -11,6 +11,7 @@ const lockScreen = document.getElementById("lock-screen");
 const lockInput = document.getElementById("lock-input");
 const lockButton = document.getElementById("lock-button");
 const lockError = document.getElementById("lock-error");
+const lockForm = document.getElementById("auth-form");
 const adminShell = document.querySelector(".admin-shell");
 const previewReset = document.getElementById("preview-reset");
 const previewSpeak = document.getElementById("preview-speak");
@@ -422,8 +423,12 @@ const updateApplyGate = () => {
 };
 
 const setLockedUI = (locked) => {
-  lockScreen.style.display = locked ? "grid" : "none";
-  adminShell.style.filter = locked ? "blur(8px)" : "none";
+  if (lockScreen) {
+    lockScreen.toggleAttribute("hidden", !locked);
+    if (!locked) lockScreen.style.display = "none";
+    else lockScreen.style.removeProperty("display");
+  }
+  if (adminShell) adminShell.style.filter = locked ? "blur(8px)" : "none";
   [startBtn, stopBtn, planBtn, applyBtn, commandEl].forEach((el) => {
     if (el) el.disabled = locked;
   });
@@ -441,23 +446,28 @@ const initPasscodeGate = () => {
   const unlocked = sessionStorage.getItem(UNLOCK_KEY) === "true";
   setLockedUI(!unlocked);
 
-  const unlock = () => {
-    if (lockInput.value.trim() === PASSCODE) {
+  const unlock = (event) => {
+    if (event) event.preventDefault();
+    const code = (lockInput?.value || "").trim();
+    if (code === PASSCODE) {
       sessionStorage.setItem(UNLOCK_KEY, "true");
-      lockError.textContent = "";
+      if (lockError) lockError.textContent = "";
       setLockedUI(false);
       speak("Controls unlocked");
       logActivity();
       return;
     }
-    lockError.textContent = "Incorrect code.";
+    if (lockError) lockError.textContent = "Incorrect code.";
     speak("Incorrect code");
   };
 
-  lockButton.addEventListener("click", unlock);
-  lockInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") unlock();
-  });
+  if (lockButton) lockButton.addEventListener("click", unlock);
+  if (lockForm) lockForm.addEventListener("submit", unlock);
+  if (lockInput) {
+    lockInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") unlock(e);
+    });
+  }
 };
 
 const initSpeech = () => {
