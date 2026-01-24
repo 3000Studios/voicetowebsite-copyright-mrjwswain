@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CheckoutProps {
@@ -21,8 +21,10 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
   });
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const paypalHostRef = useRef<HTMLDivElement | null>(null);
 
-  const total = items.reduce((sum, item) => sum + item.price, 0);
+  const total = useMemo(() => items.reduce((sum, item) => sum + item.price, 0), [items]);
+  const paypalClientId = (import.meta as any).env?.VITE_PAYPAL_CLIENT_ID as string | undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,17 +43,96 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
     }, 3000);
   };
 
-  const handlePayPal = () => {
-    setProcessing(true);
-    // Simulate PayPal redirect
-    setTimeout(() => {
-      setSuccess(true);
-      setTimeout(() => {
-        setSuccess(false);
-        onClose();
-      }, 3000);
-    }, 2000);
+  const loadPayPalSdk = async () => {
+    if (!paypalClientId) {
+      throw new Error('Missing VITE_PAYPAL_CLIENT_ID');
+    }
+    const existing = document.querySelector<HTMLScriptElement>('script[data-paypal-sdk="true"]');
+    if (existing) return;
+
+    await new Promise<void>((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(paypalClientId)}&currency=USD&intent=capture`;
+      script.async = true;
+      script.defer = true;
+      script.dataset.paypalSdk = 'true';
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load PayPal SDK'));
+      document.head.appendChild(script);
+    });
   };
+
+  useEffect(() => {
+    if (paymentMethod !== 'paypal') return;
+    if (!paypalHostRef.current) return;
+
+    let cancelled = false;
+
+    const mount = async () => {
+      try {
+        setProcessing(true);
+        await loadPayPalSdk();
+        if (cancelled) return;
+
+        const paypalAny = (window as any).paypal as any;
+        if (!paypalAny?.Buttons) {
+          throw new Error('PayPal SDK not available');
+        }
+
+        paypalHostRef.current!.innerHTML = '';
+
+        const button = paypalAny.Buttons({
+          style: { layout: 'vertical', shape: 'rect', label: 'paypal' },
+          createOrder: (_data: any, actions: any) => {
+            return actions.order.create({
+              purchase_units: [
+                {
+                  description: items.map((i) => i.name).join(', ').slice(0, 127),
+                  amount: {
+                    currency_code: 'USD',
+                    value: total.toFixed(2),
+                    breakdown: {
+                      item_total: { currency_code: 'USD', value: total.toFixed(2) },
+                    },
+                  },
+                  items: items.map((i) => ({
+                    name: i.name.slice(0, 127),
+                    unit_amount: { currency_code: 'USD', value: i.price.toFixed(2) },
+                    quantity: '1',
+                  })),
+                },
+              ],
+            });
+          },
+          onApprove: async (_data: any, actions: any) => {
+            setProcessing(true);
+            await actions.order.capture();
+            setProcessing(false);
+            setSuccess(true);
+            setTimeout(() => {
+              setSuccess(false);
+              onClose();
+            }, 1800);
+          },
+          onError: (err: any) => {
+            console.error('PayPal error', err);
+            setProcessing(false);
+          },
+        });
+
+        await button.render(paypalHostRef.current);
+        setProcessing(false);
+      } catch (err) {
+        console.error(err);
+        setProcessing(false);
+      }
+    };
+
+    void mount();
+    return () => {
+      cancelled = true;
+    };
+  }, [items, onClose, paymentMethod, total, paypalClientId]);
 
   return (
     <div className="checkout-modal">
@@ -438,18 +519,28 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                 >
-                  <button
-                    className="submit-btn"
-                    onClick={handlePayPal}
-                    disabled={processing}
-                    style={{ background: '#0070ba' }}
-                  >
-                    {processing ? (
-                      <div className="spinner" />
-                    ) : (
-                      `Continue with PayPal - $${total.toFixed(2)}`
-                    )}
-                  </button>
+                  {!paypalClientId ? (
+                    <div
+                      style={{
+                        padding: '1rem',
+                        borderRadius: 12,
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        color: '#b0b0b0',
+                      }}
+                    >
+                      Missing <code>VITE_PAYPAL_CLIENT_ID</code>. Add it to your env to enable PayPal checkout.
+                    </div>
+                  ) : (
+                    <>
+                      {processing && (
+                        <div style={{ padding: '0.75rem 0' }}>
+                          <div className="spinner" />
+                        </div>
+                      )}
+                      <div ref={paypalHostRef} />
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
