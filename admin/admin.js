@@ -47,7 +47,6 @@ let recognition;
 let listening = false;
 let lastPlan = null;
 let orchestratorHealthy = true;
-let micAccessGranted = false;
 
 const PASSCODE = "5555";
 const UNLOCK_KEY = "yt-admin-unlocked";
@@ -105,28 +104,6 @@ const speak = (text) => {
   utter.rate = 1;
   speechSynthesis.cancel();
   speechSynthesis.speak(utter);
-};
-
-const setMicState = (text, tone = "ok") => {
-  if (!micStateEl) return;
-  micStateEl.textContent = text;
-  micStateEl.classList.remove("ok", "warn", "alert");
-  if (tone) micStateEl.classList.add(tone);
-};
-
-const ensureMicAccess = async () => {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    return true;
-  }
-  if (micAccessGranted) return true;
-  try {
-    await navigator.mediaDevices.getUserMedia({ audio: true });
-    micAccessGranted = true;
-    return true;
-  } catch (err) {
-    setMicState(`Mic blocked: ${err.name || "permission denied"}`, "alert");
-    return false;
-  }
 };
 
 const clickSound = () => {
@@ -488,16 +465,8 @@ const initSpeech = () => {
   if (!micStateEl || !commandEl) {
     return null;
   }
-  if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-    setMicState("Microphone requires HTTPS or localhost.", "alert");
-    if (startBtn) startBtn.disabled = true;
-    if (stopBtn) stopBtn.disabled = true;
-    return;
-  }
   if (!SpeechRecognition) {
-    setMicState("Speech recognition not supported in this browser.", "alert");
-    if (startBtn) startBtn.disabled = true;
-    if (stopBtn) stopBtn.disabled = true;
+    micStateEl.textContent = "Speech recognition not supported in this browser.";
     return;
   }
 
@@ -513,7 +482,7 @@ const initSpeech = () => {
     const transcript = last[0].transcript.trim();
     commandEl.value = transcript;
     micStateEl.textContent = `Captured: "${transcript}"`;
-    applyLocalPreview(transcript);
+    // applyLocalPreview(transcript);
     logTranscript(transcript, "voice");
 
     const lower = transcript.toLowerCase();
@@ -527,16 +496,13 @@ const initSpeech = () => {
   };
 
   recognition.onerror = (event) => {
-    setMicState(`Mic error: ${event.error}`, "alert");
+    micStateEl.textContent = `Mic error: ${event.error}`;
   };
 
   recognition.onend = () => {
     if (listening) {
       recognition.start();
-      setMicState("Listening...", "ok");
-      return;
     }
-    setMicState("Microphone idle.", "warn");
   };
 
   return {};
@@ -545,13 +511,11 @@ const initSpeech = () => {
 const speechController = initSpeech();
 
 if (startBtn) {
-  startBtn.addEventListener("click", async () => {
+  startBtn.addEventListener("click", () => {
     if (!recognition) return;
-    const ok = await ensureMicAccess();
-    if (!ok) return;
     listening = true;
     recognition.start();
-    setMicState("Listening...", "ok");
+    if (micStateEl) micStateEl.textContent = "Listening...";
   });
 }
 
@@ -560,7 +524,7 @@ if (stopBtn) {
     if (!recognition) return;
     listening = false;
     recognition.stop();
-    setMicState("Microphone idle.", "warn");
+    if (micStateEl) micStateEl.textContent = "Microphone idle.";
   });
 }
 
