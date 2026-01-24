@@ -19,7 +19,7 @@ export const NAV_LINKS: NavigationLink[] = [
     videoUrl: 'https://media.voicetowebsite.com/storenavigation.mp4',
     description: 'Procure advanced digital assets.',
     themeColor: 'rgba(234, 179, 8, 0.5)',
-    url: 'https://voicetowebsite.com/store'
+    url: 'https://voicetowebsite.com/store.html'
   },
   {
     id: 'admin',
@@ -35,7 +35,7 @@ export const NAV_LINKS: NavigationLink[] = [
     videoUrl: 'https://media.voicetowebsite.com/appstore.mp4',
     description: 'Expand core system functionality.',
     themeColor: 'rgba(34, 197, 94, 0.5)',
-    url: 'https://voicetowebsite.com/appstore'
+    url: 'https://voicetowebsite.com/appstore.html'
   },
   {
     id: 'live',
@@ -43,7 +43,7 @@ export const NAV_LINKS: NavigationLink[] = [
     videoUrl: 'https://media.voicetowebsite.com/livenavigation.mp4',
     description: 'Synchronized real-time broadcast frequency.',
     themeColor: 'rgba(148, 163, 184, 0.5)',
-    url: 'http://voicetowebsite.com/livestream'
+    url: 'https://voicetowebsite.com/livestream.html'
   }
 ];
 
