@@ -2,7 +2,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 export const generateSiteMod = async (prompt: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    throw new Error("API_KEY not found in environment variables.");
+  }
+  const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `The user wants to modify the cinematic interface atmosphere. Prompt: "${prompt}". Provide a poetic, cinematic description of this new theme and a hex color code.`,

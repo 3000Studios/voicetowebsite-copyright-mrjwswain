@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { audioEngine } from '../services/audioEngine';
 
 interface ElectricTextProps {
@@ -12,7 +12,6 @@ interface ElectricTextProps {
 
 const ElectricText: React.FC<ElectricTextProps> = ({ text, className, onClick, active }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [sparkPos, setSparkPos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -20,10 +19,6 @@ const ElectricText: React.FC<ElectricTextProps> = ({ text, className, onClick, a
       audioEngine.playHum();
       const interval = setInterval(() => {
         audioEngine.playSpark();
-        setSparkPos({
-          x: Math.random() * 100,
-          y: Math.random() * 100,
-        });
       }, 150);
       return () => clearInterval(interval);
     }
