@@ -301,12 +301,21 @@ body {
 }
 
 .sub-nav a {
-  color: var(--muted);
+  color: transparent;
   text-decoration: none;
   padding: 0.35rem 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * 0.8);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6);
+  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease, border-color 0.25s ease;
+}
+
+.sub-nav a:hover,
+.sub-nav a:focus-visible {
+  color: #fff;
+  -webkit-text-stroke-color: transparent;
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .brand {
@@ -359,12 +368,21 @@ body {
 }
 
 .admin-subnav a {
-  color: var(--muted);
+  color: transparent;
   text-decoration: none;
   padding: 0.35rem 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * 0.8);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6);
+  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease, border-color 0.25s ease;
+}
+
+.admin-subnav a:hover,
+.admin-subnav a:focus-visible {
+  color: #fff;
+  -webkit-text-stroke-color: transparent;
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .status-grid {

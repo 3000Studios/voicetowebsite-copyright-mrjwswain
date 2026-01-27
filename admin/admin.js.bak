@@ -50,6 +50,7 @@ const productForm = document.getElementById("product-form");
 const productClear = document.getElementById("product-clear");
 const productsReset = document.getElementById("products-reset");
 const productsCount = document.getElementById("products-count");
+
 let recognition;
 let listening = false;
 let lastPlan = null;
@@ -827,9 +828,11 @@ if (!loadApps().length) {
   saveApps(seedApps());
 }
 renderApps();
+
 // Store products manager (local storage placeholders)
 const loadProducts = () => JSON.parse(localStorage.getItem("vtw-products") || "[]");
 const saveProducts = (products) => localStorage.setItem("vtw-products", JSON.stringify(products.slice(0, 100)));
+
 const seedProducts = () => ([
   {
     id: "lexicon-pro",
@@ -859,10 +862,12 @@ const seedProducts = () => ([
     ts: new Date().toISOString(),
   },
 ]);
+
 const updateProductKpis = (products = loadProducts()) => {
   if (!productsCount) return;
   productsCount.textContent = `${products.length} products`;
 };
+
 const renderProducts = () => {
   if (!productTableBody) return;
   const products = loadProducts();
@@ -886,6 +891,7 @@ const renderProducts = () => {
   }
   updateProductKpis(products);
 };
+
 productTableBody?.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-product-remove]");
   if (!btn) return;
@@ -894,6 +900,7 @@ productTableBody?.addEventListener("click", (e) => {
   saveProducts(products);
   renderProducts();
 });
+
 productForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   const formData = new FormData(productForm);
@@ -907,6 +914,7 @@ productForm?.addEventListener("submit", (e) => {
     tag: formData.get("tag")?.toString() || "",
     ts: new Date().toISOString(),
   };
+
   const products = loadProducts();
   products.unshift(product);
   saveProducts(products);
@@ -914,13 +922,16 @@ productForm?.addEventListener("submit", (e) => {
   productForm.reset();
   updateProductKpis(products);
 });
+
 productClear?.addEventListener("click", () => {
   productForm?.reset();
 });
+
 productsReset?.addEventListener("click", () => {
   saveProducts(seedProducts());
   renderProducts();
 });
+
 if (productTableBody && !loadProducts().length) {
   saveProducts(seedProducts());
 }

@@ -5,7 +5,8 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 ## Local dev
 
 - Install: `npm install`
-- Run: `npm run dev`
+- Terminal 1 (API): `npm run dev:worker` (serves `/api/orchestrator`)
+- Terminal 2 (site): `npm run dev`
 - Build: `npm run build`
 - Preview: `npm run preview`
 

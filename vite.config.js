@@ -4,6 +4,14 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      // Route API calls to the local Cloudflare Worker (`wrangler dev`).
+      "/api/orchestrator": "http://127.0.0.1:8787",
+      "/admin/logs": "http://127.0.0.1:8787",
+      "/api/analytics": "http://127.0.0.1:8787",
+    },
+  },
   build: {
     target: "esnext",
     sourcemap: false,

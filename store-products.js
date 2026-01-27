@@ -1,5 +1,4 @@
 const STORAGE_KEY = "vtw-products";
-
 const loadProducts = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -10,33 +9,27 @@ const loadProducts = () => {
     return [];
   }
 };
-
 const getPayPalClientId = () => {
   const env = window.__ENV || {};
   return env.PAYPAL_CLIENT_ID || "";
 };
-
 const formatPrice = (value) => {
   const number = Number(value || 0);
   return number.toFixed(2);
 };
-
 const mountProducts = () => {
   const scene = document.getElementById("store-product-scene");
   if (!scene) return;
-
   const products = loadProducts();
   if (!products.length) {
     scene.innerHTML = `<div class="muted" style="padding:2rem; text-align:center;">No products yet. Add products in <a href="/admin/store-manager.html">Store Manager</a>.</div>`;
     return;
   }
-
   scene.innerHTML = "";
   products.forEach((product, index) => {
     const card = document.createElement("article");
     card.className = "vt-store-card";
     card.style.animationDelay = `${Math.min(index, 6) * 0.12}s`;
-
     card.innerHTML = `
       <div class="glint"></div>
       <div class="preview-viewport" aria-hidden="true">
@@ -49,29 +42,24 @@ const mountProducts = () => {
           </div>
         </div>
       </div>
-
       <div class="header">
         <span class="label">${product.label || "Product"}</span>
         <h2 class="title">${product.title || "Untitled"}</h2>
         <p class="description">${product.desc || ""}</p>
       </div>
-
       <div class="lock-indicator" aria-hidden="true">
         <div class="lock-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         </div>
       </div>
-
       <div class="purchase-zone">
         <div class="price-tag">$${formatPrice(product.price)}</div>
         <button class="buy-btn" type="button" data-product-id="${product.id || ""}">Acquire License</button>
       </div>
     `;
-
     scene.appendChild(card);
   });
 };
-
 const wireTilt = () => {
   const cards = document.querySelectorAll(".vt-store-card");
   cards.forEach((card) => {
@@ -98,15 +86,12 @@ const wireTilt = () => {
     );
   });
 };
-
 const ensurePayPalSdk = async () => {
   if (window.paypal) return true;
   const clientId = getPayPalClientId();
   if (!clientId) return false;
-
   const existing = document.querySelector('script[data-paypal-sdk="true"]');
   if (existing) return new Promise((resolve) => existing.addEventListener("load", () => resolve(true), { once: true }));
-
   return new Promise((resolve) => {
     const script = document.createElement("script");
     script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&intent=capture`;
@@ -118,14 +103,12 @@ const ensurePayPalSdk = async () => {
     document.head.appendChild(script);
   });
 };
-
 const openPayPalModal = async (product) => {
   const ok = await ensurePayPalSdk();
   if (!ok || !window.paypal) {
     alert("PayPal is not configured yet. Set PAYPAL_CLIENT_ID_PROD in your deploy environment.");
     return;
   }
-
   const modal = document.createElement("div");
   modal.className = "vt-pay-modal";
   modal.innerHTML = `
@@ -138,14 +121,12 @@ const openPayPalModal = async (product) => {
       <div class="vt-pay-note muted">Secure payment via PayPal.</div>
     </div>
   `;
-
   document.body.appendChild(modal);
   const close = () => modal.remove();
   modal.querySelector(".vt-pay-close")?.addEventListener("click", close);
   modal.addEventListener("click", (e) => {
     if (e.target === modal) close();
   });
-
   const host = modal.querySelector("#vt-pay-host");
   window.paypal
     .Buttons({
@@ -171,7 +152,6 @@ const openPayPalModal = async (product) => {
     })
     .render(host);
 };
-
 const wireBuyButtons = () => {
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".buy-btn");
@@ -185,7 +165,6 @@ const wireBuyButtons = () => {
     openPayPalModal(product);
   });
 };
-
 const init = () => {
   mountProducts();
   wireTilt();
@@ -195,7 +174,6 @@ const init = () => {
     if (storeSearch) storeSearch.dispatchEvent(new Event("input"));
   }, 0);
 };
-
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init);
 } else {
