@@ -114,6 +114,68 @@ export default {
       }
     }
 
+if (url.pathname === "/api/health" && request.method === "GET") {
+  return jsonResponse(200, {
+    status: "ok",
+    orchestrator: "online",
+    d1: !!env.D1,
+    assets: !!env.ASSETS,
+    ts: new Date().toISOString(),
+  });
+}
+
+if (url.pathname === "/api/metrics" && request.method === "GET") {
+  if (!env.D1) {
+    return jsonResponse(503, { error: "D1 database not available." });
+  }
+
+  const since = "datetime('now','-24 hours')";
+
+  const [commands, errors] = await Promise.all([
+    env.D1.prepare(
+      `SELECT COUNT(*) AS count FROM commands WHERE ts > ${since}`
+    ).first(),
+    env.D1.prepare(
+      `SELECT COUNT(*) AS count FROM errors WHERE ts > ${since}`
+    ).first().catch(() => ({ count: 0 })),
+  ]);
+
+  return jsonResponse(200, {
+    window: "24h",
+    commands: commands?.count || 0,
+    errors: errors?.count || 0,
+    deployments: {
+      success: 0,
+      failed: 0
+    },
+    revenue: {
+      usd: 0
+    },
+    ts: new Date().toISOString()
+  });
+}
+
+if (url.pathname === "/api/session" && request.method === "POST") {
+  if (!env.D1) return jsonResponse(200, { ok: true });
+
+  const id = crypto.randomUUID();
+  const ua = request.headers.get("user-agent") || "unknown";
+
+  await env.D1.prepare(
+    `CREATE TABLE IF NOT EXISTS sessions (
+      id TEXT PRIMARY KEY,
+      ts DATETIME DEFAULT CURRENT_TIMESTAMP,
+      user_agent TEXT
+    )`
+  ).run();
+
+  await env.D1.prepare(
+    "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)"
+  ).bind(id, ua).run();
+
+  return jsonResponse(200, { ok: true });
+}
+
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await env.ASSETS.fetch(new Request(adminUrl, request));
