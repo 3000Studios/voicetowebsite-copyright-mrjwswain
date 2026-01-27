@@ -1,6 +1,6 @@
 name = "voicetowebsite"
 main = "worker.js"
-compatibility_date = "2026-01-17"
+compatibility_date = "2026-01-27"
 account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 
 # Serve the built site directly from Cloudflare (no origin) and keep the API path routed to the Worker.
@@ -12,6 +12,7 @@ routes = [
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
+ENVIRONMENT = "production"
 # Placeholder for environment variables to be set in Cloudflare Dashboard
 # OPENAI_API = ""
 # PAYPAL_CLIENT_ID_PROD = ""
@@ -32,7 +33,7 @@ binding = "KV"
 id = "e61605d144ac4348a72b7e85afc6c185"
 
 [observability]
-enabled = false
+enabled = true
 head_sampling_rate = 1
 
   [observability.logs]
@@ -45,3 +46,4 @@ head_sampling_rate = 1
   enabled = true
   persist = true
   head_sampling_rate = 1
+

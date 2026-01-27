@@ -1,16 +1,23 @@
 {
-  "name": "voicetowebsite",
+  "name": "voicetowebsite-copyright-mrjwswain",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "description": "Voice-to-Website: Autonomous Web Engineering & Monetization Engine",
+  "author": "3000 Studios",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:worker": "wrangler dev",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
     "@types/node": "^22.19.7",
+    "@types/react": "^19.0.5",
+    "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^5.1.2",
     "typescript": "^5.8.3",
     "vite": "^7.3.1",
