@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "cloudflare.wrangler",
+    "ms-vscode.vscode-typescript-next",
+    "esbenp.prettier-vscode",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}
