@@ -1,5 +1,8 @@
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
 
+const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
+const ADSENSE_SCRIPT_TAG = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}" crossorigin="anonymous"></script>`;
+
 const jsonResponse = (status, payload) =>
   addSecurityHeaders(
     new Response(JSON.stringify(payload), {
@@ -211,7 +214,7 @@ if (url.pathname === "/api/session" && request.method === "POST") {
         <script>
           window.__ENV = {
             PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || ''}",
-            ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ''}",
+            ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID}",
             ADSENSE_SLOT: "${env.ADSENSE_SLOT || ''}",
             CONTROL_PASSWORD: "${env.CONTROL_PASSWORD || ''}"
           };
@@ -225,15 +228,20 @@ if (url.pathname === "/api/session" && request.method === "POST") {
        */
       const injected = text
         .replace(/__PAYPAL_CLIENT_ID__/g, env.PAYPAL_CLIENT_ID_PROD || "")
-        .replace(/__ADSENSE_PUBLISHER__/g, env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "")
+        .replace(/__ADSENSE_PUBLISHER__/g, env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID)
         .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
         .replace('</head>', `${envInjection}</head>`); // Inject variables early
+
+      // Ensure the AdSense auto-ads loader is present site-wide.
+      const withAdsense = injected.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+        ? injected.replace(/pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g, `pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`)
+        : injected.replace("</head>", `${ADSENSE_SCRIPT_TAG}\n</head>`);
 
       const headers = new Headers(assetRes.headers);
       headers.set("Content-Type", "text/html; charset=utf-8");
       headers.set("Cache-Control", "no-store"); // Dynamic injection requires no-store or private cache
       return addSecurityHeaders(
-        new Response(injected, {
+        new Response(withAdsense, {
           status: assetRes.status,
           headers,
         })
