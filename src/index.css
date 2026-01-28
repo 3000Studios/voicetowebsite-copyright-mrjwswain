@@ -38,6 +38,7 @@ body {
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.3), 0px 2px 0px rgba(0, 0, 0, 0.4), 0px 3px 0px rgba(0, 0, 0, 0.5), 0px 4px 0px rgba(0, 0, 0, 0.6), 0px 5px 10px rgba(0, 0, 0, 0.9);
   filter: drop-shadow(0 2px 1px rgba(255, 255, 255, 0.5)) drop-shadow(0 15px 10px rgba(0, 0, 0, 1)) drop-shadow(0 25px 30px rgba(0, 0, 0, 0.7));
@@ -64,3 +65,31 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #333;
 }
+
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.03);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.premium-border-glow {
+  position: relative;
+}
+
+.premium-border-glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.3), transparent);
+  z-index: -1;
+  border-radius: inherit;
+  animation: border-rotate 4s linear infinite;
+}
+
+@keyframes border-rotate {
+  0% { opacity: 0.3; filter: hue-rotate(0deg); }
+  50% { opacity: 0.6; filter: hue-rotate(180deg); }
+  100% { opacity: 0.3; filter: hue-rotate(360deg); }
+}
+
