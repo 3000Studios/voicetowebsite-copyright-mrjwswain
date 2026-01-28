@@ -41,27 +41,55 @@
 
   <main class="page">
     <section class="section">
-      <h2>Referral hub</h2>
-      <p class="subhead">Share and manage referral codes. Community-ready.</p>
-      <div class="grid">
-        <article class="feature-card">
-          <h3>Your code</h3>
-          <p>Sign in to get a personal referral link.</p>
+      <p class="eyebrow">Affiliate Network</p>
+      <h2>Referral Hub</h2>
+      <p class="subhead">Scale your revenue by sharing VoiceToWebsite. Get 20% recurring commission on every growth plan.</p>
+      <div class="pricing-deck">
+        <article class="card luxe glass-morphism premium-border-glow">
+          <div class="card-header">
+            <div class="tier">Partner Program</div>
+          </div>
+          <div class="card-content">
+            <p class="muted mb-6">Generate your unique identifier and start tracking downstream nodes today.</p>
+            <div class="form-group mb-4">
+              <input type="text" id="referralCode" value="VW-REVENUE-BOT" readonly aria-label="Referral Code" class="referral-input" />
+            </div>
+            <button class="primary" onclick="copyReferral()">Copy Link</button>
+          </div>
         </article>
-        <article class="feature-card">
-          <h3>Community board</h3>
-          <p>Swap referral codes and track conversions.</p>
+        <article class="card luxe glass-morphism">
+          <div class="card-header">
+            <div class="tier">Community Yield</div>
+          </div>
+          <div class="card-content">
+            <ul class="features">
+              <li>20% Recurring Commission</li>
+              <li>Real-time conversion tracking</li>
+              <li>Payout via PayPal/Stripe</li>
+              <li>Priority support desk</li>
+            </ul>
+          </div>
         </article>
       </div>
       <div class="adsense-slot">
-        <ins class="adsbygoogle"
-             style="display:block"
+        <ins class="adsbygoogle adsbygoogle-slot"
              data-ad-client="__ADSENSE_PUBLISHER__"
              data-ad-slot="__ADSENSE_SLOT__"
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
       </div>
     </section>
+    <script>
+      function copyReferral() {
+        const code = document.getElementById('referralCode');
+        const link = window.location.origin + '?ref=' + code.value;
+        navigator.clipboard.writeText(link);
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = 'Copied!';
+        setTimeout(() => btn.innerText = originalText, 2000);
+      }
+    </script>
   </main>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   <script type="module" src="nav.js"></script>
