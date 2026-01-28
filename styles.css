@@ -629,3 +629,39 @@ button.ghost:hover {
 .vt-footer a:hover {
   color: #fff;
 }
+
+/* Premium Styles */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.03) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.premium-border-glow {
+  position: relative;
+  z-index: 1;
+}
+
+.premium-border-glow::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, transparent, rgba(56, 189, 248, 0.6), transparent);
+  z-index: -1;
+  border-radius: inherit;
+  animation: border-rotate 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes border-rotate {
+  0% { opacity: 0.3; filter: hue-rotate(0deg); }
+  50% { opacity: 0.8; filter: hue-rotate(180deg); }
+  100% { opacity: 0.3; filter: hue-rotate(360deg); }
+}
+
+.adsbygoogle-slot {
+  display: block;
+}
+
+
