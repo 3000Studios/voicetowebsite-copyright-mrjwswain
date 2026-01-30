@@ -474,14 +474,15 @@ export async function onRequestPost(context) {
     const baseCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits/${baseCommitSha}`);
     const baseTreeSha = baseCommit.tree.sha;
 
-    const treeItems = [];
-    for (const [path, content] of Object.entries(updates)) {
-      const blob = await githubRequest(`/repos/${owner}/${repo}/git/blobs`, {
-        method: "POST",
-        body: JSON.stringify({ content, encoding: "utf-8" }),
-      });
-      treeItems.push({ path, mode: "100644", type: "blob", sha: blob.sha });
-    }
+    const treeItems = await Promise.all(
+      Object.entries(updates).map(async ([path, content]) => {
+        const blob = await githubRequest(`/repos/${owner}/${repo}/git/blobs`, {
+          method: "POST",
+          body: JSON.stringify({ content, encoding: "utf-8" }),
+        });
+        return { path, mode: "100644", type: "blob", sha: blob.sha };
+      })
+    );
 
     const newTree = await githubRequest(`/repos/${owner}/${repo}/git/trees`, {
       method: "POST",
