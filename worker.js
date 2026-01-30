@@ -179,6 +179,44 @@ if (url.pathname === "/api/session" && request.method === "POST") {
   return jsonResponse(200, { ok: true });
 }
 
+    // Stripe Checkout
+    if (url.pathname === "/api/stripe/checkout" && request.method === "POST") {
+      const STRIPE_KEY = env.STRIPE_SECRET_KEY || "";
+      if (!STRIPE_KEY) {
+         return jsonResponse(500, { error: "Stripe not configured (missing STRIPE_SECRET_KEY)." });
+      }
+      try {
+        const body = await request.json();
+
+        const params = new URLSearchParams();
+        params.append("payment_method_types[]", "card");
+        params.append("line_items[0][price_data][currency]", "usd");
+        params.append("line_items[0][price_data][product_data][name]", body.product || "Product");
+        params.append("line_items[0][price_data][unit_amount]", body.amount || "0");
+        params.append("line_items[0][quantity]", "1");
+        params.append("mode", "payment");
+        params.append("success_url", `${url.origin}/success.html`);
+        params.append("cancel_url", `${url.origin}/cancel.html`);
+
+        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${STRIPE_KEY}`,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: params
+        });
+        const session = await stripeRes.json();
+        if (!stripeRes.ok) {
+            throw new Error(session.error?.message || "Stripe error");
+        }
+        return jsonResponse(200, { sessionId: session.id });
+
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await env.ASSETS.fetch(new Request(adminUrl, request));
