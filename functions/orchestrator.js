@@ -639,9 +639,15 @@ export async function onRequestPost(context) {
         action.type === "inject_css"
     );
 
-    if (needsIndex) indexHtml = await getFileContent("index.html", GITHUB_BASE_BRANCH);
-    if (needsApp) appJs = await getFileContent("app.js", GITHUB_BASE_BRANCH);
-    if (needsStyles) styles = await getFileContent("styles.css", GITHUB_BASE_BRANCH);
+    const [indexHtmlRes, appJsRes, stylesRes] = await Promise.all([
+      needsIndex ? getFileContent("index.html", GITHUB_BASE_BRANCH) : Promise.resolve(null),
+      needsApp ? getFileContent("app.js", GITHUB_BASE_BRANCH) : Promise.resolve(null),
+      needsStyles ? getFileContent("styles.css", GITHUB_BASE_BRANCH) : Promise.resolve(null),
+    ]);
+
+    if (needsIndex) indexHtml = indexHtmlRes;
+    if (needsApp) appJs = appJsRes;
+    if (needsStyles) styles = stylesRes;
 
     const newPages = [];
 
