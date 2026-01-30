@@ -172,12 +172,14 @@ const App: React.FC = () => {
               step="0.01" 
               value={volume} 
               onChange={handleVolumeChange}
-              className="w-16 accent-white h-1 bg-white/20 rounded-lg appearance-none cursor-none"
+              aria-label="Volume Control"
+              className="w-16 accent-white h-1 bg-white/20 rounded-lg appearance-none cursor-none focus-visible:ring-2 focus-visible:ring-cyan-500"
             />
           </div>
           <button 
             onClick={isAudioPlaying ? handleStopAudio : () => { audioEngine.playMusic(INTRO_SONG); setIsAudioPlaying(true); }}
-            className="group flex items-center gap-2"
+            aria-label={isAudioPlaying ? 'Pause Audio' : 'Play Audio'}
+            className="group flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-cyan-500 rounded"
           >
             <div className={`w-3 h-3 rounded-full ${isAudioPlaying ? 'bg-cyan-500 animate-pulse' : 'bg-white/20'}`} />
             <span className="font-orbitron text-[10px] tracking-[0.2em] text-white/60 group-hover:text-white transition-colors uppercase whitespace-nowrap">
