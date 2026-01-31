@@ -1,0 +1,3 @@
+## 2025-02-18 - [Stylized Entry Points]
+**Learning:** Highly animated "blob" entry points (like the "Ignite Interface") are often implemented as `div`s for visual freedom, completely locking out keyboard users from entering the application.
+**Action:** Always verify that the "start" or "enter" interaction of an immersive site is keyboard accessible first, as it's the gatekeeper to the entire experience. Retrofitting `role="button"` and `tabIndex` is safer than changing to `<button>` to preserve complex existing styles/animations.
