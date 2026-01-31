@@ -49,35 +49,6 @@ export default {
         return jsonResponse(503, { error: "D1 database not available." });
       }
       try {
-        await env.D1.prepare(
-          `CREATE TABLE IF NOT EXISTS commands (
-             id INTEGER PRIMARY KEY AUTOINCREMENT,
-             ts DATETIME DEFAULT CURRENT_TIMESTAMP,
-             command TEXT,
-             actions TEXT,
-             files TEXT,
-             commit_sha TEXT,
-             intent_json TEXT,
-             deployment_id TEXT,
-             deployment_status TEXT,
-             deployment_message TEXT
-           );`
-        ).run();
-        const columns = await env.D1.prepare("PRAGMA table_info(commands);").all();
-        const columnNames = new Set((columns.results || []).map((col) => col.name));
-        if (!columnNames.has("intent_json")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
-        }
-        if (!columnNames.has("deployment_id")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
-        }
-        if (!columnNames.has("deployment_status")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
-        }
-        if (!columnNames.has("deployment_message")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
-        }
-
         const data = await env.D1.prepare(
           "SELECT id, ts, command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message FROM commands ORDER BY ts DESC LIMIT 20"
         ).all();
@@ -160,14 +131,6 @@ if (url.pathname === "/api/session" && request.method === "POST") {
 
   const id = crypto.randomUUID();
   const ua = request.headers.get("user-agent") || "unknown";
-
-  await env.D1.prepare(
-    `CREATE TABLE IF NOT EXISTS sessions (
-      id TEXT PRIMARY KEY,
-      ts DATETIME DEFAULT CURRENT_TIMESTAMP,
-      user_agent TEXT
-    )`
-  ).run();
 
   await env.D1.prepare(
     "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)"
