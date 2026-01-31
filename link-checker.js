@@ -31,11 +31,9 @@ const htmlFiles = [
     'store.html',
     'strata-design-system.html',
     'studio3000.html',
-    'temp_index.html',
     'terms.html',
     'the3000-gallery.html',
     'the3000.html',
-    'voice-commands-new.html',
     'voice-to-json.html',
     'admin/analytics.html',
     'admin/app-store-manager.html',
@@ -58,8 +56,8 @@ htmlFiles.forEach(file => {
     while ((match = linkRegex.exec(content)) !== null) {
         const link = match[1];
 
-        // Ignore external links, mailto links, and anchor links
-        if (link.startsWith('http') || link.startsWith('mailto:') || link.startsWith('#')) {
+        // Ignore external links, mailto links, anchor links, and template placeholders
+        if (link.startsWith('http') || link.startsWith('mailto:') || link.startsWith('#') || link.includes('${')) {
             continue;
         }
 

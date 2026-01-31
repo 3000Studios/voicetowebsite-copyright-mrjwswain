@@ -481,6 +481,27 @@ body {
   overscroll-behavior: contain;
 }
 
+.admin-logout {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 220;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.admin-logout:hover {
+  border-color: rgba(0, 242, 255, 0.6);
+}
+
 .lock-screen {
   position: fixed;
   inset: 0;

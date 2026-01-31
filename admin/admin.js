@@ -57,6 +57,8 @@ let orchestratorHealthy = true;
 
 const PASSCODE = (window.__ENV && window.__ENV.CONTROL_PASSWORD) || "5555";
 const UNLOCK_KEY = "yt-admin-unlocked";
+const UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+const SESSION_TTL_MS = 1000 * 60 * 60 * 2;
 const positiveWords = [
   "apply now",
   "ship it",
@@ -274,6 +276,7 @@ const renderTranscripts = () => {
 
 const logTranscript = (text, source = "voice") => {
   if (!text) return;
+  touchSession();
   const transcripts = loadTranscripts();
   transcripts.unshift({ text, source, ts: new Date().toISOString() });
   saveTranscripts(transcripts);
@@ -421,7 +424,26 @@ const callOrchestrator = async (payload) => {
   }
 };
 
-const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true";
+const isSessionFresh = () => {
+  const ts = Number(sessionStorage.getItem(UNLOCK_TS_KEY) || 0);
+  if (!ts) return false;
+  return Date.now() - ts < SESSION_TTL_MS;
+};
+
+const clearSession = () => {
+  sessionStorage.removeItem(UNLOCK_KEY);
+  sessionStorage.removeItem(UNLOCK_TS_KEY);
+  document.cookie = "vtw_admin=; Path=/admin; Max-Age=0; SameSite=Lax";
+};
+
+const touchSession = () => {
+  if (sessionStorage.getItem(UNLOCK_KEY) === "true") {
+    sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
+  }
+};
+
+const isUnlocked = () =>
+  sessionStorage.getItem(UNLOCK_KEY) === "true" && isSessionFresh();
 
 const updateApplyGate = () => {
   const ok = (planConfirm?.value || "").trim().toLowerCase() === "ship it";
@@ -449,7 +471,7 @@ const setLockedUI = (locked) => {
 };
 
 const initPasscodeGate = () => {
-  const unlocked = sessionStorage.getItem(UNLOCK_KEY) === "true";
+  const unlocked = isUnlocked();
   setLockedUI(!unlocked);
 
   const unlock = (event) => {
@@ -457,6 +479,7 @@ const initPasscodeGate = () => {
     const code = (lockInput?.value || "").trim();
     if (code === PASSCODE) {
       sessionStorage.setItem(UNLOCK_KEY, "true");
+      sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
       document.cookie = "vtw_admin=1; Path=/admin; SameSite=Lax";
       if (lockError) lockError.textContent = "";
       setLockedUI(false);
@@ -720,6 +743,38 @@ if (planConfirm) {
 
 renderClips();
 renderTranscripts();
+
+(() => {
+  const createLogoutButton = () => {
+    if (document.getElementById("admin-logout")) return;
+    const button = document.createElement("button");
+    button.id = "admin-logout";
+    button.type = "button";
+    button.className = "admin-logout";
+    button.textContent = "Logout";
+    button.addEventListener("click", () => {
+      clearSession();
+      window.location.href = "/admin/";
+    });
+    document.body.appendChild(button);
+  };
+
+  if (adminShell) createLogoutButton();
+
+  const enforceSession = () => {
+    if (!isSessionFresh()) {
+      clearSession();
+      if (lockScreen) {
+        setLockedUI(true);
+      } else if (window.location.pathname.startsWith("/admin/")) {
+        window.location.href = "/admin/";
+      }
+    }
+  };
+
+  enforceSession();
+  window.setInterval(enforceSession, 60000);
+})();
 
 if (undoBtn) {
   undoBtn.addEventListener("click", async () => {

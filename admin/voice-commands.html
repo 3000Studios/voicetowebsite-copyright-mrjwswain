@@ -161,6 +161,14 @@
     </div>
 
     <div class="command-list">
+      <h2>Recent Commands</h2>
+      <div class="control-card">
+        <ul id="commandHistory" style="list-style:none;padding:0;margin:0;display:grid;gap:0.5rem;color:#a0aec0;"></ul>
+        <button class="voice-button secondary" id="clearHistory" style="margin-top:1rem;">Clear History</button>
+      </div>
+    </div>
+
+    <div class="command-list">
       <h2>Available Commands</h2>
       <div class="command-item">
         <div>
@@ -199,7 +207,14 @@
     (function guardAdmin() {
       const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
       const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
-      if (!cookie && !unlocked) {
+      const ts = Number(sessionStorage.getItem("yt-admin-unlocked-ts") || 0);
+      const fresh = ts && Date.now() - ts < 1000 * 60 * 60 * 2;
+      if (!fresh) {
+        sessionStorage.removeItem("yt-admin-unlocked");
+        sessionStorage.removeItem("yt-admin-unlocked-ts");
+        document.cookie = "vtw_admin=; Path=/admin; Max-Age=0; SameSite=Lax";
+      }
+      if (!cookie || !unlocked || !fresh) {
         window.location.href = "/admin/";
       }
     })();
@@ -296,6 +311,7 @@
         } else {
           responseBox.textContent = `❌ Error: ${data.error || 'Unknown error'}`;
         }
+        logCommand(command);
       } catch (error) {
         responseBox.textContent = `❌ Network Error: ${error.message}`;
         console.error('Command execution error:', error);
@@ -312,6 +328,38 @@
       const value = input?.value?.trim();
       if (value) executeCommand(value);
     });
+
+    const HISTORY_KEY = "vtw-command-history";
+    const historyList = document.getElementById("commandHistory");
+    const renderHistory = () => {
+      if (!historyList) return;
+      const items = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+      historyList.innerHTML = "";
+      if (!items.length) {
+        historyList.innerHTML = "<li>No recent commands yet.</li>";
+        return;
+      }
+      items.forEach((entry) => {
+        const li = document.createElement("li");
+        li.textContent = `${entry.text} — ${new Date(entry.ts).toLocaleString()}`;
+        historyList.appendChild(li);
+      });
+    };
+
+    const logCommand = (text) => {
+      if (!text) return;
+      const items = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+      items.unshift({ text, ts: new Date().toISOString() });
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 20)));
+      renderHistory();
+    };
+
+    document.getElementById("clearHistory")?.addEventListener("click", () => {
+      localStorage.removeItem(HISTORY_KEY);
+      renderHistory();
+    });
+
+    renderHistory();
   </script>
 </body>
 </html>
