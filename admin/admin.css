@@ -47,6 +47,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(14px);
   overflow: hidden;
+  pointer-events: auto;
 }
 
 .glass-nav .nav-video-mask {
@@ -103,6 +104,7 @@ body {
   color: rgba(255, 255, 255, 0.7);
   transition: color 0.2s ease, text-shadow 0.2s ease;
   text-decoration: none;
+  pointer-events: auto;
 }
 
 .glass-nav .nav-links a:hover,

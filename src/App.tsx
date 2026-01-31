@@ -299,7 +299,10 @@ const App: React.FC = () => {
                     borderColor: isHovered ? 'rgba(34, 211, 238, 0.3)' : 'rgba(255, 255, 255, 0.05)'
                 }}
               >
-                <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40">
+                <div
+                  className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40"
+                  onClick={() => handleLinkClick(link)}
+                >
                   <video
                     ref={(el) => {
                       if (el) {
@@ -356,7 +359,10 @@ const App: React.FC = () => {
                         {link.description}
                       </p>
                       <button
-                        onClick={() => handleLinkClick(link)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleLinkClick(link);
+                        }}
                         className="px-6 py-2 border border-cyan-500/30 bg-cyan-500/5 font-orbitron text-[8px] tracking-[0.4em] text-cyan-400 uppercase transition-all hover:bg-cyan-500 hover:text-black hover:scale-105"
                       >
                         ACCESS PORTAL
