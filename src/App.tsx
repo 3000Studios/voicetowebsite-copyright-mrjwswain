@@ -230,7 +230,7 @@ const App: React.FC = () => {
                   }}
                   transition={{ 
                     opacity: { duration: 1 },
-                    scale: { duration: splatterActive ? 1.2 : 4, ease: splatterActive ? "expoIn" : "easeInOut", repeat: splatterActive ? 0 : Infinity },
+                    scale: { duration: splatterActive ? 1.2 : 4, ease: splatterActive ? "circIn" : "easeInOut", repeat: splatterActive ? 0 : Infinity },
                     borderRadius: { duration: 3, repeat: Infinity, ease: "easeInOut" },
                     x: { type: 'spring', damping: 15, stiffness: 60 },
                     y: { type: 'spring', damping: 15, stiffness: 60 }
@@ -301,7 +301,7 @@ const App: React.FC = () => {
               >
                 <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40">
                   <video
-                    ref={(el) => (videoRefs.current[link.id] = el)}
+                    ref={(el) => { if (el) videoRefs.current[link.id] = el; }}
                     muted loop playsInline
                     className={`absolute w-full h-full transition-all duration-700 ${isHovered ? 'object-contain scale-100 grayscale-0' : 'object-cover scale-110 grayscale'}`}
                   >
