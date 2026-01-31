@@ -35,60 +35,72 @@ export class LuminousRibbon {
     }
 
     handleMouseMove(e) {
-        this.isActive = true;
-        this.mouse.x = e.clientX;
-        this.mouse.y = e.clientY;
+        if (!this.isActive) {
+            this.isActive = true;
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+            // Initialize points at current mouse position to avoid "flying in"
+            this.points = Array(this.options.trailLength).fill(0).map(() => ({ x: this.mouse.x, y: this.mouse.y }));
+        } else {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        }
     }
 
     handleTouchMove(e) {
-        this.isActive = true;
         e.preventDefault();
-        this.mouse.x = e.touches[0].clientX;
-        this.mouse.y = e.touches[0].clientY;
+        const x = e.touches[0].clientX;
+        const y = e.touches[0].clientY;
+
+        if (!this.isActive) {
+            this.isActive = true;
+            this.mouse.x = x;
+            this.mouse.y = y;
+            this.points = Array(this.options.trailLength).fill(0).map(() => ({ x, y }));
+        } else {
+            this.mouse.x = x;
+            this.mouse.y = y;
+        }
     }
 
     update() {
-        // Add new point at mouse position
-        // If no points, add current mouse
-        if (this.points.length === 0 && this.isActive) {
-            this.points.push({ x: this.mouse.x, y: this.mouse.y });
-        }
+        if (!this.isActive || this.points.length === 0) return;
 
-        // Ease the head towards the mouse (lag effect)
-        if (this.isActive) {
-            const head = { x: this.mouse.x, y: this.mouse.y };
-            this.points.push(head);
-        }
+        // Physics: Follow the leader
+        // 1. Head (points[0]) follows the mouse with friction/easing
+        const head = this.points[0];
+        head.x += (this.mouse.x - head.x) * this.options.friction;
+        head.y += (this.mouse.y - head.y) * this.options.friction;
 
-        // Limit trail length
-        if (this.points.length > this.options.trailLength) {
-            this.points.shift();
-        }
+        // 2. Body segments follow the previous point with tension
+        for (let i = 1; i < this.points.length; i++) {
+            const leader = this.points[i - 1];
+            const follower = this.points[i];
 
-        // If inactive (mouse stopped or left), we could let it fade, 
-        // but for now we just keep the last points which will naturally converge if we had physics.
-        // For a simple ribbon, just removing points when they are too close or old works too.
-        // Let's degrade the trail if mouse isn't moving roughly:
-        // (Simplified for this version: just keep trail fixed length logic)
+            follower.x += (leader.x - follower.x) * this.options.tension;
+            follower.y += (leader.y - follower.y) * this.options.tension;
+        }
     }
 
     getGradient(ctx, points) {
         if (points.length < 2) return this.options.colors[0];
         
-        // Create gradient along the path
-        // Simplified: linear gradient from start to end of screen or just cycle colors
-        // Better: Gradient that follows the line is hard in standard Canvas 2D without segmentation.
-        // We will draw segments or use a screen-space gradient.
-        
+        // Create gradient from head to tail
         const gradient = ctx.createLinearGradient(
             points[0].x, points[0].y, 
             points[points.length-1].x, points[points.length-1].y
         );
         
+        const len = this.options.colors.length;
         this.options.colors.forEach((color, index) => {
-            const stop = index / (this.options.colors.length - 1);
+            // Squeeze colors into 0.0 -> 0.85 to leave room for fade out
+            const stop = (index / (len - 1)) * 0.85;
             gradient.addColorStop(stop, color);
         });
+
+        // Add transparent tail
+        const lastColor = this.options.colors[len - 1];
+        gradient.addColorStop(1, fadeColor(lastColor, 0));
 
         return gradient;
     }
@@ -142,4 +154,44 @@ export class LuminousRibbon {
     setColors(newColors) {
         this.options.colors = newColors;
     }
+}
+
+// Helper to convert color to transparent version
+function fadeColor(color, alpha) {
+    color = color.trim();
+
+    if (color.startsWith('#')) {
+        const cleanHex = color.replace('#', '');
+        let r, g, b;
+
+        if (cleanHex.length === 3) {
+            r = parseInt(cleanHex[0] + cleanHex[0], 16);
+            g = parseInt(cleanHex[1] + cleanHex[1], 16);
+            b = parseInt(cleanHex[2] + cleanHex[2], 16);
+        } else {
+            r = parseInt(cleanHex.substring(0, 2), 16);
+            g = parseInt(cleanHex.substring(2, 4), 16);
+            b = parseInt(cleanHex.substring(4, 6), 16);
+        }
+
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    if (color.startsWith('hsl')) {
+        if (color.startsWith('hsla')) {
+             // Replace alpha value
+             return color.replace(/[\d.]+\)$/, `${alpha})`);
+        }
+        // Convert hsl to hsla
+        return color.replace('hsl', 'hsla').replace(')', `, ${alpha})`);
+    }
+
+    if (color.startsWith('rgb')) {
+        if (color.startsWith('rgba')) {
+             return color.replace(/[\d.]+\)$/, `${alpha})`);
+        }
+        return color.replace('rgb', 'rgba').replace(')', `, ${alpha})`);
+    }
+
+    return color;
 }
