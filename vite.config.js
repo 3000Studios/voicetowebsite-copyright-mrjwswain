@@ -26,6 +26,7 @@ export default defineConfig({
         adminAppStore: resolve(__dirname, "admin/app-store-manager.html"),
         store: resolve(__dirname, "store.html"),
         appstore: resolve(__dirname, "appstore.html"),
+        webforge: resolve(__dirname, "webforge.html"),
         rushPercussion: resolve(__dirname, "rush-percussion.html"),
         blog: resolve(__dirname, "blog.html"),
         contact: resolve(__dirname, "contact.html"),
