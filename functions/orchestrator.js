@@ -533,34 +533,6 @@ export async function onRequestPost(context) {
     if (!db) return;
     try {
       await db.prepare(
-        `CREATE TABLE IF NOT EXISTS commands (
-           id INTEGER PRIMARY KEY AUTOINCREMENT,
-           ts DATETIME DEFAULT CURRENT_TIMESTAMP,
-           command TEXT,
-           actions TEXT,
-           files TEXT,
-           commit_sha TEXT,
-           intent_json TEXT,
-           deployment_id TEXT,
-           deployment_status TEXT,
-           deployment_message TEXT
-         );`
-      ).run();
-      const columns = await db.prepare("PRAGMA table_info(commands);").all();
-      const columnNames = new Set((columns.results || []).map((col) => col.name));
-      if (!columnNames.has("intent_json")) {
-        await db.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
-      }
-      if (!columnNames.has("deployment_id")) {
-        await db.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
-      }
-      if (!columnNames.has("deployment_status")) {
-        await db.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
-      }
-      if (!columnNames.has("deployment_message")) {
-        await db.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
-      }
-      await db.prepare(
         "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
         .bind(
