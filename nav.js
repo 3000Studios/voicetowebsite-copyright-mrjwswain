@@ -40,8 +40,23 @@
     }
   };
 
-  const buildLinkHtml = () => navLinks.map((link) => `<a href="${link.href}" data-name="${link.label}">${link.label}</a>`).join("");
-  const buildListHtml = () => navLinks.map((link) => `<li><a href="${link.href}">${link.label}</a></li>`).join("");
+  const hasAdminAccess = () => {
+    try {
+      const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
+      const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+      return unlocked || cookie;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const getNavLinks = () => {
+    if (hasAdminAccess()) return navLinks;
+    return navLinks.filter((link) => link.label !== "Admin");
+  };
+
+  const buildLinkHtml = () => getNavLinks().map((link) => `<a href="${link.href}" data-name="${link.label}">${link.label}</a>`).join("");
+  const buildListHtml = () => getNavLinks().map((link) => `<li><a href="${link.href}">${link.label}</a></li>`).join("");
 
   const clearExistingNav = () => {
     document.querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav").forEach((el) => el.remove());

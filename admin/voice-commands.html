@@ -153,6 +153,14 @@
     </div>
 
     <div class="command-list">
+      <h2>Type a Command</h2>
+      <div class="control-card">
+        <textarea id="manualCommand" placeholder="e.g. Update the headline to 'Voice Revenue Engine' and set theme ocean." style="width:100%;min-height:120px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e2e8f0;padding:1rem;font-family:'Courier New', monospace;"></textarea>
+        <button class="voice-button primary" id="manualSubmit" style="margin-top:1rem;">Send Command</button>
+      </div>
+    </div>
+
+    <div class="command-list">
       <h2>Available Commands</h2>
       <div class="command-item">
         <div>
@@ -188,6 +196,14 @@
   </div>
 
   <script>
+    (function guardAdmin() {
+      const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+      const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
+      if (!cookie && !unlocked) {
+        window.location.href = "/admin/";
+      }
+    })();
+
     let recognition = null;
     let isListening = false;
 
@@ -290,6 +306,12 @@
       document.getElementById('response').textContent = 'Command responses will appear here...';
       document.getElementById('transcript').textContent = 'Waiting for voice input...';
     }
+
+    document.getElementById('manualSubmit')?.addEventListener('click', () => {
+      const input = document.getElementById('manualCommand');
+      const value = input?.value?.trim();
+      if (value) executeCommand(value);
+    });
   </script>
 </body>
 </html>

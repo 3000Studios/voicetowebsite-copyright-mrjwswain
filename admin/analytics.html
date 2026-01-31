@@ -10,6 +10,15 @@
   <link rel="stylesheet" href="./admin.css" />
 </head>
 <body>
+  <script>
+    (function guardAdmin() {
+      const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+      const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
+      if (!cookie && !unlocked) {
+        window.location.href = "/admin/";
+      }
+    })();
+  </script>
   <div class="admin-video-bg" aria-hidden="true">
     <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" autoplay muted loop playsinline></video>
   </div>

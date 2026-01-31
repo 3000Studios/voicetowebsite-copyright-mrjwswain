@@ -179,6 +179,66 @@ if (url.pathname === "/api/session" && request.method === "POST") {
   return jsonResponse(200, { ok: true });
 }
 
+    if (url.pathname === "/api/stripe/checkout" && request.method === "POST") {
+      const stripeSecret = env.STRIPE_SECRET_KEY;
+      if (!stripeSecret) {
+        return jsonResponse(501, { error: "Stripe secret key missing. Set STRIPE_SECRET_KEY." });
+      }
+
+      try {
+        const payload = await request.json();
+        const amount = Number(payload?.amount || 0);
+        const product = String(payload?.product || "product");
+        const label = String(payload?.label || "VoiceToWebsite");
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+          return jsonResponse(400, { error: "Invalid amount." });
+        }
+
+        const origin = `${url.protocol}//${url.host}`;
+        const successUrl = `${origin}/store.html?checkout=success&product=${encodeURIComponent(product)}`;
+        const cancelUrl = `${origin}/store.html?checkout=cancel`;
+
+        const form = new URLSearchParams();
+        form.set("mode", "payment");
+        form.set("success_url", successUrl);
+        form.set("cancel_url", cancelUrl);
+        form.set("line_items[0][quantity]", "1");
+        form.set("line_items[0][price_data][currency]", "USD");
+        form.set("line_items[0][price_data][product_data][name]", label);
+        form.set("line_items[0][price_data][unit_amount]", String(Math.round(amount)));
+
+        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${stripeSecret}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: form.toString(),
+        });
+
+        const stripeData = await stripeRes.json();
+        if (!stripeRes.ok || !stripeData?.id) {
+          return jsonResponse(stripeRes.status || 500, {
+            error: stripeData?.error?.message || "Stripe checkout failed.",
+          });
+        }
+
+        return jsonResponse(200, { sessionId: stripeData.id });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
+    const isAdminRoot = url.pathname === "/admin" || url.pathname === "/admin/" || url.pathname === "/admin/index.html";
+    if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
+      const cookie = request.headers.get("cookie") || "";
+      const hasAdmin = cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+      if (!hasAdmin) {
+        return Response.redirect(new URL("/admin/", url.origin), 302);
+      }
+    }
+
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await env.ASSETS.fetch(new Request(adminUrl, request));
@@ -214,6 +274,7 @@ if (url.pathname === "/api/session" && request.method === "POST") {
         <script>
           window.__ENV = {
             PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || ''}",
+            STRIPE_PUBLISHABLE_KEY: "${env.STRIPE_PUBLISHABLE_KEY || ''}",
             ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID}",
             ADSENSE_SLOT: "${env.ADSENSE_SLOT || ''}",
             CONTROL_PASSWORD: "${env.CONTROL_PASSWORD || ''}"
@@ -228,6 +289,7 @@ if (url.pathname === "/api/session" && request.method === "POST") {
        */
       const injected = text
         .replace(/__PAYPAL_CLIENT_ID__/g, env.PAYPAL_CLIENT_ID_PROD || "")
+        .replace(/__STRIPE_PUBLISHABLE_KEY__/g, env.STRIPE_PUBLISHABLE_KEY || "")
         .replace(/__ADSENSE_PUBLISHER__/g, env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID)
         .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
         .replace('</head>', `${envInjection}</head>`); // Inject variables early

@@ -55,7 +55,7 @@ let listening = false;
 let lastPlan = null;
 let orchestratorHealthy = true;
 
-const PASSCODE = "5555";
+const PASSCODE = (window.__ENV && window.__ENV.CONTROL_PASSWORD) || "5555";
 const UNLOCK_KEY = "yt-admin-unlocked";
 const positiveWords = [
   "apply now",
@@ -457,6 +457,7 @@ const initPasscodeGate = () => {
     const code = (lockInput?.value || "").trim();
     if (code === PASSCODE) {
       sessionStorage.setItem(UNLOCK_KEY, "true");
+      document.cookie = "vtw_admin=1; Path=/admin; SameSite=Lax";
       if (lockError) lockError.textContent = "";
       setLockedUI(false);
       speak("Controls unlocked");

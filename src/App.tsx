@@ -301,7 +301,13 @@ const App: React.FC = () => {
               >
                 <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40">
                   <video
-                    ref={(el) => (videoRefs.current[link.id] = el)}
+                    ref={(el) => {
+                      if (el) {
+                        videoRefs.current[link.id] = el;
+                      } else {
+                        delete videoRefs.current[link.id];
+                      }
+                    }}
                     muted loop playsInline
                     className={`absolute w-full h-full transition-all duration-700 ${isHovered ? 'object-contain scale-100 grayscale-0' : 'object-cover scale-110 grayscale'}`}
                   >

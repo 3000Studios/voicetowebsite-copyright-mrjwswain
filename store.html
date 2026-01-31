@@ -7,7 +7,7 @@
   <meta name="description" content="Store - VoiceToWebsite" />
   <link rel="stylesheet" href="styles.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262" crossorigin="anonymous"></script>
-  <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD&intent=capture"></script>
 </head>
 <body>
   <div class="video-bg" aria-hidden="true">
@@ -192,6 +192,16 @@
       <section class="store-products" aria-label="Products">
         <div class="store-product-scene" id="store-product-scene"></div>
       </section>
+      <div class="checkout-modal" id="paypalModal" aria-hidden="true">
+        <div class="checkout-modal__backdrop" data-close="true"></div>
+        <div class="checkout-modal__panel" role="dialog" aria-modal="true" aria-labelledby="paypalModalTitle">
+          <button class="checkout-modal__close" type="button" data-close="true" aria-label="Close PayPal checkout">×</button>
+          <h3 id="paypalModalTitle">PayPal Checkout</h3>
+          <p class="checkout-modal__subtitle" id="paypalModalSubtitle">Preparing PayPal…</p>
+          <div id="paypalButtons"></div>
+          <div class="checkout-modal__status" id="paypalStatus"></div>
+        </div>
+      </div>
       <div class="adsense-slot">
         <ins class="adsbygoogle adsbygoogle-slot"
              data-ad-client="ca-pub-5800977493749262"
@@ -204,13 +214,17 @@
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   <script src="https://js.stripe.com/v3"></script>
   <script>
-    const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
-    const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
+    const ENV = window.__ENV || {};
+    const PAYPAL_CLIENT = ENV.PAYPAL_CLIENT_ID || "__PAYPAL_CLIENT_ID__";
+    const STRIPE_PK = ENV.STRIPE_PUBLISHABLE_KEY || "__STRIPE_PUBLISHABLE_KEY__";
     const handleStripe = async (btn) => {
       const amount = btn.dataset.amount;
       const product = btn.dataset.product;
       const label = btn.dataset.label;
       try {
+        if (!STRIPE_PK || STRIPE_PK === "__STRIPE_PUBLISHABLE_KEY__") {
+          throw new Error("Stripe publishable key missing");
+        }
         const stripe = Stripe(STRIPE_PK);
         const res = await fetch("/api/stripe/checkout", {
           method: "POST",
@@ -225,14 +239,15 @@
         console.warn(err);
       }
     };
-    const handlePayPal = (btn) => {
+    const handlePayPal = async (btn) => {
       const amount = btn.dataset.amount;
       const product = btn.dataset.product;
+      const label = btn.dataset.label;
       if (PAYPAL_CLIENT === "__PAYPAL_CLIENT_ID__") {
         alert("PayPal client ID missing. Configure PAYPAL_CLIENT_ID to enable checkout.");
         return;
       }
-      window.location.href = `https://www.paypal.com/checkoutnow?token=${encodeURIComponent(product)}-${amount}`;
+      await openPayPalModal({ amount, product, label });
     };
     document.querySelectorAll(".stripe-btn").forEach((btn) => {
       btn.addEventListener("click", () => handleStripe(btn));
@@ -240,6 +255,81 @@
     document.querySelectorAll(".pay-btn").forEach((btn) => {
       btn.addEventListener("click", () => handlePayPal(btn));
     });
+
+    const paypalModal = document.getElementById("paypalModal");
+    const paypalButtonsHost = document.getElementById("paypalButtons");
+    const paypalStatus = document.getElementById("paypalStatus");
+    const paypalSubtitle = document.getElementById("paypalModalSubtitle");
+
+    const closePayPalModal = () => {
+      if (!paypalModal) return;
+      paypalModal.setAttribute("aria-hidden", "true");
+      paypalButtonsHost.innerHTML = "";
+      paypalStatus.textContent = "";
+    };
+
+    paypalModal?.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target?.dataset?.close === "true") {
+        closePayPalModal();
+      }
+    });
+
+    const loadPayPalSdk = () =>
+      new Promise((resolve, reject) => {
+        if (window.paypal?.Buttons) return resolve();
+        const script = document.createElement("script");
+        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(PAYPAL_CLIENT)}&currency=USD&intent=capture`;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error("Failed to load PayPal SDK"));
+        document.head.appendChild(script);
+      });
+
+    const openPayPalModal = async ({ amount, product, label }) => {
+      if (!paypalModal) return;
+      paypalModal.setAttribute("aria-hidden", "false");
+      paypalSubtitle.textContent = `${label} • $${(Number(amount) / 100).toFixed(2)}`;
+      paypalStatus.textContent = "Loading PayPal…";
+
+      try {
+        await loadPayPalSdk();
+        paypalStatus.textContent = "";
+        paypalButtonsHost.innerHTML = "";
+
+        const button = window.paypal.Buttons({
+          style: { layout: "vertical", shape: "rect", label: "paypal" },
+          createOrder: (_data, actions) =>
+            actions.order.create({
+              purchase_units: [
+                {
+                  description: label,
+                  custom_id: product,
+                  amount: { currency_code: "USD", value: (Number(amount) / 100).toFixed(2) },
+                },
+              ],
+            }),
+          onApprove: async (_data, actions) => {
+            paypalStatus.textContent = "Capturing payment…";
+            await actions.order.capture();
+            paypalStatus.textContent = "✅ Payment captured. Thank you!";
+            setTimeout(closePayPalModal, 1500);
+          },
+          onError: (err) => {
+            console.error("PayPal error", err);
+            paypalStatus.textContent = "PayPal checkout failed. Please try again.";
+          },
+          onCancel: () => {
+            paypalStatus.textContent = "Checkout canceled.";
+          },
+        });
+
+        await button.render("#paypalButtons");
+      } catch (err) {
+        console.error(err);
+        paypalStatus.textContent = "PayPal checkout not available. Check your client ID.";
+      }
+    };
     const storeSearch = document.getElementById("storeSearch");
     const storeCards = Array.from(document.querySelectorAll(".pricing-deck .card"));
     
@@ -275,7 +365,8 @@
       { name: "VoiceToWebsite", price: "$19", link: "appstore.html" },
       { name: "Rush Percussion", price: "$4.99", link: "rush-percussion.html" },
       { name: "Revenue Bot", price: "Free", link: "appstore.html" },
-      { name: "Command Center", price: "Included", link: "appstore.html" },
+      { name: "Command Center", price: "Included", link: "admin/voice-commands.html" },
+      { name: "Audio Boost 3K", price: "$129", link: "app Store apps to Sell/audioboost-pro-ai/index.html" },
     ];
 
     const renderAppResults = (term = "") => {

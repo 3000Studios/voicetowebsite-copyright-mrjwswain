@@ -9,8 +9,17 @@
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="./admin.css" />
   </head>
-  <body>
-    <video autoplay muted loop playsinline class="video-bg">
+<body>
+  <script>
+    (function guardAdmin() {
+      const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+      const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
+      if (!cookie && !unlocked) {
+        window.location.href = "/admin/";
+      }
+    })();
+  </script>
+  <video autoplay muted loop playsinline class="video-bg">
       <source
         src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4"
         type="video/mp4"
