@@ -173,6 +173,7 @@ const App: React.FC = () => {
               value={volume} 
               onChange={handleVolumeChange}
               className="w-16 accent-white h-1 bg-white/20 rounded-lg appearance-none cursor-none"
+              aria-label="Volume Control"
             />
           </div>
           <button 
@@ -236,7 +237,16 @@ const App: React.FC = () => {
                     y: { type: 'spring', damping: 15, stiffness: 60 }
                   }}
                   onClick={startExperience}
-                  className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-none flex flex-col items-center justify-center group relative overflow-hidden"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      if (e.key === ' ') e.preventDefault();
+                      startExperience();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Ignite Experience"
+                  className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-none flex flex-col items-center justify-center group relative overflow-hidden focus-visible:ring-4 focus-visible:ring-cyan-500 focus-visible:outline-none"
                >
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
                   {!splatterActive && (
