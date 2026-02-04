@@ -1,0 +1,16 @@
+{
+  "agent": "Jules",
+  "mode": "autonomous_execution",
+  "rules": {
+    "no_questions": true,
+    "no_partial_work": true,
+    "cloudflare_only": true
+  },
+  "pages": ["/","/features","/demo","/pricing","/appstore","/live","/support","/admin"],
+  "fonts": {
+    "headings": "Playfair Display",
+    "body": "Inter",
+    "system": "JetBrains Mono"
+  },
+  "deploy": "cloudflare-pages"
+}
