@@ -236,6 +236,15 @@ const App: React.FC = () => {
                     y: { type: 'spring', damping: 15, stiffness: 60 }
                   }}
                   onClick={startExperience}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Ignite Interface"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      startExperience();
+                    }
+                  }}
                   className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-none flex flex-col items-center justify-center group relative overflow-hidden"
                >
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
