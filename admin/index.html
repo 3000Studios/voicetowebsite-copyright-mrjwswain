@@ -1,1 +1,203 @@
-<!doctype html><html lang="en"><head>    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262" crossorigin="anonymous"></script><meta charset="utf-8" />  <meta name="viewport" content="width=device-width, initial-scale=1" />  <title>VoiceToWebsite | Admin</title>  <meta name="description" content="Admin landing navigation for VoiceToWebsite." />  <link rel="stylesheet" href="/styles.css" />  <link rel="stylesheet" href="./admin.css" />  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet" />  <style>    :root {      --neon-blue: #00f2ff;      --electric-purple: #7000ff;      --ferro-black: #050505;      --sizzle-color: rgba(0, 242, 255, 0.6);    }    html, body {      margin: 0;      padding: 0;      width: 100%;      height: 100%;      background: var(--ferro-black);      overflow: hidden;      font-family: "Syncopate", sans-serif;      color: white;    }    .glass-nav {      z-index: 200;    }    .admin-landing-shell {      padding: 0;      min-height: 100vh;      position: relative;      z-index: 1;    }    .lock-screen {      z-index: 300;    }    #canvas-particles {      position: fixed;      top: 0;      left: 0;      pointer-events: none;      z-index: 100;    }    .ui-wrapper {      position: relative;      width: 100vw;      height: 100vh;      display: flex;      align-items: center;      justify-content: center;      perspective: 1000px;    }    .goo-filter {      position: absolute;      visibility: hidden;    }    .portal-container {      filter: url("#goo");      display: flex;      align-items: center;      justify-content: center;      position: relative;      width: 100%;      height: 100%;    }    .mic-trigger {      position: absolute;      width: 80px;      height: 120px;      background: linear-gradient(145deg, #1a1a1a, #000);      border-radius: 40px;      cursor: pointer;      z-index: 50;      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);      display: flex;      flex-direction: column;      align-items: center;      justify-content: flex-start;      padding-top: 10px;      box-shadow: 0 0 20px rgba(0, 0, 0, 1), inset 0 2px 5px rgba(255, 255, 255, 0.1);      border: 1px solid rgba(255, 255, 255, 0.05);      appearance: none;    }    .mic-trigger:focus-visible {      outline: 2px solid var(--neon-blue);      outline-offset: 4px;    }    .mic-head {      width: 50px;      height: 50px;      background: radial-gradient(circle at 30% 30%, #444, #111);      border-radius: 50%;      position: relative;      overflow: hidden;      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);    }    .mic-head::after {      content: "";      position: absolute;      inset: 0;      background-image: radial-gradient(circle, #333 1px, transparent 1px);      background-size: 4px 4px;      opacity: 0.5;    }    .mic-trigger.active {      transform: scale(0.9);      animation: sizzle 0.1s infinite;    }    .mic-trigger.active .mic-head {      animation: electric-zoom 0.5s infinite alternate;      box-shadow: 0 0 30px var(--neon-blue), inset 0 0 15px var(--neon-blue);    }    .nav-items {      position: absolute;      display: flex;      gap: 20px;      pointer-events: none;      opacity: 0;      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);      z-index: 10;    }    .nav-items.open {      opacity: 1;      pointer-events: all;      gap: 15px;    }    .video-box {      width: 0px;      height: 450px;      background: #000;      border-radius: 20px;      overflow: hidden;      position: relative;      transition: width 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), box-shadow 0.3s ease;      box-shadow: 0 0 0px var(--neon-blue);      border: 0px solid var(--neon-blue);      display: block;      text-decoration: none;      color: inherit;    }    .video-box:focus-visible {      outline: 2px solid var(--neon-blue);      outline-offset: 4px;    }    .nav-items.open .video-box {      width: 220px;      box-shadow: 0 0 25px rgba(0, 242, 255, 0.4);      border: 2px solid var(--neon-blue);    }    .video-box video {      width: 100%;      height: 100%;      object-fit: cover;      opacity: 0.7;      transition: opacity 0.3s ease;    }    .video-box:hover video {      opacity: 1;    }    .video-box:hover {      transform: translateY(-10px) scale(1.02);      box-shadow: 0 0 40px var(--neon-blue);    }    .overlay-text {      position: absolute;      top: 40px;      left: 0;      width: 100%;      text-align: center;      z-index: 20;      pointer-events: none;      padding: 0 10px;      box-sizing: border-box;    }    .overlay-text span {      display: inline-block;      font-size: 0.7rem;      letter-spacing: 2px;      text-transform: uppercase;      color: #fff;      text-shadow: 0 0 10px #000;      pointer-events: auto;      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);    }    .instruction {      position: fixed;      bottom: 30px;      font-family: "Space Mono", monospace;      font-size: 10px;      text-transform: uppercase;      letter-spacing: 4px;      opacity: 0.4;    }    @keyframes sizzle {      0% { transform: scale(0.9) translate(1px, 1px); }      50% { transform: scale(0.9) translate(-1px, -1px); }      100% { transform: scale(0.9) translate(1px, -1px); }    }    @keyframes electric-zoom {      from { filter: brightness(1) contrast(1); }      to { filter: brightness(2) contrast(1.5) drop-shadow(0 0 10px var(--neon-blue)); }    }    @media (max-width: 1100px) {      .nav-items.open {        flex-wrap: wrap;        justify-content: center;      }      .nav-items.open .video-box {        width: 190px;        height: 320px;      }    }    @media (max-width: 720px) {      .nav-items.open .video-box {        width: 80vw;        height: 240px;      }    }  </style></head><body>  <video autoplay muted loop playsinline class="video-bg">    <source src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" type="video/mp4" />  </video>  <div class="noise-overlay" aria-hidden="true"></div>  <div class="lock-screen admin-lock" id="lock-screen">    <div class="plasma-chamber" aria-hidden="true">      <div class="ion ion-1"></div>      <div class="ion ion-2"></div>      <div class="ion ion-3"></div>    </div>    <main class="login-suspension" aria-label="Admin login">      <div class="scanner-line" aria-hidden="true"></div>      <header class="header-section">          <span class="id-label">Security Protocol // Ionized</span>        <h1>Neural Gate</h1>      </header>      <form id="auth-form">        <div class="input-group">          <span class="input-tag">01_PASS_KEY</span>          <input type="password" id="lock-input" placeholder="••••••••••••" autocomplete="current-password" required />          <div class="input-focus-line"></div>        </div>        <button type="submit" class="ignition-trigger" id="lock-button">          Initialize Session        </button>      </form>      <div class="meta-actions">        <a href="/" aria-label="Return to site">Return</a>        <a href="/contact.html" aria-label="Contact support">Request Uplink</a>      </div>      <p class="muted" id="lock-error" role="status" aria-live="polite"></p>    </main>  </div>  <div class="admin-shell admin-landing-shell">    <canvas id="canvas-particles"></canvas>    <div class="ui-wrapper">      <div class="portal-container">        <button class="mic-trigger" id="micBtn" type="button" aria-label="Toggle admin navigation">          <div class="mic-head"></div>          <div style="width:4px; height:40px; background:rgba(255,255,255,0.1); margin-top:10px; border-radius:2px;"></div>        </button>        <div class="nav-items" id="navItems">          <a class="video-box" href="/admin/voice-commands.html" aria-label="Voice Commands">            <div class="overlay-text" data-text="--Voice Commands--"></div>            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1767037191/blue_block_text_mm1www.mp4" loop muted playsinline></video>          </a>          <a class="video-box" href="/admin/analytics.html" aria-label="Web Analytics">            <div class="overlay-text" data-text="--Web Analytics--"></div>            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766986203/slow_tunnel_v0hpc8.mp4" loop muted playsinline></video>          </a>          <a class="video-box" href="/admin/live-stream.html" aria-label="Live Stream Setup">            <div class="overlay-text" data-text="--Live Stream Setup--"></div>            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768820953/254781_small_x8r39m.mp4" loop muted playsinline></video>          </a>          <a class="video-box" href="/admin/store-manager.html" aria-label="Store Manager">            <div class="overlay-text" data-text="--Store Manager--"></div>            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4" loop muted playsinline></video>          </a>          <a class="video-box" href="/admin/app-store-manager.html" aria-label="App Store Manager">            <div class="overlay-text" data-text="--App Store Manager--"></div>            <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1766986142/3dweb_azplaj.mp4" loop muted playsinline></video>          </a>        </div>      </div>    </div>    <div class="instruction">Sonic Ferro-Dust Resonance // Click to Engage</div>    <svg class="goo-filter">      <defs>        <filter id="goo">          <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />          <feComposite in="SourceGraphic" in2="goo" operator="atop" />        </filter>      </defs>    </svg>  </div>  <script>    const micBtn = document.getElementById("micBtn");    const navItems = document.getElementById("navItems");    const videos = document.querySelectorAll(".nav-items video");    const canvas = document.getElementById("canvas-particles");    const ctx = canvas.getContext("2d");    let isOpen = false;    let mouse = { x: -1000, y: -1000 };    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();    function playClickSound(freq, type = "sine") {      if (audioCtx.state === "suspended") audioCtx.resume();      const osc = audioCtx.createOscillator();      const gain = audioCtx.createGain();      osc.type = type;      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);      osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);      osc.connect(gain);      gain.connect(audioCtx.destination);      osc.start();      osc.stop(audioCtx.currentTime + 0.1);    }    function playStatic() {      if (!isOpen) return;      const bufferSize = audioCtx.sampleRate * 0.05;      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);      const data = buffer.getChannelData(0);      for (let i = 0; i < bufferSize; i++) {        data[i] = Math.random() * 2 - 1;      }      const noise = audioCtx.createBufferSource();      noise.buffer = buffer;      const gain = audioCtx.createGain();      gain.gain.setValueAtTime(0.005, audioCtx.currentTime);      noise.connect(gain);      gain.connect(audioCtx.destination);      noise.start();    }    document.querySelectorAll(".overlay-text").forEach((box) => {      const text = box.getAttribute("data-text");      box.innerHTML = text        .split("")        .map((char) => `<span>${char === " " ? "&nbsp;" : char}</span>`)        .join("");      box.querySelectorAll("span").forEach((span) => {        span.addEventListener("mouseenter", () => {          const rx = (Math.random() - 0.5) * 40;          const ry = (Math.random() - 0.5) * 40;          span.style.transform = `translate3d(${rx}px, ${ry}px, 0) rotate(${rx}deg)`;          playClickSound(800 + Math.random() * 400, "square");          setTimeout(() => {            span.style.transform = "translate3d(0,0,0) rotate(0deg)";          }, 600);        });      });    });    micBtn.addEventListener("click", () => {      isOpen = !isOpen;      micBtn.classList.toggle("active");      navItems.classList.toggle("open");      if (isOpen) {        playClickSound(150, "sawtooth");        videos.forEach((v) => v.play());      } else {        playClickSound(100, "sine");        setTimeout(() => {          if (!isOpen) videos.forEach((v) => v.pause());        }, 600);      }    });    let particles = [];    class Particle {      constructor() {        this.init();      }      init() {        this.x = Math.random() * canvas.width;        this.y = Math.random() * canvas.height;        this.size = Math.random() * 1.5 + 0.5;        this.speedX = (Math.random() - 0.5) * 2;        this.speedY = (Math.random() - 0.5) * 2;        this.color = Math.random() > 0.5 ? "#00f2ff" : "#ffffff";      }      update() {        this.x += this.speedX;        this.y += this.speedY;        const dx = mouse.x - this.x;        const dy = mouse.y - this.y;        const dist = Math.sqrt(dx * dx + dy * dy);        if (dist < 150) {          this.x += dx * 0.05;          this.y += dy * 0.05;          if (dist < 20 && Math.random() > 0.95) {            playStatic();          }        }        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;      }      draw() {        ctx.fillStyle = this.color;        ctx.beginPath();        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);        ctx.fill();        if (Math.random() > 0.98) {          ctx.strokeStyle = this.color;          ctx.lineWidth = 0.5;          ctx.beginPath();          ctx.moveTo(this.x, this.y);          ctx.lineTo(this.x + (Math.random() - 0.5) * 20, this.y + (Math.random() - 0.5) * 20);          ctx.stroke();        }      }    }    function initParticles() {      canvas.width = window.innerWidth;      canvas.height = window.innerHeight;      particles = [];      for (let i = 0; i < 150; i++) {        particles.push(new Particle());      }    }    function animate() {      ctx.clearRect(0, 0, canvas.width, canvas.height);      particles.forEach((p) => {        p.update();        p.draw();      });      requestAnimationFrame(animate);    }    window.addEventListener("resize", initParticles);    window.addEventListener("mousemove", (e) => {      mouse.x = e.clientX;      mouse.y = e.clientY;    });    initParticles();    animate();  </script>  <script type="module" src="./admin.js"></script>  <script type="module" src="/nav.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262" crossorigin="anonymous"></script>
+<meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VoiceToWebsite | Admin Command Center</title>
+  <meta name="description" content="Autonomous Voice-to-Website Command Center." />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="./admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    /* Inline overrides for the Neural Gate + Command Center hybrid */
+    .command-interface {
+      display: grid;
+      gap: 2rem;
+      margin-top: 2rem;
+      position: relative;
+      z-index: 100;
+      background: rgba(5, 7, 10, 0.85);
+      backdrop-filter: blur(20px);
+      padding: 2rem;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mic-controls {
+      display: flex;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-bg admin-video-bg">
+    <video src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4" autoplay muted loop playsinline></video>
+  </div>
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- LOCK SCREEN -->
+  <div class="lock-screen admin-lock" id="lock-screen">
+    <div class="plasma-chamber" aria-hidden="true">
+      <div class="ion ion-1"></div>
+      <div class="ion ion-2"></div>
+      <div class="ion ion-3"></div>
+    </div>
+
+    <main class="login-suspension" aria-label="Admin login">
+      <div class="scanner-line" aria-hidden="true"></div>
+
+      <header class="header-section">
+          <span class="id-label">Security Protocol // Ionized</span>
+        <h1>Neural Gate</h1>
+      </header>
+
+      <form id="auth-form">
+        <div class="input-group">
+          <span class="input-tag">01_IDENTIFIER</span>
+          <input type="email" id="lock-email" placeholder="USER_NAME@DOMAIN" autocomplete="username" />
+          <div class="input-focus-line"></div>
+        </div>
+
+        <div class="input-group">
+          <span class="input-tag">02_PASS_KEY</span>
+          <input type="password" id="lock-input" placeholder="••••••••••••" autocomplete="current-password" required />
+          <div class="input-focus-line"></div>
+        </div>
+
+        <button type="submit" class="ignition-trigger" id="lock-button">
+          Initialize Session
+        </button>
+      </form>
+
+      <div class="meta-actions">
+        <a href="/" aria-label="Return to site">Return</a>
+        <p class="muted" id="lock-error" role="status" aria-live="polite"></p>
+      </div>
+    </main>
+  </div>
+
+  <!-- MAIN ADMIN SHELL -->
+  <div class="admin-shell admin-landing-shell">
+
+    <!-- NAVIGATION HEADER -->
+    <header class="admin-header">
+      <div class="brand">
+        <div class="brand-mark">J</div>
+        <div class="brand-text">
+          <strong>JULES</strong>
+          <span>Command Center</span>
+        </div>
+      </div>
+      <nav class="admin-subnav">
+        <a href="#console">Console</a>
+        <a href="voice-commands.html">Voice</a>
+        <a href="store-manager.html">Store</a>
+        <a href="app-store-manager.html">Apps</a>
+        <a href="analytics.html">Data</a>
+      </nav>
+      <div class="status-chip warn" id="session-state">Locked</div>
+    </header>
+
+    <!-- COMMAND CENTER INTERFACE -->
+    <div class="command-interface" id="console">
+
+      <!-- STATUS & MIC -->
+      <div class="status-bar">
+        <div>
+          <span class="status-label">System Status</span>
+          <div class="status-value" id="status">Initializing...</div>
+        </div>
+        <div>
+          <span class="status-label">Orchestrator</span>
+          <div class="status-chip warn" id="orchestrator-state">Offline</div>
+        </div>
+        <div class="mic-controls">
+          <button class="primary" id="start">Start Voice</button>
+          <button class="secondary" id="stop">Stop</button>
+          <span class="status-chip" id="mic-state">Idle</span>
+        </div>
+      </div>
+
+      <!-- INPUT & CONTROLS -->
+      <div class="control-box">
+        <div class="control-main">
+          <label class="field-label" for="command">Command Input</label>
+          <textarea id="command" placeholder="Describe the change you want... (e.g. 'Change headline to Future of Web', 'Add a pricing section')"></textarea>
+
+          <div class="quick-commands" id="quick-commands">
+            <span class="quick-label">Quick:</span>
+            <button class="chip" data-command="Deploy site">Deploy</button>
+            <button class="chip" data-command="Show analytics">Analytics</button>
+            <button class="chip" data-command="Theme to midnight">Midnight Theme</button>
+          </div>
+
+          <div class="button-grid">
+            <button class="primary" id="plan">Plan Change</button>
+            <input type="text" id="plan-confirm" placeholder='Type "ship it" to confirm' style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 999px; color: white; text-align: center;" />
+            <button class="primary" id="apply" disabled>Apply & Deploy</button>
+            <button class="ghost" id="undo">Undo Last</button>
+          </div>
+        </div>
+
+        <!-- LOGS & RESPONSE -->
+        <div class="response-panel">
+          <div class="panel-head">
+            <span class="field-label">System Response</span>
+            <span class="status-chip" id="response-source">Waiting</span>
+          </div>
+          <pre id="response">Awaiting input...</pre>
+          <div id="plan-summary" class="muted small"></div>
+        </div>
+      </div>
+
+      <!-- PREVIEW SECTION -->
+      <div class="preview-shell">
+        <div class="preview-controls">
+          <h3 class="field-label">Live Preview</h3>
+          <div class="button-row">
+            <button class="ghost small" id="preview-speak">Read Summary</button>
+            <button class="ghost small" id="preview-reset">Reset Preview</button>
+            <span class="status-chip" id="preview-mode">Idle</span>
+          </div>
+        </div>
+        <div class="preview-stage solo">
+          <iframe id="preview-frame" src="/" title="Site Preview"></iframe>
+        </div>
+        <div class="preview-extras" id="preview-extras"></div>
+      </div>
+
+      <!-- ACTIVITY LOGS -->
+      <div class="activity-section">
+        <div class="panel-head">
+          <h3>Activity Log</h3>
+          <button class="ghost small" id="refresh-logs">Refresh</button>
+        </div>
+        <p class="muted" id="activity-status">Ready to load.</p>
+        <ul class="activity-list" id="activity-list"></ul>
+      </div>
+
+      <!-- TRANSCRIPTS -->
+      <div class="transcript-section">
+        <h3>Voice Transcripts</h3>
+        <p class="muted" id="transcript-status">No transcripts.</p>
+        <ul class="activity-list" id="transcript-list"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="./admin.js"></script>
+  <script type="module" src="/nav.js"></script>
+</body>
+</html>

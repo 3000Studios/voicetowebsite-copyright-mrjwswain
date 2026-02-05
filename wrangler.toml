@@ -1,5 +1,5 @@
 name = "voicetowebsite"
-main = "worker-entry.js"
+main = "worker.js"
 compatibility_date = "2026-01-27"
 account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 
