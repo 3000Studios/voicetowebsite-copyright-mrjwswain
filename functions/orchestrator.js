@@ -1,6 +1,6 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const OPENAI_API = env.OPENAI_API;
+  const OPENAI_API = env.OPENAI_API || env.OPENAI_API_KEY || env.OPENAI_API_KEY3;
   const OPENAI_MODEL = env.OPENAI_MODEL || "gpt-4o-mini";
   const GITHUB_TOKEN =
     env.GITHUB_TOKEN ||
