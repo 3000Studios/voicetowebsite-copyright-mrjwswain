@@ -1,1 +1,33 @@
-<!doctype html><html lang="en"><head>  <meta charset="utf-8" />  <meta name="viewport" content="width=device-width, initial-scale=1" />  <title>VoiceToWebsite Referrals</title>  <meta name="description" content="Referrals - VoiceToWebsite" />  <link rel="stylesheet" href="styles.css" />  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262" crossorigin="anonymous"></script></head><body class="referrals">  <div class="video-bg" aria-hidden="true">    <video src="https://cdn.coverr.co/videos/coverr-dreamy-clouds-4713/1080p.mp4" autoplay muted loop playsinline></video>  </div>  <div class="edge-glow" aria-hidden="true"></div>  <div class="edge-frame" aria-hidden="true"></div>  <header class="site-header">    <div class="nav-video">      <video src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4" autoplay muted loop playsinline></video>    </div>    <div class="brand">      <span class="brand-mark">VW</span>      <div class="brand-text">        <strong>VoiceToWebsite</strong>        <span>Revenue Engine</span>      </div>    </div>    <nav class="nav">      <a href="index.html">Home</a>      <a href="store.html">Store</a>      <a href="appstore.html">App Store</a>      <a href="blog.html">Blog</a>      <a href="livestream.html">Live Stream</a>      <a href="referrals.html">Referrals</a>      <a href="projects.html">Projects</a>      <a href="studio3000.html">3000 Studios</a>      <a href="/admin">Admin</a>      <a href="#">Contact</a>    </nav>  </header>  <main class="page">    <section class="section">      <p class="eyebrow">Affiliate Network</p>      <h2>Referral Hub</h2>      <p class="subhead">Scale your revenue by sharing VoiceToWebsite. Get 20% recurring commission on every growth plan.</p>      <div class="pricing-deck">        <article class="card luxe glass-morphism premium-border-glow">          <div class="card-header">            <div class="tier">Partner Program</div>          </div>          <div class="card-content">            <p class="muted mb-6">Generate your unique identifier and start tracking downstream nodes today.</p>            <div class="form-group mb-4">              <input type="text" id="referralCode" value="VW-REVENUE-BOT" readonly aria-label="Referral Code" class="referral-input" />            </div>            <button class="primary" onclick="copyReferral()">Copy Link</button>          </div>        </article>        <article class="card luxe glass-morphism">          <div class="card-header">            <div class="tier">Community Yield</div>          </div>          <div class="card-content">            <ul class="features">              <li>20% Recurring Commission</li>              <li>Real-time conversion tracking</li>              <li>Payout via PayPal/Stripe</li>              <li>Priority support desk</li>            </ul>          </div>        </article>      </div>      <div class="adsense-slot">        <ins class="adsbygoogle adsbygoogle-slot"             data-ad-client="ca-pub-5800977493749262"             data-ad-slot="__ADSENSE_SLOT__"             data-ad-format="auto"             data-full-width-responsive="true"></ins>      </div>    </section>    <script>      function copyReferral() {        const code = document.getElementById('referralCode');        const link = window.location.origin + '?ref=' + code.value;        navigator.clipboard.writeText(link);        const btn = event.target;        const originalText = btn.innerText;        btn.innerText = 'Copied!';        setTimeout(() => btn.innerText = originalText, 2000);      }    </script>  </main>  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>  <script type="module" src="nav.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Referrals → Partners | VoiceToWebsite</title>
+    <meta name="description" content="This page moved to /partners." />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="vt-page">
+    <main class="page">
+      <section class="section hero">
+        <p class="eyebrow">Redirect</p>
+        <h1 class="vt-h1">Partner program moved</h1>
+        <p class="subhead">
+          The referrals hub is now part of the Partners experience.
+        </p>
+        <div class="prompt-actions">
+          <a class="btn btn-primary" href="/partners">Go to Partners</a>
+          <a class="btn btn-ghost" href="/">Home</a>
+        </div>
+        <p class="muted">Redirecting…</p>
+      </section>
+    </main>
+
+    <script>
+      window.location.replace("/partners");
+    </script>
+    <script type="module" src="nav.js"></script>
+  </body>
+</html>

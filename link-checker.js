@@ -10,6 +10,8 @@ const IGNORE_DIRS = new Set([
   "node_modules",
   "dist",
   ".wrangler",
+  // Local/private vaults (not served as site pages)
+  "black-vault",
   // Source drops / downloadable app bundles (not served as site pages)
   "app Store apps to Sell",
 ]);
@@ -34,7 +36,15 @@ const isSkippable = (raw) => {
 const stripQueryHash = (link) => link.split("#")[0].split("?")[0];
 
 const walk = (dir, out = []) => {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+  let entries = [];
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch (err) {
+    if (err && (err.code === "EPERM" || err.code === "EACCES")) return out;
+    throw err;
+  }
+
+  for (const entry of entries) {
     if (entry.isDirectory()) {
       if (IGNORE_DIRS.has(entry.name)) continue;
       walk(path.join(dir, entry.name), out);
@@ -69,6 +79,11 @@ const existsAsFileOrIndex = (p) => {
   if (fs.existsSync(p) && fs.statSync(p).isFile()) return true;
   if (fs.existsSync(p) && fs.statSync(p).isDirectory()) {
     return fs.existsSync(path.join(p, "index.html"));
+  }
+  // Support clean URLs like "/pricing" that are served as "/pricing.html" by the Worker.
+  if (!path.extname(p)) {
+    const withHtml = `${p}.html`;
+    if (fs.existsSync(withHtml) && fs.statSync(withHtml).isFile()) return true;
   }
   return false;
 };

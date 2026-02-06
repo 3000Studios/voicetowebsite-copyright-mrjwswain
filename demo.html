@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interactive Demo | VoiceToWebsite</title>
+    <meta
+      name="description"
+      content="Try the VoiceToWebsite interactive demo: choose a site type, speak or type a prompt, pick a style, and preview a generated outline in seconds."
+    />
+    <meta
+      name="keywords"
+      content="voice website builder demo, ai by voice demo, website builder by voice, voice to website generator"
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://voicetowebsite.com/demo" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://voicetowebsite.com/demo" />
+    <meta property="og:title" content="Interactive Demo | VoiceToWebsite" />
+    <meta
+      property="og:description"
+      content="Choose a site type, speak or type a prompt, pick a style, and preview a generated outline in seconds."
+    />
+    <meta
+      property="og:image"
+      content="https://voicetowebsite.com/assets/demo-og.jpg"
+    />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://voicetowebsite.com/demo" />
+    <meta
+      property="twitter:title"
+      content="Interactive Demo | VoiceToWebsite"
+    />
+    <meta
+      property="twitter:description"
+      content="Choose a site type, speak or type a prompt, pick a style, and preview a generated outline in seconds."
+    />
+    <meta
+      property="twitter:image"
+      content="https://voicetowebsite.com/assets/demo-og.jpg"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="styles.css" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "VoiceToWebsite Demo",
+        "applicationCategory": "WebApplication",
+        "operatingSystem": "Web",
+        "url": "https://voicetowebsite.com/demo"
+      }
+    </script>
+  </head>
+  <body class="vt-page vt-page-demo">
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-future-is-calling-3845/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+
+    <main class="page">
+      <section class="section hero">
+        <p class="eyebrow">Demo</p>
+        <h1 class="vt-h1">Build by voice (in seconds)</h1>
+        <p class="subhead">
+          Pick a site type, speak or type a prompt, choose a vibe, and get a
+          generated outline instantly. Save with email when you’re ready.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-ghost" href="#gallery">Command Gallery</a>
+          <a class="btn btn-primary" href="/pricing">See pricing</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 id="video">60-second explainer</h2>
+        <p class="subhead">Prompt → outline → preview → save and publish.</p>
+        <div class="video-panel">
+          <video
+            controls
+            preload="metadata"
+            playsinline
+            poster="https://voicetowebsite.com/assets/demo-poster.jpg"
+          >
+            <source
+              src="https://media.voicetowebsite.com/homenavigation.mp4"
+              type="video/mp4"
+            />
+          </video>
+        </div>
+      </section>
+
+      <section class="section vt-demo" aria-label="Interactive demo funnel">
+        <div class="demo-steps" role="list">
+          <div class="demo-step is-active" data-step="1" role="listitem">
+            1. Site type
+          </div>
+          <div class="demo-step" data-step="2" role="listitem">2. Prompt</div>
+          <div class="demo-step" data-step="3" role="listitem">3. Style</div>
+          <div class="demo-step" data-step="4" role="listitem">4. Preview</div>
+          <div class="demo-step" data-step="5" role="listitem">5. Save</div>
+        </div>
+
+        <div class="demo-panels">
+          <section class="demo-panel" data-panel="1">
+            <h3>Choose a site type</h3>
+            <p class="muted">This seeds sections and copy intent.</p>
+            <div class="vt-grid">
+              <button class="choice-card" data-choice="creator" type="button">
+                Creator portfolio
+              </button>
+              <button class="choice-card" data-choice="agency" type="button">
+                Agency landing
+              </button>
+              <button class="choice-card" data-choice="local" type="button">
+                Local service
+              </button>
+              <button class="choice-card" data-choice="ecommerce" type="button">
+                Ecommerce
+              </button>
+            </div>
+            <div class="demo-nav">
+              <button class="btn btn-primary" data-next type="button">
+                Next
+              </button>
+            </div>
+          </section>
+
+          <section class="demo-panel is-hidden" data-panel="2">
+            <h3>Speak or type a prompt</h3>
+            <p class="muted">
+              Tip: include audience + offer + vibe. Example: “Create a landing
+              page for a barber shop with booking and pricing.”
+            </p>
+            <div class="prompt-shell">
+              <label class="prompt-label" for="demoPrompt">Your prompt</label>
+              <textarea
+                id="demoPrompt"
+                rows="4"
+                placeholder="Describe what you want to build…"
+              ></textarea>
+              <div class="prompt-actions">
+                <button class="btn btn-ghost" id="demoMic" type="button">
+                  🎙️ Voice
+                </button>
+                <button class="btn btn-primary" data-next type="button">
+                  Generate outline
+                </button>
+              </div>
+              <p class="muted" id="demoMicStatus" aria-live="polite"></p>
+            </div>
+            <div class="demo-nav">
+              <button class="btn btn-ghost" data-prev type="button">Back</button>
+              <button class="btn btn-primary" data-next type="button">Next</button>
+            </div>
+          </section>
+
+          <section class="demo-panel is-hidden" data-panel="3">
+            <h3>Pick a style</h3>
+            <p class="muted">Choose a theme + typography vibe.</p>
+            <div class="vt-grid">
+              <button class="choice-card" data-theme="midnight" type="button">
+                Midnight Glass
+              </button>
+              <button class="choice-card" data-theme="volt" type="button">
+                Volt
+              </button>
+              <button class="choice-card" data-theme="ember" type="button">
+                Ember
+              </button>
+              <button class="choice-card" data-theme="ocean" type="button">
+                Ocean
+              </button>
+            </div>
+            <div class="demo-nav">
+              <button class="btn btn-ghost" data-prev type="button">Back</button>
+              <button class="btn btn-primary" data-next type="button">
+                Preview
+              </button>
+            </div>
+          </section>
+
+          <section class="demo-panel is-hidden" data-panel="4">
+            <h3>Preview (instant)</h3>
+            <p class="muted">
+              This is a fast outline preview. The full build happens after you
+              save.
+            </p>
+            <div class="preview-shell">
+              <div class="preview-card">
+                <div class="preview-title" id="previewTitle">—</div>
+                <ul class="preview-list" id="previewList"></ul>
+              </div>
+              <div class="preview-card">
+                <div class="preview-title">Recommended next</div>
+                <div class="muted" id="previewNext">
+                  Add pricing, add testimonials, and publish.
+                </div>
+              </div>
+            </div>
+            <div class="demo-nav">
+              <button class="btn btn-ghost" data-prev type="button">Back</button>
+              <button class="btn btn-primary" data-next type="button">Save</button>
+            </div>
+          </section>
+
+          <section class="demo-panel is-hidden" data-panel="5">
+            <h3>Save and publish</h3>
+            <p class="muted">
+              Enter email to save this build. You’ll get a publish link and plan
+              options.
+            </p>
+            <div class="prompt-shell">
+              <label class="prompt-label" for="demoEmail">Email</label>
+              <input
+                id="demoEmail"
+                type="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+              <div class="prompt-actions">
+                <button class="btn btn-primary" id="demoSave" type="button">
+                  Save build
+                </button>
+                <a class="btn btn-ghost" href="/pricing">Compare plans</a>
+              </div>
+              <p class="muted" id="demoSaveStatus" aria-live="polite"></p>
+            </div>
+            <div class="demo-nav">
+              <button class="btn btn-ghost" data-prev type="button">Back</button>
+              <a class="btn btn-primary" href="/store">Upgrade in Store</a>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="section" id="gallery">
+        <h2>Command Gallery</h2>
+        <p class="subhead">Click any prompt to remix it in the demo funnel.</p>
+        <div class="vt-grid" id="commandGallery"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/demo-init.js"></script>
+    <script type="module" src="nav.js"></script>
+  </body>
+</html>

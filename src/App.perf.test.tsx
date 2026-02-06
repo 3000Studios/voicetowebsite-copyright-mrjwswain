@@ -18,18 +18,18 @@ vi.mock('./services/audioEngine', () => ({
   },
 }));
 
-// Mock CursorInstrument to track renders
-let cursorRenderCount = 0;
-vi.mock('./components/CursorInstrument', () => ({
+// Mock WarpTunnel to track renders (should not re-render on mousemove)
+let warpRenderCount = 0;
+vi.mock('./components/WarpTunnel', () => ({
   default: () => {
-    cursorRenderCount++;
-    return <div data-testid="cursor-instrument" />;
-  }
+    warpRenderCount++;
+    return <div data-testid="warp-tunnel" />;
+  },
 }));
 
 describe('App Performance', () => {
   beforeEach(() => {
-    cursorRenderCount = 0;
+    warpRenderCount = 0;
     vi.clearAllMocks();
   });
 
@@ -37,7 +37,7 @@ describe('App Performance', () => {
     render(<App />);
 
     // Initial render
-    const initialCount = cursorRenderCount;
+    const initialCount = warpRenderCount;
     expect(initialCount).toBeGreaterThan(0);
 
     // Simulate mouse movement
@@ -46,11 +46,11 @@ describe('App Performance', () => {
     });
 
     // After optimization, App should NOT re-render on mousemove.
-    expect(cursorRenderCount).toBe(initialCount);
+    expect(warpRenderCount).toBe(initialCount);
 
     act(() => {
         fireEvent.mouseMove(window, { clientX: 200, clientY: 200 });
     });
-    expect(cursorRenderCount).toBe(initialCount);
+    expect(warpRenderCount).toBe(initialCount);
   });
 });

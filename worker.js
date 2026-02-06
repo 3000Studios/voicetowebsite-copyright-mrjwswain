@@ -1,7 +1,6 @@
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
-const ADSENSE_SCRIPT_TAG = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}" crossorigin="anonymous"></script>`;
 
 const jsonResponse = (status, payload) =>
   addSecurityHeaders(
@@ -289,10 +288,40 @@ export default {
         .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
         .replace('</head>', `${envInjection}</head>`); // Inject variables early
 
-      // Ensure the AdSense auto-ads loader is present site-wide.
-      const withAdsense = injected.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
-        ? injected.replace(/pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g, `pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`)
-        : injected.replace("</head>", `${ADSENSE_SCRIPT_TAG}\n</head>`);
+      // Strip any hard-coded AdSense loader scripts from HTML. Policy-based injection below.
+      const strippedAdsense = injected.replace(
+        /<script\b[^>]*\bsrc=["']https?:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=[^"']+["'][^>]*>\s*<\/script>\s*/gi,
+        ""
+      );
+
+      // Ads policy: only load AdSense on pages that explicitly render ad slots and are allowed.
+      const wantsAds = /\badsbygoogle\b/.test(strippedAdsense) || strippedAdsense.includes("__ADSENSE_SLOT__");
+      const isAdminPage = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
+      const isSecretPage = url.pathname.startsWith("/the3000");
+      const normalizedPath = cleanPath || "/";
+      const isAdsAllowed =
+        normalizedPath === "/blog" ||
+        normalizedPath === "/projects" ||
+        normalizedPath === "/studio3000" ||
+        url.pathname === "/blog.html" ||
+        url.pathname === "/projects.html" ||
+        url.pathname === "/studio3000.html";
+
+      const shouldInjectAdsense = wantsAds && isAdsAllowed && !isAdminPage && !isSecretPage;
+
+      const adsensePublisher =
+        env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID;
+
+      const adsenseScriptTag = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisher}" crossorigin="anonymous"></script>`;
+
+      const withAdsense = shouldInjectAdsense
+        ? strippedAdsense.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+          ? strippedAdsense.replace(
+              /pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g,
+              `pagead/js/adsbygoogle.js?client=${adsensePublisher}`
+            )
+          : strippedAdsense.replace("</head>", `${adsenseScriptTag}\n</head>`)
+        : strippedAdsense;
 
       const headers = new Headers(assetRes.headers);
       headers.set("Content-Type", "text/html; charset=utf-8");

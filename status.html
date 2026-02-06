@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Status | VoiceToWebsite</title>
+    <meta
+      name="description"
+      content="VoiceToWebsite system status, uptime notes, and incident history."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://voicetowebsite.com/status" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://voicetowebsite.com/status" />
+    <meta property="og:title" content="Status | VoiceToWebsite" />
+    <meta
+      property="og:description"
+      content="System status, uptime notes, and incident history."
+    />
+    <meta
+      property="og:image"
+      content="https://voicetowebsite.com/assets/status-og.jpg"
+    />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://voicetowebsite.com/status" />
+    <meta property="twitter:title" content="Status | VoiceToWebsite" />
+    <meta
+      property="twitter:description"
+      content="System status, uptime notes, and incident history."
+    />
+    <meta
+      property="twitter:image"
+      content="https://voicetowebsite.com/assets/status-og.jpg"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="vt-page vt-page-status">
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+
+    <main class="page">
+      <section class="section hero">
+        <p class="eyebrow">Status</p>
+        <h1 class="vt-h1">Systems nominal</h1>
+        <p class="subhead">
+          Live status is displayed here. If you see degraded service, check the
+          incident log and subscribe for updates.
+        </p>
+        <div class="status-chips" role="status" aria-live="polite">
+          <span class="status-chip ok" id="status-overall">Operational</span>
+          <span class="status-chip" id="status-updated">Updated: —</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Components</h2>
+        <div class="vt-grid">
+          <article class="feature-card">
+            <h3>Website + assets</h3>
+            <p class="muted">Static pages, CSS, and media delivery.</p>
+            <span class="status-chip ok">Operational</span>
+          </article>
+          <article class="feature-card">
+            <h3>API (orchestrator)</h3>
+            <p class="muted">Voice/typed command execution for admin.</p>
+            <span class="status-chip ok">Operational</span>
+          </article>
+          <article class="feature-card">
+            <h3>Checkout</h3>
+            <p class="muted">Stripe + PayPal purchase routing.</p>
+            <span class="status-chip ok">Operational</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Incident history</h2>
+        <p class="subhead">No incidents reported in the last 30 days.</p>
+        <div class="table-shell">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Impact</th>
+                <th>Summary</th>
+              </tr>
+            </thead>
+            <tbody id="incidentTable">
+              <tr>
+                <td colspan="3" class="muted">No incidents.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Subscribe</h2>
+        <p class="subhead">
+          Enter your email to get status updates. (Stored locally for now.)
+        </p>
+        <div class="prompt-shell">
+          <label class="prompt-label" for="statusEmail">Email</label>
+          <input
+            id="statusEmail"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+          <div class="prompt-actions">
+            <button class="btn btn-primary" id="statusSubscribe" type="button">
+              Subscribe
+            </button>
+          </div>
+          <p class="muted" id="statusSubscribeStatus" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/status-init.js"></script>
+    <script type="module" src="nav.js"></script>
+  </body>
+</html>

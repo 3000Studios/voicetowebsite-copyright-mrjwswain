@@ -1,129 +1,74 @@
-
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { NAV_LINKS, BACKGROUND_TUNNEL, INTRO_SONG } from './constants';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from './constants';
 import { NavigationLink } from './types';
 import { audioEngine } from './services/audioEngine';
-import CursorInstrument from './components/CursorInstrument';
 import WarpTunnel from './components/WarpTunnel';
 import ElectricText from './components/ElectricText';
 import IntroOverlay from './components/IntroOverlay';
 
+const SEEN_KEY = 'vtw-v2-seen';
+
+const hasSeenV2 = () => {
+  try {
+    return localStorage.getItem(SEEN_KEY) === '1';
+  } catch (_) {
+    return false;
+  }
+};
+
+const markSeenV2 = () => {
+  try {
+    localStorage.setItem(SEEN_KEY, '1');
+  } catch (_) {}
+};
+
+const buildInstantOutline = (prompt: string) => {
+  const text = (prompt || '').trim();
+  const lower = text.toLowerCase();
+
+  const sections = [
+    'Hero + CTA',
+    'How it works (5 steps)',
+    'Use cases (tabs)',
+    'Feature blocks',
+    'Social proof',
+    'Pricing preview',
+    'FAQ',
+    'Footer (Trust + Status)',
+  ];
+
+  if (lower.includes('booking')) sections.splice(2, 0, 'Booking + availability');
+  if (lower.includes('portfolio') || lower.includes('gallery'))
+    sections.splice(2, 0, 'Portfolio / reel');
+  if (lower.includes('ecommerce') || lower.includes('store'))
+    sections.splice(2, 0, 'Products + bundles');
+  if (lower.includes('blog')) sections.splice(6, 0, 'Blog hub (topic clusters)');
+
+  return {
+    title: text ? `Preview: ${text}` : 'Preview (instant)',
+    sections,
+  };
+};
+
 const App: React.FC = () => {
-  const [phase, setPhase] = useState<'intro' | 'home'>('intro');
+  const seen = hasSeenV2();
+  const [phase, setPhase] = useState<'intro' | 'opener' | 'site'>(
+    seen ? 'site' : 'intro',
+  );
+  const [openerCollapsed, setOpenerCollapsed] = useState(seen);
+  const [showBumper, setShowBumper] = useState(seen);
   const [isWarping, setIsWarping] = useState(false);
-  const [isDetonating, setIsDetonating] = useState<string | null>(null);
-  const [activePanelId, setActivePanelId] = useState<string | null>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [volume, setVolume] = useState(0.5);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [isBoltsEnabled, setIsBoltsEnabled] = useState(false);
-  const [isShooting, setIsShooting] = useState(false);
 
-  const videoRefs = useRef<Record<string, React.RefObject<HTMLVideoElement>>>(null as any);
-  if (!videoRefs.current) {
-    videoRefs.current = NAV_LINKS.reduce((acc, link) => ({ ...acc, [link.id]: React.createRef() }), {});
-  }
+  const [tryPrompt, setTryPrompt] = useState('');
+  const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
-  // Voice Command Setup
-  useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-
-      recognition.onresult = (event: any) => {
-        const transcript = Array.from(event.results)
-          .map((result: any) => result[0])
-          .map((result: any) => result.transcript)
-          .join('')
-          .toLowerCase();
-
-        if (isBoltsEnabled && (transcript.includes('shoot') || transcript.includes('spark'))) {
-          setIsShooting(true);
-          audioEngine.playSpark();
-          // Reset shooting after a short burst
-          setTimeout(() => setIsShooting(false), 1500);
-        }
-      };
-
-      recognition.onend = () => {
-        if (isBoltsEnabled) recognition.start();
-      };
-
-      recognitionRef.current = recognition;
-    }
-  }, [isBoltsEnabled]);
-
-  const toggleBolts = () => {
-    const nextState = !isBoltsEnabled;
-    setIsBoltsEnabled(nextState);
-    if (nextState) {
-      recognitionRef.current?.start();
-      audioEngine.playHum();
-    } else {
-      recognitionRef.current?.stop();
-    }
-  };
-
-  const startExperience = () => {
-    audioEngine.enable();
-    audioEngine.playGlassTing();
-    audioEngine.playMusic(INTRO_SONG);
-    setIsAudioPlaying(true);
-  };
-
-  const completeIntro = () => {
-    setPhase('home');
-    setTimeout(() => {
-      Object.values(videoRefs.current).forEach((ref) => {
-        const video = ref.current;
-        if (video) {
-          video.currentTime = 0;
-          video.muted = true;
-          video.play().catch((e) => console.warn("Video playback issue:", e));
-        }
-      });
-    }, 50);
-  };
-
-  const handleLinkClick = (link: NavigationLink) => {
-    setIsDetonating(link.id);
-    audioEngine.playImpact();
-    
-    setTimeout(() => {
-      audioEngine.playSwoosh(); 
-      setIsWarping(true);
-      audioEngine.playWarp();
-    }, 300);
-
-    setTimeout(() => {
-      window.location.href = link.url;
-    }, 1500);
-  };
-
-  const togglePanel = (id: string) => {
-    if (activePanelId === id) {
-      setActivePanelId(null);
-    } else {
-      audioEngine.playHum();
-      setActivePanelId(id);
-    }
-  };
-
-  const handleStopAudio = () => {
-    audioEngine.stopMusic();
-    setIsAudioPlaying(false);
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = parseFloat(e.target.value);
-    setVolume(v);
-    audioEngine.setVolume(v);
-  };
+  const [activeUseCase, setActiveUseCase] = useState<
+    'creators' | 'agencies' | 'local' | 'ecommerce' | 'wordpress'
+  >('creators');
 
   const secretTapRef = useRef<number[]>([]);
   const handleSecretTap = () => {
@@ -131,183 +76,663 @@ const App: React.FC = () => {
     const taps = secretTapRef.current.filter((t) => now - t < 1500);
     taps.push(now);
     secretTapRef.current = taps;
-    if (taps.length >= 6) {
-      window.location.href = '/the3000.html';
+    if (taps.length >= 6) window.location.href = '/the3000.html';
+  };
+
+  useEffect(() => {
+    if (!showBumper) return;
+    const timer = window.setTimeout(() => setShowBumper(false), 1400);
+    return () => window.clearTimeout(timer);
+  }, [showBumper]);
+
+  useEffect(() => {
+    audioEngine.setVolume(volume);
+  }, [volume]);
+
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0])
+        .map((result: any) => result.transcript)
+        .join('');
+      setTryPrompt(transcript);
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognitionRef.current = recognition;
+
+    return () => {
+      try {
+        recognition.stop();
+      } catch (_) {}
+    };
+  }, []);
+
+  const toggleListening = () => {
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
+    if (!isListening) {
+      setIsListening(true);
+      try {
+        recognition.start();
+      } catch (_) {}
+      return;
     }
+    try {
+      recognition.stop();
+    } catch (_) {}
+  };
+
+  const toggleAudio = () => {
+    audioEngine.enable();
+    if (isAudioPlaying) {
+      audioEngine.stopMusic();
+      setIsAudioPlaying(false);
+      return;
+    }
+    audioEngine.playMusic(INTRO_SONG);
+    setIsAudioPlaying(true);
+  };
+
+  const startExperience = () => {
+    markSeenV2();
+    audioEngine.enable();
+    audioEngine.playGlassTing();
+    audioEngine.playMusic(INTRO_SONG);
+    setIsAudioPlaying(true);
+  };
+
+  const completeIntro = () => {
+    setPhase('opener');
+    setOpenerCollapsed(false);
+    window.scrollTo({ top: 0 });
+  };
+
+  const enterSite = () => {
+    markSeenV2();
+    setOpenerCollapsed(true);
+    setPhase('site');
+  };
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' && event.key !== ' ') return;
+
+      if (phase === 'intro') {
+        event.preventDefault();
+        enterSite();
+        return;
+      }
+      if (phase === 'opener' && !openerCollapsed) {
+        event.preventDefault();
+        enterSite();
+      }
+    };
+
+    const onWheel = (event: WheelEvent) => {
+      if (phase !== 'opener' || openerCollapsed) return;
+      if (event.deltaY > 0) enterSite();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('wheel', onWheel, { passive: true });
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('wheel', onWheel as any);
+    };
+  }, [phase, openerCollapsed]);
+
+  const handleTileClick = (link: NavigationLink) => {
+    audioEngine.playImpact();
+    setTimeout(() => {
+      audioEngine.playSwoosh();
+      setIsWarping(true);
+      audioEngine.playWarp();
+    }, 220);
+    setTimeout(() => {
+      window.location.href = link.url;
+    }, 1100);
+  };
+
+  const preview = useMemo(() => buildInstantOutline(tryPrompt), [tryPrompt]);
+
+  const useCases = {
+    creators: {
+      label: 'Creators',
+      prompt: 'Build a creator portfolio with a reel section and email capture.',
+      bullets: ['Publish faster', 'Capture emails', 'Monetize content'],
+      template: 'Creator Portfolio',
+      integration: 'YouTube + Newsletter',
+    },
+    agencies: {
+      label: 'Agencies',
+      prompt: 'Create an agency homepage with services, case studies, and a contact form.',
+      bullets: ['Ship client sites', 'Reuse templates', 'Reduce revisions'],
+      template: 'Agency Landing',
+      integration: 'CRM + Scheduling',
+    },
+    local: {
+      label: 'Local',
+      prompt: 'Create a landing page for a barber shop with booking and pricing.',
+      bullets: ['Rank locally', 'Drive calls', 'Book appointments'],
+      template: 'Local Service',
+      integration: 'Maps + Booking',
+    },
+    ecommerce: {
+      label: 'Ecommerce',
+      prompt: 'Design an ecommerce storefront with bundles, reviews, and FAQs.',
+      bullets: ['Bundles + upsells', 'Fast pages', 'Trust-first checkout'],
+      template: 'Storefront',
+      integration: 'Stripe + PayPal',
+    },
+    wordpress: {
+      label: 'WordPress',
+      prompt: 'Create a WordPress migration landing page with SEO checklist and pricing.',
+      bullets: ['Migration plan', 'SEO cleanup', 'Performance lift'],
+      template: 'WP Migration',
+      integration: 'Analytics + Redirects',
+    },
+  } as const;
+
+  const active = useCases[activeUseCase];
+
+  const seedDemoPrompt = (prompt: string) => {
+    setTryPrompt(prompt);
+    try {
+      localStorage.setItem('vtw-demo-prefill', JSON.stringify({ prompt, ts: Date.now() }));
+    } catch (_) {}
   };
 
   return (
-    <div className="relative w-screen h-screen bg-black select-none overflow-hidden" style={{ perspective: '2000px' }}>
-      <CursorInstrument isShooting={isShooting} />
+    <div className="relative min-h-screen bg-black select-none overflow-x-hidden">
       <WarpTunnel isVisible={isWarping} />
 
-      {/* Persistent Audio Controls */}
-      {phase === 'home' && (
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="fixed top-2 right-2 md:top-4 md:right-4 z-[150] flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 px-2 py-1 rounded-full shadow-2xl scale-[0.25] origin-top-right"
+      {/* Background atmosphere */}
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-20 brightness-50"
         >
-          <div className="flex items-center gap-2">
-            <input 
-              type="range" 
-              min="0" 
-              max="1" 
-              step="0.01" 
-              value={volume} 
-              onChange={handleVolumeChange}
-              className="w-16 accent-white h-1 bg-white/20 rounded-lg appearance-none"
-            />
-          </div>
-          <button 
-            onClick={isAudioPlaying ? handleStopAudio : () => { audioEngine.playMusic(INTRO_SONG); setIsAudioPlaying(true); }}
-            className="group flex items-center gap-2"
+          <source src={BACKGROUND_TUNNEL} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-radial-gradient from-transparent to-black" />
+      </div>
+
+      {/* Returning visitor bumper */}
+      <AnimatePresence>
+        {showBumper && phase === 'site' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[120] grid place-items-center bg-black/80 backdrop-blur-md"
           >
-            <div className={`w-3 h-3 rounded-full ${isAudioPlaying ? 'bg-cyan-500 animate-pulse' : 'bg-white/20'}`} />
-            <span className="font-orbitron text-[10px] tracking-[0.2em] text-white/60 group-hover:text-white transition-colors uppercase whitespace-nowrap">
-              {isAudioPlaying ? 'LIVE FEED' : 'RECONNECT'}
-            </span>
-          </button>
-        </motion.div>
-      )}
+            <div className="text-center px-6">
+              <div className="font-orbitron tracking-[0.5em] text-white/70 text-xs">
+                VOICETOWEBSITE
+              </div>
+              <div className="mt-4 flex items-end justify-center gap-1" aria-hidden="true">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-[6px] rounded-full bg-cyan-400/70 animate-pulse"
+                    style={{
+                      height: `${10 + (i % 5) * 7}px`,
+                      animationDelay: `${i * 60}ms`,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="mt-5 text-white/40 text-sm">Systems nominal</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Enable Bolts Button - Lower Left */}
-      {phase === 'home' && (
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          onClick={toggleBolts}
-          className="fixed bottom-6 left-6 z-[150] flex items-center gap-3 bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-lg hover:border-cyan-500/50 transition-all group"
-        >
-          <div className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${isBoltsEnabled ? 'bg-cyan-500 shadow-cyan-500 animate-pulse' : 'bg-white/20 shadow-white/10'}`} />
-          <span className="font-orbitron text-[9px] tracking-[0.2em] text-white/70 group-hover:text-white uppercase">
-            Enable Bolts with Mic
-          </span>
-          <span className="text-[8px] text-white/30 italic ml-2">(say "shoot")</span>
-        </motion.button>
-      )}
-
-      {phase === 'home' && (
+      {/* Persistent audio control */}
+      <motion.div
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed top-16 right-4 z-[160] flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 px-3 py-2 rounded-full shadow-2xl"
+      >
         <button
           type="button"
-          onClick={handleSecretTap}
-          aria-label="Open 3000 portal"
-          className="fixed top-3 left-3 z-[160] h-8 w-8 rounded-full border border-white/10 bg-white/5 opacity-0 backdrop-blur-md transition-opacity hover:opacity-25 focus:opacity-40"
+          onClick={toggleAudio}
+          className="flex items-center gap-2"
+          aria-label={isAudioPlaying ? 'Stop soundtrack' : 'Play soundtrack'}
         >
-          <span className="sr-only">3000</span>
+          <div
+            className={`w-2.5 h-2.5 rounded-full ${isAudioPlaying ? 'bg-cyan-400 animate-pulse' : 'bg-white/20'}`}
+          />
+          <span className="font-orbitron text-[10px] tracking-[0.2em] text-white/60 uppercase whitespace-nowrap">
+            {isAudioPlaying ? 'SOUND ON' : 'SOUND OFF'}
+          </span>
         </button>
-      )}
+        <input
+          aria-label="Soundtrack volume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={(e) => setVolume(parseFloat(e.target.value))}
+          className="w-20 accent-white h-1 bg-white/20 rounded-lg appearance-none"
+        />
+      </motion.div>
 
-      {/* Initiation Overlay */}
+      {/* Hidden 3000 entry */}
+      <button
+        type="button"
+        onClick={handleSecretTap}
+        aria-label="Open 3000 portal"
+        className="fixed top-3 left-3 z-[160] h-8 w-8 rounded-full border border-white/10 bg-white/5 opacity-0 backdrop-blur-md transition-opacity hover:opacity-25 focus:opacity-40"
+      >
+        <span className="sr-only">3000</span>
+      </button>
+
+      {/* Intro overlay (first visit) */}
       <AnimatePresence>
         {phase === 'intro' && (
           <IntroOverlay onStart={startExperience} onComplete={completeIntro} />
         )}
       </AnimatePresence>
 
-      {/* Cinematic Content Section */}
-      <div className="relative w-full h-full flex flex-col items-center bg-black overflow-hidden">
-        {/* Background Atmosphere */}
-        <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
-          <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-20 brightness-50">
-            <source src={BACKGROUND_TUNNEL} type="video/mp4" />
+      {/* Opener / hero */}
+      <motion.section
+        id="opener"
+        className="relative z-10 w-full overflow-hidden"
+        animate={{ minHeight: openerCollapsed ? 520 : '100vh' }}
+        transition={{ duration: 0.9, ease: 'circInOut' }}
+      >
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40">
+            <source src={INTRO_VIDEO} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-radial-gradient from-transparent to-black" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/70 to-black" />
         </div>
 
-        {/* Video Navigation Grid */}
-        <motion.div 
-          className="relative z-20 w-full flex flex-col md:flex-row h-full items-stretch overflow-hidden md:p-6 lg:p-12 gap-2 md:gap-4"
-          initial={{ opacity: 0 }}
-          animate={phase === 'home' ? { opacity: 1 } : {}}
-          transition={{ duration: 1 }}
-        >
-          {NAV_LINKS.map((link) => {
-            const isSelected = isDetonating === link.id;
-            const isOpen = activePanelId === link.id;
-            const isHovered = hoveredId === link.id;
+        {!openerCollapsed && (
+          <button
+            type="button"
+            onClick={enterSite}
+            className="fixed top-16 left-4 z-[170] px-4 py-2 rounded-full border border-white/15 bg-black/40 backdrop-blur-md text-white/80 hover:text-white hover:border-white/30 transition"
+          >
+            Skip intro (Esc / Space)
+          </button>
+        )}
 
-            return (
-              <motion.div 
-                key={link.id}
-                layout
-                onHoverStart={() => {
-                  setHoveredId(link.id);
-                  if (phase === 'home') audioEngine.playSpark();
-                }}
-                onHoverEnd={() => setHoveredId(null)}
-                className={`relative flex-1 flex flex-col transition-all duration-500 ease-out border border-white/5 rounded-xl group ${isSelected ? 'z-50' : 'z-10'} overflow-hidden shadow-2xl`}
-                animate={{
-                    flex: isSelected ? 12 : (isHovered ? 2 : 1),
-                    scale: isHovered && !isSelected ? 1.02 : 1,
-                    opacity: isDetonating && !isSelected ? 0 : 1,
-                    borderColor: isHovered ? 'rgba(34, 211, 238, 0.3)' : 'rgba(255, 255, 255, 0.05)'
-                }}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-16">
+          {!openerCollapsed ? (
+            <>
+              <div className="max-w-3xl">
+                <div className="font-orbitron text-[11px] tracking-[0.35em] text-white/60 uppercase">
+                  Voice-first web engineering
+                </div>
+                <h1 className="mt-4 text-white font-orbitron font-black text-3xl md:text-5xl tracking-[0.08em] uppercase">
+                  Your song. Your opener. Your funnel.
+                </h1>
+                <p className="mt-5 text-white/60 text-lg leading-relaxed">
+                  Scroll, click, or press Space to peel into the site. The tiles below are
+                  navigation — each one maps to a CTA.
+                </p>
+              </div>
+
+              <motion.div
+                className="mt-10 grid grid-cols-1 md:grid-cols-5 gap-3"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40">
-                  <video
-                    ref={videoRefs.current[link.id]}
-                    muted loop playsInline
-                    className={`absolute w-full h-full transition-all duration-700 ${isHovered ? 'object-contain scale-100 grayscale-0' : 'object-cover scale-110 grayscale'}`}
+                {NAV_LINKS.map((link) => (
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => handleTileClick(link)}
+                    className="relative rounded-2xl border border-white/10 overflow-hidden bg-black/40 text-left group"
                   >
-                    <source src={link.videoUrl} type="video/mp4" />
-                  </video>
-                  
-                  <div className={`absolute inset-0 transition-all duration-700 ${isHovered ? 'bg-transparent' : 'bg-black/60'}`} />
-                  
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-                    <AnimatePresence>
-                      {!isSelected && (
-                        <motion.div
-                          className="relative flex flex-col items-center"
-                          animate={{ y: isOpen ? -80 : 0, scale: isOpen ? 0.7 : 1 }}
-                        >
-                           <ElectricText 
-                             text={link.label} 
-                             className="text-lg md:text-2xl lg:text-3xl tracking-[0.4em] mb-4"
-                             onClick={() => togglePanel(link.id)}
-                             active={isOpen}
-                           />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                    <video
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                      className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-95 transition"
+                    >
+                      <source src={link.videoUrl} type="video/mp4" />
+                    </video>
+                    <div className="absolute inset-0 bg-black/60 group-hover:bg-black/35 transition" />
+                    <div className="relative z-10 p-5 min-h-[170px] flex flex-col justify-between">
+                      <div>
+                        <ElectricText
+                          text={link.label}
+                          className="text-sm tracking-[0.35em]"
+                          active={false}
+                        />
+                        <p className="mt-3 text-white/60 text-sm leading-relaxed">
+                          {link.description}
+                        </p>
+                      </div>
+                      <div className="mt-4 inline-flex items-center gap-2 text-white/70 text-xs uppercase tracking-[0.3em]">
+                        Open <span aria-hidden="true">→</span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </motion.div>
 
-                  {isSelected && (
-                    <motion.div 
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 2], opacity: [0.8, 0] }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute inset-0 bg-white blur-3xl rounded-full z-[60]"
-                    />
-                  )}
+              <div className="mt-10 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={enterSite}
+                  className="px-5 py-3 rounded-full bg-white text-black font-bold"
+                >
+                  Enter site
+                </button>
+                <a
+                  className="px-5 py-3 rounded-full border border-white/15 bg-white/5 text-white/80 hover:bg-white hover:text-black transition font-bold"
+                  href="/demo"
+                >
+                  Try the demo now
+                </a>
+              </div>
+            </>
+          ) : (
+            <div className="page" id="home">
+              <section className="section hero">
+                <p className="eyebrow">Home</p>
+                <h1 className="vt-h1">Voice to Website Builder — Speak It. Ship It.</h1>
+                <p className="subhead">
+                  Turn voice into a complete, responsive, SEO-ready website with pages,
+                  copy, templates, and one-click publish — then keep improving.
+                </p>
+                <div className="cta-row">
+                  <a className="btn btn-primary" href="/demo">
+                    Start Free Voice Build
+                  </a>
+                  <a className="btn btn-ghost" href="/demo#video">
+                    Watch 60-Second Demo
+                  </a>
+                </div>
+                <div className="trust-strip" role="note">
+                  <span>No credit card</span>
+                  <span>Privacy-first posture</span>
+                  <span>Lighthouse targets 90+/95+</span>
                 </div>
 
-                <AnimatePresence>
-                  {isOpen && !isSelected && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="bg-black/90 backdrop-blur-2xl border-t border-cyan-500/20 flex flex-col items-center justify-center p-6 text-center"
-                    >
-                      <p className="font-orbitron text-[8px] md:text-[9px] tracking-[0.3em] text-white/50 mb-6 uppercase leading-relaxed max-w-xs">
-                        {link.description}
-                      </p>
-                      <button
-                        onClick={() => handleLinkClick(link)}
-                        className="px-6 py-2 border border-cyan-500/30 bg-cyan-500/5 font-orbitron text-[8px] tracking-[0.4em] text-cyan-400 uppercase transition-all hover:bg-cyan-500 hover:text-black hover:scale-105"
-                      >
-                        ACCESS PORTAL
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
+                <div className="vt-grid" style={{ marginTop: '1.6rem' }}>
+                  <div className="feature-card">
+                    <h3>Try a command</h3>
+                    <p className="muted">Type or tap mic. Edit before generate.</p>
+                    <div className="prompt-shell">
+                      <label className="prompt-label" htmlFor="tryCommand">
+                        Command
+                      </label>
+                      <textarea
+                        id="tryCommand"
+                        rows={3}
+                        value={tryPrompt}
+                        onChange={(e) => setTryPrompt(e.target.value)}
+                        placeholder="Create a landing page for a barber shop with booking and pricing…"
+                      />
+                      <div className="prompt-actions">
+                        <button className="btn btn-ghost" type="button" onClick={toggleListening}>
+                          {isListening ? 'Stop mic' : 'Mic'}
+                        </button>
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => {
+                            seedDemoPrompt(tryPrompt);
+                            window.location.href = '/demo';
+                          }}
+                        >
+                          Open demo with this
+                        </button>
+                      </div>
+                    </div>
+                    <div className="vt-grid" style={{ marginTop: '0.9rem' }}>
+                      {[
+                        'Create a landing page for a barber shop',
+                        'Make it dark glass with neon blue accents',
+                        'Add pricing + booking + FAQ',
+                      ].map((chip) => (
+                        <button
+                          key={chip}
+                          className="choice-card"
+                          type="button"
+                          onClick={() => seedDemoPrompt(chip)}
+                        >
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="feature-card">
+                    <h3>Instant preview</h3>
+                    <p className="muted">A fast outline preview (dopamine-first).</p>
+                    <div className="preview-card">
+                      <div className="preview-title">{preview.title}</div>
+                      <ul className="preview-list">
+                        {preview.sections.slice(0, 8).map((s) => (
+                          <li key={s}>{s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
+        </div>
+      </motion.section>
+
+      {openerCollapsed && (
+        <main className="page relative z-10">
+          <section className="section">
+            <h2>How it works</h2>
+            <p className="subhead">Five steps. One safety gate. Infinite iteration.</p>
+            <div className="vt-grid">
+              {[
+                ['Speak prompt', 'Voice or type commands anywhere.'],
+                ['Generate structure', 'Pages + sections + internal links.'],
+                ['Apply design system', 'Tokens + components + motion.'],
+                ['Write copy + SEO', 'Titles, meta, schema, headings.'],
+                ['Publish + optimize', 'Performance defaults + reports.'],
+              ].map(([t, d], idx) => (
+                <article className="feature-card" key={t}>
+                  <div className="pill">{idx + 1}</div>
+                  <h3>{t}</h3>
+                  <p className="muted">{d}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <h2>Use cases</h2>
+            <p className="subhead">Creator, agency, local, ecommerce, WordPress migration.</p>
+            <div className="toggle-row" role="tablist" aria-label="Use cases">
+              {(Object.keys(useCases) as Array<keyof typeof useCases>).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`pill-toggle ${activeUseCase === key ? 'is-active' : ''}`}
+                  role="tab"
+                  aria-selected={activeUseCase === key}
+                  onClick={() => setActiveUseCase(key)}
+                >
+                  {useCases[key].label}
+                </button>
+              ))}
+            </div>
+
+            <div className="vt-grid" style={{ marginTop: '1rem' }}>
+              <article className="feature-card">
+                <h3>{active.label} wins</h3>
+                <ul className="preview-list">
+                  {active.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              </article>
+              <article className="feature-card">
+                <h3>Template</h3>
+                <p className="muted">{active.template}</p>
+                <h3 style={{ marginTop: '0.65rem' }}>Integration</h3>
+                <p className="muted">{active.integration}</p>
+              </article>
+              <article className="feature-card">
+                <h3>Build this now</h3>
+                <p className="muted">{active.prompt}</p>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => {
+                    seedDemoPrompt(active.prompt);
+                    window.location.href = '/demo';
+                  }}
+                >
+                  Open demo
+                </button>
+              </article>
+            </div>
+          </section>
+
+          <section className="section">
+            <h2>Feature blocks</h2>
+            <p className="subhead">The load-bearing parts.</p>
+            <div className="vt-grid">
+              {[
+                ['Voice layout generation', 'Turn intent into sections and hierarchy.'],
+                ['Auto copy + tone', 'Benefit-driven copy with microcopy.'],
+                ['SEO + schema', 'FAQ, Product, Video, Article scaffolding.'],
+                ['Performance defaults', 'Lazy-load, caching, reduced motion.'],
+                ['A/B suggestions', 'Ideas based on funnel friction.'],
+                ['Monetization kit', 'Subscriptions, Store, App Store, affiliates.'],
+              ].map(([t, d]) => (
+                <article className="feature-card" key={t}>
+                  <h3>{t}</h3>
+                  <p className="muted">{d}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <h2>Pricing preview</h2>
+            <p className="subhead">Free → Creator → Pro → Agency.</p>
+            <div className="vt-grid">
+              {[
+                ['Free', '$0', '1 demo build'],
+                ['Creator', '$39/mo', '1 site + blog hub'],
+                ['Pro', '$79/mo', '3 sites + integrations'],
+              ].map(([t, p, d]) => (
+                <article className="feature-card" key={t}>
+                  <h3>{t}</h3>
+                  <div className="metric-lg" style={{ fontSize: '2.4rem' }}>
+                    {p}
+                  </div>
+                  <p className="muted">{d}</p>
+                  <a className="btn btn-ghost" href="/pricing">
+                    Compare plans
+                  </a>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <h2>Store + App Store</h2>
+            <p className="subhead">Products, templates, integrations, and kits.</p>
+            <div className="vt-grid">
+              <article className="feature-card">
+                <h3>Store</h3>
+                <p className="muted">Hardware + digital bundles, upsells.</p>
+                <a className="btn btn-primary" href="/store">
+                  Open store
+                </a>
+              </article>
+              <article className="feature-card">
+                <h3>App Store</h3>
+                <p className="muted">Templates + integrations + bots.</p>
+                <a className="btn btn-ghost" href="/appstore">
+                  Open App Store
+                </a>
+              </article>
+              <article className="feature-card">
+                <h3>Partners</h3>
+                <p className="muted">Affiliates, agencies, integrators.</p>
+                <a className="btn btn-ghost" href="/partners">
+                  Partner program
+                </a>
+              </article>
+            </div>
+          </section>
+
+          <section className="section">
+            <h2>Live + blog</h2>
+            <p className="subhead">Replays become SEO pages with Video schema.</p>
+            <div className="vt-grid">
+              <article className="feature-card">
+                <h3>Live</h3>
+                <p className="muted">Live builds + replays.</p>
+                <a className="btn btn-primary" href="/livestream">
+                  Go live
+                </a>
+              </article>
+              <article className="feature-card">
+                <h3>Blog</h3>
+                <p className="muted">Topic clusters and resources.</p>
+                <a className="btn btn-ghost" href="/blog">
+                  Open blog
+                </a>
+              </article>
+              <article className="feature-card">
+                <h3>Trust + status</h3>
+                <p className="muted">Security posture and incidents.</p>
+                <a className="btn btn-ghost" href="/trust">
+                  Trust Center
+                </a>
+              </article>
+            </div>
+          </section>
+
+          <section className="section">
+            <h2>FAQ</h2>
+            <div className="vt-accordion">
+              <details className="accordion-item">
+                <summary>Do I own my site and content?</summary>
+                <p className="muted">Yes. Your pages and copy are yours.</p>
+              </details>
+              <details className="accordion-item">
+                <summary>How does Plan → Apply → Rollback work?</summary>
+                <p className="muted">
+                  You preview changes first, confirm explicitly, then apply. Undo restores
+                  the last change.
+                </p>
+              </details>
+              <details className="accordion-item">
+                <summary>Does this hurt performance?</summary>
+                <p className="muted">
+                  No. Lazy-load, caching, and reduced motion are built in.
+                </p>
+              </details>
+            </div>
+          </section>
+        </main>
+      )}
 
       <style>{`
         .bg-radial-gradient {
