@@ -19,7 +19,7 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 ## Deploy
 
 - GitHub Actions deploys on pushes to `main` via `.github/workflows/deploy.yml`.
-- Add a GitHub Actions secret named `CF_USER_TOKEN` (preferred). Fallbacks supported: `CF_Account_API_VoicetoWebsite`, `CF_API_TOKEN`, `CF_API_TOKEN2`.
+- Add a GitHub Actions secret named `CF_USER_TOKEN` (preferred). Fallbacks supported: `CF_Account_API_VoicetoWebsite`, `CLOUDFLARE_API_TOKEN`, `CF_API_TOKEN`, `CF_API_TOKEN2`.
 - Set required Worker vars/secrets in Cloudflare (examples in `ENV.example` and `wrangler.toml` comments).
 
 ## Makeover workflow

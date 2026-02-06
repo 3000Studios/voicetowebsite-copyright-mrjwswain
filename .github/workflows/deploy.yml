@@ -24,8 +24,25 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Validate Cloudflare token secret
+        shell: bash
+        env:
+          CF_USER_TOKEN: ${{ secrets.CF_USER_TOKEN }}
+          CF_ACCOUNT_API_VOICETOWEBSITE: ${{ secrets.CF_Account_API_VoicetoWebsite }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_API_TOKEN2: ${{ secrets.CF_API_TOKEN2 }}
+        run: |
+          if [ -n "$CF_USER_TOKEN" ]; then echo "Cloudflare token: CF_USER_TOKEN"; exit 0; fi
+          if [ -n "$CF_ACCOUNT_API_VOICETOWEBSITE" ]; then echo "Cloudflare token: CF_Account_API_VoicetoWebsite"; exit 0; fi
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then echo "Cloudflare token: CLOUDFLARE_API_TOKEN"; exit 0; fi
+          if [ -n "$CF_API_TOKEN" ]; then echo "Cloudflare token: CF_API_TOKEN"; exit 0; fi
+          if [ -n "$CF_API_TOKEN2" ]; then echo "Cloudflare token: CF_API_TOKEN2"; exit 0; fi
+          echo "Missing Cloudflare API token secret. Add CF_USER_TOKEN (preferred) or one of the supported fallback names."
+          exit 1
+
       - name: Deploy with Wrangler
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CF_USER_TOKEN || secrets.CF_Account_API_VoicetoWebsite || secrets.CF_API_TOKEN || secrets.CF_API_TOKEN2 }}
+          apiToken: ${{ secrets.CF_USER_TOKEN || secrets.CF_Account_API_VoicetoWebsite || secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN || secrets.CF_API_TOKEN2 }}
           command: deploy
