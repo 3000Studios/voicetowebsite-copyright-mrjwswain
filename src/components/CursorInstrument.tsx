@@ -19,7 +19,7 @@ const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
   const mouseRef = useRef<Point>({ x: -100, y: -100 });
   const handPosRef = useRef<Point>({ x: -100, y: -100 });
   const arcsRef = useRef<ElectricArc[]>([]);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number>(0);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {

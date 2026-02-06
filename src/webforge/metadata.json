@@ -1,0 +1,8 @@
+{
+  "name": "3000STUDIOS AI Web Forge Pro",
+  "description": "High-fidelity web cloning and neural transformation tool by 3000 Studios.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

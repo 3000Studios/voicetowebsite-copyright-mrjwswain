@@ -22,7 +22,10 @@ const App: React.FC = () => {
   
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const blobRef = useRef<HTMLDivElement>(null);
-  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+  const videoRefs = useRef<Record<string, React.RefObject<HTMLVideoElement>>>(null as any);
+  if (!videoRefs.current) {
+    videoRefs.current = NAV_LINKS.reduce((acc, link) => ({ ...acc, [link.id]: React.createRef() }), {});
+  }
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -105,8 +108,8 @@ const App: React.FC = () => {
     setTimeout(() => {
       setPhase('home');
       setTimeout(() => {
-        Object.values(videoRefs.current).forEach((v) => {
-          const video = v as HTMLVideoElement | null;
+        Object.values(videoRefs.current).forEach((ref) => {
+          const video = ref.current;
           if (video) {
             video.currentTime = 0;
             video.muted = true;
@@ -308,18 +311,9 @@ const App: React.FC = () => {
                     borderColor: isHovered ? 'rgba(34, 211, 238, 0.3)' : 'rgba(255, 255, 255, 0.05)'
                 }}
               >
-                <div
-                  className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40"
-                  onClick={() => handleLinkClick(link)}
-                >
+                <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40">
                   <video
-                    ref={(el) => {
-                      if (el) {
-                        videoRefs.current[link.id] = el;
-                      } else {
-                        delete videoRefs.current[link.id];
-                      }
-                    }}
+                    ref={videoRefs.current[link.id]}
                     muted loop playsInline
                     className={`absolute w-full h-full transition-all duration-700 ${isHovered ? 'object-contain scale-100 grayscale-0' : 'object-cover scale-110 grayscale'}`}
                   >
@@ -368,10 +362,7 @@ const App: React.FC = () => {
                         {link.description}
                       </p>
                       <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleLinkClick(link);
-                        }}
+                        onClick={() => handleLinkClick(link)}
                         className="px-6 py-2 border border-cyan-500/30 bg-cyan-500/5 font-orbitron text-[8px] tracking-[0.4em] text-cyan-400 uppercase transition-all hover:bg-cyan-500 hover:text-black hover:scale-105"
                       >
                         ACCESS PORTAL

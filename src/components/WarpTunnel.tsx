@@ -47,7 +47,7 @@ const WarpTunnel: React.FC<WarpTunnelProps> = ({ isVisible }) => {
                   }}
                   transition={{ 
                     duration: 0.6, 
-                    ease: "expoIn",
+                    ease: "circIn",
                     delay: Math.random() * 0.2
                   }}
                   className="absolute left-1/2 top-1/2 bg-cyan-400"
