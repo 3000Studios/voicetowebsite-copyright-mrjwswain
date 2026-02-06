@@ -244,11 +244,84 @@
     const handlePayPal = (btn) => {
       const amount = btn.dataset.amount;
       const product = btn.dataset.product;
+      const label = btn.dataset.label || product;
       if (PAYPAL_CLIENT === "__PAYPAL_CLIENT_ID__") {
         alert("PayPal client ID missing. Configure PAYPAL_CLIENT_ID to enable checkout.");
         return;
       }
-      window.location.href = `https://www.paypal.com/checkoutnow?token=${encodeURIComponent(product)}-${amount}`;
+      if (!window.paypal || typeof window.paypal.Buttons !== "function") {
+        alert("PayPal SDK not loaded.");
+        return;
+      }
+
+      const dollars = (Number(amount || 0) / 100).toFixed(2);
+
+      const overlayId = "vtw-paypal-overlay";
+      const containerId = "vtw-paypal-buttons";
+
+      const existing = document.getElementById(overlayId);
+      if (existing) existing.remove();
+
+      const overlay = document.createElement("div");
+      overlay.id = overlayId;
+      overlay.style.position = "fixed";
+      overlay.style.inset = "0";
+      overlay.style.zIndex = "9999";
+      overlay.style.background = "rgba(0,0,0,0.72)";
+      overlay.style.backdropFilter = "blur(10px)";
+      overlay.style.display = "grid";
+      overlay.style.placeItems = "center";
+      overlay.innerHTML = `
+        <div style="width:min(520px,92vw); border:1px solid rgba(255,255,255,0.12); background:rgba(8,12,20,0.92); border-radius:16px; padding:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;">
+            <div style="font-weight:800; letter-spacing:0.14em; font-size:12px; text-transform:uppercase; color:rgba(255,255,255,0.78);">
+              PayPal Checkout
+            </div>
+            <button id="vtw-paypal-close" style="border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:white; border-radius:999px; width:34px; height:34px; cursor:pointer;">✕</button>
+          </div>
+          <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:10px; color:rgba(255,255,255,0.8); font-family:system-ui;">
+            <div>${label}</div>
+            <div style="font-weight:700;">$${dollars}</div>
+          </div>
+          <div id="${containerId}"></div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+
+      const close = () => overlay.remove();
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) close();
+      });
+      overlay.querySelector("#vtw-paypal-close")?.addEventListener("click", close);
+
+      window.paypal.Buttons({
+        style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
+        createOrder: (_data, actions) => {
+          return actions.order.create({
+            purchase_units: [
+              {
+                description: label,
+                amount: { currency_code: "USD", value: dollars },
+              },
+            ],
+          });
+        },
+        onApprove: async (_data, actions) => {
+          try {
+            await actions.order.capture();
+            close();
+            window.location.href = `/store.html?checkout=success&product=${encodeURIComponent(product || "")}`;
+          } catch (err) {
+            console.warn(err);
+            alert("PayPal capture failed.");
+          }
+        },
+        onError: (err) => {
+          console.warn(err);
+          alert("PayPal checkout failed.");
+        },
+      }).render(`#${containerId}`);
     };
     document.querySelectorAll(".stripe-btn").forEach((btn) => {
       btn.addEventListener("click", () => handleStripe(btn));

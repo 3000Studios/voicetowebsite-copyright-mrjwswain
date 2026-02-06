@@ -183,8 +183,20 @@ export default {
           return jsonResponse(400, { error: "Invalid amount." });
         }
         const origin = `${url.protocol}//${url.host}`;
-        const successUrl = `${origin}/store.html?checkout=success&product=${encodeURIComponent(product)}`;
-        const cancelUrl = `${origin}/store.html?checkout=cancel`;
+        const safeUrl = (maybeUrl, fallback) => {
+          if (!maybeUrl) return fallback;
+          try {
+            const candidate = new URL(String(maybeUrl), origin);
+            if (candidate.origin !== origin) return fallback;
+            return candidate.toString();
+          } catch (_) {
+            return fallback;
+          }
+        };
+        const defaultSuccess = `${origin}/store.html?checkout=success&product=${encodeURIComponent(product)}`;
+        const defaultCancel = `${origin}/store.html?checkout=cancel`;
+        const successUrl = safeUrl(payload?.successUrl, defaultSuccess);
+        const cancelUrl = safeUrl(payload?.cancelUrl, defaultCancel);
         const form = new URLSearchParams();
         form.set("mode", "payment");
         form.set("success_url", successUrl);
@@ -219,44 +231,6 @@ export default {
       const hasAdmin = cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
       if (!hasAdmin) {
         return Response.redirect(new URL("/admin/", url.origin), 302);
-      }
-    }
-
-    // Stripe Checkout
-    if (url.pathname === "/api/stripe/checkout" && request.method === "POST") {
-      const STRIPE_KEY = env.STRIPE_SECRET_KEY || "";
-      if (!STRIPE_KEY) {
-         return jsonResponse(500, { error: "Stripe not configured (missing STRIPE_SECRET_KEY)." });
-      }
-      try {
-        const body = await request.json();
-
-        const params = new URLSearchParams();
-        params.append("payment_method_types[]", "card");
-        params.append("line_items[0][price_data][currency]", "usd");
-        params.append("line_items[0][price_data][product_data][name]", body.product || "Product");
-        params.append("line_items[0][price_data][unit_amount]", body.amount || "0");
-        params.append("line_items[0][quantity]", "1");
-        params.append("mode", "payment");
-        params.append("success_url", `${url.origin}/success.html`);
-        params.append("cancel_url", `${url.origin}/cancel.html`);
-
-        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${STRIPE_KEY}`,
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: params
-        });
-        const session = await stripeRes.json();
-        if (!stripeRes.ok) {
-            throw new Error(session.error?.message || "Stripe error");
-        }
-        return jsonResponse(200, { sessionId: session.id });
-
-      } catch (err) {
-        return jsonResponse(500, { error: err.message });
       }
     }
 

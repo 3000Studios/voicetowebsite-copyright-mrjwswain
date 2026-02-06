@@ -1,13 +1,124 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Using a simple regex
- for demonstration. A real-world solution might need a more robust HTML parser.const linkRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"/g;
-// List of HTML files
- to check (you can dynamically generate this list)const htmlFiles = [    'api-documentation.html',    'appstore.html',    'blog.html',    'contact.html',    'copyrights.html',    'cursor-demo.html',    'gallery.html',    'geological-studies.html',    'index.html',    'legal.html',    'lexicon-pro.html',    'livestream.html',    'neural-engine.html',    'privacy.html',    'projects.html',    'referrals.html',    'rush-percussion.html',    'store.html',    'strata-design-system.html',    'studio3000.html',    'terms.html',    'the3000-gallery.html',    'the3000.html',    'voice-to-json.html',    'admin/analytics.html',    'admin/app-store-manager.html',    'admin/index.html',    'admin/live-stream.html',    'admin/store-manager.html',    'admin/voice-commands.html',    'app Store apps to Sell/audioboost-pro-ai/index.html'];htmlFiles.forEach(file => {    const filePath = path.join(__dirname, file);    if (!fs.existsSync(filePath)) {        console.error(`File not found: ${file}`);        return;    }    const content = fs.readFileSync(filePath, 'utf8');    let match;    while ((match = linkRegex.exec(content)) !== null) {        const link = match[1];
-// Ignore external links
-, mailto links, anchor links, and template placeholders        if (link.startsWith('http') || link.startsWith('mailto:') || link.startsWith('#') || link.includes('${')) {            continue;        }
-// Resolve the link
-        let resolvedPath;        if (link.startsWith('/')) {            resolvedPath = path.resolve(__dirname, link.substring(1));        } else {            resolvedPath = path.resolve(path.dirname(filePath), link);        }        if (!fs.existsSync(resolvedPath)) {            console.log(`Broken link in ${file}: ${link} -> ${resolvedPath}`);        }    }});
+
+const IGNORE_DIRS = new Set([
+  ".git",
+  "node_modules",
+  "dist",
+  ".wrangler",
+  // Source drops / downloadable app bundles (not served as site pages)
+  "app Store apps to Sell",
+]);
+const HTML_RE = /\.html?$/i;
+const ATTR_RE = /\s(?:href|src)\s*=\s*"([^"]+)"/gi;
+
+const isSkippable = (raw) => {
+  const link = raw.trim();
+  if (!link) return true;
+  if (link.startsWith("#")) return true;
+  if (link.startsWith("mailto:")) return true;
+  if (link.startsWith("tel:")) return true;
+  if (link.startsWith("data:")) return true;
+  if (link.startsWith("javascript:")) return true;
+  if (link.startsWith("http://") || link.startsWith("https://")) return true;
+  if (link.startsWith("//")) return true;
+  if (link.includes("${") || link.includes("__ADSENSE_") || link.includes("__PAYPAL_")) return true;
+  if (link.startsWith("/api/")) return true;
+  return false;
+};
+
+const stripQueryHash = (link) => link.split("#")[0].split("?")[0];
+
+const walk = (dir, out = []) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      if (IGNORE_DIRS.has(entry.name)) continue;
+      walk(path.join(dir, entry.name), out);
+      continue;
+    }
+    if (entry.isFile() && HTML_RE.test(entry.name)) {
+      out.push(path.join(dir, entry.name));
+    }
+  }
+  return out;
+};
+
+const resolveTarget = (fromHtmlPath, hrefOrSrc) => {
+  const clean = stripQueryHash(hrefOrSrc.trim());
+  if (!clean) return null;
+
+  // Treat root as index.html if explicitly linked.
+  if (clean === "/") return path.join(__dirname, "index.html");
+
+  if (clean.startsWith("/")) {
+    const fromRoot = path.join(__dirname, clean.slice(1));
+    if (fs.existsSync(fromRoot)) return fromRoot;
+    const fromPublic = path.join(__dirname, "public", clean.slice(1));
+    if (fs.existsSync(fromPublic)) return fromPublic;
+    return fromRoot;
+  }
+  return path.resolve(path.dirname(fromHtmlPath), clean);
+};
+
+const existsAsFileOrIndex = (p) => {
+  if (!p) return false;
+  if (fs.existsSync(p) && fs.statSync(p).isFile()) return true;
+  if (fs.existsSync(p) && fs.statSync(p).isDirectory()) {
+    return fs.existsSync(path.join(p, "index.html"));
+  }
+  return false;
+};
+
+const checkFile = (htmlPath) => {
+  const content = fs.readFileSync(htmlPath, "utf8");
+  const broken = [];
+
+  let match;
+  while ((match = ATTR_RE.exec(content)) !== null) {
+    const raw = match[1];
+    if (isSkippable(raw)) continue;
+
+    const target = resolveTarget(htmlPath, raw);
+    if (!target) continue;
+
+    if (!existsAsFileOrIndex(target)) {
+      broken.push({ raw, target });
+    }
+  }
+
+  return broken;
+};
+
+const main = () => {
+  const htmlFiles = walk(__dirname);
+  const allBroken = [];
+
+  for (const file of htmlFiles) {
+    const broken = checkFile(file);
+    if (broken.length) {
+      for (const item of broken) {
+        allBroken.push({ file, ...item });
+      }
+    }
+  }
+
+  if (!allBroken.length) {
+    console.log(`OK: checked ${htmlFiles.length} HTML files`);
+    return 0;
+  }
+
+  console.log(`Broken links (${allBroken.length}):`);
+  for (const b of allBroken) {
+    const relFile = path.relative(__dirname, b.file).replace(/\\/g, "/");
+    const relTarget = path.relative(__dirname, b.target).replace(/\\/g, "/");
+    console.log(`- ${relFile}: "${b.raw}" -> ${relTarget}`);
+  }
+
+  return 1;
+};
+
+process.exitCode = main();
