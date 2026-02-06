@@ -79,7 +79,16 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
               y: { type: 'spring', damping: 15, stiffness: 60 }
             }}
             onClick={handleClick}
-            className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleClick();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Ignite Interface"
+            className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden focus-visible:ring-4 focus-visible:ring-cyan-400 focus-visible:ring-offset-4 focus-visible:ring-offset-black outline-none"
          >
             <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
             {!splatterActive && (
