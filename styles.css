@@ -1657,7 +1657,7 @@ button.ghost:hover {
   border-radius: 999px;
   padding: 0.7rem 0.95rem;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, rgba(10, 12, 18, 0.72), rgba(0, 0, 0, 0.4));
   color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   backdrop-filter: blur(12px);
@@ -1670,12 +1670,16 @@ button.ghost:hover {
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12), 0 18px 55px rgba(0, 0, 0, 0.5);
 }
 
-.vt-widget-fab-dot {
-  width: 10px;
-  height: 10px;
+.vt-widget-fab-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
   border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.95);
-  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.12), 0 0 22px rgba(var(--accent-rgb), 0.10);
+  color: rgba(var(--accent-rgb), 0.95);
 }
 
 .vt-widget-fab-label {
@@ -1782,10 +1786,23 @@ button.ghost:hover {
 
 .vt-widget-msg {
   display: flex;
+  align-items: flex-end;
+  gap: 0.55rem;
 }
 
 .vt-widget-msg--user {
   justify-content: flex-end;
+}
+
+.vt-widget-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--accent-rgb), 0.26);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(var(--accent-rgb), 0.24), transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.25));
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.06);
 }
 
 .vt-widget-bubble {
@@ -1799,8 +1816,17 @@ button.ghost:hover {
 }
 
 .vt-widget-msg--bot .vt-widget-bubble {
-  background: rgba(0, 0, 0, 0.35);
-  border-color: rgba(var(--accent-rgb), 0.2);
+  background:
+    radial-gradient(circle at 20% 15%, rgba(var(--accent-rgb), 0.10), transparent 55%),
+    rgba(0, 0, 0, 0.32);
+  border-color: rgba(var(--accent-rgb), 0.24);
+}
+
+.vt-widget-msg--user .vt-widget-bubble {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.16), rgba(255, 255, 255, 0.06));
+  border-color: rgba(var(--accent-rgb), 0.35);
 }
 
 .vt-widget-bubble a {
@@ -1862,6 +1888,10 @@ button.ghost:hover {
   cursor: pointer;
   padding: 0 0.85rem;
   font-weight: 800;
+}
+
+.vt-widget-mic svg {
+  display: block;
 }
 
 .vt-widget-send {
