@@ -12,6 +12,9 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "check:links": "node ./link-checker.js",
+    "verify": "npm run type-check && npm run test && npm run build && npm run check:links",
+    "clean": "node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true});\"",
     "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
