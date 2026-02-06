@@ -2,7 +2,13 @@ export async function onRequestPost(context) {
   const { request, env } = context;
   const OPENAI_API = env.OPENAI_API;
   const OPENAI_MODEL = env.OPENAI_MODEL || "gpt-4o-mini";
-  const GITHUB_TOKEN = env.GITHUB_TOKEN || env.GH_TOKEN || env.GH_BOT_TOKEN;
+  const GITHUB_TOKEN =
+    env.GITHUB_TOKEN ||
+    env.GH_TOKEN ||
+    env.GH_BOT_TOKEN ||
+    env.PERSONAL_ACCESS_TOKEN_API ||
+    env.PERSONAL_ACCESS_TOKEN ||
+    env.GITHUB_PAT;
   const GITHUB_REPO = env.GITHUB_REPO || env.GH_REPO;
   const GITHUB_BASE_BRANCH =
     env.GITHUB_BASE_BRANCH || env.GH_BASE_BRANCH || "main";
