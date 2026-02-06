@@ -1616,6 +1616,13 @@ button.ghost:hover {
   display: block;
 }
 
+.vtw-adsense-slot {
+  display: block;
+  margin: 18px auto 0;
+  max-width: 920px;
+  padding: 0 18px;
+}
+
 .mb-4 { margin-bottom: 1rem !important; }
 .mb-6 { margin-bottom: 1.5rem !important; }
 

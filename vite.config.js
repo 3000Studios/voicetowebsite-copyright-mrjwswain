@@ -34,6 +34,8 @@ export default defineConfig({
         trust: resolve(__dirname, "trust.html"),
         partners: resolve(__dirname, "partners.html"),
         webforge: resolve(__dirname, "webforge.html"),
+        cursorDemo: resolve(__dirname, "cursor-demo.html"),
+        projectPlanningHub: resolve(__dirname, "project-planning-hub.html"),
         rushPercussion: resolve(__dirname, "rush-percussion.html"),
         blog: resolve(__dirname, "blog.html"),
         contact: resolve(__dirname, "contact.html"),

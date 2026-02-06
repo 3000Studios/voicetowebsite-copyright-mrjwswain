@@ -6,6 +6,24 @@
     { id: "ember", label: "Ember" },
     { id: "ocean", label: "Ocean" },
   ];
+
+  const isShellDisabled = () => {
+    try {
+      const meta = document.querySelector('meta[name="vtw-shell"]');
+      if (meta && String(meta.getAttribute("content") || "").toLowerCase() === "off") return true;
+      if (document.documentElement?.dataset?.vtwShell === "off") return true;
+      if (document.body?.dataset?.vtwShell === "off") return true;
+    } catch (_) {}
+    return false;
+  };
+
+  const isAdminPage = () => {
+    try {
+      return location.pathname.startsWith("/admin");
+    } catch (_) {
+      return false;
+    }
+  };
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/features", label: "Features" },
@@ -195,6 +213,61 @@
       </section>
     `;
     document.body.appendChild(wrap);
+  };
+
+  const isAdsAllowed = () => {
+    try {
+      const p = (location.pathname || "").replace(/\/$/, "");
+      if (!p || p === "/") return false;
+      if (p.startsWith("/admin") || p.startsWith("/the3000")) return false;
+      return p === "/blog" || p === "/projects" || p === "/studio3000";
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const maybeInjectAdsense = () => {
+    try {
+      if (!isAdsAllowed()) return;
+      if (document.getElementById("vtw-adsense-loader")) return;
+      const env = window.__ENV || {};
+      const publisher = String(env.ADSENSE_PUBLISHER || "").trim();
+      const slot = String(env.ADSENSE_SLOT || "").trim();
+      if (!publisher || !slot) return;
+
+      const script = document.createElement("script");
+      script.id = "vtw-adsense-loader";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(
+        publisher,
+      )}`;
+      document.head.appendChild(script);
+
+      const footer = document.querySelector(".vt-footer");
+      if (!footer || footer.querySelector(".vtw-adsense-slot")) return;
+      const wrap = document.createElement("div");
+      wrap.className = "vtw-adsense-slot";
+      wrap.innerHTML = `
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="${publisher}"
+             data-ad-slot="${slot}"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      `;
+      const bar = footer.querySelector(".status-bar");
+      if (bar) bar.insertAdjacentElement("beforebegin", wrap);
+      else footer.appendChild(wrap);
+
+      const push = () => {
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (_) {}
+      };
+      if (script.complete) push();
+      else script.addEventListener("load", push, { once: true });
+    } catch (_) {}
   };
 
   const wireWidget = () => {
@@ -397,16 +470,21 @@
   };
   const init = () => {
     initTheme();
-    injectNav();
-    injectWidget();
-    injectFooter();
-    wireThemeSwitcher();
-    wireWidget();
-    initFooterTimestamp();
-    initFooterParallax();
-    electrifyLinks();
-    spectralizeCards();
-    initScrollReveals();
+
+    if (!isShellDisabled() && !isAdminPage()) {
+      injectNav();
+      injectWidget();
+      injectFooter();
+      wireThemeSwitcher();
+      wireWidget();
+      initFooterTimestamp();
+      initFooterParallax();
+      electrifyLinks();
+      spectralizeCards();
+      initScrollReveals();
+      maybeInjectAdsense();
+    }
+
     maybeInitAdminTerminalFix();
   };
   const maybeInitAdminTerminalFix = () => {
