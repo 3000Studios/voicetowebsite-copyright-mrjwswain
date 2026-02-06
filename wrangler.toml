@@ -11,6 +11,9 @@ routes = [
 
 compatibility_flags = ["nodejs_compat"]
 
+[ai]
+binding = "AI"
+
 [vars]
 ENVIRONMENT = "production"
 # Placeholder for environment variables to be set in Cloudflare Dashboard
@@ -31,6 +34,13 @@ database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
 [[kv_namespaces]]
 binding = "KV"
 id = "e61605d144ac4348a72b7e85afc6c185"
+
+[[r2_buckets]]
+binding = "R2"
+# Create this bucket in Cloudflare (Template Store + user uploads).
+bucket_name = "voicetowebsite-template-store"
+# Optional: set a different bucket for `wrangler dev`.
+preview_bucket_name = "voicetowebsite-template-store-dev"
 
 [observability]
 enabled = true

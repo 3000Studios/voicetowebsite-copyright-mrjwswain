@@ -273,6 +273,14 @@ a {
 }
 
 /* Global injected nav (nav.js) */
+:root[data-vtw-phase="opener"] .glass-nav,
+:root[data-vtw-phase="opener"] .vt-widget,
+:root[data-vtw-phase="opener"] .vt-footer {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .glass-nav {
   position: fixed;
   top: 0;

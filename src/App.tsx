@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from './constants';
 import { NavigationLink } from './types';
 import { audioEngine } from './services/audioEngine';
 import WarpTunnel from './components/WarpTunnel';
 import ElectricText from './components/ElectricText';
-import IntroOverlay from './components/IntroOverlay';
+import AudioWaveform from './components/AudioWaveform';
 
 const SEEN_KEY = 'vtw-v2-seen';
 
@@ -53,9 +53,7 @@ const buildInstantOutline = (prompt: string) => {
 
 const App: React.FC = () => {
   const seen = hasSeenV2();
-  const [phase, setPhase] = useState<'intro' | 'opener' | 'site'>(
-    seen ? 'site' : 'intro',
-  );
+  const [phase, setPhase] = useState<'opener' | 'site'>(seen ? 'site' : 'opener');
   const [openerCollapsed, setOpenerCollapsed] = useState(seen);
   const [showBumper, setShowBumper] = useState(seen);
   const [isWarping, setIsWarping] = useState(false);
@@ -65,6 +63,8 @@ const App: React.FC = () => {
   const [tryPrompt, setTryPrompt] = useState('');
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+
+  const reduceMotion = useReducedMotion();
 
   const [activeUseCase, setActiveUseCase] = useState<
     'creators' | 'agencies' | 'local' | 'ecommerce' | 'wordpress'
@@ -84,6 +84,17 @@ const App: React.FC = () => {
     const timer = window.setTimeout(() => setShowBumper(false), 1400);
     return () => window.clearTimeout(timer);
   }, [showBumper]);
+
+  useEffect(() => {
+    try {
+      document.documentElement.dataset.vtwPhase = phase;
+    } catch (_) {}
+    return () => {
+      try {
+        delete document.documentElement.dataset.vtwPhase;
+      } catch (_) {}
+    };
+  }, [phase]);
 
   useEffect(() => {
     audioEngine.setVolume(volume);
@@ -143,20 +154,6 @@ const App: React.FC = () => {
     setIsAudioPlaying(true);
   };
 
-  const startExperience = () => {
-    markSeenV2();
-    audioEngine.enable();
-    audioEngine.playGlassTing();
-    audioEngine.playMusic(INTRO_SONG);
-    setIsAudioPlaying(true);
-  };
-
-  const completeIntro = () => {
-    setPhase('opener');
-    setOpenerCollapsed(false);
-    window.scrollTo({ top: 0 });
-  };
-
   const enterSite = () => {
     markSeenV2();
     setOpenerCollapsed(true);
@@ -167,11 +164,6 @@ const App: React.FC = () => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' && event.key !== ' ') return;
 
-      if (phase === 'intro') {
-        event.preventDefault();
-        enterSite();
-        return;
-      }
       if (phase === 'opener' && !openerCollapsed) {
         event.preventDefault();
         enterSite();
@@ -192,7 +184,12 @@ const App: React.FC = () => {
   }, [phase, openerCollapsed]);
 
   const handleTileClick = (link: NavigationLink) => {
+    markSeenV2();
     audioEngine.playImpact();
+    if (reduceMotion) {
+      window.location.href = link.url;
+      return;
+    }
     setTimeout(() => {
       audioEngine.playSwoosh();
       setIsWarping(true);
@@ -254,7 +251,7 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-black select-none overflow-x-hidden">
-      <WarpTunnel isVisible={isWarping} />
+      <WarpTunnel isVisible={!reduceMotion && isWarping} />
 
       {/* Background atmosphere */}
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
@@ -277,23 +274,18 @@ const App: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[120] grid place-items-center bg-black/80 backdrop-blur-md"
+            className="fixed inset-0 z-[220] grid place-items-center bg-black/80 backdrop-blur-md"
           >
             <div className="text-center px-6">
               <div className="font-orbitron tracking-[0.5em] text-white/70 text-xs">
                 VOICETOWEBSITE
               </div>
-              <div className="mt-4 flex items-end justify-center gap-1" aria-hidden="true">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-[6px] rounded-full bg-cyan-400/70 animate-pulse"
-                    style={{
-                      height: `${10 + (i % 5) * 7}px`,
-                      animationDelay: `${i * 60}ms`,
-                    }}
-                  />
-                ))}
+              <div className="mt-5 grid place-items-center" aria-hidden="true">
+                <AudioWaveform
+                  active={isAudioPlaying}
+                  mode="bumper"
+                  className="vt-waveform vt-waveform-bumper"
+                />
               </div>
               <div className="mt-5 text-white/40 text-sm">Systems nominal</div>
             </div>
@@ -342,13 +334,6 @@ const App: React.FC = () => {
         <span className="sr-only">3000</span>
       </button>
 
-      {/* Intro overlay (first visit) */}
-      <AnimatePresence>
-        {phase === 'intro' && (
-          <IntroOverlay onStart={startExperience} onComplete={completeIntro} />
-        )}
-      </AnimatePresence>
-
       {/* Opener / hero */}
       <motion.section
         id="opener"
@@ -357,184 +342,299 @@ const App: React.FC = () => {
         transition={{ duration: 0.9, ease: 'circInOut' }}
       >
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className={`w-full h-full object-cover transition-opacity duration-700 ${openerCollapsed ? 'opacity-20' : 'opacity-40'}`}
+          >
             <source src={INTRO_VIDEO} type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/70 to-black" />
+          <AudioWaveform active={isAudioPlaying} className="vt-waveform" />
         </div>
 
         {!openerCollapsed && (
           <button
             type="button"
             onClick={enterSite}
-            className="fixed top-16 left-4 z-[170] px-4 py-2 rounded-full border border-white/15 bg-black/40 backdrop-blur-md text-white/80 hover:text-white hover:border-white/30 transition"
+            className="fixed top-28 right-4 z-[170] px-4 py-2 rounded-full border border-white/15 bg-black/40 backdrop-blur-md text-white/80 hover:text-white hover:border-white/30 transition"
           >
             Skip intro (Esc / Space)
           </button>
         )}
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-16">
-          {!openerCollapsed ? (
-            <>
-              <div className="max-w-3xl">
-                <div className="font-orbitron text-[11px] tracking-[0.35em] text-white/60 uppercase">
-                  Voice-first web engineering
-                </div>
-                <h1 className="mt-4 text-white font-orbitron font-black text-3xl md:text-5xl tracking-[0.08em] uppercase">
-                  Your song. Your opener. Your funnel.
-                </h1>
-                <p className="mt-5 text-white/60 text-lg leading-relaxed">
-                  Scroll, click, or press Space to peel into the site. The tiles below are
-                  navigation — each one maps to a CTA.
-                </p>
-              </div>
-
+          <AnimatePresence mode="wait" initial={false}>
+            {!openerCollapsed ? (
               <motion.div
-                className="mt-10 grid grid-cols-1 md:grid-cols-5 gap-3"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+                key="opener"
+                initial={
+                  reduceMotion
+                    ? { opacity: 0 }
+                    : { opacity: 0, y: 16, clipPath: 'circle(140% at 50% 50%)' }
+                }
+                animate={
+                  reduceMotion
+                    ? { opacity: 1, transition: { duration: 0.35 } }
+                    : {
+                        opacity: 1,
+                        y: 0,
+                        clipPath: 'circle(140% at 50% 50%)',
+                        transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+                      }
+                }
+                exit={
+                  reduceMotion
+                    ? { opacity: 0, transition: { duration: 0.2 } }
+                    : {
+                        opacity: 0,
+                        y: -8,
+                        clipPath: 'circle(0% at 50% 18%)',
+                        transition: { duration: 0.85, ease: [0.65, 0, 0.35, 1] },
+                      }
+                }
               >
-                {NAV_LINKS.map((link) => (
-                  <button
-                    key={link.id}
-                    type="button"
-                    onClick={() => handleTileClick(link)}
-                    className="relative rounded-2xl border border-white/10 overflow-hidden bg-black/40 text-left group"
-                  >
-                    <video
-                      muted
-                      loop
-                      playsInline
-                      autoPlay
-                      className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-95 transition"
+                <div className="max-w-3xl">
+                  <div className="font-orbitron text-[11px] tracking-[0.35em] text-white/60 uppercase">
+                    Voice-first web engineering
+                  </div>
+                  <h1 className="mt-4 text-white font-orbitron font-black text-3xl md:text-5xl tracking-[0.08em] uppercase">
+                    Your song. Your opener. Your funnel.
+                  </h1>
+                  <p className="mt-5 text-white/60 text-lg leading-relaxed">
+                    Scroll, click, or press Space to peel into the site. The tiles below are
+                    navigation — each one maps to a CTA.
+                  </p>
+                  {!isAudioPlaying && (
+                    <div className="mt-6 flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={toggleAudio}
+                        className="px-4 py-2 rounded-full border border-white/15 bg-white/5 text-white/80 hover:bg-white hover:text-black transition font-bold"
+                      >
+                        Start song
+                      </button>
+                      <span className="text-white/40 text-xs uppercase tracking-[0.35em]">
+                        Autoplay muted by default
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <motion.div
+                  className="mt-10 grid grid-cols-1 md:grid-cols-5 gap-3"
+                  style={{ perspective: 1200 }}
+                  variants={
+                    reduceMotion
+                      ? {
+                          initial: {},
+                          animate: { transition: { staggerChildren: 0.02, delayChildren: 0.08 } },
+                          exit: { transition: { staggerChildren: 0.015, staggerDirection: -1 } },
+                        }
+                      : {
+                          initial: {},
+                          animate: { transition: { staggerChildren: 0.06, delayChildren: 0.12 } },
+                          exit: { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
+                        }
+                  }
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  {NAV_LINKS.map((link) => (
+                    <motion.button
+                      key={link.id}
+                      type="button"
+                      onClick={() => handleTileClick(link)}
+                      className="relative rounded-2xl border border-white/10 overflow-hidden bg-black/40 text-left group"
+                      style={{ transformStyle: 'preserve-3d' }}
+                      variants={
+                        reduceMotion
+                          ? {
+                              initial: { opacity: 0 },
+                              animate: {
+                                opacity: 1,
+                                transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+                              },
+                              exit: { opacity: 0, transition: { duration: 0.18 } },
+                            }
+                          : {
+                              initial: {
+                                opacity: 0,
+                                y: 18,
+                                rotateX: -12,
+                                filter: 'blur(4px)',
+                                clipPath: 'inset(0% 0% 0% 0% round 16px)',
+                              },
+                              animate: {
+                                opacity: 1,
+                                y: 0,
+                                rotateX: 0,
+                                filter: 'blur(0px)',
+                                clipPath: 'inset(0% 0% 0% 0% round 16px)',
+                                transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+                              },
+                              exit: {
+                                opacity: 0,
+                                y: -28,
+                                rotateX: 22,
+                                clipPath: 'inset(0% 0% 100% 0% round 16px)',
+                                transition: { duration: 0.55, ease: [0.65, 0, 0.35, 1] },
+                              },
+                            }
+                      }
                     >
-                      <source src={link.videoUrl} type="video/mp4" />
-                    </video>
-                    <div className="absolute inset-0 bg-black/60 group-hover:bg-black/35 transition" />
-                    <div className="relative z-10 p-5 min-h-[170px] flex flex-col justify-between">
-                      <div>
-                        <ElectricText
-                          text={link.label}
-                          className="text-sm tracking-[0.35em]"
-                          active={false}
-                        />
-                        <p className="mt-3 text-white/60 text-sm leading-relaxed">
-                          {link.description}
-                        </p>
+                      <video
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                        className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-95 transition"
+                      >
+                        <source src={link.videoUrl} type="video/mp4" />
+                      </video>
+                      <div className="absolute inset-0 bg-black/60 group-hover:bg-black/35 transition" />
+                      <div className="relative z-10 p-5 min-h-[170px] flex flex-col justify-between">
+                        <div>
+                          <ElectricText
+                            text={link.label}
+                            className="text-sm tracking-[0.35em]"
+                            active={false}
+                          />
+                          <p className="mt-3 text-white/60 text-sm leading-relaxed">
+                            {link.description}
+                          </p>
+                        </div>
+                        <div className="mt-4 inline-flex items-center gap-2 text-white/70 text-xs uppercase tracking-[0.3em]">
+                          Open <span aria-hidden="true">→</span>
+                        </div>
                       </div>
-                      <div className="mt-4 inline-flex items-center gap-2 text-white/70 text-xs uppercase tracking-[0.3em]">
-                        Open <span aria-hidden="true">→</span>
-                      </div>
-                    </div>
+                    </motion.button>
+                  ))}
+                </motion.div>
+
+                <div className="mt-10 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={enterSite}
+                    className="px-5 py-3 rounded-full bg-white text-black font-bold"
+                  >
+                    Enter site
                   </button>
-                ))}
+                  <a
+                    className="px-5 py-3 rounded-full border border-white/15 bg-white/5 text-white/80 hover:bg-white hover:text-black transition font-bold"
+                    href="/demo"
+                  >
+                    Try the demo now
+                  </a>
+                </div>
               </motion.div>
+            ) : (
+              <motion.div
+                key="hero"
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+                }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="page" id="home">
+                  <section className="section hero">
+                    <p className="eyebrow">Home</p>
+                    <h1 className="vt-h1">Voice to Website Builder — Speak It. Ship It.</h1>
+                    <p className="subhead">
+                      Turn voice into a complete, responsive, SEO-ready website with pages,
+                      copy, templates, and one-click publish — then keep improving.
+                    </p>
+                    <div className="cta-row">
+                      <a className="btn btn-primary" href="/demo">
+                        Start Free Voice Build
+                      </a>
+                      <a className="btn btn-ghost" href="/demo#video">
+                        Watch 60-Second Demo
+                      </a>
+                    </div>
+                    <div className="trust-strip" role="note">
+                      <span>No credit card</span>
+                      <span>Privacy-first posture</span>
+                      <span>Lighthouse targets 90+/95+</span>
+                    </div>
 
-              <div className="mt-10 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={enterSite}
-                  className="px-5 py-3 rounded-full bg-white text-black font-bold"
-                >
-                  Enter site
-                </button>
-                <a
-                  className="px-5 py-3 rounded-full border border-white/15 bg-white/5 text-white/80 hover:bg-white hover:text-black transition font-bold"
-                  href="/demo"
-                >
-                  Try the demo now
-                </a>
-              </div>
-            </>
-          ) : (
-            <div className="page" id="home">
-              <section className="section hero">
-                <p className="eyebrow">Home</p>
-                <h1 className="vt-h1">Voice to Website Builder — Speak It. Ship It.</h1>
-                <p className="subhead">
-                  Turn voice into a complete, responsive, SEO-ready website with pages,
-                  copy, templates, and one-click publish — then keep improving.
-                </p>
-                <div className="cta-row">
-                  <a className="btn btn-primary" href="/demo">
-                    Start Free Voice Build
-                  </a>
-                  <a className="btn btn-ghost" href="/demo#video">
-                    Watch 60-Second Demo
-                  </a>
-                </div>
-                <div className="trust-strip" role="note">
-                  <span>No credit card</span>
-                  <span>Privacy-first posture</span>
-                  <span>Lighthouse targets 90+/95+</span>
-                </div>
+                    <div className="vt-grid" style={{ marginTop: '1.6rem' }}>
+                      <div className="feature-card">
+                        <h3>Try a command</h3>
+                        <p className="muted">Type or tap mic. Edit before generate.</p>
+                        <div className="prompt-shell">
+                          <label className="prompt-label" htmlFor="tryCommand">
+                            Command
+                          </label>
+                          <textarea
+                            id="tryCommand"
+                            rows={3}
+                            value={tryPrompt}
+                            onChange={(e) => setTryPrompt(e.target.value)}
+                            placeholder="Create a landing page for a barber shop with booking and pricing…"
+                          />
+                          <div className="prompt-actions">
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={toggleListening}
+                            >
+                              {isListening ? 'Stop mic' : 'Mic'}
+                            </button>
+                            <button
+                              className="btn btn-primary"
+                              type="button"
+                              onClick={() => {
+                                seedDemoPrompt(tryPrompt);
+                                window.location.href = '/demo';
+                              }}
+                            >
+                              Open demo with this
+                            </button>
+                          </div>
+                        </div>
+                        <div className="vt-grid" style={{ marginTop: '0.9rem' }}>
+                          {[
+                            'Create a landing page for a barber shop',
+                            'Make it dark glass with neon blue accents',
+                            'Add pricing + booking + FAQ',
+                          ].map((chip) => (
+                            <button
+                              key={chip}
+                              className="choice-card"
+                              type="button"
+                              onClick={() => seedDemoPrompt(chip)}
+                            >
+                              {chip}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
-                <div className="vt-grid" style={{ marginTop: '1.6rem' }}>
-                  <div className="feature-card">
-                    <h3>Try a command</h3>
-                    <p className="muted">Type or tap mic. Edit before generate.</p>
-                    <div className="prompt-shell">
-                      <label className="prompt-label" htmlFor="tryCommand">
-                        Command
-                      </label>
-                      <textarea
-                        id="tryCommand"
-                        rows={3}
-                        value={tryPrompt}
-                        onChange={(e) => setTryPrompt(e.target.value)}
-                        placeholder="Create a landing page for a barber shop with booking and pricing…"
-                      />
-                      <div className="prompt-actions">
-                        <button className="btn btn-ghost" type="button" onClick={toggleListening}>
-                          {isListening ? 'Stop mic' : 'Mic'}
-                        </button>
-                        <button
-                          className="btn btn-primary"
-                          type="button"
-                          onClick={() => {
-                            seedDemoPrompt(tryPrompt);
-                            window.location.href = '/demo';
-                          }}
-                        >
-                          Open demo with this
-                        </button>
+                      <div className="feature-card">
+                        <h3>Instant preview</h3>
+                        <p className="muted">A fast outline preview (dopamine-first).</p>
+                        <div className="preview-card">
+                          <div className="preview-title">{preview.title}</div>
+                          <ul className="preview-list">
+                            {preview.sections.slice(0, 8).map((s) => (
+                              <li key={s}>{s}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                    <div className="vt-grid" style={{ marginTop: '0.9rem' }}>
-                      {[
-                        'Create a landing page for a barber shop',
-                        'Make it dark glass with neon blue accents',
-                        'Add pricing + booking + FAQ',
-                      ].map((chip) => (
-                        <button
-                          key={chip}
-                          className="choice-card"
-                          type="button"
-                          onClick={() => seedDemoPrompt(chip)}
-                        >
-                          {chip}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="feature-card">
-                    <h3>Instant preview</h3>
-                    <p className="muted">A fast outline preview (dopamine-first).</p>
-                    <div className="preview-card">
-                      <div className="preview-title">{preview.title}</div>
-                      <ul className="preview-list">
-                        {preview.sections.slice(0, 8).map((s) => (
-                          <li key={s}>{s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                  </section>
                 </div>
-              </section>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.section>
 

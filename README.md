@@ -15,6 +15,20 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 
 - Copy `ENV.example` → `.env` (or set env vars in your deploy platform)
 - Cloudflare settings live in `wrangler.toml`
+- If you want `/api/analytics/overview` to return real Cloudflare data, set `CF_ZONE_ID` + `CF_API_TOKEN` (see `ENV.example`).
+- Admin login uses `CONTROL_PASSWORD` and server-issued signed cookies. Optional hardening: set `ADMIN_COOKIE_SECRET`.
+
+## Edge AI + R2
+
+- Workers AI binding: `wrangler.toml` `[ai] binding = "AI"`
+- R2 binding: `wrangler.toml` `[[r2_buckets]]` with `binding = "R2"`
+- Voice-to-layout endpoints:
+  - `POST /api/generate` (accepts JSON prompt or multipart `audio`)
+  - `GET /api/preview?id=...`
+  - `GET /preview/:id`
+  - `POST /api/publish`
+  - `GET /api/bot-hub/brief`
+  - `POST /api/bot-hub/coordinate`
 
 ## Deploy
 

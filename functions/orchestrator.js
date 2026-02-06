@@ -2,6 +2,7 @@ export async function onRequestPost(context) {
   const { request, env } = context;
   const OPENAI_API = env.OPENAI_API || env.OPENAI_API_KEY || env.OPENAI_API_KEY3;
   const OPENAI_MODEL = env.OPENAI_MODEL || "gpt-4o-mini";
+  const WORKERS_AI = env.AI;
   const GITHUB_TOKEN =
     env.GITHUB_TOKEN ||
     env.GH_TOKEN ||
@@ -39,6 +40,14 @@ export async function onRequestPost(context) {
     const match = trimmed.match(/```json\s*([\s\S]*?)\s*```/i);
     if (match) return JSON.parse(match[1]);
     throw new Error("Failed to parse JSON response.");
+  };
+  const pickAiText = (result) => {
+    if (!result) return "";
+    if (typeof result === "string") return result;
+    if (typeof result.response === "string") return result.response;
+    if (typeof result.text === "string") return result.text;
+    if (typeof result.output_text === "string") return result.output_text;
+    return JSON.stringify(result);
   };
   const slugify = (value) =>
     value
@@ -739,15 +748,25 @@ export async function onRequestPost(context) {
     }
     let plan = payload.plan;
     if (!plan) {
-      if (!OPENAI_API) {
-        const fallback = buildFallbackPlan(command);
-        if (!fallback.actions.length) {
-          throw new Error(
-            "Missing OPENAI_API. Set the Cloudflare Worker secret: wrangler secret put OPENAI_API",
-          );
+      if (!OPENAI_API && WORKERS_AI) {
+        try {
+          const systemPrompt =
+            `You are a site editor for a static HTML/CSS/JS site.Return ONLY valid JSON with this schema:{  "summary": "short summary",  "commitMessage": "short git commit message",  "actions": [    {"type":"update_copy","field":"headline","value":"..."},    {"type":"update_meta","title":"...","description":"..."},    {"type":"update_theme","theme":"ember|ocean|volt|midnight"},    {"type":"add_page","slug":"partners","title":"Partners","headline":"...","body":"..."},    {"type":"insert_monetization","headline":"...","description":"...","cta":"..."},    {"type":"update_background_video","src":"https://...mp4"},    {"type":"update_wallpaper","src":"https://...jpg"},    {"type":"update_avatar","src":"https://...jpg"},    {"type":"insert_section","id":"custom","title":"...","body":"..."},    {"type":"add_product","name":"...","price":"...","description":"...","image":"https://..."},    {"type":"insert_video","id":"music-video","title":"...","src":"https://...mp4","poster":"https://...jpg"},    {"type":"insert_stream","id":"livestream","title":"...","url":"https://..."},    {"type":"inject_css","css":".class { color: red; }"}  ]}Only include supported actions. Keep values concise and suitable for production.`.trim();
+          const result = await WORKERS_AI.run("@cf/meta/llama-3.1-8b-instruct", {
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: command },
+            ],
+            temperature: 0.2,
+            max_tokens: 900,
+          });
+          plan = extractJson(pickAiText(result));
+        } catch (err) {
+          const fallback = buildFallbackPlan(command);
+          if (!fallback.actions.length) throw err;
+          plan = fallback;
         }
-        plan = fallback;
-      } else {
+      } else if (OPENAI_API) {
         try {
           const res = await fetch(
             "https://api.openai.com/v1/chat/completions",
@@ -786,6 +805,14 @@ export async function onRequestPost(context) {
           if (!fallback.actions.length) throw err;
           plan = fallback;
         }
+      } else {
+        const fallback = buildFallbackPlan(command);
+        if (!fallback.actions.length) {
+          throw new Error(
+            "No AI configured. Bind Workers AI (wrangler.toml [ai] binding = \"AI\") or set OPENAI_API.",
+          );
+        }
+        plan = fallback;
       }
     }
     const intent = buildIntent(plan, command);

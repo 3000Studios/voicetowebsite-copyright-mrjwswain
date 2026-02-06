@@ -4,6 +4,11 @@ class AudioEngine {
   private isEnabled = false;
   private bgMusic: HTMLAudioElement | null = null;
   private currentVolume = 0.5;
+  private musicSource: MediaElementAudioSourceNode | null = null;
+  private musicGain: GainNode | null = null;
+  private analyser: AnalyserNode | null = null;
+  private analyserTimeData: Uint8Array<ArrayBuffer> | null = null;
+  private analyserFreqData: Uint8Array<ArrayBuffer> | null = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -18,15 +23,68 @@ class AudioEngine {
     this.isEnabled = true;
   }
 
+  private teardownMusicGraph() {
+    try {
+      this.musicSource?.disconnect();
+    } catch (_) {}
+    try {
+      this.analyser?.disconnect();
+    } catch (_) {}
+    try {
+      this.musicGain?.disconnect();
+    } catch (_) {}
+    this.musicSource = null;
+    this.musicGain = null;
+    this.analyser = null;
+    this.analyserTimeData = null;
+    this.analyserFreqData = null;
+  }
+
   public playMusic(url: string) {
     if (this.bgMusic) {
       this.bgMusic.pause();
       this.bgMusic = null;
     }
-    this.bgMusic = new Audio(url);
-    this.bgMusic.loop = true;
-    this.bgMusic.volume = this.currentVolume;
-    this.bgMusic.play().catch(e => console.error("Audio playback blocked or invalid format", e));
+
+    this.teardownMusicGraph();
+
+    const audio = new Audio(url);
+    audio.crossOrigin = 'anonymous';
+    audio.loop = true;
+    audio.preload = 'auto';
+
+    // Prefer routing music through Web Audio so we can drive reactive visuals.
+    if (this.context) {
+      try {
+        const source = this.context.createMediaElementSource(audio);
+        const analyser = this.context.createAnalyser();
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = 0.82;
+
+        const gain = this.context.createGain();
+        gain.gain.setValueAtTime(this.currentVolume, this.context.currentTime);
+
+        source.connect(analyser);
+        analyser.connect(gain);
+        gain.connect(this.context.destination);
+
+        this.musicSource = source;
+        this.analyser = analyser;
+        this.musicGain = gain;
+        this.analyserTimeData = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
+        this.analyserFreqData = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
+      } catch (err) {
+        // Fallback to direct element playback if the graph cannot be constructed.
+        audio.volume = this.currentVolume;
+      }
+    } else {
+      audio.volume = this.currentVolume;
+    }
+
+    this.bgMusic = audio;
+    this.bgMusic
+      .play()
+      .catch((e) => console.error('Audio playback blocked or invalid format', e));
   }
 
   public stopMusic() {
@@ -38,13 +96,35 @@ class AudioEngine {
 
   public setVolume(volume: number) {
     this.currentVolume = Math.max(0, Math.min(1, volume));
-    if (this.bgMusic) {
-      this.bgMusic.volume = this.currentVolume;
+    if (this.musicGain && this.context) {
+      this.musicGain.gain.setTargetAtTime(this.currentVolume, this.context.currentTime, 0.03);
+      return;
     }
+    if (this.bgMusic) this.bgMusic.volume = this.currentVolume;
   }
 
   public getVolume() {
     return this.currentVolume;
+  }
+
+  public getMusicTimeDomainData() {
+    if (!this.analyser || !this.analyserTimeData) return null;
+    this.analyser.getByteTimeDomainData(this.analyserTimeData);
+    return this.analyserTimeData;
+  }
+
+  public getMusicFrequencyData() {
+    if (!this.analyser || !this.analyserFreqData) return null;
+    this.analyser.getByteFrequencyData(this.analyserFreqData);
+    return this.analyserFreqData;
+  }
+
+  public getMusicEnergy() {
+    const freq = this.getMusicFrequencyData();
+    if (!freq || !freq.length) return 0;
+    let sum = 0;
+    for (let i = 0; i < freq.length; i++) sum += freq[i];
+    return Math.min(1, sum / (freq.length * 255));
   }
 
   private async playFrequency(freq: number, type: OscillatorType, volume: number, duration: number, ramp: 'exp' | 'linear' = 'exp') {

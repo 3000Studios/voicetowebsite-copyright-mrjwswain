@@ -1,4 +1,18 @@
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
+import {
+  clearAdminCookieHeaders,
+  hasValidAdminCookie,
+  isAdminEnabled,
+  mintAdminCookieValue,
+  setAdminCookieHeaders,
+} from "./functions/adminAuth.js";
+import { handleBotHubRequest } from "./functions/botHub.js";
+import {
+  handleGenerateRequest,
+  handlePreviewApiRequest,
+  handlePreviewPageRequest,
+  handlePublishRequest,
+} from "./functions/siteGenerator.js";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
 
@@ -32,6 +46,60 @@ export default {
 
     if (!env.ASSETS) {
       return jsonResponse(500, { error: "ASSETS binding is missing on this Worker route." });
+    }
+
+    // Admin auth (server-issued, signed cookie)
+    if (url.pathname === "/api/admin/login" && request.method === "POST") {
+      if (!isAdminEnabled(env)) {
+        return jsonResponse(501, { error: "Admin is not enabled. Set CONTROL_PASSWORD in Cloudflare." });
+      }
+      try {
+        const contentType = request.headers.get("content-type") || "";
+        let password = "";
+        if (contentType.includes("application/json")) {
+          const body = await request.json();
+          password = String(body?.password || "");
+        } else if (contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data")) {
+          const form = await request.formData();
+          password = String(form.get("password") || "");
+        } else {
+          password = String(await request.text());
+        }
+        if (!password || password !== String(env.CONTROL_PASSWORD)) {
+          return jsonResponse(401, { error: "Invalid password." });
+        }
+        const cookieValue = await mintAdminCookieValue(env);
+        const headers = new Headers({ "Content-Type": "application/json" });
+        setAdminCookieHeaders(headers, cookieValue, { secure: url.protocol === "https:" });
+        return addSecurityHeaders(new Response(JSON.stringify({ ok: true }), { status: 200, headers }));
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
+    if (url.pathname === "/api/admin/logout" && request.method === "POST") {
+      const headers = new Headers({ "Content-Type": "application/json" });
+      clearAdminCookieHeaders(headers, { secure: url.protocol === "https:" });
+      return addSecurityHeaders(new Response(JSON.stringify({ ok: true }), { status: 200, headers }));
+    }
+
+    // Voice-to-layout routes (edge / Workers AI + D1 + R2)
+    if (url.pathname === "/api/generate" && request.method === "POST") {
+      return addSecurityHeaders(await handleGenerateRequest({ request, env, ctx }));
+    }
+    if (url.pathname === "/api/preview" && request.method === "GET") {
+      return addSecurityHeaders(await handlePreviewApiRequest({ request, env, ctx }));
+    }
+    if (url.pathname.startsWith("/preview/") && request.method === "GET") {
+      return addSecurityHeaders(await handlePreviewPageRequest({ request, env, ctx }));
+    }
+    if (url.pathname === "/api/publish" && request.method === "POST") {
+      return addSecurityHeaders(await handlePublishRequest({ request, env, ctx }));
+    }
+
+    // Bot hub (coordination + shared brief for multiple AI bots)
+    if (url.pathname.startsWith("/api/bot-hub")) {
+      return addSecurityHeaders(await handleBotHubRequest({ request, env, ctx }));
     }
 
     // Orchestrator API (primary: /api/orchestrator; legacy: /.netlify/functions/orchestrator)
@@ -90,9 +158,18 @@ export default {
     // Cloudflare zone analytics proxy (real data only)
     if (url.pathname === "/api/analytics/overview" && request.method === "GET") {
       const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
-      const apiToken = env.CF_API_TOKEN || env.CF_API_TOKEN2;
+      const apiToken =
+        env.CF_API_TOKEN ||
+        env.CF_API_TOKEN2 ||
+        env.CF_USER_TOKEN ||
+        env.CLOUDFLARE_API_TOKEN ||
+        env.CF_ACCOUNT_API_VOICETOWEBSITE ||
+        env.CF_Account_API_VoicetoWebsite;
       if (!apiToken || !zoneId) {
-        return jsonResponse(501, { error: "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (or CF_API_TOKEN2) and optionally CF_ZONE_ID." });
+        return jsonResponse(501, {
+          error:
+            "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (preferred) or CF_USER_TOKEN, and optionally CF_ZONE_ID.",
+        });
       }
       try {
         const since = "-43200"; // last 12 hours; supports relative values
@@ -226,8 +303,7 @@ export default {
 
     const isAdminRoot = url.pathname === "/admin" || url.pathname === "/admin/" || url.pathname === "/admin/index.html";
     if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
-      const cookie = request.headers.get("cookie") || "";
-      const hasAdmin = cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+      const hasAdmin = await hasValidAdminCookie(request, env);
       if (!hasAdmin) {
         return Response.redirect(new URL("/admin/", url.origin), 302);
       }
@@ -270,8 +346,7 @@ export default {
             PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || ''}",
             STRIPE_PUBLISHABLE_KEY: "${env.STRIPE_PUBLISHABLE_KEY || ''}",
             ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID}",
-            ADSENSE_SLOT: "${env.ADSENSE_SLOT || ''}",
-            CONTROL_PASSWORD: "${env.CONTROL_PASSWORD || ''}"
+            ADSENSE_SLOT: "${env.ADSENSE_SLOT || ''}"
           };
         </script>
       `;
