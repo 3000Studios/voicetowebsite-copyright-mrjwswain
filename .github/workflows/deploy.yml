@@ -27,5 +27,5 @@ jobs:
       - name: Deploy with Wrangler
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CF_Account_API_VoicetoWebsite || secrets.CF_API_TOKEN || secrets.CF_API_TOKEN2 }}
+          apiToken: ${{ secrets.CF_USER_TOKEN || secrets.CF_Account_API_VoicetoWebsite || secrets.CF_API_TOKEN || secrets.CF_API_TOKEN2 }}
           command: deploy
