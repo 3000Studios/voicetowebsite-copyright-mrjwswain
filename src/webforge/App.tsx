@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { analyzeSource, forgeWebsite } from './services/geminiService';
-import { AppState, StylePreferences, ComponentType, AppMode } from './types';
+import { AppState } from './types';
 import ScreenshotUpload from './components/ScreenshotUpload';
 import ResultView from './components/ResultView';
 import Logo from './components/Logo';

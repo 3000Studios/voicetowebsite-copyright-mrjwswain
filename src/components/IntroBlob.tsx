@@ -85,7 +85,7 @@ const IntroBlob: React.FC<IntroBlobProps> = ({ splatterActive, onStart }) => {
             borderRadius: { duration: 3, repeat: Infinity, ease: "easeInOut" }
         }}
         onClick={onStart}
-        className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-none flex flex-col items-center justify-center group relative overflow-hidden"
+        className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden"
     >
         <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
         {!splatterActive && (

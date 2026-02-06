@@ -17,7 +17,7 @@ interface CursorInstrumentProps {
 const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef<Point>({ x: -100, y: -100 });
-  const handPosRef = useRef<Point>({ x: -100, y: -100 });
+  const cursorPosRef = useRef<Point>({ x: -100, y: -100 });
   const arcsRef = useRef<ElectricArc[]>([]);
   const requestRef = useRef<number>(0);
 
@@ -51,65 +51,34 @@ const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
       };
     };
 
-    const drawRobotHand = (x: number, y: number) => {
+    const drawIonCursor = (x: number, y: number) => {
       ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(-Math.PI / 12); 
+      ctx.globalCompositeOperation = 'lighter';
 
-      // Significantly smaller scale (0.25 vs 0.6)
-      const scale = 0.25;
-      ctx.scale(scale, scale);
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, 22);
+      grad.addColorStop(0, 'rgba(34, 211, 238, 0.9)');
+      grad.addColorStop(0.4, 'rgba(34, 211, 238, 0.22)');
+      grad.addColorStop(1, 'rgba(34, 211, 238, 0)');
 
-      // Palm base
-      const palmGrad = ctx.createLinearGradient(-30, 0, 30, 60);
-      palmGrad.addColorStop(0, '#d1d5db'); 
-      palmGrad.addColorStop(0.5, '#4b5563'); 
-      palmGrad.addColorStop(1, '#111827'); 
-      
-      ctx.fillStyle = palmGrad;
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.roundRect(-25, 10, 50, 60, 10);
+      ctx.arc(x, y, 22, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-      ctx.lineWidth = 2;
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(x, y, 9, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Index Finger (Pointing)
-      const drawFinger = (fx: number, fy: number, length: number, isPointing: boolean) => {
-        ctx.save();
-        ctx.translate(fx, fy);
-        if (isPointing) ctx.rotate(-Math.PI / 6);
-        
-        for (let i = 0; i < 3; i++) {
-          const segLen = length / 3;
-          ctx.fillStyle = palmGrad;
-          ctx.beginPath();
-          ctx.roundRect(-6, -segLen * (i + 1), 12, segLen, 4);
-          ctx.fill();
-          ctx.stroke();
-          
-          ctx.fillStyle = '#22d3ee';
-          ctx.beginPath();
-          ctx.arc(0, -segLen * i, 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
-      };
-
-      drawFinger(-15, 15, 40, false); 
-      drawFinger(-5, 12, 55, false);  
-      drawFinger(5, 10, 65, false);   
-      drawFinger(18, 15, 60, true);   
-      
-      // Thumb
-      ctx.save();
-      ctx.translate(-25, 45);
-      ctx.rotate(-Math.PI / 2.5);
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.65)';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(-8, 0, 16, 35, 6);
-      ctx.fill();
+      ctx.moveTo(x - 14, y);
+      ctx.lineTo(x + 14, y);
+      ctx.moveTo(x, y - 14);
+      ctx.lineTo(x, y + 14);
       ctx.stroke();
-      ctx.restore();
 
       ctx.restore();
     };
@@ -118,15 +87,16 @@ const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const lerp = 0.3;
-      handPosRef.current.x += (mouseRef.current.x - handPosRef.current.x) * lerp;
-      handPosRef.current.y += (mouseRef.current.y - handPosRef.current.y) * lerp;
+      cursorPosRef.current.x +=
+        (mouseRef.current.x - cursorPosRef.current.x) * lerp;
+      cursorPosRef.current.y +=
+        (mouseRef.current.y - cursorPosRef.current.y) * lerp;
 
-      const hx = handPosRef.current.x;
-      const hy = handPosRef.current.y;
+      const hx = cursorPosRef.current.x;
+      const hy = cursorPosRef.current.y;
 
-      // Adjusted Tip position for smaller scale
-      const tipX = hx + 15; 
-      const tipY = hy - 18;
+      const tipX = hx;
+      const tipY = hy;
 
       // Emit arcs ONLY if isShooting is active
       if (isShooting) {
@@ -175,7 +145,7 @@ const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
         ctx.shadowBlur = 0;
       }
 
-      drawRobotHand(hx, hy);
+      drawIonCursor(hx, hy);
 
       requestRef.current = requestAnimationFrame(render);
     };

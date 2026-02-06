@@ -1,10 +1,10 @@
 (() => {
   const navLinks = [
-    { href: "index.html", label: "Home" },
-    { href: "store.html", label: "Store" },
+    { href: "/index.html", label: "Home" },
+    { href: "/store.html", label: "Store" },
     { href: "/admin", label: "Admin" },
-    { href: "appstore.html", label: "App Store" },
-    { href: "livestream.html", label: "Live" },
+    { href: "/appstore.html", label: "App Store" },
+    { href: "/livestream.html", label: "Live" },
   ];
   const footerLinks = {
     platform: [
@@ -115,6 +115,35 @@
     initFooterParallax();
     electrifyLinks();
     spectralizeCards();
+    initScrollReveals();
+    maybeInitAdminTerminalFix();
+  };
+  const maybeInitAdminTerminalFix = () => {
+    try {
+      if (!location.pathname.startsWith("/admin")) return;
+      if (!document.getElementById("apply")) return;
+      import("/admin/terminal-fix.js").catch(() => {});
+    } catch (_) {}
+  };
+  const initScrollReveals = () => {
+    if (!("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -12% 0px" },
+    );
+
+    document.querySelectorAll(".spectral-card").forEach((el) => {
+      if (el.dataset.revealInit) return;
+      el.dataset.revealInit = "1";
+      el.classList.add("reveal");
+      observer.observe(el);
+    });
   };
   const injectFooter = () => {
     const existing = document.querySelector(".vt-footer");

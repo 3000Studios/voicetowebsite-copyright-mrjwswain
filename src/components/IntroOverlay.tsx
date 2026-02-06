@@ -79,7 +79,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
               y: { type: 'spring', damping: 15, stiffness: 60 }
             }}
             onClick={handleClick}
-            className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-none flex flex-col items-center justify-center group relative overflow-hidden"
+            className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden"
          >
             <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
             {!splatterActive && (
