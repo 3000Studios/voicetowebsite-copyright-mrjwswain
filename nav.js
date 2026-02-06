@@ -184,13 +184,7 @@
     wrap.id = "vtw-widget";
     wrap.innerHTML = `
       <button class="vt-widget-fab" id="vtw-widget-toggle" type="button" aria-expanded="false" aria-controls="vtw-widget-panel" aria-label="Open chat and mic widget">
-        <span class="vt-widget-fab-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 2.75c4.97 0 9 3.78 9 8.44 0 2.77-1.42 5.22-3.63 6.78-.36.25-.58.66-.58 1.1v1.74c0 .58-.63.94-1.13.66l-2.58-1.46a1.5 1.5 0 0 0-.73-.19H12c-4.97 0-9-3.78-9-8.44S7.03 2.75 12 2.75Z" stroke="currentColor" stroke-width="1.6" opacity="0.9"/>
-            <path d="M8.2 11.1h7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M8.2 14.1h5.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
-          </svg>
-        </span>
+        <span class="vt-widget-fab-dot" aria-hidden="true"></span>
         <span class="vt-widget-fab-label">Ask / Build</span>
       </button>
       <section class="vt-widget-panel" id="vtw-widget-panel" aria-hidden="true">
@@ -211,14 +205,7 @@
           <div class="vt-widget-input">
             <label class="sr-only" for="vtw-widget-text">Message</label>
             <textarea id="vtw-widget-text" rows="2" placeholder="Ask a question…"></textarea>
-            <button class="vt-widget-mic" id="vtw-widget-mic" type="button" aria-label="Voice input">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M12 14.5a3.25 3.25 0 0 0 3.25-3.25V6.75A3.25 3.25 0 0 0 12 3.5 3.25 3.25 0 0 0 8.75 6.75v4.5A3.25 3.25 0 0 0 12 14.5Z" stroke="currentColor" stroke-width="1.6"/>
-                <path d="M6.5 11.25c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M12 16.75V20.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M9.25 20.5h5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              </svg>
-            </button>
+            <button class="vt-widget-mic" id="vtw-widget-mic" type="button" aria-label="Voice input">🎙️</button>
             <button class="vt-widget-send" id="vtw-widget-send" type="button">Send</button>
           </div>
           <div class="vt-widget-status muted" id="vtw-widget-status" aria-live="polite"></div>
@@ -350,10 +337,7 @@
       if (!log) return;
       const row = document.createElement("div");
       row.className = `vt-widget-msg vt-widget-msg--${who}`;
-      row.innerHTML =
-        who === "bot"
-          ? `<div class="vt-widget-avatar" aria-hidden="true"></div><div class="vt-widget-bubble">${content}</div>`
-          : `<div class="vt-widget-bubble">${content}</div>`;
+      row.innerHTML = `<div class="vt-widget-bubble">${content}</div>`;
       log.appendChild(row);
       log.scrollTop = log.scrollHeight;
     };
