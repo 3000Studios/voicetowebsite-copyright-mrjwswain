@@ -265,12 +265,20 @@
     </div>
 
     <script>
-      const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
+      const PAYPAL_CLIENT = (() => {
+        const injected = "__PAYPAL_CLIENT_ID__";
+        if (injected && injected !== "__PAYPAL_CLIENT_ID__") return injected;
+        try {
+          const envClient = window.__ENV && window.__ENV.PAYPAL_CLIENT_ID;
+          if (envClient) return String(envClient);
+        } catch (_) {}
+        return "";
+      })();
       const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
 
       // Initialize PayPal SDK Button
       const initPayPal = () => {
-        if (window.paypal) {
+        if (window.paypal && PAYPAL_CLIENT) {
           window.paypal
             .Buttons({
               style: {
