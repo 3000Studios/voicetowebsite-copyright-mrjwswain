@@ -311,15 +311,42 @@ export default {
              title TEXT,
              desc TEXT,
              price REAL,
-             link TEXT,  -- URL to download/access (optional)
+             link TEXT,  -- Optional fulfillment URL (avoid public downloads)
+             stripe_buy_button_id TEXT,
+             stripe_payment_link TEXT,
              tag TEXT,
              active INTEGER DEFAULT 1,
              ts DATETIME DEFAULT CURRENT_TIMESTAMP
            );`,
         ).run();
+
+        // Best-effort migrations for older tables.
+        await env.D1.prepare("ALTER TABLE products ADD COLUMN stripe_buy_button_id TEXT;")
+          .run()
+          .catch(() => {});
+        await env.D1.prepare("ALTER TABLE products ADD COLUMN stripe_payment_link TEXT;")
+          .run()
+          .catch(() => {});
       } catch (err) {
         console.error("Product table init failed:", err);
       }
+
+      const normalizeProduct = (row) => {
+        const r = row || {};
+        return {
+          id: r.id,
+          label: r.label || "",
+          title: r.title || "",
+          desc: r.desc || "",
+          price: Number(r.price || 0),
+          tag: r.tag || "",
+          link: r.link || "",
+          stripeBuyButtonId: r.stripe_buy_button_id || r.stripeBuyButtonId || "",
+          stripePaymentLink: r.stripe_payment_link || r.stripePaymentLink || "",
+          active: Number(r.active || 1),
+          ts: r.ts || "",
+        };
+      };
 
       // GET: Public list of active products
       if (request.method === "GET") {
