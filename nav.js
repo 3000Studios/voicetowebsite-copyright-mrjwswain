@@ -34,7 +34,6 @@
     { href: "/blog", label: "Blog" },
     { href: "/livestream", label: "Live" },
     { href: "/support", label: "Support" },
-    { href: "/admin", label: "Admin" },
   ];
   const footerLinks = {
     platform: [
@@ -263,8 +262,8 @@
           <div class="vt-widget-hints" id="vtw-widget-hints"></div>
           <div class="vt-widget-input">
             <label class="sr-only" for="vtw-widget-text">Message</label>
-            <textarea id="vtw-widget-text" rows="2" placeholder="Ask a question…"></textarea>
-            <button class="vt-widget-mic" id="vtw-widget-mic" type="button" aria-label="Voice input">🎙️</button>
+            <textarea id="vtw-widget-text" rows="2" placeholder="Ask a question..."></textarea>
+            <button class="vt-widget-mic" id="vtw-widget-mic" type="button" aria-label="Voice input">Mic</button>
             <button class="vt-widget-send" id="vtw-widget-send" type="button">Send</button>
           </div>
           <div class="vt-widget-status muted" id="vtw-widget-status" aria-live="polite"></div>
@@ -272,6 +271,125 @@
       </section>
     `;
     document.body.appendChild(wrap);
+  };
+
+  const hashString = (value) => {
+    const str = String(value || "");
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+
+  const injectBottomWaves = () => {
+    try {
+      if (document.getElementById("vtw-bottom-waves")) return;
+
+      const canvas = document.createElement("canvas");
+      canvas.id = "vtw-bottom-waves";
+      canvas.className = "vtw-bottom-waves";
+      canvas.setAttribute("aria-hidden", "true");
+      document.body.appendChild(canvas);
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const palettes = [
+        ["#ffffff", "#d1d5db", "#fbbf24"],
+        ["#fbbf24", "#ffffff", "#cbd5e1"],
+        ["#e5e7eb", "#fef3c7", "#ffffff"],
+        ["#ffffff", "#fef3c7", "#d1d5db"],
+        ["#d1d5db", "#ffffff", "#f59e0b"],
+      ];
+      const idx = hashString(normalizePath()) % palettes.length;
+      const [c1, c2, c3] = palettes[idx];
+
+      const hexToRgb = (hex) => {
+        const h = String(hex || "").replace("#", "").trim();
+        if (h.length === 3) {
+          const r = parseInt(h[0] + h[0], 16);
+          const g = parseInt(h[1] + h[1], 16);
+          const b = parseInt(h[2] + h[2], 16);
+          return { r, g, b };
+        }
+        if (h.length === 6) {
+          const r = parseInt(h.slice(0, 2), 16);
+          const g = parseInt(h.slice(2, 4), 16);
+          const b = parseInt(h.slice(4, 6), 16);
+          return { r, g, b };
+        }
+        return { r: 255, g: 255, b: 255 };
+      };
+
+      const rgb1 = hexToRgb(c1);
+      const rgb2 = hexToRgb(c2);
+      const rgb3 = hexToRgb(c3);
+
+      let w = 0;
+      let h = 0;
+      let dpr = 1;
+      const resize = () => {
+        dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+        w = Math.max(1, Math.floor(window.innerWidth));
+        h = Math.max(1, Math.floor(canvas.getBoundingClientRect().height || 140));
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      };
+      resize();
+      window.addEventListener("resize", resize, { passive: true });
+
+      let t = 0;
+      const draw = () => {
+        t += 0.016;
+        ctx.clearRect(0, 0, w, h);
+        ctx.globalCompositeOperation = "lighter";
+
+        const maxBar = Math.floor(h * 0.85);
+        const step = 12;
+        const base = h - 1;
+
+        for (let x = 0; x < w + step; x += step) {
+          const n1 = (Math.sin(t * 1.7 + x * 0.035) + 1) * 0.5;
+          const n2 = (Math.sin(t * 2.3 + x * 0.021 + 1.1) + 1) * 0.5;
+          const n3 = (Math.sin(t * 3.1 + x * 0.015 + 2.6) + 1) * 0.5;
+          const amp = 0.35 * n1 + 0.4 * n2 + 0.25 * n3;
+          const barH = Math.max(6, Math.floor(maxBar * amp));
+
+          const mix = x / Math.max(1, w);
+          const leftMix = 1 - Math.min(1, mix * 2);
+          const rightMix = Math.max(0, (mix - 0.5) * 2);
+          const midMix = 1 - leftMix - rightMix;
+
+          const r = Math.floor(rgb1.r * leftMix + rgb2.r * midMix + rgb3.r * rightMix);
+          const g = Math.floor(rgb1.g * leftMix + rgb2.g * midMix + rgb3.g * rightMix);
+          const b = Math.floor(rgb1.b * leftMix + rgb2.b * midMix + rgb3.b * rightMix);
+
+          const glow = 0.22 + amp * 0.68;
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(0.92, glow)})`;
+          ctx.shadowBlur = 18;
+          ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${Math.min(0.55, glow)})`;
+
+          const bw = step - 3;
+          const x0 = x + 1;
+          const y0 = base - barH;
+          const radius = Math.max(3, Math.min(14, Math.floor(bw * 0.55)));
+
+          ctx.beginPath();
+          ctx.moveTo(x0 + radius, y0);
+          ctx.arcTo(x0 + bw, y0, x0 + bw, y0 + barH, radius);
+          ctx.arcTo(x0 + bw, y0 + barH, x0, y0 + barH, radius);
+          ctx.arcTo(x0, y0 + barH, x0, y0, radius);
+          ctx.arcTo(x0, y0, x0 + bw, y0, radius);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(draw);
+      };
+      draw();
+    } catch (_) {}
   };
 
   const normalizePath = () => {
@@ -489,17 +607,17 @@
 
     const modes = {
       ask: {
-        placeholder: "Ask a question…",
+        placeholder: "Ask a question...",
         chips: [
           "What is VoiceToWebsite?",
-          "How does Plan → Apply work?",
+          "How does Plan -> Apply work?",
           "Show pricing",
           "Open the demo",
           "Where do ads appear?",
         ],
       },
       build: {
-        placeholder: "Describe what you want to build…",
+        placeholder: "Describe what you want to build...",
         chips: [
           "Build a creator portfolio site",
           "Make a barber shop landing page with booking",
@@ -553,7 +671,7 @@
         return `Open the interactive demo: <a href="/demo">/demo</a>. You’ll get an outline preview in seconds.`;
       }
       if (t.includes("plan") || t.includes("rollback") || t.includes("apply")) {
-        return `Plan → Apply → Rollback is the safety gate. See <a href="/features">Features</a>, or run it in <a href="/admin/">Admin</a> (requires unlock).`;
+        return `Plan -> Apply -> Rollback is the safety gate. See <a href="/features">Features</a>, or run it in <a href="/admin/">Admin</a> (requires unlock).`;
       }
       if (t.includes("ads")) {
         return `Ads are controlled by AdSense mode (auto/slots) and can be disabled per page with <code>&lt;meta name="vtw-ads" content="off"&gt;</code>.`;
@@ -581,7 +699,7 @@
           JSON.stringify({ prompt: value, ts: Date.now() }),
         );
       } catch (_) {}
-      addMsg("bot", `Opening <a href="/demo">/demo</a> with your prompt…`);
+      addMsg("bot", `Opening <a href="/demo">/demo</a> with your prompt...`);
       setTimeout(() => {
         window.location.href = "/demo";
       }, 350);
@@ -655,7 +773,7 @@
         if (!listening) {
           listening = true;
           root.classList.add("is-listening");
-          if (status) status.textContent = "Listening…";
+          if (status) status.textContent = "Listening...";
           recognition.start();
           return;
         }
@@ -685,6 +803,8 @@
       spectralizeCards();
       initScrollReveals();
     }
+
+    injectBottomWaves();
 
     if (!isAdminPage()) {
       maybeInjectAdsense();

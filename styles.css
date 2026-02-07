@@ -1690,16 +1690,60 @@ button.ghost:hover {
 }
 
 /* Floating Ask/Build widget (nav.js) */
+.vtw-metallic-heading {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #e5e7eb 14%,
+    #fef3c7 28%,
+    #fbbf24 40%,
+    #ffffff 54%,
+    #d1d5db 72%,
+    #ffffff 100%
+  );
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.22), 0 18px 55px rgba(0, 0, 0, 0.65);
+  animation: vtw-metallic-shimmer 3.4s ease-in-out infinite;
+}
+
+@keyframes vtw-metallic-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.vtw-bottom-waves {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 140px;
+  pointer-events: none;
+  z-index: 240;
+  opacity: 0.92;
+  mix-blend-mode: screen;
+}
+
 .vt-widget {
   position: fixed;
   right: 18px;
   bottom: 18px;
   z-index: 2600;
-  display: grid;
-  gap: 0.65rem;
+  width: min(410px, calc(100vw - 36px));
+  height: 52px;
+  contain: layout paint size;
 }
 
 .vt-widget-fab {
+  position: absolute;
+  right: 0;
+  bottom: 0;
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
@@ -1735,19 +1779,38 @@ button.ghost:hover {
 }
 
 .vt-widget-panel {
-  width: min(410px, calc(100vw - 36px));
-  max-height: min(72vh, 640px);
+  position: absolute;
+  right: 0;
+  bottom: calc(52px + 0.65rem);
+  width: 100%;
+  height: min(72vh, 640px);
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(16px);
   overflow: hidden;
-  display: none;
+  display: grid;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px) scale(0.985);
+  transform-origin: bottom right;
+  pointer-events: none;
+  transition:
+    opacity 220ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    transform 260ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    visibility 0s linear 260ms;
 }
 
 .vt-widget.is-open .vt-widget-panel {
-  display: grid;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 220ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    transform 260ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    visibility 0s;
 }
 
 .vt-widget-head {

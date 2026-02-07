@@ -4,7 +4,6 @@ import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from './constan
 import { NavigationLink } from './types';
 import { audioEngine } from './services/audioEngine';
 import WarpTunnel from './components/WarpTunnel';
-import ElectricText from './components/ElectricText';
 import AudioWaveform from './components/AudioWaveform';
 
 const SEEN_KEY = 'vtw-v2-seen';
@@ -326,7 +325,7 @@ const App: React.FC = () => {
           className="w-full h-full object-cover opacity-20 brightness-50"
         >
           <source src={BACKGROUND_TUNNEL} type="video/mp4" />
-        </video>
+          </video>
         <div className="absolute inset-0 bg-radial-gradient from-transparent to-black" />
       </div>
 
@@ -415,7 +414,6 @@ const App: React.FC = () => {
             <source src={INTRO_VIDEO} type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/70 to-black" />
-          <AudioWaveform active={isAudioPlaying} className="vt-waveform" />
         </div>
 
         {!openerCollapsed && (
@@ -428,7 +426,7 @@ const App: React.FC = () => {
           </button>
         )}
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-16">
+        <div className="relative z-10 w-full">
           <AnimatePresence mode="wait" initial={false}>
             {!openerCollapsed ? (
               <motion.div
@@ -459,126 +457,59 @@ const App: React.FC = () => {
                       }
                 }
               >
-                <div className="max-w-3xl">
-                  <div className="font-orbitron text-[11px] tracking-[0.35em] text-white/60 uppercase">
-                    Voice-first web engineering
-                  </div>
-                  <h1 className="mt-4 text-white font-orbitron font-black text-3xl md:text-5xl tracking-[0.08em] uppercase">
-                    Your song. Your opener. Your funnel.
-                  </h1>
-                  <p className="mt-5 text-white/60 text-lg leading-relaxed">
-                    Scroll, click, or press Space to peel into the site. The tiles below are
-                    navigation — each one maps to a CTA.
-                  </p>
-                  {!isAudioPlaying && (
-                    <div className="mt-6 flex flex-wrap items-center gap-3">
+                <div className="relative w-full h-screen overflow-hidden">
+                  <div className="absolute inset-0 flex md:grid md:grid-cols-5 overflow-x-auto md:overflow-hidden snap-x snap-mandatory">
+                    {NAV_LINKS.map((link) => (
                       <button
+                        key={link.id}
                         type="button"
-                        onClick={toggleAudio}
-                        className="px-4 py-2 rounded-full border border-white/15 bg-white/5 text-white/80 hover:bg-white hover:text-black transition font-bold"
+                        onClick={() => handleTileClick(link)}
+                        className="relative h-full w-screen md:w-full flex-shrink-0 md:flex-shrink border-r border-white/10 overflow-hidden group snap-center"
+                        aria-label={`Open ${link.label}`}
                       >
-                        Start song
+                        <video muted loop playsInline autoPlay className="absolute inset-0 w-full h-full object-cover">
+                          <source src={link.videoUrl} type="video/mp4" />
+                        </video>
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/70 to-black" />
+                        <div
+                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500"
+                          style={{ background: link.themeColor }}
+                          aria-hidden="true"
+                        />
+                        <div className="relative z-10 h-full w-full grid place-items-center text-center px-7 md:px-5">
+                          <div>
+                            <div className="font-orbitron text-[11px] md:text-[10px] tracking-[0.5em] text-white/75 uppercase">
+                              {link.label}
+                            </div>
+                            <p className="mt-5 text-white/60 text-base md:text-sm leading-relaxed max-w-[22rem] mx-auto">
+                              {link.description}
+                            </p>
+                            <div className="mt-8 inline-flex items-center justify-center gap-2 text-white/70 text-xs uppercase tracking-[0.35em]">
+                              Enter <span aria-hidden="true">&rarr;</span>
+                            </div>
+                          </div>
+                        </div>
                       </button>
-                      <span className="text-white/40 text-xs uppercase tracking-[0.35em]">
-                        Autoplay tries on load (tap if blocked)
-                      </span>
+                    ))}
+                  </div>
+
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
+                    <div className="font-orbitron text-[11px] tracking-[0.5em] text-white/60 uppercase">
+                      Voice-first web engineering
                     </div>
-                  )}
+                    <h1 className="mt-5 vtw-metallic-heading font-orbitron font-black text-3xl md:text-6xl tracking-[0.18em] uppercase">
+                      Voice To Website
+                    </h1>
+                    <p className="mt-6 text-white/65 text-base md:text-lg max-w-2xl leading-relaxed">
+                      Click a panel to enter. Press Space to peel into the full site.
+                    </p>
+                  </div>
+
+                  <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/85 to-transparent pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/90 to-transparent pointer-events-none" />
                 </div>
 
-                <motion.div
-                  className="mt-10 grid grid-cols-1 md:grid-cols-5 gap-3"
-                  style={{ perspective: 1200 }}
-                  variants={
-                    reduceMotion
-                      ? {
-                          initial: {},
-                          animate: { transition: { staggerChildren: 0.02, delayChildren: 0.08 } },
-                          exit: { transition: { staggerChildren: 0.015, staggerDirection: -1 } },
-                        }
-                      : {
-                          initial: {},
-                          animate: { transition: { staggerChildren: 0.06, delayChildren: 0.12 } },
-                          exit: { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
-                        }
-                  }
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                >
-                  {NAV_LINKS.map((link) => (
-                    <motion.button
-                      key={link.id}
-                      type="button"
-                      onClick={() => handleTileClick(link)}
-                      className="relative rounded-2xl border border-white/10 overflow-hidden bg-black/40 text-left group"
-                      style={{ transformStyle: 'preserve-3d' }}
-                      variants={
-                        reduceMotion
-                          ? {
-                              initial: { opacity: 0 },
-                              animate: {
-                                opacity: 1,
-                                transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
-                              },
-                              exit: { opacity: 0, transition: { duration: 0.18 } },
-                            }
-                          : {
-                              initial: {
-                                opacity: 0,
-                                y: 18,
-                                rotateX: -12,
-                                filter: 'blur(4px)',
-                                clipPath: 'inset(0% 0% 0% 0% round 16px)',
-                              },
-                              animate: {
-                                opacity: 1,
-                                y: 0,
-                                rotateX: 0,
-                                filter: 'blur(0px)',
-                                clipPath: 'inset(0% 0% 0% 0% round 16px)',
-                                transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
-                              },
-                              exit: {
-                                opacity: 0,
-                                y: -28,
-                                rotateX: 22,
-                                clipPath: 'inset(0% 0% 100% 0% round 16px)',
-                                transition: { duration: 0.55, ease: [0.65, 0, 0.35, 1] },
-                              },
-                            }
-                      }
-                    >
-                      <video
-                        muted
-                        loop
-                        playsInline
-                        autoPlay
-                        className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-95 transition"
-                      >
-                        <source src={link.videoUrl} type="video/mp4" />
-                      </video>
-                      <div className="absolute inset-0 bg-black/60 group-hover:bg-black/35 transition" />
-                      <div className="relative z-10 p-5 min-h-[170px] flex flex-col justify-between">
-                        <div>
-                          <ElectricText
-                            text={link.label}
-                            className="text-sm tracking-[0.35em]"
-                            active={false}
-                          />
-                          <p className="mt-3 text-white/60 text-sm leading-relaxed">
-                            {link.description}
-                          </p>
-                        </div>
-                        <div className="mt-4 inline-flex items-center gap-2 text-white/70 text-xs uppercase tracking-[0.3em]">
-                          Open <span aria-hidden="true">→</span>
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
-                </motion.div>
-
-                <div className="mt-10 flex flex-wrap gap-3">
+                <div className="px-6 pt-8 pb-14 flex flex-wrap gap-3 justify-center">
                   <button
                     type="button"
                     onClick={enterSite}
@@ -640,7 +571,7 @@ const App: React.FC = () => {
                             rows={3}
                             value={tryPrompt}
                             onChange={(e) => setTryPrompt(e.target.value)}
-                            placeholder="Create a landing page for a barber shop with booking and pricing…"
+                            placeholder="Create a landing page for a barber shop with booking and pricing..."
                           />
                           <div className="prompt-actions">
                             <button
@@ -795,7 +726,7 @@ const App: React.FC = () => {
 
           <section className="section">
             <h2>Pricing preview</h2>
-            <p className="subhead">Free → Creator → Pro → Agency.</p>
+            <p className="subhead">Free -&gt; Creator -&gt; Pro -&gt; Agency.</p>
             <div className="vt-grid">
               {[
                 ['Free', '$0', '1 demo build'],
@@ -880,7 +811,7 @@ const App: React.FC = () => {
                 <p className="muted">Yes. Your pages and copy are yours.</p>
               </details>
               <details className="accordion-item">
-                <summary>How does Plan → Apply → Rollback work?</summary>
+                <summary>How does Plan -&gt; Apply -&gt; Rollback work?</summary>
                 <p className="muted">
                   You preview changes first, confirm explicitly, then apply. Undo restores
                   the last change.

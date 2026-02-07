@@ -33,7 +33,7 @@ export const NAV_LINKS: NavigationLink[] = [
     id: "pricing",
     label: "PRICING",
     videoUrl: "https://media.voicetowebsite.com/storenavigation.mp4",
-    description: "Free → Enterprise, with yearly savings.",
+    description: "Free to Enterprise, with yearly savings.",
     themeColor: "rgba(245, 158, 11, 0.5)",
     url: "/pricing",
   },
