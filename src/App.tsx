@@ -219,12 +219,13 @@ const App: React.FC = () => {
       .catch(() => setIsAdmin(false));
   }, []);
 
-  const generateSitePreview = async () => {
-    const prompt = tryPrompt.trim();
+  const generateSitePreview = async (overridePrompt?: string) => {
+    const prompt = String(overridePrompt ?? tryPrompt).trim();
     if (!prompt) {
       setGenerateError("Add a prompt first (voice or typing).");
       return;
     }
+    if (overridePrompt) setTryPrompt(prompt);
     setIsGenerating(true);
     setGenerateError("");
     setPublishResult(null);
@@ -244,6 +245,11 @@ const App: React.FC = () => {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const runInstantDemo = async () => {
+    const fallback = demoPresets[demoCategory].chips[0] || demoPresets[demoCategory].placeholder;
+    await generateSitePreview(fallback);
   };
 
   const publishGenerated = async () => {
@@ -620,7 +626,7 @@ const App: React.FC = () => {
                     <h1 className="vt-h1">Voice to Website Builder — Speak It. Ship It.</h1>
                     <p className="subhead">
                       Turn voice into a complete, responsive, SEO-ready website with pages, copy, templates, and
-                      one-click publish — then keep improving.
+                      one-click publish — then keep improving with admin-safe sandbox edits.
                     </p>
                     <div className="cta-row">
                       <a className="btn btn-primary" href="/demo">
@@ -628,6 +634,12 @@ const App: React.FC = () => {
                       </a>
                       <a className="btn btn-ghost" href="/demo#video">
                         Watch 60-Second Demo
+                      </a>
+                      <button className="btn btn-ghost" type="button" onClick={runInstantDemo}>
+                        Run instant demo
+                      </button>
+                      <a className="btn btn-ghost" href="/license.html">
+                        Get licensed download
                       </a>
                     </div>
                     <div className="trust-strip" role="note">
@@ -716,10 +728,13 @@ const App: React.FC = () => {
                             <button
                               className="btn btn-ghost"
                               type="button"
-                              onClick={generateSitePreview}
+                              onClick={() => generateSitePreview()}
                               disabled={isGenerating}
                             >
                               {isGenerating ? "Generating..." : "Generate live preview"}
+                            </button>
+                            <button className="btn btn-ghost" type="button" onClick={runInstantDemo}>
+                              Instant build
                             </button>
                           </div>
                         </div>
@@ -835,6 +850,9 @@ const App: React.FC = () => {
                           <a className="btn btn-primary" href="/demo">
                             Full demo
                           </a>
+                          <a className="btn btn-ghost" href="/license.html">
+                            Licensed kit
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -919,6 +937,25 @@ const App: React.FC = () => {
           </section>
 
           <section className="section">
+            <h2>Generative Studio Reel</h2>
+            <p className="subhead">
+              Luminous, voice-led UI compositions. These are generated patterns you can deploy or remix.
+            </p>
+            <div className="reel-grid">
+              {[
+                "https://cdn.coverr.co/videos/coverr-abstract-liquid-gold-8020/1080p.mp4",
+                "https://cdn.coverr.co/videos/coverr-futuristic-network-9220/1080p.mp4",
+                "https://cdn.coverr.co/videos/coverr-abstract-paint-1720/1080p.mp4",
+              ].map((src) => (
+                <div className="reel-card" key={src}>
+                  <video src={src} autoPlay muted loop playsInline />
+                  <div className="reel-caption">Generated motion layer</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
             <h2>Feature blocks</h2>
             <p className="subhead">The load-bearing parts.</p>
             <div className="vt-grid">
@@ -940,12 +977,13 @@ const App: React.FC = () => {
 
           <section className="section">
             <h2>Pricing preview</h2>
-            <p className="subhead">Free -&gt; Creator -&gt; Pro -&gt; Agency.</p>
+            <p className="subhead">Free -&gt; Starter -&gt; Growth -&gt; Enterprise.</p>
             <div className="vt-grid">
               {[
                 ["Free", "$0", "1 demo build"],
-                ["Creator", "$39/mo", "1 site + blog hub"],
-                ["Pro", "$79/mo", "3 sites + integrations"],
+                ["Starter", "$79/mo", "Weekly license key + 1 site"],
+                ["Growth", "$249/mo", "Monthly license keys"],
+                ["Enterprise", "$699/mo", "Unlimited sites + seats"],
               ].map(([t, p, d]) => (
                 <article className="feature-card" key={t}>
                   <h3>{t}</h3>

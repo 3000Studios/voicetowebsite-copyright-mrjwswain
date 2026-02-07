@@ -202,6 +202,26 @@
         margin: 0 auto;
       }
 
+      .category-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin: 2rem auto 3rem;
+      }
+
+      .category-pill {
+        border-radius: 999px;
+        padding: 0.6rem 1.1rem;
+        border: 1px solid var(--border-membrane);
+        background: rgba(0, 0, 0, 0.35);
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.7rem;
+        font-family: var(--font-mono);
+      }
+
       .app-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -372,6 +392,14 @@
         <p class="subhead">
           Deploy autonomous modules that build, monetize, and scale your digital ecosystem in real-time.
         </p>
+        <div class="category-grid">
+          <span class="category-pill">Voice AI</span>
+          <span class="category-pill">Design Systems</span>
+          <span class="category-pill">Automation</span>
+          <span class="category-pill">Growth Ops</span>
+          <span class="category-pill">Data Rooms</span>
+          <span class="category-pill">Motion Kits</span>
+        </div>
       </section>
 
       <div class="app-grid">

@@ -35,6 +35,7 @@ export default defineConfig({
         adminAppStore: resolve(__dirname, "admin/app-store-manager.html"),
         store: resolve(__dirname, "store.html"),
         appstore: resolve(__dirname, "appstore.html"),
+        license: resolve(__dirname, "license.html"),
         howItWorks: resolve(__dirname, "how-it-works.html"),
         templates: resolve(__dirname, "templates.html"),
         features: resolve(__dirname, "features.html"),

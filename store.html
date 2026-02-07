@@ -130,14 +130,16 @@
       </section>
       <section class="section">
         <h2>Storefront</h2>
-        <p class="subhead">Subscription-ready plans and one-time app purchase options.</p>
+        <p class="subhead">
+          Subscription-ready plans and one-time app purchase options. Licenses are issued after payment confirmation.
+        </p>
         <div class="pricing-deck">
           <div class="card luxe" data-tier="starter">
             <div class="card-header">
               <div class="tier">Starter Site</div>
               <div class="price">
                 <span class="currency">$</span>
-                <span class="amount">39</span>
+                <span class="amount">79</span>
                 <span class="period">/month</span>
               </div>
             </div>
@@ -146,15 +148,16 @@
                 <li>Single brand with AI edits</li>
                 <li>3 live pages + contact</li>
                 <li>Weekly deploys</li>
+                <li>Weekly license key (7 days)</li>
                 <li>Email support</li>
                 <li class="not-included">Livestream pack</li>
                 <li class="not-included">Team seats</li>
               </ul>
               <div class="button-row">
-                <button class="primary pay-btn" data-product="starter" data-amount="3900" data-label="Starter Site">
+                <button class="primary pay-btn" data-product="starter" data-amount="7900" data-label="Starter Site">
                   PayPal
                 </button>
-                <button class="ghost stripe-btn" data-product="starter" data-amount="3900" data-label="Starter Site">
+                <button class="ghost stripe-btn" data-product="starter" data-amount="7900" data-label="Starter Site">
                   Stripe
                 </button>
               </div>
@@ -167,7 +170,7 @@
               <div class="tier">Growth Voice</div>
               <div class="price">
                 <span class="currency">$</span>
-                <span class="amount">99</span>
+                <span class="amount">249</span>
                 <span class="period">/month</span>
               </div>
             </div>
@@ -177,14 +180,15 @@
                 <li>Unlimited pages & variants</li>
                 <li>Livestream pack included</li>
                 <li>Daily deploys + rollback</li>
+                <li>Monthly license keys</li>
                 <li>Slack priority support</li>
                 <li class="not-included">Dedicated engineer</li>
               </ul>
               <div class="button-row">
-                <button class="primary pay-btn" data-product="growth" data-amount="9900" data-label="Growth Voice">
+                <button class="primary pay-btn" data-product="growth" data-amount="24900" data-label="Growth Voice">
                   PayPal
                 </button>
-                <button class="ghost stripe-btn" data-product="growth" data-amount="9900" data-label="Growth Voice">
+                <button class="ghost stripe-btn" data-product="growth" data-amount="24900" data-label="Growth Voice">
                   Stripe
                 </button>
               </div>
@@ -196,7 +200,7 @@
               <div class="tier">Enterprise Edge</div>
               <div class="price">
                 <span class="currency">$</span>
-                <span class="amount">249</span>
+                <span class="amount">699</span>
                 <span class="period">/month</span>
               </div>
             </div>
@@ -207,13 +211,14 @@
                 <li>Live ops desk 24/7</li>
                 <li>Governed deploy approvals</li>
                 <li>Dedicated engineer</li>
+                <li>Monthly + annual license options</li>
                 <li>Custom branding & SSO</li>
               </ul>
               <div class="button-row">
                 <button
                   class="primary pay-btn"
                   data-product="enterprise"
-                  data-amount="24900"
+                  data-amount="69900"
                   data-label="Enterprise Edge"
                 >
                   PayPal
@@ -221,7 +226,7 @@
                 <button
                   class="ghost stripe-btn"
                   data-product="enterprise"
-                  data-amount="24900"
+                  data-amount="69900"
                   data-label="Enterprise Edge"
                 >
                   Stripe
@@ -236,7 +241,7 @@
               <div class="tier">Lifetime App Buyout</div>
               <div class="price">
                 <span class="currency">$</span>
-                <span class="amount">499</span>
+                <span class="amount">4999</span>
                 <span class="period">one-time</span>
               </div>
             </div>
@@ -246,14 +251,15 @@
                 <li>Self-host or edge-host</li>
                 <li>White-label rights</li>
                 <li>1 year updates</li>
+                <li>Perpetual license key</li>
                 <li>Priority onboarding</li>
                 <li>Optional support retainer</li>
               </ul>
               <div class="button-row">
-                <button class="primary pay-btn" data-product="lifetime" data-amount="49900" data-label="Lifetime App">
+                <button class="primary pay-btn" data-product="lifetime" data-amount="499900" data-label="Lifetime App">
                   PayPal
                 </button>
-                <button class="ghost stripe-btn" data-product="lifetime" data-amount="49900" data-label="Lifetime App">
+                <button class="ghost stripe-btn" data-product="lifetime" data-amount="499900" data-label="Lifetime App">
                   Stripe
                 </button>
               </div>
@@ -456,11 +462,11 @@
       const appResults = document.getElementById("appSearchResults");
       const appInventory = [
         { name: "Project Planning Hub", price: "$49", link: "project-planning-hub.html" },
-        { name: "Platinum Voice Site", price: "$199/mo", link: "appstore.html" },
-        { name: "Automation Kit", price: "$149/mo", link: "appstore.html" },
-        { name: "Livestream Pack", price: "$89/mo", link: "appstore.html" },
-        { name: "Support Retainer", price: "$99/mo", link: "appstore.html" },
-        { name: "VoiceToWebsite", price: "$19", link: "appstore.html" },
+        { name: "Starter Site", price: "$79/mo", link: "store.html" },
+        { name: "Growth Voice", price: "$249/mo", link: "store.html" },
+        { name: "Enterprise Edge", price: "$699/mo", link: "store.html" },
+        { name: "Lifetime App Buyout", price: "$4,999", link: "store.html" },
+        { name: "Support Retainer", price: "$299/mo", link: "appstore.html" },
         { name: "Rush Percussion", price: "$4.99", link: "rush-percussion.html" },
         { name: "Revenue Bot", price: "Free", link: "appstore.html" },
         { name: "Command Center", price: "Included", link: "appstore.html" },

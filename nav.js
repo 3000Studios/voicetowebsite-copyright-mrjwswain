@@ -1,6 +1,7 @@
 (() => {
   const THEME_KEY = "vtw-theme";
   const THEMES = [
+    { id: "metallic", label: "Metallic" },
     { id: "midnight", label: "Midnight" },
     { id: "volt", label: "Volt" },
     { id: "ember", label: "Ember" },
@@ -35,6 +36,7 @@
     { href: "/", label: "Home" },
     { href: "/features", label: "Features" },
     { href: "/pricing", label: "Pricing" },
+    { href: "/license", label: "License" },
     { href: "/demo", label: "Demo" },
     { href: "/store", label: "Store" },
     { href: "/appstore", label: "App Store" },
@@ -42,6 +44,17 @@
     { href: "/livestream", label: "Live" },
     { href: "/support", label: "Support" },
   ];
+
+  const adminLinks = [
+    { href: "/admin/index", label: "Dashboard" },
+    { href: "/admin/store-manager", label: "Store Manager" },
+    { href: "/admin/app-store-manager", label: "App Store" },
+    { href: "/admin/analytics", label: "Analytics" },
+    { href: "/admin/live-stream", label: "Live Stream" },
+    { href: "/admin/voice-commands", label: "Voice Commands" },
+    { href: "/admin/bot-command-center", label: "Bot Command Center" },
+  ];
+
   const footerLinks = {
     platform: [
       { href: "/features", label: "Features" },
@@ -49,6 +62,7 @@
       { href: "/templates", label: "Templates" },
       { href: "/demo", label: "Interactive Demo" },
       { href: "/pricing", label: "Pricing" },
+      { href: "/license", label: "Licensing" },
       { href: "/store", label: "Store" },
       { href: "/appstore", label: "App Store" },
     ],
@@ -66,6 +80,7 @@
     ],
   };
   const navVideoSrc = "https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4";
+  const globalVideoSrc = "https://cdn.coverr.co/videos/coverr-abstract-liquid-gold-8020/1080p.mp4";
 
   const normalizeTheme = (value) => {
     const found = THEMES.some((t) => t.id === value);
@@ -91,6 +106,13 @@
       stored = localStorage.getItem(THEME_KEY);
     } catch (_) {}
     applyTheme(stored || "midnight");
+  };
+  const enforceAdminTheme = () => {
+    try {
+      if (!isAdminPage()) return;
+      // Admin is locked to Metallic for a unified control-room feel.
+      applyTheme("metallic");
+    } catch (_) {}
   };
 
   const wireThemeSwitcher = () => {
@@ -183,10 +205,24 @@
     if (hasAdminAccess()) return navLinks;
     return navLinks.filter((link) => link.label !== "Admin");
   };
-  const buildLinkHtml = () =>
-    getNavLinks()
+  const buildLinkHtml = () => {
+    let links = getNavLinks()
       .map((link) => `<a href="${link.href}" data-name="${link.label}">${link.label}</a>`)
       .join("");
+
+    if (hasAdminAccess()) {
+      const dropdownHtml = `
+        <div class="nav-dropdown" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-dropdown-trigger">Management ▾</button>
+          <div class="nav-dropdown-menu">
+            ${adminLinks.map((l) => `<a href="${l.href}">${l.label}</a>`).join("")}
+          </div>
+        </div>
+      `;
+      links += dropdownHtml;
+    }
+    return links;
+  };
   const buildListHtml = () =>
     getNavLinks()
       .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
@@ -210,9 +246,23 @@
       if (root && !root.id) root.id = "main";
     } catch (_) {}
   };
+  const ensureVideoBg = () => {
+    if (prefersReducedMotion()) return;
+    if (document.querySelector(".video-bg")) return;
+    const wrap = document.createElement("div");
+    wrap.className = "video-bg";
+    wrap.setAttribute("aria-hidden", "true");
+    wrap.innerHTML = `
+      <video autoplay muted loop playsinline>
+        <source src="${globalVideoSrc}" type="video/mp4" />
+      </video>
+    `;
+    document.body.prepend(wrap);
+  };
   const injectNav = () => {
     clearExistingNav();
     ensureMainAnchor();
+    ensureVideoBg();
     const body = document.body;
     const fragment = document.createDocumentFragment();
     const skip = document.createElement("a");
@@ -830,23 +880,27 @@
   };
   const init = () => {
     initTheme();
+    enforceAdminTheme();
 
-    if (!isShellDisabled() && !isAdminPage()) {
+    const adminPage = isAdminPage();
+    if (!isShellDisabled()) {
       injectNav();
-      injectWidget();
-      injectFooter();
       wireThemeSwitcher();
-      wireWidget();
-      initFooterTimestamp();
-      initFooterParallax();
-      electrifyLinks();
-      spectralizeCards();
-      if (!prefersReducedMotion()) initScrollReveals();
+      if (!adminPage) {
+        injectWidget();
+        injectFooter();
+        wireWidget();
+        initFooterTimestamp();
+        initFooterParallax();
+        electrifyLinks();
+        spectralizeCards();
+        if (!prefersReducedMotion()) initScrollReveals();
+      }
     }
 
-    if (!isAdminPage() && !prefersReducedMotion()) injectBottomWaves();
+    if (!prefersReducedMotion()) injectBottomWaves();
 
-    if (!isAdminPage()) {
+    if (!adminPage) {
       maybeInjectAdsense();
     }
 

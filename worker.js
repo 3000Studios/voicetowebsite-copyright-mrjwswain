@@ -156,6 +156,74 @@ const ensureOrdersTable = async (env) => {
   ).run();
 };
 
+const base64UrlEncode = (input) => {
+  const bytes = input instanceof Uint8Array ? input : new TextEncoder().encode(String(input));
+  let binary = "";
+  bytes.forEach((b) => (binary += String.fromCharCode(b)));
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+};
+
+const base64UrlDecode = (input) => {
+  const padded = String(input)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/")
+    .padEnd(Math.ceil(input.length / 4) * 4, "=");
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+};
+
+const signLicensePayload = async (secret, payloadB64) => {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payloadB64));
+  return base64UrlEncode(new Uint8Array(sig));
+};
+
+const issueLicenseToken = async (env, { email, term, plan, orderId }) => {
+  const secret = String(env.LICENSE_SECRET || "").trim();
+  if (!secret) throw new Error("License secret missing. Set LICENSE_SECRET.");
+
+  const now = Math.floor(Date.now() / 1000);
+  const termKey = String(term || "week").toLowerCase();
+  const days = termKey === "month" ? 30 : termKey === "year" ? 365 : termKey === "perpetual" ? 3650 : 7;
+  const exp = termKey === "perpetual" ? now + days * 86400 : now + days * 86400;
+
+  const payload = {
+    v: 1,
+    iat: now,
+    exp,
+    email: String(email || "").trim(),
+    term: termKey,
+    plan: String(plan || "").trim(),
+    orderId: String(orderId || "").trim(),
+  };
+  const payloadB64 = base64UrlEncode(JSON.stringify(payload));
+  const sig = await signLicensePayload(secret, payloadB64);
+  return `vtw1.${payloadB64}.${sig}`;
+};
+
+const verifyLicenseToken = async (env, token) => {
+  const secret = String(env.LICENSE_SECRET || "").trim();
+  if (!secret) throw new Error("License secret missing. Set LICENSE_SECRET.");
+  const parts = String(token || "").split(".");
+  if (parts.length !== 3 || parts[0] !== "vtw1") throw new Error("Invalid license format.");
+  const payloadB64 = parts[1];
+  const sig = parts[2];
+  const expected = await signLicensePayload(secret, payloadB64);
+  if (sig !== expected) throw new Error("Invalid license signature.");
+  const payload = JSON.parse(base64UrlDecode(payloadB64));
+  const now = Math.floor(Date.now() / 1000);
+  if (payload?.exp && now > payload.exp) throw new Error("License expired.");
+  return payload;
+};
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -643,16 +711,87 @@ export default {
       }
     }
 
+    // License issuance + verification
+    if (url.pathname === "/api/license/issue" && request.method === "POST") {
+      const hasAdmin = await hasValidAdminCookie(request, env);
+      if (!hasAdmin) return jsonResponse(401, { error: "Unauthorized" });
+      try {
+        const payload = await request.json().catch(() => ({}));
+        const email = String(payload?.email || "").trim();
+        const term = String(payload?.term || "week").trim();
+        const plan = String(payload?.plan || "starter").trim();
+        const orderId = String(payload?.orderId || "").trim();
+        if (!email) return jsonResponse(400, { error: "Email required." });
+
+        const license = await issueLicenseToken(env, { email, term, plan, orderId });
+
+        if (env.D1) {
+          await env.D1.prepare(
+            `CREATE TABLE IF NOT EXISTS licenses (
+               id TEXT PRIMARY KEY,
+               email TEXT,
+               plan TEXT,
+               term TEXT,
+               order_id TEXT,
+               status TEXT DEFAULT 'active',
+               issued_at DATETIME DEFAULT CURRENT_TIMESTAMP
+             );`
+          ).run();
+          await env.D1.prepare(
+            "INSERT OR REPLACE INTO licenses (id, email, plan, term, order_id, status) VALUES (?, ?, ?, ?, ?, ?)"
+          )
+            .bind(license, email, plan, term, orderId, "active")
+            .run();
+        }
+
+        return jsonResponse(200, { ok: true, license });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
+    if (url.pathname === "/api/license/verify" && request.method === "POST") {
+      try {
+        const payload = await request.json().catch(() => ({}));
+        const license = String(payload?.license || "").trim();
+        if (!license) return jsonResponse(400, { error: "License required." });
+
+        const data = await verifyLicenseToken(env, license);
+        if (env.D1) {
+          try {
+            await env.D1.prepare(
+              `CREATE TABLE IF NOT EXISTS licenses (
+                 id TEXT PRIMARY KEY,
+                 email TEXT,
+                 plan TEXT,
+                 term TEXT,
+                 order_id TEXT,
+                 status TEXT DEFAULT 'active',
+                 issued_at DATETIME DEFAULT CURRENT_TIMESTAMP
+               );`
+            ).run();
+            const row = await env.D1.prepare("SELECT status FROM licenses WHERE id = ? LIMIT 1").bind(license).first();
+            if (row && String(row.status || "").toLowerCase() !== "active") {
+              return jsonResponse(403, { error: "License revoked." });
+            }
+          } catch (_) {}
+        }
+        return jsonResponse(200, { ok: true, data });
+      } catch (err) {
+        return jsonResponse(400, { error: err.message });
+      }
+    }
+
     // PayPal Orders API (server-side create + capture)
     if (url.pathname === "/api/paypal/order/create" && request.method === "POST") {
       try {
         const payload = await request.json().catch(() => ({}));
 
         const planCatalog = {
-          starter: { amountUsd: 39.0, label: "Starter Site" },
-          growth: { amountUsd: 99.0, label: "Growth Voice" },
-          enterprise: { amountUsd: 249.0, label: "Enterprise Edge" },
-          lifetime: { amountUsd: 499.0, label: "Lifetime App" },
+          starter: { amountUsd: 79.0, label: "Starter Site" },
+          growth: { amountUsd: 249.0, label: "Growth Voice" },
+          enterprise: { amountUsd: 699.0, label: "Enterprise Edge" },
+          lifetime: { amountUsd: 4999.0, label: "Lifetime App" },
         };
 
         const skuCatalog = {
