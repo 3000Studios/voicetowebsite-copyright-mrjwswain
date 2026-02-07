@@ -288,13 +288,6 @@ export default {
       const id = crypto.randomUUID();
       const ua = request.headers.get("user-agent") || "unknown";
       await env.D1.prepare(
-        `CREATE TABLE IF NOT EXISTS sessions (
-          id TEXT PRIMARY KEY,
-          ts DATETIME DEFAULT CURRENT_TIMESTAMP,
-          user_agent TEXT
-        )`,
-      ).run();
-      await env.D1.prepare(
         "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)",
       )
         .bind(id, ua)
