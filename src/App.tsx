@@ -51,11 +51,51 @@ const buildInstantOutline = (prompt: string) => {
   };
 };
 
+const useCases = {
+  creators: {
+    label: 'Creators',
+    prompt: 'Build a creator portfolio with a reel section and email capture.',
+    bullets: ['Publish faster', 'Capture emails', 'Monetize content'],
+    template: 'Creator Portfolio',
+    integration: 'YouTube + Newsletter',
+  },
+  agencies: {
+    label: 'Agencies',
+    prompt: 'Create an agency homepage with services, case studies, and a contact form.',
+    bullets: ['Ship client sites', 'Reuse templates', 'Reduce revisions'],
+    template: 'Agency Landing',
+    integration: 'CRM + Scheduling',
+  },
+  local: {
+    label: 'Local',
+    prompt: 'Create a landing page for a barber shop with booking and pricing.',
+    bullets: ['Rank locally', 'Drive calls', 'Book appointments'],
+    template: 'Local Service',
+    integration: 'Maps + Booking',
+  },
+  ecommerce: {
+    label: 'Ecommerce',
+    prompt: 'Design an ecommerce storefront with bundles, reviews, and FAQs.',
+    bullets: ['Bundles + upsells', 'Fast pages', 'Trust-first checkout'],
+    template: 'Storefront',
+    integration: 'Stripe + PayPal',
+  },
+  wordpress: {
+    label: 'WordPress',
+    prompt: 'Create a WordPress migration landing page with SEO checklist and pricing.',
+    bullets: ['Migration plan', 'SEO cleanup', 'Performance lift'],
+    template: 'WP Migration',
+    integration: 'Analytics + Redirects',
+  },
+} as const;
+
 const App: React.FC = () => {
-  const seen = hasSeenV2();
-  const [phase, setPhase] = useState<'opener' | 'site'>(seen ? 'site' : 'opener');
-  const [openerCollapsed, setOpenerCollapsed] = useState(seen);
-  const [showBumper, setShowBumper] = useState(seen);
+  // Lazy initialization avoids localStorage reads on every render
+  const [initialSeen] = useState(() => hasSeenV2());
+
+  const [phase, setPhase] = useState<'opener' | 'site'>(initialSeen ? 'site' : 'opener');
+  const [openerCollapsed, setOpenerCollapsed] = useState(initialSeen);
+  const [showBumper, setShowBumper] = useState(initialSeen);
   const [isWarping, setIsWarping] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -202,43 +242,6 @@ const App: React.FC = () => {
 
   const preview = useMemo(() => buildInstantOutline(tryPrompt), [tryPrompt]);
 
-  const useCases = {
-    creators: {
-      label: 'Creators',
-      prompt: 'Build a creator portfolio with a reel section and email capture.',
-      bullets: ['Publish faster', 'Capture emails', 'Monetize content'],
-      template: 'Creator Portfolio',
-      integration: 'YouTube + Newsletter',
-    },
-    agencies: {
-      label: 'Agencies',
-      prompt: 'Create an agency homepage with services, case studies, and a contact form.',
-      bullets: ['Ship client sites', 'Reuse templates', 'Reduce revisions'],
-      template: 'Agency Landing',
-      integration: 'CRM + Scheduling',
-    },
-    local: {
-      label: 'Local',
-      prompt: 'Create a landing page for a barber shop with booking and pricing.',
-      bullets: ['Rank locally', 'Drive calls', 'Book appointments'],
-      template: 'Local Service',
-      integration: 'Maps + Booking',
-    },
-    ecommerce: {
-      label: 'Ecommerce',
-      prompt: 'Design an ecommerce storefront with bundles, reviews, and FAQs.',
-      bullets: ['Bundles + upsells', 'Fast pages', 'Trust-first checkout'],
-      template: 'Storefront',
-      integration: 'Stripe + PayPal',
-    },
-    wordpress: {
-      label: 'WordPress',
-      prompt: 'Create a WordPress migration landing page with SEO checklist and pricing.',
-      bullets: ['Migration plan', 'SEO cleanup', 'Performance lift'],
-      template: 'WP Migration',
-      integration: 'Analytics + Redirects',
-    },
-  } as const;
 
   const active = useCases[activeUseCase];
 
