@@ -213,11 +213,22 @@
   <script>
     const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
     const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
+    const STRIPE_LINKS = {
+      starter: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_STARTER) || "",
+      growth: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_GROWTH) || "",
+      enterprise: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_ENTERPRISE) || "",
+      lifetime: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_LIFETIME) || "",
+    };
     const handleStripe = async (btn) => {
       const amount = btn.dataset.amount;
       const product = btn.dataset.product;
       const label = btn.dataset.label;
       try {
+        const link = (STRIPE_LINKS[String(product || "").toLowerCase()] || "").trim();
+        if (link) {
+          window.location.href = link;
+          return;
+        }
         const stripe = Stripe(STRIPE_PK);
         const res = await fetch("/api/stripe/checkout", {
           method: "POST",

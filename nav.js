@@ -90,19 +90,74 @@
     applyTheme(document.documentElement.dataset.theme);
   };
 
-  const beep = () => {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.frequency.value = 880;
-      gain.gain.value = 0.08;
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.08);
-    } catch (_) {}
+  const SoundEngine = {
+    ctx: null,
+    init: () => {
+      if (!SoundEngine.ctx) {
+        SoundEngine.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (SoundEngine.ctx.state === "suspended") {
+        SoundEngine.ctx.resume();
+      }
+      return SoundEngine.ctx;
+    },
+    play: (type = "hover") => {
+      try {
+        const ctx = SoundEngine.init();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === "hover") {
+          // Subtle tech chirp
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(440, t);
+          osc.frequency.exponentialRampToValueAtTime(880, t + 0.05);
+          gain.gain.setValueAtTime(0.02, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+          osc.start(t);
+          osc.stop(t + 0.05);
+        } else if (type === "click") {
+          // Percussive blip
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(800, t);
+          osc.frequency.exponentialRampToValueAtTime(100, t + 0.1);
+          gain.gain.setValueAtTime(0.05, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+          osc.start(t);
+          osc.stop(t + 0.1);
+        } else if (type === "success") {
+          // Ascending chime
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(500, t);
+          osc.frequency.exponentialRampToValueAtTime(1200, t + 0.2);
+          gain.gain.setValueAtTime(0.03, t);
+          gain.gain.linearRampToValueAtTime(0, t + 0.3);
+          osc.start(t);
+          osc.stop(t + 0.3);
+
+          // Harmonics
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.type = "square";
+          osc2.frequency.setValueAtTime(250, t);
+          osc2.frequency.exponentialRampToValueAtTime(600, t + 0.2);
+          gain2.gain.setValueAtTime(0.01, t);
+          gain2.gain.linearRampToValueAtTime(0, t + 0.3);
+          osc2.start(t);
+          osc2.stop(t + 0.3);
+        }
+      } catch (_) {}
+    }
   };
+
+  const playHover = () => SoundEngine.play("hover");
+  const playClick = () => SoundEngine.play("click");
   const hasAdminAccess = () => {
     try {
       const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
@@ -161,13 +216,17 @@
     overlay.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", closeOnNavigate);
     });
-    const interactiveLinks = nav.querySelectorAll("a");
-    interactiveLinks.forEach((link) =>
-      link.addEventListener("mouseenter", beep),
-    );
+    const interactiveLinks = nav.querySelectorAll("a, .brand");
+    interactiveLinks.forEach((link) => {
+      link.addEventListener("mouseenter", playHover);
+      link.addEventListener("mousedown", playClick);
+    });
     overlay
       .querySelectorAll("a")
-      .forEach((link) => link.addEventListener("mouseenter", beep));
+      .forEach((link) => {
+        link.addEventListener("mouseenter", playHover);
+        link.addEventListener("click", playClick);
+      });
     const toggleButton = nav.querySelector(".nav-toggle");
     toggleButton?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
