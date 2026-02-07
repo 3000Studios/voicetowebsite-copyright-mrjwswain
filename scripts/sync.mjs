@@ -1,7 +1,9 @@
 import { spawnSync } from "node:child_process";
 
-const gitCmd = process.platform === "win32" ? "git.exe" : "git";
-const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+const isWin = process.platform === "win32";
+const gitCmd = isWin ? "git.exe" : "git";
+const npmCmd = isWin ? process.env.ComSpec || "cmd.exe" : "npm";
+const npmPrefixArgs = isWin ? ["/d", "/s", "/c", "npm"] : [];
 
 const run = (cmd, args, opts = {}) => {
   const res = spawnSync(cmd, args, { stdio: "inherit", shell: false, env: process.env, ...opts });
@@ -10,6 +12,6 @@ const run = (cmd, args, opts = {}) => {
 
 run(gitCmd, ["fetch", "--prune", "origin"]);
 run(gitCmd, ["pull", "--rebase"]);
-run(npmCmd, ["ci"]);
-run(npmCmd, ["run", "format"]);
-run(npmCmd, ["run", "verify"]);
+run(npmCmd, [...npmPrefixArgs, "ci"]);
+run(npmCmd, [...npmPrefixArgs, "run", "format"]);
+run(npmCmd, [...npmPrefixArgs, "run", "verify"]);

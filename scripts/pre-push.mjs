@@ -1,7 +1,9 @@
 import { spawnSync } from "node:child_process";
 
-const gitCmd = process.platform === "win32" ? "git.exe" : "git";
-const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+const isWin = process.platform === "win32";
+const gitCmd = isWin ? "git.exe" : "git";
+const npmCmd = isWin ? process.env.ComSpec || "cmd.exe" : "npm";
+const npmPrefixArgs = isWin ? ["/d", "/s", "/c", "npm"] : [];
 
 const run = (cmd, args, { capture = false } = {}) => {
   const res = spawnSync(cmd, args, {
@@ -29,4 +31,4 @@ if (Number.isFinite(behind) && behind > 0) {
 }
 
 console.log(`Sync check OK (ahead=${ahead}, behind=${behind}).`);
-run(npmCmd, ["run", "verify"]);
+run(npmCmd, [...npmPrefixArgs, "run", "verify"]);

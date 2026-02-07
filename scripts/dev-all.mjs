@@ -1,9 +1,11 @@
 import { spawn } from "node:child_process";
 
-const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+const isWin = process.platform === "win32";
+const npmCmd = isWin ? process.env.ComSpec || "cmd.exe" : "npm";
+const npmPrefixArgs = isWin ? ["/d", "/s", "/c", "npm"] : [];
 
 const spawnNpm = (label, args) => {
-  const child = spawn(npmCmd, args, {
+  const child = spawn(npmCmd, [...npmPrefixArgs, ...args], {
     stdio: ["inherit", "pipe", "pipe"],
     shell: false,
     env: process.env,
