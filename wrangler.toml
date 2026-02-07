@@ -16,6 +16,7 @@ binding = "AI"
 
 [vars]
 ENVIRONMENT = "production"
+PUBLIC_GENERATE = "1"
 # Placeholder for environment variables to be set in Cloudflare Dashboard
 # OPENAI_API = ""
 # PAYPAL_CLIENT_ID_PROD = ""
@@ -28,11 +29,11 @@ directory = "./dist"
 binding = "ASSETS"
 
 [[d1_databases]]
-binding = "D1"
+binding = "DB"
 database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
 
 [[kv_namespaces]]
-binding = "KV"
+binding = "CACHE"
 id = "e61605d144ac4348a72b7e85afc6c185"
 
 [[r2_buckets]]
