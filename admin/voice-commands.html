@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Voice Command Center - 3000 Studios</title>
+  <title>Command Center - 3000 Studios</title>
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="/admin/admin.css">
   <style>
@@ -123,8 +123,18 @@
 
   <div class="voice-command-center">
     <div class="command-header">
-      <h1>🎤 Voice Command Center</h1>
-      <p>Control your website with voice commands</p>
+      <h1>Command Center</h1>
+      <p>Control and Monitor your Autonomous Bots</p>
+    </div>
+
+    <!-- Bot Activity Section -->
+    <div class="command-list" id="botActivitySection">
+      <h2>Bot Activity</h2>
+      <div class="control-card">
+        <div id="botActivityList" style="display:grid;gap:1rem;">
+             <div style="color:#a0aec0;">Connecting to bots...</div>
+        </div>
+      </div>
     </div>
 
     <div class="voice-controls">
@@ -362,6 +372,61 @@
     });
 
     renderHistory();
+
+    // Polling Bots Status
+    async function pollBots() {
+         const list = document.getElementById('botActivityList');
+         if (!list) return;
+         try {
+             const res = await fetch('/api/bots/status');
+             if (!res.ok) throw new Error('Failed to fetch status');
+             const data = await res.json();
+
+             // Combine builds and commands
+             const activities = [];
+             if (data.commands) {
+                data.commands.forEach(c => activities.push({
+                    type: 'COMMAND',
+                    ts: c.ts,
+                    summary: c.command,
+                    status: c.deployment_status || 'processed'
+                }));
+             }
+             if (data.builds) {
+                data.builds.forEach(b => activities.push({
+                    type: 'BUILD',
+                    ts: b.ts,
+                    summary: 'Voice-to-Layout Build',
+                    status: b.status
+                }));
+             }
+
+             activities.sort((a,b) => new Date(b.ts) - new Date(a.ts));
+
+             if (activities.length === 0) {
+                 list.innerHTML = '<div style="color:#a0aec0;">No active bots.</div>';
+                 return;
+             }
+
+             list.innerHTML = activities.map(act => `
+                <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; border-left: 4px solid ${act.status === 'failed' ? '#ef4444' : '#10b981'};">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                        <span style="font-weight:bold;color:#fff;">${act.type}</span>
+                        <span style="color:#a0aec0;font-size:0.8rem;">${new Date(act.ts).toLocaleTimeString()}</span>
+                    </div>
+                    <div style="color:#e2e8f0;">${act.summary}</div>
+                    <div style="margin-top:0.5rem;font-size:0.8rem;color:${act.status === 'failed' ? '#ef4444' : '#10b981'};text-transform:uppercase;">${act.status}</div>
+                </div>
+             `).join('');
+
+         } catch(err) {
+             // console.error(err);
+         }
+    }
+
+    // Start polling
+    pollBots();
+    setInterval(pollBots, 5000);
   </script>
 </body>
 </html>

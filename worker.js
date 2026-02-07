@@ -29,9 +29,75 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const cleanPath = url.pathname.replace(/\/$/, "");
+    const db = env.DB || env.D1;
 
     if (!env.ASSETS) {
       return jsonResponse(500, { error: "ASSETS binding is missing on this Worker route." });
+    }
+
+    // 1. Voice-to-Text Integration (The "Speak It" part)
+    if (url.pathname === "/api/voice-to-layout" && request.method === "POST") {
+      try {
+        if (!env.AI) return jsonResponse(503, { error: "AI binding missing." });
+        if (!db) return jsonResponse(503, { error: "DB binding missing." });
+
+        const audioBlob = await request.arrayBuffer();
+
+        // Transcribe
+        const transcription = await env.AI.run("@cf/openai/whisper", {
+          audio: [...new Uint8Array(audioBlob)],
+        });
+
+        // Intent-to-Layout (The "Ship It" part)
+        const layout = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
+          prompt: `System: You are an expert web architect.
+                   User Intent: ${transcription.text}.
+                   Task: Generate a JSON layout for a landing page including Hero, Pricing, and FAQ.
+                   Return ONLY valid JSON.`,
+        });
+
+        // Store the build in DB
+        await db.prepare(`
+          CREATE TABLE IF NOT EXISTS builds (
+            id TEXT PRIMARY KEY,
+            layout TEXT,
+            status TEXT,
+            ts DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `).run();
+
+        const id = crypto.randomUUID();
+        await db.prepare("INSERT INTO builds (id, layout, status) VALUES (?, ?, ?)")
+          .bind(id, JSON.stringify(layout), "preview")
+          .run();
+
+        return jsonResponse(200, {
+          id,
+          text: transcription.text,
+          layout
+        });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
+    // Bot Activity Status
+    if (url.pathname === "/api/bots/status" && request.method === "GET") {
+        if (!db) return jsonResponse(503, { error: "DB binding missing." });
+        try {
+            // Fetch recent commands
+            const recentCommands = await db.prepare("SELECT * FROM commands ORDER BY ts DESC LIMIT 5").all().catch(() => ({ results: [] }));
+
+            // Fetch recent builds (if table exists)
+            const recentBuilds = await db.prepare("SELECT * FROM builds ORDER BY ts DESC LIMIT 5").all().catch(() => ({ results: [] }));
+
+            return jsonResponse(200, {
+                commands: recentCommands.results || [],
+                builds: recentBuilds.results || []
+            });
+        } catch(err) {
+             return jsonResponse(500, { error: err.message });
+        }
     }
 
     // Orchestrator API (primary: /api/orchestrator; legacy: /.netlify/functions/orchestrator)
@@ -40,17 +106,17 @@ export default {
         return jsonResponse(405, { error: "Method not allowed." });
       }
       // Delegate to the Cloudflare function implementation for orchestration.
-      const res = await handleOrchestrator({ request, env, ctx });
+      const res = await handleOrchestrator({ request, env: { ...env, D1: db, DB: db }, ctx });
       return addSecurityHeaders(res);
     }
 
     // Admin activity logs (read-only)
     if (url.pathname === "/admin/logs" && request.method === "GET") {
-      if (!env.D1) {
+      if (!db) {
         return jsonResponse(503, { error: "D1 database not available." });
       }
       try {
-        await env.D1.prepare(
+        await db.prepare(
           `CREATE TABLE IF NOT EXISTS commands (
              id INTEGER PRIMARY KEY AUTOINCREMENT,
              ts DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -64,21 +130,21 @@ export default {
              deployment_message TEXT
            );`
         ).run();
-        const columns = await env.D1.prepare("PRAGMA table_info(commands);").all();
+        const columns = await db.prepare("PRAGMA table_info(commands);").all();
         const columnNames = new Set((columns.results || []).map((col) => col.name));
         if (!columnNames.has("intent_json")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
+          await db.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
         }
         if (!columnNames.has("deployment_id")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
+          await db.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
         }
         if (!columnNames.has("deployment_status")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
+          await db.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
         }
         if (!columnNames.has("deployment_message")) {
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
+          await db.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
         }
-        const data = await env.D1.prepare(
+        const data = await db.prepare(
           "SELECT id, ts, command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message FROM commands ORDER BY ts DESC LIMIT 20"
         ).all();
         return jsonResponse(200, { logs: data.results || [] });
@@ -117,22 +183,22 @@ export default {
       return jsonResponse(200, {
         status: "ok",
         orchestrator: "online",
-        d1: !!env.D1,
+        d1: !!db,
         assets: !!env.ASSETS,
         ts: new Date().toISOString(),
       });
     }
 
     if (url.pathname === "/api/metrics" && request.method === "GET") {
-      if (!env.D1) {
+      if (!db) {
         return jsonResponse(503, { error: "D1 database not available." });
       }
       const since = "datetime('now','-24 hours')";
       const [commands, errors] = await Promise.all([
-        env.D1.prepare(
+        db.prepare(
           `SELECT COUNT(*) AS count FROM commands WHERE ts > ${since}`
         ).first(),
-        env.D1.prepare(
+        db.prepare(
           `SELECT COUNT(*) AS count FROM errors WHERE ts > ${since}`
         ).first().catch(() => ({ count: 0 })),
       ]);
@@ -152,17 +218,17 @@ export default {
     }
 
     if (url.pathname === "/api/session" && request.method === "POST") {
-      if (!env.D1) return jsonResponse(200, { ok: true });
+      if (!db) return jsonResponse(200, { ok: true });
       const id = crypto.randomUUID();
       const ua = request.headers.get("user-agent") || "unknown";
-      await env.D1.prepare(
+      await db.prepare(
         `CREATE TABLE IF NOT EXISTS sessions (
           id TEXT PRIMARY KEY,
           ts DATETIME DEFAULT CURRENT_TIMESTAMP,
           user_agent TEXT
         )`
       ).run();
-      await env.D1.prepare(
+      await db.prepare(
         "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)"
       ).bind(id, ua).run();
       return jsonResponse(200, { ok: true });

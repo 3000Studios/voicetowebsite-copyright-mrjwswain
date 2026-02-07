@@ -3,7 +3,6 @@ main = "worker.js"
 compatibility_date = "2026-01-27"
 account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 
-# Serve the built site directly from Cloudflare (no origin) and keep the API path routed to the Worker.
 routes = [
   "voicetowebsite.com/*",
   "www.voicetowebsite.com/*",
@@ -13,20 +12,22 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "production"
-# Placeholder for environment variables to be set in Cloudflare Dashboard
-# OPENAI_API = ""
-# PAYPAL_CLIENT_ID_PROD = ""
-# ADSENSE_PUBLISHER = ""
-# ADSENSE_SLOT = ""
-# CONTROL_PASSWORD = ""
+PAYPAL_RECEIVER = "mr.jwswain@gmail.com"
 
 [assets]
 directory = "./dist"
 binding = "ASSETS"
 
+[ai]
+binding = "AI"
+
 [[d1_databases]]
-binding = "D1"
+binding = "DB"
 database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "voicetowebsite-assets"
 
 [[kv_namespaces]]
 binding = "KV"
@@ -46,4 +47,3 @@ head_sampling_rate = 1
   enabled = true
   persist = true
   head_sampling_rate = 1
-
