@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Flux | VoiceToWebsite Tools</title>
+    <meta name="description" content="Cybernetic focus timer for deep work sessions." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .timer-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        text-align: center;
+      }
+
+      .timer-display {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 8rem;
+        font-weight: 700;
+        color: var(--conductive-cyan);
+        text-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+        margin: 2rem 0;
+        line-height: 1;
+      }
+
+      .controls {
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      .control-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-membrane);
+        color: var(--text-main);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .control-btn:hover {
+        border-color: var(--conductive-cyan);
+        background: rgba(0, 242, 255, 0.1);
+      }
+
+      .control-btn.active {
+        background: var(--conductive-cyan);
+        color: #000;
+      }
+
+      .mode-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .mode-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid transparent;
+      }
+
+      .mode-btn.active {
+        color: var(--text-main);
+        border-bottom-color: var(--conductive-purple);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="timer-container">
+      <div class="mode-selector">
+        <button class="mode-btn active" data-time="25">Focus</button>
+        <button class="mode-btn" data-time="5">Short Break</button>
+        <button class="mode-btn" data-time="15">Long Break</button>
+      </div>
+
+      <div class="timer-display" id="display">25:00</div>
+
+      <div class="controls">
+        <button class="control-btn" id="startBtn">INITIALIZE</button>
+        <button class="control-btn" id="resetBtn">RESET</button>
+      </div>
+    </main>
+
+    <script type="module" src="nav.js"></script>
+    <script>
+      let timeLeft = 25 * 60;
+      let timerId = null;
+      let isRunning = false;
+
+      const display = document.getElementById("display");
+      const startBtn = document.getElementById("startBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const modeBtns = document.querySelectorAll(".mode-btn");
+
+      function updateDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        display.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        document.title = `${display.textContent} - Focus Flux`;
+      }
+
+      function startTimer() {
+        if (isRunning) {
+          clearInterval(timerId);
+          isRunning = false;
+          startBtn.textContent = "RESUME";
+          startBtn.classList.remove("active");
+          return;
+        }
+
+        isRunning = true;
+        startBtn.textContent = "PAUSE";
+        startBtn.classList.add("active");
+
+        timerId = setInterval(() => {
+          timeLeft--;
+          updateDisplay();
+
+          if (timeLeft <= 0) {
+            clearInterval(timerId);
+            isRunning = false;
+            startBtn.textContent = "INITIALIZE";
+            startBtn.classList.remove("active");
+            new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
+            alert("Session Complete");
+          }
+        }, 1000);
+      }
+
+      function resetTimer() {
+        clearInterval(timerId);
+        isRunning = false;
+        startBtn.textContent = "INITIALIZE";
+        startBtn.classList.remove("active");
+
+        // Get current active mode time
+        const activeMode = document.querySelector(".mode-btn.active");
+        timeLeft = parseInt(activeMode.dataset.time) * 60;
+        updateDisplay();
+      }
+
+      startBtn.addEventListener("click", startTimer);
+      resetBtn.addEventListener("click", resetTimer);
+
+      modeBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          modeBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          timeLeft = parseInt(btn.dataset.time) * 60;
+          resetTimer();
+        });
+      });
+
+      // Init
+      updateDisplay();
+    </script>
+  </body>
+</html>
