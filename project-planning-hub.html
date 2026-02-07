@@ -280,23 +280,29 @@
                 label: "pay",
                 height: 45,
               },
-              createOrder: (data, actions) => {
-                return actions.order.create({
-                  purchase_units: [
-                    {
-                      description: "Project Planning Hub",
-                      amount: {
-                        currency_code: "USD",
-                        value: "49.00",
-                      },
-                    },
-                  ],
+              createOrder: async () => {
+                const res = await fetch("/api/paypal/order/create", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ sku: "project-planning-hub" }),
                 });
+                const payload = await res.json().catch(() => ({}));
+                if (!res.ok || !payload?.id) {
+                  throw new Error(String(payload?.error || "PayPal order create failed."));
+                }
+                return payload.id;
               },
-              onApprove: (data, actions) => {
-                return actions.order.capture().then((details) => {
-                  alert("Transaction completed by " + details.payer.name.given_name);
+              onApprove: async (data) => {
+                const res = await fetch("/api/paypal/order/capture", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ orderId: data?.orderID, sku: "project-planning-hub" }),
                 });
+                const payload = await res.json().catch(() => ({}));
+                if (!res.ok || !payload?.ok) {
+                  throw new Error(String(payload?.error || "PayPal capture failed."));
+                }
+                alert("Payment completed. Thank you.");
               },
               onError: (err) => {
                 console.error(err);

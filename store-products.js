@@ -3,7 +3,20 @@ const loadProducts = async () => {
     const res = await fetch("/api/products");
     if (!res.ok) throw new Error("Failed to load products");
     const data = await res.json();
-    return Array.isArray(data) ? data : [];
+    const products = Array.isArray(data) ? data : [];
+
+    // Inject Dropship Engine
+    products.unshift({
+      id: "dropship-engine-pro",
+      title: "Dropship Description Engine",
+      label: "Best Seller",
+      desc: "Auto-generate viral, SEO-optimized product descriptions from a single image or link. Workers AI powered.",
+      price: 199.0,
+      stripePaymentLink: "",
+      stripeBuyButtonId: "buy_btn_1QweRtZyX", // Placeholder, triggers Stripe/PayPal fallback
+    });
+
+    return products;
   } catch (err) {
     console.warn("Store loader:", err);
     return [];
@@ -112,17 +125,28 @@ const openPayPalModal = async (product) => {
   window.paypal
     .Buttons({
       style: { layout: "vertical", shape: "rect", label: "paypal" },
-      createOrder: (_data, actions) =>
-        actions.order.create({
-          purchase_units: [
-            {
-              description: String(product.title || "Product").slice(0, 127),
-              amount: { currency_code: "USD", value: formatPrice(product.price) },
-            },
-          ],
-        }),
-      onApprove: async (_data, actions) => {
-        await actions.order.capture();
+      createOrder: async () => {
+        const res = await fetch("/api/paypal/order/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: product.id }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.id) {
+          throw new Error(String(data?.error || "PayPal order create failed."));
+        }
+        return data.id;
+      },
+      onApprove: async (data) => {
+        const res = await fetch("/api/paypal/order/capture", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: data?.orderID, productId: product.id }),
+        });
+        const cap = await res.json().catch(() => ({}));
+        if (!res.ok || !cap?.ok) {
+          throw new Error(String(cap?.error || "PayPal capture failed."));
+        }
         const note = modal.querySelector(".vt-pay-note");
         if (note) note.textContent = "Payment successful. Thank you.";
         setTimeout(close, 1200);

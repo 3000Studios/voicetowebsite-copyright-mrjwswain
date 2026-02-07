@@ -1,30 +1,165 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Referrals → Partners | VoiceToWebsite</title>
-    <meta name="description" content="This page moved to /partners." />
-    <meta name="robots" content="noindex, follow" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Partner Program | VoiceToWebsite</title>
+    <meta name="description" content="Earn 10% on every referral. Join the VoiceToWebsite partner ecosystem." />
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://js.stripe.com/v3"></script>
+    <style>
+      .page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 6rem 2rem;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 4rem;
+        background: linear-gradient(to bottom, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+      }
+
+      .hero p {
+        font-size: 1.25rem;
+        color: var(--text-dim);
+        max-width: 600px;
+        margin: 0 auto 3rem;
+      }
+
+      .referral-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-membrane);
+        border-radius: 24px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .referral-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--conductive-cyan), transparent);
+      }
+
+      .step-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+        text-align: left;
+      }
+
+      .step-number {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--conductive-cyan);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .step h3 {
+        font-size: 1.25rem;
+        color: #fff;
+        margin-bottom: 0.5rem;
+      }
+      .step p {
+        color: var(--text-dim);
+        font-size: 0.9rem;
+      }
+
+      .cta-box {
+        margin-top: 3rem;
+        padding: 2rem;
+        background: rgba(0, 242, 255, 0.05);
+        border-radius: 16px;
+        border: 1px solid rgba(0, 242, 255, 0.2);
+      }
+
+      .ref-link {
+        font-family: "JetBrains Mono", monospace;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-membrane);
+        color: var(--text-main);
+        width: 100%;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      .primary-btn {
+        background: var(--conductive-cyan);
+        color: #000;
+        border: none;
+        padding: 1rem 2rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .primary-btn:hover {
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        transform: translateY(-2px);
+      }
+    </style>
   </head>
-  <body class="vt-page">
+  <body>
     <main class="page">
-      <section class="section hero">
-        <p class="eyebrow">Redirect</p>
-        <h1 class="vt-h1">Partner program moved</h1>
-        <p class="subhead">The referrals hub is now part of the Partners experience.</p>
-        <div class="prompt-actions">
-          <a class="btn btn-primary" href="/partners">Go to Partners</a>
-          <a class="btn btn-ghost" href="/">Home</a>
-        </div>
-        <p class="muted">Redirecting…</p>
+      <section class="hero">
+        <h1>Monetize Your Network</h1>
+        <p>
+          Turn your traffic into recurring revenue. Get 10% lifetime commissions on every VoiceToWebsite license you
+          refer.
+        </p>
       </section>
+
+      <div class="referral-card glass-morphism">
+        <h2>How It Works</h2>
+        <div class="step-grid">
+          <div class="step">
+            <div class="step-number">STEP 01</div>
+            <h3>Get Your Link</h3>
+            <p>Generate your unique tracking link instantly. No approval delays.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">STEP 02</div>
+            <h3>Share & Promote</h3>
+            <p>Embed in your blog, newsletter, or social channels. We provide the assets.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">STEP 03</div>
+            <h3>Earn 10%</h3>
+            <p>Receive payouts directly to your PayPal or Stripe account every month.</p>
+          </div>
+        </div>
+
+        <div class="cta-box">
+          <h3>Your Active Referral Link</h3>
+          <input type="text" class="ref-link" value="https://voicetowebsite.com/?ref=USER_ID" readonly id="refInput" />
+          <button class="primary-btn" onclick="copyLink()">COPY LINK</button>
+        </div>
+      </div>
     </main>
 
     <script>
-      window.location.replace("/partners");
+      function copyLink() {
+        const input = document.getElementById("refInput");
+        input.select();
+        input.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(input.value);
+        alert("Referral link copied to clipboard!");
+      }
     </script>
     <script type="module" src="nav.js"></script>
   </body>

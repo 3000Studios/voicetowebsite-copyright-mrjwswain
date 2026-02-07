@@ -39,6 +39,123 @@ const addSecurityHeaders = (response) => {
   });
 };
 
+let paypalTokenCache = {
+  mode: "",
+  clientId: "",
+  accessToken: "",
+  expiresAtMs: 0,
+};
+
+const getPayPalMode = (env) => {
+  const explicit = String(env.PAYPAL_ENV || env.PAYPAL_MODE || "")
+    .trim()
+    .toLowerCase();
+  if (explicit === "live" || explicit === "sandbox") return explicit;
+  if (env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_SECRET_PROD) return "live";
+  return "sandbox";
+};
+
+const getPayPalCredentials = (env) => {
+  const mode = getPayPalMode(env);
+  const liveClientId = String(env.PAYPAL_CLIENT_ID_PROD || "").trim();
+  const liveSecret = String(env.PAYPAL_CLIENT_SECRET_PROD || "").trim();
+  const sandboxClientId = String(env.PAYPAL_CLIENT_ID || "").trim();
+  const sandboxSecret = String(env.PAYPAL_CLIENT_SECRET || "").trim();
+
+  if (mode === "live") {
+    return {
+      mode,
+      clientId: liveClientId || sandboxClientId,
+      clientSecret: liveSecret || sandboxSecret,
+      apiBase: "https://api-m.paypal.com",
+    };
+  }
+  return {
+    mode,
+    clientId: sandboxClientId || liveClientId,
+    clientSecret: sandboxSecret || liveSecret,
+    apiBase: "https://api-m.sandbox.paypal.com",
+  };
+};
+
+const getPayPalAccessToken = async (env) => {
+  const { mode, clientId, clientSecret, apiBase } = getPayPalCredentials(env);
+  if (!clientId) {
+    throw new Error("PayPal client id missing. Set PAYPAL_CLIENT_ID (sandbox) or PAYPAL_CLIENT_ID_PROD (live).");
+  }
+  if (!clientSecret) {
+    throw new Error(
+      "PayPal client secret missing. Set PAYPAL_CLIENT_SECRET (sandbox) or PAYPAL_CLIENT_SECRET_PROD (live)."
+    );
+  }
+
+  const now = Date.now();
+  const validCache =
+    paypalTokenCache?.accessToken &&
+    paypalTokenCache.mode === mode &&
+    paypalTokenCache.clientId === clientId &&
+    paypalTokenCache.expiresAtMs - 60_000 > now;
+  if (validCache) return { accessToken: paypalTokenCache.accessToken, apiBase };
+
+  const basic = btoa(`${clientId}:${clientSecret}`);
+  const form = new URLSearchParams();
+  form.set("grant_type", "client_credentials");
+  const res = await fetch(`${apiBase}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${basic}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: form.toString(),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const detail = data?.error_description || data?.error || "PayPal token request failed.";
+    throw new Error(detail);
+  }
+
+  const accessToken = String(data?.access_token || "");
+  const expiresInSec = Number(data?.expires_in || 0);
+  paypalTokenCache = {
+    mode,
+    clientId,
+    accessToken,
+    expiresAtMs: now + Math.max(0, expiresInSec) * 1000,
+  };
+  return { accessToken, apiBase };
+};
+
+const paypalApiFetch = async (env, path, init = {}) => {
+  const { accessToken, apiBase } = await getPayPalAccessToken(env);
+  const url = `${apiBase}${path.startsWith("/") ? path : `/${path}`}`;
+  const headers = new Headers(init.headers || {});
+  headers.set("Authorization", `Bearer ${accessToken}`);
+  headers.set("Content-Type", headers.get("Content-Type") || "application/json");
+  headers.set("Accept", headers.get("Accept") || "application/json");
+  return fetch(url, { ...init, headers });
+};
+
+const toUsdString = (amount) => {
+  const n = Number(amount || 0);
+  if (!Number.isFinite(n) || n <= 0) return "";
+  return n.toFixed(2);
+};
+
+const ensureOrdersTable = async (env) => {
+  if (!env.D1) return;
+  await env.D1.prepare(
+    `CREATE TABLE IF NOT EXISTS orders (
+       id TEXT PRIMARY KEY,
+       product_id TEXT,
+       amount REAL,
+       currency TEXT DEFAULT 'USD',
+       status TEXT DEFAULT 'completed',
+       customer_email TEXT,
+       ts DATETIME DEFAULT CURRENT_TIMESTAMP
+     );`
+  ).run();
+};
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -196,6 +313,8 @@ export default {
         stripe_publishable: !!(env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC),
         stripe_secret: !!env.STRIPE_SECRET_KEY,
         paypal_client_id: !!(env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID),
+        paypal_secret: !!(env.PAYPAL_CLIENT_SECRET_PROD || env.PAYPAL_CLIENT_SECRET),
+        paypal_mode: getPayPalMode(env),
         adsense_publisher: !!(env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID),
         adsense_slots: {
           slot: !!env.ADSENSE_SLOT,
@@ -508,17 +627,7 @@ export default {
 
       try {
         // Ensure table exists (idempotent)
-        await env.D1.prepare(
-          `CREATE TABLE IF NOT EXISTS orders (
-             id TEXT PRIMARY KEY,
-             product_id TEXT,
-             amount REAL,
-             currency TEXT DEFAULT 'USD',
-             status TEXT DEFAULT 'completed',
-             customer_email TEXT,
-             ts DATETIME DEFAULT CURRENT_TIMESTAMP
-           );`
-        ).run();
+        await ensureOrdersTable(env);
 
         const stats = await env.D1.prepare(`SELECT COUNT(*) as count, SUM(amount) as revenue FROM orders`).first();
 
@@ -528,6 +637,187 @@ export default {
           total_orders: stats.count || 0,
           total_revenue: stats.revenue || 0,
           recent_orders: recent.results || [],
+        });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
+    // PayPal Orders API (server-side create + capture)
+    if (url.pathname === "/api/paypal/order/create" && request.method === "POST") {
+      try {
+        const payload = await request.json().catch(() => ({}));
+
+        const planCatalog = {
+          starter: { amountUsd: 39.0, label: "Starter Site" },
+          growth: { amountUsd: 99.0, label: "Growth Voice" },
+          enterprise: { amountUsd: 249.0, label: "Enterprise Edge" },
+          lifetime: { amountUsd: 499.0, label: "Lifetime App" },
+        };
+
+        const skuCatalog = {
+          "project-planning-hub": { amountUsd: 49.0, label: "Project Planning Hub" },
+          "ai-web-forge-pro": { amountUsd: 49.99, label: "AI Web Forge Pro" },
+          "ai-drive": { amountUsd: 4.99, label: "AI Drive" },
+          "google-ai-prompts": { amountUsd: 2.99, label: "Google AI Prompts" },
+        };
+
+        const plan = String(payload?.product || payload?.plan || "")
+          .trim()
+          .toLowerCase();
+        const sku = String(payload?.sku || "")
+          .trim()
+          .toLowerCase();
+        const productId = String(payload?.productId || payload?.product_id || "").trim();
+
+        let description = "";
+        let amountUsd = 0;
+        let productRef = "";
+
+        if (sku && skuCatalog[sku]) {
+          description = skuCatalog[sku].label;
+          amountUsd = skuCatalog[sku].amountUsd;
+          productRef = `sku:${sku}`;
+        } else if (plan && planCatalog[plan]) {
+          description = planCatalog[plan].label;
+          amountUsd = planCatalog[plan].amountUsd;
+          productRef = `plan:${plan}`;
+        } else if (productId) {
+          if (!env.D1) return jsonResponse(503, { error: "D1 database not available for product checkout." });
+          const row = await env.D1.prepare("SELECT id, title, price FROM products WHERE id = ? AND active = 1 LIMIT 1")
+            .bind(productId)
+            .first();
+          if (!row) return jsonResponse(404, { error: "Product not found." });
+
+          description = String(row.title || row.id || "Product");
+          amountUsd = Number(row.price || 0);
+          productRef = `product:${String(row.id || productId)}`;
+        } else {
+          return jsonResponse(400, { error: "Missing product. Provide { product: 'starter' } or { productId }." });
+        }
+
+        const amount = toUsdString(amountUsd);
+        if (!amount) return jsonResponse(400, { error: "Invalid product amount." });
+
+        const reqId = crypto?.randomUUID
+          ? crypto.randomUUID()
+          : `vtw-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+
+        const body = {
+          intent: "CAPTURE",
+          purchase_units: [
+            {
+              description: description.slice(0, 127),
+              custom_id: productRef.slice(0, 127),
+              amount: { currency_code: "USD", value: amount },
+            },
+          ],
+        };
+
+        const ppRes = await paypalApiFetch(env, "/v2/checkout/orders", {
+          method: "POST",
+          headers: { "PayPal-Request-Id": reqId, Prefer: "return=representation" },
+          body: JSON.stringify(body),
+        });
+
+        const data = await ppRes.json().catch(() => ({}));
+        if (!ppRes.ok) {
+          const detail =
+            data?.message ||
+            data?.error_description ||
+            data?.error ||
+            data?.details?.[0]?.description ||
+            "PayPal order create failed.";
+          return jsonResponse(ppRes.status || 500, { error: detail });
+        }
+
+        return jsonResponse(200, { id: data.id, status: data.status });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
+    if (url.pathname === "/api/paypal/order/capture" && request.method === "POST") {
+      try {
+        const payload = await request.json().catch(() => ({}));
+        const orderId = String(payload?.orderId || payload?.orderID || payload?.id || "").trim();
+        if (!orderId) return jsonResponse(400, { error: "Missing orderId." });
+
+        const plan = String(payload?.product || payload?.plan || "")
+          .trim()
+          .toLowerCase();
+        const sku = String(payload?.sku || "")
+          .trim()
+          .toLowerCase();
+        const productId = String(payload?.productId || payload?.product_id || "").trim();
+        const expectedRef = sku ? `sku:${sku}` : plan ? `plan:${plan}` : productId ? `product:${productId}` : "";
+
+        if (expectedRef) {
+          const getRes = await paypalApiFetch(env, `/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
+            method: "GET",
+          });
+          const getData = await getRes.json().catch(() => ({}));
+          if (!getRes.ok) {
+            const detail = getData?.message || getData?.details?.[0]?.description || "PayPal order lookup failed.";
+            return jsonResponse(getRes.status || 500, { error: detail });
+          }
+          const actualRef = String(getData?.purchase_units?.[0]?.custom_id || "").trim();
+          if (actualRef && actualRef !== expectedRef) {
+            return jsonResponse(400, { error: "Order does not match requested product." });
+          }
+        }
+
+        const capRes = await paypalApiFetch(env, `/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, {
+          method: "POST",
+          headers: { Prefer: "return=representation" },
+          body: JSON.stringify({}),
+        });
+        const capData = await capRes.json().catch(() => ({}));
+        if (!capRes.ok) {
+          const detail =
+            capData?.message ||
+            capData?.details?.[0]?.description ||
+            capData?.error_description ||
+            capData?.error ||
+            "PayPal capture failed.";
+          return jsonResponse(capRes.status || 500, { error: detail });
+        }
+
+        const payerEmail = String(capData?.payer?.email_address || "");
+        const status = String(capData?.status || "").toLowerCase();
+        const captureAmount = Number(
+          capData?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value ||
+            capData?.purchase_units?.[0]?.amount?.value ||
+            0
+        );
+        const currency = String(
+          capData?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code ||
+            capData?.purchase_units?.[0]?.amount?.currency_code ||
+            "USD"
+        );
+        const productRef =
+          expectedRef || String(capData?.purchase_units?.[0]?.custom_id || "").trim() || "paypal:unknown";
+
+        if (env.D1) {
+          try {
+            await ensureOrdersTable(env);
+            const rowId = `paypal:${orderId}`;
+            await env.D1.prepare(
+              "INSERT OR IGNORE INTO orders (id, product_id, amount, currency, status, customer_email) VALUES (?, ?, ?, ?, ?, ?)"
+            )
+              .bind(rowId, productRef, Number.isFinite(captureAmount) ? captureAmount : 0, currency, status, payerEmail)
+              .run();
+          } catch (err) {
+            console.warn("PayPal order log failed:", err);
+          }
+        }
+
+        return jsonResponse(200, {
+          ok: true,
+          orderId,
+          status,
+          amount: Number.isFinite(captureAmount) ? captureAmount : 0,
+          currency,
         });
       } catch (err) {
         return jsonResponse(500, { error: err.message });

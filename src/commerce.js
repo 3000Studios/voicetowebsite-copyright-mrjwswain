@@ -44,7 +44,7 @@ export const handleStripePurchase = async (product, amount, redirectUrl) => {
   }
 };
 
-export const handlePayPalPurchase = (product, amount, redirectUrl) => {
+export const handlePayPalPurchase = (sku, displayName, amount, redirectUrl) => {
   if (!window.paypal || typeof window.paypal.Buttons !== "function") {
     alert("PayPal SDK not loaded. Add https://www.paypal.com/sdk/js to the page.");
     return;
@@ -74,7 +74,7 @@ export const handlePayPalPurchase = (product, amount, redirectUrl) => {
           <button id="vtw-paypal-close" style="border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:white; border-radius:999px; width:34px; height:34px; cursor:pointer;">✕</button>
         </div>
         <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:10px; color:rgba(255,255,255,0.8); font-family:system-ui;">
-          <div>${product}</div>
+          <div>${displayName || sku}</div>
           <div style="font-weight:700;">$${Number(amount).toFixed(2)}</div>
         </div>
         <div id="${containerId}"></div>
@@ -92,25 +92,49 @@ export const handlePayPalPurchase = (product, amount, redirectUrl) => {
   });
   overlay.querySelector("#vtw-paypal-close")?.addEventListener("click", close);
 
-  const returnUrl = new URL(redirectUrl, window.location.origin).href;
+  const returnUrl = (() => {
+    try {
+      const u = new URL(String(redirectUrl || ""), window.location.origin);
+      if (u.protocol !== "http:" && u.protocol !== "https:") return window.location.href;
+      return u.href;
+    } catch (_) {
+      return window.location.href;
+    }
+  })();
 
   window.paypal
     .Buttons({
       style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
-      createOrder: (_data, actions) => {
-        return actions.order.create({
-          purchase_units: [
-            {
-              description: product,
-              amount: { currency_code: "USD", value: Number(amount).toFixed(2) },
-            },
-          ],
-          application_context: { return_url: returnUrl, cancel_url: window.location.href },
+      createOrder: async () => {
+        const res = await fetch("/api/paypal/order/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sku: String(sku || "")
+              .trim()
+              .toLowerCase(),
+          }),
         });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.id) {
+          throw new Error(String(data?.error || "PayPal order create failed."));
+        }
+        return data.id;
       },
-      onApprove: async (_data, actions) => {
+      onApprove: async (data) => {
         try {
-          await actions.order.capture();
+          const res = await fetch("/api/paypal/order/capture", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderId: data?.orderID,
+              sku: String(sku || "")
+                .trim()
+                .toLowerCase(),
+            }),
+          });
+          const cap = await res.json().catch(() => ({}));
+          if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
           close();
           window.location.href = returnUrl;
         } catch (err) {

@@ -61,6 +61,15 @@ htmlFiles.forEach((file) => {
     }
   }
 
+  // 1a. Inject AdSense Auto-Ads (Global)
+  if (!content.includes("adsbygoogle.js")) {
+    // Replace YOUR_PUBLISHER_ID with actual ID if available, otherwise placeholders work for now
+    const adScript = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID" crossorigin="anonymous"></script>`;
+    if (content.includes("</head>")) {
+      content = content.replace("</head>", `  ${adScript}\n</head>`);
+    }
+  }
+
   // 2. Inject nav.js if missing
   if (!content.includes("nav.js")) {
     if (content.includes("</body>")) {

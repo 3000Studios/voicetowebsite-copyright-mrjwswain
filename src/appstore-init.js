@@ -6,12 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = e.target.closest(".purchase-btn");
     if (btn) {
       e.preventDefault();
-      const product = btn.dataset.product;
+      const sku = btn.dataset.sku || btn.dataset.product;
+      const label = btn.dataset.label || btn.dataset.product || sku;
       const price = parseFloat(btn.dataset.price);
       const url = btn.dataset.url;
       // Prefer Stripe when configured; fallback to PayPal.
-      handleStripePurchase(product, price, url).catch(() => {
-        handlePayPalPurchase(product, price, url);
+      handleStripePurchase(sku, price, url).catch(() => {
+        handlePayPalPurchase(sku, label, price, url);
       });
     }
   });

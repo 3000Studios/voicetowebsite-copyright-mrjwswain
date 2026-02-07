@@ -365,19 +365,27 @@
         window.paypal
           .Buttons({
             style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
-            createOrder: (_data, actions) => {
-              return actions.order.create({
-                purchase_units: [
-                  {
-                    description: label,
-                    amount: { currency_code: "USD", value: dollars },
-                  },
-                ],
+            createOrder: async () => {
+              const res = await fetch("/api/paypal/order/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ product }),
               });
+              const data = await res.json().catch(() => ({}));
+              if (!res.ok || !data?.id) {
+                throw new Error(String(data?.error || "PayPal order create failed."));
+              }
+              return data.id;
             },
-            onApprove: async (_data, actions) => {
+            onApprove: async (data) => {
               try {
-                await actions.order.capture();
+                const res = await fetch("/api/paypal/order/capture", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ orderId: data?.orderID, product }),
+                });
+                const cap = await res.json().catch(() => ({}));
+                if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
                 close();
                 window.location.href = `/store.html?checkout=success&product=${encodeURIComponent(product || "")}`;
               } catch (err) {

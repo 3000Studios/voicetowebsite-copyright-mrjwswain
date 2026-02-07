@@ -19,6 +19,7 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 - Cloudflare settings live in `wrangler.toml`
 - If you want `/api/analytics/overview` to return real Cloudflare data, set `CF_ZONE_ID` + `CF_API_TOKEN` (see `ENV.example`).
 - Admin login uses `CONTROL_PASSWORD` and server-issued signed cookies. Optional hardening: set `ADMIN_COOKIE_SECRET`.
+- PayPal server-side checkout uses `PAYPAL_CLIENT_ID(_PROD)` + `PAYPAL_CLIENT_SECRET(_PROD)` and optional `PAYPAL_ENV=sandbox|live`.
 
 ## Edge AI + R2
 
@@ -31,6 +32,14 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
   - `POST /api/publish`
   - `GET /api/bot-hub/brief`
   - `POST /api/bot-hub/coordinate`
+
+## Payments
+
+- PayPal (server-side, tamper-resistant):
+  - `POST /api/paypal/order/create` (body: `{ product: 'starter' }` or `{ productId }` or `{ sku }`)
+  - `POST /api/paypal/order/capture` (body: `{ orderId, product|productId|sku }`)
+- Stripe:
+  - `POST /api/stripe/checkout`
 
 ## Deploy
 
