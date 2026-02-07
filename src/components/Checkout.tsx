@@ -255,6 +255,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
           background: rgba(102, 126, 234, 0.2);
         }
 
+        .payment-method-btn[aria-pressed="true"] {
+          border-color: #667eea;
+          background: rgba(102, 126, 234, 0.2);
+        }
+
         .payment-icon {
           font-size: 2rem;
         }
@@ -391,8 +396,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkout-title"
       >
-        <button className="checkout-close" onClick={onClose}>
+        <button className="checkout-close" onClick={onClose} aria-label="Close checkout">
           ×
         </button>
 
@@ -404,7 +412,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
           </div>
         ) : (
           <>
-            <h2 className="checkout-title">Checkout</h2>
+            <h2 className="checkout-title" id="checkout-title">Checkout</h2>
 
             <div className="order-summary">
               <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>Order Summary</h3>
@@ -425,6 +433,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
               <button
                 className={`payment-method-btn ${paymentMethod === "stripe" ? "active" : ""}`}
                 onClick={() => setPaymentMethod("stripe")}
+                aria-pressed={paymentMethod === "stripe"}
               >
                 <div className="payment-icon">💳</div>
                 <div>Credit Card</div>
@@ -432,6 +441,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
               <button
                 className={`payment-method-btn ${paymentMethod === "paypal" ? "active" : ""}`}
                 onClick={() => setPaymentMethod("paypal")}
+                aria-pressed={paymentMethod === "paypal"}
               >
                 <div className="payment-icon">🅿️</div>
                 <div>PayPal</div>
@@ -448,8 +458,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   exit={{ opacity: 0, y: -20 }}
                 >
                   <div className="form-group">
-                    <label className="form-label">Email</label>
+                    <label className="form-label" htmlFor="email">Email</label>
                     <input
+                      id="email"
                       type="email"
                       className="form-input"
                       placeholder="your@email.com"
@@ -459,8 +470,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Cardholder Name</label>
+                    <label className="form-label" htmlFor="card-name">Cardholder Name</label>
                     <input
+                      id="card-name"
                       type="text"
                       className="form-input"
                       placeholder="John Doe"
@@ -470,9 +482,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Card Number</label>
+                    <label className="form-label" htmlFor="card-number">Card Number</label>
                     <input
+                      id="card-number"
                       type="text"
+                      inputMode="numeric"
                       className="form-input"
                       placeholder="1234 5678 9012 3456"
                       value={formData.cardNumber}
@@ -482,9 +496,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label">Expiry Date</label>
+                      <label className="form-label" htmlFor="card-expiry">Expiry Date</label>
                       <input
+                        id="card-expiry"
                         type="text"
+                        inputMode="numeric"
                         className="form-input"
                         placeholder="MM/YY"
                         value={formData.expiry}
@@ -493,9 +509,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                       />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">CVC</label>
+                      <label className="form-label" htmlFor="card-cvc">CVC</label>
                       <input
+                        id="card-cvc"
                         type="text"
+                        inputMode="numeric"
                         className="form-input"
                         placeholder="123"
                         value={formData.cvc}
