@@ -252,10 +252,10 @@ export default {
       }
       try {
         const stripeProductCatalog = {
-          starter: { amount: 3900, label: "Starter Site" },
-          growth: { amount: 9900, label: "Growth Voice" },
-          enterprise: { amount: 24900, label: "Enterprise Edge" },
-          lifetime: { amount: 49900, label: "Lifetime App" },
+          starter: { amount: 3900, label: "Starter Site", priceId: env.STRIPE_PRICE_STARTER },
+          growth: { amount: 9900, label: "Growth Voice", priceId: env.STRIPE_PRICE_GROWTH },
+          enterprise: { amount: 24900, label: "Enterprise Edge", priceId: env.STRIPE_PRICE_ENTERPRISE },
+          lifetime: { amount: 49900, label: "Lifetime App", priceId: env.STRIPE_PRICE_LIFETIME },
         };
 
         const payload = await request.json();
@@ -266,6 +266,7 @@ export default {
 
         const label = catalogEntry?.label || String(payload?.label || "VoiceToWebsite");
         const amount = catalogEntry?.amount ?? Number(payload?.amount || 0);
+        const priceId = (catalogEntry?.priceId ? String(catalogEntry.priceId) : "").trim();
 
         if (!catalogEntry && !allowCustomAmount) {
           return jsonResponse(400, {
@@ -274,7 +275,24 @@ export default {
           });
         }
 
-        if (!Number.isFinite(amount) || amount <= 0) return jsonResponse(400, { error: "Invalid amount." });
+        // Prefer Price IDs (prevents client-side price tampering). Fallback to amount only when explicitly allowed.
+        const usePriceId = Boolean(priceId);
+        if (!usePriceId) {
+          if (!allowCustomAmount) {
+            return jsonResponse(400, {
+              error: "Stripe price ID not configured for this product. Set STRIPE_PRICE_* vars or enable STRIPE_ALLOW_CUSTOM_AMOUNT=1.",
+              supported: Object.keys(stripeProductCatalog),
+            });
+          }
+          if (!Number.isFinite(amount) || amount <= 0) return jsonResponse(400, { error: "Invalid amount." });
+        }
+
+        const paymentMethodTypes = String(env.STRIPE_PAYMENT_METHOD_TYPES || "card")
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean)
+          .slice(0, 6);
+
         const origin = `${url.protocol}//${url.host}`;
         const safeUrl = (maybeUrl, fallback) => {
           if (!maybeUrl) return fallback;
@@ -294,10 +312,16 @@ export default {
         form.set("mode", "payment");
         form.set("success_url", successUrl);
         form.set("cancel_url", cancelUrl);
+        paymentMethodTypes.forEach((t, idx) => form.set(`payment_method_types[${idx}]`, t));
+
         form.set("line_items[0][quantity]", "1");
-        form.set("line_items[0][price_data][currency]", "USD");
-        form.set("line_items[0][price_data][product_data][name]", label);
-        form.set("line_items[0][price_data][unit_amount]", String(Math.round(amount)));
+        if (usePriceId) {
+          form.set("line_items[0][price]", priceId);
+        } else {
+          form.set("line_items[0][price_data][currency]", "USD");
+          form.set("line_items[0][price_data][product_data][name]", label);
+          form.set("line_items[0][price_data][unit_amount]", String(Math.round(amount)));
+        }
         const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
           method: "POST",
           headers: {
