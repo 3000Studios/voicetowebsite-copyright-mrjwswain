@@ -251,13 +251,30 @@ export default {
         return jsonResponse(501, { error: "Stripe secret key missing. Set STRIPE_SECRET_KEY." });
       }
       try {
+        const stripeProductCatalog = {
+          starter: { amount: 3900, label: "Starter Site" },
+          growth: { amount: 9900, label: "Growth Voice" },
+          enterprise: { amount: 24900, label: "Enterprise Edge" },
+          lifetime: { amount: 49900, label: "Lifetime App" },
+        };
+
         const payload = await request.json();
-        const amount = Number(payload?.amount || 0);
-        const product = String(payload?.product || "product");
-        const label = String(payload?.label || "VoiceToWebsite");
-        if (!Number.isFinite(amount) || amount <= 0) {
-          return jsonResponse(400, { error: "Invalid amount." });
+        const product = String(payload?.product || "").trim().toLowerCase() || "product";
+
+        const allowCustomAmount = String(env.STRIPE_ALLOW_CUSTOM_AMOUNT || "") === "1";
+        const catalogEntry = stripeProductCatalog[product];
+
+        const label = catalogEntry?.label || String(payload?.label || "VoiceToWebsite");
+        const amount = catalogEntry?.amount ?? Number(payload?.amount || 0);
+
+        if (!catalogEntry && !allowCustomAmount) {
+          return jsonResponse(400, {
+            error: "Unknown product. Use a supported product id or enable STRIPE_ALLOW_CUSTOM_AMOUNT=1.",
+            supported: Object.keys(stripeProductCatalog),
+          });
         }
+
+        if (!Number.isFinite(amount) || amount <= 0) return jsonResponse(400, { error: "Invalid amount." });
         const origin = `${url.protocol}//${url.host}`;
         const safeUrl = (maybeUrl, fallback) => {
           if (!maybeUrl) return fallback;
