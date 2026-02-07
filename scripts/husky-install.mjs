@@ -5,5 +5,6 @@ if (process.env.CI) process.exit(0);
 if (!fs.existsSync(".git")) process.exit(0);
 
 const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
-const res = spawnSync(npxCmd, ["--no-install", "husky", "install"], { stdio: "inherit", shell: false });
+// `husky install` is deprecated in v9; invoking `husky` with no args installs hooks.
+const res = spawnSync(npxCmd, ["--no-install", "husky"], { stdio: "inherit", shell: false });
 process.exit(res.status ?? 0);
