@@ -1,3 +1,16 @@
+const FALLBACK_REGEX = {
+  url: /https?:\/\/\S+/,
+  say: /make .*say (.+)/i,
+  sayAlt: /say (.+)/i,
+  headline: /headline(?:\s+to|\s+is)?\s+(.+)/i,
+  subhead: /subhead(?:\s+to|\s+is)?\s+(.+)/i,
+  cta: /(cta|button)(?:\s+to|\s+is)?\s+(.+)/i,
+  title: /title(?:\s+to|\s+is)?\s+(.+)/i,
+  description: /description(?:\s+to|\s+is)?\s+(.+)/i,
+  font: /font(?:\s+to|\s+is)?\s+([a-zA-Z0-9\s-]+)/i,
+  theme: /theme(?:\s+to|\s+is)?\s+(ember|ocean|volt|midnight)/i,
+};
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const OPENAI_API = env.OPENAI_API || env.OPENAI_API_KEY || env.OPENAI_API_KEY3;
@@ -57,21 +70,17 @@ export async function onRequestPost(context) {
   const buildFallbackPlan = (command) => {
     const actions = [];
     const text = command.toLowerCase();
-    const urlMatch = command.match(/https?:\/\/\S+/);
+    const urlMatch = command.match(FALLBACK_REGEX.url);
     const url = urlMatch ? urlMatch[0] : "";
     const sayMatch =
-      command.match(/make .*say (.+)/i) || command.match(/say (.+)/i);
-    const headlineMatch = command.match(/headline(?:\s+to|\s+is)?\s+(.+)/i);
-    const subheadMatch = command.match(/subhead(?:\s+to|\s+is)?\s+(.+)/i);
-    const ctaMatch = command.match(/(cta|button)(?:\s+to|\s+is)?\s+(.+)/i);
-    const titleMatch = command.match(/title(?:\s+to|\s+is)?\s+(.+)/i);
-    const descMatch = command.match(/description(?:\s+to|\s+is)?\s+(.+)/i);
-    const fontMatch = command.match(
-      /font(?:\s+to|\s+is)?\s+([a-zA-Z0-9\s-]+)/i,
-    );
-    const themeMatch = command.match(
-      /theme(?:\s+to|\s+is)?\s+(ember|ocean|volt|midnight)/i,
-    );
+      command.match(FALLBACK_REGEX.say) || command.match(FALLBACK_REGEX.sayAlt);
+    const headlineMatch = command.match(FALLBACK_REGEX.headline);
+    const subheadMatch = command.match(FALLBACK_REGEX.subhead);
+    const ctaMatch = command.match(FALLBACK_REGEX.cta);
+    const titleMatch = command.match(FALLBACK_REGEX.title);
+    const descMatch = command.match(FALLBACK_REGEX.description);
+    const fontMatch = command.match(FALLBACK_REGEX.font);
+    const themeMatch = command.match(FALLBACK_REGEX.theme);
     if (sayMatch) {
       actions.push({
         type: "update_copy",
