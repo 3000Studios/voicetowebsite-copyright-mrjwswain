@@ -111,6 +111,115 @@
     <!-- COMMAND CENTER INTERFACE -->
     <div class="command-interface" id="console">
 
+      <!-- ADMIN HUB -->
+      <section class="card wide" id="admin-hub-card">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Admin hub</p>
+            <h2>All Admin Pages</h2>
+            <p class="muted">One place to run ops: commands, products, apps, analytics, and live tools.</p>
+          </div>
+          <div class="status-strip">
+            <span class="status-chip" id="hub-auth">Locked</span>
+            <span class="status-chip" id="hub-config">Config: —</span>
+          </div>
+        </div>
+
+        <div class="admin-feature-grid" style="margin-top: 1.2rem;">
+          <a class="feature-card" href="voice-commands.html" aria-label="Open voice commands">
+            <div class="icon-square" aria-hidden="true">VC</div>
+            <h3>Voice Commands</h3>
+            <p>Run live prompts, capture transcripts, and ship changes.</p>
+          </a>
+
+          <a class="feature-card" href="store-manager.html" aria-label="Open store manager">
+            <div class="icon-square" aria-hidden="true">ST</div>
+            <h3>Store Manager</h3>
+            <p>Manage products, Stripe Buy Buttons, and payment links.</p>
+          </a>
+
+          <a class="feature-card" href="app-store-manager.html" aria-label="Open app store manager">
+            <div class="icon-square" aria-hidden="true">AP</div>
+            <h3>App Store Manager</h3>
+            <p>Curate apps, publish listings, and attach media.</p>
+          </a>
+
+          <a class="feature-card" href="analytics.html" aria-label="Open analytics dashboard">
+            <div class="icon-square" aria-hidden="true">AN</div>
+            <h3>Analytics</h3>
+            <p>Cloudflare traffic telemetry + sales endpoints.</p>
+          </a>
+
+          <a class="feature-card" href="live-stream.html" aria-label="Open live stream tools">
+            <div class="icon-square" aria-hidden="true">LS</div>
+            <h3>Live Stream</h3>
+            <p>Configure embeds, clips, and show overlays.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- SNAPSHOT -->
+      <section class="card wide" id="admin-snapshot-card">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">At-a-glance</p>
+            <h2>Profit Readiness Snapshot</h2>
+            <p class="muted">No secrets shown. Only status + counts.</p>
+          </div>
+          <div class="status-strip">
+            <span class="status-chip" id="hub-snapshot-status">Waiting...</span>
+            <button class="ghost small" id="hub-refresh" type="button">Refresh</button>
+          </div>
+        </div>
+
+        <div class="analytics-kpis" style="margin-top: 1.2rem;">
+          <div class="metric-card">
+            <div class="metric-label">Requests (12h)</div>
+            <div class="metric-value" id="hub-requests">—</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Uniques (12h)</div>
+            <div class="metric-value" id="hub-uniques">—</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Products</div>
+            <div class="metric-value" id="hub-products">—</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Missing Buy Buttons</div>
+            <div class="metric-value" id="hub-missing-buttons">—</div>
+          </div>
+        </div>
+
+        <div class="table-shell" style="margin-top: 1.2rem;">
+          <div class="table-head">
+            <h3>Payments configuration</h3>
+          </div>
+          <table class="app-table">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Stripe publishable</td>
+                <td id="hub-stripe-pub">—</td>
+              </tr>
+              <tr>
+                <td>Stripe secret</td>
+                <td id="hub-stripe-secret">—</td>
+              </tr>
+              <tr>
+                <td>PayPal client ID</td>
+                <td id="hub-paypal">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- STATUS & MIC -->
       <div class="status-bar">
         <div>
@@ -204,6 +313,7 @@
 
   <script type="module" src="./admin.js"></script>
   <script type="module" src="./auto-mode.js"></script>
+  <script type="module" src="./hub.js"></script>
   <script type="module" src="../nav.js"></script>
 </body>
 </html>

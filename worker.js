@@ -213,6 +213,28 @@ export default {
       });
     }
 
+    if (url.pathname === "/api/config/status" && request.method === "GET") {
+      const hasAdmin = await hasValidAdminCookie(request, env);
+      if (!hasAdmin) {
+        return jsonResponse(401, { error: "Unauthorized" });
+      }
+      return jsonResponse(200, {
+        stripe_publishable: !!(env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC),
+        stripe_secret: !!env.STRIPE_SECRET_KEY,
+        paypal_client_id: !!(env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID),
+        adsense_publisher: !!(
+          env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID
+        ),
+        adsense_slots: {
+          slot: !!env.ADSENSE_SLOT,
+          top: !!env.ADSENSE_SLOT_TOP,
+          mid: !!env.ADSENSE_SLOT_MID,
+          bottom: !!env.ADSENSE_SLOT_BOTTOM,
+        },
+        ts: new Date().toISOString(),
+      });
+    }
+
     if (url.pathname === "/api/metrics" && request.method === "GET") {
       if (!env.D1) {
         return jsonResponse(503, { error: "D1 database not available." });
