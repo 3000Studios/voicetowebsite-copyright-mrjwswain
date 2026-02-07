@@ -758,8 +758,8 @@ export default {
       const envInjection = `
         <script>
           window.__ENV = {
-            PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || ""}",
-            STRIPE_PUBLISHABLE_KEY: "${env.STRIPE_PUBLISHABLE_KEY || ""}",
+            PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID || ""}",
+            STRIPE_PUBLISHABLE_KEY: "${env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC || ""}",
             STRIPE_PAYMENT_LINK_STARTER: "${env.STRIPE_PAYMENT_LINK_STARTER || ""}",
             STRIPE_PAYMENT_LINK_GROWTH: "${env.STRIPE_PAYMENT_LINK_GROWTH || ""}",
             STRIPE_PAYMENT_LINK_ENTERPRISE: "${env.STRIPE_PAYMENT_LINK_ENTERPRISE || ""}",
@@ -836,10 +836,13 @@ export default {
        * We also continue to support direct text replacement for HTML-embedded tokens.
        */
       const injected = text
-        .replace(/__PAYPAL_CLIENT_ID__/g, env.PAYPAL_CLIENT_ID_PROD || "")
+        .replace(
+          /__PAYPAL_CLIENT_ID__/g,
+          env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID || "",
+        )
         .replace(
           /__STRIPE_PUBLISHABLE_KEY__/g,
-          env.STRIPE_PUBLISHABLE_KEY || "",
+          env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC || "",
         )
         .replace(
           /__ADSENSE_PUBLISHER__/g,

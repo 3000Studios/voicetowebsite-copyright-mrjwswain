@@ -16,6 +16,7 @@ binding = "AI"
 
 [vars]
 ENVIRONMENT = "production"
+PUBLIC_GENERATE = "1"
 # Placeholder for environment variables to be set in Cloudflare Dashboard
 # OPENAI_API = ""
 # PAYPAL_CLIENT_ID_PROD = ""
@@ -61,4 +62,3 @@ head_sampling_rate = 1
   enabled = true
   persist = true
   head_sampling_rate = 1
-
