@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Synth | VoiceToWebsite Tools</title>
+    <meta name="description" content="Generate harmonic color palettes for your next web project." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .tool-container {
+        max-width: 800px;
+        margin: 8rem auto 4rem;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .palette-display {
+        display: flex;
+        height: 200px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-membrane);
+      }
+
+      .color-swatch {
+        flex: 1;
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        padding-bottom: 1rem;
+        cursor: pointer;
+        transition: flex 0.3s ease;
+        position: relative;
+      }
+
+      .color-swatch:hover {
+        flex: 1.5;
+      }
+
+      .color-code {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 0.5rem;
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        backdrop-filter: blur(5px);
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+      }
+
+      .color-swatch:hover .color-code {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .controls {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .action-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-membrane);
+        color: var(--text-main);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--conductive-cyan);
+        transform: translateY(-2px);
+      }
+
+      .action-btn.primary {
+        background: var(--conductive-cyan);
+        color: #000;
+        border-color: var(--conductive-cyan);
+      }
+
+      .action-btn.primary:hover {
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="tool-container">
+      <h1>Color Synth</h1>
+      <p class="subhead" style="margin-bottom: 3rem">Harmonic Palette Generator</p>
+
+      <div class="palette-display" id="palette">
+        <!-- Swatches injected here -->
+      </div>
+
+      <div class="controls">
+        <button class="action-btn primary" id="generateBtn">GENERATE NEW</button>
+        <button class="action-btn" id="copyBtn">COPY CSS</button>
+      </div>
+    </main>
+
+    <script type="module" src="nav.js"></script>
+    <script>
+      const paletteEl = document.getElementById("palette");
+      const generateBtn = document.getElementById("generateBtn");
+      const copyBtn = document.getElementById("copyBtn");
+
+      function generateColor() {
+        const hex = Math.floor(Math.random() * 16777215).toString(16);
+        return "#" + "0".repeat(6 - hex.length) + hex;
+      }
+
+      function generatePalette() {
+        const colors = [];
+        // Simple logic: base color + variations
+        const baseHue = Math.floor(Math.random() * 360);
+
+        for (let i = 0; i < 5; i++) {
+          const hue = (baseHue + i * 30) % 360;
+          const saturation = 60 + Math.random() * 20;
+          const lightness = 40 + Math.random() * 40;
+          colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+        }
+        return colors;
+      }
+
+      function renderPalette() {
+        const colors = generatePalette();
+        paletteEl.innerHTML = "";
+
+        colors.forEach((color) => {
+          const swatch = document.createElement("div");
+          swatch.className = "color-swatch";
+          swatch.style.backgroundColor = color;
+
+          // Convert HSL to Hex for display (simplified for demo, keeping HSL for now)
+          swatch.innerHTML = `<span class="color-code">${color}</span>`;
+
+          swatch.addEventListener("click", () => {
+            navigator.clipboard.writeText(color);
+            alert("Copied: " + color);
+          });
+
+          paletteEl.appendChild(swatch);
+        });
+      }
+
+      generateBtn.addEventListener("click", renderPalette);
+
+      copyBtn.addEventListener("click", () => {
+        const codes = Array.from(document.querySelectorAll(".color-code"))
+          .map((el) => el.innerText)
+          .join("\n");
+        navigator.clipboard.writeText(codes);
+        alert("Palette copied to clipboard!");
+      });
+
+      // Init
+      renderPalette();
+    </script>
+  </body>
+</html>

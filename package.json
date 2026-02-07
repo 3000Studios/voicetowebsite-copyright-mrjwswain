@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite",
     "dev:worker": "wrangler dev",
+    "dev:all": "node ./scripts/dev-all.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
@@ -16,8 +17,16 @@
     "smash:check": "node ./check_smash.cjs",
     "smash:apply": "node ./apply_smash.cjs",
     "verify": "npm run type-check && npm run test && npm run build && npm run check:links",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "heal": "node ./scripts/heal.mjs",
+    "ship": "node ./scripts/ship.mjs",
+    "prepare": "node ./scripts/husky-install.mjs",
     "clean": "node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true});\"",
     "deploy": "npm run build && wrangler deploy"
+  },
+  "lint-staged": {
+    "*.{js,cjs,mjs,ts,tsx,css,scss,json,md,yml,yaml,html}": "prettier --write"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250109.0",
@@ -29,6 +38,9 @@
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^5.1.2",
     "jsdom": "^27.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6",
+    "prettier": "^3.6.2",
     "typescript": "^5.8.3",
     "vite": "^7.3.1",
     "vitest": "^4.0.18",

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Snake | VoiceToWebsite Arcade</title>
+    <meta name="description" content="Play Neon Snake, a high-speed cybernetic arcade game." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding-top: 6rem;
+      }
+
+      canvas {
+        border: 2px solid var(--conductive-cyan);
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        background-color: #050510;
+      }
+
+      .score-board {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.5rem;
+        color: var(--text-main);
+        margin-bottom: 1rem;
+      }
+
+      .controls-hint {
+        margin-top: 1rem;
+        color: var(--text-dim);
+        font-size: 0.8rem;
+      }
+
+      .start-btn {
+        background: var(--conductive-cyan);
+        color: #000;
+        border: none;
+        padding: 0.8rem 2rem;
+        font-family: "Orbitron", sans-serif;
+        font-weight: bold;
+        font-size: 1.2rem;
+        cursor: pointer;
+        margin-top: 2rem;
+        clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        transition: all 0.3s ease;
+      }
+
+      .start-btn:hover {
+        box-shadow: 0 0 30px rgba(0, 242, 255, 0.6);
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="game-container">
+      <div class="score-board">SCORE: <span id="score">0</span></div>
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+      <button id="startBtn" class="start-btn">INITIALIZE RUN</button>
+      <p class="controls-hint">USE ARROW KEYS or WASD TO NAVIGATE</p>
+    </main>
+
+    <script type="module" src="nav.js"></script>
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const scoreEl = document.getElementById("score");
+      const startBtn = document.getElementById("startBtn");
+
+      const gridSize = 20;
+      const tileCount = canvas.width / gridSize;
+
+      let score = 0;
+      let snake = [];
+      let food = { x: 15, y: 15 };
+      let dx = 0;
+      let dy = 0;
+      let gameInterval;
+      let isRunning = false;
+
+      function initGame() {
+        snake = [{ x: 10, y: 10 }];
+        score = 0;
+        dx = 0;
+        dy = 0;
+        scoreEl.innerText = score;
+        placeFood();
+        draw();
+      }
+
+      function startGame() {
+        if (isRunning) return;
+        initGame();
+        isRunning = true;
+        dx = 1; // Start moving right
+        dy = 0;
+        startBtn.style.display = "none";
+        gameInterval = setInterval(gameLoop, 100);
+      }
+
+      function gameOver() {
+        clearInterval(gameInterval);
+        isRunning = false;
+        startBtn.style.display = "block";
+        startBtn.innerText = "RETRY CONNECTION";
+
+        ctx.fillStyle = "rgba(0,0,0,0.7)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#00f2ff";
+        ctx.font = "30px Orbitron";
+        ctx.textAlign = "center";
+        ctx.fillText("SYSTEM FAILURE", canvas.width / 2, canvas.height / 2);
+      }
+
+      function placeFood() {
+        food.x = Math.floor(Math.random() * tileCount);
+        food.y = Math.floor(Math.random() * tileCount);
+        // Check if food spawns on snake (simple check)
+        snake.forEach((part) => {
+          if (part.x === food.x && part.y === food.y) placeFood();
+        });
+      }
+
+      function gameLoop() {
+        const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+        // Wall collision
+        if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+          gameOver();
+          return;
+        }
+
+        // Self collision
+        for (let i = 0; i < snake.length; i++) {
+          if (head.x === snake[i].x && head.y === snake[i].y) {
+            gameOver();
+            return;
+          }
+        }
+
+        snake.unshift(head);
+
+        // Eat food
+        if (head.x === food.x && head.y === food.y) {
+          score += 10;
+          scoreEl.innerText = score;
+          placeFood();
+        } else {
+          snake.pop();
+        }
+
+        draw();
+      }
+
+      function draw() {
+        // Clear background
+        ctx.fillStyle = "#050510";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw Snake
+        ctx.fillStyle = "#00f2ff";
+        snake.forEach((part, index) => {
+          // Gradient effect for snake
+          ctx.globalAlpha = 1 - index / (snake.length + 5);
+          ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
+        });
+        ctx.globalAlpha = 1;
+
+        // Draw Food
+        ctx.fillStyle = "#ff0055";
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#ff0055";
+        ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+        ctx.shadowBlur = 0;
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (!isRunning) return;
+
+        switch (e.key) {
+          case "ArrowUp":
+          case "w":
+            if (dy !== 1) {
+              dx = 0;
+              dy = -1;
+            }
+            break;
+          case "ArrowDown":
+          case "s":
+            if (dy !== -1) {
+              dx = 0;
+              dy = 1;
+            }
+            break;
+          case "ArrowLeft":
+          case "a":
+            if (dx !== 1) {
+              dx = -1;
+              dy = 0;
+            }
+            break;
+          case "ArrowRight":
+          case "d":
+            if (dx !== -1) {
+              dx = 1;
+              dy = 0;
+            }
+            break;
+        }
+      });
+
+      startBtn.addEventListener("click", startGame);
+
+      // Initial draw
+      initGame();
+    </script>
+  </body>
+</html>
