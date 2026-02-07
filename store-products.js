@@ -124,7 +124,24 @@ const openPayPalModal = async (product) => {
           ],
         }),
       onApprove: async (_data, actions) => {
-        await actions.order.capture();
+        try {
+          const details = await actions.order.capture();
+          const payerEmail = details.payer?.email_address || "";
+
+          await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: details.id,
+              product_id: product.id || product.title,
+              amount: Number(product.price),
+              customer_email: payerEmail,
+            }),
+          });
+        } catch (e) {
+          console.warn("Failed to record order:", e);
+        }
+
         const note = modal.querySelector(".vt-pay-note");
         if (note) note.textContent = "Payment successful. Thank you.";
         setTimeout(close, 1200);

@@ -110,7 +110,25 @@ export const handlePayPalPurchase = (product, amount, redirectUrl) => {
       },
       onApprove: async (_data, actions) => {
         try {
-          await actions.order.capture();
+          const details = await actions.order.capture();
+          const payerEmail = details.payer?.email_address || "";
+
+          // Record order in D1
+          try {
+            await fetch("/api/orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: details.id,
+                product_id: product,
+                amount: Number(amount),
+                customer_email: payerEmail,
+              }),
+            });
+          } catch (e) {
+            console.warn("Failed to record order:", e);
+          }
+
           close();
           window.location.href = returnUrl;
         } catch (err) {

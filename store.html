@@ -318,7 +318,24 @@
         },
         onApprove: async (_data, actions) => {
           try {
-            await actions.order.capture();
+            const details = await actions.order.capture();
+            const payerEmail = details.payer?.email_address || "";
+
+            try {
+              await fetch("/api/orders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  id: details.id,
+                  product_id: product,
+                  amount: Number(amount) / 100,
+                  customer_email: payerEmail,
+                }),
+              });
+            } catch (e) {
+              console.warn("Failed to record order:", e);
+            }
+
             close();
             window.location.href = `/store.html?checkout=success&product=${encodeURIComponent(product || "")}`;
           } catch (err) {
