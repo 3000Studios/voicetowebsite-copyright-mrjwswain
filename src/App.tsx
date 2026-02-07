@@ -308,52 +308,76 @@ const App: React.FC = () => {
                     borderColor: isHovered ? 'rgba(34, 211, 238, 0.3)' : 'rgba(255, 255, 255, 0.05)'
                 }}
               >
-                <div
-                  className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40"
-                  onClick={() => handleLinkClick(link)}
-                >
-                  <video
-                    ref={(el) => {
-                      if (el) {
-                        videoRefs.current[link.id] = el;
-                      } else {
-                        delete videoRefs.current[link.id];
+                <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-black/40">
+                  <div
+                    className="absolute inset-0 w-full h-full cursor-none"
+                    onClick={() => handleLinkClick(link)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Enter ${link.label}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLinkClick(link);
                       }
                     }}
-                    muted loop playsInline
-                    className={`absolute w-full h-full transition-all duration-700 ${isHovered ? 'object-contain scale-100 grayscale-0' : 'object-cover scale-110 grayscale'}`}
                   >
-                    <source src={link.videoUrl} type="video/mp4" />
-                  </video>
+                    <video
+                      ref={(el) => {
+                        if (el) {
+                          videoRefs.current[link.id] = el;
+                        } else {
+                          delete videoRefs.current[link.id];
+                        }
+                      }}
+                      muted loop playsInline
+                      className={`absolute w-full h-full transition-all duration-700 ${isHovered ? 'object-contain scale-100 grayscale-0' : 'object-cover scale-110 grayscale'}`}
+                    >
+                      <source src={link.videoUrl} type="video/mp4" />
+                    </video>
+
+                    <div className={`absolute inset-0 transition-all duration-700 ${isHovered ? 'bg-transparent' : 'bg-black/60'}`} />
+
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: [0, 2], opacity: [0.8, 0] }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 bg-white blur-3xl rounded-full z-[60]"
+                      />
+                    )}
+                  </div>
                   
-                  <div className={`absolute inset-0 transition-all duration-700 ${isHovered ? 'bg-transparent' : 'bg-black/60'}`} />
-                  
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4 pointer-events-none">
                     <AnimatePresence>
                       {!isSelected && (
                         <motion.div
-                          className="relative flex flex-col items-center"
+                          className="relative flex flex-col items-center pointer-events-auto"
                           animate={{ y: isOpen ? -80 : 0, scale: isOpen ? 0.7 : 1 }}
                         >
                            <ElectricText 
                              text={link.label} 
                              className="text-lg md:text-2xl lg:text-3xl tracking-[0.4em] mb-4"
-                             onClick={() => togglePanel(link.id)}
+                             onClick={(e) => {
+                               e?.stopPropagation();
+                               togglePanel(link.id);
+                             }}
                              active={isOpen}
+                             role="button"
+                             tabIndex={0}
+                             aria-label={`Show info for ${link.label}`}
+                             onKeyDown={(e) => {
+                               if (e.key === 'Enter' || e.key === ' ') {
+                                 e.preventDefault();
+                                 e.stopPropagation();
+                                 togglePanel(link.id);
+                               }
+                             }}
                            />
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
-
-                  {isSelected && (
-                    <motion.div 
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 2], opacity: [0.8, 0] }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute inset-0 bg-white blur-3xl rounded-full z-[60]"
-                    />
-                  )}
                 </div>
 
                 <AnimatePresence>
