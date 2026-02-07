@@ -260,6 +260,11 @@ export default {
             STRIPE_PUBLISHABLE_KEY: "${env.STRIPE_PUBLISHABLE_KEY || ''}",
             ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID}",
             ADSENSE_SLOT: "${env.ADSENSE_SLOT || ''}",
+            ADSENSE_MODE: "${env.ADSENSE_MODE || 'auto'}",
+            ADSENSE_SLOT_TOP: "${env.ADSENSE_SLOT_TOP || ''}",
+            ADSENSE_SLOT_MID: "${env.ADSENSE_SLOT_MID || ''}",
+            ADSENSE_SLOT_BOTTOM: "${env.ADSENSE_SLOT_BOTTOM || ''}",
+            ADSENSE_MAX_SLOTS: "${env.ADSENSE_MAX_SLOTS || '3'}",
             CONTROL_PASSWORD: "${env.CONTROL_PASSWORD || ''}"
           };
         </script>

@@ -21,6 +21,11 @@ ENVIRONMENT = "production"
 # PAYPAL_CLIENT_ID_PROD = ""
 # ADSENSE_PUBLISHER = ""
 # ADSENSE_SLOT = ""
+# ADSENSE_MODE = "auto" # off | auto | slots | hybrid
+# ADSENSE_SLOT_TOP = ""
+# ADSENSE_SLOT_MID = ""
+# ADSENSE_SLOT_BOTTOM = ""
+# ADSENSE_MAX_SLOTS = "3"
 # CONTROL_PASSWORD = ""
 
 [assets]

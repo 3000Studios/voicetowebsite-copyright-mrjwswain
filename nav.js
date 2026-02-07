@@ -274,25 +274,68 @@
     document.body.appendChild(wrap);
   };
 
+  const normalizePath = () => {
+    try {
+      let p = String(location.pathname || "/");
+      if (!p.startsWith("/")) p = `/${p}`;
+      p = p.replace(/\/$/, "");
+      if (!p) p = "/";
+      if (p.endsWith(".html")) p = p.slice(0, -5);
+      return p || "/";
+    } catch (_) {
+      return "/";
+    }
+  };
+
+  const normalizeAdsMode = (raw) => {
+    const v = String(raw || "auto").trim().toLowerCase();
+    if (!v) return "auto";
+    if (["off", "disabled", "false", "0", "none"].includes(v)) return "off";
+    if (["auto", "autoads", "page"].includes(v)) return "auto";
+    if (["slots", "manual"].includes(v)) return "slots";
+    if (["hybrid", "both"].includes(v)) return "hybrid";
+    return "auto";
+  };
+
+  const detectPublisherFromDom = () => {
+    try {
+      const script = document.querySelector(
+        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="]',
+      );
+      if (!script) return "";
+      const src = String(script.getAttribute("src") || "");
+      const match = src.match(/[?&]client=([^&]+)/i);
+      return match ? decodeURIComponent(match[1]) : "";
+    } catch (_) {
+      return "";
+    }
+  };
+
   const isAdsAllowed = () => {
     try {
-      const p = (location.pathname || "").replace(/\/$/, "");
-      if (!p || p === "/") return false;
+      const p = normalizePath();
       if (p.startsWith("/admin") || p.startsWith("/the3000")) return false;
-      return p === "/blog" || p === "/projects" || p === "/studio3000";
+
+      const meta = document.querySelector('meta[name="vtw-ads"]');
+      const setting = String(meta?.getAttribute("content") || "").trim().toLowerCase();
+      if (setting === "off" || setting === "false" || setting === "0") return false;
+      if (setting === "on" || setting === "true" || setting === "1") return true;
+
+      // Maximize by default: show ads everywhere except admin/secret or pages that explicitly opt out.
+      return true;
     } catch (_) {
       return false;
     }
   };
 
-  const maybeInjectAdsense = () => {
+  const ensureAdsenseLoader = (publisher) => {
     try {
-      if (!isAdsAllowed()) return;
-      if (document.getElementById("vtw-adsense-loader")) return;
-      const env = window.__ENV || {};
-      const publisher = String(env.ADSENSE_PUBLISHER || "").trim();
-      const slot = String(env.ADSENSE_SLOT || "").trim();
-      if (!publisher || !slot) return;
+      if (!publisher) return Promise.resolve(false);
+      if (document.getElementById("vtw-adsense-loader")) return Promise.resolve(true);
+      const existing = document.querySelector(
+        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]',
+      );
+      if (existing) return Promise.resolve(true);
 
       const script = document.createElement("script");
       script.id = "vtw-adsense-loader";
@@ -302,30 +345,130 @@
         publisher,
       )}`;
       document.head.appendChild(script);
+      return new Promise((resolve) => {
+        script.addEventListener("load", () => resolve(true), { once: true });
+        script.addEventListener("error", () => resolve(false), { once: true });
+      });
+    } catch (_) {
+      return Promise.resolve(false);
+    }
+  };
 
-      const footer = document.querySelector(".vt-footer");
-      if (!footer || footer.querySelector(".vtw-adsense-slot")) return;
-      const wrap = document.createElement("div");
-      wrap.className = "vtw-adsense-slot";
-      wrap.innerHTML = `
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="${publisher}"
-             data-ad-slot="${slot}"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      `;
-      const bar = footer.querySelector(".status-bar");
-      if (bar) bar.insertAdjacentElement("beforebegin", wrap);
-      else footer.appendChild(wrap);
+  const pushAdsense = () => {
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (_) {}
+  };
 
-      const push = () => {
-        try {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (_) {}
-      };
-      if (script.complete) push();
-      else script.addEventListener("load", push, { once: true });
+  const createAdsenseSlot = ({ publisher, slot, placement }) => {
+    const wrap = document.createElement("div");
+    wrap.className = `vtw-adsense-slot vtw-adsense-${placement}`;
+    wrap.dataset.vtwPlacement = placement;
+    wrap.innerHTML = `
+      <div class="vtw-ad-label">Advertisement</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="${publisher}"
+           data-ad-slot="${slot}"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    `;
+    return wrap;
+  };
+
+  const insertSlot = (wrap, placement) => {
+    const footer = document.querySelector(".vt-footer");
+    const main = document.querySelector("main.page") || document.querySelector("main") || document.body;
+    const sections = main ? Array.from(main.querySelectorAll("section.section")) : [];
+
+    if (placement === "top") {
+      const anchor = sections[0] || main.firstElementChild;
+      if (anchor) anchor.insertAdjacentElement("beforebegin", wrap);
+      else main.prepend(wrap);
+      return;
+    }
+
+    if (placement === "mid") {
+      const idx = sections.length ? Math.min(sections.length - 1, Math.max(0, Math.floor(sections.length / 2))) : -1;
+      const anchor = idx >= 0 ? sections[idx] : main.firstElementChild;
+      if (anchor) anchor.insertAdjacentElement("afterend", wrap);
+      else main.appendChild(wrap);
+      return;
+    }
+
+    // bottom
+    if (footer) footer.insertAdjacentElement("beforebegin", wrap);
+    else main.appendChild(wrap);
+  };
+
+  const maybeInjectAdsense = () => {
+    try {
+      if (!isAdsAllowed()) return;
+      const env = window.__ENV || {};
+      const mode = normalizeAdsMode(env.ADSENSE_MODE);
+      if (mode === "off") return;
+
+      const publisher = String(env.ADSENSE_PUBLISHER || detectPublisherFromDom() || "").trim();
+      if (!publisher) return;
+
+      const slotFallback = String(env.ADSENSE_SLOT || "").trim();
+      const slotTopRaw = String(env.ADSENSE_SLOT_TOP || "").trim();
+      const slotMidRaw = String(env.ADSENSE_SLOT_MID || "").trim();
+      const slotBottomRaw = String(env.ADSENSE_SLOT_BOTTOM || "").trim();
+      const maxSlots = Math.max(0, Math.min(6, Number.parseInt(String(env.ADSENSE_MAX_SLOTS || "3"), 10) || 3));
+
+      // Auto ads: just ensure the loader is present. Google will place units based on account settings.
+      if (mode === "auto") {
+        ensureAdsenseLoader(publisher);
+        return;
+      }
+
+      const providedSlots = [slotTopRaw, slotMidRaw, slotBottomRaw].filter(Boolean);
+      const candidateSlots = providedSlots.length ? providedSlots : slotFallback ? [slotFallback] : [];
+      const distinctSlots = [...new Set(candidateSlots)];
+
+      // Avoid reusing the same slot ID in multiple placements unless explicitly provided.
+      let placements = [];
+      if (distinctSlots.length === 1) {
+        placements = [{ placement: "mid", slot: distinctSlots[0] }];
+      } else {
+        placements = [
+          { placement: "top", slot: slotTopRaw || slotFallback },
+          { placement: "mid", slot: slotMidRaw || slotFallback },
+          { placement: "bottom", slot: slotBottomRaw || slotFallback },
+        ]
+          .filter((p) => p.slot)
+          .filter((p, idx, arr) => arr.findIndex((x) => x.slot === p.slot) === idx);
+      }
+
+      if (!placements.length) {
+        if (mode === "hybrid") ensureAdsenseLoader(publisher);
+        return;
+      }
+
+      const existing = document.querySelectorAll("ins.adsbygoogle").length;
+      let remaining = Math.max(0, maxSlots - existing);
+      if (!remaining) return;
+
+      const loader = ensureAdsenseLoader(publisher);
+
+      const inserts = [];
+      for (const p of placements) {
+        if (!remaining) break;
+        if (document.querySelector(`.vtw-adsense-slot[data-vtw-placement="${p.placement}"]`)) continue;
+        const wrap = createAdsenseSlot({ publisher, slot: p.slot, placement: p.placement });
+        insertSlot(wrap, p.placement);
+        inserts.push(wrap);
+        remaining--;
+      }
+
+      if (!inserts.length) return;
+
+      loader.then((ok) => {
+        if (!ok) return;
+        // Push only the slots we created (avoids double-push on pages that already do it manually).
+        inserts.forEach(() => pushAdsense());
+      });
     } catch (_) {}
   };
 
@@ -413,7 +556,7 @@
         return `Plan → Apply → Rollback is the safety gate. See <a href="/features">Features</a>, or run it in <a href="/admin/">Admin</a> (requires unlock).`;
       }
       if (t.includes("ads")) {
-        return `Ads are only intended for blog/resources pages — never the core funnel. See <a href="/blog">Blog</a>.`;
+        return `Ads are controlled by AdSense mode (auto/slots) and can be disabled per page with <code>&lt;meta name="vtw-ads" content="off"&gt;</code>.`;
       }
       if (t.includes("privacy") || t.includes("data") || t.includes("security")) {
         return `For data handling + security posture, visit <a href="/trust">Trust Center</a> and <a href="/privacy">Privacy</a>.`;
@@ -541,6 +684,9 @@
       electrifyLinks();
       spectralizeCards();
       initScrollReveals();
+    }
+
+    if (!isAdminPage()) {
       maybeInjectAdsense();
     }
 

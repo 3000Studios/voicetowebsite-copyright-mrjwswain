@@ -1660,6 +1660,18 @@ button.ghost:hover {
   padding: 0 18px;
 }
 
+.vtw-adsense-slot .vtw-ad-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 8px;
+}
+
+.vtw-adsense-slot.vtw-adsense-top {
+  margin-top: 10px;
+}
+
 .mb-4 { margin-bottom: 1rem !important; }
 .mb-6 { margin-bottom: 1.5rem !important; }
 
