@@ -141,12 +141,18 @@
             <button class="chip" data-command="Theme to midnight">Midnight Theme</button>
           </div>
 
+          <div style="margin: 1rem 0; padding: 0.5rem; background: rgba(255, 200, 0, 0.1); border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
+            <input type="checkbox" id="autonomous-mode" style="width: 1.2rem; height: 1.2rem;" />
+            <label for="autonomous-mode" style="font-weight: bold; cursor: pointer;">Autonomous Mode (Auto-Plan & Auto-Deploy)</label>
+          </div>
+
           <div class="button-grid">
             <button class="primary" id="plan">Plan Change</button>
             <input type="text" id="plan-confirm" placeholder='Type "ship it" to confirm' style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.8rem; border-radius: 999px; color: white; text-align: center;" />
             <button class="primary" id="apply" disabled>Apply & Deploy</button>
             <button class="ghost" id="undo">Undo Last</button>
           </div>
+        </div>
         </div>
 
         <!-- LOGS & RESPONSE -->
