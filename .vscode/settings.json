@@ -3,7 +3,7 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
 
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
@@ -11,6 +11,7 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsserver.maxTsServerMemory": 4096,
 
   "npm.packageManager": "npm",
 
@@ -18,8 +19,32 @@
     "**/dist": true,
     "**/node_modules": true
   },
-  "editor.defaultFormatter": "google.antigravity-code-executor",
+  "files.exclude": {
+    "**/dist": true,
+    "**/node_modules": true
+  },
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/dist/**": true,
+    "**/node_modules/**": true,
+    "**/.wrangler/**": true,
+    "**/Media/**": true,
+    "**/black-vault/**": true
+  },
+  "git.autofetch": false,
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": true,
+
+  "[javascript]": { "editor.formatOnSave": true },
+  "[javascriptreact]": { "editor.formatOnSave": true },
+  "[typescript]": { "editor.formatOnSave": true },
+  "[typescriptreact]": { "editor.formatOnSave": true },
+  "[json]": { "editor.formatOnSave": true },
+  "[css]": { "editor.formatOnSave": true },
+  "[scss]": { "editor.formatOnSave": true },
+  "[markdown]": { "editor.formatOnSave": true },
+  "[html]": { "editor.formatOnSave": false },
   "cSpell.words": [
     "ADSENSE",
     "Adsense",
