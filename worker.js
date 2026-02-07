@@ -136,6 +136,10 @@ export default {
       url.pathname === "/api/orchestrator" ||
       url.pathname === "/.netlify/functions/orchestrator"
     ) {
+      const hasAdmin = await hasValidAdminCookie(request, env);
+      if (!hasAdmin) {
+        return jsonResponse(401, { error: "Unauthorized" });
+      }
       if (request.method !== "POST") {
         return jsonResponse(405, { error: "Method not allowed." });
       }

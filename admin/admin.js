@@ -10,6 +10,7 @@ const lockScreen = document.getElementById("lock-screen");
 const lockInput = document.getElementById("lock-input");
 const lockButton = document.getElementById("lock-button");
 const lockError = document.getElementById("lock-error");
+const lockForm = document.getElementById("auth-form");
 const adminShell = document.querySelector(".admin-shell");
 const previewReset = document.getElementById("preview-reset");
 const previewSpeak = document.getElementById("preview-speak");
@@ -24,8 +25,9 @@ let listening = false;
 let inactivityTimer = null;
 let lastPlan = null;
 
-const PASSCODE = "5555";
 const UNLOCK_KEY = "yt-admin-unlocked";
+const UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+const SESSION_TTL_MS = 1000 * 60 * 60 * 2;
 const positiveWords = [
   "apply now",
   "ship it",
@@ -265,7 +267,26 @@ const callOrchestrator = async (payload) => {
   return data;
 };
 
-const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true";
+const isSessionFresh = () => {
+  const ts = Number(sessionStorage.getItem(UNLOCK_TS_KEY) || 0);
+  if (!ts) return false;
+  return Date.now() - ts < SESSION_TTL_MS;
+};
+
+const clearSession = () => {
+  sessionStorage.removeItem(UNLOCK_KEY);
+  sessionStorage.removeItem(UNLOCK_TS_KEY);
+  document.cookie = "vtw_admin=; Path=/; Max-Age=0; SameSite=Lax";
+};
+
+const touchSession = () => {
+  if (sessionStorage.getItem(UNLOCK_KEY) === "true") {
+    sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
+  }
+};
+
+const isUnlocked = () =>
+  sessionStorage.getItem(UNLOCK_KEY) === "true" && isSessionFresh();
 
 const setLockedUI = (locked) => {
   lockScreen.style.display = locked ? "grid" : "none";
@@ -277,26 +298,47 @@ const setLockedUI = (locked) => {
 };
 
 const initPasscodeGate = () => {
-  const unlocked = sessionStorage.getItem(UNLOCK_KEY) === "true";
+  if (!isSessionFresh()) {
+    clearSession();
+  }
+  const unlocked = isUnlocked();
   setLockedUI(!unlocked);
 
-  const unlock = () => {
-    if (lockInput.value.trim() === PASSCODE) {
+  const unlock = async (event) => {
+    if (event) event.preventDefault();
+    const code = (lockInput?.value || "").trim();
+    if (!code) {
+      if (lockError) lockError.textContent = "Enter access code.";
+      return;
+    }
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: code }),
+      });
+      if (!res.ok) {
+        throw new Error("Invalid password");
+      }
       sessionStorage.setItem(UNLOCK_KEY, "true");
-      lockError.textContent = "";
+      sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
+      if (lockError) lockError.textContent = "";
       setLockedUI(false);
       speak("Controls unlocked");
       logActivity();
-      return;
+    } catch (_) {
+      if (lockError) lockError.textContent = "Incorrect code.";
+      speak("Incorrect code");
     }
-    lockError.textContent = "Incorrect code.";
-    speak("Incorrect code");
   };
 
-  lockButton.addEventListener("click", unlock);
-  lockInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") unlock();
-  });
+  if (lockButton) lockButton.addEventListener("click", unlock);
+  if (lockForm) lockForm.addEventListener("submit", unlock);
+  if (lockInput) {
+    lockInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") unlock(e);
+    });
+  }
 };
 
 const initSpeech = () => {
@@ -383,6 +425,7 @@ planBtn.addEventListener("click", async () => {
       speak("Unlock required");
       return;
     }
+    touchSession();
     const command = commandEl.value.trim();
     if (!command) return;
     setResponse({ status: "Planning..." });
@@ -408,6 +451,7 @@ applyBtn.addEventListener("click", async () => {
       speak("Unlock required");
       return;
     }
+    touchSession();
     if (!lastPlan) {
       const fallbackCommand = commandEl.value.trim();
       if (!fallbackCommand) {

@@ -1,0 +1,4 @@
+## 2025-05-20 - Exposed Secrets via Client-Side Injection
+**Vulnerability:** The application was injecting `env.CONTROL_PASSWORD` directly into the `window.__ENV` object in `worker.js`, making the admin password visible in the page source. Admin authentication was then performed client-side by comparing user input against this exposed secret.
+**Learning:** The `worker.js` uses a string replacement strategy to inject environment variables into `index.html`. Any variable added to this `window.__ENV` object is public. Client-side authentication checks are fundamentally insecure.
+**Prevention:** Never inject secrets (API keys with private scope, passwords, signing keys) into client-side code. Use server-side endpoints (Cloudflare Workers/Functions) to handle sensitive logic and verify credentials, issuing HttpOnly cookies for session management.

@@ -214,7 +214,7 @@
       if (!fresh) {
         sessionStorage.removeItem("yt-admin-unlocked");
         sessionStorage.removeItem("yt-admin-unlocked-ts");
-        document.cookie = "vtw_admin=; Path=/admin; Max-Age=0; SameSite=Lax";
+        document.cookie = "vtw_admin=; Path=/; Max-Age=0; SameSite=Lax";
       }
       if (!cookie || !unlocked || !fresh) {
         window.location.href = "/admin/";

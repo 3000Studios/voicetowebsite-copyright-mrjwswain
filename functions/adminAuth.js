@@ -88,7 +88,7 @@ export const isAdminRequest = async (request, env) => {
 export const setAdminCookieHeaders = (headers, cookieValue, { secure = true } = {}) => {
   headers.append(
     "Set-Cookie",
-    `${adminCookieName}=${cookieValue}; Path=/admin; Max-Age=${adminCookieTtlSeconds}; ${
+    `${adminCookieName}=${cookieValue}; Path=/; Max-Age=${adminCookieTtlSeconds}; ${
       secure ? "Secure; " : ""
     }SameSite=Lax`
   );
@@ -97,6 +97,6 @@ export const setAdminCookieHeaders = (headers, cookieValue, { secure = true } = 
 export const clearAdminCookieHeaders = (headers, { secure = true } = {}) => {
   headers.append(
     "Set-Cookie",
-    `${adminCookieName}=; Path=/admin; Max-Age=0; ${secure ? "Secure; " : ""}SameSite=Lax`
+    `${adminCookieName}=; Path=/; Max-Age=0; ${secure ? "Secure; " : ""}SameSite=Lax`
   );
 };
