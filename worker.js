@@ -406,8 +406,18 @@ export default {
       `;
 
       const normalizedPath = cleanPath || "/";
-      const canonicalPath = normalizedPath === "/" ? "/" : normalizedPath;
-      const canonicalUrl = `${url.origin}${canonicalPath}`;
+      const seoPath = (() => {
+        try {
+          let p = String(url.pathname || "/");
+          if (p.length > 1) p = p.replace(/\/$/, "");
+          if (p.endsWith(".html")) p = p.slice(0, -5);
+          if (!p) p = "/";
+          return p;
+        } catch (_) {
+          return "/";
+        }
+      })();
+      const canonicalUrl = `${url.origin}${seoPath === "/" ? "/" : seoPath}`;
       const isAdminPage = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
       const isSecretPage = url.pathname.startsWith("/the3000");
       const robotsTag = isAdminPage || isSecretPage
@@ -474,7 +484,7 @@ export default {
       const hasOgType = /<meta\b[^>]*property=["']og:type["']/i.test(seoInjected);
       const hasOgSiteName = /<meta\b[^>]*property=["']og:site_name["']/i.test(seoInjected);
       const hasDescription = /<meta\b[^>]*name=["']description["']/i.test(seoInjected);
-      const fallbackDescription = descriptionByPath[normalizedPath] || defaultDescription;
+      const fallbackDescription = descriptionByPath[seoPath] || defaultDescription;
 
       const seoBlock = `
         <link rel="canonical" href="${canonicalUrl}" />
