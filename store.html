@@ -210,6 +210,7 @@
     </section>
   </main>
   <script src="https://js.stripe.com/v3"></script>
+  <script async src="https://js.stripe.com/v3/buy-button.js"></script>
   <script>
     const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
     const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
@@ -218,6 +219,12 @@
       growth: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_GROWTH) || "",
       enterprise: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_ENTERPRISE) || "",
       lifetime: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_LIFETIME) || "",
+    };
+    const STRIPE_BUY_BUTTON_IDS = {
+      starter: (window.__ENV && window.__ENV.STRIPE_BUY_BUTTON_ID_STARTER) || "",
+      growth: (window.__ENV && window.__ENV.STRIPE_BUY_BUTTON_ID_GROWTH) || "",
+      enterprise: (window.__ENV && window.__ENV.STRIPE_BUY_BUTTON_ID_ENTERPRISE) || "",
+      lifetime: (window.__ENV && window.__ENV.STRIPE_BUY_BUTTON_ID_LIFETIME) || "",
     };
     const handleStripe = async (btn) => {
       const amount = btn.dataset.amount;
@@ -327,6 +334,27 @@
     };
     document.querySelectorAll(".stripe-btn").forEach((btn) => {
       btn.addEventListener("click", () => handleStripe(btn));
+    });
+
+    // If Buy Button IDs are configured, replace the Stripe button with an embedded Stripe Buy Button.
+    // This bypasses our /api/stripe/checkout flow and tends to be the lowest-friction path.
+    document.querySelectorAll(".stripe-btn").forEach((btn) => {
+      const product = String(btn.dataset.product || "").toLowerCase();
+      const buyButtonId = (STRIPE_BUY_BUTTON_IDS[product] || "").trim();
+      if (!buyButtonId) return;
+      if (!STRIPE_PK || STRIPE_PK === "__STRIPE_PUBLISHABLE_KEY__") return;
+
+      btn.style.display = "none";
+      const parent = btn.parentElement;
+      if (!parent) return;
+
+      const wrap = document.createElement("div");
+      wrap.className = "stripe-buy-button-wrap";
+      const el = document.createElement("stripe-buy-button");
+      el.setAttribute("buy-button-id", buyButtonId);
+      el.setAttribute("publishable-key", STRIPE_PK);
+      wrap.appendChild(el);
+      parent.appendChild(wrap);
     });
     document.querySelectorAll(".pay-btn").forEach((btn) => {
       btn.addEventListener("click", () => handlePayPal(btn));
