@@ -24,6 +24,13 @@
       return false;
     }
   };
+  const prefersReducedMotion = () => {
+    try {
+      return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (_) {
+      return false;
+    }
+  };
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/features", label: "Features" },
@@ -51,8 +58,7 @@
       { href: "/terms", label: "Terms" },
     ],
   };
-  const navVideoSrc =
-    "https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4";
+  const navVideoSrc = "https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4";
 
   const normalizeTheme = (value) => {
     const found = THEMES.some((t) => t.id === value);
@@ -152,7 +158,7 @@
           osc2.stop(t + 0.3);
         }
       } catch (_) {}
-    }
+    },
   };
 
   const playHover = () => SoundEngine.play("hover");
@@ -160,9 +166,7 @@
   const hasAdminAccess = () => {
     try {
       const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
-      const cookie = document.cookie
-        .split(";")
-        .some((part) => part.trim().startsWith("vtw_admin=1"));
+      const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
       return unlocked || cookie;
     } catch (_) {
       return false;
@@ -174,26 +178,40 @@
   };
   const buildLinkHtml = () =>
     getNavLinks()
-      .map(
-        (link) =>
-          `<a href="${link.href}" data-name="${link.label}">${link.label}</a>`,
-      )
+      .map((link) => `<a href="${link.href}" data-name="${link.label}">${link.label}</a>`)
       .join("");
   const buildListHtml = () =>
     getNavLinks()
       .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
       .join("");
   const clearExistingNav = () => {
-    document
-      .querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav")
-      .forEach((el) => el.remove());
+    document.querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav").forEach((el) => el.remove());
+    const skip = document.querySelector(".vtw-skip-link");
+    if (skip) skip.remove();
     const toggle = document.getElementById("mobileNavToggle");
     if (toggle) toggle.remove();
   };
+  const ensureMainAnchor = () => {
+    try {
+      if (document.getElementById("main")) return;
+      const main = document.querySelector("main");
+      if (main && !main.id) {
+        main.id = "main";
+        return;
+      }
+      const root = document.getElementById("root");
+      if (root && !root.id) root.id = "main";
+    } catch (_) {}
+  };
   const injectNav = () => {
     clearExistingNav();
+    ensureMainAnchor();
     const body = document.body;
     const fragment = document.createDocumentFragment();
+    const skip = document.createElement("a");
+    skip.className = "vtw-skip-link";
+    skip.href = "#main";
+    skip.textContent = "Skip to content";
     const toggle = document.createElement("input");
     toggle.type = "checkbox";
     toggle.id = "mobileNavToggle";
@@ -205,8 +223,9 @@
     const overlay = document.createElement("div");
     overlay.className = "mobile-overlay";
     overlay.id = "mobileOverlay";
+    overlay.setAttribute("aria-hidden", "true");
     overlay.innerHTML = `      <ul>        ${buildListHtml()}      </ul>    `;
-    fragment.append(toggle, nav, overlay);
+    fragment.append(skip, toggle, nav, overlay);
     body.prepend(fragment);
     body.classList.add("nav-ready");
     const closeOnNavigate = () => {
@@ -220,12 +239,10 @@
       link.addEventListener("mouseenter", playHover);
       link.addEventListener("mousedown", playClick);
     });
-    overlay
-      .querySelectorAll("a")
-      .forEach((link) => {
-        link.addEventListener("mouseenter", playHover);
-        link.addEventListener("click", playClick);
-      });
+    overlay.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("mouseenter", playHover);
+      link.addEventListener("click", playClick);
+    });
     const toggleButton = nav.querySelector(".nav-toggle");
     toggleButton?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
@@ -233,6 +250,25 @@
         toggle.checked = !toggle.checked;
       }
     });
+
+    const syncOverlayA11y = () => {
+      const open = Boolean(toggle.checked);
+      overlay.setAttribute("aria-hidden", open ? "false" : "true");
+      toggleButton?.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    toggle.addEventListener("change", syncOverlayA11y);
+    syncOverlayA11y();
+
+    window.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key !== "Escape") return;
+        if (!toggle.checked) return;
+        toggle.checked = false;
+        syncOverlayA11y();
+      },
+      { passive: true }
+    );
   };
 
   const injectWidget = () => {
@@ -307,7 +343,9 @@
       const [c1, c2, c3] = palettes[idx];
 
       const hexToRgb = (hex) => {
-        const h = String(hex || "").replace("#", "").trim();
+        const h = String(hex || "")
+          .replace("#", "")
+          .trim();
         if (h.length === 3) {
           const r = parseInt(h[0] + h[0], 16);
           const g = parseInt(h[1] + h[1], 16);
@@ -406,7 +444,9 @@
   };
 
   const normalizeAdsMode = (raw) => {
-    const v = String(raw || "auto").trim().toLowerCase();
+    const v = String(raw || "auto")
+      .trim()
+      .toLowerCase();
     if (!v) return "auto";
     if (["off", "disabled", "false", "0", "none"].includes(v)) return "off";
     if (["auto", "autoads", "page"].includes(v)) return "auto";
@@ -418,7 +458,7 @@
   const detectPublisherFromDom = () => {
     try {
       const script = document.querySelector(
-        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="]',
+        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="]'
       );
       if (!script) return "";
       const src = String(script.getAttribute("src") || "");
@@ -435,7 +475,9 @@
       if (p.startsWith("/admin") || p.startsWith("/the3000")) return false;
 
       const meta = document.querySelector('meta[name="vtw-ads"]');
-      const setting = String(meta?.getAttribute("content") || "").trim().toLowerCase();
+      const setting = String(meta?.getAttribute("content") || "")
+        .trim()
+        .toLowerCase();
       if (setting === "off" || setting === "false" || setting === "0") return false;
       if (setting === "on" || setting === "true" || setting === "1") return true;
 
@@ -450,9 +492,7 @@
     try {
       if (!publisher) return Promise.resolve(false);
       if (document.getElementById("vtw-adsense-loader")) return Promise.resolve(true);
-      const existing = document.querySelector(
-        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]',
-      );
+      const existing = document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
       if (existing) return Promise.resolve(true);
 
       const script = document.createElement("script");
@@ -460,7 +500,7 @@
       script.async = true;
       script.crossOrigin = "anonymous";
       script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(
-        publisher,
+        publisher
       )}`;
       document.head.appendChild(script);
       return new Promise((resolve) => {
@@ -694,10 +734,7 @@
       }
 
       try {
-        localStorage.setItem(
-          "vtw-demo-prefill",
-          JSON.stringify({ prompt: value, ts: Date.now() }),
-        );
+        localStorage.setItem("vtw-demo-prefill", JSON.stringify({ prompt: value, ts: Date.now() }));
       } catch (_) {}
       addMsg("bot", `Opening <a href="/demo">/demo</a> with your prompt...`);
       setTimeout(() => {
@@ -739,8 +776,7 @@
       if (event.key === "Escape") setExpanded(false);
     });
 
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       micBtn?.setAttribute("disabled", "true");
       micBtn && (micBtn.title = "Voice input not supported in this browser.");
@@ -782,10 +818,7 @@
     }
 
     setMode("ask");
-    addMsg(
-      "bot",
-      `Need help? Ask here — or switch to Build to jump into <a href="/demo">/demo</a>.`,
-    );
+    addMsg("bot", `Need help? Ask here — or switch to Build to jump into <a href="/demo">/demo</a>.`);
     renderHints();
   };
   const init = () => {
@@ -801,10 +834,10 @@
       initFooterParallax();
       electrifyLinks();
       spectralizeCards();
-      initScrollReveals();
+      if (!prefersReducedMotion()) initScrollReveals();
     }
 
-    injectBottomWaves();
+    if (!isAdminPage() && !prefersReducedMotion()) injectBottomWaves();
 
     if (!isAdminPage()) {
       maybeInjectAdsense();
@@ -829,7 +862,7 @@
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -12% 0px" },
+      { threshold: 0.12, rootMargin: "0px 0px -12% 0px" }
     );
 
     document.querySelectorAll(".spectral-card").forEach((el) => {
@@ -851,8 +884,7 @@
       .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
       .join("");
     const themeButtons = THEMES.map(
-      (t) =>
-        `<button type="button" class="theme-btn" data-theme="${t.id}" data-vtw-theme-btn>${t.label}</button>`,
+      (t) => `<button type="button" class="theme-btn" data-theme="${t.id}" data-vtw-theme-btn>${t.label}</button>`
     ).join("");
     footer.innerHTML = `      <div class="footer-container">        <div class="strata-cell">          <div class="etched-brand">VOICE<br>TO<br>WEBSITE</div>          <p class="vt-footer-tagline">            Erosion-resistant digital infrastructure for the vocal era.          </p>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Platform</h4>          <ul class="footer-links">            ${platformLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Company</h4>          <ul class="footer-links">            ${companyLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Trending Now</h4>          <a href="/lexicon-pro.html" class="hot-product-card">            <div>              <div class="hot-tag">NEW RELEASE</div>              <div class="product-name">LEXICON PRO</div>              <p class="hot-product-desc">                Real-time site stratification from live audio feeds.              </p>            </div>            <div class="product-cta">ACQUIRE LICENSE</div>          </a>        </div>      </div>      <div class="status-bar">        <div class="live-indicator">          <div class="pulse-stack">            <div class="pulse" aria-hidden="true"></div>            <span>SYSTEMS NOMINAL</span>          </div>          <span>LATENCY: 14MS</span>          <span class="timestamp" id="vt-footer-timestamp"></span>        </div>        <div>          &copy; ${new Date().getFullYear()} VOICETOWEBSITE.COM
 
@@ -862,7 +894,7 @@
       .querySelector(".strata-cell")
       ?.insertAdjacentHTML(
         "beforeend",
-        `<div class="footer-theme"><div class="theme-label">Theme</div><div class="theme-switch" role="group" aria-label="Theme switcher">${themeButtons}</div></div>`,
+        `<div class="footer-theme"><div class="theme-label">Theme</div><div class="theme-switch" role="group" aria-label="Theme switcher">${themeButtons}</div></div>`
       );
     document.body.appendChild(footer);
   };
@@ -889,14 +921,14 @@
           const y = e.clientY - rect.top;
           cell.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(var(--accent-rgb), 0.08) 0%, rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.03) 100%)`;
         },
-        { passive: true },
+        { passive: true }
       );
       cell.addEventListener(
         "mouseleave",
         () => {
           cell.style.background = "";
         },
-        { passive: true },
+        { passive: true }
       );
     });
   };

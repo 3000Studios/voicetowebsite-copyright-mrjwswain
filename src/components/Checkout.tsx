@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CheckoutProps {
   items: Array<{
@@ -11,13 +11,13 @@ interface CheckoutProps {
 }
 
 export default function Checkout({ items, onClose }: CheckoutProps) {
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypal' | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal" | null>(null);
   const [formData, setFormData] = useState({
-    email: '',
-    cardNumber: '',
-    expiry: '',
-    cvc: '',
-    name: '',
+    email: "",
+    cardNumber: "",
+    expiry: "",
+    cvc: "",
+    name: "",
   });
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -45,25 +45,25 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
 
   const loadPayPalSdk = async () => {
     if (!paypalClientId) {
-      throw new Error('Missing VITE_PAYPAL_CLIENT_ID');
+      throw new Error("Missing VITE_PAYPAL_CLIENT_ID");
     }
     const existing = document.querySelector<HTMLScriptElement>('script[data-paypal-sdk="true"]');
     if (existing) return;
 
     await new Promise<void>((resolve, reject) => {
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(paypalClientId)}&currency=USD&intent=capture`;
       script.async = true;
       script.defer = true;
-      script.dataset.paypalSdk = 'true';
+      script.dataset.paypalSdk = "true";
       script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load PayPal SDK'));
+      script.onerror = () => reject(new Error("Failed to load PayPal SDK"));
       document.head.appendChild(script);
     });
   };
 
   useEffect(() => {
-    if (paymentMethod !== 'paypal') return;
+    if (paymentMethod !== "paypal") return;
     if (!paypalHostRef.current) return;
 
     let cancelled = false;
@@ -76,29 +76,32 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
 
         const paypalAny = (window as any).paypal as any;
         if (!paypalAny?.Buttons) {
-          throw new Error('PayPal SDK not available');
+          throw new Error("PayPal SDK not available");
         }
 
-        paypalHostRef.current!.innerHTML = '';
+        paypalHostRef.current!.innerHTML = "";
 
         const button = paypalAny.Buttons({
-          style: { layout: 'vertical', shape: 'rect', label: 'paypal' },
+          style: { layout: "vertical", shape: "rect", label: "paypal" },
           createOrder: (_data: any, actions: any) => {
             return actions.order.create({
               purchase_units: [
                 {
-                  description: items.map((i) => i.name).join(', ').slice(0, 127),
+                  description: items
+                    .map((i) => i.name)
+                    .join(", ")
+                    .slice(0, 127),
                   amount: {
-                    currency_code: 'USD',
+                    currency_code: "USD",
                     value: total.toFixed(2),
                     breakdown: {
-                      item_total: { currency_code: 'USD', value: total.toFixed(2) },
+                      item_total: { currency_code: "USD", value: total.toFixed(2) },
                     },
                   },
                   items: items.map((i) => ({
                     name: i.name.slice(0, 127),
-                    unit_amount: { currency_code: 'USD', value: i.price.toFixed(2) },
-                    quantity: '1',
+                    unit_amount: { currency_code: "USD", value: i.price.toFixed(2) },
+                    quantity: "1",
                   })),
                 },
               ],
@@ -115,7 +118,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
             }, 1800);
           },
           onError: (err: any) => {
-            console.error('PayPal error', err);
+            console.error("PayPal error", err);
             setProcessing(false);
           },
         });
@@ -397,20 +400,18 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
           <div className="success-animation">
             <div className="success-icon">✓</div>
             <h2 className="success-title">Payment Successful!</h2>
-            <p className="success-message">
-              Thank you for your purchase. Check your email for download links.
-            </p>
+            <p className="success-message">Thank you for your purchase. Check your email for download links.</p>
           </div>
         ) : (
           <>
             <h2 className="checkout-title">Checkout</h2>
 
             <div className="order-summary">
-              <h3 style={{ marginBottom: '1rem', fontSize: '1.3rem' }}>Order Summary</h3>
+              <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>Order Summary</h3>
               {items.map((item) => (
                 <div key={item.id} className="order-item">
                   <span>{item.name}</span>
-                  <span style={{ fontWeight: '700' }}>${item.price.toFixed(2)}</span>
+                  <span style={{ fontWeight: "700" }}>${item.price.toFixed(2)}</span>
                 </div>
               ))}
               <div className="order-total">
@@ -419,18 +420,18 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
               </div>
             </div>
 
-            <h3 style={{ marginBottom: '1rem', fontSize: '1.3rem' }}>Payment Method</h3>
+            <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>Payment Method</h3>
             <div className="payment-methods">
               <button
-                className={`payment-method-btn ${paymentMethod === 'stripe' ? 'active' : ''}`}
-                onClick={() => setPaymentMethod('stripe')}
+                className={`payment-method-btn ${paymentMethod === "stripe" ? "active" : ""}`}
+                onClick={() => setPaymentMethod("stripe")}
               >
                 <div className="payment-icon">💳</div>
                 <div>Credit Card</div>
               </button>
               <button
-                className={`payment-method-btn ${paymentMethod === 'paypal' ? 'active' : ''}`}
-                onClick={() => setPaymentMethod('paypal')}
+                className={`payment-method-btn ${paymentMethod === "paypal" ? "active" : ""}`}
+                onClick={() => setPaymentMethod("paypal")}
               >
                 <div className="payment-icon">🅿️</div>
                 <div>PayPal</div>
@@ -438,7 +439,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
             </div>
 
             <AnimatePresence mode="wait">
-              {paymentMethod === 'stripe' && (
+              {paymentMethod === "stripe" && (
                 <motion.form
                   className="checkout-form"
                   onSubmit={handleSubmit}
@@ -504,16 +505,12 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     </div>
                   </div>
                   <button type="submit" className="submit-btn" disabled={processing}>
-                    {processing ? (
-                      <div className="spinner" />
-                    ) : (
-                      `Pay $${total.toFixed(2)}`
-                    )}
+                    {processing ? <div className="spinner" /> : `Pay $${total.toFixed(2)}`}
                   </button>
                 </motion.form>
               )}
 
-              {paymentMethod === 'paypal' && (
+              {paymentMethod === "paypal" && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -522,11 +519,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   {!paypalClientId ? (
                     <div
                       style={{
-                        padding: '1rem',
+                        padding: "1rem",
                         borderRadius: 12,
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        color: '#b0b0b0',
+                        background: "rgba(255,255,255,0.06)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        color: "#b0b0b0",
                       }}
                     >
                       Missing <code>VITE_PAYPAL_CLIENT_ID</code>. Add it to your env to enable PayPal checkout.
@@ -534,7 +531,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   ) : (
                     <>
                       {processing && (
-                        <div style={{ padding: '0.75rem 0' }}>
+                        <div style={{ padding: "0.75rem 0" }}>
                           <div className="spinner" />
                         </div>
                       )}

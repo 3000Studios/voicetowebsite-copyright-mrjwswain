@@ -1,17 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from './constants';
-import { NavigationLink } from './types';
-import { audioEngine } from './services/audioEngine';
-import WarpTunnel from './components/WarpTunnel';
-import AudioWaveform from './components/AudioWaveform';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from "./constants";
+import { NavigationLink } from "./types";
+import { audioEngine } from "./services/audioEngine";
+import WarpTunnel from "./components/WarpTunnel";
+import AudioWaveform from "./components/AudioWaveform";
 
-const SEEN_KEY = 'vtw-v2-seen';
-const AUDIO_OPTOUT_KEY = 'vtw-audio-optout';
+const SEEN_KEY = "vtw-v2-seen";
+const AUDIO_OPTOUT_KEY = "vtw-audio-optout";
 
 const hasSeenV2 = () => {
   try {
-    return localStorage.getItem(SEEN_KEY) === '1';
+    return localStorage.getItem(SEEN_KEY) === "1";
   } catch (_) {
     return false;
   }
@@ -19,13 +19,13 @@ const hasSeenV2 = () => {
 
 const markSeenV2 = () => {
   try {
-    localStorage.setItem(SEEN_KEY, '1');
+    localStorage.setItem(SEEN_KEY, "1");
   } catch (_) {}
 };
 
 const hasAudioOptedOut = () => {
   try {
-    return localStorage.getItem(AUDIO_OPTOUT_KEY) === '1';
+    return localStorage.getItem(AUDIO_OPTOUT_KEY) === "1";
   } catch (_) {
     return false;
   }
@@ -33,57 +33,55 @@ const hasAudioOptedOut = () => {
 
 const setAudioOptOut = (optOut: boolean) => {
   try {
-    if (optOut) localStorage.setItem(AUDIO_OPTOUT_KEY, '1');
+    if (optOut) localStorage.setItem(AUDIO_OPTOUT_KEY, "1");
     else localStorage.removeItem(AUDIO_OPTOUT_KEY);
   } catch (_) {}
 };
 
 const buildInstantOutline = (prompt: string) => {
-  const text = (prompt || '').trim();
+  const text = (prompt || "").trim();
   const lower = text.toLowerCase();
 
   const sections = [
-    'Hero + CTA',
-    'How it works (5 steps)',
-    'Use cases (tabs)',
-    'Feature blocks',
-    'Social proof',
-    'Pricing preview',
-    'FAQ',
-    'Footer (Trust + Status)',
+    "Hero + CTA",
+    "How it works (5 steps)",
+    "Use cases (tabs)",
+    "Feature blocks",
+    "Social proof",
+    "Pricing preview",
+    "FAQ",
+    "Footer (Trust + Status)",
   ];
 
-  if (lower.includes('booking')) sections.splice(2, 0, 'Booking + availability');
-  if (lower.includes('portfolio') || lower.includes('gallery'))
-    sections.splice(2, 0, 'Portfolio / reel');
-  if (lower.includes('ecommerce') || lower.includes('store'))
-    sections.splice(2, 0, 'Products + bundles');
-  if (lower.includes('blog')) sections.splice(6, 0, 'Blog hub (topic clusters)');
+  if (lower.includes("booking")) sections.splice(2, 0, "Booking + availability");
+  if (lower.includes("portfolio") || lower.includes("gallery")) sections.splice(2, 0, "Portfolio / reel");
+  if (lower.includes("ecommerce") || lower.includes("store")) sections.splice(2, 0, "Products + bundles");
+  if (lower.includes("blog")) sections.splice(6, 0, "Blog hub (topic clusters)");
 
   return {
-    title: text ? `Preview: ${text}` : 'Preview (instant)',
+    title: text ? `Preview: ${text}` : "Preview (instant)",
     sections,
   };
 };
 
 const App: React.FC = () => {
   const seen = hasSeenV2();
-  const [phase, setPhase] = useState<'opener' | 'site'>(seen ? 'site' : 'opener');
+  const [phase, setPhase] = useState<"opener" | "site">(seen ? "site" : "opener");
   const [openerCollapsed, setOpenerCollapsed] = useState(seen);
   const [showBumper, setShowBumper] = useState(seen);
   const [isWarping, setIsWarping] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
-  const [tryPrompt, setTryPrompt] = useState('');
+  const [tryPrompt, setTryPrompt] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   const reduceMotion = useReducedMotion();
 
-  const [activeUseCase, setActiveUseCase] = useState<
-    'creators' | 'agencies' | 'local' | 'ecommerce' | 'wordpress'
-  >('creators');
+  const [activeUseCase, setActiveUseCase] = useState<"creators" | "agencies" | "local" | "ecommerce" | "wordpress">(
+    "creators"
+  );
 
   const secretTapRef = useRef<number[]>([]);
   const handleSecretTap = () => {
@@ -91,7 +89,7 @@ const App: React.FC = () => {
     const taps = secretTapRef.current.filter((t) => now - t < 1500);
     taps.push(now);
     secretTapRef.current = taps;
-    if (taps.length >= 6) window.location.href = '/the3000.html';
+    if (taps.length >= 6) window.location.href = "/the3000.html";
   };
 
   useEffect(() => {
@@ -143,14 +141,14 @@ const App: React.FC = () => {
         });
       };
       const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Enter' || event.key === ' ') onGesture();
+        if (event.key === "Enter" || event.key === " ") onGesture();
       };
 
-      window.addEventListener('pointerdown', onGesture, { capture: true });
-      window.addEventListener('keydown', onKeyDown, { capture: true });
+      window.addEventListener("pointerdown", onGesture, { capture: true });
+      window.addEventListener("keydown", onKeyDown, { capture: true });
       removeUnlockListeners = () => {
-        window.removeEventListener('pointerdown', onGesture, true);
-        window.removeEventListener('keydown', onKeyDown, true);
+        window.removeEventListener("pointerdown", onGesture, true);
+        window.removeEventListener("keydown", onKeyDown, true);
       };
     });
 
@@ -161,20 +159,19 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'en-US';
+    recognition.lang = "en-US";
 
     recognition.onresult = (event: any) => {
       const transcript = Array.from(event.results)
         .map((result: any) => result[0])
         .map((result: any) => result.transcript)
-        .join('');
+        .join("");
       setTryPrompt(transcript);
     };
     recognition.onend = () => setIsListening(false);
@@ -219,29 +216,29 @@ const App: React.FC = () => {
   const enterSite = () => {
     markSeenV2();
     setOpenerCollapsed(true);
-    setPhase('site');
+    setPhase("site");
   };
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' && event.key !== ' ') return;
+      if (event.key !== "Escape" && event.key !== " ") return;
 
-      if (phase === 'opener' && !openerCollapsed) {
+      if (phase === "opener" && !openerCollapsed) {
         event.preventDefault();
         enterSite();
       }
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (phase !== 'opener' || openerCollapsed) return;
+      if (phase !== "opener" || openerCollapsed) return;
       if (event.deltaY > 0) enterSite();
     };
 
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("wheel", onWheel, { passive: true });
     return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('wheel', onWheel as any);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("wheel", onWheel as any);
     };
   }, [phase, openerCollapsed]);
 
@@ -266,39 +263,39 @@ const App: React.FC = () => {
 
   const useCases = {
     creators: {
-      label: 'Creators',
-      prompt: 'Build a creator portfolio with a reel section and email capture.',
-      bullets: ['Publish faster', 'Capture emails', 'Monetize content'],
-      template: 'Creator Portfolio',
-      integration: 'YouTube + Newsletter',
+      label: "Creators",
+      prompt: "Build a creator portfolio with a reel section and email capture.",
+      bullets: ["Publish faster", "Capture emails", "Monetize content"],
+      template: "Creator Portfolio",
+      integration: "YouTube + Newsletter",
     },
     agencies: {
-      label: 'Agencies',
-      prompt: 'Create an agency homepage with services, case studies, and a contact form.',
-      bullets: ['Ship client sites', 'Reuse templates', 'Reduce revisions'],
-      template: 'Agency Landing',
-      integration: 'CRM + Scheduling',
+      label: "Agencies",
+      prompt: "Create an agency homepage with services, case studies, and a contact form.",
+      bullets: ["Ship client sites", "Reuse templates", "Reduce revisions"],
+      template: "Agency Landing",
+      integration: "CRM + Scheduling",
     },
     local: {
-      label: 'Local',
-      prompt: 'Create a landing page for a barber shop with booking and pricing.',
-      bullets: ['Rank locally', 'Drive calls', 'Book appointments'],
-      template: 'Local Service',
-      integration: 'Maps + Booking',
+      label: "Local",
+      prompt: "Create a landing page for a barber shop with booking and pricing.",
+      bullets: ["Rank locally", "Drive calls", "Book appointments"],
+      template: "Local Service",
+      integration: "Maps + Booking",
     },
     ecommerce: {
-      label: 'Ecommerce',
-      prompt: 'Design an ecommerce storefront with bundles, reviews, and FAQs.',
-      bullets: ['Bundles + upsells', 'Fast pages', 'Trust-first checkout'],
-      template: 'Storefront',
-      integration: 'Stripe + PayPal',
+      label: "Ecommerce",
+      prompt: "Design an ecommerce storefront with bundles, reviews, and FAQs.",
+      bullets: ["Bundles + upsells", "Fast pages", "Trust-first checkout"],
+      template: "Storefront",
+      integration: "Stripe + PayPal",
     },
     wordpress: {
-      label: 'WordPress',
-      prompt: 'Create a WordPress migration landing page with SEO checklist and pricing.',
-      bullets: ['Migration plan', 'SEO cleanup', 'Performance lift'],
-      template: 'WP Migration',
-      integration: 'Analytics + Redirects',
+      label: "WordPress",
+      prompt: "Create a WordPress migration landing page with SEO checklist and pricing.",
+      bullets: ["Migration plan", "SEO cleanup", "Performance lift"],
+      template: "WP Migration",
+      integration: "Analytics + Redirects",
     },
   } as const;
 
@@ -307,7 +304,7 @@ const App: React.FC = () => {
   const seedDemoPrompt = (prompt: string) => {
     setTryPrompt(prompt);
     try {
-      localStorage.setItem('vtw-demo-prefill', JSON.stringify({ prompt, ts: Date.now() }));
+      localStorage.setItem("vtw-demo-prefill", JSON.stringify({ prompt, ts: Date.now() }));
     } catch (_) {}
   };
 
@@ -317,21 +314,15 @@ const App: React.FC = () => {
 
       {/* Background atmosphere */}
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover opacity-20 brightness-50"
-        >
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-20 brightness-50">
           <source src={BACKGROUND_TUNNEL} type="video/mp4" />
-          </video>
+        </video>
         <div className="absolute inset-0 bg-radial-gradient from-transparent to-black" />
       </div>
 
       {/* Returning visitor bumper */}
       <AnimatePresence>
-        {showBumper && phase === 'site' && (
+        {showBumper && phase === "site" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -339,15 +330,9 @@ const App: React.FC = () => {
             className="fixed inset-0 z-[220] grid place-items-center bg-black/80 backdrop-blur-md"
           >
             <div className="text-center px-6">
-              <div className="font-orbitron tracking-[0.5em] text-white/70 text-xs">
-                VOICETOWEBSITE
-              </div>
+              <div className="font-orbitron tracking-[0.5em] text-white/70 text-xs">VOICETOWEBSITE</div>
               <div className="mt-5 grid place-items-center" aria-hidden="true">
-                <AudioWaveform
-                  active={isAudioPlaying}
-                  mode="bumper"
-                  className="vt-waveform vt-waveform-bumper"
-                />
+                <AudioWaveform active={isAudioPlaying} mode="bumper" className="vt-waveform vt-waveform-bumper" />
               </div>
               <div className="mt-5 text-white/40 text-sm">Systems nominal</div>
             </div>
@@ -365,13 +350,11 @@ const App: React.FC = () => {
           type="button"
           onClick={toggleAudio}
           className="flex items-center gap-2"
-          aria-label={isAudioPlaying ? 'Stop soundtrack' : 'Play soundtrack'}
+          aria-label={isAudioPlaying ? "Stop soundtrack" : "Play soundtrack"}
         >
-          <div
-            className={`w-2.5 h-2.5 rounded-full ${isAudioPlaying ? 'bg-cyan-400 animate-pulse' : 'bg-white/20'}`}
-          />
+          <div className={`w-2.5 h-2.5 rounded-full ${isAudioPlaying ? "bg-cyan-400 animate-pulse" : "bg-white/20"}`} />
           <span className="font-orbitron text-[10px] tracking-[0.2em] text-white/60 uppercase whitespace-nowrap">
-            {isAudioPlaying ? 'SOUND ON' : 'SOUND OFF'}
+            {isAudioPlaying ? "SOUND ON" : "SOUND OFF"}
           </span>
         </button>
         <input
@@ -400,8 +383,8 @@ const App: React.FC = () => {
       <motion.section
         id="opener"
         className="relative z-10 w-full overflow-hidden"
-        animate={{ minHeight: openerCollapsed ? 520 : '100vh' }}
-        transition={{ duration: 0.9, ease: 'circInOut' }}
+        animate={{ minHeight: openerCollapsed ? 520 : "100vh" }}
+        transition={{ duration: 0.9, ease: "circInOut" }}
       >
         <div className="absolute inset-0 z-0 pointer-events-none">
           <video
@@ -409,7 +392,7 @@ const App: React.FC = () => {
             muted
             loop
             playsInline
-            className={`w-full h-full object-cover transition-opacity duration-700 ${openerCollapsed ? 'opacity-20' : 'opacity-40'}`}
+            className={`w-full h-full object-cover transition-opacity duration-700 ${openerCollapsed ? "opacity-20" : "opacity-40"}`}
           >
             <source src={INTRO_VIDEO} type="video/mp4" />
           </video>
@@ -431,18 +414,14 @@ const App: React.FC = () => {
             {!openerCollapsed ? (
               <motion.div
                 key="opener"
-                initial={
-                  reduceMotion
-                    ? { opacity: 0 }
-                    : { opacity: 0, y: 16, clipPath: 'circle(140% at 50% 50%)' }
-                }
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, clipPath: "circle(140% at 50% 50%)" }}
                 animate={
                   reduceMotion
                     ? { opacity: 1, transition: { duration: 0.35 } }
                     : {
                         opacity: 1,
                         y: 0,
-                        clipPath: 'circle(140% at 50% 50%)',
+                        clipPath: "circle(140% at 50% 50%)",
                         transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
                       }
                 }
@@ -452,7 +431,7 @@ const App: React.FC = () => {
                     : {
                         opacity: 0,
                         y: -8,
-                        clipPath: 'circle(0% at 50% 18%)',
+                        clipPath: "circle(0% at 50% 18%)",
                         transition: { duration: 0.85, ease: [0.65, 0, 0.35, 1] },
                       }
                 }
@@ -541,8 +520,8 @@ const App: React.FC = () => {
                     <p className="eyebrow">Home</p>
                     <h1 className="vt-h1">Voice to Website Builder — Speak It. Ship It.</h1>
                     <p className="subhead">
-                      Turn voice into a complete, responsive, SEO-ready website with pages,
-                      copy, templates, and one-click publish — then keep improving.
+                      Turn voice into a complete, responsive, SEO-ready website with pages, copy, templates, and
+                      one-click publish — then keep improving.
                     </p>
                     <div className="cta-row">
                       <a className="btn btn-primary" href="/demo">
@@ -558,7 +537,7 @@ const App: React.FC = () => {
                       <span>Lighthouse targets 90+/95+</span>
                     </div>
 
-                    <div className="vt-grid" style={{ marginTop: '1.6rem' }}>
+                    <div className="vt-grid" style={{ marginTop: "1.6rem" }}>
                       <div className="feature-card">
                         <h3>Try a command</h3>
                         <p className="muted">Type or tap mic. Edit before generate.</p>
@@ -574,30 +553,26 @@ const App: React.FC = () => {
                             placeholder="Create a landing page for a barber shop with booking and pricing..."
                           />
                           <div className="prompt-actions">
-                            <button
-                              className="btn btn-ghost"
-                              type="button"
-                              onClick={toggleListening}
-                            >
-                              {isListening ? 'Stop mic' : 'Mic'}
+                            <button className="btn btn-ghost" type="button" onClick={toggleListening}>
+                              {isListening ? "Stop mic" : "Mic"}
                             </button>
                             <button
                               className="btn btn-primary"
                               type="button"
                               onClick={() => {
                                 seedDemoPrompt(tryPrompt);
-                                window.location.href = '/demo';
+                                window.location.href = "/demo";
                               }}
                             >
                               Open demo with this
                             </button>
                           </div>
                         </div>
-                        <div className="vt-grid" style={{ marginTop: '0.9rem' }}>
+                        <div className="vt-grid" style={{ marginTop: "0.9rem" }}>
                           {[
-                            'Create a landing page for a barber shop',
-                            'Make it dark glass with neon blue accents',
-                            'Add pricing + booking + FAQ',
+                            "Create a landing page for a barber shop",
+                            "Make it dark glass with neon blue accents",
+                            "Add pricing + booking + FAQ",
                           ].map((chip) => (
                             <button
                               key={chip}
@@ -639,11 +614,11 @@ const App: React.FC = () => {
             <p className="subhead">Five steps. One safety gate. Infinite iteration.</p>
             <div className="vt-grid">
               {[
-                ['Speak prompt', 'Voice or type commands anywhere.'],
-                ['Generate structure', 'Pages + sections + internal links.'],
-                ['Apply design system', 'Tokens + components + motion.'],
-                ['Write copy + SEO', 'Titles, meta, schema, headings.'],
-                ['Publish + optimize', 'Performance defaults + reports.'],
+                ["Speak prompt", "Voice or type commands anywhere."],
+                ["Generate structure", "Pages + sections + internal links."],
+                ["Apply design system", "Tokens + components + motion."],
+                ["Write copy + SEO", "Titles, meta, schema, headings."],
+                ["Publish + optimize", "Performance defaults + reports."],
               ].map(([t, d], idx) => (
                 <article className="feature-card" key={t}>
                   <div className="pill">{idx + 1}</div>
@@ -662,7 +637,7 @@ const App: React.FC = () => {
                 <button
                   key={key}
                   type="button"
-                  className={`pill-toggle ${activeUseCase === key ? 'is-active' : ''}`}
+                  className={`pill-toggle ${activeUseCase === key ? "is-active" : ""}`}
                   role="tab"
                   aria-selected={activeUseCase === key}
                   onClick={() => setActiveUseCase(key)}
@@ -672,7 +647,7 @@ const App: React.FC = () => {
               ))}
             </div>
 
-            <div className="vt-grid" style={{ marginTop: '1rem' }}>
+            <div className="vt-grid" style={{ marginTop: "1rem" }}>
               <article className="feature-card">
                 <h3>{active.label} wins</h3>
                 <ul className="preview-list">
@@ -684,7 +659,7 @@ const App: React.FC = () => {
               <article className="feature-card">
                 <h3>Template</h3>
                 <p className="muted">{active.template}</p>
-                <h3 style={{ marginTop: '0.65rem' }}>Integration</h3>
+                <h3 style={{ marginTop: "0.65rem" }}>Integration</h3>
                 <p className="muted">{active.integration}</p>
               </article>
               <article className="feature-card">
@@ -695,7 +670,7 @@ const App: React.FC = () => {
                   type="button"
                   onClick={() => {
                     seedDemoPrompt(active.prompt);
-                    window.location.href = '/demo';
+                    window.location.href = "/demo";
                   }}
                 >
                   Open demo
@@ -709,12 +684,12 @@ const App: React.FC = () => {
             <p className="subhead">The load-bearing parts.</p>
             <div className="vt-grid">
               {[
-                ['Voice layout generation', 'Turn intent into sections and hierarchy.'],
-                ['Auto copy + tone', 'Benefit-driven copy with microcopy.'],
-                ['SEO + schema', 'FAQ, Product, Video, Article scaffolding.'],
-                ['Performance defaults', 'Lazy-load, caching, reduced motion.'],
-                ['A/B suggestions', 'Ideas based on funnel friction.'],
-                ['Monetization kit', 'Subscriptions, Store, App Store, affiliates.'],
+                ["Voice layout generation", "Turn intent into sections and hierarchy."],
+                ["Auto copy + tone", "Benefit-driven copy with microcopy."],
+                ["SEO + schema", "FAQ, Product, Video, Article scaffolding."],
+                ["Performance defaults", "Lazy-load, caching, reduced motion."],
+                ["A/B suggestions", "Ideas based on funnel friction."],
+                ["Monetization kit", "Subscriptions, Store, App Store, affiliates."],
               ].map(([t, d]) => (
                 <article className="feature-card" key={t}>
                   <h3>{t}</h3>
@@ -729,13 +704,13 @@ const App: React.FC = () => {
             <p className="subhead">Free -&gt; Creator -&gt; Pro -&gt; Agency.</p>
             <div className="vt-grid">
               {[
-                ['Free', '$0', '1 demo build'],
-                ['Creator', '$39/mo', '1 site + blog hub'],
-                ['Pro', '$79/mo', '3 sites + integrations'],
+                ["Free", "$0", "1 demo build"],
+                ["Creator", "$39/mo", "1 site + blog hub"],
+                ["Pro", "$79/mo", "3 sites + integrations"],
               ].map(([t, p, d]) => (
                 <article className="feature-card" key={t}>
                   <h3>{t}</h3>
-                  <div className="metric-lg" style={{ fontSize: '2.4rem' }}>
+                  <div className="metric-lg" style={{ fontSize: "2.4rem" }}>
                     {p}
                   </div>
                   <p className="muted">{d}</p>
@@ -813,15 +788,12 @@ const App: React.FC = () => {
               <details className="accordion-item">
                 <summary>How does Plan -&gt; Apply -&gt; Rollback work?</summary>
                 <p className="muted">
-                  You preview changes first, confirm explicitly, then apply. Undo restores
-                  the last change.
+                  You preview changes first, confirm explicitly, then apply. Undo restores the last change.
                 </p>
               </details>
               <details className="accordion-item">
                 <summary>Does this hurt performance?</summary>
-                <p className="muted">
-                  No. Lazy-load, caching, and reduced motion are built in.
-                </p>
+                <p className="muted">No. Lazy-load, caching, and reduced motion are built in.</p>
               </details>
             </div>
           </section>

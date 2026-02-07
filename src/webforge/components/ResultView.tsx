@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
-import { GeneratedCode, TabType } from '../types';
-import { refineCode, enhanceCode } from '../services/geminiService';
+import React, { useState } from "react";
+import { GeneratedCode, TabType } from "../types";
+import { refineCode, enhanceCode } from "../services/geminiService";
 
 interface ResultViewProps {
   result: GeneratedCode;
@@ -13,7 +12,7 @@ interface ResultViewProps {
 const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, setIsAnalyzing }) => {
   const [activeTab, setActiveTab] = useState<TabType>(TabType.PREVIEW);
   const [copied, setCopied] = useState(false);
-  const [refineInput, setRefineInput] = useState('');
+  const [refineInput, setRefineInput] = useState("");
 
   const playSound = (url: string) => {
     const audio = new Audio(url);
@@ -24,19 +23,19 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(result.html);
     setCopied(true);
-    playSound('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258525');
+    playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258525");
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleRefine = async () => {
     if (!refineInput || isAnalyzing) return;
     setIsAnalyzing(true);
-    playSound('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529');
+    playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
     try {
       const newResult = await refineCode(result.html, refineInput);
       onUpdate(newResult);
-      setRefineInput('');
-      playSound('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532');
+      setRefineInput("");
+      playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
     } catch (e) {
       console.error(e);
     } finally {
@@ -47,11 +46,11 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
   const handleEnhance = async () => {
     if (isAnalyzing) return;
     setIsAnalyzing(true);
-    playSound('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529');
+    playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
     try {
       const newResult = await enhanceCode(result.html);
       onUpdate(newResult);
-      playSound('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532');
+      playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
     } catch (e) {
       console.error(e);
     } finally {
@@ -65,14 +64,20 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
         <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-900/90">
           <div className="flex bg-slate-950 p-1.5 rounded-xl border border-slate-800">
             <button
-              onClick={() => { setActiveTab(TabType.PREVIEW); playSound('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529'); }}
-              className={`px-6 py-2 rounded-lg text-xs font-black orbitron transition-all ${activeTab === TabType.PREVIEW ? 'bg-slate-100 text-slate-900 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+              onClick={() => {
+                setActiveTab(TabType.PREVIEW);
+                playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+              }}
+              className={`px-6 py-2 rounded-lg text-xs font-black orbitron transition-all ${activeTab === TabType.PREVIEW ? "bg-slate-100 text-slate-900 shadow-lg" : "text-slate-500 hover:text-slate-300"}`}
             >
               PREVIEW
             </button>
             <button
-              onClick={() => { setActiveTab(TabType.CODE); playSound('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529'); }}
-              className={`px-6 py-2 rounded-lg text-xs font-black orbitron transition-all ${activeTab === TabType.CODE ? 'bg-slate-100 text-slate-900 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+              onClick={() => {
+                setActiveTab(TabType.CODE);
+                playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+              }}
+              className={`px-6 py-2 rounded-lg text-xs font-black orbitron transition-all ${activeTab === TabType.CODE ? "bg-slate-100 text-slate-900 shadow-lg" : "text-slate-500 hover:text-slate-300"}`}
             >
               CODE
             </button>
@@ -88,18 +93,18 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
             </button>
             <button
               onClick={copyToClipboard}
-              className={`btn-3d px-6 py-2.5 rounded-xl text-xs font-black orbitron flex items-center ${copied ? 'text-green-400 border-green-500/50' : 'text-slate-200'}`}
+              className={`btn-3d px-6 py-2.5 rounded-xl text-xs font-black orbitron flex items-center ${copied ? "text-green-400 border-green-500/50" : "text-slate-200"}`}
             >
-              <i className={`fa-solid ${copied ? 'fa-check' : 'fa-skull'} mr-2`}></i>
-              {copied ? 'COPIED!' : 'GET OVER HERE!'}
+              <i className={`fa-solid ${copied ? "fa-check" : "fa-skull"} mr-2`}></i>
+              {copied ? "COPIED!" : "GET OVER HERE!"}
             </button>
             <button
               onClick={() => {
-                const blob = new Blob([result.html], { type: 'text/html' });
+                const blob = new Blob([result.html], { type: "text/html" });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
+                const a = document.createElement("a");
                 a.href = url;
-                a.download = 'forged-component.html';
+                a.download = "forged-component.html";
                 a.click();
               }}
               className="btn-3d btn-3d-primary px-6 py-2.5 rounded-xl text-xs font-black orbitron flex items-center"
@@ -138,7 +143,7 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
             onChange={(e) => setRefineInput(e.target.value)}
             placeholder="Tell the forge what to change... (e.g. 'Make the hero section have a larger font')"
             className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-6 py-3 text-sm font-bold text-slate-100 outline-none focus:border-slate-500"
-            onKeyDown={(e) => e.key === 'Enter' && handleRefine()}
+            onKeyDown={(e) => e.key === "Enter" && handleRefine()}
           />
           <button
             onClick={handleRefine}

@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedCode, StylePreferences, ComponentType } from "../types";
 
@@ -8,8 +7,8 @@ const getAi = () => {
   if (!ai) {
     const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
     if (!apiKey) {
-        console.warn("VITE_GOOGLE_API_KEY is not set. AI features will fail.");
-        throw new Error("API Key missing");
+      console.warn("VITE_GOOGLE_API_KEY is not set. AI features will fail.");
+      throw new Error("API Key missing");
     }
     ai = new GoogleGenAI({ apiKey });
   }
@@ -24,8 +23,8 @@ export const analyzeSource = async (
   isUrl: boolean = false
 ): Promise<GeneratedCode> => {
   const prompt = `
-    Analyze this ${isUrl ? 'website URL' : 'website screenshot'}.
-    TASK: Forge a professional, store-ready ${componentType === 'Full Page' ? 'high-converting web page' : componentType}.
+    Analyze this ${isUrl ? "website URL" : "website screenshot"}.
+    TASK: Forge a professional, store-ready ${componentType === "Full Page" ? "high-converting web page" : componentType}.
 
     CONTENT REQUIREMENTS:
     1. REPLACEMENT: ${customContent || "N/A: Extract essence from source."}
@@ -47,7 +46,12 @@ export const analyzeSource = async (
     model: "gemini-3-pro-preview",
     contents: isUrl
       ? prompt
-      : { parts: [{ inlineData: { mimeType: "image/png", data: source.replace(/^data:image\/(png|jpeg|jpg);base64,/, "") } }, { text: prompt }] },
+      : {
+          parts: [
+            { inlineData: { mimeType: "image/png", data: source.replace(/^data:image\/(png|jpeg|jpg);base64,/, "") } },
+            { text: prompt },
+          ],
+        },
     config: {
       tools: isUrl ? [{ googleSearch: {} }] : undefined,
       responseMimeType: "application/json",
@@ -74,7 +78,10 @@ export const forgeWebsite = async (
 ): Promise<GeneratedCode> => {
   const prompt = `
     CREATE A BRAND NEW HIGH-FIDELITY WEB COMPONENT: "${description}".
-    SECTIONS: ${Object.entries(sections).filter(([_,v]) => v).map(([k]) => k).join(', ')}.
+    SECTIONS: ${Object.entries(sections)
+      .filter(([_, v]) => v)
+      .map(([k]) => k)
+      .join(", ")}.
 
     STORE-READY FEATURES:
     - Auto-insert high-definition background videos from Pexels/Mixkit.
@@ -107,10 +114,7 @@ export const forgeWebsite = async (
   return JSON.parse(response.text!) as GeneratedCode;
 };
 
-export const refineCode = async (
-  currentHtml: string,
-  instructions: string
-): Promise<GeneratedCode> => {
+export const refineCode = async (currentHtml: string, instructions: string): Promise<GeneratedCode> => {
   const prompt = `
     Refine the following code based on these instructions: "${instructions}"
     Maintain the 100% store-ready quality (Social sharing, animations, accessibility, responsiveness).

@@ -93,7 +93,10 @@ export default {
       const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
       const apiToken = env.CF_API_TOKEN || env.CF_API_TOKEN2;
       if (!apiToken || !zoneId) {
-        return jsonResponse(501, { error: "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (or CF_API_TOKEN2) and optionally CF_ZONE_ID." });
+        return jsonResponse(501, {
+          error:
+            "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (or CF_API_TOKEN2) and optionally CF_ZONE_ID.",
+        });
       }
       try {
         const since = "-43200"; // last 12 hours; supports relative values
@@ -106,7 +109,9 @@ export default {
         });
         const data = await cfRes.json();
         if (!cfRes.ok || !data?.success) {
-          return jsonResponse(cfRes.status || 500, { error: data?.errors || data?.messages || "Analytics fetch failed." });
+          return jsonResponse(cfRes.status || 500, {
+            error: data?.errors || data?.messages || "Analytics fetch failed.",
+          });
         }
         return jsonResponse(200, { result: data.result });
       } catch (err) {
@@ -130,12 +135,10 @@ export default {
       }
       const since = "datetime('now','-24 hours')";
       const [commands, errors] = await Promise.all([
-        env.D1.prepare(
-          `SELECT COUNT(*) AS count FROM commands WHERE ts > ${since}`
-        ).first(),
-        env.D1.prepare(
-          `SELECT COUNT(*) AS count FROM errors WHERE ts > ${since}`
-        ).first().catch(() => ({ count: 0 })),
+        env.D1.prepare(`SELECT COUNT(*) AS count FROM commands WHERE ts > ${since}`).first(),
+        env.D1.prepare(`SELECT COUNT(*) AS count FROM errors WHERE ts > ${since}`)
+          .first()
+          .catch(() => ({ count: 0 })),
       ]);
       return jsonResponse(200, {
         window: "24h",
@@ -143,12 +146,12 @@ export default {
         errors: errors?.count || 0,
         deployments: {
           success: 0,
-          failed: 0
+          failed: 0,
         },
         revenue: {
-          usd: 0
+          usd: 0,
         },
-        ts: new Date().toISOString()
+        ts: new Date().toISOString(),
       });
     }
 
@@ -163,9 +166,7 @@ export default {
           user_agent TEXT
         )`
       ).run();
-      await env.D1.prepare(
-        "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)"
-      ).bind(id, ua).run();
+      await env.D1.prepare("INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)").bind(id, ua).run();
       return jsonResponse(200, { ok: true });
     }
 
@@ -256,16 +257,16 @@ export default {
       const envInjection = `
         <script>
           window.__ENV = {
-            PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || ''}",
-            STRIPE_PUBLISHABLE_KEY: "${env.STRIPE_PUBLISHABLE_KEY || ''}",
+            PAYPAL_CLIENT_ID: "${env.PAYPAL_CLIENT_ID_PROD || ""}",
+            STRIPE_PUBLISHABLE_KEY: "${env.STRIPE_PUBLISHABLE_KEY || ""}",
             ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID}",
-            ADSENSE_SLOT: "${env.ADSENSE_SLOT || ''}",
-            ADSENSE_MODE: "${env.ADSENSE_MODE || 'auto'}",
-            ADSENSE_SLOT_TOP: "${env.ADSENSE_SLOT_TOP || ''}",
-            ADSENSE_SLOT_MID: "${env.ADSENSE_SLOT_MID || ''}",
-            ADSENSE_SLOT_BOTTOM: "${env.ADSENSE_SLOT_BOTTOM || ''}",
-            ADSENSE_MAX_SLOTS: "${env.ADSENSE_MAX_SLOTS || '3'}",
-            CONTROL_PASSWORD: "${env.CONTROL_PASSWORD || ''}"
+            ADSENSE_SLOT: "${env.ADSENSE_SLOT || ""}",
+            ADSENSE_MODE: "${env.ADSENSE_MODE || "auto"}",
+            ADSENSE_SLOT_TOP: "${env.ADSENSE_SLOT_TOP || ""}",
+            ADSENSE_SLOT_MID: "${env.ADSENSE_SLOT_MID || ""}",
+            ADSENSE_SLOT_BOTTOM: "${env.ADSENSE_SLOT_BOTTOM || ""}",
+            ADSENSE_MAX_SLOTS: "${env.ADSENSE_MAX_SLOTS || "3"}",
+            CONTROL_PASSWORD: "${env.CONTROL_PASSWORD || ""}"
           };
         </script>
       `;
@@ -285,9 +286,10 @@ export default {
       const canonicalUrl = `${url.origin}${seoPath === "/" ? "/" : seoPath}`;
       const isAdminPage = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
       const isSecretPage = url.pathname.startsWith("/the3000");
-      const robotsTag = isAdminPage || isSecretPage
-        ? "noindex, nofollow"
-        : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+      const robotsTag =
+        isAdminPage || isSecretPage
+          ? "noindex, nofollow"
+          : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
       const defaultOgImage = `${url.origin}/vtw-wallpaper.png`;
       const defaultDescription = "VoiceToWebsite — autonomous web engineering, deployment, and monetization.";
@@ -325,9 +327,12 @@ export default {
       const injected = text
         .replace(/__PAYPAL_CLIENT_ID__/g, env.PAYPAL_CLIENT_ID_PROD || "")
         .replace(/__STRIPE_PUBLISHABLE_KEY__/g, env.STRIPE_PUBLISHABLE_KEY || "")
-        .replace(/__ADSENSE_PUBLISHER__/g, env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID)
+        .replace(
+          /__ADSENSE_PUBLISHER__/g,
+          env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID
+        )
         .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
-        .replace('</head>', `${envInjection}</head>`); // Inject variables early
+        .replace("</head>", `${envInjection}</head>`); // Inject variables early
 
       // SEO: canonical + robots + stable OG/Twitter URLs + JSON-LD.
       let seoInjected = injected
@@ -335,7 +340,10 @@ export default {
         .replace(/<meta\b[^>]*name=["']robots["'][^>]*>\s*/gi, "")
         .replace(/<meta\b[^>]*property=["']og:url["'][^>]*>\s*/gi, "")
         .replace(/<meta\b[^>]*(?:name|property)=["']twitter:url["'][^>]*>\s*/gi, "")
-        .replace(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*id=["']vtw-jsonld["'][\s\S]*?<\/script>\s*/gi, "");
+        .replace(
+          /<script\b[^>]*type=["']application\/ld\+json["'][^>]*id=["']vtw-jsonld["'][\s\S]*?<\/script>\s*/gi,
+          ""
+        );
 
       const hasOgImage = /<meta\b[^>]*property=["']og:image["']/i.test(seoInjected);
       const hasTwitterImage = /<meta\b[^>]*(?:name|property)=["']twitter:image["']/i.test(seoInjected);
@@ -367,7 +375,10 @@ export default {
 
       // Ensure the AdSense auto-ads loader is present site-wide.
       const withAdsense = seoInjected.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
-        ? seoInjected.replace(/pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g, `pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`)
+        ? seoInjected.replace(
+            /pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g,
+            `pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`
+          )
         : seoInjected.replace("</head>", `${ADSENSE_SCRIPT_TAG}\n</head>`);
 
       const headers = new Headers(assetRes.headers);

@@ -1,4 +1,3 @@
-
 class AudioEngine {
   private context: AudioContext | null = null;
   private isEnabled = false;
@@ -11,13 +10,13 @@ class AudioEngine {
   private analyserFreqData: Uint8Array<ArrayBuffer> | null = null;
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
   }
 
   public async enable() {
-    if (this.context?.state === 'suspended') {
+    if (this.context?.state === "suspended") {
       try {
         await this.context.resume();
       } catch (_) {}
@@ -51,9 +50,9 @@ class AudioEngine {
     this.teardownMusicGraph();
 
     const audio = new Audio(url);
-    audio.crossOrigin = 'anonymous';
+    audio.crossOrigin = "anonymous";
     audio.loop = true;
-    audio.preload = 'auto';
+    audio.preload = "auto";
 
     // Prefer routing music through Web Audio so we can drive reactive visuals.
     if (this.context) {
@@ -89,7 +88,7 @@ class AudioEngine {
       await this.bgMusic.play();
       return true;
     } catch (e) {
-      console.error('Audio playback blocked or invalid format', e);
+      console.error("Audio playback blocked or invalid format", e);
       return false;
     }
   }
@@ -134,45 +133,51 @@ class AudioEngine {
     return Math.min(1, sum / (freq.length * 255));
   }
 
-  private async playFrequency(freq: number, type: OscillatorType, volume: number, duration: number, ramp: 'exp' | 'linear' = 'exp') {
+  private async playFrequency(
+    freq: number,
+    type: OscillatorType,
+    volume: number,
+    duration: number,
+    ramp: "exp" | "linear" = "exp"
+  ) {
     if (!this.isEnabled || !this.context) return;
-    
+
     const osc = this.context.createOscillator();
     const gain = this.context.createGain();
-    
+
     osc.type = type;
     osc.frequency.setValueAtTime(freq, this.context.currentTime);
-    
+
     gain.gain.setValueAtTime(volume * this.currentVolume * 2, this.context.currentTime);
-    if (ramp === 'exp') {
+    if (ramp === "exp") {
       gain.gain.exponentialRampToValueAtTime(0.0001, this.context.currentTime + duration);
     } else {
       gain.gain.linearRampToValueAtTime(0, this.context.currentTime + duration);
     }
-    
+
     osc.connect(gain);
     gain.connect(this.context.destination);
-    
+
     osc.start();
     osc.stop(this.context.currentTime + duration);
   }
 
   public playHum() {
-    this.playFrequency(40, 'sine', 0.05, 0.5);
+    this.playFrequency(40, "sine", 0.05, 0.5);
   }
 
   public playSpark() {
-    this.playFrequency(Math.random() * 2000 + 1000, 'square', 0.02, 0.05);
+    this.playFrequency(Math.random() * 2000 + 1000, "square", 0.02, 0.05);
   }
 
   public playImpact() {
-    this.playFrequency(60, 'sawtooth', 0.3, 1);
-    this.playFrequency(30, 'sine', 0.5, 1.5);
+    this.playFrequency(60, "sawtooth", 0.3, 1);
+    this.playFrequency(30, "sine", 0.5, 1.5);
   }
 
   public playGlassTing() {
-    this.playFrequency(2500, 'sine', 0.2, 0.1);
-    this.playFrequency(5000, 'sine', 0.1, 0.05);
+    this.playFrequency(2500, "sine", 0.2, 0.1);
+    this.playFrequency(5000, "sine", 0.1, 0.05);
   }
 
   public playSwoosh() {
@@ -181,11 +186,11 @@ class AudioEngine {
     const gain = this.context.createGain();
     const filter = this.context.createBiquadFilter();
 
-    osc.type = 'sawtooth';
+    osc.type = "sawtooth";
     osc.frequency.setValueAtTime(100, this.context.currentTime);
     osc.frequency.exponentialRampToValueAtTime(2000, this.context.currentTime + 0.5);
 
-    filter.type = 'lowpass';
+    filter.type = "lowpass";
     filter.frequency.setValueAtTime(100, this.context.currentTime);
     filter.frequency.exponentialRampToValueAtTime(5000, this.context.currentTime + 0.5);
 

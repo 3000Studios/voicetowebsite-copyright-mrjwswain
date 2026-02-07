@@ -13,9 +13,7 @@
   <body>
     <script>
       (function guardAdmin() {
-        const cookie = document.cookie
-          .split(";")
-          .some((part) => part.trim().startsWith("vtw_admin=1"));
+        const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
         const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
         const ts = Number(sessionStorage.getItem("yt-admin-unlocked-ts") || 0);
         const fresh = ts && Date.now() - ts < 1000 * 60 * 60 * 2;
@@ -57,12 +55,7 @@
         <form id="auth-form">
           <div class="input-group">
             <span class="input-tag">01_IDENTIFIER</span>
-            <input
-              type="email"
-              id="lock-email"
-              placeholder="USER_NAME@DOMAIN"
-              autocomplete="username"
-            />
+            <input type="email" id="lock-email" placeholder="USER_NAME@DOMAIN" autocomplete="username" />
             <div class="input-focus-line"></div>
           </div>
 
@@ -78,9 +71,7 @@
             <div class="input-focus-line"></div>
           </div>
 
-          <button type="submit" class="ignition-trigger" id="lock-button">
-            Initialize Session
-          </button>
+          <button type="submit" class="ignition-trigger" id="lock-button">Initialize Session</button>
         </form>
 
         <div class="meta-actions">
@@ -98,8 +89,9 @@
           class="card"
           id="livestream-setup"
           style="
-            background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-              url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986161/Fire_jlrw9r.mp4');
+            background-image:
+              linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+              url(&quot;https://res.cloudinary.com/dj92eb97f/video/upload/v1766986161/Fire_jlrw9r.mp4&quot;);
             background-size: cover;
             background-position: center;
           "
@@ -114,20 +106,12 @@
                 id="admin-live-player"
                 controls
                 muted
-                style="
-                  width: 100%;
-                  border-radius: 12px;
-                  border: 1px solid rgba(255, 255, 255, 0.1);
-                "
+                style="width: 100%; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1)"
                 src=""
               ></video>
 
               <div class="live-admin__controls">
-                <input
-                  type="url"
-                  id="admin-live-url"
-                  placeholder="https://www.youtube.com/embed/..."
-                />
+                <input type="url" id="admin-live-url" placeholder="https://www.youtube.com/embed/..." />
                 <button class="primary" id="admin-live-load">Load Stream</button>
                 <button class="secondary" id="admin-live-save">Save Clip</button>
               </div>

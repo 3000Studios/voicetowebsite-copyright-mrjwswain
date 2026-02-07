@@ -66,12 +66,7 @@ const wrapFetch = () => {
   const originalFetch = window.fetch.bind(window);
 
   window.fetch = async (input, init) => {
-    const url =
-      typeof input === "string"
-        ? input
-        : input instanceof Request
-          ? input.url
-          : "";
+    const url = typeof input === "string" ? input : input instanceof Request ? input.url : "";
 
     const isOrchestrator = url.includes("/api/orchestrator");
     let mode = "";
@@ -100,16 +95,10 @@ const wrapFetch = () => {
             local: Boolean(data?.local),
           });
           if (mode === "plan" && res.ok) {
-            setTerminalState(
-              TERMINAL_STATE.AWAITING_CONFIRMATION,
-              data?.local ? "Offline preview" : "Plan ready",
-            );
+            setTerminalState(TERMINAL_STATE.AWAITING_CONFIRMATION, data?.local ? "Offline preview" : "Plan ready");
           }
           if (mode === "apply" && res.ok) {
-            setTerminalState(
-              TERMINAL_STATE.COMPLETE,
-              data?.local ? "Simulated" : "Complete",
-            );
+            setTerminalState(TERMINAL_STATE.COMPLETE, data?.local ? "Simulated" : "Complete");
           }
           if (!res.ok) {
             setTerminalState(TERMINAL_STATE.ERROR, "Request failed");
@@ -148,7 +137,7 @@ const installGuards = () => {
       setTerminalState(TERMINAL_STATE.LISTENING, "Mic live");
       appendExecutionLog({ type: "mic_start" });
     },
-    { capture: true },
+    { capture: true }
   );
 
   stopBtn?.addEventListener(
@@ -157,7 +146,7 @@ const installGuards = () => {
       setTerminalState(TERMINAL_STATE.IDLE, "Mic idle");
       appendExecutionLog({ type: "mic_stop" });
     },
-    { capture: true },
+    { capture: true }
   );
 
   planBtn?.addEventListener(
@@ -166,7 +155,7 @@ const installGuards = () => {
       setTerminalState(TERMINAL_STATE.PLANNING, "Planning…");
       appendExecutionLog({ type: "plan_click" });
     },
-    { capture: true },
+    { capture: true }
   );
 
   applyBtn?.addEventListener(
@@ -192,7 +181,7 @@ const installGuards = () => {
       setTerminalState(TERMINAL_STATE.EXECUTING, "Applying…");
       appendExecutionLog({ type: "apply_click" });
     },
-    { capture: true },
+    { capture: true }
   );
 
   syncApplyGate();
@@ -200,4 +189,3 @@ const installGuards = () => {
 
 wrapFetch();
 installGuards();
-

@@ -1,5 +1,4 @@
-
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 
 interface ScreenshotUploadProps {
   onUpload: (base64: string) => void;
@@ -29,29 +28,27 @@ const ScreenshotUpload: React.FC<ScreenshotUploadProps> = ({ onUpload, isLoading
       <div
         onClick={!isLoading ? triggerUpload : undefined}
         className={`relative group border-2 border-dashed rounded-2xl p-12 transition-all cursor-pointer flex flex-col items-center justify-center text-center
-          ${isLoading
-            ? 'bg-gray-50 border-gray-200 cursor-not-allowed'
-            : 'bg-white border-blue-200 hover:border-blue-400 hover:bg-blue-50'}`}
+          ${
+            isLoading
+              ? "bg-gray-50 border-gray-200 cursor-not-allowed"
+              : "bg-white border-blue-200 hover:border-blue-400 hover:bg-blue-50"
+          }`}
       >
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          accept="image/*"
-          className="hidden"
-        />
+        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
 
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-transform ${isLoading ? 'animate-pulse' : 'group-hover:scale-110'} bg-blue-100 text-blue-600`}>
-          <i className={`fa-solid ${isLoading ? 'fa-spinner fa-spin' : 'fa-cloud-arrow-up'} text-2xl`}></i>
+        <div
+          className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-transform ${isLoading ? "animate-pulse" : "group-hover:scale-110"} bg-blue-100 text-blue-600`}
+        >
+          <i className={`fa-solid ${isLoading ? "fa-spinner fa-spin" : "fa-cloud-arrow-up"} text-2xl`}></i>
         </div>
 
         <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          {isLoading ? 'Analyzing Screenshot...' : 'Drop a screenshot here'}
+          {isLoading ? "Analyzing Screenshot..." : "Drop a screenshot here"}
         </h3>
         <p className="text-gray-500 max-w-sm">
           {isLoading
-            ? 'Our AI is dissecting the layout, colors, and components to recreate them for you.'
-            : 'Take a screenshot of any website you like and upload it. We will generate the code to clone its vibe.'}
+            ? "Our AI is dissecting the layout, colors, and components to recreate them for you."
+            : "Take a screenshot of any website you like and upload it. We will generate the code to clone its vibe."}
         </p>
 
         {!isLoading && (

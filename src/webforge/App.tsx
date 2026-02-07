@@ -1,11 +1,10 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { analyzeSource, forgeWebsite } from './services/geminiService';
-import { AppState } from './types';
-import ScreenshotUpload from './components/ScreenshotUpload';
-import ResultView from './components/ResultView';
-import Logo from './components/Logo';
-import VoiceInput from './components/VoiceInput';
+import React, { useState, useEffect, useRef } from "react";
+import { analyzeSource, forgeWebsite } from "./services/geminiService";
+import { AppState } from "./types";
+import ScreenshotUpload from "./components/ScreenshotUpload";
+import ResultView from "./components/ResultView";
+import Logo from "./components/Logo";
+import VoiceInput from "./components/VoiceInput";
 
 const statusMessages = [
   "Infecting Neural Pathways...",
@@ -14,29 +13,29 @@ const statusMessages = [
   "Synthesizing Content Stream...",
   "Applying Platinum UX Overrides...",
   "Finalizing Neural Forge...",
-  "Ready for Extraction."
+  "Ready for Extraction.",
 ];
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
-    mode: 'CLONE',
+    mode: "CLONE",
     isAnalyzing: false,
     progress: 0,
     screenshot: null,
     result: null,
     error: null,
     preferences: {
-      primaryColor: '#00e5ff',
-      fontFamily: 'Orbitron',
-      spacing: 'Normal'
+      primaryColor: "#00e5ff",
+      fontFamily: "Orbitron",
+      spacing: "Normal",
     },
-    componentType: 'Full Page',
-    customContent: '',
+    componentType: "Full Page",
+    customContent: "",
     forgeSections: { header: true, main: true, footer: true },
-    forgeDescription: ''
+    forgeDescription: "",
   });
 
-  const [urlInput, setUrlInput] = useState('');
+  const [urlInput, setUrlInput] = useState("");
   const [statusIdx, setStatusIdx] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -52,17 +51,17 @@ const App: React.FC = () => {
     let timer: any;
     let statusTimer: any;
     if (state.isAnalyzing) {
-      setState(s => ({ ...s, progress: 0 }));
+      setState((s) => ({ ...s, progress: 0 }));
       setStatusIdx(0);
       timer = setInterval(() => {
-        setState(s => ({
+        setState((s) => ({
           ...s,
-          progress: Math.min(s.progress + (Math.random() * 8), 98)
+          progress: Math.min(s.progress + Math.random() * 8, 98),
         }));
       }, 400);
 
       statusTimer = setInterval(() => {
-        setStatusIdx(i => (i + 1) % (statusMessages.length - 1));
+        setStatusIdx((i) => (i + 1) % (statusMessages.length - 1));
       }, 2500);
     }
     return () => {
@@ -72,41 +71,41 @@ const App: React.FC = () => {
   }, [state.isAnalyzing]);
 
   const runAnalysis = async (source: string, isUrl: boolean) => {
-    playSfx('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529');
-    setState(prev => ({ ...prev, isAnalyzing: true, screenshot: isUrl ? null : source, error: null }));
+    playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+    setState((prev) => ({ ...prev, isAnalyzing: true, screenshot: isUrl ? null : source, error: null }));
     try {
       const result = await analyzeSource(source, state.preferences, state.componentType, state.customContent, isUrl);
-      setState(prev => ({ ...prev, isAnalyzing: false, progress: 100, result }));
-      playSfx('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532');
+      setState((prev) => ({ ...prev, isAnalyzing: false, progress: 100, result }));
+      playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
     } catch (err) {
-      setState(prev => ({ ...prev, isAnalyzing: false, error: "CRITICAL ERROR: NEURAL LINK SEVERED." }));
+      setState((prev) => ({ ...prev, isAnalyzing: false, error: "CRITICAL ERROR: NEURAL LINK SEVERED." }));
     }
   };
 
   const runForge = async () => {
     if (!state.forgeDescription) return;
-    playSfx('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529');
-    setState(prev => ({ ...prev, isAnalyzing: true, error: null, result: null }));
+    playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+    setState((prev) => ({ ...prev, isAnalyzing: true, error: null, result: null }));
     try {
       const result = await forgeWebsite(state.forgeDescription, state.forgeSections, state.preferences);
-      setState(prev => ({ ...prev, isAnalyzing: false, progress: 100, result }));
-      playSfx('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532');
+      setState((prev) => ({ ...prev, isAnalyzing: false, progress: 100, result }));
+      playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
     } catch (err) {
-      setState(prev => ({ ...prev, isAnalyzing: false, error: "FORGE OVERLOAD: NEURAL COLLAPSE." }));
+      setState((prev) => ({ ...prev, isAnalyzing: false, error: "FORGE OVERLOAD: NEURAL COLLAPSE." }));
     }
   };
 
   const handleEnhanceGlobal = () => {
-    const colors = ['#00e5ff', '#6366f1', '#f43f5e', '#10b981', '#8b5cf6'];
-    const fonts = ['Orbitron', 'Space Grotesk', 'Syncopate', 'Bebas Neue'];
+    const colors = ["#00e5ff", "#6366f1", "#f43f5e", "#10b981", "#8b5cf6"];
+    const fonts = ["Orbitron", "Space Grotesk", "Syncopate", "Bebas Neue"];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      preferences: { ...prev.preferences, primaryColor: randomColor, fontFamily: randomFont }
+      preferences: { ...prev.preferences, primaryColor: randomColor, fontFamily: randomFont },
     }));
-    playSfx('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529');
+    playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
   };
 
   return (
@@ -117,34 +116,54 @@ const App: React.FC = () => {
 
       <header className="relative h-[550px] flex flex-col items-center justify-center overflow-hidden border-b-8 border-slate-900 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
         <video autoPlay loop muted playsInline className="header-bg-video">
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-diving-deep-under-the-ocean-1563-large.mp4" type="video/mp4" />
+          <source
+            src="https://assets.mixkit.co/videos/preview/mixkit-diving-deep-under-the-ocean-1563-large.mp4"
+            type="video/mp4"
+          />
         </video>
 
         <div className="z-10 text-center space-y-8 px-4 max-w-5xl">
-          <div className="logo-container inline-block mb-4 cursor-pointer" onClick={() => setState(s => ({ ...s, result: null }))}>
+          <div
+            className="logo-container inline-block mb-4 cursor-pointer"
+            onClick={() => setState((s) => ({ ...s, result: null }))}
+          >
             <div className="silver-border p-[4px] shadow-[0_0_60px_rgba(0,229,255,0.2)]">
               <div className="bg-slate-950 rounded-[14px] p-8 flex flex-col items-center justify-center border border-white/10">
-                 <Logo className="w-48 h-48" />
-                 <h1 className="text-4xl font-black orbitron tracking-[0.2em] text-slate-100 glow-text italic mt-6" style={{ fontFamily: state.preferences.fontFamily }}>
+                <Logo className="w-48 h-48" />
+                <h1
+                  className="text-4xl font-black orbitron tracking-[0.2em] text-slate-100 glow-text italic mt-6"
+                  style={{ fontFamily: state.preferences.fontFamily }}
+                >
                   3000STUDIOS.COM
-                 </h1>
-                 <p className="text-slate-500 text-[10px] font-black tracking-[0.5em] mt-2 uppercase">J.W. Swain Platinum Forge Protocol</p>
+                </h1>
+                <p className="text-slate-500 text-[10px] font-black tracking-[0.5em] mt-2 uppercase">
+                  J.W. Swain Platinum Forge Protocol
+                </p>
               </div>
             </div>
           </div>
-          <h2 className="text-6xl md:text-9xl font-black orbitron text-white italic header-shadow uppercase tracking-tighter" style={{ fontFamily: state.preferences.fontFamily }}>
+          <h2
+            className="text-6xl md:text-9xl font-black orbitron text-white italic header-shadow uppercase tracking-tighter"
+            style={{ fontFamily: state.preferences.fontFamily }}
+          >
             GET <span className="text-cyan-400">OVER</span> HERE
           </h2>
           <div className="flex flex-wrap justify-center gap-8 pt-6">
             <button
-              onClick={() => { setState(s => ({ ...s, mode: 'CLONE', result: null })); playSfx('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529'); }}
-              className={`px-12 py-5 rounded-2xl orbitron font-black tracking-widest text-sm transition-all border-2 btn-3d ${state.mode === 'CLONE' ? 'bg-white text-slate-950 border-white shadow-[0_0_40px_rgba(255,255,255,0.4)]' : 'bg-transparent text-white border-slate-700 hover:border-white'}`}
+              onClick={() => {
+                setState((s) => ({ ...s, mode: "CLONE", result: null }));
+                playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+              }}
+              className={`px-12 py-5 rounded-2xl orbitron font-black tracking-widest text-sm transition-all border-2 btn-3d ${state.mode === "CLONE" ? "bg-white text-slate-950 border-white shadow-[0_0_40px_rgba(255,255,255,0.4)]" : "bg-transparent text-white border-slate-700 hover:border-white"}`}
             >
               ACQUISITION
             </button>
             <button
-              onClick={() => { setState(s => ({ ...s, mode: 'FORGE', result: null })); playSfx('https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529'); }}
-              className={`px-12 py-5 rounded-2xl orbitron font-black tracking-widest text-sm transition-all border-2 btn-3d ${state.mode === 'FORGE' ? 'bg-white text-slate-950 border-white shadow-[0_0_40px_rgba(255,255,255,0.4)]' : 'bg-transparent text-white border-slate-700 hover:border-white'}`}
+              onClick={() => {
+                setState((s) => ({ ...s, mode: "FORGE", result: null }));
+                playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+              }}
+              className={`px-12 py-5 rounded-2xl orbitron font-black tracking-widest text-sm transition-all border-2 btn-3d ${state.mode === "FORGE" ? "bg-white text-slate-950 border-white shadow-[0_0_40px_rgba(255,255,255,0.4)]" : "bg-transparent text-white border-slate-700 hover:border-white"}`}
             >
               NEURAL FORGE
             </button>
@@ -163,7 +182,7 @@ const App: React.FC = () => {
         <div className="fixed top-[550px] left-0 w-full h-3 bg-slate-900 z-50 overflow-hidden">
           <div className="h-full progress-bar-fill shadow-[0_0_40px_#fff]" style={{ width: `${state.progress}%` }} />
           <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white font-black orbitron text-xl italic tracking-widest animate-pulse drop-shadow-[0_0_10px_rgba(0,0,0,1)]">
-             {statusMessages[statusIdx]}
+            {statusMessages[statusIdx]}
           </div>
         </div>
       )}
@@ -177,7 +196,7 @@ const App: React.FC = () => {
         )}
 
         {!state.result && !state.isAnalyzing ? (
-          state.mode === 'CLONE' ? (
+          state.mode === "CLONE" ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
               <div className="lg:col-span-7 space-y-16">
                 <div className="beveled-box p-16 border-slate-700/50 space-y-12">
@@ -185,7 +204,13 @@ const App: React.FC = () => {
                     <h3 className="text-sm font-black orbitron text-slate-400 uppercase tracking-[0.4em] border-b border-slate-800 pb-6">
                       <i className="fa-solid fa-bolt mr-3 text-cyan-500"></i> Acquisition Protocol
                     </h3>
-                    <form onSubmit={(e) => { e.preventDefault(); runAnalysis(urlInput, true); }} className="flex gap-4">
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        runAnalysis(urlInput, true);
+                      }}
+                      className="flex gap-4"
+                    >
                       <div className="flex-1 flex gap-3">
                         <input
                           type="url"
@@ -196,12 +221,19 @@ const App: React.FC = () => {
                         />
                         <VoiceInput onResult={(t) => setUrlInput(t)} className="h-[74px] w-[74px] text-xl" />
                       </div>
-                      <button type="submit" className="btn-3d btn-3d-primary px-12 py-6 rounded-2xl font-black orbitron text-xs">ACQUIRE</button>
+                      <button
+                        type="submit"
+                        className="btn-3d btn-3d-primary px-12 py-6 rounded-2xl font-black orbitron text-xs"
+                      >
+                        ACQUIRE
+                      </button>
                     </form>
                   </div>
                   <div className="relative py-6 flex items-center justify-center">
                     <div className="h-px bg-slate-800 flex-1"></div>
-                    <span className="mx-10 text-[12px] font-black orbitron text-slate-600 uppercase tracking-[0.8em]">OR DROP DATA</span>
+                    <span className="mx-10 text-[12px] font-black orbitron text-slate-600 uppercase tracking-[0.8em]">
+                      OR DROP DATA
+                    </span>
                     <div className="h-px bg-slate-800 flex-1"></div>
                   </div>
                   <ScreenshotUpload onUpload={(b) => runAnalysis(b, false)} isLoading={false} />
@@ -216,11 +248,14 @@ const App: React.FC = () => {
                   <textarea
                     placeholder="Input custom restaurant data, menus, or branding overrides here..."
                     value={state.customContent}
-                    onChange={(e) => setState(s => ({ ...s, customContent: e.target.value }))}
+                    onChange={(e) => setState((s) => ({ ...s, customContent: e.target.value }))}
                     className="w-full h-72 bg-slate-950 border-2 border-slate-800 rounded-2xl p-10 text-xs font-bold text-slate-300 outline-none focus:border-cyan-500 code-scrollbar resize-none shadow-inner"
                   />
                   <div className="flex justify-end">
-                    <VoiceInput onResult={(t) => setState(s => ({ ...s, customContent: s.customContent + " " + t }))} className="w-[60px] h-[60px]" />
+                    <VoiceInput
+                      onResult={(t) => setState((s) => ({ ...s, customContent: s.customContent + " " + t }))}
+                      className="w-[60px] h-[60px]"
+                    />
                   </div>
                 </div>
               </div>
@@ -233,20 +268,29 @@ const App: React.FC = () => {
                 </h3>
 
                 <div className="space-y-8">
-                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-[0.5em]">Protocol Architectures</label>
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-[0.5em]">
+                    Protocol Architectures
+                  </label>
                   <div className="flex flex-wrap gap-12">
-                    {['Header', 'Main', 'Footer'].map(s => (
+                    {["Header", "Main", "Footer"].map((s) => (
                       <label key={s} className="flex items-center space-x-5 cursor-pointer group">
                         <input
                           type="checkbox"
                           checked={(state.forgeSections as any)[s.toLowerCase()]}
-                          onChange={() => setState(prev => ({
-                            ...prev,
-                            forgeSections: { ...prev.forgeSections, [s.toLowerCase()]: !(prev.forgeSections as any)[s.toLowerCase()] }
-                          }))}
+                          onChange={() =>
+                            setState((prev) => ({
+                              ...prev,
+                              forgeSections: {
+                                ...prev.forgeSections,
+                                [s.toLowerCase()]: !(prev.forgeSections as any)[s.toLowerCase()],
+                              },
+                            }))
+                          }
                           className="w-10 h-10 rounded-xl bg-slate-900 border-2 border-slate-700 text-cyan-400 focus:ring-0"
                         />
-                        <span className="text-lg font-black orbitron text-slate-400 group-hover:text-white transition-colors uppercase tracking-widest">{s}</span>
+                        <span className="text-lg font-black orbitron text-slate-400 group-hover:text-white transition-colors uppercase tracking-widest">
+                          {s}
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -254,13 +298,18 @@ const App: React.FC = () => {
 
                 <div className="space-y-8">
                   <div className="flex items-center justify-between">
-                    <label className="block text-[11px] font-black text-slate-500 uppercase tracking-[0.5em]">Forge Concept Transmission</label>
-                    <VoiceInput onResult={(t) => setState(s => ({ ...s, forgeDescription: s.forgeDescription + " " + t }))} className="w-[70px] h-[70px]" />
+                    <label className="block text-[11px] font-black text-slate-500 uppercase tracking-[0.5em]">
+                      Forge Concept Transmission
+                    </label>
+                    <VoiceInput
+                      onResult={(t) => setState((s) => ({ ...s, forgeDescription: s.forgeDescription + " " + t }))}
+                      className="w-[70px] h-[70px]"
+                    />
                   </div>
                   <textarea
                     placeholder="Detailed vision: 'A high-converting SaaS landing page for cyber-security, featuring futuristic data-viz, glowing blue accents, and a tiered pricing table'..."
                     value={state.forgeDescription}
-                    onChange={(e) => setState(s => ({ ...s, forgeDescription: e.target.value }))}
+                    onChange={(e) => setState((s) => ({ ...s, forgeDescription: e.target.value }))}
                     className="w-full h-64 bg-slate-950 border-2 border-slate-800 rounded-2xl p-10 text-lg font-bold text-slate-200 outline-none focus:border-cyan-400 transition-all resize-none shadow-inner"
                   />
                 </div>
@@ -280,27 +329,38 @@ const App: React.FC = () => {
         ) : state.isAnalyzing ? (
           <div className="h-[60vh] flex flex-col items-center justify-center text-center">
             <div className="relative w-64 h-64 mb-16 animate-pulse">
-               <div className="silver-border p-[8px] rounded-full shadow-[0_0_100px_rgba(0,229,255,0.4)]">
+              <div className="silver-border p-[8px] rounded-full shadow-[0_0_100px_rgba(0,229,255,0.4)]">
                 <div className="bg-slate-950 rounded-full w-full h-full flex items-center justify-center border-8 border-slate-800">
                   <Logo className="w-32 h-32 animate-spin-slow" />
                 </div>
               </div>
             </div>
-            <h2 className="text-6xl font-black orbitron text-white mb-8 italic tracking-tighter glow-text">SYNTHESIZING REALITY...</h2>
+            <h2 className="text-6xl font-black orbitron text-white mb-8 italic tracking-tighter glow-text">
+              SYNTHESIZING REALITY...
+            </h2>
             <div className="flex space-x-8">
-              {[0,1,2].map(i => <div key={i} className="w-5 h-5 bg-cyan-400 rounded-full animate-bounce shadow-[0_0_25px_#00e5ff]" style={{ animationDelay: `${i*0.2}s` }} />)}
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-5 h-5 bg-cyan-400 rounded-full animate-bounce shadow-[0_0_25px_#00e5ff]"
+                  style={{ animationDelay: `${i * 0.2}s` }}
+                />
+              ))}
             </div>
-            <p className="mt-12 text-slate-600 font-black orbitron uppercase tracking-[0.8em] text-[14px]">Forging Platinum-Grade Dom Components</p>
+            <p className="mt-12 text-slate-600 font-black orbitron uppercase tracking-[0.8em] text-[14px]">
+              Forging Platinum-Grade Dom Components
+            </p>
           </div>
         ) : state.result ? (
           <div className="space-y-16 animate-in fade-in slide-in-from-bottom-20 duration-1000">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
               <div className="space-y-8">
                 <button
-                  onClick={() => setState(s => ({ ...s, result: null }))}
+                  onClick={() => setState((s) => ({ ...s, result: null }))}
                   className="text-slate-500 hover:text-cyan-400 font-black orbitron text-[12px] uppercase tracking-[0.5em] transition-all flex items-center group"
                 >
-                  <i className="fa-solid fa-chevron-left mr-4 group-hover:-translate-x-2 transition-transform"></i> ABANDON FORGE
+                  <i className="fa-solid fa-chevron-left mr-4 group-hover:-translate-x-2 transition-transform"></i>{" "}
+                  ABANDON FORGE
                 </button>
                 <div className="flex items-center space-x-10">
                   <h2 className="text-7xl font-black orbitron text-white tracking-tighter uppercase glow-text italic">
@@ -313,8 +373,12 @@ const App: React.FC = () => {
               </div>
               <div className="beveled-box p-10 flex items-center space-x-10 border-slate-800 bg-slate-900/60 shadow-[0_0_40px_rgba(34,197,94,0.15)]">
                 <div className="text-right">
-                  <p className="text-[12px] font-black text-slate-600 uppercase tracking-[0.4em] mb-3">Protocol Success</p>
-                  <p className="text-lg font-black orbitron text-green-400 uppercase tracking-[0.3em] animate-pulse">VICTORY ACHIEVED</p>
+                  <p className="text-[12px] font-black text-slate-600 uppercase tracking-[0.4em] mb-3">
+                    Protocol Success
+                  </p>
+                  <p className="text-lg font-black orbitron text-green-400 uppercase tracking-[0.3em] animate-pulse">
+                    VICTORY ACHIEVED
+                  </p>
                 </div>
                 <div className="w-24 h-24 rounded-3xl bg-slate-950 border-4 border-slate-800 flex items-center justify-center shadow-inner shadow-green-500/20">
                   <i className="fa-solid fa-check-double text-5xl text-green-400"></i>
@@ -324,9 +388,9 @@ const App: React.FC = () => {
 
             <ResultView
               result={state.result}
-              onUpdate={(r) => setState(s => ({ ...s, result: r }))}
+              onUpdate={(r) => setState((s) => ({ ...s, result: r }))}
               isAnalyzing={state.isAnalyzing}
-              setIsAnalyzing={(v) => setState(s => ({ ...s, isAnalyzing: v }))}
+              setIsAnalyzing={(v) => setState((s) => ({ ...s, isAnalyzing: v }))}
             />
           </div>
         ) : null}
@@ -346,30 +410,63 @@ const App: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <span className="text-4xl font-black orbitron text-white tracking-tighter italic glow-text block">3000STUDIOS.COM</span>
-                  <span className="text-[9px] font-black text-slate-600 uppercase tracking-[1em] mt-2 block">FORGE THE FUTURE</span>
+                  <span className="text-4xl font-black orbitron text-white tracking-tighter italic glow-text block">
+                    3000STUDIOS.COM
+                  </span>
+                  <span className="text-[9px] font-black text-slate-600 uppercase tracking-[1em] mt-2 block">
+                    FORGE THE FUTURE
+                  </span>
                 </div>
               </div>
               <p className="text-slate-500 text-sm font-bold uppercase tracking-[0.2em] leading-loose max-w-lg">
-                Universal Neural Web Acquisition Engine. Designed, engineered, and deployed by J.W. Swain. 3000 Studios Proprietary Protocol Alpha-9. Optimized for store-ready deployment.
+                Universal Neural Web Acquisition Engine. Designed, engineered, and deployed by J.W. Swain. 3000 Studios
+                Proprietary Protocol Alpha-9. Optimized for store-ready deployment.
               </p>
             </div>
 
             <div className="space-y-10">
-              <h4 className="text-[12px] font-black orbitron text-slate-500 uppercase tracking-[0.6em]">Core Protocols</h4>
+              <h4 className="text-[12px] font-black orbitron text-slate-500 uppercase tracking-[0.6em]">
+                Core Protocols
+              </h4>
               <ul className="space-y-6 text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">
-                <li><a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">Neural Sync v4.8</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">DOM Deconstruction</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">Acquisition Engine</a></li>
+                <li>
+                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                    Neural Sync v4.8
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                    DOM Deconstruction
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                    Acquisition Engine
+                  </a>
+                </li>
               </ul>
             </div>
 
             <div className="space-y-10">
-              <h4 className="text-[12px] font-black orbitron text-slate-500 uppercase tracking-[0.6em]">Secure Terminal</h4>
+              <h4 className="text-[12px] font-black orbitron text-slate-500 uppercase tracking-[0.6em]">
+                Secure Terminal
+              </h4>
               <ul className="space-y-6 text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">
-                <li><a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">Store Access</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">Private Vault</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">Architect SDK</a></li>
+                <li>
+                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                    Store Access
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                    Private Vault
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                    Architect SDK
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -384,7 +481,10 @@ const App: React.FC = () => {
                 <i className="fa-solid fa-fingerprint text-cyan-500 text-xl"></i>
                 <p>IDENTIFIED AS PROPRIETARY 3000TECH</p>
               </div>
-              <p className="text-slate-800 text-[10px] max-w-sm ml-auto font-black uppercase">Protected by 3000 Studios Proprietary Technology. Copyright 2024 J.W. Swain. Unauthorized replication detected will trigger neural purge protocols.</p>
+              <p className="text-slate-800 text-[10px] max-w-sm ml-auto font-black uppercase">
+                Protected by 3000 Studios Proprietary Technology. Copyright 2024 J.W. Swain. Unauthorized replication
+                detected will trigger neural purge protocols.
+              </p>
             </div>
           </div>
         </div>

@@ -138,8 +138,7 @@ iframe {
     0px 3px 0px rgba(0, 0, 0, 0.5),
     0px 4px 0px rgba(0, 0, 0, 0.6),
     0px 5px 10px rgba(0, 0, 0, 0.9);
-  filter: drop-shadow(0 2px 1px rgba(255, 255, 255, 0.5))
-    drop-shadow(0 15px 10px rgba(0, 0, 0, 1))
+  filter: drop-shadow(0 2px 1px rgba(255, 255, 255, 0.5)) drop-shadow(0 15px 10px rgba(0, 0, 0, 1))
     drop-shadow(0 25px 30px rgba(0, 0, 0, 0.7));
   animation: gloss-shine 3s ease-in-out infinite;
 }
@@ -149,13 +148,7 @@ iframe {
 }
 
 .metallic-goo {
-  background: radial-gradient(
-    circle at 30% 30%,
-    #fff,
-    #9ca3af 20%,
-    #4b5563 50%,
-    #111827 100%
-  );
+  background: radial-gradient(circle at 30% 30%, #fff, #9ca3af 20%, #4b5563 50%, #111827 100%);
   box-shadow:
     inset 0 0 20px rgba(255, 255, 255, 0.5),
     0 10px 30px rgba(0, 0, 0, 0.8);
@@ -200,12 +193,7 @@ iframe {
   content: "";
   position: absolute;
   inset: -1px;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(34, 211, 238, 0.3),
-    transparent
-  );
+  background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.3), transparent);
   z-index: -1;
   border-radius: inherit;
   animation: border-rotate 4s linear infinite;

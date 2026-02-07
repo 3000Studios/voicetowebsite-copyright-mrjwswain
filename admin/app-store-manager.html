@@ -13,9 +13,7 @@
   <body>
     <script>
       (function guardAdmin() {
-        const cookie = document.cookie
-          .split(";")
-          .some((part) => part.trim().startsWith("vtw_admin=1"));
+        const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
         const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
         const ts = Number(sessionStorage.getItem("yt-admin-unlocked-ts") || 0);
         const fresh = ts && Date.now() - ts < 1000 * 60 * 60 * 2;
@@ -57,12 +55,7 @@
         <form id="auth-form">
           <div class="input-group">
             <span class="input-tag">01_IDENTIFIER</span>
-            <input
-              type="email"
-              id="lock-email"
-              placeholder="USER_NAME@DOMAIN"
-              autocomplete="username"
-            />
+            <input type="email" id="lock-email" placeholder="USER_NAME@DOMAIN" autocomplete="username" />
             <div class="input-focus-line"></div>
           </div>
 
@@ -78,9 +71,7 @@
             <div class="input-focus-line"></div>
           </div>
 
-          <button type="submit" class="ignition-trigger" id="lock-button">
-            Initialize Session
-          </button>
+          <button type="submit" class="ignition-trigger" id="lock-button">Initialize Session</button>
         </form>
 
         <div class="meta-actions">
@@ -98,8 +89,9 @@
           class="card wide"
           id="app-manager"
           style="
-            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-              url('https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4');
+            background-image:
+              linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+              url(&quot;https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4&quot;);
             background-size: cover;
             background-position: center;
           "
@@ -108,9 +100,7 @@
             <div>
               <p class="eyebrow">Apps</p>
               <h2>App Store Manager</h2>
-              <p class="muted">
-                Control listings, track sales, and push apps directly to the Store.
-              </p>
+              <p class="muted">Control listings, track sales, and push apps directly to the Store.</p>
             </div>
             <div class="status-strip">
               <span class="status-chip" id="apps-count">0 apps</span>
@@ -171,14 +161,7 @@
                   </label>
                   <label>
                     <span class="form-label">Price (USD)</span>
-                    <input
-                      type="number"
-                      name="price"
-                      min="0"
-                      step="1"
-                      placeholder="99"
-                      required
-                    />
+                    <input type="number" name="price" min="0" step="1" placeholder="99" required />
                   </label>
                   <label>
                     <span class="form-label">Tag</span>
@@ -192,20 +175,12 @@
 
                 <label>
                   <span class="form-label">Description</span>
-                  <textarea
-                    name="desc"
-                    rows="3"
-                    placeholder="One-line value prop for the app."
-                  ></textarea>
+                  <textarea name="desc" rows="3" placeholder="One-line value prop for the app."></textarea>
                 </label>
 
                 <label>
                   <span class="form-label">Store link (optional)</span>
-                  <input
-                    type="url"
-                    name="link"
-                    placeholder="https://voicetowebsite.com/store"
-                  />
+                  <input type="url" name="link" placeholder="https://voicetowebsite.com/store" />
                 </label>
 
                 <div class="button-grid">
@@ -213,10 +188,7 @@
                   <button type="button" class="ghost" id="app-clear">Clear</button>
                 </div>
 
-                <p class="muted small">
-                  Saved apps appear in the table and sync to the Store in a future API
-                  hook.
-                </p>
+                <p class="muted small">Saved apps appear in the table and sync to the Store in a future API hook.</p>
               </form>
             </div>
           </div>

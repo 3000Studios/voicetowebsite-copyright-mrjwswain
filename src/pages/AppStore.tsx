@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Checkout from '../components/Checkout';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Checkout from "../components/Checkout";
 
 interface App {
   id: string;
@@ -19,168 +19,166 @@ interface App {
   tags: string[];
 }
 
-const CATEGORIES = [
-  'All',
-  'Productivity',
-  'Voice AI',
-  'Design Tools',
-  'Analytics',
-  'Marketing',
-  'Developer Tools',
-];
+const CATEGORIES = ["All", "Productivity", "Voice AI", "Design Tools", "Analytics", "Marketing", "Developer Tools"];
 
 const APPS: App[] = [
   {
-    id: 'voice-commander-pro',
-    name: 'Voice Commander Pro',
-    description: 'Advanced voice-to-code system with AI-powered suggestions',
-    longDescription: 'Transform your development workflow with Voice Commander Pro. This revolutionary tool allows you to write, edit, and deploy code using only your voice. Powered by advanced AI, it understands context and provides intelligent suggestions.',
+    id: "voice-commander-pro",
+    name: "Voice Commander Pro",
+    description: "Advanced voice-to-code system with AI-powered suggestions",
+    longDescription:
+      "Transform your development workflow with Voice Commander Pro. This revolutionary tool allows you to write, edit, and deploy code using only your voice. Powered by advanced AI, it understands context and provides intelligent suggestions.",
     price: 299.99,
-    category: 'Developer Tools',
+    category: "Developer Tools",
     rating: 4.9,
     downloads: 15420,
-    version: '2.1.0',
-    developer: '3000 Studios',
+    version: "2.1.0",
+    developer: "3000 Studios",
     screenshots: [],
     features: [
-      'Natural language code generation',
-      'Multi-language support (20+ languages)',
-      'Real-time syntax correction',
-      'AI-powered code completion',
-      'Voice-activated debugging',
-      'Integration with popular IDEs',
+      "Natural language code generation",
+      "Multi-language support (20+ languages)",
+      "Real-time syntax correction",
+      "AI-powered code completion",
+      "Voice-activated debugging",
+      "Integration with popular IDEs",
     ],
-    icon: '🎤',
-    tags: ['voice', 'ai', 'coding', 'productivity'],
+    icon: "🎤",
+    tags: ["voice", "ai", "coding", "productivity"],
   },
   {
-    id: 'site-builder-ai',
-    name: 'AI Site Builder',
-    description: 'Build stunning websites with voice commands in minutes',
-    longDescription: 'Create professional websites without touching your keyboard. AI Site Builder uses advanced machine learning to understand your vision and build pixel-perfect sites through natural conversation.',
+    id: "site-builder-ai",
+    name: "AI Site Builder",
+    description: "Build stunning websites with voice commands in minutes",
+    longDescription:
+      "Create professional websites without touching your keyboard. AI Site Builder uses advanced machine learning to understand your vision and build pixel-perfect sites through natural conversation.",
     price: 199.99,
-    category: 'Design Tools',
+    category: "Design Tools",
     rating: 4.8,
     downloads: 28350,
-    version: '3.0.2',
-    developer: '3000 Studios',
+    version: "3.0.2",
+    developer: "3000 Studios",
     screenshots: [],
     features: [
-      'Voice-driven design system',
-      'Responsive layouts automatically',
-      'SEO optimization built-in',
-      'One-click deployment',
-      'Custom domain integration',
-      'Analytics dashboard',
+      "Voice-driven design system",
+      "Responsive layouts automatically",
+      "SEO optimization built-in",
+      "One-click deployment",
+      "Custom domain integration",
+      "Analytics dashboard",
     ],
-    icon: '🏗️',
-    tags: ['website', 'ai', 'design', 'voice'],
+    icon: "🏗️",
+    tags: ["website", "ai", "design", "voice"],
   },
   {
-    id: 'analytics-voice-pro',
-    name: 'Analytics Voice Pro',
-    description: 'Query your analytics data using natural language',
-    longDescription: 'Stop clicking through dashboards. Ask questions about your data in plain English and get instant, actionable insights. Supports Google Analytics, Mixpanel, Amplitude, and more.',
+    id: "analytics-voice-pro",
+    name: "Analytics Voice Pro",
+    description: "Query your analytics data using natural language",
+    longDescription:
+      "Stop clicking through dashboards. Ask questions about your data in plain English and get instant, actionable insights. Supports Google Analytics, Mixpanel, Amplitude, and more.",
     price: 149.99,
-    category: 'Analytics',
+    category: "Analytics",
     rating: 4.7,
     downloads: 12890,
-    version: '1.5.1',
-    developer: '3000 Studios',
+    version: "1.5.1",
+    developer: "3000 Studios",
     screenshots: [],
     features: [
-      'Natural language queries',
-      'Multi-platform integration',
-      'Custom report generation',
-      'Voice-activated dashboards',
-      'Automated insights',
-      'Export to PDF/Excel',
+      "Natural language queries",
+      "Multi-platform integration",
+      "Custom report generation",
+      "Voice-activated dashboards",
+      "Automated insights",
+      "Export to PDF/Excel",
     ],
-    icon: '📊',
-    tags: ['analytics', 'data', 'voice', 'business'],
+    icon: "📊",
+    tags: ["analytics", "data", "voice", "business"],
   },
   {
-    id: 'content-creator-ai',
-    name: 'Content Creator AI',
-    description: 'Generate blog posts, social media, and marketing copy with voice',
-    longDescription: 'Create compelling content at the speed of thought. Simply speak your ideas and watch as AI Content Creator transforms them into polished, SEO-optimized content ready for publication.',
+    id: "content-creator-ai",
+    name: "Content Creator AI",
+    description: "Generate blog posts, social media, and marketing copy with voice",
+    longDescription:
+      "Create compelling content at the speed of thought. Simply speak your ideas and watch as AI Content Creator transforms them into polished, SEO-optimized content ready for publication.",
     price: 179.99,
-    category: 'Marketing',
+    category: "Marketing",
     rating: 4.9,
     downloads: 34210,
-    version: '2.3.0',
-    developer: '3000 Studios',
+    version: "2.3.0",
+    developer: "3000 Studios",
     screenshots: [],
     features: [
-      'Multi-format content generation',
-      'SEO optimization',
-      'Plagiarism checking',
-      'Brand voice customization',
-      'Social media scheduling',
-      'A/B testing tools',
+      "Multi-format content generation",
+      "SEO optimization",
+      "Plagiarism checking",
+      "Brand voice customization",
+      "Social media scheduling",
+      "A/B testing tools",
     ],
-    icon: '✍️',
-    tags: ['content', 'marketing', 'ai', 'seo'],
+    icon: "✍️",
+    tags: ["content", "marketing", "ai", "seo"],
   },
   {
-    id: 'voice-automation-suite',
-    name: 'Voice Automation Suite',
-    description: 'Automate any workflow with custom voice commands',
-    longDescription: 'Build powerful automation workflows using only your voice. Connect apps, trigger actions, and streamline your entire business process without writing a single line of code.',
+    id: "voice-automation-suite",
+    name: "Voice Automation Suite",
+    description: "Automate any workflow with custom voice commands",
+    longDescription:
+      "Build powerful automation workflows using only your voice. Connect apps, trigger actions, and streamline your entire business process without writing a single line of code.",
     price: 249.99,
-    category: 'Productivity',
+    category: "Productivity",
     rating: 4.8,
     downloads: 19560,
-    version: '1.8.3',
-    developer: '3000 Studios',
+    version: "1.8.3",
+    developer: "3000 Studios",
     screenshots: [],
     features: [
-      'Visual workflow builder',
-      '500+ app integrations',
-      'Custom voice triggers',
-      'Conditional logic',
-      'Scheduled automation',
-      'Team collaboration',
+      "Visual workflow builder",
+      "500+ app integrations",
+      "Custom voice triggers",
+      "Conditional logic",
+      "Scheduled automation",
+      "Team collaboration",
     ],
-    icon: '⚡',
-    tags: ['automation', 'productivity', 'voice', 'workflow'],
+    icon: "⚡",
+    tags: ["automation", "productivity", "voice", "workflow"],
   },
   {
-    id: 'voice-crm',
-    name: 'Voice CRM Pro',
-    description: 'Manage customer relationships hands-free',
-    longDescription: 'The first truly voice-native CRM. Update deals, log calls, send emails, and manage your pipeline while driving, walking, or multitasking. Never miss a follow-up again.',
+    id: "voice-crm",
+    name: "Voice CRM Pro",
+    description: "Manage customer relationships hands-free",
+    longDescription:
+      "The first truly voice-native CRM. Update deals, log calls, send emails, and manage your pipeline while driving, walking, or multitasking. Never miss a follow-up again.",
     price: 329.99,
-    category: 'Productivity',
+    category: "Productivity",
     rating: 4.9,
     downloads: 8920,
-    version: '1.2.0',
-    developer: '3000 Studios',
+    version: "1.2.0",
+    developer: "3000 Studios",
     screenshots: [],
     features: [
-      'Voice contact management',
-      'Automated follow-ups',
-      'Deal pipeline tracking',
-      'Email integration',
-      'Call recording & transcription',
-      'Mobile-first design',
+      "Voice contact management",
+      "Automated follow-ups",
+      "Deal pipeline tracking",
+      "Email integration",
+      "Call recording & transcription",
+      "Mobile-first design",
     ],
-    icon: '👥',
-    tags: ['crm', 'sales', 'voice', 'business'],
+    icon: "👥",
+    tags: ["crm", "sales", "voice", "business"],
   },
 ];
 
 export default function AppStore() {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const [cart, setCart] = useState<string[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
 
   const filteredApps = APPS.filter((app) => {
-    const matchesCategory = selectedCategory === 'All' || app.category === selectedCategory;
+    const matchesCategory = selectedCategory === "All" || app.category === selectedCategory;
     const matchesSearch =
-      searchQuery === '' ||
+      searchQuery === "" ||
       app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       app.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       app.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -518,9 +516,7 @@ export default function AppStore() {
 
       <div className="store-header">
         <h1 className="store-title">App Store</h1>
-        <p className="store-subtitle">
-          Discover powerful voice-enabled apps to supercharge your workflow
-        </p>
+        <p className="store-subtitle">Discover powerful voice-enabled apps to supercharge your workflow</p>
       </div>
 
       <div className="search-bar">
@@ -537,7 +533,7 @@ export default function AppStore() {
         {CATEGORIES.map((category) => (
           <button
             key={category}
-            className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+            className={`category-btn ${selectedCategory === category ? "active" : ""}`}
             onClick={() => setSelectedCategory(category)}
           >
             {category}
@@ -565,7 +561,7 @@ export default function AppStore() {
               </div>
             </div>
             <button
-              className={`add-to-cart-btn ${cart.includes(app.id) ? 'in-cart' : ''}`}
+              className={`add-to-cart-btn ${cart.includes(app.id) ? "in-cart" : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
                 if (cart.includes(app.id)) {
@@ -575,7 +571,7 @@ export default function AppStore() {
                 }
               }}
             >
-              {cart.includes(app.id) ? '✓ In Cart' : 'Add to Cart'}
+              {cart.includes(app.id) ? "✓ In Cart" : "Add to Cart"}
             </button>
           </motion.div>
         ))}
@@ -586,7 +582,7 @@ export default function AppStore() {
           className="cart-widget"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200 }}
+          transition={{ type: "spring", stiffness: 200 }}
         >
           <div className="cart-count">🛒 {cart.length} items</div>
           <div className="cart-total">${totalPrice.toFixed(2)}</div>
@@ -622,21 +618,21 @@ export default function AppStore() {
                   <p className="modal-developer">by {selectedApp.developer}</p>
                 </div>
               </div>
-              <p style={{ fontSize: '1.2rem', lineHeight: '1.8', marginBottom: '2rem' }}>
+              <p style={{ fontSize: "1.2rem", lineHeight: "1.8", marginBottom: "2rem" }}>
                 {selectedApp.longDescription}
               </p>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Features</h3>
+              <h3 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>Features</h3>
               <ul className="features-list">
                 {selectedApp.features.map((feature, index) => (
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
-              <div className="app-meta" style={{ marginTop: '2rem' }}>
+              <div className="app-meta" style={{ marginTop: "2rem" }}>
                 <div className="app-price">${selectedApp.price}</div>
                 <div>Version {selectedApp.version}</div>
               </div>
               <button
-                className={`add-to-cart-btn ${cart.includes(selectedApp.id) ? 'in-cart' : ''}`}
+                className={`add-to-cart-btn ${cart.includes(selectedApp.id) ? "in-cart" : ""}`}
                 onClick={() => {
                   if (cart.includes(selectedApp.id)) {
                     removeFromCart(selectedApp.id);
@@ -645,7 +641,7 @@ export default function AppStore() {
                   }
                 }}
               >
-                {cart.includes(selectedApp.id) ? '✓ In Cart' : 'Add to Cart'}
+                {cart.includes(selectedApp.id) ? "✓ In Cart" : "Add to Cart"}
               </button>
             </motion.div>
           </motion.div>

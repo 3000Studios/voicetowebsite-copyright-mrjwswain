@@ -285,8 +285,7 @@ const touchSession = () => {
   }
 };
 
-const isUnlocked = () =>
-  sessionStorage.getItem(UNLOCK_KEY) === "true" && isSessionFresh();
+const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true" && isSessionFresh();
 
 const setLockedUI = (locked) => {
   lockScreen.style.display = locked ? "grid" : "none";

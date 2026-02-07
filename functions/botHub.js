@@ -97,8 +97,9 @@ export async function handleBotHubRequest({ request, env }) {
   if (!isAdmin) return json(401, { error: "Admin required." });
 
   if (path === "/api/bot-hub/agents" && request.method === "GET") {
-    const agents = await env.D1.prepare("SELECT id, ts, name, kind, endpoint, notes FROM bot_agents ORDER BY ts DESC")
-      .all();
+    const agents = await env.D1.prepare(
+      "SELECT id, ts, name, kind, endpoint, notes FROM bot_agents ORDER BY ts DESC"
+    ).all();
     return json(200, { ok: true, agents: agents.results || [] });
   }
 
@@ -158,17 +159,13 @@ Rules:
       });
       const output = extractJson(pickAiText(aiResult));
 
-      await env.D1.prepare(
-        "INSERT INTO bot_tasks (id, status, agent_name, input_json, output_json) VALUES (?,?,?,?,?)"
-      )
+      await env.D1.prepare("INSERT INTO bot_tasks (id, status, agent_name, input_json, output_json) VALUES (?,?,?,?,?)")
         .bind(taskId, "done", agents.join(","), JSON.stringify({ notes, agents }), JSON.stringify(output))
         .run();
 
       return json(200, { ok: true, taskId, output });
     } catch (err) {
-      await env.D1.prepare(
-        "INSERT INTO bot_tasks (id, status, agent_name, input_json, error) VALUES (?,?,?,?,?)"
-      )
+      await env.D1.prepare("INSERT INTO bot_tasks (id, status, agent_name, input_json, error) VALUES (?,?,?,?,?)")
         .bind(taskId, "error", agents.join(","), JSON.stringify({ notes, agents }), String(err.message || err))
         .run();
       return json(502, { error: err.message, taskId });
@@ -177,4 +174,3 @@ Rules:
 
   return json(404, { error: "Not found." });
 }
-

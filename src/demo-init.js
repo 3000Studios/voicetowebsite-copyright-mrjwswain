@@ -6,7 +6,7 @@ const COMMANDS = [
   "Build a creator portfolio with a reel section and email capture",
   "Make an agency homepage with services, case studies, and a contact form",
   "Design an ecommerce storefront for skincare with bundles and FAQs",
-  "Create a WordPress migration landing page with SEO checklist and pricing"
+  "Create a WordPress migration landing page with SEO checklist and pricing",
 ];
 
 const safeJsonParse = (value, fallback) => {
@@ -60,8 +60,7 @@ const setTheme = (theme) => {
   } catch {}
 };
 
-const hasKeyword = (text, keyword) =>
-  (text || "").toLowerCase().includes(keyword.toLowerCase());
+const hasKeyword = (text, keyword) => (text || "").toLowerCase().includes(keyword.toLowerCase());
 
 const generateOutline = ({ siteType, prompt }) => {
   const normalizedPrompt = (prompt || "").trim();
@@ -119,8 +118,7 @@ const renderPreview = (state, els) => {
     });
   }
   if (els.previewNext) {
-    els.previewNext.textContent =
-      "Add pricing, add testimonials, then publish to your domain.";
+    els.previewNext.textContent = "Add pricing, add testimonials, then publish to your domain.";
   }
 };
 
@@ -145,18 +143,14 @@ const wireChoices = (state) => {
     const siteChoice = event.target.closest("[data-choice]");
     if (siteChoice) {
       state.siteType = siteChoice.getAttribute("data-choice") || state.siteType;
-      document
-        .querySelectorAll("[data-choice]")
-        .forEach((el) => el.classList.toggle("is-selected", el === siteChoice));
+      document.querySelectorAll("[data-choice]").forEach((el) => el.classList.toggle("is-selected", el === siteChoice));
       saveState(state);
     }
 
     const themeChoice = event.target.closest("[data-theme]");
     if (themeChoice) {
       state.theme = themeChoice.getAttribute("data-theme") || state.theme;
-      document
-        .querySelectorAll("[data-theme]")
-        .forEach((el) => el.classList.toggle("is-selected", el === themeChoice));
+      document.querySelectorAll("[data-theme]").forEach((el) => el.classList.toggle("is-selected", el === themeChoice));
       setTheme(state.theme);
       saveState(state);
     }
@@ -195,8 +189,7 @@ const wirePrompt = (state, els) => {
 };
 
 const createRecognition = (els) => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return null;
 
   const recognition = new SpeechRecognition();
@@ -249,8 +242,7 @@ const wireMic = (state, els) => {
 };
 
 const wireSave = (state, els) => {
-  const isValidEmail = (value) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((value || "").trim());
+  const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((value || "").trim());
 
   const loadBuilds = () => safeJsonParse(localStorage.getItem(SAVED_BUILDS_KEY) || "[]", []);
   const saveBuilds = (list) => localStorage.setItem(SAVED_BUILDS_KEY, JSON.stringify(list.slice(0, 50)));
@@ -272,9 +264,7 @@ const wireSave = (state, els) => {
     const list = loadBuilds();
     list.unshift(build);
     saveBuilds(list);
-    els.saveStatus &&
-      (els.saveStatus.textContent =
-        "Saved locally. In production, you’ll receive a publish link.");
+    els.saveStatus && (els.saveStatus.textContent = "Saved locally. In production, you’ll receive a publish link.");
     if (els.email) els.email.value = "";
   });
 };

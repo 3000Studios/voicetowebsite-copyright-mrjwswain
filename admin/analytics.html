@@ -4,10 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>VoiceToWebsite | Analytics</title>
-    <meta
-      name="description"
-      content="Real-time analytics from Cloudflare and sales endpoints."
-    />
+    <meta name="description" content="Real-time analytics from Cloudflare and sales endpoints." />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="../styles.css" />
@@ -16,9 +13,7 @@
   <body>
     <script>
       (function guardAdmin() {
-        const cookie = document.cookie
-          .split(";")
-          .some((part) => part.trim().startsWith("vtw_admin=1"));
+        const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
         const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
         const ts = Number(sessionStorage.getItem("yt-admin-unlocked-ts") || 0);
         const fresh = ts && Date.now() - ts < 1000 * 60 * 60 * 2;
@@ -63,10 +58,7 @@
             <div>
               <p class="eyebrow">Edge traffic</p>
               <h2>Cloudflare Overview</h2>
-              <p class="muted">
-                Requests, bandwidth, threats, and uniques pulled from the Cloudflare
-                Analytics API.
-              </p>
+              <p class="muted">Requests, bandwidth, threats, and uniques pulled from the Cloudflare Analytics API.</p>
             </div>
             <div class="status-strip">
               <span class="status-chip" id="analytics-status">Loading…</span>
@@ -120,8 +112,7 @@
               <p class="eyebrow">Sales</p>
               <h2>Sales & Checkout</h2>
               <p class="muted">
-                Connect your payments endpoint to surface real sales data. No mock
-                values are displayed.
+                Connect your payments endpoint to surface real sales data. No mock values are displayed.
               </p>
             </div>
             <div class="status-strip">
@@ -129,9 +120,7 @@
             </div>
           </div>
           <div class="table-shell" id="sales-shell">
-            <div class="muted">
-              Loading sales data...
-            </div>
+            <div class="muted">Loading sales data...</div>
           </div>
         </section>
       </main>
@@ -180,8 +169,7 @@
         });
 
         if (!ts.length) {
-          timeseriesEl.innerHTML =
-            '<tr><td colspan="4" class="muted">No analytics timeseries returned.</td></tr>';
+          timeseriesEl.innerHTML = '<tr><td colspan="4" class="muted">No analytics timeseries returned.</td></tr>';
         }
       };
 
@@ -209,13 +197,13 @@
         if (salesStatus) salesStatus.textContent = "Loading...";
 
         try {
-            const res = await fetch("/api/sales/stats", { cache: "no-store" });
-            const data = await res.json();
+          const res = await fetch("/api/sales/stats", { cache: "no-store" });
+          const data = await res.json();
 
-            const shell = document.getElementById("sales-shell");
-            if (shell) {
-                if (data.recent_orders && data.recent_orders.length > 0) {
-                    let html = `
+          const shell = document.getElementById("sales-shell");
+          if (shell) {
+            if (data.recent_orders && data.recent_orders.length > 0) {
+              let html = `
                       <table class="app-table">
                         <thead>
                             <tr>
@@ -226,45 +214,46 @@
                             </tr>
                         </thead>
                         <tbody>`;
-                    data.recent_orders.forEach(o => {
-                        html += `<tr>
+              data.recent_orders.forEach((o) => {
+                html += `<tr>
                             <td class="small muted">${o.id}</td>
                             <td>$${Number(o.amount || 0).toFixed(2)}</td>
                             <td>${o.product_id}</td>
                             <td class="small">${new Date(o.ts).toLocaleString()}</td>
                         </tr>`;
-                    });
-                    html += `</tbody></table>`;
+              });
+              html += `</tbody></table>`;
 
-                    // Add summary
-                    html = `<div class="analytics-kpis" style="margin-bottom:1rem;">
+              // Add summary
+              html =
+                `<div class="analytics-kpis" style="margin-bottom:1rem;">
                         <div class="metric-card">
                             <div class="metric-label">Total Revenue</div>
-                            <div class="metric-value">$${Number(data.total_revenue||0).toFixed(2)}</div>
+                            <div class="metric-value">$${Number(data.total_revenue || 0).toFixed(2)}</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-label">Orders</div>
-                            <div class="metric-value">${data.total_orders||0}</div>
+                            <div class="metric-value">${data.total_orders || 0}</div>
                         </div>
                     </div>` + html;
 
-                    shell.innerHTML = html;
-                    if (salesStatus) {
-                        salesStatus.textContent = "Live";
-                        salesStatus.classList.add("ok");
-                    }
-                } else {
-                    shell.innerHTML = `<div class="muted">No sales recorded yet.</div>`;
-                    if (salesStatus) salesStatus.textContent = "No Data";
-                }
+              shell.innerHTML = html;
+              if (salesStatus) {
+                salesStatus.textContent = "Live";
+                salesStatus.classList.add("ok");
+              }
+            } else {
+              shell.innerHTML = `<div class="muted">No sales recorded yet.</div>`;
+              if (salesStatus) salesStatus.textContent = "No Data";
             }
+          }
         } catch (err) {
-            if (salesStatus) {
-                salesStatus.textContent = "Error";
-                salesStatus.classList.add("alert");
-            }
-            const shell = document.getElementById("sales-shell");
-            if (shell) shell.innerHTML = `<div class="muted alert">Failed to load sales: ${err.message}</div>`;
+          if (salesStatus) {
+            salesStatus.textContent = "Error";
+            salesStatus.classList.add("alert");
+          }
+          const shell = document.getElementById("sales-shell");
+          if (shell) shell.innerHTML = `<div class="muted alert">Failed to load sales: ${err.message}</div>`;
         }
       };
 

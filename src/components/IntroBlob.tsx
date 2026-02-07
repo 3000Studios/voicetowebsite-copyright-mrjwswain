@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import React, { useRef, useEffect } from "react";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 
 interface IntroBlobProps {
   splatterActive: boolean;
@@ -18,19 +18,19 @@ const IntroBlob: React.FC<IntroBlobProps> = ({ splatterActive, onStart }) => {
         const rect = blobRef.current.getBoundingClientRect();
         centerRef.current = {
           x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2
+          y: rect.top + rect.height / 2,
         };
       }
     };
 
     updateCenter();
-    window.addEventListener('resize', updateCenter);
+    window.addEventListener("resize", updateCenter);
 
     // Also update on mount/delay because layout might shift
     const t = setTimeout(updateCenter, 100);
     return () => {
-        window.removeEventListener('resize', updateCenter);
-        clearTimeout(t);
+      window.removeEventListener("resize", updateCenter);
+      clearTimeout(t);
     };
   }, []);
 
@@ -39,8 +39,8 @@ const IntroBlob: React.FC<IntroBlobProps> = ({ splatterActive, onStart }) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
 
   const maxPull = 50;
@@ -71,32 +71,36 @@ const IntroBlob: React.FC<IntroBlobProps> = ({ splatterActive, onStart }) => {
 
   return (
     <motion.div
-        ref={blobRef}
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{
-            opacity: 1,
-            scale: splatterActive ? 25 : [1, 1.05, 1],
-            borderRadius: splatterActive ? "50%" : ["50% 50% 50% 50%", "48% 52% 45% 55%", "52% 48% 55% 45%"]
-        }}
-        style={{ x, y }}
-        transition={{
-            opacity: { duration: 1 },
-            scale: { duration: splatterActive ? 1.2 : 4, ease: splatterActive ? "circIn" : "easeInOut", repeat: splatterActive ? 0 : Infinity },
-            borderRadius: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-        }}
-        onClick={onStart}
-        className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden"
+      ref={blobRef}
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{
+        opacity: 1,
+        scale: splatterActive ? 25 : [1, 1.05, 1],
+        borderRadius: splatterActive ? "50%" : ["50% 50% 50% 50%", "48% 52% 45% 55%", "52% 48% 55% 45%"],
+      }}
+      style={{ x, y }}
+      transition={{
+        opacity: { duration: 1 },
+        scale: {
+          duration: splatterActive ? 1.2 : 4,
+          ease: splatterActive ? "circIn" : "easeInOut",
+          repeat: splatterActive ? 0 : Infinity,
+        },
+        borderRadius: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+      }}
+      onClick={onStart}
+      className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden"
     >
-        <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
-        {!splatterActive && (
-            <motion.span
-                animate={{ opacity: [0.6, 1, 0.6], letterSpacing: ["0.3em", "0.5em", "0.3em"] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="font-orbitron text-[8px] md:text-[9px] text-black font-black uppercase pointer-events-none z-20 text-center px-4"
-            >
-                IGNITE INTERFACE
-            </motion.span>
-        )}
+      <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
+      {!splatterActive && (
+        <motion.span
+          animate={{ opacity: [0.6, 1, 0.6], letterSpacing: ["0.3em", "0.5em", "0.3em"] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="font-orbitron text-[8px] md:text-[9px] text-black font-black uppercase pointer-events-none z-20 text-center px-4"
+        >
+          IGNITE INTERFACE
+        </motion.span>
+      )}
     </motion.div>
   );
 };

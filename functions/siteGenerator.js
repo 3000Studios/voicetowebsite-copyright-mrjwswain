@@ -24,7 +24,8 @@ const pickAiText = (result) => {
   if (typeof result.response === "string") return result.response;
   if (typeof result.text === "string") return result.text;
   if (typeof result.output_text === "string") return result.output_text;
-  if (Array.isArray(result?.choices) && result.choices[0]?.message?.content) return String(result.choices[0].message.content);
+  if (Array.isArray(result?.choices) && result.choices[0]?.message?.content)
+    return String(result.choices[0].message.content);
   return JSON.stringify(result);
 };
 
@@ -60,9 +61,7 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
   const description = layout?.description || "Generated preview";
   const theme = layout?.theme || "midnight";
   const pages = Array.isArray(layout?.pages) ? layout.pages : [];
-  const nav = pages
-    .map((p) => `<a href="#${p.slug || ""}">${p.title || p.slug || "Page"}</a>`)
-    .join("");
+  const nav = pages.map((p) => `<a href="#${p.slug || ""}">${p.title || p.slug || "Page"}</a>`).join("");
   const sections = pages
     .map((p) => {
       const blocks = Array.isArray(p.sections) ? p.sections : [];
@@ -260,9 +259,7 @@ export async function handlePublishRequest({ request, env }) {
   const siteId = String(body?.siteId || "");
   if (!siteId) return json(400, { error: "Missing siteId." });
 
-  const row = await env.D1.prepare("SELECT id, html, css, layout_json FROM sites WHERE id = ?")
-    .bind(siteId)
-    .first();
+  const row = await env.D1.prepare("SELECT id, html, css, layout_json FROM sites WHERE id = ?").bind(siteId).first();
   if (!row) return json(404, { error: "Not found." });
 
   const base = `sites/${siteId}`;
@@ -290,9 +287,7 @@ export async function handlePublishRequest({ request, env }) {
   for (const asset of assets) {
     const buf = new TextEncoder().encode(String(asset.body));
     await env.R2.put(asset.key, buf, { httpMetadata: { contentType: asset.contentType } });
-    await env.D1.prepare(
-      "INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)"
-    )
+    await env.D1.prepare("INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)")
       .bind(siteId, asset.kind, asset.key, asset.contentType, buf.byteLength)
       .run();
   }
@@ -301,4 +296,3 @@ export async function handlePublishRequest({ request, env }) {
 
   return json(200, { ok: true, siteId, r2Prefix: base });
 }
-

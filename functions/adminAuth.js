@@ -24,13 +24,10 @@ const getCookie = (cookieHeader, name) => {
 };
 
 const importHmacKey = async (secret) =>
-  crypto.subtle.importKey(
-    "raw",
-    textEncoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
-  );
+  crypto.subtle.importKey("raw", textEncoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [
+    "sign",
+    "verify",
+  ]);
 
 const sign = async (secret, message) => {
   const key = await importHmacKey(secret);
@@ -38,8 +35,7 @@ const sign = async (secret, message) => {
   return base64UrlEncode(new Uint8Array(sig));
 };
 
-export const getAdminSigningSecret = (env) =>
-  env.ADMIN_COOKIE_SECRET || env.CONTROL_PASSWORD || "";
+export const getAdminSigningSecret = (env) => env.ADMIN_COOKIE_SECRET || env.CONTROL_PASSWORD || "";
 
 export const isAdminEnabled = (env) => Boolean(env.CONTROL_PASSWORD);
 
@@ -95,8 +91,5 @@ export const setAdminCookieHeaders = (headers, cookieValue, { secure = true } = 
 };
 
 export const clearAdminCookieHeaders = (headers, { secure = true } = {}) => {
-  headers.append(
-    "Set-Cookie",
-    `${adminCookieName}=; Path=/; Max-Age=0; ${secure ? "Secure; " : ""}SameSite=Lax`
-  );
+  headers.append("Set-Cookie", `${adminCookieName}=; Path=/; Max-Age=0; ${secure ? "Secure; " : ""}SameSite=Lax`);
 };

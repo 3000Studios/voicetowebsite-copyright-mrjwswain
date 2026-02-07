@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function VoiceCommanderPro() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   return (
     <div className="voice-commander-pro">
@@ -225,14 +225,13 @@ export default function VoiceCommanderPro() {
           className="app-icon-large"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 100 }}
+          transition={{ type: "spring", stiffness: 100 }}
         >
           🎤
         </motion.div>
         <h1 className="hero-title">Voice Commander Pro</h1>
         <p className="hero-subtitle">
-          The world's most advanced voice-to-code system. Write, edit, and deploy code using only
-          your voice.
+          The world's most advanced voice-to-code system. Write, edit, and deploy code using only your voice.
         </p>
         <div className="price-tag">$299.99</div>
         <div className="cta-buttons">
@@ -242,28 +241,16 @@ export default function VoiceCommanderPro() {
       </div>
 
       <div className="tabs">
-        <button
-          className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('overview')}
-        >
+        <button className={`tab ${activeTab === "overview" ? "active" : ""}`} onClick={() => setActiveTab("overview")}>
           Overview
         </button>
-        <button
-          className={`tab ${activeTab === 'features' ? 'active' : ''}`}
-          onClick={() => setActiveTab('features')}
-        >
+        <button className={`tab ${activeTab === "features" ? "active" : ""}`} onClick={() => setActiveTab("features")}>
           Features
         </button>
-        <button
-          className={`tab ${activeTab === 'specs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('specs')}
-        >
+        <button className={`tab ${activeTab === "specs" ? "active" : ""}`} onClick={() => setActiveTab("specs")}>
           Specifications
         </button>
-        <button
-          className={`tab ${activeTab === 'reviews' ? 'active' : ''}`}
-          onClick={() => setActiveTab('reviews')}
-        >
+        <button className={`tab ${activeTab === "reviews" ? "active" : ""}`} onClick={() => setActiveTab("reviews")}>
           Reviews
         </button>
       </div>
@@ -275,55 +262,50 @@ export default function VoiceCommanderPro() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {activeTab === 'overview' && (
+        {activeTab === "overview" && (
           <>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>
-              Transform Your Development Workflow
-            </h2>
-            <p style={{ fontSize: '1.2rem', lineHeight: '1.8', marginBottom: '2rem' }}>
-              Voice Commander Pro is the revolutionary tool that allows developers to write code at
-              the speed of thought. Using advanced AI and natural language processing, it
-              understands your intent and generates clean, production-ready code.
+            <h2 style={{ fontSize: "2.5rem", marginBottom: "2rem" }}>Transform Your Development Workflow</h2>
+            <p style={{ fontSize: "1.2rem", lineHeight: "1.8", marginBottom: "2rem" }}>
+              Voice Commander Pro is the revolutionary tool that allows developers to write code at the speed of
+              thought. Using advanced AI and natural language processing, it understands your intent and generates
+              clean, production-ready code.
             </p>
             <div className="features-grid">
               <div className="feature-card">
                 <div className="feature-icon">🧠</div>
                 <h3 className="feature-title">AI-Powered Intelligence</h3>
                 <p className="feature-description">
-                  Advanced machine learning models understand context and generate optimal code
-                  solutions.
+                  Advanced machine learning models understand context and generate optimal code solutions.
                 </p>
               </div>
               <div className="feature-card">
                 <div className="feature-icon">🌍</div>
                 <h3 className="feature-title">20+ Languages</h3>
                 <p className="feature-description">
-                  Support for all major programming languages including Python, JavaScript,
-                  TypeScript, Go, Rust, and more.
+                  Support for all major programming languages including Python, JavaScript, TypeScript, Go, Rust, and
+                  more.
                 </p>
               </div>
               <div className="feature-card">
                 <div className="feature-icon">⚡</div>
                 <h3 className="feature-title">Real-Time Correction</h3>
                 <p className="feature-description">
-                  Automatic syntax checking and error correction as you speak, ensuring clean code
-                  every time.
+                  Automatic syntax checking and error correction as you speak, ensuring clean code every time.
                 </p>
               </div>
             </div>
           </>
         )}
 
-        {activeTab === 'features' && (
+        {activeTab === "features" && (
           <>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Complete Feature Set</h2>
+            <h2 style={{ fontSize: "2.5rem", marginBottom: "2rem" }}>Complete Feature Set</h2>
             <div className="features-grid">
               <div className="feature-card">
                 <div className="feature-icon">💬</div>
                 <h3 className="feature-title">Natural Language Processing</h3>
                 <p className="feature-description">
-                  Speak naturally and watch your words transform into code. No need to memorize
-                  special commands.
+                  Speak naturally and watch your words transform into code. No need to memorize special commands.
                 </p>
               </div>
               <div className="feature-card">
@@ -357,17 +339,15 @@ export default function VoiceCommanderPro() {
               <div className="feature-card">
                 <div className="feature-icon">🎯</div>
                 <h3 className="feature-title">Custom Commands</h3>
-                <p className="feature-description">
-                  Create custom voice macros for repetitive tasks and workflows.
-                </p>
+                <p className="feature-description">Create custom voice macros for repetitive tasks and workflows.</p>
               </div>
             </div>
           </>
         )}
 
-        {activeTab === 'specs' && (
+        {activeTab === "specs" && (
           <>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Technical Specifications</h2>
+            <h2 style={{ fontSize: "2.5rem", marginBottom: "2rem" }}>Technical Specifications</h2>
             <ul className="specs-list">
               <li>
                 <span className="spec-label">Version</span>
@@ -405,36 +385,34 @@ export default function VoiceCommanderPro() {
           </>
         )}
 
-        {activeTab === 'reviews' && (
+        {activeTab === "reviews" && (
           <>
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>
-              What Developers Are Saying
-            </h2>
+            <h2 style={{ fontSize: "2.5rem", marginBottom: "2rem" }}>What Developers Are Saying</h2>
             <div className="testimonial">
               <p className="testimonial-text">
-                "Voice Commander Pro has completely changed how I code. I can now write complex
-                algorithms while pacing around my office. My productivity has increased by 300%."
+                "Voice Commander Pro has completely changed how I code. I can now write complex algorithms while pacing
+                around my office. My productivity has increased by 300%."
               </p>
               <p className="testimonial-author">— Sarah Chen, Senior Software Engineer @ Google</p>
             </div>
             <div className="testimonial">
               <p className="testimonial-text">
-                "As someone with RSI, this tool has been a lifesaver. I can continue doing what I
-                love without pain. The AI is incredibly accurate."
+                "As someone with RSI, this tool has been a lifesaver. I can continue doing what I love without pain. The
+                AI is incredibly accurate."
               </p>
               <p className="testimonial-author">— Marcus Rodriguez, Full Stack Developer</p>
             </div>
             <div className="testimonial">
               <p className="testimonial-text">
-                "I was skeptical at first, but after trying the demo, I was blown away. The natural
-                language understanding is phenomenal. Worth every penny."
+                "I was skeptical at first, but after trying the demo, I was blown away. The natural language
+                understanding is phenomenal. Worth every penny."
               </p>
               <p className="testimonial-author">— Emily Watson, CTO @ TechStartup Inc</p>
             </div>
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⭐⭐⭐⭐⭐</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>4.9 out of 5</div>
-              <div style={{ color: '#888' }}>Based on 15,420 reviews</div>
+            <div style={{ textAlign: "center", marginTop: "3rem" }}>
+              <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>⭐⭐⭐⭐⭐</div>
+              <div style={{ fontSize: "1.5rem", fontWeight: "700" }}>4.9 out of 5</div>
+              <div style={{ color: "#888" }}>Based on 15,420 reviews</div>
             </div>
           </>
         )}

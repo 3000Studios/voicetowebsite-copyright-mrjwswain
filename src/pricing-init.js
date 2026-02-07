@@ -14,7 +14,7 @@ const applyBilling = (mode) => {
   document.querySelectorAll(".vt-pricing .amount[data-monthly]").forEach((el) => {
     const monthly = el.getAttribute("data-monthly");
     const yearly = el.getAttribute("data-yearly");
-    el.textContent = mode === "yearly" ? yearly ?? monthly ?? "—" : monthly ?? "—";
+    el.textContent = mode === "yearly" ? (yearly ?? monthly ?? "—") : (monthly ?? "—");
   });
 
   localStorage.setItem(STORAGE_KEY, mode);
@@ -54,4 +54,3 @@ document.addEventListener("DOMContentLoaded", () => {
     compareDialog.setAttribute("open", "true");
   });
 });
-

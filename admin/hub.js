@@ -6,9 +6,7 @@ const byId = (id) => document.getElementById(id);
 
 const hasAdminCookie = () => {
   try {
-    return document.cookie
-      .split(";")
-      .some((part) => part.trim().startsWith("vtw_admin=1"));
+    return document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
   } catch (_) {
     return false;
   }
@@ -88,9 +86,7 @@ const loadSnapshot = async () => {
 
     const products = Array.isArray(productsPayload?.products) ? productsPayload.products : [];
     productsEl.textContent = fmtNumber(products.length);
-    const missingButtons = products.filter(
-      (p) => p && p.active !== 0 && !String(p.stripe_buy_button_id || "").trim(),
-    );
+    const missingButtons = products.filter((p) => p && p.active !== 0 && !String(p.stripe_buy_button_id || "").trim());
     missingEl.textContent = fmtNumber(missingButtons.length);
 
     stripePubEl.textContent = config.stripe_publishable ? "Connected" : "Missing";
@@ -98,7 +94,11 @@ const loadSnapshot = async () => {
     paypalEl.textContent = config.paypal_client_id ? "Connected" : "Missing";
 
     const paymentsReady = !!(config.stripe_publishable && config.stripe_secret) || !!config.paypal_client_id;
-    setChip(configChip, paymentsReady ? "Config: payments ready" : "Config: missing payments", paymentsReady ? "ok" : "warn");
+    setChip(
+      configChip,
+      paymentsReady ? "Config: payments ready" : "Config: missing payments",
+      paymentsReady ? "ok" : "warn"
+    );
     setChip(statusChip, "Live", "ok");
   } catch (err) {
     setChip(statusChip, err?.message || "Snapshot failed", "alert");

@@ -1,11 +1,17 @@
-
-export type ComponentType = 'Full Page' | 'Header' | 'Hero Section' | 'Feature Section' | 'Card Component' | 'Pricing Table' | 'Footer';
-export type AppMode = 'CLONE' | 'FORGE';
+export type ComponentType =
+  | "Full Page"
+  | "Header"
+  | "Hero Section"
+  | "Feature Section"
+  | "Card Component"
+  | "Pricing Table"
+  | "Footer";
+export type AppMode = "CLONE" | "FORGE";
 
 export interface StylePreferences {
   primaryColor: string;
   fontFamily: string;
-  spacing: 'Compact' | 'Normal' | 'Relaxed';
+  spacing: "Compact" | "Normal" | "Relaxed";
 }
 
 export interface GeneratedCode {
@@ -33,6 +39,6 @@ export interface AppState {
 }
 
 export enum TabType {
-  PREVIEW = 'PREVIEW',
-  CODE = 'CODE'
+  PREVIEW = "PREVIEW",
+  CODE = "CODE",
 }

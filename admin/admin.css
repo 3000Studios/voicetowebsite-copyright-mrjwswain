@@ -102,7 +102,9 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: rgba(255, 255, 255, 0.7);
-  transition: color 0.2s ease, text-shadow 0.2s ease;
+  transition:
+    color 0.2s ease,
+    text-shadow 0.2s ease;
   text-decoration: none;
   pointer-events: auto;
 }
@@ -141,7 +143,9 @@ body {
   width: 18px;
   height: 2px;
   background: #fff;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .nav-toggle span::before {
@@ -282,7 +286,8 @@ body {
 }
 
 .admin-lock .id-label {
-  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 10px;
   letter-spacing: 0.4em;
   text-transform: uppercase;
@@ -297,7 +302,7 @@ body {
   font-weight: 700;
   font-size: 2rem;
   letter-spacing: -0.03em;
-  background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,0.4) 100%);
+  background: linear-gradient(to bottom, #fff 0%, rgba(255, 255, 255, 0.4) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -312,7 +317,8 @@ body {
 }
 
 .admin-lock .input-tag {
-  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 9px;
   color: rgba(255, 255, 255, 0.4);
   position: absolute;
@@ -359,7 +365,8 @@ body {
   background: transparent;
   border: 1px solid rgba(0, 242, 255, 0.9);
   color: rgba(0, 242, 255, 0.9);
-  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -369,7 +376,7 @@ body {
 }
 
 .admin-lock .ignition-trigger::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -394,7 +401,8 @@ body {
   justify-content: space-between;
   gap: 1rem;
   margin-top: 22px;
-  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 10px;
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
@@ -416,20 +424,39 @@ body {
 }
 
 @keyframes admin-float-ion {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(100px, 50px) scale(1.1); }
-  66% { transform: translate(-50px, 100px) scale(0.9); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(100px, 50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-50px, 100px) scale(0.9);
+  }
 }
 
 @keyframes admin-pulse-chamber {
-  0% { opacity: 0.45; }
-  100% { opacity: 0.7; }
+  0% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0.7;
+  }
 }
 
 @keyframes admin-scan {
-  0% { top: 0%; opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { top: 100%; opacity: 0; }
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
 }
 
 .admin-video-bg {
@@ -476,7 +503,10 @@ body {
   border-radius: 999px;
   font-size: calc(0.9rem * 0.8);
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6);
-  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease, border-color 0.25s ease;
+  transition:
+    color 0.25s ease,
+    -webkit-text-stroke-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .sub-nav a:hover,
@@ -543,7 +573,10 @@ body {
   border-radius: 999px;
   font-size: calc(0.9rem * 0.8);
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6);
-  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease, border-color 0.25s ease;
+  transition:
+    color 0.25s ease,
+    -webkit-text-stroke-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .admin-subnav a:hover,
@@ -750,7 +783,10 @@ body {
   opacity: 0;
   z-index: -10;
   cursor: pointer;
-  transition: opacity 1s, z-index 0.3s, transform 1s;
+  transition:
+    opacity 1s,
+    z-index 0.3s,
+    transform 1s;
   transform: translateX(0);
   display: grid;
   place-items: center;
@@ -765,12 +801,22 @@ body {
   height: 6px;
   background: #000;
   border-radius: 6px;
-  transition: background-color 0.3s, height 0.3s, top 0.3s, transform 0.3s;
+  transition:
+    background-color 0.3s,
+    height 0.3s,
+    top 0.3s,
+    transform 0.3s;
   content: "";
 }
 
-.menu .btn .line::before { top: -12px; transform-origin: 15% 100%; }
-.menu .btn .line::after { top: 12px; transform-origin: 25% 30%; }
+.menu .btn .line::before {
+  top: -12px;
+  transform-origin: 15% 100%;
+}
+.menu .btn .line::after {
+  top: 12px;
+  transform-origin: 25% 30%;
+}
 
 .menu .btn.trigger {
   opacity: 1;
@@ -808,7 +854,10 @@ body {
   text-decoration: none;
   display: grid;
   place-items: center;
-  transition: opacity 1s, z-index 0.3s, transform 1s;
+  transition:
+    opacity 1s,
+    z-index 0.3s,
+    transform 1s;
 }
 
 .menu .btn-icon:hover {
@@ -835,23 +884,55 @@ body {
   width: 110%;
 }
 
-.menu .rotater:nth-child(1) { transform: rotate(-22.5deg); }
-.menu .rotater:nth-child(2) { transform: rotate(22.5deg); }
-.menu .rotater:nth-child(3) { transform: rotate(67.5deg); }
-.menu .rotater:nth-child(4) { transform: rotate(112.5deg); }
-.menu .rotater:nth-child(5) { transform: rotate(157.5deg); }
-.menu .rotater:nth-child(6) { transform: rotate(202.5deg); }
-.menu .rotater:nth-child(7) { transform: rotate(247.5deg); }
-.menu .rotater:nth-child(8) { transform: rotate(292.5deg); }
+.menu .rotater:nth-child(1) {
+  transform: rotate(-22.5deg);
+}
+.menu .rotater:nth-child(2) {
+  transform: rotate(22.5deg);
+}
+.menu .rotater:nth-child(3) {
+  transform: rotate(67.5deg);
+}
+.menu .rotater:nth-child(4) {
+  transform: rotate(112.5deg);
+}
+.menu .rotater:nth-child(5) {
+  transform: rotate(157.5deg);
+}
+.menu .rotater:nth-child(6) {
+  transform: rotate(202.5deg);
+}
+.menu .rotater:nth-child(7) {
+  transform: rotate(247.5deg);
+}
+.menu .rotater:nth-child(8) {
+  transform: rotate(292.5deg);
+}
 
-.menu.active .rotater:nth-child(1) .btn-icon { transform: translateY(-10em) rotate(22.5deg); }
-.menu.active .rotater:nth-child(2) .btn-icon { transform: translateY(-10em) rotate(-22.5deg); }
-.menu.active .rotater:nth-child(3) .btn-icon { transform: translateY(-10em) rotate(-67.5deg); }
-.menu.active .rotater:nth-child(4) .btn-icon { transform: translateY(-10em) rotate(-112.5deg); }
-.menu.active .rotater:nth-child(5) .btn-icon { transform: translateY(-10em) rotate(-157.5deg); }
-.menu.active .rotater:nth-child(6) .btn-icon { transform: translateY(-10em) rotate(-202.5deg); }
-.menu.active .rotater:nth-child(7) .btn-icon { transform: translateY(-10em) rotate(-247.5deg); }
-.menu.active .rotater:nth-child(8) .btn-icon { transform: translateY(-10em) rotate(-292.5deg); }
+.menu.active .rotater:nth-child(1) .btn-icon {
+  transform: translateY(-10em) rotate(22.5deg);
+}
+.menu.active .rotater:nth-child(2) .btn-icon {
+  transform: translateY(-10em) rotate(-22.5deg);
+}
+.menu.active .rotater:nth-child(3) .btn-icon {
+  transform: translateY(-10em) rotate(-67.5deg);
+}
+.menu.active .rotater:nth-child(4) .btn-icon {
+  transform: translateY(-10em) rotate(-112.5deg);
+}
+.menu.active .rotater:nth-child(5) .btn-icon {
+  transform: translateY(-10em) rotate(-157.5deg);
+}
+.menu.active .rotater:nth-child(6) .btn-icon {
+  transform: translateY(-10em) rotate(-202.5deg);
+}
+.menu.active .rotater:nth-child(7) .btn-icon {
+  transform: translateY(-10em) rotate(-247.5deg);
+}
+.menu.active .rotater:nth-child(8) .btn-icon {
+  transform: translateY(-10em) rotate(-292.5deg);
+}
 
 .menu {
   display: none;
@@ -994,7 +1075,9 @@ a.feature-card:focus-visible {
   border-radius: 20px;
   padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   display: grid;
   gap: 1rem;
 }
@@ -1197,7 +1280,10 @@ a.feature-card:focus-visible {
   padding: 0.85rem 1.4rem;
   font-family: inherit;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .primary {
@@ -1281,7 +1367,9 @@ pre {
   border-radius: 999px;
   padding: 0.4rem 0.8rem;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .chip:hover {
@@ -1509,15 +1597,23 @@ pre {
     mask-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12.21 10.57'%3E%3Cpath fill='%23ffffff' d='M6.1 0h6.11L9.16 5.29 6.1 10.57 3.05 5.29 0 0h6.1z'/%3E%3C/svg%3E"),
       linear-gradient(black calc(100% - 28px), transparent calc(100% - 10px));
-    mask-size: auto 26px, 100% 100%;
+    mask-size:
+      auto 26px,
+      100% 100%;
     mask-repeat: repeat-x, no-repeat;
-    mask-position: left bottom, top left;
+    mask-position:
+      left bottom,
+      top left;
     -webkit-mask-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12.21 10.57'%3E%3Cpath fill='%23ffffff' d='M6.1 0h6.11L9.16 5.29 6.1 10.57 3.05 5.29 0 0h6.1z'/%3E%3C/svg%3E"),
       linear-gradient(black calc(100% - 28px), transparent calc(100% - 10px));
-    -webkit-mask-size: auto 26px, 100% 100%;
+    -webkit-mask-size:
+      auto 26px,
+      100% 100%;
     -webkit-mask-repeat: repeat-x, no-repeat;
-    -webkit-mask-position: left bottom, top left;
+    -webkit-mask-position:
+      left bottom,
+      top left;
     border-bottom: none;
   }
 
@@ -1539,7 +1635,9 @@ pre {
     pointer-events: none;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     border-radius: 0 0 18px 18px;
-    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.4s ease;
+    transition:
+      transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+      opacity 0.4s ease;
   }
 
   #admin-nav-toggle:checked + .site-nav .nav {

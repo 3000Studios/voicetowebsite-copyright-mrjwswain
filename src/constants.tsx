@@ -1,7 +1,6 @@
 import { NavigationLink } from "./types";
 
-export const BACKGROUND_TUNNEL =
-  "https://pub-6293369f8afa4d849c26002fd232f5ac.r2.dev/looping%20tunnel.mp4";
+export const BACKGROUND_TUNNEL = "https://pub-6293369f8afa4d849c26002fd232f5ac.r2.dev/looping%20tunnel.mp4";
 export const INTRO_SONG = "https://media.voicetowebsite.com/Intro%20funk.mp3";
 
 export const NAV_LINKS: NavigationLink[] = [
@@ -47,5 +46,4 @@ export const NAV_LINKS: NavigationLink[] = [
   },
 ];
 
-export const INTRO_VIDEO =
-  "https://cdn.pixabay.com/video/2024/02/10/199890-911494511_tiny.mp4";
+export const INTRO_VIDEO = "https://cdn.pixabay.com/video/2024/02/10/199890-911494511_tiny.mp4";
