@@ -1,4 +1,5 @@
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
+export { BotHub } from "./src/durable_objects/BotHubDO.js";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
 
@@ -42,6 +43,16 @@ export default {
       // Delegate to the Cloudflare function implementation for orchestration.
       const res = await handleOrchestrator({ request, env, ctx });
       return addSecurityHeaders(res);
+    }
+
+    // BotHub Sync API (Durable Object)
+    if (url.pathname === "/api/sync") {
+      if (!env.BOT_HUB) {
+        return jsonResponse(503, { error: "BotHub binding not available." });
+      }
+      const id = env.BOT_HUB.idFromName("global");
+      const stub = env.BOT_HUB.get(id);
+      return stub.fetch(request);
     }
 
     // Admin activity logs (read-only)

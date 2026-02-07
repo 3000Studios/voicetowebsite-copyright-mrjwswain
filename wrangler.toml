@@ -24,6 +24,15 @@ ENVIRONMENT = "production"
 directory = "./dist"
 binding = "ASSETS"
 
+[durable_objects]
+bindings = [
+  { name = "BOT_HUB", class_name = "BotHub" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["BotHub"]
+
 [[d1_databases]]
 binding = "D1"
 database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
