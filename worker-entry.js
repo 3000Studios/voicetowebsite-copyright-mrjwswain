@@ -270,6 +270,43 @@ export default {
         </script>
       `;
 
+      const normalizedPath = cleanPath || "/";
+      const canonicalPath = normalizedPath === "/" ? "/" : normalizedPath;
+      const canonicalUrl = `${url.origin}${canonicalPath}`;
+      const isAdminPage = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
+      const isSecretPage = url.pathname.startsWith("/the3000");
+      const robotsTag = isAdminPage || isSecretPage
+        ? "noindex, nofollow"
+        : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+
+      const defaultOgImage = `${url.origin}/vtw-wallpaper.png`;
+      const defaultDescription = "VoiceToWebsite — autonomous web engineering, deployment, and monetization.";
+      const descriptionByPath = {
+        "/rush-percussion": "RUSH PERCUSSION: an interactive microgame demo from the VoiceToWebsite App Store.",
+      };
+      const seoJsonLd = JSON.stringify(
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": `${url.origin}/#organization`,
+              name: "VoiceToWebsite",
+              url: url.origin,
+            },
+            {
+              "@type": "WebSite",
+              "@id": `${url.origin}/#website`,
+              url: url.origin,
+              name: "VoiceToWebsite",
+              publisher: { "@id": `${url.origin}/#organization` },
+            },
+          ],
+        },
+        null,
+        0
+      );
+
       // Inject strict replacements for legacy placeholders + new __ENV
       /*
        * Note: We inject __ENV before the closing </head> or <body> for availability.
@@ -282,14 +319,51 @@ export default {
         .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
         .replace('</head>', `${envInjection}</head>`); // Inject variables early
 
+      // SEO: canonical + robots + stable OG/Twitter URLs + JSON-LD.
+      let seoInjected = injected
+        .replace(/<link\b[^>]*rel=["']canonical["'][^>]*>\s*/gi, "")
+        .replace(/<meta\b[^>]*name=["']robots["'][^>]*>\s*/gi, "")
+        .replace(/<meta\b[^>]*property=["']og:url["'][^>]*>\s*/gi, "")
+        .replace(/<meta\b[^>]*(?:name|property)=["']twitter:url["'][^>]*>\s*/gi, "")
+        .replace(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*id=["']vtw-jsonld["'][\s\S]*?<\/script>\s*/gi, "");
+
+      const hasOgImage = /<meta\b[^>]*property=["']og:image["']/i.test(seoInjected);
+      const hasTwitterImage = /<meta\b[^>]*(?:name|property)=["']twitter:image["']/i.test(seoInjected);
+      const hasTwitterCard = /<meta\b[^>]*(?:name|property)=["']twitter:card["']/i.test(seoInjected);
+      const hasOgType = /<meta\b[^>]*property=["']og:type["']/i.test(seoInjected);
+      const hasOgSiteName = /<meta\b[^>]*property=["']og:site_name["']/i.test(seoInjected);
+      const hasDescription = /<meta\b[^>]*name=["']description["']/i.test(seoInjected);
+      const fallbackDescription = descriptionByPath[normalizedPath] || defaultDescription;
+
+      const seoBlock = `
+        <link rel="canonical" href="${canonicalUrl}" />
+        <meta name="robots" content="${robotsTag}" />
+        ${hasDescription ? "" : `<meta name="description" content="${fallbackDescription}" />`}
+        <meta property="og:url" content="${canonicalUrl}" />
+        <meta property="og:type" content="${hasOgType ? "" : "website"}" />
+        <meta property="og:site_name" content="${hasOgSiteName ? "" : "VoiceToWebsite"}" />
+        <meta name="twitter:url" content="${canonicalUrl}" />
+        ${hasTwitterCard ? "" : `<meta name="twitter:card" content="summary_large_image" />`}
+        ${hasOgImage ? "" : `<meta property="og:image" content="${defaultOgImage}" />`}
+        ${hasTwitterImage ? "" : `<meta name="twitter:image" content="${defaultOgImage}" />`}
+        <script type="application/ld+json" id="vtw-jsonld">${seoJsonLd}</script>
+      `;
+
+      const sanitizedSeoBlock = seoBlock
+        .replace(/<meta property="og:type" content=""\s*\/>\s*/g, "")
+        .replace(/<meta property="og:site_name" content=""\s*\/>\s*/g, "");
+
+      seoInjected = seoInjected.replace("</head>", `${sanitizedSeoBlock}\n</head>`);
+
       // Ensure the AdSense auto-ads loader is present site-wide.
-      const withAdsense = injected.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
-        ? injected.replace(/pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g, `pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`)
-        : injected.replace("</head>", `${ADSENSE_SCRIPT_TAG}\n</head>`);
+      const withAdsense = seoInjected.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+        ? seoInjected.replace(/pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g, `pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`)
+        : seoInjected.replace("</head>", `${ADSENSE_SCRIPT_TAG}\n</head>`);
 
       const headers = new Headers(assetRes.headers);
       headers.set("Content-Type", "text/html; charset=utf-8");
       headers.set("Cache-Control", "no-store"); // Dynamic injection requires no-store or private cache
+      headers.set("X-Robots-Tag", robotsTag);
 
       return addSecurityHeaders(
         new Response(withAdsense, {
