@@ -359,44 +359,82 @@ export default {
           if (!results || results.length === 0) {
             const seed = [
               {
-                id: "lexicon-pro",
-                label: "Architecture / 01",
-                title: "Lexicon Pro",
-                desc: "High-signal product copy + landing modules tuned for conversion.",
+                id: "voice-to-saas-template",
+                label: "Template / 01",
+                title: "Voice-to-SaaS Template",
+                desc: "Full SaaS starter: landing, pricing, onboarding, docs, and conversion blocks tuned for speed.",
                 price: 149,
-                tag: "License",
-                link: "/downloads/project-planning-hub.zip", // Example mapping
-              },
-              {
-                id: "lumina-pro",
-                label: "Visuals / 02",
-                title: "Lumina Pro",
-                desc: "Spectral creative kit for branded media blocks and UI surfaces.",
-                price: 89,
-                tag: "Toolkit",
-                link: "/downloads/audioboost-pro-ai.zip", // Example mapping
-              },
-              {
-                id: "vertex-node",
-                label: "Protocol / 03",
-                title: "Vertex Node",
-                desc: "Private indexing + content routing pack for multi-page ecosystems.",
-                price: 210,
-                tag: "Bundle",
+                tag: "Template",
                 link: "",
+                stripeBuyButtonId: "",
+                stripePaymentLink: "",
+              },
+              {
+                id: "ai-audio-enhancer-presets",
+                label: "Audio / 02",
+                title: "AI Audio Enhancer Presets",
+                desc: "A curated preset pack for quick, clean voice and podcast enhancement.",
+                price: 49,
+                tag: "Presets",
+                link: "",
+                stripeBuyButtonId: "",
+                stripePaymentLink: "",
+              },
+              {
+                id: "premium-metallic-ui-kit",
+                label: "UI / 03",
+                title: "Premium Metallic UI Kit",
+                desc: "Metallic gradients, shine animations, glass panels, and high-converting layout primitives.",
+                price: 89,
+                tag: "UI Kit",
+                link: "",
+                stripeBuyButtonId: "",
+                stripePaymentLink: "",
+              },
+              {
+                id: "jules-ai-integration-module",
+                label: "Integration / 04",
+                title: "\"Jules\" AI Integration Module",
+                desc: "Drop-in AI integration module (API wiring, safety gates, prompt surfaces, and logging hooks).",
+                price: 199,
+                tag: "Module",
+                link: "",
+                stripeBuyButtonId: "",
+                stripePaymentLink: "",
+              },
+              {
+                id: "voice-seo-automation-script",
+                label: "SEO / 05",
+                title: "Voice-SEO Automation Script",
+                desc: "Programmatic SEO helpers: sitemaps, canonical fixes, metadata injection, and long-tail page generation.",
+                price: 99,
+                tag: "Script",
+                link: "",
+                stripeBuyButtonId: "",
+                stripePaymentLink: "",
               },
             ];
             for (const p of seed) {
               await env.D1.prepare(
-                "INSERT INTO products (id, label, title, desc, price, tag, link) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO products (id, label, title, desc, price, tag, link, stripe_buy_button_id, stripe_payment_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
               )
-                .bind(p.id, p.label, p.title, p.desc, p.price, p.tag, p.link)
+                .bind(
+                  p.id,
+                  p.label,
+                  p.title,
+                  p.desc,
+                  p.price,
+                  p.tag,
+                  p.link,
+                  p.stripeBuyButtonId,
+                  p.stripePaymentLink,
+                )
                 .run();
             }
-            return jsonResponse(200, seed);
+            return jsonResponse(200, seed.map(normalizeProduct));
           }
 
-          return jsonResponse(200, results);
+          return jsonResponse(200, (results || []).map(normalizeProduct));
         } catch (err) {
           return jsonResponse(500, { error: err.message });
         }
@@ -409,15 +447,27 @@ export default {
 
         try {
           const body = await request.json();
-          const { id, label, title, desc, price, tag, link } = body;
+          const {
+            id,
+            label,
+            title,
+            desc,
+            price,
+            tag,
+            link,
+            stripeBuyButtonId,
+            stripePaymentLink,
+            stripe_buy_button_id,
+            stripe_payment_link,
+          } = body || {};
           if (!id || !title)
             return jsonResponse(400, {
               error: "Missing required fields (id, title).",
             });
 
           await env.D1.prepare(
-            `INSERT INTO products (id, label, title, desc, price, tag, link, active, ts)
-             VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP)
+            `INSERT INTO products (id, label, title, desc, price, tag, link, stripe_buy_button_id, stripe_payment_link, active, ts)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP)
              ON CONFLICT(id) DO UPDATE SET
                label=excluded.label,
                title=excluded.title,
@@ -425,6 +475,8 @@ export default {
                price=excluded.price,
                tag=excluded.tag,
                link=excluded.link,
+               stripe_buy_button_id=excluded.stripe_buy_button_id,
+               stripe_payment_link=excluded.stripe_payment_link,
                ts=CURRENT_TIMESTAMP`,
           )
             .bind(
@@ -435,6 +487,8 @@ export default {
               Number(price || 0),
               tag || "",
               link || "",
+              String(stripeBuyButtonId || stripe_buy_button_id || ""),
+              String(stripePaymentLink || stripe_payment_link || ""),
             )
             .run();
 

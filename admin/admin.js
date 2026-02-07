@@ -289,7 +289,9 @@ productForm?.addEventListener("submit", async (e) => {
     desc: formData.get("desc")?.toString() || "",
     price: Number(formData.get("price") || 0),
     tag: formData.get("tag")?.toString() || "",
-    link: "", // Default to empty, can be edited later or assumed from convention
+    link: "",
+    stripeBuyButtonId: formData.get("stripeBuyButtonId")?.toString() || "",
+    stripePaymentLink: formData.get("stripePaymentLink")?.toString() || "",
   };
 
   try {
