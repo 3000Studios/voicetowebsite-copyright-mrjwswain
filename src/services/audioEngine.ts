@@ -16,9 +16,11 @@ class AudioEngine {
     }
   }
 
-  public enable() {
+  public async enable() {
     if (this.context?.state === 'suspended') {
-      this.context.resume();
+      try {
+        await this.context.resume();
+      } catch (_) {}
     }
     this.isEnabled = true;
   }
@@ -40,7 +42,7 @@ class AudioEngine {
     this.analyserFreqData = null;
   }
 
-  public playMusic(url: string) {
+  public async playMusic(url: string) {
     if (this.bgMusic) {
       this.bgMusic.pause();
       this.bgMusic = null;
@@ -82,9 +84,14 @@ class AudioEngine {
     }
 
     this.bgMusic = audio;
-    this.bgMusic
-      .play()
-      .catch((e) => console.error('Audio playback blocked or invalid format', e));
+
+    try {
+      await this.bgMusic.play();
+      return true;
+    } catch (e) {
+      console.error('Audio playback blocked or invalid format', e);
+      return false;
+    }
   }
 
   public stopMusic() {

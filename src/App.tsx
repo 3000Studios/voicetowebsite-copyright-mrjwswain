@@ -8,6 +8,7 @@ import ElectricText from './components/ElectricText';
 import AudioWaveform from './components/AudioWaveform';
 
 const SEEN_KEY = 'vtw-v2-seen';
+const AUDIO_OPTOUT_KEY = 'vtw-audio-optout';
 
 const hasSeenV2 = () => {
   try {
@@ -20,6 +21,21 @@ const hasSeenV2 = () => {
 const markSeenV2 = () => {
   try {
     localStorage.setItem(SEEN_KEY, '1');
+  } catch (_) {}
+};
+
+const hasAudioOptedOut = () => {
+  try {
+    return localStorage.getItem(AUDIO_OPTOUT_KEY) === '1';
+  } catch (_) {
+    return false;
+  }
+};
+
+const setAudioOptOut = (optOut: boolean) => {
+  try {
+    if (optOut) localStorage.setItem(AUDIO_OPTOUT_KEY, '1');
+    else localStorage.removeItem(AUDIO_OPTOUT_KEY);
   } catch (_) {}
 };
 
@@ -101,6 +117,51 @@ const App: React.FC = () => {
   }, [volume]);
 
   useEffect(() => {
+    if (hasAudioOptedOut()) return;
+
+    let disposed = false;
+    let removeUnlockListeners = () => {};
+    let starting = false;
+
+    const tryStart = async () => {
+      if (starting) return false;
+      starting = true;
+      await audioEngine.enable();
+      const ok = await audioEngine.playMusic(INTRO_SONG);
+      starting = false;
+      if (disposed) return ok;
+      if (ok) setIsAudioPlaying(true);
+      return ok;
+    };
+
+    tryStart().then((ok) => {
+      if (disposed) return;
+      if (ok) return;
+
+      const onGesture = () => {
+        tryStart().then((ok2) => {
+          if (ok2) removeUnlockListeners();
+        });
+      };
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') onGesture();
+      };
+
+      window.addEventListener('pointerdown', onGesture, { capture: true });
+      window.addEventListener('keydown', onKeyDown, { capture: true });
+      removeUnlockListeners = () => {
+        window.removeEventListener('pointerdown', onGesture, true);
+        window.removeEventListener('keydown', onKeyDown, true);
+      };
+    });
+
+    return () => {
+      disposed = true;
+      removeUnlockListeners();
+    };
+  }, []);
+
+  useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
@@ -143,15 +204,17 @@ const App: React.FC = () => {
     } catch (_) {}
   };
 
-  const toggleAudio = () => {
-    audioEngine.enable();
+  const toggleAudio = async () => {
+    await audioEngine.enable();
     if (isAudioPlaying) {
       audioEngine.stopMusic();
       setIsAudioPlaying(false);
+      setAudioOptOut(true);
       return;
     }
-    audioEngine.playMusic(INTRO_SONG);
-    setIsAudioPlaying(true);
+    setAudioOptOut(false);
+    const ok = await audioEngine.playMusic(INTRO_SONG);
+    setIsAudioPlaying(ok);
   };
 
   const enterSite = () => {
@@ -417,7 +480,7 @@ const App: React.FC = () => {
                         Start song
                       </button>
                       <span className="text-white/40 text-xs uppercase tracking-[0.35em]">
-                        Autoplay muted by default
+                        Autoplay tries on load (tap if blocked)
                       </span>
                     </div>
                   )}
