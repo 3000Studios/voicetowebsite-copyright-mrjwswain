@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How VoiceToWebsite Works | Voice → Full Website</title>
+    <meta
+      name="description"
+      content="VoiceToWebsite: speak a prompt → generate a full multi-page website preview → publish and iterate with an admin-only sandbox safety gate."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://voicetowebsite.com/how-it-works" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://voicetowebsite.com/how-it-works" />
+    <meta property="og:title" content="How VoiceToWebsite Works" />
+    <meta
+      property="og:description"
+      content="Speak → generate → preview → publish. With an admin-only sandbox safety gate."
+    />
+    <meta property="og:image" content="https://voicetowebsite.com/vtw-wallpaper.png" />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://voicetowebsite.com/how-it-works" />
+    <meta property="twitter:title" content="How VoiceToWebsite Works" />
+    <meta
+      property="twitter:description"
+      content="Voice → Full Website live demo. Generate multi-page previews, then publish and iterate safely."
+    />
+    <meta property="twitter:image" content="https://voicetowebsite.com/vtw-wallpaper.png" />
+
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="vt-page">
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+
+    <main class="page" id="main">
+      <section class="section hero">
+        <p class="eyebrow">How it works</p>
+        <h1 class="vt-h1">Voice → Full Website, start to finish</h1>
+        <p class="subhead">
+          Speak a prompt and get a complete website blueprint: pages, sections, conversion copy, and a live preview
+          URL—then publish and iterate with an admin-only sandbox gate.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="/demo">Run the full demo</a>
+          <a class="btn btn-ghost" href="/sandbox.html">Open sandbox page</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>The flow</h2>
+        <p class="subhead">Fast preview for buyers. Safe apply for operators.</p>
+        <div class="vt-grid">
+          <article class="feature-card">
+            <div class="pill">1</div>
+            <h3>Speak a prompt</h3>
+            <p class="muted">Use voice (Web Speech) or type: “Build a landing page for a mobile car wash…”</p>
+          </article>
+          <article class="feature-card">
+            <div class="pill">2</div>
+            <h3>Generate structure</h3>
+            <p class="muted">AI outputs a multi-page layout: nav, pages, and 2–5 sections per page.</p>
+          </article>
+          <article class="feature-card">
+            <div class="pill">3</div>
+            <h3>Preview instantly</h3>
+            <p class="muted">You get a live preview URL you can share immediately.</p>
+          </article>
+          <article class="feature-card">
+            <div class="pill">4</div>
+            <h3>Admin-only sandbox apply</h3>
+            <p class="muted">Voice commands can update the sandbox page safely without touching production pages.</p>
+          </article>
+          <article class="feature-card">
+            <div class="pill">5</div>
+            <h3>Publish + iterate</h3>
+            <p class="muted">Publish generated sites to R2 (admin) and keep improving with Plan → Apply gates.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>What “sandbox” means</h2>
+        <div class="vt-grid">
+          <article class="feature-card">
+            <h3>Safe target file</h3>
+            <p class="muted">Admin orchestration can be locked to `sandbox.html` only.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Supported actions</h3>
+            <p class="muted">Update headline/subhead/CTA, theme, insert sections, swap background video.</p>
+          </article>
+          <article class="feature-card">
+            <h3>No secrets exposed</h3>
+            <p class="muted">Never inject passwords or signing keys into client-side `window.__ENV`.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="nav.js"></script>
+  </body>
+</html>

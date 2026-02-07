@@ -1,5 +1,4 @@
-
-const { performance } = require('perf_hooks');
+const { performance } = require("perf_hooks");
 
 const allowedFields = ["eyebrow", "headline", "subhead", "cta", "price", "metric1", "metric2", "metric3"];
 

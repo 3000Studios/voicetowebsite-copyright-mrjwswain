@@ -45,6 +45,8 @@
   const footerLinks = {
     platform: [
       { href: "/features", label: "Features" },
+      { href: "/how-it-works", label: "How it Works" },
+      { href: "/templates", label: "Templates" },
       { href: "/demo", label: "Interactive Demo" },
       { href: "/pricing", label: "Pricing" },
       { href: "/store", label: "Store" },

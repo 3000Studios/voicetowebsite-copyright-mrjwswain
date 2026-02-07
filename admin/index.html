@@ -261,6 +261,24 @@
               placeholder="Describe the change you want... (e.g. 'Change headline to Future of Web', 'Add a pricing section')"
             ></textarea>
 
+            <div class="quick-commands" style="margin-top: 0.75rem">
+              <span class="quick-label">Target:</span>
+              <select
+                id="target-mode"
+                style="
+                  background: rgba(255, 255, 255, 0.06);
+                  border: 1px solid rgba(255, 255, 255, 0.12);
+                  padding: 0.6rem 0.9rem;
+                  border-radius: 999px;
+                  color: white;
+                "
+              >
+                <option value="sandbox" selected>Sandbox (Recommended)</option>
+                <option value="site">Live site (Danger)</option>
+              </select>
+              <span class="muted small">Sandbox edits `sandbox.html` only.</span>
+            </div>
+
             <div class="quick-commands" id="quick-commands">
               <span class="quick-label">Quick:</span>
               <button class="chip" data-command="Deploy site">Deploy</button>
@@ -327,7 +345,7 @@
             </div>
           </div>
           <div class="preview-stage solo">
-            <iframe id="preview-frame" src="/" title="Site Preview"></iframe>
+            <iframe id="preview-frame" src="/sandbox.html" title="Site Preview"></iframe>
           </div>
           <div class="preview-extras" id="preview-extras"></div>
         </div>

@@ -47,14 +47,14 @@ const wireTilt = () => {
         const rotateY = (centerX - x) / 20;
         card.style.transform = `perspective(1000px) translateY(-10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
       },
-      { passive: true },
+      { passive: true }
     );
     card.addEventListener(
       "mouseleave",
       () => {
         card.style.transform = "perspective(1000px) translateY(0) rotateX(0) rotateY(0)";
       },
-      { passive: true },
+      { passive: true }
     );
   });
 };
@@ -66,9 +66,7 @@ const ensurePayPalSdk = async () => {
 
   const existing = document.querySelector('script[data-paypal-sdk="true"]');
   if (existing) {
-    return new Promise((resolve) =>
-      existing.addEventListener("load", () => resolve(true), { once: true }),
-    );
+    return new Promise((resolve) => existing.addEventListener("load", () => resolve(true), { once: true }));
   }
 
   return new Promise((resolve) => {
@@ -273,8 +271,7 @@ const init = async () => {
 
   const products = await loadProducts();
   if (!products.length) {
-    scene.innerHTML =
-      '<div class="muted" style="padding:2rem; text-align:center;">No products available.</div>';
+    scene.innerHTML = '<div class="muted" style="padding:2rem; text-align:center;">No products available.</div>';
     return;
   }
 
@@ -314,4 +311,3 @@ if (document.readyState === "loading") {
 } else {
   init();
 }
-

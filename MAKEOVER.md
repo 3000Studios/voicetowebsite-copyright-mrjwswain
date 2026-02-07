@@ -22,19 +22,23 @@ This repo is ready to be redesigned “from the top” without breaking deploys.
 ## Environment variable names (supported)
 
 **OpenAI**
+
 - `OPENAI_API` (preferred)
 - `OPENAI_API_KEY3` (accepted fallback)
 
 **GitHub (for orchestrator commits/uploads)**
+
 - `GH_TOKEN` / `GITHUB_TOKEN` (preferred)
 - `PERSONAL_ACCESS_TOKEN_API` (accepted fallback)
 
 **Commerce / Ads**
+
 - `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
 - `PAYPAL_CLIENT_ID_PROD`
 - `ADSENSE_PUBLISHER`, `ADSENSE_SLOT`
 
 **Admin**
+
 - `CONTROL_PASSWORD`
 
 ## “New Everything” recommended order
@@ -52,4 +56,3 @@ This repo is ready to be redesigned “from the top” without breaking deploys.
    - Keep the “Plan → Confirm → Apply” gate and offline hard-lock.
 5. **Ship safely**
    - Keep `npm run verify` green while iterating.
-

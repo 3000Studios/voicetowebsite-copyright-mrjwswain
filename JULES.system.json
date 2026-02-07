@@ -6,7 +6,7 @@
     "no_partial_work": true,
     "cloudflare_only": true
   },
-  "pages": ["/","/features","/demo","/pricing","/appstore","/live","/support","/admin"],
+  "pages": ["/", "/features", "/demo", "/pricing", "/appstore", "/live", "/support", "/admin"],
   "fonts": {
     "headings": "Playfair Display",
     "body": "Inter",

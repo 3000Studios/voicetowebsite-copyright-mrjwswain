@@ -147,20 +147,52 @@ export async function onRequestPost(context) {
       actions,
     };
   };
-  const actionFileMap = {
-    update_copy: ["index.html", "app.js"],
-    update_meta: ["index.html"],
-    update_theme: ["app.js"],
-    add_page: ["index.html"],
-    insert_monetization: ["index.html", "styles.css"],
-    update_background_video: ["index.html"],
-    update_wallpaper: ["styles.css"],
-    update_avatar: ["index.html"],
-    insert_section: ["index.html"],
-    add_product: ["index.html"],
-    insert_video: ["index.html"],
-    insert_stream: ["index.html"],
-    inject_css: ["styles.css"],
+  const SANDBOX_HTML = "sandbox.html";
+  const SITE_HTML = "index.html";
+
+  const SANDBOX_ALLOWED_ACTIONS = new Set([
+    "update_copy",
+    "update_meta",
+    "update_theme",
+    "update_background_video",
+    "update_avatar",
+    "insert_section",
+    "insert_video",
+    "insert_stream",
+    "insert_monetization",
+    "inject_css",
+  ]);
+
+  const getActionFileMap = (target) => {
+    if (target === "sandbox") {
+      return {
+        update_copy: [SANDBOX_HTML],
+        update_meta: [SANDBOX_HTML],
+        update_theme: [SANDBOX_HTML],
+        insert_monetization: [SANDBOX_HTML],
+        update_background_video: [SANDBOX_HTML],
+        update_avatar: [SANDBOX_HTML],
+        insert_section: [SANDBOX_HTML],
+        insert_video: [SANDBOX_HTML],
+        insert_stream: [SANDBOX_HTML],
+        inject_css: [SANDBOX_HTML],
+      };
+    }
+    return {
+      update_copy: [SITE_HTML, "app.js"],
+      update_meta: [SITE_HTML],
+      update_theme: ["app.js"],
+      add_page: [SITE_HTML],
+      insert_monetization: [SITE_HTML, "styles.css"],
+      update_background_video: [SITE_HTML],
+      update_wallpaper: ["styles.css"],
+      update_avatar: [SITE_HTML],
+      insert_section: [SITE_HTML],
+      add_product: [SITE_HTML],
+      insert_video: [SITE_HTML],
+      insert_stream: [SITE_HTML],
+      inject_css: ["styles.css"],
+    };
   };
   const structuralActions = new Set([
     "add_page",
@@ -205,7 +237,8 @@ export async function onRequestPost(context) {
         return `Apply ${action.type}`;
     }
   };
-  const getActionScope = (action) => {
+  const getActionScope = (action, target) => {
+    const actionFileMap = getActionFileMap(target);
     const files = new Set(actionFileMap[action.type] || []);
     if (action.type === "add_page" && action.slug) {
       files.add(`${action.slug}.html`);
@@ -219,7 +252,7 @@ export async function onRequestPost(context) {
     if (action.type === "add_product") sections.push("store");
     return { files: Array.from(files), sections };
   };
-  const buildIntent = (plan, command) => {
+  const buildIntent = (plan, command, target) => {
     const actions = plan.actions || [];
     const actionTypes = actions.map((action) => action.type);
     const scope = { files: [], sections: [], components: [] };
@@ -227,7 +260,7 @@ export async function onRequestPost(context) {
     const diffLines = [];
     let requiresConfirmation = false;
     actions.forEach((action) => {
-      const actionScope = getActionScope(action);
+      const actionScope = getActionScope(action, target);
       scope.files.push(...actionScope.files);
       scope.sections.push(...actionScope.sections);
       if (structuralActions.has(action.type)) requiresConfirmation = true;
@@ -304,6 +337,31 @@ export async function onRequestPost(context) {
   const updateTheme = (content, theme) => {
     const safeValue = toSafeJsString(theme);
     return content.replace(/theme:\s*'[^']*'/, `theme: '${safeValue}'`);
+  };
+  const updateHtmlTheme = (content, theme) => {
+    const t = String(theme || "").trim();
+    if (!t) return content;
+    if (/<html[^>]*\bdata-theme=/i.test(content)) {
+      return content.replace(/(<html[^>]*\bdata-theme=["'])([^"']*)(["'])/i, `$1${t}$3`);
+    }
+    return content.replace(/<html(\s[^>]*)?>/i, (match) => {
+      if (match.includes("data-theme")) return match;
+      return match.replace(/>$/, ` data-theme="${t}">`);
+    });
+  };
+  const injectCssIntoHtml = (content, css) => {
+    if (!css) return content;
+    const safe = String(css);
+    if (content.includes('id="vtw-sandbox-injected"')) {
+      return content.replace(
+        /<style\b[^>]*id=["']vtw-sandbox-injected["'][^>]*>([\s\S]*?)<\/style>/i,
+        (_m, existing) => `<style id="vtw-sandbox-injected">\n${existing}\n${safe}\n</style>`
+      );
+    }
+    if (content.includes("</head>")) {
+      return content.replace("</head>", `<style id="vtw-sandbox-injected">\n${safe}\n</style>\n</head>`);
+    }
+    return `${content}\n<style id="vtw-sandbox-injected">\n${safe}\n</style>\n`;
   };
   const updateMeta = (content, title, description) => {
     let updated = content;
@@ -506,8 +564,16 @@ export async function onRequestPost(context) {
       return { status: "failed", deploymentId: "", message: err.message };
     }
   };
-  const applyActions = async (actions, command, intent) => {
+  const applyActions = async (actions, command, intent, target) => {
+    if (target === "sandbox") {
+      for (const action of actions || []) {
+        if (!SANDBOX_ALLOWED_ACTIONS.has(action?.type)) {
+          throw new Error(`Action not allowed in sandbox mode: ${action?.type}`);
+        }
+      }
+    }
     const updates = {};
+    const htmlPath = target === "sandbox" ? SANDBOX_HTML : SITE_HTML;
     let indexHtml = null;
     let appJs = null;
     let styles = null;
@@ -526,13 +592,16 @@ export async function onRequestPost(context) {
         "insert_stream",
       ].includes(action.type)
     );
-    const needsApp = actions.some((action) => ["update_copy", "update_theme"].includes(action.type));
-    const needsStyles = actions.some(
-      (action) =>
-        action.type === "insert_monetization" || action.type === "update_wallpaper" || action.type === "inject_css"
-    );
+    const needsApp =
+      target !== "sandbox" && actions.some((action) => ["update_copy", "update_theme"].includes(action.type));
+    const needsStyles =
+      target !== "sandbox" &&
+      actions.some(
+        (action) =>
+          action.type === "insert_monetization" || action.type === "update_wallpaper" || action.type === "inject_css"
+      );
     const [indexHtmlResult, appJsResult, stylesResult] = await Promise.all([
-      needsIndex ? getFileContent("index.html", GITHUB_BASE_BRANCH) : Promise.resolve(null),
+      needsIndex ? getFileContent(htmlPath, GITHUB_BASE_BRANCH) : Promise.resolve(null),
       needsApp ? getFileContent("app.js", GITHUB_BASE_BRANCH) : Promise.resolve(null),
       needsStyles ? getFileContent("styles.css", GITHUB_BASE_BRANCH) : Promise.resolve(null),
     ]);
@@ -553,13 +622,21 @@ export async function onRequestPost(context) {
           appJs = updateAppState(appJs, action.field, action.value);
         }
       }
-      if (action.type === "update_theme" && appJs) {
-        appJs = updateTheme(appJs, action.theme);
+      if (action.type === "update_theme") {
+        if (target === "sandbox" && indexHtml) {
+          indexHtml = updateHtmlTheme(indexHtml, action.theme);
+        }
+        if (appJs) {
+          appJs = updateTheme(appJs, action.theme);
+        }
       }
       if (action.type === "update_meta" && indexHtml) {
         indexHtml = updateMeta(indexHtml, action.title, action.description);
       }
       if (action.type === "add_page" && indexHtml) {
+        if (target === "sandbox") {
+          throw new Error("add_page is not supported in sandbox mode.");
+        }
         const slug = action.slug || "new-page";
         const title = action.title || "New Page";
         const headline = action.headline || title;
@@ -609,8 +686,11 @@ export async function onRequestPost(context) {
       if (action.type === "inject_css" && styles) {
         styles = appendCustomStyles(styles, action.css);
       }
+      if (action.type === "inject_css" && target === "sandbox" && indexHtml) {
+        indexHtml = injectCssIntoHtml(indexHtml, action.css);
+      }
     }
-    if (indexHtml) updates["index.html"] = indexHtml;
+    if (indexHtml) updates[htmlPath] = indexHtml;
     if (appJs) updates["app.js"] = appJs;
     if (styles) updates["styles.css"] = styles;
     newPages.forEach((page) => {
@@ -653,6 +733,7 @@ export async function onRequestPost(context) {
     const payload = await request.json();
     const mode = payload.mode || "plan";
     const command = payload.command || "";
+    const target = payload.target === "sandbox" ? "sandbox" : "site";
     if (mode === "rollback_last") {
       const result = await revertLastCommit();
       return new Response(JSON.stringify({ mode, result }), {
@@ -729,10 +810,10 @@ export async function onRequestPost(context) {
         plan = fallback;
       }
     }
-    const intent = buildIntent(plan, command);
+    const intent = buildIntent(plan, command, target);
     plan.intent = intent;
     if (mode === "plan") {
-      return new Response(JSON.stringify({ mode, command, plan }), {
+      return new Response(JSON.stringify({ mode, command, target, plan }), {
         headers: { "Content-Type": "application/json" },
       });
     }
@@ -740,8 +821,8 @@ export async function onRequestPost(context) {
     if (intent?.confirmation?.required && payload.confirmation !== intent.confirmation.phrase) {
       throw new Error(`Confirmation required. Send confirmation phrase: ${intent.confirmation.phrase}`);
     }
-    const applied = await applyActions(actions, command, intent);
-    return new Response(JSON.stringify({ mode, command, plan, ...applied }), {
+    const applied = await applyActions(actions, command, intent, target);
+    return new Response(JSON.stringify({ mode, command, target, plan, ...applied }), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {

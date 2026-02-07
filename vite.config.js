@@ -10,6 +10,13 @@ export default defineConfig({
       "/api/orchestrator": "http://127.0.0.1:8787",
       "/admin/logs": "http://127.0.0.1:8787",
       "/api/analytics": "http://127.0.0.1:8787",
+      "/api/generate": "http://127.0.0.1:8787",
+      "/api/preview": "http://127.0.0.1:8787",
+      "/api/publish": "http://127.0.0.1:8787",
+      "/preview": "http://127.0.0.1:8787",
+      "/api/bot-hub": "http://127.0.0.1:8787",
+      "/api/health": "http://127.0.0.1:8787",
+      "/api/config": "http://127.0.0.1:8787",
     },
   },
   build: {
@@ -18,6 +25,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
+        sandbox: resolve(__dirname, "sandbox.html"),
         admin: resolve(__dirname, "admin/index.html"),
         adminVoice: resolve(__dirname, "admin/voice-commands.html"),
         adminAnalytics: resolve(__dirname, "admin/analytics.html"),
@@ -26,6 +34,8 @@ export default defineConfig({
         adminAppStore: resolve(__dirname, "admin/app-store-manager.html"),
         store: resolve(__dirname, "store.html"),
         appstore: resolve(__dirname, "appstore.html"),
+        howItWorks: resolve(__dirname, "how-it-works.html"),
+        templates: resolve(__dirname, "templates.html"),
         features: resolve(__dirname, "features.html"),
         pricing: resolve(__dirname, "pricing.html"),
         demo: resolve(__dirname, "demo.html"),

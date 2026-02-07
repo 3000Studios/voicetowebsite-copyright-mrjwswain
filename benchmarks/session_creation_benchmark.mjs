@@ -1,12 +1,12 @@
-import { DatabaseSync } from 'node:sqlite';
-import { performance } from 'node:perf_hooks';
+import { DatabaseSync } from "node:sqlite";
+import { performance } from "node:perf_hooks";
 
 // Setup DB
-const db = new DatabaseSync(':memory:');
+const db = new DatabaseSync(":memory:");
 
 // Cleanup helper
 function cleanup() {
-  db.exec('DROP TABLE IF EXISTS sessions');
+  db.exec("DROP TABLE IF EXISTS sessions");
 }
 
 const ITERATIONS = 10000;

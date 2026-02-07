@@ -22,12 +22,7 @@
       <h1 id="gallery-title">Gallery</h1>
 
       <div class="gallery-frame" id="gallery-frame">
-        <div
-          class="thumb"
-          style="height: 100%; display: grid; place-items: center; color: #fff"
-        >
-          No media yet.
-        </div>
+        <div class="thumb" style="height: 100%; display: grid; place-items: center; color: #fff">No media yet.</div>
       </div>
 
       <div class="gallery-controls">
@@ -44,8 +39,7 @@
       const labelMap = { jerica: "Jerica", jadon: "Jadon", mom: "Mom", dad: "Dad" };
 
       const storageKey = (k) => `media-${k}`;
-      const loadMedia = (key) =>
-        JSON.parse(localStorage.getItem(storageKey(key)) || "[]");
+      const loadMedia = (key) => JSON.parse(localStorage.getItem(storageKey(key)) || "[]");
 
       const frame = document.getElementById("gallery-frame");
       const title = document.getElementById("gallery-title");

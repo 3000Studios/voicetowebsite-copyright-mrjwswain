@@ -1,290 +1,352 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Project Planning Hub | VoiceToWebsite App Store</title>
-    <meta name="description" content="Project Planning Hub for VoiceToWebsite: workflows, templates, and checklists to scope, ship, and monetize sites faster." />
+    <meta
+      name="description"
+      content="Project Planning Hub for VoiceToWebsite: workflows, templates, and checklists to scope, ship, and monetize sites faster."
+    />
     <link rel="stylesheet" href="/styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://js.stripe.com/v3"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD"></script>
     <style>
-        :root {
-            --bg-deep: #030305;
-            --text-main: #e0e0e0;
-            --text-dim: #94a3b8;
-            --conductive-cyan: #00f2ff;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-        body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-        .page-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
-        }
-        .header {
-            margin-bottom: 3rem;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 2rem;
-            color: var(--conductive-cyan);
-            text-decoration: none;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-        }
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .lead {
-            font-size: 1.25rem;
-            color: var(--text-dim);
-            max-width: 800px;
-            line-height: 1.6;
-        }
-        .media-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            margin: 4rem 0;
-        }
-        .media-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            overflow: hidden;
-            padding: 1rem;
-        }
-        .media-label {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            margin-bottom: 1rem;
-            display: block;
-        }
-        video {
-            width: 100%;
-            border-radius: 8px;
-            display: block;
-        }
+      :root {
+        --bg-deep: #030305;
+        --text-main: #e0e0e0;
+        --text-dim: #94a3b8;
+        --conductive-cyan: #00f2ff;
+        --font-mono: "JetBrains Mono", monospace;
+      }
+      body {
+        background-color: var(--bg-deep);
+        color: var(--text-main);
+        font-family: "Inter", sans-serif;
+        overflow-x: hidden;
+      }
+      .page-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+      }
+      .header {
+        margin-bottom: 3rem;
+      }
+      .back-link {
+        display: inline-block;
+        margin-bottom: 2rem;
+        color: var(--conductive-cyan);
+        text-decoration: none;
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+      }
+      h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .lead {
+        font-size: 1.25rem;
+        color: var(--text-dim);
+        max-width: 800px;
+        line-height: 1.6;
+      }
+      .media-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin: 4rem 0;
+      }
+      .media-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        overflow: hidden;
+        padding: 1rem;
+      }
+      .media-label {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        margin-bottom: 1rem;
+        display: block;
+      }
+      video {
+        width: 100%;
+        border-radius: 8px;
+        display: block;
+      }
 
-        /* Mock Interface Styles */
-        .mock-interface {
-            width: 100%;
-            height: 400px;
-            background: #0f0f15;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .mock-header {
-            height: 40px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            padding: 0 1rem;
-            gap: 8px;
-            background: rgba(255,255,255,0.05);
-        }
-        .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .red { background: #ff5f56; }
-        .yellow { background: #ffbd2e; }
-        .green { background: #27c93f; }
+      /* Mock Interface Styles */
+      .mock-interface {
+        width: 100%;
+        height: 400px;
+        background: #0f0f15;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .mock-header {
+        height: 40px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .mock-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .red {
+        background: #ff5f56;
+      }
+      .yellow {
+        background: #ffbd2e;
+      }
+      .green {
+        background: #27c93f;
+      }
 
-        .mock-body { flex: 1; display: flex; }
-        .mock-sidebar { width: 200px; border-right: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); }
-        .mock-content { flex: 1; padding: 20px; }
-        .mock-row { height: 20px; background: rgba(255,255,255,0.1); margin-bottom: 10px; border-radius: 4px; width: 80%; }
-        .short { width: 40%; }
-        .mock-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
-        .mock-card { height: 100px; background: rgba(0, 242, 255, 0.05); border-radius: 8px; border: 1px solid rgba(0, 242, 255, 0.1); }
+      .mock-body {
+        flex: 1;
+        display: flex;
+      }
+      .mock-sidebar {
+        width: 200px;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .mock-content {
+        flex: 1;
+        padding: 20px;
+      }
+      .mock-row {
+        height: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        margin-bottom: 10px;
+        border-radius: 4px;
+        width: 80%;
+      }
+      .short {
+        width: 40%;
+      }
+      .mock-card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+      }
+      .mock-card {
+        height: 100px;
+        background: rgba(0, 242, 255, 0.05);
+        border-radius: 8px;
+        border: 1px solid rgba(0, 242, 255, 0.1);
+      }
 
-        .checkout-panel {
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            padding: 3rem;
-            border-radius: 24px;
-            text-align: center;
-            margin-top: 4rem;
-        }
-        .price {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            display: block;
-        }
-        .btn-row {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        button.stripe-btn {
-            padding: 0.8rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border-radius: 4px; /* Match PayPal slightly */
-            cursor: pointer;
-            transition: transform 0.2s;
-            background: #635bff;
-            color: #fff;
-            border: none;
-            height: 45px; /* Approx height of PayPal button */
-            display: inline-flex;
-            align-items: center;
-        }
-        button.stripe-btn:hover {
-            transform: scale(1.02);
-            background: #7a73ff;
-        }
+      .checkout-panel {
+        background: rgba(0, 242, 255, 0.05);
+        border: 1px solid rgba(0, 242, 255, 0.2);
+        padding: 3rem;
+        border-radius: 24px;
+        text-align: center;
+        margin-top: 4rem;
+      }
+      .price {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        display: block;
+      }
+      .btn-row {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      button.stripe-btn {
+        padding: 0.8rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 4px; /* Match PayPal slightly */
+        cursor: pointer;
+        transition: transform 0.2s;
+        background: #635bff;
+        color: #fff;
+        border: none;
+        height: 45px; /* Approx height of PayPal button */
+        display: inline-flex;
+        align-items: center;
+      }
+      button.stripe-btn:hover {
+        transform: scale(1.02);
+        background: #7a73ff;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="page-container">
-        <a href="appstore.html" class="back-link">← Back to App Store</a>
+      <a href="appstore.html" class="back-link">← Back to App Store</a>
 
-        <header class="header">
-            <h1>Project Planning Hub</h1>
-            <p class="lead">A high-end, collaborative dashboard for website owners and developers to track upgrades, costs, time, and project approvals with AI-driven strategy suggestions.</p>
-        </header>
+      <header class="header">
+        <h1>Project Planning Hub</h1>
+        <p class="lead">
+          A high-end, collaborative dashboard for website owners and developers to track upgrades, costs, time, and
+          project approvals with AI-driven strategy suggestions.
+        </p>
+      </header>
 
-        <div class="media-grid">
-            <div class="media-card">
-                <span class="media-label">PREVIEW VIDEO</span>
-                <video controls autoplay muted loop playsinline>
-                    <source src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
+      <div class="media-grid">
+        <div class="media-card">
+          <span class="media-label">PREVIEW VIDEO</span>
+          <video controls autoplay muted loop playsinline>
+            <source
+              src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="media-card">
+          <span class="media-label">INTERFACE PREVIEW</span>
+          <div class="mock-interface">
+            <div class="mock-header">
+              <div class="mock-dot red"></div>
+              <div class="mock-dot yellow"></div>
+              <div class="mock-dot green"></div>
             </div>
-            <div class="media-card">
-                <span class="media-label">INTERFACE PREVIEW</span>
-                <div class="mock-interface">
-                    <div class="mock-header">
-                        <div class="mock-dot red"></div>
-                        <div class="mock-dot yellow"></div>
-                        <div class="mock-dot green"></div>
-                    </div>
-                    <div class="mock-body">
-                        <div class="mock-sidebar"></div>
-                        <div class="mock-content">
-                            <div class="mock-row"></div>
-                            <div class="mock-row short"></div>
-                            <div class="mock-card-grid">
-                                <div class="mock-card"></div>
-                                <div class="mock-card"></div>
-                                <div class="mock-card"></div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="mock-body">
+              <div class="mock-sidebar"></div>
+              <div class="mock-content">
+                <div class="mock-row"></div>
+                <div class="mock-row short"></div>
+                <div class="mock-card-grid">
+                  <div class="mock-card"></div>
+                  <div class="mock-card"></div>
+                  <div class="mock-card"></div>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
 
-        <div class="checkout-panel">
-            <h2>Get Full Access</h2>
-            <span class="price">$49</span>
-            <div class="btn-row">
-                <div id="paypal-button-container" style="min-width: 200px; z-index: 1;"></div>
-                <button class="stripe-btn" data-product="project-planning-hub" data-amount="4900" data-label="Project Planning Hub">Pay with Stripe</button>
-            </div>
+      <div class="checkout-panel">
+        <h2>Get Full Access</h2>
+        <span class="price">$49</span>
+        <div class="btn-row">
+          <div id="paypal-button-container" style="min-width: 200px; z-index: 1"></div>
+          <button
+            class="stripe-btn"
+            data-product="project-planning-hub"
+            data-amount="4900"
+            data-label="Project Planning Hub"
+          >
+            Pay with Stripe
+          </button>
         </div>
+      </div>
     </div>
 
     <script>
-    const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
-    const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
+      const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
+      const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
 
-    // Initialize PayPal SDK Button
-    const initPayPal = () => {
+      // Initialize PayPal SDK Button
+      const initPayPal = () => {
         if (window.paypal) {
-            window.paypal.Buttons({
-                style: {
-                    layout: 'horizontal',
-                    color: 'gold',
-                    shape: 'rect',
-                    label: 'pay',
-                    height: 45
-                },
-                createOrder: (data, actions) => {
-                    return actions.order.create({
-                        purchase_units: [{
-                            description: "Project Planning Hub",
-                            amount: {
-                                currency_code: "USD",
-                                value: '49.00'
-                            }
-                        }]
-                    });
-                },
-                onApprove: (data, actions) => {
-                    return actions.order.capture().then(details => {
-                        alert('Transaction completed by ' + details.payer.name.given_name);
-                    });
-                },
-                onError: (err) => {
-                    console.error(err);
-                    alert("PayPal error: " + err);
-                }
-            }).render('#paypal-button-container');
+          window.paypal
+            .Buttons({
+              style: {
+                layout: "horizontal",
+                color: "gold",
+                shape: "rect",
+                label: "pay",
+                height: 45,
+              },
+              createOrder: (data, actions) => {
+                return actions.order.create({
+                  purchase_units: [
+                    {
+                      description: "Project Planning Hub",
+                      amount: {
+                        currency_code: "USD",
+                        value: "49.00",
+                      },
+                    },
+                  ],
+                });
+              },
+              onApprove: (data, actions) => {
+                return actions.order.capture().then((details) => {
+                  alert("Transaction completed by " + details.payer.name.given_name);
+                });
+              },
+              onError: (err) => {
+                console.error(err);
+                alert("PayPal error: " + err);
+              },
+            })
+            .render("#paypal-button-container");
         } else {
-            console.warn("PayPal SDK not loaded");
-            // If SDK failed to load (e.g. invalid client ID), show a fallback or error
-            document.getElementById('paypal-button-container').innerHTML = '<p style="color:red; font-size:0.8rem;">PayPal Config Missing</p>';
+          console.warn("PayPal SDK not loaded");
+          // If SDK failed to load (e.g. invalid client ID), show a fallback or error
+          document.getElementById("paypal-button-container").innerHTML =
+            '<p style="color:red; font-size:0.8rem;">PayPal Config Missing</p>';
         }
-    };
+      };
 
-    // Initialize Stripe
-    const handleStripe = async (btn) => {
-      const amount = btn.dataset.amount;
-      const product = btn.dataset.product;
-      const label = btn.dataset.label;
-      try {
-        const stripeKey = STRIPE_PK === "__STRIPE_PUBLISHABLE_KEY__" ? null : STRIPE_PK;
-        if (!stripeKey) {
-             alert("Stripe is not configured (missing publishable key).");
-             return;
+      // Initialize Stripe
+      const handleStripe = async (btn) => {
+        const amount = btn.dataset.amount;
+        const product = btn.dataset.product;
+        const label = btn.dataset.label;
+        try {
+          const stripeKey = STRIPE_PK === "__STRIPE_PUBLISHABLE_KEY__" ? null : STRIPE_PK;
+          if (!stripeKey) {
+            alert("Stripe is not configured (missing publishable key).");
+            return;
+          }
+          const stripe = Stripe(stripeKey);
+
+          const res = await fetch("/api/stripe/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount, product, label, source: "appstore" }),
+          });
+          const data = await res.json();
+          if (!data.sessionId) throw new Error(data.error || "No session ID returned");
+          await stripe.redirectToCheckout({ sessionId: data.sessionId });
+        } catch (err) {
+          alert("Stripe checkout error: " + err.message);
+          console.error(err);
         }
-        const stripe = Stripe(stripeKey);
+      };
 
-        const res = await fetch("/api/stripe/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount, product, label, source: "appstore" }),
-        });
-        const data = await res.json();
-        if (!data.sessionId) throw new Error(data.error || "No session ID returned");
-        await stripe.redirectToCheckout({ sessionId: data.sessionId });
-      } catch (err) {
-        alert("Stripe checkout error: " + err.message);
-        console.error(err);
-      }
-    };
+      document.querySelectorAll(".stripe-btn").forEach((btn) => {
+        btn.addEventListener("click", () => handleStripe(btn));
+      });
 
-    document.querySelectorAll(".stripe-btn").forEach((btn) => {
-      btn.addEventListener("click", () => handleStripe(btn));
-    });
-
-    // Wait for SDK to load if it's async
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPayPal);
-    } else {
+      // Wait for SDK to load if it's async
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initPayPal);
+      } else {
         // Checking if SDK is ready loop or just timeout if async attribute is used
         // Since the script tag is before this, it might be loading.
         // The script in head has 'defer' usually? No, it's just <script src...>.
@@ -293,13 +355,13 @@
         // Here I put it in head without async/defer in my previous write.
         // I should check if window.paypal exists.
         if (window.paypal) {
-            initPayPal();
+          initPayPal();
         } else {
-            // Poll for it or just wait
-            window.addEventListener('load', initPayPal);
+          // Poll for it or just wait
+          window.addEventListener("load", initPayPal);
         }
-    }
+      }
     </script>
-</body>
-<script type="module" src="/nav.js"></script>
+  </body>
+  <script type="module" src="/nav.js"></script>
 </html>

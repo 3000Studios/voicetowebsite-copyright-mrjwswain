@@ -1,5 +1,4 @@
-
-import { performance } from 'perf_hooks';
+import { performance } from "perf_hooks";
 
 // Mock Configuration
 const LATENCY_MS = 50;
@@ -7,8 +6,8 @@ const UPDATES_COUNT = 10;
 
 // Mock githubRequest
 const githubRequest = async (path, options) => {
-  await new Promise(resolve => setTimeout(resolve, LATENCY_MS));
-  return { sha: 'mock-sha-' + Math.random().toString(36).substring(7) };
+  await new Promise((resolve) => setTimeout(resolve, LATENCY_MS));
+  return { sha: "mock-sha-" + Math.random().toString(36).substring(7) };
 };
 
 // Generate mock updates

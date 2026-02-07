@@ -76,6 +76,18 @@ const App: React.FC = () => {
   const [tryPrompt, setTryPrompt] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const [demoCategory, setDemoCategory] = useState<"saas" | "local" | "ecommerce" | "creator" | "portfolio" | "agency">(
+    "saas"
+  );
+  const [demoTone, setDemoTone] = useState<"default" | "luxury" | "bold" | "playful" | "minimal">("default");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState("");
+  const [generatedSiteId, setGeneratedSiteId] = useState("");
+  const [generatedPreviewUrl, setGeneratedPreviewUrl] = useState("");
+  const [generatedLayout, setGeneratedLayout] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState<any>(null);
 
   const reduceMotion = useReducedMotion();
 
@@ -200,6 +212,60 @@ const App: React.FC = () => {
     } catch (_) {}
   };
 
+  useEffect(() => {
+    // Detect admin session to enable admin-only actions like publishing.
+    fetch("/api/config/status")
+      .then((res) => setIsAdmin(res.ok))
+      .catch(() => setIsAdmin(false));
+  }, []);
+
+  const generateSitePreview = async () => {
+    const prompt = tryPrompt.trim();
+    if (!prompt) {
+      setGenerateError("Add a prompt first (voice or typing).");
+      return;
+    }
+    setIsGenerating(true);
+    setGenerateError("");
+    setPublishResult(null);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, tone: demoTone }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || `Generate failed (HTTP ${res.status})`);
+      setGeneratedSiteId(String(data?.siteId || ""));
+      setGeneratedPreviewUrl(String(data?.previewUrl || ""));
+      setGeneratedLayout(data?.layout || null);
+    } catch (err: any) {
+      setGenerateError(err?.message || "Generate failed.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const publishGenerated = async () => {
+    if (!generatedSiteId) return;
+    setIsPublishing(true);
+    setPublishResult(null);
+    try {
+      const res = await fetch("/api/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId: generatedSiteId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || `Publish failed (HTTP ${res.status})`);
+      setPublishResult(data);
+    } catch (err: any) {
+      setPublishResult({ error: err?.message || "Publish failed." });
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   const toggleAudio = async () => {
     await audioEngine.enable();
     if (isAudioPlaying) {
@@ -298,6 +364,39 @@ const App: React.FC = () => {
       integration: "Analytics + Redirects",
     },
   } as const;
+
+  const demoPresets: Record<typeof demoCategory, { label: string; placeholder: string; chips: string[] }> = {
+    saas: {
+      label: "SaaS",
+      placeholder: "Build a landing page for an AI customer support tool with pricing, FAQ, and integrations...",
+      chips: ["B2B SaaS landing with pricing", "Add integrations + security", "Make it minimal and fast"],
+    },
+    local: {
+      label: "Local",
+      placeholder: "Create a website for a mobile car wash with booking, pricing, and service areas...",
+      chips: ["Mobile car wash + booking", "Add service areas + reviews", "Make it bold and conversion-first"],
+    },
+    ecommerce: {
+      label: "Ecommerce",
+      placeholder: "Create a storefront for premium coffee beans with bundles, subscriptions, and FAQs...",
+      chips: ["Coffee store + bundles", "Add subscriptions + upsells", "Make it luxury black + gold"],
+    },
+    creator: {
+      label: "Creator",
+      placeholder: "Build a creator homepage with a reel, newsletter capture, and brand partnerships...",
+      chips: ["Creator reel + newsletter", "Add brand kit + partnerships", "Make it playful neon"],
+    },
+    portfolio: {
+      label: "Portfolio",
+      placeholder: "Create a portfolio for a UI designer with case studies and a contact form...",
+      chips: ["Designer portfolio + case studies", "Add testimonials + process", "Make it clean and minimal"],
+    },
+    agency: {
+      label: "Agency",
+      placeholder: "Create an agency homepage with services, case studies, and an inquiry form...",
+      chips: ["Agency + services + case studies", "Add lead magnet + booking", "Make it bold and premium"],
+    },
+  };
 
   const active = useCases[activeUseCase];
 
@@ -539,8 +638,10 @@ const App: React.FC = () => {
 
                     <div className="vt-grid" style={{ marginTop: "1.6rem" }}>
                       <div className="feature-card">
-                        <h3>Try a command</h3>
-                        <p className="muted">Type or tap mic. Edit before generate.</p>
+                        <h3>Voice → Full Website (live)</h3>
+                        <p className="muted">
+                          Speak a prompt, generate a real multi-page preview, then publish (admin).
+                        </p>
                         <div className="prompt-shell">
                           <label className="prompt-label" htmlFor="tryCommand">
                             Command
@@ -550,8 +651,54 @@ const App: React.FC = () => {
                             rows={3}
                             value={tryPrompt}
                             onChange={(e) => setTryPrompt(e.target.value)}
-                            placeholder="Create a landing page for a barber shop with booking and pricing..."
+                            placeholder={demoPresets[demoCategory].placeholder}
                           />
+                          <div className="prompt-actions" style={{ justifyContent: "space-between" }}>
+                            <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+                              <label className="sr-only" htmlFor="demoCategory">
+                                Category
+                              </label>
+                              <select
+                                id="demoCategory"
+                                value={demoCategory}
+                                onChange={(e) => setDemoCategory(e.target.value as any)}
+                                style={{
+                                  background: "rgba(255,255,255,0.05)",
+                                  border: "1px solid rgba(255,255,255,0.1)",
+                                  color: "white",
+                                  borderRadius: 999,
+                                  padding: "0.6rem 0.9rem",
+                                }}
+                              >
+                                {(Object.keys(demoPresets) as Array<keyof typeof demoPresets>).map((k) => (
+                                  <option key={k} value={k}>
+                                    {demoPresets[k].label}
+                                  </option>
+                                ))}
+                              </select>
+                              <label className="sr-only" htmlFor="demoTone">
+                                Tone
+                              </label>
+                              <select
+                                id="demoTone"
+                                value={demoTone}
+                                onChange={(e) => setDemoTone(e.target.value as any)}
+                                style={{
+                                  background: "rgba(255,255,255,0.05)",
+                                  border: "1px solid rgba(255,255,255,0.1)",
+                                  color: "white",
+                                  borderRadius: 999,
+                                  padding: "0.6rem 0.9rem",
+                                }}
+                              >
+                                <option value="default">Default</option>
+                                <option value="bold">Bold</option>
+                                <option value="luxury">Luxury</option>
+                                <option value="minimal">Minimal</option>
+                                <option value="playful">Playful</option>
+                              </select>
+                            </div>
+                          </div>
                           <div className="prompt-actions">
                             <button className="btn btn-ghost" type="button" onClick={toggleListening}>
                               {isListening ? "Stop mic" : "Mic"}
@@ -566,14 +713,23 @@ const App: React.FC = () => {
                             >
                               Open demo with this
                             </button>
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={generateSitePreview}
+                              disabled={isGenerating}
+                            >
+                              {isGenerating ? "Generating..." : "Generate live preview"}
+                            </button>
                           </div>
                         </div>
+                        {generateError && (
+                          <div className="muted" role="status" style={{ marginTop: "0.65rem", color: "#fca5a5" }}>
+                            {generateError}
+                          </div>
+                        )}
                         <div className="vt-grid" style={{ marginTop: "0.9rem" }}>
-                          {[
-                            "Create a landing page for a barber shop",
-                            "Make it dark glass with neon blue accents",
-                            "Add pricing + booking + FAQ",
-                          ].map((chip) => (
+                          {demoPresets[demoCategory].chips.map((chip) => (
                             <button
                               key={chip}
                               className="choice-card"
@@ -587,15 +743,98 @@ const App: React.FC = () => {
                       </div>
 
                       <div className="feature-card">
-                        <h3>Instant preview</h3>
-                        <p className="muted">A fast outline preview (dopamine-first).</p>
+                        <h3>Preview</h3>
+                        <p className="muted">Instant outline + live AI preview URL.</p>
                         <div className="preview-card">
-                          <div className="preview-title">{preview.title}</div>
+                          <div className="preview-title">{generatedSiteId ? "Generated preview" : preview.title}</div>
+                          {generatedSiteId ? (
+                            <div className="muted" style={{ marginTop: "0.35rem" }}>
+                              Site ID: {generatedSiteId}
+                            </div>
+                          ) : null}
+                          {generatedPreviewUrl ? (
+                            <a
+                              className="btn btn-ghost"
+                              href={generatedPreviewUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ marginTop: "0.75rem" }}
+                            >
+                              Open preview
+                            </a>
+                          ) : null}
+                          {isAdmin && generatedSiteId ? (
+                            <button
+                              className="btn btn-primary"
+                              type="button"
+                              onClick={publishGenerated}
+                              disabled={isPublishing}
+                              style={{ marginTop: "0.75rem" }}
+                            >
+                              {isPublishing ? "Publishing..." : "Publish to R2 (admin)"}
+                            </button>
+                          ) : null}
+                          {publishResult ? (
+                            <pre
+                              className="muted"
+                              style={{
+                                marginTop: "0.75rem",
+                                whiteSpace: "pre-wrap",
+                                background: "rgba(0,0,0,0.35)",
+                                padding: "0.75rem",
+                                borderRadius: 12,
+                                border: "1px solid rgba(255,255,255,0.08)",
+                              }}
+                            >
+                              {JSON.stringify(publishResult, null, 2)}
+                            </pre>
+                          ) : null}
                           <ul className="preview-list">
-                            {preview.sections.slice(0, 8).map((s) => (
-                              <li key={s}>{s}</li>
-                            ))}
+                            {generatedLayout?.pages?.length
+                              ? generatedLayout.pages.map((p: any) => (
+                                  <li key={p.slug || p.title}>{p.title || p.slug}</li>
+                                ))
+                              : preview.sections.slice(0, 8).map((s) => <li key={s}>{s}</li>)}
                           </ul>
+                        </div>
+                      </div>
+
+                      <div className="feature-card">
+                        <h3>Live website demo</h3>
+                        <p className="muted">End-to-end, in one screen. This is the selling point.</p>
+                        <div
+                          style={{
+                            borderRadius: 18,
+                            overflow: "hidden",
+                            border: "1px solid rgba(255,255,255,0.10)",
+                            background: "rgba(0,0,0,0.25)",
+                            minHeight: 360,
+                          }}
+                        >
+                          {generatedPreviewUrl ? (
+                            <iframe
+                              title="Generated preview"
+                              src={generatedPreviewUrl}
+                              style={{ width: "100%", height: 420, border: 0 }}
+                            />
+                          ) : (
+                            <iframe
+                              title="Sandbox"
+                              src="/sandbox.html"
+                              style={{ width: "100%", height: 420, border: 0 }}
+                            />
+                          )}
+                        </div>
+                        <div className="muted" style={{ marginTop: "0.65rem" }}>
+                          Tip: generate a preview, then open Admin to apply sandbox edits safely.
+                        </div>
+                        <div className="prompt-actions" style={{ marginTop: "0.65rem" }}>
+                          <a className="btn btn-ghost" href="/admin/">
+                            Admin sandbox
+                          </a>
+                          <a className="btn btn-primary" href="/demo">
+                            Full demo
+                          </a>
                         </div>
                       </div>
                     </div>

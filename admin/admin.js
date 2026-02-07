@@ -6,6 +6,7 @@ const startBtn = document.getElementById("start");
 const stopBtn = document.getElementById("stop");
 const planBtn = document.getElementById("plan");
 const applyBtn = document.getElementById("apply");
+const targetModeEl = document.getElementById("target-mode");
 const lockScreen = document.getElementById("lock-screen");
 const lockInput = document.getElementById("lock-input");
 const lockButton = document.getElementById("lock-button");
@@ -24,6 +25,8 @@ let recognition;
 let listening = false;
 let inactivityTimer = null;
 let lastPlan = null;
+
+const getTargetMode = () => (targetModeEl && targetModeEl.value === "site" ? "site" : "sandbox");
 
 const UNLOCK_KEY = "yt-admin-unlocked";
 const UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
@@ -247,12 +250,13 @@ const logActivity = async () => {
 };
 
 const callOrchestrator = async (payload) => {
+  const target = getTargetMode();
   const res = await fetch("/api/orchestrator", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, target }),
   });
   const text = await res.text();
   let data = {};
@@ -460,7 +464,7 @@ applyBtn.addEventListener("click", async () => {
       const data = await callOrchestrator({ mode: "plan", command: fallbackCommand });
       lastPlan = data;
     }
-    setResponse({ status: "Applying live to production..." });
+    setResponse({ status: `Applying to ${getTargetMode()}...` });
     const data = await callOrchestrator({ mode: "apply", plan: lastPlan.plan, command: lastPlan.command });
     setResponse(data);
     logActivity();
@@ -469,6 +473,15 @@ applyBtn.addEventListener("click", async () => {
     speak("Apply failed");
   }
 });
+
+if (targetModeEl && previewFrame) {
+  targetModeEl.addEventListener("change", () => {
+    lastPlan = null;
+    resetPreview();
+    previewFrame.src = getTargetMode() === "site" ? "/" : "/sandbox.html";
+    setStatus(`Target: ${getTargetMode()}`);
+  });
+}
 
 if (previewReset) {
   previewReset.addEventListener("click", () => resetPreview());

@@ -1,1 +1,189 @@
-<!doctype html><html lang="en"><head>  <meta charset="utf-8" />  <meta name="viewport" content="width=device-width, initial-scale=1" />  <title>VoiceToWebsite Live Stream</title>  <meta name="description" content="Live Stream - VoiceToWebsite" />  <link rel="stylesheet" href="styles.css" />  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Macondo&display=swap" />  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262" crossorigin="anonymous"></script></head><body class="livestream">  <div class="video-bg" aria-hidden="true">    <video src="https://cdn.coverr.co/videos/coverr-particles-in-space-9235/1080p.mp4" autoplay muted loop playsinline></video>  </div>  <div class="edge-glow" aria-hidden="true"></div>  <div class="edge-frame" aria-hidden="true"></div>  <header class="site-header">    <div class="nav-video">      <video src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4" autoplay muted loop playsinline></video>    </div>    <div class="brand">      <span class="brand-mark">VW</span>      <div class="brand-text">        <strong>VoiceToWebsite</strong>        <span>Revenue Engine</span>      </div>    </div>    <nav class="nav">      <a href="index.html">Home</a>      <a href="store.html">Store</a>      <a href="appstore.html">App Store</a>      <a href="blog.html">Blog</a>      <a href="livestream.html">Live Stream</a>      <a href="referrals.html">Referrals</a>      <a href="projects.html">Projects</a>      <a href="studio3000.html">3000 Studios</a>      <a href="/admin">Admin</a>      <a href="contact.html">Contact</a>    </nav>  </header>  <main class="page">    <section class="section live-setup">      <div class="live-head">        <div>          <p class="eyebrow">Live Control</p>          <h2>Live Stream Setup</h2>          <p class="muted">Configure your live stream destinations and embeds.</p>        </div>      </div>      <div class="live-panel">        <div class="live-grid">          <div class="live-block">            <h3>Current Stream</h3>            <div class="live-player-shell">              <iframe id="live-embed" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen title="Live stream" loading="lazy"></iframe>            </div>            <input type="url" id="live-url" placeholder="https://www.youtube.com/embed/..." />            <div class="live-actions">              <button id="live-load" class="primary">Load Stream</button>              <button id="live-save" class="ghost">Save Clip</button>            </div>            <p class="muted" id="live-status"></p>          </div>          <div class="live-block live-clips-block">            <div class="live-clips-head">              <h3>Saved Clips</h3>              <button class="ghost small" id="live-clear">Clear</button>            </div>            <ul id="live-clips" class="clip-list">              <li class="muted">No clips yet.</li>            </ul>          </div>        </div>      </div>    </section>    <section class="section story-feed" id="live-blog">      <div class="lineup-header">        <div>          <h2>Latest Web Build Signals</h2>          <p class="muted">SEO-rich, voice-first success stories for livestream viewers.</p>        </div>        <a class="pill-link" href="blog.html">View archive</a>      </div>      <div class="story-grid" id="live-story-grid">        <article class="story-card skeleton">          <div class="story-bg skeleton-line w-80"></div>          <div class="story-copy">            <h3 class="skeleton-line w-60"></h3>            <p class="skeleton-line w-90"></p>          </div>        </article>        <article class="story-card skeleton">          <div class="story-bg skeleton-line w-80"></div>          <div class="story-copy">            <h3 class="skeleton-line w-70"></h3>            <p class="skeleton-line w-90"></p>          </div>        </article>        <article class="story-card skeleton">          <div class="story-bg skeleton-line w-80"></div>          <div class="story-copy">            <h3 class="skeleton-line w-65"></h3>            <p class="skeleton-line w-90"></p>          </div>        </article>      </div>    </section>  </main>  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>  <script>    const liveEmbed = document.getElementById("live-embed");    const liveStatus = document.getElementById("live-status");    const liveUrlInput = document.getElementById("live-url");    const liveLoadBtn = document.getElementById("live-load");    const liveSaveBtn = document.getElementById("live-save");    const liveClips = document.getElementById("live-clips");    const liveClearBtn = document.getElementById("live-clear");    const loadSavedClips = () => JSON.parse(localStorage.getItem("vtw-live-clips") || "[]");    const persistClips = (clips) => localStorage.setItem("vtw-live-clips", JSON.stringify(clips.slice(0, 20)));    const setLiveStatus = (msg) => {      if (liveStatus) liveStatus.textContent = msg;    };    const renderClips = () => {      if (!liveClips) return;      const clips = loadSavedClips();      liveClips.innerHTML = "";      clips.forEach((clip) => {        const li = document.createElement("li");        li.innerHTML = `          <span>            <strong>${clip.title || "Clip"}</strong>            <span class="muted small"> — ${new Date(clip.ts).toLocaleString()}</span>          </span>          <div class="clip-actions">            <button class="ghost small" data-url="${clip.url}">Load</button>            <a href="${clip.url}" target="_blank" rel="noreferrer">Open</a>          </div>        `;        liveClips.appendChild(li);      });      if (!clips.length) {        liveClips.innerHTML = `<li class="muted">No clips yet.</li>`;      }    };    const setEmbed = (url) => {      if (!url || !liveEmbed) return;      liveEmbed.src = url;      setLiveStatus("Stream loaded.");    };    liveLoadBtn?.addEventListener("click", () => {      const url = liveUrlInput.value.trim();      if (!url) return;      setEmbed(url);    });    liveSaveBtn?.addEventListener("click", () => {      const url = liveUrlInput.value.trim();      if (!url) return;      const clips = loadSavedClips();      clips.unshift({ url, title: url.slice(0, 60), ts: new Date().toISOString() });      persistClips(clips);      renderClips();      setLiveStatus("Clip saved.");    });    liveClearBtn?.addEventListener("click", () => {      persistClips([]);      renderClips();      setLiveStatus("Clips cleared.");    });    liveClips?.addEventListener("click", (e) => {      const btn = e.target.closest("button[data-url]");      if (!btn) return;      const url = btn.getAttribute("data-url");      if (url) {        liveUrlInput.value = url;        setEmbed(url);      }    });    renderClips();    // live page story feed    const liveStoryGrid = document.getElementById("live-story-grid");    const renderLiveStories = (posts = []) => {      if (!liveStoryGrid) return;      liveStoryGrid.innerHTML = "";      posts.slice(0, 3).forEach((post) => {        const card = document.createElement("article");        card.className = "story-card";        card.innerHTML = `          <div class="story-bg" style="background-image:url('${post.image || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80"}');"></div>          <div class="story-copy">            <p class="eyebrow">${post.tag || "Web"}</p>            <h3>${post.title}</h3>            <p class="muted">${post.desc}</p>            <a class="pill-link" href="${post.url}" target="_blank" rel="noreferrer">Read →</a>          </div>        `;        liveStoryGrid.appendChild(card);      });    };    const loadLiveBlog = async () => {      try {        const res = await fetch("https://dev.to/api/articles?tag=webdev&per_page=3");        if (!res.ok) throw new Error("bad status");        const data = await res.json();        const posts = data.map((p) => ({          title: p.title,          desc: p.description || "SEO-rich web dev insights for your next build.",          url: p.url,          tag: (p.tag_list && p.tag_list[0]) || "webdev",          image: p.cover_image || p.social_image,        }));        renderLiveStories(posts);      } catch (err) {        renderLiveStories([          {            title: "Hands-free site builds",            desc: "How voice-first flows ship accessible sites for everyone.",            url: "https://developer.mozilla.org/",            tag: "accessibility",            image: "https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?auto=format&fit=crop&w=900&q=80",          },          {            title: "Speed to launch",            desc: "From appointment to live deploy in under a day.",            url: "https://vercel.com/blog",            tag: "shipping",            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",          },          {            title: "Voice SEO wins",            desc: "Structured content that ranks while you talk.",            url: "https://ai.googleblog.com/",            tag: "seo",            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",          },        ]);      }    };    loadLiveBlog();  </script>  <script type="module" src="nav.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite Live Stream</title>
+    <meta name="description" content="Live Stream - VoiceToWebsite" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Macondo&display=swap" />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body class="livestream">
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-particles-in-space-9235/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+    <header class="site-header">
+      <div class="nav-video">
+        <video
+          src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+      </div>
+      <div class="brand">
+        <span class="brand-mark">VW</span>
+        <div class="brand-text"><strong>VoiceToWebsite</strong> <span>Revenue Engine</span></div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a> <a href="store.html">Store</a> <a href="appstore.html">App Store</a>
+        <a href="blog.html">Blog</a> <a href="livestream.html">Live Stream</a> <a href="referrals.html">Referrals</a>
+        <a href="projects.html">Projects</a> <a href="studio3000.html">3000 Studios</a> <a href="/admin">Admin</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+    <main class="page">
+      <section class="section live-setup">
+        <div class="live-head">
+          <div>
+            <p class="eyebrow">Live Control</p>
+            <h2>Live Stream Setup</h2>
+            <p class="muted">Configure your live stream destinations and embeds.</p>
+          </div>
+        </div>
+        <div class="live-panel">
+          <div class="live-grid">
+            <div class="live-block">
+              <h3>Current Stream</h3>
+              <div class="live-player-shell">
+                <iframe
+                  id="live-embed"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  allowfullscreen
+                  title="Live stream"
+                  loading="lazy"
+                ></iframe>
+              </div>
+              <input type="url" id="live-url" placeholder="https://www.youtube.com/embed/..." />
+              <div class="live-actions">
+                <button id="live-load" class="primary">Load Stream</button>
+                <button id="live-save" class="ghost">Save Clip</button>
+              </div>
+              <p class="muted" id="live-status"></p>
+            </div>
+            <div class="live-block live-clips-block">
+              <div class="live-clips-head">
+                <h3>Saved Clips</h3>
+                <button class="ghost small" id="live-clear">Clear</button>
+              </div>
+              <ul id="live-clips" class="clip-list">
+                <li class="muted">No clips yet.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section story-feed" id="live-blog">
+        <div class="lineup-header">
+          <div>
+            <h2>Latest Web Build Signals</h2>
+            <p class="muted">SEO-rich, voice-first success stories for livestream viewers.</p>
+          </div>
+          <a class="pill-link" href="blog.html">View archive</a>
+        </div>
+        <div class="story-grid" id="live-story-grid">
+          <article class="story-card skeleton">
+            <div class="story-bg skeleton-line w-80"></div>
+            <div class="story-copy">
+              <h3 class="skeleton-line w-60"></h3>
+              <p class="skeleton-line w-90"></p>
+            </div>
+          </article>
+          <article class="story-card skeleton">
+            <div class="story-bg skeleton-line w-80"></div>
+            <div class="story-copy">
+              <h3 class="skeleton-line w-70"></h3>
+              <p class="skeleton-line w-90"></p>
+            </div>
+          </article>
+          <article class="story-card skeleton">
+            <div class="story-bg skeleton-line w-80"></div>
+            <div class="story-copy">
+              <h3 class="skeleton-line w-65"></h3>
+              <p class="skeleton-line w-90"></p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <script>
+      const liveEmbed = document.getElementById("live-embed");
+      const liveStatus = document.getElementById("live-status");
+      const liveUrlInput = document.getElementById("live-url");
+      const liveLoadBtn = document.getElementById("live-load");
+      const liveSaveBtn = document.getElementById("live-save");
+      const liveClips = document.getElementById("live-clips");
+      const liveClearBtn = document.getElementById("live-clear");
+      const loadSavedClips = () => JSON.parse(localStorage.getItem("vtw-live-clips") || "[]");
+      const persistClips = (clips) => localStorage.setItem("vtw-live-clips", JSON.stringify(clips.slice(0, 20)));
+      const setLiveStatus = (msg) => {
+        if (liveStatus) liveStatus.textContent = msg;
+      };
+      const renderClips = () => {
+        if (!liveClips) return;
+        const clips = loadSavedClips();
+        liveClips.innerHTML = "";
+        clips.forEach((clip) => {
+          const li = document.createElement("li");
+          li.innerHTML = `          <span>            <strong>${clip.title || "Clip"}</strong>            <span class="muted small"> — ${new Date(clip.ts).toLocaleString()}</span>          </span>          <div class="clip-actions">            <button class="ghost small" data-url="${clip.url}">Load</button>            <a href="${clip.url}" target="_blank" rel="noreferrer">Open</a>          </div>        `;
+          liveClips.appendChild(li);
+        });
+        if (!clips.length) {
+          liveClips.innerHTML = `<li class="muted">No clips yet.</li>`;
+        }
+      };
+      const setEmbed = (url) => {
+        if (!url || !liveEmbed) return;
+        liveEmbed.src = url;
+        setLiveStatus("Stream loaded.");
+      };
+      liveLoadBtn?.addEventListener("click", () => {
+        const url = liveUrlInput.value.trim();
+        if (!url) return;
+        setEmbed(url);
+      });
+      liveSaveBtn?.addEventListener("click", () => {
+        const url = liveUrlInput.value.trim();
+        if (!url) return;
+        const clips = loadSavedClips();
+        clips.unshift({ url, title: url.slice(0, 60), ts: new Date().toISOString() });
+        persistClips(clips);
+        renderClips();
+        setLiveStatus("Clip saved.");
+      });
+      liveClearBtn?.addEventListener("click", () => {
+        persistClips([]);
+        renderClips();
+        setLiveStatus("Clips cleared.");
+      });
+      liveClips?.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-url]");
+        if (!btn) return;
+        const url = btn.getAttribute("data-url");
+        if (url) {
+          liveUrlInput.value = url;
+          setEmbed(url);
+        }
+      });
+      renderClips(); // live page story feed    const liveStoryGrid = document.getElementById("live-story-grid");    const renderLiveStories = (posts = []) => {      if (!liveStoryGrid) return;      liveStoryGrid.innerHTML = "";      posts.slice(0, 3).forEach((post) => {        const card = document.createElement("article");        card.className = "story-card";        card.innerHTML = `          <div class="story-bg" style="background-image:url('${post.image || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80"}');"></div>          <div class="story-copy">            <p class="eyebrow">${post.tag || "Web"}</p>            <h3>${post.title}</h3>            <p class="muted">${post.desc}</p>            <a class="pill-link" href="${post.url}" target="_blank" rel="noreferrer">Read →</a>          </div>        `;        liveStoryGrid.appendChild(card);      });    };    const loadLiveBlog = async () => {      try {        const res = await fetch("https://dev.to/api/articles?tag=webdev&per_page=3");        if (!res.ok) throw new Error("bad status");        const data = await res.json();        const posts = data.map((p) => ({          title: p.title,          desc: p.description || "SEO-rich web dev insights for your next build.",          url: p.url,          tag: (p.tag_list && p.tag_list[0]) || "webdev",          image: p.cover_image || p.social_image,        }));        renderLiveStories(posts);      } catch (err) {        renderLiveStories([          {            title: "Hands-free site builds",            desc: "How voice-first flows ship accessible sites for everyone.",            url: "https://developer.mozilla.org/",            tag: "accessibility",            image: "https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?auto=format&fit=crop&w=900&q=80",          },          {            title: "Speed to launch",            desc: "From appointment to live deploy in under a day.",            url: "https://vercel.com/blog",            tag: "shipping",            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",          },          {            title: "Voice SEO wins",            desc: "Structured content that ranks while you talk.",            url: "https://ai.googleblog.com/",            tag: "seo",            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",          },        ]);      }    };    loadLiveBlog();
+    </script>
+    <script type="module" src="nav.js"></script>
+  </body>
+</html>

@@ -1,5 +1,4 @@
-
-const { performance } = require('perf_hooks');
+const { performance } = require("perf_hooks");
 
 // Mock D1 Database
 class MockD1 {
@@ -11,25 +10,34 @@ class MockD1 {
     return {
       run: async () => {
         // Simulate some latency for DB operations
-        await new Promise(resolve => setTimeout(resolve, 1));
-        if (query.includes('CREATE TABLE')) {
-          this.tables['commands'] = true;
+        await new Promise((resolve) => setTimeout(resolve, 1));
+        if (query.includes("CREATE TABLE")) {
+          this.tables["commands"] = true;
         }
         return {};
       },
       all: async () => {
-        await new Promise(resolve => setTimeout(resolve, 1));
-        if (query.includes('PRAGMA table_info')) {
-          return { results: [{ name: 'id' }, { name: 'ts' }, { name: 'command' }, { name: 'actions' }, { name: 'files' }, { name: 'commit_sha' }] };
+        await new Promise((resolve) => setTimeout(resolve, 1));
+        if (query.includes("PRAGMA table_info")) {
+          return {
+            results: [
+              { name: "id" },
+              { name: "ts" },
+              { name: "command" },
+              { name: "actions" },
+              { name: "files" },
+              { name: "commit_sha" },
+            ],
+          };
         }
         return { results: [] };
       },
       bind: () => ({
         run: async () => {
-          await new Promise(resolve => setTimeout(resolve, 1));
+          await new Promise((resolve) => setTimeout(resolve, 1));
           return {};
-        }
-      })
+        },
+      }),
     };
   }
 }
@@ -39,8 +47,9 @@ const db = new MockD1();
 // Current Implementation
 const logToDB_Current = async () => {
   try {
-    await db.prepare(
-      `CREATE TABLE IF NOT EXISTS commands (
+    await db
+      .prepare(
+        `CREATE TABLE IF NOT EXISTS commands (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
          ts DATETIME DEFAULT CURRENT_TIMESTAMP,
          command TEXT,
@@ -52,7 +61,8 @@ const logToDB_Current = async () => {
          deployment_status TEXT,
          deployment_message TEXT
        );`
-    ).run();
+      )
+      .run();
     const columns = await db.prepare("PRAGMA table_info(commands);").all();
     const columnNames = new Set((columns.results || []).map((col) => col.name));
     if (!columnNames.has("intent_json")) {
@@ -67,19 +77,11 @@ const logToDB_Current = async () => {
     if (!columnNames.has("deployment_message")) {
       await db.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
     }
-    await db.prepare(
-      "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-    )
-      .bind(
-        "test command",
-        "[]",
-        "[]",
-        "sha123",
-        "{}",
-        "dep123",
-        "success",
-        "deployed"
+    await db
+      .prepare(
+        "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
+      .bind("test command", "[]", "[]", "sha123", "{}", "dep123", "success", "deployed")
       .run();
   } catch (_) {
     // ignore logging errors
@@ -90,19 +92,11 @@ const logToDB_Current = async () => {
 const logToDB_Optimized = async () => {
   try {
     // Only the INSERT statement
-    await db.prepare(
-      "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-    )
-      .bind(
-        "test command",
-        "[]",
-        "[]",
-        "sha123",
-        "{}",
-        "dep123",
-        "success",
-        "deployed"
+    await db
+      .prepare(
+        "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
+      .bind("test command", "[]", "[]", "sha123", "{}", "dep123", "success", "deployed")
       .run();
   } catch (_) {
     // ignore logging errors
