@@ -1,6 +1,14 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Silence jsdom "Not implemented: HTMLCanvasElement.getContext" warnings.
+// Components that use canvas already handle a null 2D context.
+Object.defineProperty(window.HTMLCanvasElement.prototype, 'getContext', {
+  configurable: true,
+  writable: true,
+  value: vi.fn(() => null),
+});
+
 // Mock SpeechRecognition
 class MockSpeechRecognition {
   continuous = false;
