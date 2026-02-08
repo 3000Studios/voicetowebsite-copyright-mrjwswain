@@ -3,6 +3,9 @@ main = "worker.js"
 compatibility_date = "2026-01-27"
 account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 
+# Cloudflare Pages build output directory (so Pages does not warn about wrangler.toml)
+pages_build_output_dir = "dist"
+
 # Serve the built site directly from Cloudflare (no origin) and keep the API path routed to the Worker.
 routes = [
   "voicetowebsite.com/*",
