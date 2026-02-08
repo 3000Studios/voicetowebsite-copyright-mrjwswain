@@ -14,6 +14,8 @@ ENVIRONMENT = "production"
 PUBLIC_GENERATE = "1"
 # Placeholder for environment variables to be set in Cloudflare Dashboard
 # OPENAI_API = ""
+# Environment Variables
+PAYPAL_CLIENT_ID = "AV64tommaL7dHsABJvulSEPX3IksB3o2jcVhBneJEd5p0LtWOgoXzRvMmGU4Dkc2m_xuLP6wyan9P-8c"
 # PAYPAL_CLIENT_ID_PROD = ""
 # ADSENSE_PUBLISHER = ""
 # ADSENSE_SLOT = ""
