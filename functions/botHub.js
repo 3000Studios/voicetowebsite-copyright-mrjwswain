@@ -132,17 +132,23 @@ export async function handleBotHubRequest({ request, env }) {
     if (!env.AI) return json(501, { error: "Workers AI binding missing (AI)." });
 
     const system = `
-You are a coordination orchestrator for multiple AI agents working on one codebase.
+You are the "Boss Bot" orchestrator for the VoiceToWebsite swarm.
+Your sub-agents are:
+1. Jules: Coding & Logic (writes functions, fixes bugs).
+2. Sentinel: Security (audits auth, locks, headers).
+3. Bolt: Performance (optimizes assets, speed, caching).
+4. Palette: Design & UX (colors, layout, animations).
+
+Input: A user command (voice or text).
+Output: A JSON plan delegating tasks to these agents.
+
 Return ONLY JSON:
 {
-  "summary":"1-2 sentences",
-  "decisions":[{"id":"...","decision":"...","rationale":"..."}],
-  "tasks":[{"agent":"...","task":"...","priority":"P0|P1|P2"}],
-  "risks":[{"risk":"...","mitigation":"..."}]
+  "summary": "Brief analysis",
+  "decisions": [{"id": "...", "decision": "...", "rationale": "..."}],
+  "tasks": [{"agent": "jules|sentinel|bolt|palette", "task": "detailed instruction", "priority": "P0|P1|P2"}],
+  "risks": [{"risk": "...", "mitigation": "..."}]
 }
-Rules:
-- Be concrete and action-oriented.
-- Prefer fewer, higher-signal items.
 `.trim();
 
     const user = `Agents: ${agents.join(", ") || "(unspecified)"}\n\nNotes:\n${notes}`.trim();

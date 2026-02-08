@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Boss Bot | Command Center</title>
+    <meta name="description" content="Boss Bot Orchestration Interface" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bot-neon: #00f2ff;
+        --bot-bg: #030712;
+      }
+      body {
+        background-color: var(--bot-bg);
+        background-image:
+          radial-gradient(circle at 50% 0%, rgba(0, 242, 255, 0.15), transparent 60%),
+          linear-gradient(180deg, rgba(3, 7, 18, 0.9), #000);
+      }
+      .boss-interface {
+        max-width: 1100px;
+        margin: 100px auto 4rem;
+        padding: 0 1.5rem;
+        display: grid;
+        gap: 2rem;
+      }
+
+      .pulse-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .bot-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .bot-card.active {
+        border-color: var(--bot-neon);
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .bot-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        display: grid;
+        place-items: center;
+        font-size: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .bot-card.active .bot-icon {
+        background: rgba(0, 242, 255, 0.1);
+        border-color: var(--bot-neon);
+        color: var(--bot-neon);
+        animation: pulse 2s infinite;
+      }
+
+      .bot-name {
+        font-family: "Syncopate", sans-serif;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+      }
+
+      .bot-status {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-family: "Space Mono", monospace;
+      }
+
+      .command-stripe {
+        background: linear-gradient(145deg, rgba(20, 30, 48, 0.8), rgba(10, 15, 25, 0.9));
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        padding: 2rem;
+        backdrop-filter: blur(12px);
+      }
+
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .cmd-input {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1rem 1.2rem;
+        border-radius: 12px;
+        color: #fff;
+        font-family: "Space Mono", monospace;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .cmd-input:focus {
+        border-color: var(--bot-neon);
+      }
+
+      .voice-btn {
+        flex: 0 0 60px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        cursor: pointer;
+        color: #fff;
+        transition: all 0.2s;
+        display: grid;
+        place-items: center;
+      }
+
+      .voice-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .voice-btn.listening {
+        background: var(--error-color);
+        border-color: var(--error-color);
+        animation: pulse 1.5s infinite;
+      }
+
+      .stream-log {
+        height: 300px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        font-family: "Space Mono", monospace;
+        font-size: 0.9rem;
+      }
+
+      .log-entry {
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      }
+
+      .log-entry .ts {
+        color: var(--muted);
+        font-size: 0.75rem;
+        margin-right: 0.5rem;
+      }
+
+      .log-entry .agent {
+        color: var(--bot-neon);
+        margin-right: 0.5rem;
+        font-weight: bold;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(0, 242, 255, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 242, 255, 0);
+        }
+      }
+    </style>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <!-- Background Waves -->
+    <canvas id="vtw-bottom-waves" class="vtw-bottom-waves" aria-hidden="true"></canvas>
+
+    <div class="boss-interface">
+      <header>
+        <p class="eyebrow">Orchestration Level 1</p>
+        <h1 class="vt-h1" style="font-family: &quot;Syncopate&quot;, sans-serif">Boss Bot</h1>
+        <p class="subhead">Delegate tasks to the swarm. Speak or type your command.</p>
+      </header>
+
+      <!-- System Pulse -->
+      <section class="pulse-grid" id="bot-grid">
+        <div class="bot-card" id="bot-jules">
+          <div class="bot-icon">J</div>
+          <div class="bot-name">Jules</div>
+          <div class="bot-status">Coding...</div>
+        </div>
+        <div class="bot-card" id="bot-sentinel">
+          <div class="bot-icon">S</div>
+          <div class="bot-name">Sentinel</div>
+          <div class="bot-status">Securing...</div>
+        </div>
+        <div class="bot-card" id="bot-bolt">
+          <div class="bot-icon">B</div>
+          <div class="bot-name">Bolt</div>
+          <div class="bot-status">Optimizing...</div>
+        </div>
+        <div class="bot-card" id="bot-palette">
+          <div class="bot-icon">P</div>
+          <div class="bot-name">Palette</div>
+          <div class="bot-status">Designing...</div>
+        </div>
+      </section>
+
+      <!-- Command Center -->
+      <section class="command-stripe">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem">Direct Command</h2>
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="boss-input"
+            class="cmd-input"
+            placeholder="e.g., 'Update the pricing page header' or 'Check server health'"
+          />
+          <button id="boss-mic" class="voice-btn" aria-label="Voice Command">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </button>
+          <button id="boss-send" class="btn btn-primary">Execute</button>
+        </div>
+      </section>
+
+      <!-- Feedback / Log -->
+      <section class="stream-log" id="boss-log">
+        <div class="log-entry">
+          <span class="ts">[SYSTEM]</span>
+          <span class="content">Boss Bot initialized. Network active.</span>
+        </div>
+      </section>
+      <section class="stream-log" id="audit-log" aria-label="Live audit feed" style="margin-top: 1rem">
+        <div class="log-entry">
+          <span class="ts">[AUDIT]</span>
+          <span class="content">Loading JULES.audit.txt...</span>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="../nav.js"></script>
+    <script type="module">
+      import { SoundEngine } from "../nav.js?v=2";
+
+      const input = document.getElementById("boss-input");
+      const sendBtn = document.getElementById("boss-send");
+      const micBtn = document.getElementById("boss-mic");
+      const log = document.getElementById("boss-log");
+      const audit = document.getElementById("audit-log");
+      const bots = {
+        jules: document.getElementById("bot-jules"),
+        sentinel: document.getElementById("bot-sentinel"),
+        bolt: document.getElementById("bot-bolt"),
+        palette: document.getElementById("bot-palette"),
+      };
+
+      const addLog = (agent, msg) => {
+        const div = document.createElement("div");
+        div.className = "log-entry";
+        const time = new Date().toLocaleTimeString();
+        div.innerHTML = `<span class="ts">[${time}]</span><span class="agent">${agent}</span><span class="content">${msg}</span>`;
+        log.prepend(div);
+      };
+
+      const normalizeAgent = (name = "") => {
+        const id = String(name).toLowerCase();
+        if (id.includes("sentinel")) return "sentinel";
+        if (id.includes("palette")) return "palette";
+        if (id.includes("bolt")) return "bolt";
+        return "jules";
+      };
+
+      const setBotState = (agent, { status = "Idle", active = false } = {}) => {
+        const card = bots[agent];
+        if (!card) return;
+        card.classList.toggle("active", active);
+        const statusEl = card.querySelector(".bot-status");
+        if (statusEl) statusEl.textContent = status;
+      };
+
+      const pulse = { timer: null, order: [] };
+      const setSystemPulse = (agents = []) => {
+        if (pulse.timer) window.clearInterval(pulse.timer);
+        pulse.order = agents.filter(Boolean);
+        if (!pulse.order.length) {
+          Object.keys(bots).forEach((id) => setBotState(id, { status: "Idle", active: false }));
+          return;
+        }
+        let idx = 0;
+        const tick = () => {
+          const agent = pulse.order[idx % pulse.order.length];
+          Object.keys(bots).forEach((id) =>
+            setBotState(id, { status: id === agent ? "Executing" : "Standby", active: id === agent })
+          );
+          idx += 1;
+        };
+        tick();
+        pulse.timer = window.setInterval(tick, 1400);
+      };
+
+      const handleResult = (data, cmd) => {
+        const output = data?.output || {};
+        const summary = output.summary || "Delegating to swarm.";
+        addLog("BOSS", summary);
+        const tasks = Array.isArray(output.tasks) ? output.tasks : [];
+        const sequence = [];
+        tasks.forEach((task) => {
+          const agent = normalizeAgent(task.agent);
+          sequence.push(agent);
+          setBotState(agent, { status: task.task || "Task queued", active: true });
+          addLog(agent.toUpperCase(), task.task || `Executing: ${cmd}`);
+        });
+        if (!tasks.length) addLog("BOSS", "No tasks returned; refine the command or check API keys.");
+        setSystemPulse(sequence);
+      };
+
+      const renderAudit = (content) => {
+        if (!audit) return;
+        audit.innerHTML = "";
+        const lines = content.trim().split(/\r?\n/).slice(-120);
+        lines.reverse().forEach((line) => {
+          const div = document.createElement("div");
+          div.className = "log-entry";
+          div.innerHTML = `<span class="ts">[AUDIT]</span><span class="content">${line}</span>`;
+          audit.appendChild(div);
+        });
+      };
+
+      const loadAudit = async () => {
+        try {
+          const res = await fetch("/JULES.audit.txt", { cache: "no-store" });
+          const text = await res.text();
+          renderAudit(text);
+        } catch (err) {
+          addLog("SYSTEM", "Audit log unavailable.");
+        }
+      };
+
+      const processCommand = async (cmd) => {
+        if (!cmd) return;
+        const text = String(cmd || "").trim();
+        if (!text) return;
+        addLog("USER", text);
+        input.value = "";
+        SoundEngine.play("click");
+        setSystemPulse([]);
+        addLog("BOSS", "Analyzing request...");
+
+        try {
+          const res = await fetch("/api/bot-hub/coordinate", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ notes: text, agents: Object.keys(bots) }),
+          });
+
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || data.error) throw new Error(data.error || `API Error: ${res.status}`);
+
+          handleResult(data, text);
+        } catch (err) {
+          addLog("ERROR", err.message || "Unknown error");
+          setSystemPulse([]);
+        }
+      };
+
+      sendBtn.addEventListener("click", () => processCommand(input.value));
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") processCommand(input.value);
+      });
+
+      // Voice input -> Boss Bot
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recognition = null;
+      let isListening = false;
+
+      const stopListening = () => {
+        if (!recognition) return;
+        isListening = false;
+        micBtn.classList.remove("listening");
+        recognition.stop();
+        addLog("SYSTEM", "Microphone muted.");
+      };
+
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.onresult = (event) => {
+          const transcript = Array.from(event.results)
+            .map((r) => r[0]?.transcript || "")
+            .join(" ")
+            .trim();
+          if (transcript) {
+            addLog("VOICE", transcript);
+            processCommand(transcript);
+          }
+        };
+        recognition.onend = () => {
+          if (isListening) stopListening();
+        };
+      }
+
+      micBtn.addEventListener("click", () => {
+        if (!recognition) {
+          addLog("SYSTEM", "Speech recognition not supported in this browser.");
+          return;
+        }
+        if (isListening) {
+          stopListening();
+          return;
+        }
+        isListening = true;
+        micBtn.classList.add("listening");
+        addLog("SYSTEM", "Microphone active. Listening...");
+        recognition.start();
+      });
+
+      loadAudit();
+      window.setInterval(loadAudit, 10000);
+    </script>
+  </body>
+</html>

@@ -135,6 +135,44 @@ const paypalApiFetch = async (env, path, init = {}) => {
   return fetch(url, { ...init, headers });
 };
 
+// Simple dynamic-price PayPal helpers (mirrors existing catalog flow)
+export const createPayPalOrder = async (env, product = {}) => {
+  const amount = toUsdString(product.price);
+  if (!amount) throw new Error("Invalid price.");
+  const currency = (product.currency || "USD").toUpperCase();
+  const body = {
+    intent: "CAPTURE",
+    purchase_units: [
+      {
+        reference_id: product.sku || "custom",
+        description: product.name || "Custom Product",
+        amount: { currency_code: currency, value: amount },
+      },
+    ],
+  };
+  const res = await paypalApiFetch(env, "/v2/checkout/orders", {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || data?.details?.[0]?.description || "PayPal order create failed");
+  return data;
+};
+
+export const capturePayPalOrder = async (env, orderID) => {
+  const id = String(orderID || "").trim();
+  if (!id) throw new Error("orderID required.");
+  const res = await paypalApiFetch(env, `/v2/checkout/orders/${encodeURIComponent(id)}/capture`, {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({}),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || data?.details?.[0]?.description || "PayPal capture failed");
+  return data;
+};
+
 const toUsdString = (amount) => {
   const n = Number(amount || 0);
   if (!Number.isFinite(n) || n <= 0) return "";
@@ -428,210 +466,9 @@ export default {
       return jsonResponse(200, { ok: true });
     }
 
-    // Products API (D1 backed)
-    if (url.pathname === "/api/products") {
-      if (!env.D1) return jsonResponse(503, { error: "D1 unavailable." });
-
-      // Auto-init logs table (already handled above) + products table
-      try {
-        await env.D1.prepare(
-          `CREATE TABLE IF NOT EXISTS products (
-             id TEXT PRIMARY KEY,
-             label TEXT,
-             title TEXT,
-             desc TEXT,
-             price REAL,
-             link TEXT,  -- Optional fulfillment URL (avoid public downloads)
-             stripe_buy_button_id TEXT,
-             stripe_payment_link TEXT,
-             tag TEXT,
-             active INTEGER DEFAULT 1,
-             ts DATETIME DEFAULT CURRENT_TIMESTAMP
-           );`
-        ).run();
-
-        // Best-effort migrations for older tables.
-        await env.D1.prepare("ALTER TABLE products ADD COLUMN stripe_buy_button_id TEXT;")
-          .run()
-          .catch(() => {});
-        await env.D1.prepare("ALTER TABLE products ADD COLUMN stripe_payment_link TEXT;")
-          .run()
-          .catch(() => {});
-      } catch (err) {
-        console.error("Product table init failed:", err);
-      }
-
-      const normalizeProduct = (row) => {
-        const r = row || {};
-        return {
-          id: r.id,
-          label: r.label || "",
-          title: r.title || "",
-          desc: r.desc || "",
-          price: Number(r.price || 0),
-          tag: r.tag || "",
-          link: r.link || "",
-          stripeBuyButtonId: r.stripe_buy_button_id || r.stripeBuyButtonId || "",
-          stripePaymentLink: r.stripe_payment_link || r.stripePaymentLink || "",
-          active: Number(r.active || 1),
-          ts: r.ts || "",
-        };
-      };
-
-      // GET: Public list of active products
-      if (request.method === "GET") {
-        try {
-          const { results } = await env.D1.prepare("SELECT * FROM products WHERE active = 1 ORDER BY ts DESC").all();
-
-          // Seed if empty (just once)
-          if (!results || results.length === 0) {
-            const seed = [
-              {
-                id: "voice-to-saas-template",
-                label: "Template / 01",
-                title: "Voice-to-SaaS Template",
-                desc: "Full SaaS starter: landing, pricing, onboarding, docs, and conversion blocks tuned for speed.",
-                price: 149,
-                tag: "Template",
-                link: "",
-                stripeBuyButtonId: "",
-                stripePaymentLink: "",
-              },
-              {
-                id: "ai-audio-enhancer-presets",
-                label: "Audio / 02",
-                title: "AI Audio Enhancer Presets",
-                desc: "A curated preset pack for quick, clean voice and podcast enhancement.",
-                price: 49,
-                tag: "Presets",
-                link: "",
-                stripeBuyButtonId: "",
-                stripePaymentLink: "",
-              },
-              {
-                id: "premium-metallic-ui-kit",
-                label: "UI / 03",
-                title: "Premium Metallic UI Kit",
-                desc: "Metallic gradients, shine animations, glass panels, and high-converting layout primitives.",
-                price: 89,
-                tag: "UI Kit",
-                link: "",
-                stripeBuyButtonId: "",
-                stripePaymentLink: "",
-              },
-              {
-                id: "jules-ai-integration-module",
-                label: "Integration / 04",
-                title: '"Jules" AI Integration Module',
-                desc: "Drop-in AI integration module (API wiring, safety gates, prompt surfaces, and logging hooks).",
-                price: 199,
-                tag: "Module",
-                link: "",
-                stripeBuyButtonId: "",
-                stripePaymentLink: "",
-              },
-              {
-                id: "voice-seo-automation-script",
-                label: "SEO / 05",
-                title: "Voice-SEO Automation Script",
-                desc: "Programmatic SEO helpers: sitemaps, canonical fixes, metadata injection, and long-tail page generation.",
-                price: 99,
-                tag: "Script",
-                link: "",
-                stripeBuyButtonId: "",
-                stripePaymentLink: "",
-              },
-            ];
-            for (const p of seed) {
-              await env.D1.prepare(
-                "INSERT INTO products (id, label, title, desc, price, tag, link, stripe_buy_button_id, stripe_payment_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-              )
-                .bind(p.id, p.label, p.title, p.desc, p.price, p.tag, p.link, p.stripeBuyButtonId, p.stripePaymentLink)
-                .run();
-            }
-            return jsonResponse(200, seed.map(normalizeProduct));
-          }
-
-          return jsonResponse(200, (results || []).map(normalizeProduct));
-        } catch (err) {
-          return jsonResponse(500, { error: err.message });
-        }
-      }
-
-      // POST: Admin add/update product
-      if (request.method === "POST") {
-        const hasAdmin = await hasValidAdminCookie(request, env);
-        if (!hasAdmin) return jsonResponse(401, { error: "Unauthorized" });
-
-        try {
-          const body = await request.json();
-          const {
-            id,
-            label,
-            title,
-            desc,
-            price,
-            tag,
-            link,
-            stripeBuyButtonId,
-            stripePaymentLink,
-            stripe_buy_button_id,
-            stripe_payment_link,
-          } = body || {};
-          if (!id || !title)
-            return jsonResponse(400, {
-              error: "Missing required fields (id, title).",
-            });
-
-          await env.D1.prepare(
-            `INSERT INTO products (id, label, title, desc, price, tag, link, stripe_buy_button_id, stripe_payment_link, active, ts)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP)
-             ON CONFLICT(id) DO UPDATE SET
-               label=excluded.label,
-               title=excluded.title,
-               desc=excluded.desc,
-               price=excluded.price,
-               tag=excluded.tag,
-               link=excluded.link,
-               stripe_buy_button_id=excluded.stripe_buy_button_id,
-               stripe_payment_link=excluded.stripe_payment_link,
-               ts=CURRENT_TIMESTAMP`
-          )
-            .bind(
-              id,
-              label || "",
-              title,
-              desc || "",
-              Number(price || 0),
-              tag || "",
-              link || "",
-              String(stripeBuyButtonId || stripe_buy_button_id || ""),
-              String(stripePaymentLink || stripe_payment_link || "")
-            )
-            .run();
-
-          return jsonResponse(200, { ok: true, id });
-        } catch (err) {
-          return jsonResponse(500, { error: err.message });
-        }
-      }
-
-      // DELETE: Admin remove (soft delete or hard delete)
-      if (request.method === "DELETE") {
-        const hasAdmin = await hasValidAdminCookie(request, env);
-        if (!hasAdmin) return jsonResponse(401, { error: "Unauthorized" });
-
-        const urlObj = new URL(request.url);
-        const id = urlObj.searchParams.get("id");
-        if (!id) return jsonResponse(400, { error: "Missing id parameter." });
-
-        try {
-          await env.D1.prepare("DELETE FROM products WHERE id = ?").bind(id).run();
-          return jsonResponse(200, { ok: true });
-        } catch (err) {
-          return jsonResponse(500, { error: err.message });
-        }
-      }
+    // Catalog API (single source of truth JSON)
+    if (url.pathname === "/api/products" || url.pathname === "/api/catalog") {
+      return jsonResponse(200, catalog);
     }
 
     // Orders API (D1 backed)
@@ -684,28 +521,63 @@ export default {
       }
     }
 
-    // Sales Stats API (for analytics)
-    if (url.pathname === "/api/sales/stats") {
-      if (!env.D1)
-        return jsonResponse(200, {
-          total_orders: 0,
-          total_revenue: 0,
-          recent_orders: [],
-        });
-
+    if (url.pathname === "/api/checkout" && request.method === "POST") {
       try {
-        // Ensure table exists (idempotent)
-        await ensureOrdersTable(env);
+        const { provider, itemId, id } = await request.json(); // Support both 'id' (prompt) and 'itemId' (legacy)
+        const targetId = id || itemId;
 
-        const stats = await env.D1.prepare(`SELECT COUNT(*) as count, SUM(amount) as revenue FROM orders`).first();
+        // 1. Fetch Item from SOT (products.json)
+        const allItems = [...(catalog.products || []), ...(catalog.apps || []), ...(catalog.subscriptions || [])];
+        const item = allItems.find((p) => p.id === targetId);
 
-        const recent = await env.D1.prepare(`SELECT * FROM orders ORDER BY ts DESC LIMIT 5`).all();
+        if (!item) return jsonResponse(404, { error: `Item not found: ${targetId}` });
 
-        return jsonResponse(200, {
-          total_orders: stats.count || 0,
-          total_revenue: stats.revenue || 0,
-          recent_orders: recent.results || [],
-        });
+        // 2. PayPal Flow
+        if (provider === "paypal") {
+          const order = await createPayPalOrder(env, {
+            sku: item.id,
+            name: item.name,
+            price: item.price,
+            currency: item.currency || "USD",
+          });
+          return jsonResponse(200, { id: order.id, status: order.status || "CREATED" });
+        }
+
+        // 3. Stripe Flow
+        if (provider === "stripe") {
+          const stripeKey = env.STRIPE_SECRET_KEY || env.STRIPE_SECRET;
+          if (!stripeKey) throw new Error("Stripe not configured");
+
+          const isSub = item.type === "subscription";
+          const mode = isSub ? "subscription" : "payment";
+
+          const params = new URLSearchParams();
+          params.append("mode", mode);
+          params.append("success_url", `${url.origin}/success.html`);
+          params.append("cancel_url", `${url.origin}/cancel.html`);
+          params.append("line_items[0][quantity]", "1");
+          params.append("line_items[0][price_data][currency]", (item.currency || "usd").toLowerCase());
+          params.append("line_items[0][price_data][product_data][name]", item.name);
+          params.append("line_items[0][price_data][unit_amount]", Math.round(item.price * 100));
+
+          if (isSub) {
+            params.append("line_items[0][price_data][recurring][interval]", (item.interval || "month").toLowerCase());
+          }
+
+          const stRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${stripeKey}`,
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: params,
+          });
+          const data = await stRes.json();
+          if (!stRes.ok) throw new Error(data.error?.message || "Stripe session failed");
+          return jsonResponse(200, { url: data.url, id: data.id });
+        }
+
+        return jsonResponse(400, { error: "Invalid provider" });
       } catch (err) {
         return jsonResponse(500, { error: err.message });
       }
@@ -779,6 +651,34 @@ export default {
         return jsonResponse(200, { ok: true, data });
       } catch (err) {
         return jsonResponse(400, { error: err.message });
+      }
+    }
+
+    // PayPal Orders API (dynamic price shortcut)
+    if (url.pathname === "/api/paypal/create-order" && request.method === "POST") {
+      try {
+        const product = await request.json().catch(() => ({}));
+        const order = await createPayPalOrder(env, product);
+        return jsonResponse(200, { id: order.id, status: order.status || "CREATED" });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message || "PayPal order create failed." });
+      }
+    }
+
+    if (url.pathname === "/api/paypal/capture-order" && request.method === "POST") {
+      try {
+        const payload = await request.json().catch(() => ({}));
+        const capture = await capturePayPalOrder(env, payload?.orderID || payload?.orderId || payload?.id);
+        const cap = capture?.purchase_units?.[0]?.payments?.captures?.[0] || {};
+        return jsonResponse(200, {
+          id: capture?.id,
+          status: capture?.status,
+          captureId: cap.id,
+          amount: cap?.amount?.value,
+          currency: cap?.amount?.currency_code,
+        });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message || "PayPal capture failed." });
       }
     }
 
@@ -876,7 +776,10 @@ export default {
       }
     }
 
-    if (url.pathname === "/api/paypal/order/capture" && request.method === "POST") {
+    if (
+      (url.pathname === "/api/paypal/order/capture" || url.pathname === "/api/paypal/capture") &&
+      request.method === "POST"
+    ) {
       try {
         const payload = await request.json().catch(() => ({}));
         const orderId = String(payload?.orderId || payload?.orderID || payload?.id || "").trim();

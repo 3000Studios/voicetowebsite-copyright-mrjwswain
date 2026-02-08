@@ -1,19 +1,29 @@
 const loadProducts = async () => {
   try {
-    const res = await fetch("/api/products");
-    if (!res.ok) throw new Error("Failed to load products");
+    const res = await fetch("/api/catalog");
+    if (!res.ok) throw new Error("Failed to load catalog");
     const data = await res.json();
-    const products = Array.isArray(data) ? data : [];
 
-    // Inject Dropship Engine
+    // Unified Schema Support
+    let products = [];
+    if (Array.isArray(data)) {
+      products = data;
+    } else if (data.products || data.apps) {
+      products = [...(data.products || []), ...(data.apps || [])];
+    }
+
+    // Inject Dropship Engine (Frontend Only Feature)
     products.unshift({
       id: "dropship-engine-pro",
+      type: "product",
       title: "Dropship Description Engine",
+      name: "Dropship Description Engine",
       label: "Best Seller",
       desc: "Auto-generate viral, SEO-optimized product descriptions from a single image or link. Workers AI powered.",
       price: 199.0,
+      currency: "USD",
       stripePaymentLink: "",
-      stripeBuyButtonId: "buy_btn_1QweRtZyX", // Placeholder, triggers Stripe/PayPal fallback
+      stripeBuyButtonId: "buy_btn_1QweRtZyX",
     });
 
     return products;
@@ -31,8 +41,15 @@ const getEnv = () => {
   }
 };
 
-const getPayPalClientId = () => String(getEnv().PAYPAL_CLIENT_ID || "").trim();
-const getStripePublishableKey = () => String(getEnv().STRIPE_PUBLISHABLE_KEY || "").trim();
+const getPayPalClientId = () => {
+  const env = getEnv();
+  return String(env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID || "").trim();
+};
+
+const getStripePublishableKey = () => {
+  const env = getEnv();
+  return String(env.STRIPE_PUBLIC || env.STRIPE_PUBLISHABLE_KEY || "").trim();
+};
 
 const formatPrice = (value) => {
   const number = Number(value || 0);
@@ -126,34 +143,36 @@ const openPayPalModal = async (product) => {
     .Buttons({
       style: { layout: "vertical", shape: "rect", label: "paypal" },
       createOrder: async () => {
-        const res = await fetch("/api/paypal/order/create", {
+        // Unified Commerce: PayPal
+        const res = await fetch("/api/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId: product.id }),
+          body: JSON.stringify({
+            provider: "paypal",
+            itemId: product.id,
+          }),
         });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data?.id) {
-          throw new Error(String(data?.error || "PayPal order create failed."));
-        }
+        const data = await res.json();
+        if (!res.ok || !data.id) throw new Error(data.error || "Order failed");
         return data.id;
       },
       onApprove: async (data) => {
-        const res = await fetch("/api/paypal/order/capture", {
+        // Capture
+        const res = await fetch("/api/paypal/capture-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: data?.orderID, productId: product.id }),
+          body: JSON.stringify({ orderID: data.orderID }),
         });
-        const cap = await res.json().catch(() => ({}));
-        if (!res.ok || !cap?.ok) {
-          throw new Error(String(cap?.error || "PayPal capture failed."));
-        }
+        const cap = await res.json();
+        if (!res.ok) throw new Error(cap.error || "Capture failed");
+
         const note = modal.querySelector(".vt-pay-note");
-        if (note) note.textContent = "Payment successful. Thank you.";
-        setTimeout(close, 1200);
+        if (note) note.textContent = "Payment successful!";
+        setTimeout(close, 1500);
       },
       onError: (err) => {
         console.error(err);
-        alert("PayPal error. Please try again.");
+        alert("Payment error. Try again.");
       },
     })
     .render(host);
@@ -269,7 +288,13 @@ const renderProducts = (scene, products) => {
             ? `<div class="stripe-buy-host" data-buy-button-id="${buyButtonId}"></div>`
             : `
               <div class="button-row">
-                <button class="buy-btn buy-btn-paypal" type="button">PayPal</button>
+                <button class="buy-btn buy-btn-paypal"
+                        type="button"
+                        data-name="${product.title}"
+                        data-price="${product.price}"
+                        data-sku="${product.id}">
+                  PayPal
+                </button>
                 <button class="buy-btn buy-btn-stripe" type="button">Stripe</button>
               </div>
             `

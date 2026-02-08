@@ -3,18 +3,18 @@
 
 :root {
   color-scheme: dark;
-  --bg: #05070a;
-  --surface: #0f141b;
-  --surface-2: #121a22;
-  --text: #f5f3ee;
-  --muted: #9aa3ad;
-  --accent: #d4af37;
-  --accent-2: #0f5e4a;
-  --accent-white: #fdfcf8;
-  --accent-emerald-bright: #1ccf9c;
-  --stone-gray: #6f7780;
-  --ash: #4d545a;
-  --ring: rgba(212, 175, 55, 0.35);
+  --bg: #0a0f18;
+  --surface: linear-gradient(145deg, rgba(23, 32, 48, 0.9), rgba(6, 10, 18, 0.92));
+  --surface-2: #111827;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #cbd5e1;
+  --accent-2: #8ea5c9;
+  --accent-white: #f8fafc;
+  --accent-emerald-bright: #a5f3fc;
+  --stone-gray: #6b7280;
+  --ash: #4b5563;
+  --ring: rgba(203, 213, 225, 0.35);
 }
 
 * {
