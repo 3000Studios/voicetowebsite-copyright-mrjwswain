@@ -31,7 +31,7 @@
     "autopilot": "node ./scripts/autopilot.mjs",
     "prepare": "node ./scripts/husky-install.mjs",
     "clean": "node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true});\"",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler pages deploy dist --project-name voicetowebsite-copyright-mrjwswain --branch main"
   },
   "lint-staged": {
     "*.{js,cjs,mjs,ts,tsx,css,scss,json,md,yml,yaml,html}": "prettier --write"

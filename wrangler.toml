@@ -1,16 +1,8 @@
 name = "voicetowebsite"
-main = "worker.js"
 compatibility_date = "2026-01-27"
-account_id = "d6ec056b27a57bcf807a46b2e3379d60"
 
 # Cloudflare Pages build output directory (so Pages does not warn about wrangler.toml)
 pages_build_output_dir = "dist"
-
-# Serve the built site directly from Cloudflare (no origin) and keep the API path routed to the Worker.
-routes = [
-  "voicetowebsite.com/*",
-  "www.voicetowebsite.com/*",
-]
 
 compatibility_flags = ["nodejs_compat"]
 
@@ -32,11 +24,6 @@ PUBLIC_GENERATE = "1"
 # ADSENSE_MAX_SLOTS = "3"
 # CONTROL_PASSWORD = ""
 
-[assets]
-directory = "./dist"
-# NOTE: "ASSETS" is reserved in Pages projects on newer Wrangler versions.
-binding = "SITE_ASSETS"
-
 [[d1_databases]]
 binding = "D1"
 database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
@@ -51,18 +38,3 @@ binding = "R2"
 bucket_name = "voicetowebsite-template-store"
 # Optional: set a different bucket for `wrangler dev`.
 preview_bucket_name = "voicetowebsite-template-store-dev"
-
-[observability]
-enabled = true
-head_sampling_rate = 1
-
-  [observability.logs]
-  enabled = true
-  head_sampling_rate = 1
-  persist = true
-  invocation_logs = true
-
-  [observability.traces]
-  enabled = true
-  persist = true
-  head_sampling_rate = 1
