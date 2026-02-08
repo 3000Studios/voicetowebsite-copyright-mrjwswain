@@ -108,6 +108,8 @@ iframe {
 
 #root {
   min-height: 100vh;
+  position: relative;
+  z-index: 10;
 }
 
 /* Keyboard visibility (especially important if a custom cursor is used) */

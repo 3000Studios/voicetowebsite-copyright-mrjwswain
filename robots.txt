@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Private / restricted
+Disallow: /admin
+Disallow: /admin/
+Disallow: /the3000
+Disallow: /the3000/
+Disallow: /api
+Disallow: /api/
+
+Sitemap: https://voicetowebsite.com/sitemap.xml

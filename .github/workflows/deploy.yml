@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
@@ -32,7 +32,8 @@ jobs:
       - name: Verify (typecheck + tests + build + link check)
         run: npm run verify
 
-      - name: Validate Cloudflare token secret
+      - name: Resolve Cloudflare token secret
+        id: cf_token
         shell: bash
         env:
           CF_USER_TOKEN: ${{ secrets.CF_USER_TOKEN }}
@@ -41,16 +42,26 @@ jobs:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_API_TOKEN2: ${{ secrets.CF_API_TOKEN2 }}
         run: |
-          if [ -n "$CF_USER_TOKEN" ]; then echo "Cloudflare token: CF_USER_TOKEN"; exit 0; fi
-          if [ -n "$CF_ACCOUNT_API_VOICETOWEBSITE" ]; then echo "Cloudflare token: CF_Account_API_VoicetoWebsite"; exit 0; fi
-          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then echo "Cloudflare token: CLOUDFLARE_API_TOKEN"; exit 0; fi
-          if [ -n "$CF_API_TOKEN" ]; then echo "Cloudflare token: CF_API_TOKEN"; exit 0; fi
-          if [ -n "$CF_API_TOKEN2" ]; then echo "Cloudflare token: CF_API_TOKEN2"; exit 0; fi
-          echo "Missing Cloudflare API token secret. Add CF_USER_TOKEN (preferred) or one of the supported fallback names."
-          exit 1
+          TOKEN=""
+          NAME=""
+          if [ -n "$CF_USER_TOKEN" ]; then TOKEN="$CF_USER_TOKEN"; NAME="CF_USER_TOKEN"; fi
+          if [ -z "$TOKEN" ] && [ -n "$CF_ACCOUNT_API_VOICETOWEBSITE" ]; then TOKEN="$CF_ACCOUNT_API_VOICETOWEBSITE"; NAME="CF_Account_API_VoicetoWebsite"; fi
+          if [ -z "$TOKEN" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then TOKEN="$CLOUDFLARE_API_TOKEN"; NAME="CLOUDFLARE_API_TOKEN"; fi
+          if [ -z "$TOKEN" ] && [ -n "$CF_API_TOKEN" ]; then TOKEN="$CF_API_TOKEN"; NAME="CF_API_TOKEN"; fi
+          if [ -z "$TOKEN" ] && [ -n "$CF_API_TOKEN2" ]; then TOKEN="$CF_API_TOKEN2"; NAME="CF_API_TOKEN2"; fi
+
+          if [ -z "$TOKEN" ]; then
+            echo "Missing Cloudflare API token secret. Add CF_USER_TOKEN (preferred) or one of the supported fallback names."
+            exit 1
+          fi
+
+          echo "Cloudflare token: $NAME"
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
 
       - name: Deploy with Wrangler
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CF_USER_TOKEN || secrets.CF_Account_API_VoicetoWebsite || secrets.CLOUDFLARE_API_TOKEN || secrets.CF_API_TOKEN || secrets.CF_API_TOKEN2 }}
+          apiToken: ${{ steps.cf_token.outputs.token }}
           command: deploy
+          wranglerVersion: "4.59.2"

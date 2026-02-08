@@ -4,28 +4,97 @@
     <loc>https://voicetowebsite.com/</loc>
   </url>
   <url>
-    <loc>https://voicetowebsite.com/features</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/pricing</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/demo</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/store</loc>
+    <loc>https://voicetowebsite.com/api-documentation</loc>
   </url>
   <url>
     <loc>https://voicetowebsite.com/appstore</loc>
   </url>
   <url>
-    <loc>https://voicetowebsite.com/livestream</loc>
-  </url>
-  <url>
     <loc>https://voicetowebsite.com/blog</loc>
   </url>
   <url>
+    <loc>https://voicetowebsite.com/color-synth</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/contact</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/copyrights</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/cursor-demo</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/cyber-blog</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/demo</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/features</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/focus-timer</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/gallery</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/geological-studies</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/how-it-works</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/legal</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/lexicon-pro</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/license</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/livestream</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/memory-matrix</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/neon-snake</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/neural-engine</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/partners</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/pricing</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/privacy</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/project-planning-hub</loc>
+  </url>
+  <url>
     <loc>https://voicetowebsite.com/projects</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/referrals</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/rush-percussion</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/status</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/store</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/strata-design-system</loc>
   </url>
   <url>
     <loc>https://voicetowebsite.com/studio3000</loc>
@@ -34,63 +103,27 @@
     <loc>https://voicetowebsite.com/support</loc>
   </url>
   <url>
-    <loc>https://voicetowebsite.com/status</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/trust</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/partners</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/webforge</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/cursor-demo</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/project-planning-hub</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/rush-percussion</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/referrals</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/contact</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/gallery</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/legal</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/copyrights</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/neural-engine</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/strata-design-system</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/api-documentation</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/voice-to-json</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/geological-studies</loc>
-  </url>
-  <url>
-    <loc>https://voicetowebsite.com/privacy</loc>
+    <loc>https://voicetowebsite.com/templates</loc>
   </url>
   <url>
     <loc>https://voicetowebsite.com/terms</loc>
   </url>
   <url>
-    <loc>https://voicetowebsite.com/lexicon-pro</loc>
+    <loc>https://voicetowebsite.com/the3000-gallery</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/the3000</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/trust</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/voice-to-json</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/webforge</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/zen-particles</loc>
   </url>
 </urlset>

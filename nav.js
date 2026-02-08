@@ -43,6 +43,7 @@
     { href: "/blog", label: "Blog" },
     { href: "/livestream", label: "Live" },
     { href: "/support", label: "Support" },
+    { href: "/admin", label: "Admin" },
   ];
 
   const adminLinks = [
@@ -376,6 +377,47 @@
     return h >>> 0;
   };
 
+  const hslToRgb = (h, s, l) => {
+    const hue = (((h % 360) + 360) % 360) / 360;
+    const sat = Math.max(0, Math.min(1, s));
+    const lit = Math.max(0, Math.min(1, l));
+
+    if (sat === 0) {
+      const v = Math.round(lit * 255);
+      return { r: v, g: v, b: v };
+    }
+
+    const q = lit < 0.5 ? lit * (1 + sat) : lit + sat - lit * sat;
+    const p = 2 * lit - q;
+    const hueToChannel = (t) => {
+      let x = t;
+      if (x < 0) x += 1;
+      if (x > 1) x -= 1;
+      if (x < 1 / 6) return p + (q - p) * 6 * x;
+      if (x < 1 / 2) return q;
+      if (x < 2 / 3) return p + (q - p) * (2 / 3 - x) * 6;
+      return p;
+    };
+
+    return {
+      r: Math.round(hueToChannel(hue + 1 / 3) * 255),
+      g: Math.round(hueToChannel(hue) * 255),
+      b: Math.round(hueToChannel(hue - 1 / 3) * 255),
+    };
+  };
+
+  const buildWavePalette = (pathKey) => {
+    const seed = hashString(pathKey || "/");
+    const hue = seed % 360;
+    const sat = 0.62 + ((seed >>> 9) % 18) / 100;
+    const lit = 0.58 + ((seed >>> 15) % 12) / 100;
+    return [
+      hslToRgb(hue, sat, lit),
+      hslToRgb((hue + 28 + ((seed >>> 3) % 16)) % 360, Math.min(0.92, sat + 0.08), Math.min(0.82, lit + 0.09)),
+      hslToRgb((hue + 330 + ((seed >>> 19) % 24)) % 360, Math.max(0.5, sat - 0.12), Math.max(0.48, lit - 0.12)),
+    ];
+  };
+
   const injectBottomWaves = () => {
     try {
       if (document.getElementById("vtw-bottom-waves")) return;
@@ -389,38 +431,7 @@
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const palettes = [
-        ["#ffffff", "#d1d5db", "#fbbf24"],
-        ["#fbbf24", "#ffffff", "#cbd5e1"],
-        ["#e5e7eb", "#fef3c7", "#ffffff"],
-        ["#ffffff", "#fef3c7", "#d1d5db"],
-        ["#d1d5db", "#ffffff", "#f59e0b"],
-      ];
-      const idx = hashString(normalizePath()) % palettes.length;
-      const [c1, c2, c3] = palettes[idx];
-
-      const hexToRgb = (hex) => {
-        const h = String(hex || "")
-          .replace("#", "")
-          .trim();
-        if (h.length === 3) {
-          const r = parseInt(h[0] + h[0], 16);
-          const g = parseInt(h[1] + h[1], 16);
-          const b = parseInt(h[2] + h[2], 16);
-          return { r, g, b };
-        }
-        if (h.length === 6) {
-          const r = parseInt(h.slice(0, 2), 16);
-          const g = parseInt(h.slice(2, 4), 16);
-          const b = parseInt(h.slice(4, 6), 16);
-          return { r, g, b };
-        }
-        return { r: 255, g: 255, b: 255 };
-      };
-
-      const rgb1 = hexToRgb(c1);
-      const rgb2 = hexToRgb(c2);
-      const rgb3 = hexToRgb(c3);
+      const [rgb1, rgb2, rgb3] = buildWavePalette(normalizePath());
 
       let w = 0;
       let h = 0;

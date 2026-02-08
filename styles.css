@@ -170,13 +170,23 @@ body {
   margin: 0;
   font-family: var(--font-family);
   background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+/* Dedicated wallpaper layer so other fixed effects can reliably sit "above wallpaper"
+   while staying behind all content (z-order is consistent across pages). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  pointer-events: none;
   background-image:
     radial-gradient(1200px circle at 20% 10%, rgba(var(--accent-rgb), 0.18), transparent 58%), var(--wallpaper-image);
   background-size: auto, cover;
   background-position: center, center;
   background-attachment: fixed, fixed;
-  color: var(--text-color);
-  overflow-x: hidden;
 }
 
 img,
@@ -270,7 +280,7 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -2;
+  z-index: -3;
   overflow: hidden;
   opacity: 0.4;
 }
@@ -1933,7 +1943,7 @@ button.ghost:hover {
   width: 100%;
   height: 140px;
   pointer-events: none;
-  z-index: 240;
+  z-index: -2;
   opacity: 0.92;
   mix-blend-mode: screen;
 }
