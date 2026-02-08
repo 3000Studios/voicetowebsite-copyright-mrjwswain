@@ -23,6 +23,7 @@
     "heal": "node ./scripts/heal.mjs",
     "ship": "node ./scripts/ship.mjs",
     "ship:push": "node ./scripts/ship.mjs --push",
+    "auto:ship": "node ./scripts/auto-ship.mjs",
     "sync": "node ./scripts/sync.mjs",
     "autopilot": "node ./scripts/autopilot.mjs",
     "prepare": "node ./scripts/husky-install.mjs",
