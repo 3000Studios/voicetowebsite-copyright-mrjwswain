@@ -37,6 +37,7 @@
     "*.{js,cjs,mjs,ts,tsx,css,scss,json,md,yml,yaml,html}": "prettier --write"
   },
   "devDependencies": {
+    "@cloudflare/kv-asset-handler": "^0.4.2",
     "@cloudflare/workers-types": "^4.20250109.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
