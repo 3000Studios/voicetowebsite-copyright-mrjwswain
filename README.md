@@ -51,3 +51,5 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 ## Makeover workflow
 
 - See `MAKEOVER.md` for a clean, safe “new everything” order and the key entry points.
+
+<!-- auto-deploy smoke test: 2026-02-08 12:02:55 -->
