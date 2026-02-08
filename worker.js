@@ -25,8 +25,10 @@ const jsonResponse = (status, payload) =>
     })
   );
 
-const addSecurityHeaders = (response) => {
+const addSecurityHeaders = (response, options = {}) => {
   const headers = new Headers(response.headers);
+  if (options.cacheControl) headers.set("Cache-Control", options.cacheControl);
+  if (options.pragmaNoCache) headers.set("Pragma", "no-cache");
   headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "SAMEORIGIN");
@@ -266,6 +268,7 @@ const verifyLicenseToken = async (env, token) => {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const pathname = url.pathname;
     const cleanPath = url.pathname.replace(/\/$/, "");
 
     if (!env.ASSETS) {
@@ -997,17 +1000,17 @@ export default {
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await env.ASSETS.fetch(new Request(adminUrl, request));
-      return addSecurityHeaders(res);
+      return addSecurityHeaders(res, { cacheControl: "no-store", pragmaNoCache: true });
     }
 
     if (url.pathname.startsWith("/admin/")) {
       const adminRes = await env.ASSETS.fetch(request);
       if (adminRes.status !== 404) {
-        return addSecurityHeaders(adminRes);
+        return addSecurityHeaders(adminRes, { cacheControl: "no-store", pragmaNoCache: true });
       }
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await env.ASSETS.fetch(new Request(adminUrl, request));
-      return addSecurityHeaders(res);
+      return addSecurityHeaders(res, { cacheControl: "no-store", pragmaNoCache: true });
     }
 
     if (cleanPath && !cleanPath.includes(".") && cleanPath !== "/") {
@@ -1020,6 +1023,11 @@ export default {
 
     // Default: serve the built static assets from ./dist with optional placeholder injection.
     const assetRes = await env.ASSETS.fetch(request);
+    // Never cache global "shell" assets (nav/wave/theme). This avoids getting stuck on an older navbar
+    // when Cloudflare serves a stale response during revalidation.
+    if (pathname === "/nav.js" || pathname === "/styles.css") {
+      return addSecurityHeaders(assetRes, { cacheControl: "no-store", pragmaNoCache: true });
+    }
     const contentType = assetRes.headers.get("Content-Type") || "";
     if (contentType.includes("text/html")) {
       const text = await assetRes.text();
@@ -1187,12 +1195,10 @@ export default {
       headers.set("Content-Type", "text/html; charset=utf-8");
 
       // Cache policy:
-      // - Admin/secret pages: never cache (avoid leaking sensitive state + ensure instant updates).
-      // - Public pages: allow edge caching with revalidation for faster repeat visits.
-      headers.set(
-        "Cache-Control",
-        isAdminPage || isSecretPage ? "no-store" : "public, max-age=0, s-maxage=600, stale-while-revalidate=86400"
-      );
+      // HTML is always "no-store" so new deploys show up immediately and we never get stuck on a stale
+      // navbar / old asset hashes due to edge stale-while-revalidate behavior.
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
       headers.set("X-Robots-Tag", robotsTag);
 
       return addSecurityHeaders(
