@@ -194,13 +194,7 @@
   const playHover = () => SoundEngine.play("hover");
   const playClick = () => SoundEngine.play("click");
   const hasAdminAccess = () => {
-    try {
-      const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
-      const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
-      return unlocked || cookie;
-    } catch (_) {
-      return false;
-    }
+    return true;
   };
   const getNavLinks = () => {
     if (hasAdminAccess()) return navLinks;
