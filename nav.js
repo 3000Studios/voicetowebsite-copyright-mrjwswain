@@ -7,6 +7,8 @@
     { id: "ember", label: "Ember" },
     { id: "ocean", label: "Ocean" },
   ];
+  // Force cache-bust/version stamp so new nav bundle propagates
+  document.documentElement.dataset.navVersion = "2026-02-08-02";
 
   const isShellDisabled = () => {
     try {
