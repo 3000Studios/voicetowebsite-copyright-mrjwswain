@@ -8,8 +8,9 @@ const LOCK_PATH = path.join(ROOT, ".git", "auto-ship.lock");
 const DEBOUNCE_MS = Number(process.env.AUTO_SHIP_DEBOUNCE_MS || 12000);
 const MIN_INTERVAL_MS = Number(process.env.AUTO_SHIP_MIN_INTERVAL_MS || 60000);
 const COMMIT_PREFIX = process.env.AUTO_SHIP_COMMIT_PREFIX || "Auto:";
+// Permanent default: deploy via local workaround (not GitHub Actions).
 const AUTO_DEPLOY = String(process.env.AUTO_SHIP_DEPLOY || "1").trim() !== "0";
-const DEPLOY_CMD = process.env.AUTO_SHIP_DEPLOY_CMD || "npx wrangler deploy";
+const DEPLOY_CMD = process.env.AUTO_SHIP_DEPLOY_CMD || "npm run deploy";
 
 const IGNORE_DIRS = new Set([".git", "node_modules", "dist", ".wrangler", ".vite", "coverage"]);
 const IGNORE_FILES = new Set([

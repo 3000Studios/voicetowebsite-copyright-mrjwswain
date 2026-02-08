@@ -1,0 +1,20 @@
+name: Deploy (Disabled)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy is disabled
+        run: |
+          echo "Deploy via GitHub Actions is disabled for this repo."
+          echo "Production deploy is performed locally by: npm run auto:ship"
+          echo "Do not reintroduce cloudflare/wrangler-action or similar deploy steps."
