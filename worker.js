@@ -270,10 +270,11 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname;
     const cleanPath = url.pathname.replace(/\/$/, "");
+    const assets = env.ASSETS || env.SITE_ASSETS;
 
-    if (!env.ASSETS) {
+    if (!assets) {
       return jsonResponse(500, {
-        error: "ASSETS binding is missing on this Worker route.",
+        error: "Static assets binding is missing on this Worker route.",
       });
     }
 
@@ -409,7 +410,7 @@ export default {
         status: "ok",
         orchestrator: "online",
         d1: !!env.D1,
-        assets: !!env.ASSETS,
+        assets: !!(env.ASSETS || env.SITE_ASSETS),
         ts: new Date().toISOString(),
       });
     }
@@ -999,30 +1000,30 @@ export default {
 
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);
-      const res = await env.ASSETS.fetch(new Request(adminUrl, request));
+      const res = await assets.fetch(new Request(adminUrl, request));
       return addSecurityHeaders(res, { cacheControl: "no-store", pragmaNoCache: true });
     }
 
     if (url.pathname.startsWith("/admin/")) {
-      const adminRes = await env.ASSETS.fetch(request);
+      const adminRes = await assets.fetch(request);
       if (adminRes.status !== 404) {
         return addSecurityHeaders(adminRes, { cacheControl: "no-store", pragmaNoCache: true });
       }
       const adminUrl = new URL("/admin/index.html", url.origin);
-      const res = await env.ASSETS.fetch(new Request(adminUrl, request));
+      const res = await assets.fetch(new Request(adminUrl, request));
       return addSecurityHeaders(res, { cacheControl: "no-store", pragmaNoCache: true });
     }
 
     if (cleanPath && !cleanPath.includes(".") && cleanPath !== "/") {
       const htmlUrl = new URL(`${cleanPath}.html`, url.origin);
-      const htmlRes = await env.ASSETS.fetch(new Request(htmlUrl, request));
+      const htmlRes = await assets.fetch(new Request(htmlUrl, request));
       if (htmlRes.status !== 404) {
         return addSecurityHeaders(htmlRes);
       }
     }
 
     // Default: serve the built static assets from ./dist with optional placeholder injection.
-    const assetRes = await env.ASSETS.fetch(request);
+    const assetRes = await assets.fetch(request);
     // Never cache global "shell" assets (nav/wave/theme). This avoids getting stuck on an older navbar
     // when Cloudflare serves a stale response during revalidation.
     if (pathname === "/nav.js" || pathname === "/styles.css") {
