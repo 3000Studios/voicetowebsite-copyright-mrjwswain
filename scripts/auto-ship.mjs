@@ -8,6 +8,8 @@ const LOCK_PATH = path.join(ROOT, ".git", "auto-ship.lock");
 const DEBOUNCE_MS = Number(process.env.AUTO_SHIP_DEBOUNCE_MS || 12000);
 const MIN_INTERVAL_MS = Number(process.env.AUTO_SHIP_MIN_INTERVAL_MS || 60000);
 const COMMIT_PREFIX = process.env.AUTO_SHIP_COMMIT_PREFIX || "Auto:";
+const AUTO_DEPLOY = String(process.env.AUTO_SHIP_DEPLOY || "1").trim() !== "0";
+const DEPLOY_CMD = process.env.AUTO_SHIP_DEPLOY_CMD || "npx wrangler deploy";
 
 const IGNORE_DIRS = new Set([".git", "node_modules", "dist", ".wrangler", ".vite", "coverage"]);
 const IGNORE_FILES = new Set([
@@ -22,6 +24,17 @@ const run = (cmd, args, opts = {}) => {
     stdio: "inherit",
     shell: process.platform === "win32",
     ...opts,
+  });
+  if (res.error) throw res.error;
+  return res.status ?? 1;
+};
+
+const runShell = (commandLine) => {
+  const res = spawnSync(commandLine, {
+    cwd: ROOT,
+    stdio: "inherit",
+    shell: true,
+    env: process.env,
   });
   if (res.error) throw res.error;
   return res.status ?? 1;
@@ -163,6 +176,16 @@ const tick = () => {
       console.log("auto-ship: git push failed; will retry on next change.");
       schedule();
       return;
+    }
+
+    if (AUTO_DEPLOY) {
+      console.log(`auto-ship: deploying to production via "${DEPLOY_CMD}"...`);
+      const deployCode = runShell(DEPLOY_CMD);
+      if (deployCode !== 0) {
+        console.log("auto-ship: deploy failed; will retry on next change.");
+        schedule();
+        return;
+      }
     }
   } finally {
     releaseLock();
