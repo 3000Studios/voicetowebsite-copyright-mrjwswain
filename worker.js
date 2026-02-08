@@ -13,6 +13,7 @@ import {
   handlePreviewPageRequest,
   handlePublishRequest,
 } from "./functions/siteGenerator.js";
+import catalog from "./products.json";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
 
