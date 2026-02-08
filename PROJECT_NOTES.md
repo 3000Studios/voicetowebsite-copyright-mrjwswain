@@ -8,3 +8,7 @@
 - Secrets: `OPENAI_API`, `GITHUB_TOKEN`, `GITHUB_REPO`, `GITHUB_BASE_BRANCH`, optional `PAYPAL_CLIENT_ID_PROD`, `ADSENSE_PUBLISHER`, `ADSENSE_SLOT`, `DB` (D1).
 - Ownership/IP: `OWNER.md`, `COPYRIGHT`, `PATENT_PREP.md`. Repo is proprietary, no public license.
 - Pending hardening (future): JWT/Access gate on `/api/orchestrator`, JSON Schema validation of commands, rate limiting, D1 logging/rollback.
+
+## Automation & Deployment Rules
+
+- **Always Auto-Retry Deployment**: The deployment script (`automate_all.ps1`) is configured to automatically retry deployment up to 3 times on failure. This is a critical rule to handle transient network or CLI issues.
