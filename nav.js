@@ -8,7 +8,7 @@
     { id: "ocean", label: "Ocean" },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
-  document.documentElement.dataset.navVersion = "2026-02-08-02";
+  document.documentElement.dataset.navVersion = "2026-02-09-01";
 
   const isShellDisabled = () => {
     try {
@@ -75,6 +75,7 @@
       { href: "/status", label: "Status" },
       { href: "/privacy", label: "Privacy" },
       { href: "/terms", label: "Terms" },
+      { href: "/admin", label: "Admin" },
     ],
     affiliates: [
       { href: "https://www.cloudflare.com/r/YOUR_ID", label: "Powered by Cloudflare ($20 Credit)" },
