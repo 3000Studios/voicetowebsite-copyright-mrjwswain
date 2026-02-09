@@ -347,16 +347,6 @@ export default {
       return addSecurityHeaders(await handleBotHubRequest({ request, env, ctx }));
     }
 
-    // Optional legacy sync endpoint (only active if a Durable Object binding is configured).
-    if (url.pathname === "/api/sync") {
-      if (!env.BOT_HUB) {
-        return jsonResponse(503, { error: "BotHub binding not available." });
-      }
-      const id = env.BOT_HUB.idFromName("global");
-      const stub = env.BOT_HUB.get(id);
-      return addSecurityHeaders(await stub.fetch(request));
-    }
-
     // Bot status feed for the voice command center UI.
     // Keeps payload small and tolerates missing tables.
     if (url.pathname === "/api/bots/status" && request.method === "GET") {
