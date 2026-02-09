@@ -5,11 +5,24 @@ import { audioEngine } from "../services/audioEngine";
 interface ElectricTextProps {
   text: string;
   className?: string;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
   active?: boolean;
+  role?: string;
+  tabIndex?: number;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
+  "aria-label"?: string;
 }
 
-const ElectricText: React.FC<ElectricTextProps> = ({ text, className, onClick, active }) => {
+const ElectricText: React.FC<ElectricTextProps> = ({
+  text,
+  className,
+  onClick,
+  active,
+  role,
+  tabIndex,
+  onKeyDown,
+  "aria-label": ariaLabel,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -29,7 +42,11 @@ const ElectricText: React.FC<ElectricTextProps> = ({ text, className, onClick, a
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
-      className={`relative ${onClick ? "cursor-pointer" : "cursor-default"} select-none ${className} font-orbitron font-black tracking-widest flex flex-col items-center justify-center`}
+      role={role}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      aria-label={ariaLabel}
+      className={`relative cursor-none select-none ${className} font-orbitron font-black tracking-widest flex flex-col items-center justify-center`}
     >
       {/* Platinum Steel-Plated Typography with shimmer */}
       <span
