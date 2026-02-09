@@ -412,7 +412,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
           </div>
         ) : (
           <>
-            <h2 className="checkout-title" id="checkout-title">Checkout</h2>
+            <h2 className="checkout-title" id="checkout-title">
+              Checkout
+            </h2>
 
             <div className="order-summary">
               <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>Order Summary</h3>
@@ -458,7 +460,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   exit={{ opacity: 0, y: -20 }}
                 >
                   <div className="form-group">
-                    <label className="form-label" htmlFor="email">Email</label>
+                    <label className="form-label" htmlFor="email">
+                      Email
+                    </label>
                     <input
                       id="email"
                       type="email"
@@ -470,7 +474,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label" htmlFor="card-name">Cardholder Name</label>
+                    <label className="form-label" htmlFor="card-name">
+                      Cardholder Name
+                    </label>
                     <input
                       id="card-name"
                       type="text"
@@ -482,7 +488,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label" htmlFor="card-number">Card Number</label>
+                    <label className="form-label" htmlFor="card-number">
+                      Card Number
+                    </label>
                     <input
                       id="card-number"
                       type="text"
@@ -496,7 +504,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="form-label" htmlFor="card-expiry">Expiry Date</label>
+                      <label className="form-label" htmlFor="card-expiry">
+                        Expiry Date
+                      </label>
                       <input
                         id="card-expiry"
                         type="text"
@@ -509,7 +519,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                       />
                     </div>
                     <div className="form-group">
-                      <label className="form-label" htmlFor="card-cvc">CVC</label>
+                      <label className="form-label" htmlFor="card-cvc">
+                        CVC
+                      </label>
                       <input
                         id="card-cvc"
                         type="text"
