@@ -347,6 +347,16 @@ export default {
       return addSecurityHeaders(await handleBotHubRequest({ request, env, ctx }));
     }
 
+    // Optional legacy sync endpoint (only active if a Durable Object binding is configured).
+    if (url.pathname === "/api/sync") {
+      if (!env.BOT_HUB) {
+        return jsonResponse(503, { error: "BotHub binding not available." });
+      }
+      const id = env.BOT_HUB.idFromName("global");
+      const stub = env.BOT_HUB.get(id);
+      return addSecurityHeaders(await stub.fetch(request));
+    }
+
     // Bot status feed for the voice command center UI.
     // Keeps payload small and tolerates missing tables.
     if (url.pathname === "/api/bots/status" && request.method === "GET") {
@@ -401,6 +411,32 @@ export default {
         return jsonResponse(503, { error: "D1 database not available." });
       }
       try {
+        // Ensure schema exists so first-run doesn't 500.
+        await env.D1.prepare(
+          `CREATE TABLE IF NOT EXISTS commands (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             ts DATETIME DEFAULT CURRENT_TIMESTAMP,
+             command TEXT,
+             actions TEXT,
+             files TEXT,
+             commit_sha TEXT,
+             intent_json TEXT,
+             deployment_id TEXT,
+             deployment_status TEXT,
+             deployment_message TEXT
+           );`
+        ).run();
+        const columns = await env.D1.prepare("PRAGMA table_info(commands);").all();
+        const columnNames = new Set((columns.results || []).map((col) => col.name));
+        if (!columnNames.has("intent_json"))
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
+        if (!columnNames.has("deployment_id"))
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
+        if (!columnNames.has("deployment_status"))
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
+        if (!columnNames.has("deployment_message"))
+          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
+
         const data = await env.D1.prepare(
           "SELECT id, ts, command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message FROM commands ORDER BY ts DESC LIMIT 20"
         ).all();

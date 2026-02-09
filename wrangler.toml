@@ -29,6 +29,15 @@ PAYPAL_CLIENT_ID = "AV64tommaL7dHsABJvulSEPX3IksB3o2jcVhBneJEd5p0LtWOgoXzRvMmGU4
 CONTROL_PASSWORD = "5555"
 ADMIN_EMAIL = "mr.jwswain@gmail.com"
 
+[durable_objects]
+bindings = [
+  { name = "BOT_HUB", class_name = "BotHub" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["BotHub"]
+
 [[d1_databases]]
 binding = "D1"
 database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
