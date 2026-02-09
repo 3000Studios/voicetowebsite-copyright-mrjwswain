@@ -37,6 +37,7 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
   const rafRef = useRef<number | null>(null);
   const tRef = useRef(0);
   const lastSizeRef = useRef({ w: 0, h: 0, dpr: 1 });
+  const accentRgbRef = useRef<readonly [number, number, number]>([56, 189, 248]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -52,7 +53,24 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
     const barCount = mode === "bumper" ? 18 : 54;
     const barGap = mode === "bumper" ? 4 : 3;
 
-    const resizeToClient = () => {
+    // --- Optimization: Cache accent color ---
+    const updateAccent = () => {
+      const style = getComputedStyle(document.documentElement);
+      accentRgbRef.current = parseAccentRgb(style.getPropertyValue("--accent-rgb"));
+    };
+    updateAccent();
+
+    const mutationObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.type === "attributes" && m.attributeName === "data-theme") {
+          updateAccent();
+        }
+      }
+    });
+    mutationObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    // --- Optimization: ResizeObserver instead of per-frame reads ---
+    const updateSize = () => {
       const dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
       const w = Math.max(1, Math.floor(canvas.clientWidth));
       const h = Math.max(1, Math.floor(canvas.clientHeight));
@@ -66,13 +84,26 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
+    // Initial size
+    updateSize();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateSize();
+    });
+    resizeObserver.observe(canvas);
+
+    // Also listen to window resize for DPR changes
+    const onResize = () => updateSize();
+    window.addEventListener("resize", onResize, { passive: true });
+
     const draw = () => {
-      resizeToClient();
+      // Removed resizeToClient() call from animation loop
 
       const { w, h } = lastSizeRef.current;
       ctx.clearRect(0, 0, w, h);
 
-      const [r, g, b] = parseAccentRgb(getComputedStyle(document.documentElement).getPropertyValue("--accent-rgb"));
+      // Read from ref instead of DOM
+      const [r, g, b] = accentRgbRef.current;
 
       const freq = active ? audioEngine.getMusicFrequencyData() : null;
       const energy = active ? audioEngine.getMusicEnergy() : 0;
@@ -128,11 +159,10 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
 
     draw();
 
-    const onResize = () => resizeToClient();
-    window.addEventListener("resize", onResize, { passive: true });
-
     return () => {
       window.removeEventListener("resize", onResize as any);
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [active, mode]);
