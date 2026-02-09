@@ -51,7 +51,7 @@ const IgniteBlob: React.FC<IgniteBlobProps> = ({ splatterActive, onStart }) => {
         opacity: { duration: 1 },
         scale: {
           duration: splatterActive ? 1.2 : 4,
-          ease: splatterActive ? "expoIn" : "easeInOut",
+          ease: splatterActive ? "circIn" : "easeInOut",
           repeat: splatterActive ? 0 : Infinity,
         },
         borderRadius: { duration: 3, repeat: Infinity, ease: "easeInOut" },
