@@ -129,9 +129,11 @@ const applyLocalPreview = (command) => {
   const fontMatch = command.match(/font\s+(to|is|=)?\s*([a-zA-Z0-9\s-]+)/i);
 
   if (sayMatch) setFrameText("#headline", sayMatch[1].trim());
+  if (text.includes("eyebrow")) setFrameText("#eyebrow", command);
   if (text.includes("headline")) setFrameText("#headline", command);
   if (text.includes("subhead")) setFrameText("#subhead", command);
   if (text.includes("cta")) setFrameText("#cta", command);
+  if (text.includes("price")) setFrameText("#price", command);
 
   if (hexMatch) setFrameStyle("#headline", { color: `#${hexMatch[1]}` });
   if (fontMatch) {
@@ -160,9 +162,7 @@ const applyActionsPreview = (actions = []) => {
   const doc = getFrameDoc();
   actions.forEach((action) => {
     if (action.type === "update_copy") {
-      if (action.field === "headline") setFrameText("#headline", action.value);
-      if (action.field === "subhead") setFrameText("#subhead", action.value);
-      if (action.field === "cta") setFrameText("#cta", action.value);
+      if (action.field) setFrameText(`#${action.field}`, action.value);
     }
     if (action.type === "update_meta" && action.title && doc) {
       doc.title = action.title;

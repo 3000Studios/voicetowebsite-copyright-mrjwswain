@@ -1,0 +1,15 @@
+{
+  "copy": {
+    "eyebrow": "Home",
+    "headline": "Voice to Website Builder \u2014 Speak It. Ship It.",
+    "subhead": "Turn voice into a complete, responsive, SEO-ready website with pages, copy, templates, and one-click publish \u2014 then keep improving with admin-safe sandbox edits.",
+    "cta": "Start Free Voice Build",
+    "price": "",
+    "metric1": "No credit card",
+    "metric2": "Privacy-first posture",
+    "metric3": "Lighthouse targets 90+/95+"
+  },
+  "theme": {
+    "default": "midnight"
+  }
+}

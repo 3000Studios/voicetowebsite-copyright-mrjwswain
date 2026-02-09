@@ -149,6 +149,7 @@ export async function onRequestPost(context) {
   };
   const SANDBOX_HTML = "sandbox.html";
   const SITE_HTML = "index.html";
+  const SITE_CONFIG = "src/site-config.json";
 
   const SANDBOX_ALLOWED_ACTIONS = new Set([
     "update_copy",
@@ -179,9 +180,9 @@ export async function onRequestPost(context) {
       };
     }
     return {
-      update_copy: [SITE_HTML, "app.js"],
+      update_copy: [SITE_CONFIG],
       update_meta: [SITE_HTML],
-      update_theme: ["app.js"],
+      update_theme: [SITE_CONFIG],
       add_page: [SITE_HTML],
       insert_monetization: [SITE_HTML, "styles.css"],
       update_background_video: [SITE_HTML],
@@ -575,24 +576,38 @@ export async function onRequestPost(context) {
     const updates = {};
     const htmlPath = target === "sandbox" ? SANDBOX_HTML : SITE_HTML;
     let indexHtml = null;
-    let appJs = null;
+    let siteConfig = null;
     let styles = null;
     const auditLog = [];
     const needsIndex = actions.some((action) =>
-      [
-        "update_copy",
-        "update_meta",
-        "add_page",
-        "insert_monetization",
-        "update_background_video",
-        "update_avatar",
-        "insert_section",
-        "add_product",
-        "insert_video",
-        "insert_stream",
-      ].includes(action.type)
+      (target === "sandbox"
+        ? [
+            "update_copy",
+            "update_meta",
+            "update_theme",
+            "add_page",
+            "insert_monetization",
+            "update_background_video",
+            "update_avatar",
+            "insert_section",
+            "add_product",
+            "insert_video",
+            "insert_stream",
+          ]
+        : [
+            "update_meta",
+            "add_page",
+            "insert_monetization",
+            "update_background_video",
+            "update_avatar",
+            "insert_section",
+            "add_product",
+            "insert_video",
+            "insert_stream",
+          ]
+      ).includes(action.type)
     );
-    const needsApp =
+    const needsSiteConfig =
       target !== "sandbox" && actions.some((action) => ["update_copy", "update_theme"].includes(action.type));
     const needsStyles =
       target !== "sandbox" &&
@@ -600,13 +615,13 @@ export async function onRequestPost(context) {
         (action) =>
           action.type === "insert_monetization" || action.type === "update_wallpaper" || action.type === "inject_css"
       );
-    const [indexHtmlResult, appJsResult, stylesResult] = await Promise.all([
+    const [indexHtmlResult, siteConfigResult, stylesResult] = await Promise.all([
       needsIndex ? getFileContent(htmlPath, GITHUB_BASE_BRANCH) : Promise.resolve(null),
-      needsApp ? getFileContent("app.js", GITHUB_BASE_BRANCH) : Promise.resolve(null),
+      needsSiteConfig ? getFileContent(SITE_CONFIG, GITHUB_BASE_BRANCH) : Promise.resolve(null),
       needsStyles ? getFileContent("styles.css", GITHUB_BASE_BRANCH) : Promise.resolve(null),
     ]);
     indexHtml = indexHtmlResult;
-    appJs = appJsResult;
+    siteConfig = siteConfigResult ? JSON.parse(siteConfigResult) : null;
     styles = stylesResult;
     const newPages = [];
     for (const action of actions) {
@@ -618,16 +633,18 @@ export async function onRequestPost(context) {
             indexHtml = updateElementById(indexHtml, target, action.value || "");
           }
         }
-        if (appJs) {
-          appJs = updateAppState(appJs, action.field, action.value);
+        if (siteConfig && action.field && allowedFields.includes(action.field)) {
+          siteConfig.copy = siteConfig.copy || {};
+          siteConfig.copy[action.field] = String(action.value || "");
         }
       }
       if (action.type === "update_theme") {
         if (target === "sandbox" && indexHtml) {
           indexHtml = updateHtmlTheme(indexHtml, action.theme);
         }
-        if (appJs) {
-          appJs = updateTheme(appJs, action.theme);
+        if (siteConfig) {
+          siteConfig.theme = siteConfig.theme || {};
+          siteConfig.theme.default = action.theme;
         }
       }
       if (action.type === "update_meta" && indexHtml) {
@@ -691,7 +708,7 @@ export async function onRequestPost(context) {
       }
     }
     if (indexHtml) updates[htmlPath] = indexHtml;
-    if (appJs) updates["app.js"] = appJs;
+    if (siteConfig) updates[SITE_CONFIG] = `${JSON.stringify(siteConfig, null, 2)}\n`;
     if (styles) updates["styles.css"] = styles;
     newPages.forEach((page) => {
       updates[page.path] = page.content;

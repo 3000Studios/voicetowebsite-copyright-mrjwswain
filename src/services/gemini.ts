@@ -1,9 +1,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 export const generateSiteMod = async (prompt: string) => {
-  const apiKey = (process.env as any).API_KEY;
+  const apiKey = (process.env as any).GEMINIAPIKEY2;
   if (!apiKey) {
-    throw new Error("API_KEY not found in environment variables.");
+    throw new Error("GEMINIAPIKEY2 not found in environment variables.");
   }
   const ai = new GoogleGenAI({ apiKey: apiKey as string });
   const response = await ai.models.generateContent({

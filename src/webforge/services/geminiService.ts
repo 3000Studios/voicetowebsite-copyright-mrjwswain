@@ -5,9 +5,9 @@ let ai: GoogleGenAI | null = null;
 
 const getAi = () => {
   if (!ai) {
-    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINIAPIKEY2;
     if (!apiKey) {
-      console.warn("VITE_GOOGLE_API_KEY is not set. AI features will fail.");
+      console.warn("VITE_GEMINIAPIKEY2 is not set. AI features will fail.");
       throw new Error("API Key missing");
     }
     ai = new GoogleGenAI({ apiKey });

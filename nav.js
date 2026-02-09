@@ -1,3 +1,5 @@
+import siteConfig from "./src/site-config.json";
+
 (() => {
   const THEME_KEY = "vtw-theme";
   const THEMES = [
@@ -109,7 +111,7 @@
     try {
       stored = localStorage.getItem(THEME_KEY);
     } catch (_) {}
-    applyTheme(stored || "midnight");
+    applyTheme(stored || siteConfig?.theme?.default || "midnight");
   };
   const enforceAdminTheme = () => {
     try {

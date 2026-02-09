@@ -16,7 +16,7 @@ Always provide specific numbers when discussing potential traffic increases (e.g
 Keep responses concise and helpful.`;
 
 export const getAiSuggestions = async (currentTasks: ProjectTask[]) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINIAPIKEY2 });
 
   const prompt = `Based on these current tasks for TheCajunmenu.site:
   ${currentTasks.map(t => `${t.title}: ${t.description}`).join(', ')}
@@ -25,7 +25,7 @@ export const getAiSuggestions = async (currentTasks: ProjectTask[]) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash-exp",
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION + " Return exactly 3 suggestions with titles, descriptions, estimated costs, estimated hours, and categories.",
@@ -56,10 +56,10 @@ export const getAiSuggestions = async (currentTasks: ProjectTask[]) => {
 };
 
 export const chatWithAssistant = async (message: string, history: {role: string, parts: {text: string}[]}[]) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINIAPIKEY2 });
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-pro-preview", // Use pro for search grounding
+      model: "gemini-2.0-flash-exp", // Use 2.0 flash for search grounding
       contents: [
         ...history,
         { role: 'user', parts: [{ text: message }] }

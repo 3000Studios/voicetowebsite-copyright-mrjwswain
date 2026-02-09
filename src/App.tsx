@@ -5,6 +5,7 @@ import { NavigationLink } from "./types";
 import { audioEngine } from "./services/audioEngine";
 import WarpTunnel from "./components/WarpTunnel";
 import AudioWaveform from "./components/AudioWaveform";
+import siteConfig from "./site-config.json";
 
 const SEEN_KEY = "vtw-v2-seen";
 const AUDIO_OPTOUT_KEY = "vtw-audio-optout";
@@ -65,6 +66,8 @@ const buildInstantOutline = (prompt: string) => {
 };
 
 const App: React.FC = () => {
+  const copy = siteConfig?.copy;
+
   const seen = hasSeenV2();
   const [phase, setPhase] = useState<"opener" | "site">(seen ? "site" : "opener");
   const [openerCollapsed, setOpenerCollapsed] = useState(seen);
@@ -622,15 +625,19 @@ const App: React.FC = () => {
               >
                 <div className="page" id="home">
                   <section className="section hero">
-                    <p className="eyebrow">Home</p>
-                    <h1 className="vt-h1">Voice to Website Builder — Speak It. Ship It.</h1>
-                    <p className="subhead">
-                      Turn voice into a complete, responsive, SEO-ready website with pages, copy, templates, and
-                      one-click publish — then keep improving with admin-safe sandbox edits.
+                    <p className="eyebrow" id="eyebrow">
+                      {copy?.eyebrow || "Home"}
+                    </p>
+                    <h1 className="vt-h1" id="headline">
+                      {copy?.headline || "Voice to Website Builder — Speak It. Ship It."}
+                    </h1>
+                    <p className="subhead" id="subhead">
+                      {copy?.subhead ||
+                        "Turn voice into a complete, responsive, SEO-ready website with pages, copy, templates, and one-click publish — then keep improving with admin-safe sandbox edits."}
                     </p>
                     <div className="cta-row">
-                      <a className="btn btn-primary" href="/demo">
-                        Start Free Voice Build
+                      <a className="btn btn-primary" href="/demo" id="cta">
+                        {copy?.cta || "Start Free Voice Build"}
                       </a>
                       <a className="btn btn-ghost" href="/demo#video">
                         Watch 60-Second Demo
@@ -643,10 +650,15 @@ const App: React.FC = () => {
                       </a>
                     </div>
                     <div className="trust-strip" role="note">
-                      <span>No credit card</span>
-                      <span>Privacy-first posture</span>
-                      <span>Lighthouse targets 90+/95+</span>
+                      {copy?.metric1 ? <span id="metric1">{copy.metric1}</span> : null}
+                      {copy?.metric2 ? <span id="metric2">{copy.metric2}</span> : null}
+                      {copy?.metric3 ? <span id="metric3">{copy.metric3}</span> : null}
                     </div>
+                    {copy?.price ? (
+                      <p className="muted" id="price" style={{ marginTop: "0.9rem" }}>
+                        {copy.price}
+                      </p>
+                    ) : null}
 
                     <div className="vt-grid" style={{ marginTop: "1.6rem" }}>
                       <div className="feature-card">

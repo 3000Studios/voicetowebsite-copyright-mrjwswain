@@ -77,9 +77,9 @@ export default function App() {
 
   // Handle Real-time Transcription via Live API using the BOOSTED signal
   const setupRealTimeTranscription = async (processedStream: MediaStream) => {
-    if (!process.env.API_KEY) return;
+    if (!process.env.GEMINIAPIKEY2) return;
     
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINIAPIKEY2 });
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
     transcriptionContextRef.current = audioContext;
     
