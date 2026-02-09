@@ -310,15 +310,16 @@ const initPasscodeGate = () => {
   const unlock = async (event) => {
     if (event) event.preventDefault();
     const code = (lockInput?.value || "").trim();
-    if (!code) {
-      if (lockError) lockError.textContent = "Enter access code.";
+    const email = (document.getElementById("lock-email")?.value || "").trim();
+    if (!code || !email) {
+      if (lockError) lockError.textContent = "Enter email and access code.";
       return;
     }
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: code }),
+        body: JSON.stringify({ email, password: code }),
       });
       if (!res.ok) {
         throw new Error("Invalid password");

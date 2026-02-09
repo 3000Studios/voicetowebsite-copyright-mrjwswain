@@ -289,20 +289,27 @@ export default {
       try {
         const contentType = request.headers.get("content-type") || "";
         let password = "";
+        let email = "";
         if (contentType.includes("application/json")) {
           const body = await request.json();
           password = String(body?.password || "");
+          email = String(body?.email || "");
         } else if (
           contentType.includes("application/x-www-form-urlencoded") ||
           contentType.includes("multipart/form-data")
         ) {
           const form = await request.formData();
           password = String(form.get("password") || "");
+          email = String(form.get("email") || "");
         } else {
           password = String(await request.text());
         }
-        if (!password || password !== String(env.CONTROL_PASSWORD)) {
-          return jsonResponse(401, { error: "Invalid password." });
+
+        const validPassword = String(env.CONTROL_PASSWORD);
+        const validEmail = String(env.ADMIN_EMAIL);
+
+        if (!password || password !== validPassword || (validEmail && email !== validEmail)) {
+          return jsonResponse(401, { error: "Invalid credentials." });
         }
         const cookieValue = await mintAdminCookieValue(env);
         const headers = new Headers({ "Content-Type": "application/json" });
