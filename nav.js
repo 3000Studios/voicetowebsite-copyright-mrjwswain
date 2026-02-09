@@ -203,28 +203,47 @@
     if (hasAdminAccess()) return navLinks;
     return navLinks.filter((link) => link.label !== "Admin");
   };
-  const buildLinkHtml = () => {
-    let links = getNavLinks()
+  // Admin was getting clipped off on mid-sized viewports because the nav bar
+  // had `overflow: hidden` and too many links in one row. Keep Admin pinned
+  // in a right-side "actions" area so it's always reachable.
+  const getPrimaryNavLinks = () => getNavLinks().filter((l) => l.label !== "Admin");
+  const getAdminNavLink = () => getNavLinks().find((l) => l.label === "Admin") || null;
+
+  const buildPrimaryLinksHtml = () =>
+    getPrimaryNavLinks()
       .map((link) => `<a href="${link.href}" data-name="${link.label}">${link.label}</a>`)
       .join("");
 
+  const buildActionsHtml = () => {
+    let html = "";
+    const admin = getAdminNavLink();
+    if (admin) html += `<a class="nav-admin-link" href="${admin.href}" data-name="${admin.label}">${admin.label}</a>`;
+
     if (hasAdminAccess()) {
-      const dropdownHtml = `
+      html += `
         <div class="nav-dropdown" aria-haspopup="true" aria-expanded="false">
-          <button class="nav-dropdown-trigger">Management ▾</button>
+          <button class="nav-dropdown-trigger" type="button">Management ▾</button>
           <div class="nav-dropdown-menu">
             ${adminLinks.map((l) => `<a href="${l.href}">${l.label}</a>`).join("")}
           </div>
         </div>
       `;
-      links += dropdownHtml;
     }
-    return links;
+    return html;
   };
-  const buildListHtml = () =>
-    getNavLinks()
-      .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
-      .join("");
+
+  const buildListHtml = () => {
+    // Mobile overlay: include primary links + Admin + management links when available.
+    const items = [];
+    getPrimaryNavLinks().forEach((link) => items.push(`<li><a href="${link.href}">${link.label}</a></li>`));
+    const admin = getAdminNavLink();
+    if (admin) items.push(`<li><a href="${admin.href}">${admin.label}</a></li>`);
+    if (hasAdminAccess()) {
+      items.push(`<li class="mobile-section"><span>Management</span></li>`);
+      adminLinks.forEach((l) => items.push(`<li><a href="${l.href}">${l.label}</a></li>`));
+    }
+    return items.join("");
+  };
   const clearExistingNav = () => {
     document.querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav").forEach((el) => el.remove());
     const skip = document.querySelector(".vtw-skip-link");
@@ -274,7 +293,7 @@
     toggle.setAttribute("aria-hidden", "true");
     const nav = document.createElement("nav");
     nav.className = "glass-nav";
-    nav.innerHTML = `      <div class="nav-video-mask" aria-hidden="true">        <video autoplay muted loop playsinline>          <source src="${navVideoSrc}" type="video/mp4" />        </video>      </div>      <div class="brand">        <span class="brand-dot"></span>        <span class="brand-name">VoiceToWebsite</span>      </div>      <div class="nav-links">        ${buildLinkHtml()}      </div>      <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">        <span></span>      </label>    `;
+    nav.innerHTML = `      <div class="nav-video-mask" aria-hidden="true">        <video autoplay muted loop playsinline>          <source src="${navVideoSrc}" type="video/mp4" />        </video>      </div>      <div class="brand">        <span class="brand-dot"></span>        <span class="brand-name">VoiceToWebsite</span>      </div>      <div class="nav-links">        ${buildPrimaryLinksHtml()}      </div>      <div class="nav-actions">        ${buildActionsHtml()}      </div>      <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">        <span></span>      </label>    `;
     const overlay = document.createElement("div");
     overlay.className = "mobile-overlay";
     overlay.id = "mobileOverlay";

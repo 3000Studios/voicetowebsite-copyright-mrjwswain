@@ -46,7 +46,7 @@ body {
   background: rgba(4, 6, 10, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(14px);
-  overflow: hidden;
+  overflow: visible;
   pointer-events: auto;
 }
 
@@ -95,6 +95,19 @@ body {
   z-index: 1;
   display: flex;
   gap: 1.4rem;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.glass-nav .nav-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 0 0 auto;
 }
 
 .glass-nav .nav-links a {
@@ -107,6 +120,28 @@ body {
     text-shadow 0.2s ease;
   text-decoration: none;
   pointer-events: auto;
+  white-space: nowrap;
+}
+
+.glass-nav .nav-admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.glass-nav .nav-admin-link:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
 }
 
 .glass-nav .nav-links a:hover,
@@ -199,9 +234,20 @@ body {
   .glass-nav .nav-links {
     display: none;
   }
+  .glass-nav .nav-actions {
+    display: none;
+  }
   .nav-toggle {
     display: inline-flex;
   }
+}
+
+.mobile-overlay .mobile-section {
+  opacity: 0.7;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  margin-top: 1rem;
 }
 
 /* Ionized admin lock modal */

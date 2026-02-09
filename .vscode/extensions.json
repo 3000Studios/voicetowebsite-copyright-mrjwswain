@@ -4,6 +4,9 @@
     "ms-vscode.vscode-typescript-next",
     "esbenp.prettier-vscode",
     "christian-kohler.path-intellisense",
-    "streetsidesoftware.code-spell-checker"
+    "streetsidesoftware.code-spell-checker",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "usernamehw.errorlens"
   ]
 }

@@ -1,10 +1,11 @@
 name = "voicetowebsite"
 compatibility_date = "2026-01-27"
-
-# Cloudflare Pages build output directory (so Pages does not warn about wrangler.toml)
-pages_build_output_dir = "dist"
+main = "worker.js"
 
 compatibility_flags = ["nodejs_compat"]
+
+# Static assets from Vite build output.
+assets = { directory = "dist", binding = "ASSETS" }
 
 [ai]
 binding = "AI"

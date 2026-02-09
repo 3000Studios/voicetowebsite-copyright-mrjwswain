@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { GeneratedCode, StylePreferences, ComponentType } from "../types";
+import { ComponentType, GeneratedCode, StylePreferences } from "../types";
 
 let ai: GoogleGenAI | null = null;
 
@@ -43,7 +43,7 @@ export const analyzeSource = async (
   `;
 
   const config = {
-    model: "gemini-3-pro-preview",
+    model: "gemini-2.0-flash-exp",
     contents: isUrl
       ? prompt
       : {
@@ -96,7 +96,7 @@ export const forgeWebsite = async (
   `;
 
   const response = await getAi().models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: "gemini-2.0-flash-exp",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -122,7 +122,7 @@ export const refineCode = async (currentHtml: string, instructions: string): Pro
   `;
 
   const response = await getAi().models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: "gemini-2.0-flash-exp",
     contents: { parts: [{ text: currentHtml }, { text: prompt }] },
     config: {
       responseMimeType: "application/json",
@@ -151,7 +151,7 @@ export const enhanceCode = async (currentHtml: string): Promise<GeneratedCode> =
   `;
 
   const response = await getAi().models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: "gemini-2.0-flash-exp",
     contents: { parts: [{ text: currentHtml }, { text: prompt }] },
     config: {
       responseMimeType: "application/json",

@@ -1,7 +1,18 @@
 import fs from "fs";
 import path from "path";
 
-const SITE_URL = "https://voicetowebsite.com";
+const normalizeSiteUrl = (value) => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    return url.origin;
+  } catch (_) {
+    return raw.replace(/\/+$/, "");
+  }
+};
+
+const SITE_URL = normalizeSiteUrl(process.env.SITE_URL || process.env.PUBLIC_SITE_URL) || "https://voicetowebsite.com";
 const ROOT_DIR = process.cwd();
 const PUBLIC_DIR = path.join(ROOT_DIR, "public");
 
