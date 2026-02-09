@@ -347,6 +347,34 @@ export default {
       return addSecurityHeaders(await handleBotHubRequest({ request, env, ctx }));
     }
 
+    // Bot status feed for the voice command center UI.
+    // Keeps payload small and tolerates missing tables.
+    if (url.pathname === "/api/bots/status" && request.method === "GET") {
+      if (!env.D1) {
+        return jsonResponse(503, { error: "D1 database not available." });
+      }
+      try {
+        const commandsRes = await env.D1.prepare(
+          "SELECT id, ts, command, actions, files, deployment_status FROM commands ORDER BY ts DESC LIMIT 5"
+        ).all();
+        let builds = [];
+        try {
+          const buildsRes = await env.D1.prepare(
+            "SELECT id, ts, status, message FROM builds ORDER BY ts DESC LIMIT 5"
+          ).all();
+          builds = buildsRes.results || [];
+        } catch (_) {
+          builds = [];
+        }
+        return jsonResponse(200, {
+          commands: commandsRes.results || [],
+          builds,
+        });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
+    }
+
     // Orchestrator API (primary: /api/orchestrator; legacy: /.netlify/functions/orchestrator)
     if (url.pathname === "/api/orchestrator" || url.pathname === "/.netlify/functions/orchestrator") {
       const hasAdmin = await hasValidAdminCookie(request, env);
