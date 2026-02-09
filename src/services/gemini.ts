@@ -7,7 +7,7 @@ export const generateSiteMod = async (prompt: string) => {
   }
   const ai = new GoogleGenAI({ apiKey: apiKey as string });
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash-exp",
+    model: import.meta.env.VITE_GEMINI_MODEL || "gemini-2.0-flash-exp",
     contents:
       `The user wants to modify the cinematic interface atmosphere. Prompt: "${prompt}". Provide a poetic, cinematic description of this new theme and a hex color code.` as any,
     config: {

@@ -43,7 +43,7 @@ export const analyzeSource = async (
   `;
 
   const config = {
-    model: "gemini-2.0-flash-exp",
+    model: import.meta.env.VITE_GEMINI_MODEL || "gemini-2.0-flash-exp",
     contents: isUrl
       ? prompt
       : {

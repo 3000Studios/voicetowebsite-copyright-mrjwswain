@@ -25,7 +25,7 @@ export const getAiSuggestions = async (currentTasks: ProjectTask[]) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
+      model: import.meta.env.VITE_GEMINI_MODEL || "gemini-2.0-flash-exp",
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION + " Return exactly 3 suggestions with titles, descriptions, estimated costs, estimated hours, and categories.",
