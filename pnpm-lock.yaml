@@ -20,6 +20,9 @@ importers:
         specifier: ^19.2.3
         version: 19.2.4(react@19.2.4)
     devDependencies:
+      "@cloudflare/kv-asset-handler":
+        specifier: ^0.4.2
+        version: 0.4.2
       "@cloudflare/workers-types":
         specifier: ^4.20250109.0
         version: 4.20260207.0
@@ -34,7 +37,7 @@ importers:
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       "@types/node":
         specifier: ^22.19.7
-        version: 22.19.9
+        version: 22.19.10
       "@types/react":
         specifier: ^19.0.5
         version: 19.2.13
@@ -43,7 +46,7 @@ importers:
         version: 19.2.3(@types/react@19.2.13)
       "@vitejs/plugin-react":
         specifier: ^5.1.2
-        version: 5.1.3(vite@7.3.1(@types/node@22.19.9)(yaml@2.8.2))
+        version: 5.1.3(vite@7.3.1(@types/node@22.19.10)(yaml@2.8.2))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -61,12 +64,12 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^7.3.1
-        version: 7.3.1(@types/node@22.19.9)(yaml@2.8.2)
+        version: 7.3.1(@types/node@22.19.10)(yaml@2.8.2)
       vitest:
         specifier: ^4.0.18
-        version: 4.0.18(@types/node@22.19.9)(jsdom@27.4.0)(yaml@2.8.2)
+        version: 4.0.18(@types/node@22.19.10)(jsdom@27.4.0)(yaml@2.8.2)
       wrangler:
-        specifier: ^4.59.2
+        specifier: ^4.63.0
         version: 4.63.0(@cloudflare/workers-types@4.20260207.0)
 
 packages:
@@ -1155,9 +1158,9 @@ packages:
     resolution:
       { integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w== }
 
-  "@types/node@22.19.9":
+  "@types/node@22.19.10":
     resolution:
-      { integrity: sha512-PD03/U8g1F9T9MI+1OBisaIARhSzeidsUjQaf51fOxrfjeiKN9bLVO06lHuHYjxdnqLWJijJHfqXPSJri2EM2A== }
+      { integrity: sha512-tF5VOugLS/EuDlTBijk0MqABfP8UxgYazTLo3uIn3b4yJgg26QRbVYJYsDtHrjdDUIRfP70+VfhTTc+CE1yskw== }
 
   "@types/react-dom@19.2.3":
     resolution:
@@ -2990,7 +2993,7 @@ snapshots:
 
   "@types/estree@1.0.8": {}
 
-  "@types/node@22.19.9":
+  "@types/node@22.19.10":
     dependencies:
       undici-types: 6.21.0
 
@@ -3002,7 +3005,7 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  "@vitejs/plugin-react@5.1.3(vite@7.3.1(@types/node@22.19.9)(yaml@2.8.2))":
+  "@vitejs/plugin-react@5.1.3(vite@7.3.1(@types/node@22.19.10)(yaml@2.8.2))":
     dependencies:
       "@babel/core": 7.29.0
       "@babel/plugin-transform-react-jsx-self": 7.27.1(@babel/core@7.29.0)
@@ -3010,7 +3013,7 @@ snapshots:
       "@rolldown/pluginutils": 1.0.0-rc.2
       "@types/babel__core": 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.1(@types/node@22.19.9)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@22.19.10)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -3023,13 +3026,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.0.3
 
-  "@vitest/mocker@4.0.18(vite@7.3.1(@types/node@22.19.9)(yaml@2.8.2))":
+  "@vitest/mocker@4.0.18(vite@7.3.1(@types/node@22.19.10)(yaml@2.8.2))":
     dependencies:
       "@vitest/spy": 4.0.18
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.1(@types/node@22.19.9)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@22.19.10)(yaml@2.8.2)
 
   "@vitest/pretty-format@4.0.18":
     dependencies:
@@ -3602,7 +3605,7 @@ snapshots:
       "@protobufjs/path": 1.1.2
       "@protobufjs/pool": 1.1.0
       "@protobufjs/utf8": 1.1.0
-      "@types/node": 22.19.9
+      "@types/node": 22.19.10
       long: 5.3.2
 
   punycode@2.3.1: {}
@@ -3819,7 +3822,7 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
-  vite@7.3.1(@types/node@22.19.9)(yaml@2.8.2):
+  vite@7.3.1(@types/node@22.19.10)(yaml@2.8.2):
     dependencies:
       esbuild: 0.27.3
       fdir: 6.5.0(picomatch@4.0.3)
@@ -3828,14 +3831,14 @@ snapshots:
       rollup: 4.57.1
       tinyglobby: 0.2.15
     optionalDependencies:
-      "@types/node": 22.19.9
+      "@types/node": 22.19.10
       fsevents: 2.3.3
       yaml: 2.8.2
 
-  vitest@4.0.18(@types/node@22.19.9)(jsdom@27.4.0)(yaml@2.8.2):
+  vitest@4.0.18(@types/node@22.19.10)(jsdom@27.4.0)(yaml@2.8.2):
     dependencies:
       "@vitest/expect": 4.0.18
-      "@vitest/mocker": 4.0.18(vite@7.3.1(@types/node@22.19.9)(yaml@2.8.2))
+      "@vitest/mocker": 4.0.18(vite@7.3.1(@types/node@22.19.10)(yaml@2.8.2))
       "@vitest/pretty-format": 4.0.18
       "@vitest/runner": 4.0.18
       "@vitest/snapshot": 4.0.18
@@ -3852,10 +3855,10 @@ snapshots:
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.3.1(@types/node@22.19.9)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@22.19.10)(yaml@2.8.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      "@types/node": 22.19.9
+      "@types/node": 22.19.10
       jsdom: 27.4.0
     transitivePeerDependencies:
       - jiti
