@@ -4,8 +4,10 @@ on:
   push:
     branches-ignore:
       - main
-  pull_request: {}
-  workflow_dispatch: {}
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
   schedule:
     - cron: "0 9 * * 1" # Mondays 09:00 UTC
 
@@ -15,18 +17,44 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Setup Node
+    steps:
+      # -------------------------
+      # Checkout (full history)
+      # -------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # -------------------------
+      # Node (PINNED, NO .nvmrc)
+      # -------------------------
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version: 20
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      # -------------------------
+      # Hard fail if lockfile missing
+      # -------------------------
+      - name: Validate lockfile
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "❌ package-lock.json is required for CI"
+            exit 1
+          fi
 
+      # -------------------------
+      # Deterministic install
+      # -------------------------
+      - name: Install dependencies
+        run: |
+          npm ci --no-audit --no-fund
+
+      # -------------------------
+      # Verify / lint / test
+      # -------------------------
       - name: Verify
         run: npm run verify
