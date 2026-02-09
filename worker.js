@@ -2,6 +2,7 @@ import {
   clearAdminCookieHeaders,
   hasValidAdminCookie,
   isAdminEnabled,
+  isAdminRequest,
   mintAdminCookieValue,
   setAdminCookieHeaders,
 } from "./functions/adminAuth.js";
@@ -348,6 +349,12 @@ export default {
       if (request.method !== "POST") {
         return jsonResponse(405, { error: "Method not allowed." });
       }
+
+      const isAdmin = await isAdminRequest(request, env);
+      if (!isAdmin) {
+        return jsonResponse(401, { error: "Unauthorized. Admin access required." });
+      }
+
       // Delegate to the Cloudflare function implementation for orchestration.
       const res = await handleOrchestrator({ request, env, ctx });
       return addSecurityHeaders(res);
