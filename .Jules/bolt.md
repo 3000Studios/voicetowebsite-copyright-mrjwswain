@@ -1,4 +1,4 @@
-## 2024-05-23 - Avoiding Layout Thrashing in Animation Loops
+## 2025-02-19 - Missing Tailwind Configuration
 
-**Learning:** `getComputedStyle` and DOM property reads (like `clientWidth`) force the browser to recalculate styles and layout. Doing this inside a `requestAnimationFrame` loop (60fps) causes significant performance degradation ("layout thrashing").
-**Action:** Move style and layout reads outside the animation loop. Use observers (`MutationObserver`, `ResizeObserver`) to detect changes and update cached values. Only use the cached values inside the `draw` loop.
+**Learning:** The project uses Tailwind utility classes (e.g., `w-48`, `h-48`) in `App.tsx` but lacks `tailwindcss` dependency and configuration. This results in broken layout (elements defaulting to browser defaults) in dev/build environments.
+**Action:** When working on UI in this repo, verify if utility classes are actually applying styles. For performance tasks, focus on logical structure and React render cycles rather than visual fidelity if the style system is broken.
