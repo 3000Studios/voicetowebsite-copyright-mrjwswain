@@ -905,10 +905,12 @@ const App: React.FC = () => {
               {(Object.keys(useCases) as Array<keyof typeof useCases>).map((key) => (
                 <button
                   key={key}
+                  id={`tab-${key}`}
                   type="button"
                   className={`pill-toggle ${activeUseCase === key ? "is-active" : ""}`}
                   role="tab"
                   aria-selected={activeUseCase === key}
+                  aria-controls="use-cases-panel"
                   onClick={() => setActiveUseCase(key)}
                 >
                   {useCases[key].label}
@@ -916,7 +918,14 @@ const App: React.FC = () => {
               ))}
             </div>
 
-            <div className="vt-grid" style={{ marginTop: "1rem" }}>
+            <div
+              id="use-cases-panel"
+              role="tabpanel"
+              aria-labelledby={`tab-${activeUseCase}`}
+              tabIndex={0}
+              className="vt-grid"
+              style={{ marginTop: "1rem" }}
+            >
               <article className="feature-card">
                 <h3>{active.label} wins</h3>
                 <ul className="preview-list">
