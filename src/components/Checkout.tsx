@@ -1,5 +1,5 @@
+import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface CheckoutProps {
   items: Array<{
@@ -138,7 +138,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
   }, [items, onClose, paymentMethod, total, paypalClientId]);
 
   return (
-    <div className="checkout-modal">
+    <div className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
       <style>{`
         .checkout-modal {
           position: fixed;
@@ -407,7 +407,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
           </div>
         ) : (
           <>
-            <h2 id="checkout-title" className="checkout-title">
+            <h2 className="checkout-title" id="checkout-title">
               Checkout
             </h2>
 
@@ -457,11 +457,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   exit={{ opacity: 0, y: -20 }}
                 >
                   <div className="form-group">
-                    <label htmlFor="email" className="form-label">
+                    <label className="form-label" htmlFor="email-input">
                       Email
                     </label>
                     <input
-                      id="email"
+                      id="email-input"
                       type="email"
                       className="form-input"
                       placeholder="your@email.com"
@@ -471,11 +471,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="cardholder-name" className="form-label">
+                    <label className="form-label" htmlFor="name-input">
                       Cardholder Name
                     </label>
                     <input
-                      id="cardholder-name"
+                      id="name-input"
                       type="text"
                       className="form-input"
                       placeholder="John Doe"
@@ -485,11 +485,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="card-number" className="form-label">
+                    <label className="form-label" htmlFor="card-input">
                       Card Number
                     </label>
                     <input
-                      id="card-number"
+                      id="card-input"
                       type="text"
                       className="form-input"
                       placeholder="1234 5678 9012 3456"
@@ -500,11 +500,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="expiry-date" className="form-label">
+                      <label className="form-label" htmlFor="expiry-input">
                         Expiry Date
                       </label>
                       <input
-                        id="expiry-date"
+                        id="expiry-input"
                         type="text"
                         className="form-input"
                         placeholder="MM/YY"
@@ -514,11 +514,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                       />
                     </div>
                     <div className="form-group">
-                      <label htmlFor="cvc" className="form-label">
+                      <label className="form-label" htmlFor="cvc-input">
                         CVC
                       </label>
                       <input
-                        id="cvc"
+                        id="cvc-input"
                         type="text"
                         className="form-input"
                         placeholder="123"
