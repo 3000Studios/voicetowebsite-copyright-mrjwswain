@@ -409,6 +409,19 @@ const App: React.FC = () => {
 
   const active = useCases[activeUseCase];
 
+  const tabsRef = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  useEffect(() => {
+    // If focus is currently within the tab list, move it to the new active tab.
+    // This handles keyboard navigation (Arrow keys) while respecting mouse users.
+    const currentFocus = document.activeElement;
+    const isTabFocused = Object.values(tabsRef.current).some((el) => el === currentFocus);
+
+    if (isTabFocused && tabsRef.current[activeUseCase]) {
+      tabsRef.current[activeUseCase]?.focus();
+    }
+  }, [activeUseCase]);
+
   const seedDemoPrompt = (prompt: string) => {
     setTryPrompt(prompt);
     try {
@@ -905,6 +918,9 @@ const App: React.FC = () => {
               {(Object.keys(useCases) as Array<keyof typeof useCases>).map((key) => (
                 <button
                   key={key}
+                  ref={(el) => {
+                    if (el) tabsRef.current[key] = el;
+                  }}
                   type="button"
                   className={`pill-toggle ${activeUseCase === key ? "is-active" : ""}`}
                   role="tab"

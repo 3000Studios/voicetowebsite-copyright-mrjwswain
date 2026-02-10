@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import App from "./App";
 
@@ -67,5 +67,28 @@ describe("App Accessibility - Use Cases", () => {
       expect(tabId).toBeTruthy();
       expect(panel).toHaveAttribute("aria-labelledby", tabId);
     }
+  });
+
+  it("should move focus when navigating tabs with arrow keys", async () => {
+    render(<App />);
+
+    const tabs = screen.getAllByRole("tab");
+    const firstTab = tabs[0];
+    const secondTab = tabs[1];
+
+    // Simulate user focusing the first tab
+    firstTab.focus();
+    expect(document.activeElement).toBe(firstTab);
+
+    // Press ArrowRight
+    fireEvent.keyDown(firstTab, { key: "ArrowRight", code: "ArrowRight" });
+
+    // Wait for effect to run
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // Expect focus to have moved to the second tab
+    expect(document.activeElement).toBe(secondTab);
   });
 });

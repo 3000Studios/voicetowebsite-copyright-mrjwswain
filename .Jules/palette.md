@@ -7,3 +7,8 @@
 
 **Learning:** Placing interactive text overlays directly inside interactive cards (e.g., a video background that acts as a link) creates nested focusable areas, confusing screen readers and keyboard navigation.
 **Action:** Decouple these into sibling elements within a parent container. Use absolute positioning to visually layer them while keeping the DOM structure flat and sequentially navigable.
+
+## 2025-02-18 - Tab Focus Management
+
+**Learning:** In custom React tab components, updating the active tab state via keyboard doesn't automatically move focus to the new tab, leaving the user stranded on an inactive (and often non-focusable) element.
+**Action:** Use `useEffect` and `useRef` to programmatically move focus to the active tab when `document.activeElement` is within the tab group.
