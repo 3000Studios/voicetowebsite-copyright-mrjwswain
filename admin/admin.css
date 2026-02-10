@@ -632,6 +632,40 @@ body {
   border-color: rgba(255, 255, 255, 0.22);
 }
 
+.admin-subnav .nav-dropdown {
+  height: auto;
+}
+
+/* Make the injected "Management" dropdown match the pill subnav links. */
+.admin-subnav .nav-dropdown-trigger {
+  background: none;
+  color: transparent;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  font-size: calc(0.9rem * 0.8);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.admin-subnav .nav-dropdown-trigger:hover,
+.admin-subnav .nav-dropdown:hover .nav-dropdown-trigger,
+.admin-subnav .nav-dropdown.is-open .nav-dropdown-trigger {
+  color: #fff;
+  -webkit-text-stroke-color: transparent;
+  border-color: rgba(255, 255, 255, 0.22);
+  text-shadow: none;
+}
+
+.admin-subnav .nav-dropdown-menu {
+  top: calc(100% + 0.35rem);
+  right: auto;
+  left: 0;
+  width: 220px;
+  z-index: 500;
+}
+
 .status-grid {
   display: grid;
   gap: 1rem;

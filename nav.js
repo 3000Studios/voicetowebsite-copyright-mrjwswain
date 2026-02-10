@@ -10,7 +10,7 @@ import siteConfig from "./src/site-config.json";
     { id: "ocean", label: "Ocean" },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
-  document.documentElement.dataset.navVersion = "2026-02-09-01";
+  document.documentElement.dataset.navVersion = "2026-02-10-01";
 
   const isShellDisabled = () => {
     try {
@@ -51,13 +51,13 @@ import siteConfig from "./src/site-config.json";
   ];
 
   const adminLinks = [
-    { href: "/admin/index", label: "Dashboard" },
-    { href: "/admin/store-manager", label: "Store Manager" },
-    { href: "/admin/app-store-manager", label: "App Store" },
-    { href: "/admin/analytics", label: "Analytics" },
-    { href: "/admin/live-stream", label: "Live Stream" },
-    { href: "/admin/voice-commands", label: "Voice Commands" },
-    { href: "/admin/bot-command-center", label: "Bot Command Center" },
+    { href: "/admin/", label: "Dashboard" },
+    { href: "/admin/store-manager.html", label: "Store Manager" },
+    { href: "/admin/app-store-manager.html", label: "App Store Manager" },
+    { href: "/admin/analytics.html", label: "Analytics" },
+    { href: "/admin/live-stream.html", label: "Live Stream" },
+    { href: "/admin/voice-commands.html", label: "Voice Commands" },
+    { href: "/admin/bot-command-center.html", label: "Bot Command Center" },
   ];
 
   const footerLinks = {
@@ -198,13 +198,36 @@ import siteConfig from "./src/site-config.json";
 
   const playHover = () => SoundEngine.play("hover");
   const playClick = () => SoundEngine.play("click");
+  const ADMIN_UNLOCK_KEY = "yt-admin-unlocked";
+  const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+  const ADMIN_SESSION_TTL_MS = 1000 * 60 * 60 * 2;
+  const hasAdminCookie = () => {
+    try {
+      return document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+    } catch (_) {
+      return false;
+    }
+  };
+  const isAdminSessionFresh = () => {
+    try {
+      const ts = Number(sessionStorage.getItem(ADMIN_UNLOCK_TS_KEY) || 0);
+      if (!ts) return false;
+      return Date.now() - ts < ADMIN_SESSION_TTL_MS;
+    } catch (_) {
+      return false;
+    }
+  };
   const hasAdminAccess = () => {
-    return true;
+    // Keep "Management" out of the global navigation. Only show it in the admin subnav
+    // after the user has successfully unlocked (cookie + sessionStorage gate).
+    if (!isAdminPage()) return false;
+    try {
+      return hasAdminCookie() && sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "true" && isAdminSessionFresh();
+    } catch (_) {
+      return false;
+    }
   };
-  const getNavLinks = () => {
-    if (hasAdminAccess()) return navLinks;
-    return navLinks.filter((link) => link.label !== "Admin");
-  };
+  const getNavLinks = () => navLinks;
   // Admin was getting clipped off on mid-sized viewports because the nav bar
   // had `overflow: hidden` and too many links in one row. Keep Admin pinned
   // in a right-side "actions" area so it's always reachable.
@@ -220,31 +243,72 @@ import siteConfig from "./src/site-config.json";
     let html = "";
     const admin = getAdminNavLink();
     if (admin) html += `<a class="nav-admin-link" href="${admin.href}" data-name="${admin.label}">${admin.label}</a>`;
-
-    if (hasAdminAccess()) {
-      html += `
-        <div class="nav-dropdown" aria-haspopup="true" aria-expanded="false">
-          <button class="nav-dropdown-trigger" type="button">Management ▾</button>
-          <div class="nav-dropdown-menu">
-            ${adminLinks.map((l) => `<a href="${l.href}">${l.label}</a>`).join("")}
-          </div>
-        </div>
-      `;
-    }
     return html;
   };
 
   const buildListHtml = () => {
-    // Mobile overlay: include primary links + Admin + management links when available.
+    // Mobile overlay: include primary links + Admin.
     const items = [];
     getPrimaryNavLinks().forEach((link) => items.push(`<li><a href="${link.href}">${link.label}</a></li>`));
     const admin = getAdminNavLink();
     if (admin) items.push(`<li><a href="${admin.href}">${admin.label}</a></li>`);
-    if (hasAdminAccess()) {
-      items.push(`<li class="mobile-section"><span>Management</span></li>`);
-      adminLinks.forEach((l) => items.push(`<li><a href="${l.href}">${l.label}</a></li>`));
-    }
     return items.join("");
+  };
+
+  const ensureAdminSubnavManagement = () => {
+    try {
+      if (!isAdminPage()) return;
+      const subnav = document.querySelector(".admin-subnav");
+      if (!subnav) return;
+      if (document.getElementById("vtw-admin-management")) return;
+
+      const wrap = document.createElement("div");
+      wrap.id = "vtw-admin-management";
+      wrap.className = "nav-dropdown admin-subnav-dropdown";
+      wrap.hidden = true;
+      wrap.innerHTML = `
+        <button class="nav-dropdown-trigger" type="button" aria-expanded="false">Management ▾</button>
+        <div class="nav-dropdown-menu">
+          ${adminLinks.map((l) => `<a href="${l.href}">${l.label}</a>`).join("")}
+        </div>
+      `;
+      subnav.appendChild(wrap);
+
+      const trigger = wrap.querySelector(".nav-dropdown-trigger");
+      const close = () => {
+        wrap.classList.remove("is-open");
+        trigger?.setAttribute("aria-expanded", "false");
+      };
+      trigger?.addEventListener("click", (e) => {
+        e.preventDefault();
+        const open = !wrap.classList.contains("is-open");
+        wrap.classList.toggle("is-open", open);
+        trigger.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      document.addEventListener("click", (e) => {
+        if (!wrap.classList.contains("is-open")) return;
+        if (wrap.contains(e.target)) return;
+        close();
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        close();
+      });
+
+      // If the user unlocks after page load, reveal it.
+      const update = () => {
+        wrap.hidden = !hasAdminAccess();
+      };
+      update();
+      if (wrap.hidden) {
+        let tries = 0;
+        const timer = window.setInterval(() => {
+          tries += 1;
+          update();
+          if (!wrap.hidden || tries >= 60) window.clearInterval(timer);
+        }, 500);
+      }
+    } catch (_) {}
   };
   const clearExistingNav = () => {
     document.querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav").forEach((el) => el.remove());
@@ -933,6 +997,7 @@ import siteConfig from "./src/site-config.json";
       maybeInjectAdsense();
     }
 
+    ensureAdminSubnavManagement();
     maybeInitAdminTerminalFix();
   };
   const maybeInitAdminTerminalFix = () => {
