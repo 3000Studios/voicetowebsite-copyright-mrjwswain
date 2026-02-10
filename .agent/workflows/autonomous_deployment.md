@@ -1,22 +1,41 @@
 ---
-description: Fully automate the project build, verify, and deploy pipeline
+description: Fully automate the project build, verify, and deploy pipeline (Cloudflare Workers)
 ---
 
-This workflow automates the entire deployment process.
-It performs the following steps:
+# Production Deployment Flow (The TRUTH)
 
-1.  **Format & Lint**: Ensures code quality.
-2.  **Smash UI Unification**: Applies the design system to all HTML files.
-3.  **Verify**: Runs tests and type checks.
-4.  **Version Control**: Commits all changes with a timestamp.
-5.  **Push**: Pushes changes to the remote repository.
-6.  **Deploy**: Deploys the application to production (Cloudflare Pages).
+**TRUTH**: GitHub Actions deploy is disabled. We deploy from the local machine via Wrangler.
+`wrangler.toml` routes `voicetowebsite.com/*` to the Worker.
 
-To run this workflow, execute the following command in your terminal:
+## Manual Deployment Steps
 
-```powershell
-.\automate_all.ps1
+1. **Verify locally**:
+
+   ```bash
+   npm run verify
+   ```
+
+2. **Deploy to Cloudflare**:
+   (Builds then runs `wrangler deploy`)
+   ```bash
+   npm run deploy
+   ```
+
+## "Auto everything" loop
+
+(Watch/Verify/Commit/Push/Deploy)
+
+```bash
+npm run auto:ship
+```
+
+## Local Development
+
+(Runs site + worker dev together)
+
+```bash
+npm run dev:all
 ```
 
 // turbo
-.\automate_all.ps1
+npm run deploy

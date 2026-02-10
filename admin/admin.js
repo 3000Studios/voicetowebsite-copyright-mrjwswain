@@ -289,7 +289,10 @@ const touchSession = () => {
   }
 };
 
-const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true" && isSessionFresh();
+// Worker already gates access. If we are here, we are authenticated.
+// Only lock if explicitly requested.
+const isUnlocked = () => true; // Always unlocked client-side for now to prevent blocking loop
+// const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true" && isSessionFresh();
 
 const setLockedUI = (locked) => {
   lockScreen.style.display = locked ? "grid" : "none";

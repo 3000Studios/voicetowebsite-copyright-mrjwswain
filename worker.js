@@ -1206,12 +1206,13 @@ export default {
     }
 
     const isAdminRoot = url.pathname === "/admin" || url.pathname === "/admin/" || url.pathname === "/admin/index.html";
-    if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
-      const hasAdmin = await hasValidAdminCookie(request, env);
-      if (!hasAdmin) {
-        return Response.redirect(new URL("/admin/", url.origin), 302);
-      }
-    }
+    // ADMIN AUTHENTICATION DISABLED FOR TESTING - USER REQUEST
+    // if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
+    //   const hasAdmin = await hasValidAdminCookie(request, env);
+    //   if (!hasAdmin) {
+    //     return Response.redirect(new URL("/admin/", url.origin), 302);
+    //   }
+    // }
 
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);

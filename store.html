@@ -281,7 +281,9 @@
     <script src="https://js.stripe.com/v3"></script>
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <script>
-      const PAYPAL_CLIENT = "__PAYPAL_CLIENT_ID__";
+      const PAYPAL_CLIENT =
+        (window.__ENV && window.__ENV.PAYPAL_CLIENT_ID) ||
+        (String("__PAYPAL_CLIENT_ID__").startsWith("__") ? "" : "__PAYPAL_CLIENT_ID__");
       const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
       const STRIPE_LINKS = {
         starter: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_STARTER) || "",
@@ -323,12 +325,19 @@
         const amount = btn.dataset.amount;
         const product = btn.dataset.product;
         const label = btn.dataset.label || product;
-        if (PAYPAL_CLIENT === "__PAYPAL_CLIENT_ID__") {
+        if (!PAYPAL_CLIENT || String(PAYPAL_CLIENT).startsWith("__")) {
           alert("PayPal client ID missing. Configure PAYPAL_CLIENT_ID to enable checkout.");
           return;
         }
-        if (!window.paypal || typeof window.paypal.Buttons !== "function") {
-          alert("PayPal SDK not loaded.");
+        if (!window.paypal) {
+          if (!PAYPAL_CLIENT) {
+            alert("PayPal client ID missing (env var not set).");
+            return;
+          }
+          const script = document.createElement("script");
+          script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT}&currency=USD`;
+          script.onload = () => handlePayPal(btn);
+          document.head.appendChild(script);
           return;
         }
 

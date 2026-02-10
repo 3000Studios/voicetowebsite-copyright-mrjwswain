@@ -1151,4 +1151,36 @@ import siteConfig from "./src/site-config.json";
   } else {
     init();
   }
+
+  /* Music Autoplay */
+  const ensureMusic = () => {
+    if (document.getElementById("vtw-bg-music")) return;
+    const audio = document.createElement("audio");
+    audio.id = "vtw-bg-music";
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.src =
+      "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=ambient-piano-10785.mp3";
+    document.body.appendChild(audio);
+
+    const play = () => {
+      audio.play().catch(() => {
+        console.log("Autoplay blocked. Waiting for interaction.");
+        const unlock = () => {
+          audio.play();
+          document.removeEventListener("click", unlock);
+          document.removeEventListener("keydown", unlock);
+        };
+        document.addEventListener("click", unlock);
+        document.addEventListener("keydown", unlock);
+      });
+    };
+    // Attempt immediate play
+    play();
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ensureMusic);
+  } else {
+    ensureMusic();
+  }
 })();

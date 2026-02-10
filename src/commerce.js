@@ -1,12 +1,12 @@
-const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
-const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || (window.__ENV && window.__ENV.PAYPAL_CLIENT_ID);
+const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || (window.__ENV && window.__ENV.STRIPE_PUBLISHABLE_KEY);
 
 export const checkCredentials = () => {
   if (!PAYPAL_CLIENT_ID) {
-    console.warn("VITE_PAYPAL_CLIENT_ID is missing in .env");
+    console.warn("VITE_PAYPAL_CLIENT_ID is missing in .env and window.__ENV");
   }
   if (!STRIPE_PK) {
-    console.warn("VITE_STRIPE_PUBLISHABLE_KEY is missing in .env");
+    console.warn("VITE_STRIPE_PUBLISHABLE_KEY is missing in .env and window.__ENV");
   }
 };
 
