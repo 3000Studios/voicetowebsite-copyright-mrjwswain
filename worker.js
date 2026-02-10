@@ -1063,6 +1063,148 @@ export default {
       }
     }
 
+    // PayPal Webhook Handler (signature-verified)
+    // Route: POST /api/paypal-webhook
+    // IMPORTANT: PayPal webhooks MUST be signature-verified. Otherwise, anyone can spoof payments.
+    if (url.pathname === "/api/paypal-webhook" && request.method === "POST") {
+      try {
+        const mode = getPayPalMode(env);
+        const webhookId = String(
+          (mode === "live" ? env.PAYPAL_WEBHOOK_ID_PROD : env.PAYPAL_WEBHOOK_ID) ||
+            env.PAYPAL_WEBHOOK_ID_PROD ||
+            env.PAYPAL_WEBHOOK_ID ||
+            ""
+        ).trim();
+        if (!webhookId) {
+          return jsonResponse(501, {
+            error: "PayPal webhook not configured. Set PAYPAL_WEBHOOK_ID (sandbox) or PAYPAL_WEBHOOK_ID_PROD (live).",
+          });
+        }
+
+        const bodyText = await request.text();
+        let payload = {};
+        try {
+          payload = bodyText ? JSON.parse(bodyText) : {};
+        } catch (_) {
+          return jsonResponse(400, { error: "Invalid JSON body." });
+        }
+
+        const transmissionId = request.headers.get("PAYPAL-TRANSMISSION-ID") || "";
+        const transmissionTime = request.headers.get("PAYPAL-TRANSMISSION-TIME") || "";
+        const transmissionSig = request.headers.get("PAYPAL-TRANSMISSION-SIG") || "";
+        const certUrl = request.headers.get("PAYPAL-CERT-URL") || "";
+        const authAlgo = request.headers.get("PAYPAL-AUTH-ALGO") || "";
+
+        if (!transmissionId || !transmissionTime || !transmissionSig || !certUrl || !authAlgo) {
+          return jsonResponse(400, { error: "Missing PayPal signature headers." });
+        }
+
+        const verifyRes = await paypalApiFetch(env, "/v1/notifications/verify-webhook-signature", {
+          method: "POST",
+          body: JSON.stringify({
+            auth_algo: authAlgo,
+            cert_url: certUrl,
+            transmission_id: transmissionId,
+            transmission_sig: transmissionSig,
+            transmission_time: transmissionTime,
+            webhook_id: webhookId,
+            webhook_event: payload,
+          }),
+        });
+        const verifyData = await verifyRes.json().catch(() => ({}));
+        if (!verifyRes.ok) {
+          const detail =
+            verifyData?.message || verifyData?.details?.[0]?.description || "PayPal signature verify failed.";
+          return jsonResponse(verifyRes.status || 500, { error: detail });
+        }
+
+        const status = String(verifyData?.verification_status || "").toUpperCase();
+        if (status !== "SUCCESS") {
+          return jsonResponse(401, { error: "Invalid webhook signature." });
+        }
+
+        const eventId = String(payload?.id || crypto.randomUUID());
+        const eventType = String(payload?.event_type || "");
+        const resource = payload?.resource || {};
+
+        const resourceId = String(resource?.id || "");
+        const resourceStatus = String(resource?.status || payload?.summary || "");
+        const email =
+          String(
+            resource?.payer?.email_address || resource?.subscriber?.email_address || resource?.email_address || ""
+          ) || "";
+
+        const amountValue =
+          Number(resource?.amount?.value) ||
+          Number(resource?.purchase_units?.[0]?.amount?.value) ||
+          Number(resource?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value) ||
+          0;
+        const currencyCode =
+          String(
+            resource?.amount?.currency_code ||
+              resource?.purchase_units?.[0]?.amount?.currency_code ||
+              resource?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code ||
+              "USD"
+          ) || "USD";
+
+        // Extract related order id for capture events where possible.
+        const relatedOrderId = String(
+          resource?.supplementary_data?.related_ids?.order_id || resource?.invoice_id || resourceId || ""
+        ).trim();
+
+        // Persist minimal audit record.
+        if (env.D1) {
+          try {
+            await env.D1.prepare(
+              `CREATE TABLE IF NOT EXISTS paypal_webhook_events (
+                 id TEXT PRIMARY KEY,
+                 event_type TEXT,
+                 resource_id TEXT,
+                 related_order_id TEXT,
+                 status TEXT,
+                 amount REAL,
+                 currency TEXT,
+                 email TEXT,
+                 ts DATETIME DEFAULT CURRENT_TIMESTAMP
+               );`
+            ).run();
+
+            await env.D1.prepare(
+              "INSERT OR IGNORE INTO paypal_webhook_events (id, event_type, resource_id, related_order_id, status, amount, currency, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            )
+              .bind(
+                eventId,
+                eventType,
+                resourceId,
+                relatedOrderId,
+                resourceStatus,
+                Number.isFinite(amountValue) ? amountValue : 0,
+                currencyCode,
+                email
+              )
+              .run();
+
+            // If we already recorded a PayPal checkout capture as an order, update it to reflect the latest status.
+            if (relatedOrderId) {
+              await ensureOrdersTable(env);
+              const rowId = `paypal:${relatedOrderId}`;
+              await env.D1.prepare("UPDATE orders SET status = ?, ts = CURRENT_TIMESTAMP WHERE id = ?")
+                .bind(String(resourceStatus || "webhook").toLowerCase(), rowId)
+                .run();
+            }
+          } catch (err) {
+            console.warn("PayPal webhook D1 log failed:", err);
+          }
+        }
+
+        console.log("PayPal webhook verified:", eventType, resourceId || eventId);
+        return jsonResponse(200, { ok: true });
+      } catch (err) {
+        console.error("PayPal webhook error:", err);
+        return jsonResponse(500, { error: "Webhook processing failed" });
+      }
+    }
+
     const isAdminRoot = url.pathname === "/admin" || url.pathname === "/admin/" || url.pathname === "/admin/index.html";
     if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
       const hasAdmin = await hasValidAdminCookie(request, env);
