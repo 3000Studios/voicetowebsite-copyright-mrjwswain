@@ -291,8 +291,7 @@ const touchSession = () => {
 
 // Worker already gates access. If we are here, we are authenticated.
 // Only lock if explicitly requested.
-const isUnlocked = () => true; // Always unlocked client-side for now to prevent blocking loop
-// const isUnlocked = () => sessionStorage.getItem(UNLOCK_KEY) === "true" && isSessionFresh();
+const isUnlocked = () => true; // Security removed per USER REQUEST
 
 const setLockedUI = (locked) => {
   lockScreen.style.display = locked ? "grid" : "none";
@@ -304,54 +303,8 @@ const setLockedUI = (locked) => {
 };
 
 const initPasscodeGate = () => {
-  if (!isSessionFresh()) {
-    clearSession();
-  }
-  const unlocked = isUnlocked();
-  setLockedUI(!unlocked);
-
-  const unlock = async (event) => {
-    if (event) event.preventDefault();
-    const code = (lockInput?.value || "").trim();
-    const email = (document.getElementById("lock-email")?.value || "").trim();
-    if (!code || !email) {
-      if (lockError) lockError.textContent = "Enter email and access code.";
-      return;
-    }
-    try {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password: code }),
-      });
-      if (!res.ok) {
-        let msg = "Invalid credentials.";
-        try {
-          const data = await res.json();
-          if (data && typeof data.error === "string") msg = data.error;
-        } catch (_) {}
-        throw new Error(msg);
-      }
-      sessionStorage.setItem(UNLOCK_KEY, "true");
-      sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
-      if (lockError) lockError.textContent = "";
-      setLockedUI(false);
-      speak("Controls unlocked");
-      logActivity();
-    } catch (_) {
-      const message = _.message || "Incorrect code.";
-      if (lockError) lockError.textContent = message;
-      speak(message);
-    }
-  };
-
-  if (lockButton) lockButton.addEventListener("click", unlock);
-  if (lockForm) lockForm.addEventListener("submit", unlock);
-  if (lockInput) {
-    lockInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") unlock(e);
-    });
-  }
+  // Passcode gate removed per USER REQUEST
+  setLockedUI(false);
 };
 
 const initSpeech = () => {

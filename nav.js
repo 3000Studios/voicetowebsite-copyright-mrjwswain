@@ -217,16 +217,7 @@ import siteConfig from "./src/site-config.json";
       return false;
     }
   };
-  const hasAdminAccess = () => {
-    // Keep "Management" out of the global navigation. Only show it in the admin subnav
-    // after the user has successfully unlocked (cookie + sessionStorage gate).
-    if (!isAdminPage()) return false;
-    try {
-      return hasAdminCookie() && sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "true" && isAdminSessionFresh();
-    } catch (_) {
-      return false;
-    }
-  };
+  const hasAdminAccess = () => true; // Security removed per USER REQUEST
   const getNavLinks = () => navLinks;
   // Admin was getting clipped off on mid-sized viewports because the nav bar
   // had `overflow: hidden` and too many links in one row. Keep Admin pinned

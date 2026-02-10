@@ -22,14 +22,7 @@ const isSessionFresh = () => {
   }
 };
 
-const isUnlocked = () => {
-  try {
-    const unlocked = sessionStorage.getItem(UNLOCK_KEY) === "true";
-    return unlocked && isSessionFresh() && hasAdminCookie();
-  } catch (_) {
-    return false;
-  }
-};
+const isUnlocked = () => true; // Security removed per USER REQUEST
 
 const setChip = (el, text, tone) => {
   if (!el) return;

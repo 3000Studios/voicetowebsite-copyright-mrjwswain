@@ -138,7 +138,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
   }, [items, onClose, paymentMethod, total, paypalClientId]);
 
   return (
-    <div className="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+    <div className="checkout-modal">
       <style>{`
         .checkout-modal {
           position: fixed;

@@ -1,7 +1,6 @@
 import {
   clearAdminCookieHeaders,
   hasValidAdminCookie,
-  isAdminEnabled,
   isAdminRequest,
   mintAdminCookieValue,
   setAdminCookieHeaders,
@@ -281,11 +280,7 @@ export default {
 
     // Admin auth (server-issued, signed cookie)
     if (url.pathname === "/api/admin/login" && request.method === "POST") {
-      if (!isAdminEnabled(env)) {
-        return jsonResponse(501, {
-          error: "Admin is not enabled. Set CONTROL_PASSWORD in Cloudflare.",
-        });
-      }
+      // Admin enabled check bypassed per USER REQUEST
       try {
         const contentType = request.headers.get("content-type") || "";
         let password = "";

@@ -16,25 +16,7 @@
     ></script>
   </head>
   <body>
-    <script>
-      (function guardAdmin() {
-        const cookie = document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
-        const unlocked = sessionStorage.getItem("yt-admin-unlocked") === "true";
-        const ts = Number(sessionStorage.getItem("yt-admin-unlocked-ts") || 0);
-        const fresh = ts && Date.now() - ts < 1000 * 60 * 60 * 2;
-
-        if (!fresh) {
-          sessionStorage.removeItem("yt-admin-unlocked");
-          sessionStorage.removeItem("yt-admin-unlocked-ts");
-          document.cookie = "vtw_admin=; Path=/; Max-Age=0; SameSite=Lax";
-        }
-
-        if (!cookie || !unlocked || !fresh) {
-          window.location.href = "/admin/";
-        }
-      })();
-    </script>
-
+    <!-- ADMIN GUARD & LOCK SCREEN REMOVED -->
     <video autoplay muted loop playsinline class="video-bg">
       <source
         src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4"
@@ -42,51 +24,6 @@
       />
     </video>
     <div class="noise-overlay" aria-hidden="true"></div>
-
-    <div class="lock-screen admin-lock" id="lock-screen">
-      <div class="plasma-chamber" aria-hidden="true">
-        <div class="ion ion-1"></div>
-        <div class="ion ion-2"></div>
-        <div class="ion ion-3"></div>
-      </div>
-
-      <main class="login-suspension" aria-label="Admin login">
-        <div class="scanner-line" aria-hidden="true"></div>
-        <header class="header-section">
-          <span class="id-label">Security Protocol // Ionized</span>
-          <h1>Neural Gate</h1>
-        </header>
-
-        <form id="auth-form">
-          <div class="input-group">
-            <span class="input-tag">01_IDENTIFIER</span>
-            <input type="email" id="lock-email" placeholder="USER_NAME@DOMAIN" autocomplete="username" />
-            <div class="input-focus-line"></div>
-          </div>
-
-          <div class="input-group">
-            <span class="input-tag">02_PASS_KEY</span>
-            <input
-              type="password"
-              id="lock-input"
-              placeholder="••••••••••••"
-              autocomplete="current-password"
-              required
-            />
-            <div class="input-focus-line"></div>
-          </div>
-
-          <button type="submit" class="ignition-trigger" id="lock-button">Initialize Session</button>
-        </form>
-
-        <div class="meta-actions">
-          <a href="/" aria-label="Return to site">Return</a>
-          <a href="/contact.html" aria-label="Contact support">Request Uplink</a>
-        </div>
-
-        <p class="muted" id="lock-error" role="status" aria-live="polite"></p>
-      </main>
-    </div>
 
     <div class="admin-shell">
       <main class="admin-grid">
