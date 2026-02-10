@@ -305,10 +305,15 @@ export default {
           password = String(await request.text());
         }
 
-        const validPassword = String(env.CONTROL_PASSWORD);
-        const validEmail = String(env.ADMIN_EMAIL);
+        const validPassword = String(env.CONTROL_PASSWORD || "").trim();
+        const validEmail = String(env.ADMIN_EMAIL || "")
+          .trim()
+          .toLowerCase();
+        const providedEmail = String(email || "")
+          .trim()
+          .toLowerCase();
 
-        if (!password || password !== validPassword || (validEmail && email !== validEmail)) {
+        if (!password || String(password).trim() !== validPassword || (validEmail && providedEmail !== validEmail)) {
           return jsonResponse(401, { error: "Invalid credentials." });
         }
         const cookieValue = await mintAdminCookieValue(env);

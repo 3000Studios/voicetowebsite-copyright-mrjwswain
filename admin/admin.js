@@ -322,7 +322,12 @@ const initPasscodeGate = () => {
         body: JSON.stringify({ email, password: code }),
       });
       if (!res.ok) {
-        throw new Error("Invalid password");
+        let msg = "Invalid credentials.";
+        try {
+          const data = await res.json();
+          if (data && typeof data.error === "string") msg = data.error;
+        } catch (_) {}
+        throw new Error(msg);
       }
       sessionStorage.setItem(UNLOCK_KEY, "true");
       sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
@@ -331,8 +336,9 @@ const initPasscodeGate = () => {
       speak("Controls unlocked");
       logActivity();
     } catch (_) {
-      if (lockError) lockError.textContent = "Incorrect code.";
-      speak("Incorrect code");
+      const message = _.message || "Incorrect code.";
+      if (lockError) lockError.textContent = message;
+      speak(message);
     }
   };
 

@@ -34,21 +34,10 @@ binding = "AI"
 [vars]
 ENVIRONMENT = "production"
 PUBLIC_GENERATE = "1"
-# Placeholder for environment variables to be set in Cloudflare Dashboard
-# OPENAI_API = ""
-# Environment Variables
-PAYPAL_CLIENT_ID = "AV64tommaL7dHsABJvulSEPX3IksB3o2jcVhBneJEd5p0LtWOgoXzRvMmGU4Dkc2m_xuLP6wyan9P-8c"
-# PAYPAL_CLIENT_ID_PROD = ""
-# ADSENSE_PUBLISHER = ""
-# ADSENSE_SLOT = ""
-# ADSENSE_MODE = "auto" # off | auto | slots | hybrid
-# ADSENSE_SLOT_TOP = ""
-# ADSENSE_SLOT_MID = ""
-# ADSENSE_SLOT_BOTTOM = ""
-# ADSENSE_MAX_SLOTS = "3"
-# ADSENSE_MAX_SLOTS = "3"
-CONTROL_PASSWORD = "5555"
-ADMIN_EMAIL = "mr.jwswain@gmail.com"
+# NOTE: Do not commit secrets.
+# Set runtime variables/secrets in the Cloudflare Dashboard (Worker settings) or via `wrangler secret put`.
+# Examples (dashboard): ADMIN_EMAIL, PAYPAL_CLIENT_ID, ADSENSE_*.
+# Examples (secrets): CONTROL_PASSWORD, LICENSE_SECRET, ADMIN_COOKIE_SECRET, STRIPE_SECRET_KEY, etc.
 
 [[d1_databases]]
 binding = "D1"
