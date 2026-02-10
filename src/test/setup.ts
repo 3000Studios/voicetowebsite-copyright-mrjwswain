@@ -44,3 +44,19 @@ Object.defineProperty(window.HTMLMediaElement.prototype, "load", {
   writable: true,
   value: vi.fn(),
 });
+
+// Mock IntersectionObserver
+class IntersectionObserverMock implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = "";
+  readonly thresholds: ReadonlyArray<number> = [];
+
+  constructor() {}
+
+  disconnect = vi.fn() as unknown as () => void;
+  observe = vi.fn() as unknown as (target: Element) => void;
+  takeRecords = vi.fn() as unknown as () => IntersectionObserverEntry[];
+  unobserve = vi.fn() as unknown as (target: Element) => void;
+}
+
+vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);

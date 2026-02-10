@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from "./constants";
-import { NavigationLink } from "./types";
-import { audioEngine } from "./services/audioEngine";
-import WarpTunnel from "./components/WarpTunnel";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
+import LazyVideo from "./components/LazyVideo";
+import WarpTunnel from "./components/WarpTunnel";
+import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from "./constants";
+import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
+import { NavigationLink } from "./types";
 
 const SEEN_KEY = "vtw-v2-seen";
 const AUDIO_OPTOUT_KEY = "vtw-audio-optout";
@@ -980,7 +981,7 @@ const App: React.FC = () => {
                 "https://cdn.coverr.co/videos/coverr-abstract-paint-1720/1080p.mp4",
               ].map((src) => (
                 <div className="reel-card" key={src}>
-                  <video src={src} autoPlay muted loop playsInline />
+                  <LazyVideo src={src} autoPlay muted loop playsInline />
                   <div className="reel-caption">Generated motion layer</div>
                 </div>
               ))}
