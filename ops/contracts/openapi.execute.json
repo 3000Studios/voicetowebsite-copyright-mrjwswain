@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "VoiceToWebsite Execute API",
-    "description": "Canonical orchestration endpoint for Custom GPT phone control.",
-    "version": "1.1.0"
+    "version": "1.2.0",
+    "description": "Production orchestration API for VoiceToWebsite. This contract is for Custom GPT Actions using a single canonical endpoint."
   },
   "servers": [
     {
@@ -11,12 +11,19 @@
       "description": "Production API base URL"
     }
   ],
+  "tags": [
+    {
+      "name": "Orchestration",
+      "description": "Plan, preview, apply, deploy, status, and rollback operations."
+    }
+  ],
   "paths": {
     "/execute": {
       "post": {
         "operationId": "executeCommand",
-        "summary": "Run an orchestration action",
-        "description": "Supports plan, preview, apply, deploy, status, and rollback with idempotency and confirm-token safety.",
+        "tags": ["Orchestration"],
+        "summary": "Execute orchestration action",
+        "description": "Runs one orchestration action. Use preview first, then apply/deploy/rollback with confirmToken.",
         "security": [
           {
             "OrchestratorToken": []
@@ -27,17 +34,75 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Action"
+                "$ref": "#/components/schemas/ExecuteAction"
               },
               "examples": {
-                "previewExample": {
-                  "summary": "Preview a UI change",
+                "plan": {
+                  "summary": "Plan a homepage update",
+                  "value": {
+                    "action": "plan",
+                    "idempotencyKey": "plan-home-20260211-01",
+                    "command": "Plan a homepage hero refresh for conversion lift",
+                    "target": "site",
+                    "safetyLevel": "low",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "preview": {
+                  "summary": "Preview changes and get confirm token",
                   "value": {
                     "action": "preview",
                     "idempotencyKey": "preview-home-20260211-01",
                     "command": "Update homepage hero headline to Build Faster on the Edge",
                     "target": "site",
-                    "safetyLevel": "high"
+                    "safetyLevel": "high",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "apply": {
+                  "summary": "Apply a previewed change",
+                  "value": {
+                    "action": "apply",
+                    "idempotencyKey": "preview-home-20260211-01",
+                    "command": "Update homepage hero headline to Build Faster on the Edge",
+                    "confirmToken": "vtwcfm.<payload>.<signature>",
+                    "target": "site",
+                    "safetyLevel": "high",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "deploy": {
+                  "summary": "Deploy with explicit confirm token",
+                  "value": {
+                    "action": "deploy",
+                    "idempotencyKey": "deploy-20260211-01",
+                    "command": "Deploy latest production-safe changes",
+                    "confirmToken": "vtwcfm.<payload>.<signature>",
+                    "target": "site",
+                    "safetyLevel": "high",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "status": {
+                  "summary": "Fetch orchestration status",
+                  "value": {
+                    "action": "status",
+                    "idempotencyKey": "status-20260211-01",
+                    "target": "site",
+                    "safetyLevel": "low",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "rollback": {
+                  "summary": "Rollback last production change",
+                  "value": {
+                    "action": "rollback",
+                    "idempotencyKey": "rollback-20260211-01",
+                    "command": "Rollback last production change",
+                    "confirmToken": "vtwcfm.<payload>.<signature>",
+                    "target": "site",
+                    "safetyLevel": "high",
+                    "actor": "custom-gpt"
                   }
                 }
               }
@@ -46,11 +111,11 @@
         },
         "responses": {
           "200": {
-            "description": "Successful execution event",
+            "description": "Action accepted and executed",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event"
+                  "$ref": "#/components/schemas/ExecuteEvent"
                 }
               }
             }
@@ -66,7 +131,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized (missing/invalid x-orch-token or admin cookie)",
+            "description": "Unauthorized (missing or invalid x-orch-token/admin cookie)",
             "content": {
               "application/json": {
                 "schema": {
@@ -76,7 +141,7 @@
             }
           },
           "403": {
-            "description": "Forbidden (confirmToken missing/invalid)",
+            "description": "Forbidden (confirmToken missing/invalid/expired)",
             "content": {
               "application/json": {
                 "schema": {
@@ -86,11 +151,11 @@
             }
           },
           "500": {
-            "description": "Execution failure",
+            "description": "Execution error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event"
+                  "$ref": "#/components/schemas/ExecuteEvent"
                 }
               }
             }
@@ -105,37 +170,44 @@
         "type": "apiKey",
         "in": "header",
         "name": "x-orch-token",
-        "description": "Set to your configured ORCH_TOKEN (current default expected by this repo: supersecret)."
+        "description": "Custom header token for orchestration calls."
       }
     },
     "schemas": {
-      "Action": {
+      "ExecuteAction": {
         "type": "object",
         "additionalProperties": false,
+        "description": "Action request for POST /execute.",
         "properties": {
           "action": {
             "type": "string",
-            "enum": ["plan", "preview", "apply", "deploy", "status", "rollback"]
+            "enum": ["plan", "preview", "apply", "deploy", "status", "rollback"],
+            "description": "Requested orchestration operation."
           },
           "idempotencyKey": {
             "type": "string",
-            "minLength": 3
+            "minLength": 3,
+            "description": "Unique key for deduplication."
           },
           "command": {
-            "type": "string"
+            "type": "string",
+            "description": "Natural-language command. Required for plan/preview/apply."
           },
           "target": {
             "type": "string",
-            "enum": ["site", "sandbox"],
-            "default": "site"
+            "enum": ["site"],
+            "default": "site",
+            "description": "Production-only execution target."
           },
           "safetyLevel": {
             "type": "string",
             "enum": ["low", "medium", "high"],
-            "default": "medium"
+            "default": "medium",
+            "description": "Risk level used by policy and workflow."
           },
           "confirmToken": {
-            "type": "string"
+            "type": "string",
+            "description": "Single-use expiring token from preview, required for apply/deploy/rollback."
           },
           "actor": {
             "oneOf": [
@@ -146,11 +218,13 @@
                 "type": "object",
                 "additionalProperties": true
               }
-            ]
+            ],
+            "description": "Caller identity and context."
           },
           "parameters": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": true,
+            "description": "Optional extension parameters."
           }
         },
         "required": ["action", "idempotencyKey"],
@@ -183,29 +257,35 @@
           }
         ]
       },
-      "Event": {
+      "ExecuteEvent": {
         "type": "object",
         "additionalProperties": false,
+        "description": "Canonical event envelope returned by /execute.",
         "properties": {
           "eventId": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique event identifier."
           },
           "timestamp": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Event creation time in ISO format."
           },
           "traceId": {
-            "type": "string"
+            "type": "string",
+            "description": "Trace identifier for request correlation."
           },
           "eventType": {
             "type": "string",
-            "enum": ["planned", "previewed", "confirmed", "applied", "deployed", "rolled_back", "error"]
+            "enum": ["planned", "previewed", "confirmed", "applied", "deployed", "rolled_back", "error"],
+            "description": "Lifecycle event type."
           },
           "action": {
-            "$ref": "#/components/schemas/Action"
+            "$ref": "#/components/schemas/ExecuteAction"
           },
           "result": {
-            "type": ["object", "array", "string", "number", "boolean", "null"]
+            "type": ["object", "array", "string", "number", "boolean", "null"],
+            "description": "Action result payload. For preview this may include confirmToken/confirmBy."
           },
           "error": {
             "type": "object",
@@ -214,7 +294,8 @@
               "message": {
                 "type": "string"
               }
-            }
+            },
+            "description": "Error details for failed actions."
           }
         },
         "required": ["eventId", "timestamp", "traceId", "eventType", "action"]
@@ -229,7 +310,8 @@
           "traceId": {
             "type": "string"
           }
-        }
+        },
+        "required": ["error"]
       }
     }
   }
