@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
+node ./scripts/update-global-system-doc.mjs
+git add GLOBAL_SYSTEM_INSTRUCTIONS.md
 npx --no-install lint-staged
