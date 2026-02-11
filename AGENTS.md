@@ -20,6 +20,7 @@ This repo is designed for an autonomous operator to make changes safely and keep
 
 - GitHub Actions deployment is intentionally disabled for this repo.
 - Production deploy is performed via local `wrangler deploy` (`npm run deploy`), typically driven by `npm run auto:ship`.
+  - `npm run deploy` runs `npm run verify` first, then `wrangler deploy --keep-vars`.
 
 ## Environment Variables (Typical)
 

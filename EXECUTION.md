@@ -6,7 +6,7 @@ No questions. No approvals. No partials.
 
 MANDATORY ORDER:
 
-1. HECK
+1. CHECK
 2. Modify
 3. Build
 4. Commit

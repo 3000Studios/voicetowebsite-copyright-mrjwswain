@@ -10,7 +10,10 @@ const MIN_INTERVAL_MS = Number(process.env.AUTO_SHIP_MIN_INTERVAL_MS || 60000);
 const COMMIT_PREFIX = process.env.AUTO_SHIP_COMMIT_PREFIX || "Auto:";
 // Permanent default: deploy via local workaround (not GitHub Actions).
 const AUTO_DEPLOY = String(process.env.AUTO_SHIP_DEPLOY || "1").trim() !== "0";
-const DEPLOY_CMD = process.env.AUTO_SHIP_DEPLOY_CMD || "npm run deploy";
+// NOTE: auto-ship already runs `npm run verify` before commit/push.
+// Default deploy command intentionally skips re-running verify (unlike `npm run deploy`).
+// When started via `npm run auto:ship`, `wrangler` is available on PATH (node_modules/.bin).
+const DEPLOY_CMD = process.env.AUTO_SHIP_DEPLOY_CMD || "wrangler deploy --keep-vars";
 
 const IGNORE_DIRS = new Set([".git", "node_modules", "dist", ".wrangler", ".vite", "coverage"]);
 const IGNORE_FILES = new Set([
