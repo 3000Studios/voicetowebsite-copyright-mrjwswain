@@ -13,6 +13,7 @@ export default defineConfig({
       "/api/generate": "http://127.0.0.1:8787",
       "/api/preview": "http://127.0.0.1:8787",
       "/api/publish": "http://127.0.0.1:8787",
+      "/api/execute": "http://127.0.0.1:8787",
       "/preview": "http://127.0.0.1:8787",
       "/api/bot-hub": "http://127.0.0.1:8787",
       "/api/health": "http://127.0.0.1:8787",

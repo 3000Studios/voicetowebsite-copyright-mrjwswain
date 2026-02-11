@@ -6,6 +6,7 @@ import {
   setAdminCookieHeaders,
 } from "./functions/adminAuth.js";
 import { handleBotHubRequest } from "./functions/botHub.js";
+import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
 import {
   handleGenerateRequest,
@@ -373,6 +374,11 @@ export default {
       } catch (err) {
         return jsonResponse(500, { error: err.message });
       }
+    }
+
+    // Execute API (canonical orchestration endpoint for Custom GPT)
+    if (url.pathname === "/api/execute" && request.method === "POST") {
+      return addSecurityHeaders(await handleExecuteRequest({ request, env, ctx }));
     }
 
     // Orchestrator API (primary: /api/orchestrator; legacy: /.netlify/functions/orchestrator)

@@ -1,0 +1,236 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "VoiceToWebsite Execute API",
+    "description": "Canonical orchestration endpoint for Custom GPT phone control.",
+    "version": "1.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://voicetowebsite.com/api",
+      "description": "Production API base URL"
+    }
+  ],
+  "paths": {
+    "/execute": {
+      "post": {
+        "operationId": "executeCommand",
+        "summary": "Run an orchestration action",
+        "description": "Supports plan, preview, apply, deploy, status, and rollback with idempotency and confirm-token safety.",
+        "security": [
+          {
+            "OrchestratorToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Action"
+              },
+              "examples": {
+                "previewExample": {
+                  "summary": "Preview a UI change",
+                  "value": {
+                    "action": "preview",
+                    "idempotencyKey": "preview-home-20260211-01",
+                    "command": "Update homepage hero headline to Build Faster on the Edge",
+                    "target": "site",
+                    "safetyLevel": "high"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful execution event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing/invalid x-orch-token or admin cookie)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (confirmToken missing/invalid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Execution failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OrchestratorToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-orch-token",
+        "description": "Set to your configured ORCH_TOKEN (current default expected by this repo: supersecret)."
+      }
+    },
+    "schemas": {
+      "Action": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["plan", "preview", "apply", "deploy", "status", "rollback"]
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 3
+          },
+          "command": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string",
+            "enum": ["site", "sandbox"],
+            "default": "site"
+          },
+          "safetyLevel": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "default": "medium"
+          },
+          "confirmToken": {
+            "type": "string"
+          },
+          "actor": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              }
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": ["action", "idempotencyKey"],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "enum": ["plan", "preview", "apply"]
+                }
+              },
+              "required": ["action"]
+            },
+            "then": {
+              "required": ["command"]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "enum": ["apply", "deploy", "rollback"]
+                }
+              },
+              "required": ["action"]
+            },
+            "then": {
+              "required": ["confirmToken"]
+            }
+          }
+        ]
+      },
+      "Event": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eventId": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string",
+            "enum": ["planned", "previewed", "confirmed", "applied", "deployed", "rolled_back", "error"]
+          },
+          "action": {
+            "$ref": "#/components/schemas/Action"
+          },
+          "result": {
+            "type": ["object", "array", "string", "number", "boolean", "null"]
+          },
+          "error": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": ["eventId", "timestamp", "traceId", "eventType", "action"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

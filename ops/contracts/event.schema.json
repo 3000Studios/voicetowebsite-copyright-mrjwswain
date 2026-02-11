@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voicetowebsite.com/schemas/event.schema.json",
+  "title": "ExecuteEvent",
+  "description": "Response event envelope returned by /api/execute.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "description": "Unique event identifier."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "traceId": {
+      "type": "string",
+      "description": "Trace identifier propagated by caller or generated at edge."
+    },
+    "eventType": {
+      "type": "string",
+      "enum": ["planned", "previewed", "confirmed", "applied", "deployed", "rolled_back", "error"]
+    },
+    "action": {
+      "$ref": "https://voicetowebsite.com/schemas/action.schema.json"
+    },
+    "result": {
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": ["eventId", "timestamp", "traceId", "eventType", "action"]
+}
