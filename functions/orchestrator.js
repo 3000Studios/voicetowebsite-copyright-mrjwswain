@@ -311,6 +311,86 @@ export async function onRequestPost(context) {
     if (!res.ok) throw new Error(`GitHub error: ${await res.text()}`);
     return res.json();
   };
+  const decodeBase64Utf8 = (input) => {
+    const clean = String(input || "").replace(/\s+/g, "");
+    const binary = atob(clean);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  };
+  const normalizeCss = (rawCss) => {
+    const source = String(rawCss || "")
+      .replace(/\r\n?/g, "\n")
+      .trim();
+    if (!source) return "";
+    let result = "";
+    let indent = 0;
+    let inString = false;
+    let stringQuote = "";
+    const writeIndent = () => "  ".repeat(Math.max(0, indent));
+    const trimRight = () => {
+      result = result.replace(/[ \t]+$/g, "");
+    };
+    const ensureLine = () => {
+      trimRight();
+      if (!result.endsWith("\n")) result += "\n";
+      result += writeIndent();
+    };
+
+    for (let i = 0; i < source.length; i += 1) {
+      const ch = source[i];
+
+      if (inString) {
+        result += ch;
+        if (ch === stringQuote && source[i - 1] !== "\\") {
+          inString = false;
+          stringQuote = "";
+        }
+        continue;
+      }
+
+      if (ch === "'" || ch === '"') {
+        inString = true;
+        stringQuote = ch;
+        result += ch;
+        continue;
+      }
+
+      if (ch === "{") {
+        trimRight();
+        result += " {\n";
+        indent += 1;
+        result += writeIndent();
+        continue;
+      }
+
+      if (ch === "}") {
+        indent = Math.max(0, indent - 1);
+        trimRight();
+        result += `\n${writeIndent()}}\n${writeIndent()}`;
+        continue;
+      }
+
+      if (ch === ";") {
+        result += ";\n";
+        result += writeIndent();
+        continue;
+      }
+
+      if (ch === "\n") {
+        if (!result.endsWith("\n")) {
+          ensureLine();
+        }
+        continue;
+      }
+
+      result += ch;
+    }
+
+    return `${result
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()}\n`;
+  };
   const getRepoParts = () => {
     const [owner, repo] = (GITHUB_REPO || "").split("/");
     if (!owner || !repo) throw new Error("GITHUB_REPO must be owner/repo.");
@@ -324,7 +404,7 @@ export async function onRequestPost(context) {
   const getFileContent = async (path, ref) => {
     const { owner, repo } = getRepoParts();
     const data = await githubRequest(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${ref}`);
-    return atob(data.content);
+    return decodeBase64Utf8(data.content);
   };
   const updateAppState = (content, field, value) => {
     if (!allowedFields.includes(field)) return content;
@@ -449,7 +529,9 @@ export async function onRequestPost(context) {
   };
   const appendCustomStyles = (stylesContent, css) => {
     if (!css) return stylesContent;
-    return `${stylesContent}\n\n/* Voice-injected styles */\n${css}\n`;
+    const normalizedCss = normalizeCss(css);
+    if (!normalizedCss) return stylesContent;
+    return `${stylesContent}\n\n/* Voice-injected styles */\n${normalizedCss}`;
   };
   const buildPageTemplate = ({ title, headline, body }) => {
     return `<!doctype html><html lang="en"><head>  <meta charset="utf-8" />  <meta name="viewport" content="width=device-width, initial-scale=1" />  <title>${title}</title>  <meta name="description" content="${title}" />  <link rel="stylesheet" href="styles.css" /></head><body>  <div class="bg-noise" aria-hidden="true"></div>  <header class="site-header">    <div class="brand">      <span class="brand-mark">VW</span>      <div class="brand-text">        <strong>VoiceToWebsite</strong>        <span>Revenue Engine</span>      </div>    </div>    <nav class="nav">      <a href="index.html">Home</a>    </nav>    <button class="ghost-button">Book a Demo</button>  </header>  <main class="page">    <section class="section">      <h1>${headline}</h1>      <p>${body}</p>    </section>  </main>  <footer class="footer">    <div>      <strong>VoiceToWebsite</strong>      <p>Revenue systems that never sleep.</p>    </div>    <div class="footer-links">      <a href="index.html">Home</a>    </div>  </footer></body></html>`;
