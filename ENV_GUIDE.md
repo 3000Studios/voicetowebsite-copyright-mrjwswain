@@ -4,12 +4,12 @@ This document lists environment variables required or recommended for **VoiceToW
 
 ## Critical Variables (Required for Core Functionality)
 
-| Variable                 | Description                                       | Where to find                    |
-| :----------------------- | :------------------------------------------------ | :------------------------------- |
-| **`CONTROL_PASSWORD`**   | Password for Admin API & Neural Gate login.       | Set by you.                      |
-| **`ADMIN_EMAIL`**        | Email address for Admin login validation.         | Set by you.                      |
-| **`VITE_GEMINIAPIKEY2`** | Google Gemini API key for AI features (WebForge). | Google AI Studio.                |
-| **`LICENSE_SECRET`**     | Secret string used to sign/verify license tokens. | Generate a strong random string. |
+| Variable               | Description                                        | Where to find                    |
+| :--------------------- | :------------------------------------------------- | :------------------------------- |
+| **`CONTROL_PASSWORD`** | Password for Admin API & Neural Gate login.        | Set by you.                      |
+| **`ADMIN_EMAIL`**      | Email address for Admin login validation.          | Set by you.                      |
+| **`GEMINIAPIKEY2`**    | Google Gemini API key for server-side AI features. | Google AI Studio.                |
+| **`LICENSE_SECRET`**   | Secret string used to sign/verify license tokens.  | Generate a strong random string. |
 
 ---
 
@@ -19,9 +19,10 @@ These are new recommendations to improve site operations, flexibility, and secur
 
 ### AI Configuration
 
-| Variable                | Default                | Description                                                                                     |
-| :---------------------- | :--------------------- | :---------------------------------------------------------------------------------------------- |
-| **`VITE_GEMINI_MODEL`** | `gemini-2.0-flash-exp` | Override the AI model version without redeploying code. Useful when Google releases new models. |
+| Variable                 | Default                | Description                                                                                     |
+| :----------------------- | :--------------------- | :---------------------------------------------------------------------------------------------- |
+| **`VITE_GEMINI_MODEL`**  | `gemini-2.0-flash-exp` | Override the AI model version without redeploying code. Useful when Google releases new models. |
+| **`VITE_GEMINIAPIKEY2`** | (optional)             | Public client-side Gemini key used by WebForge in the browser. Treat as **public** if used.     |
 
 ### Commerce (Stripe & PayPal)
 
@@ -57,9 +58,11 @@ ADMIN_EMAIL=you@example.com
 ADMIN_COOKIE_SECRET=
 
 # --- AI CONFIGURATION ---
-VITE_GEMINIAPIKEY2=your_key_here
+GEMINIAPIKEY2=your_key_here
 # NEW: Switch models easily (e.g., gemini-1.5-pro, gemini-ultra)
 VITE_GEMINI_MODEL=gemini-2.0-flash-exp
+# OPTIONAL (PUBLIC): WebForge browser-side key. Do not use a secret key here.
+VITE_GEMINIAPIKEY2=
 
 # --- COMMERCE ---
 LICENSE_SECRET=super_secret_signing_string

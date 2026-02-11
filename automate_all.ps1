@@ -25,7 +25,7 @@ if ($LASTEXITCODE -ne 0) { Write-Error "Git push failed!"; exit 1 }
 
 # 4. Deploy to Production
 # 4. Deploy to Production with Auto-Retry
-Write-Host "Deploying to Cloudflare Pages..." -ForegroundColor Yellow
+Write-Host "Deploying to Cloudflare Workers..." -ForegroundColor Yellow
 $maxRetries = 3
 $retryCount = 0
 $deploySuccess = $false
