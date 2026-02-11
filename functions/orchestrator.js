@@ -539,7 +539,7 @@ export async function onRequestPost(context) {
     }
   };
   const triggerDeployment = async (commitSha, intent) => {
-    const hookUrl = env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK;
+    const hookUrl = env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK || env.VOICETOWEBSITE_HOOK || env.Webhook;
     const autoDeployOnPush =
       String(env.CF_WORKERS_BUILDS_AUTO_DEPLOY || env.CF_AUTO_DEPLOY_ON_PUSH || "")
         .trim()
