@@ -1423,7 +1423,7 @@ input[type="search"]:focus {
 }
 
 .features li:before {
-  content: "✓";
+  content: "â";
   color: var(--success-color);
   margin-right: 0.75rem;
   font-weight: bold;
@@ -1434,7 +1434,7 @@ input[type="search"]:focus {
 }
 
 .features li.not-included:before {
-  content: "—";
+  content: "â";
   color: inherit;
 }
 
@@ -2295,3 +2295,7 @@ button.ghost:hover {
     transition: none;
   }
 }
+
+
+/* Voice-injected styles */
+.hero-headline { font-size: 42px; }
