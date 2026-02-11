@@ -2296,6 +2296,7 @@ button.ghost:hover {
   }
 }
 
-
 /* Voice-injected styles */
-.hero-headline { font-size: 42px; }
+.hero-headline {
+  font-size: 42px;
+}
