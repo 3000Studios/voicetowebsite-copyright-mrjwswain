@@ -43,9 +43,12 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 
 ## Deploy
 
-- GitHub Actions deploys on pushes to `main` via `.github/workflows/deploy.yml`.
-- Add a GitHub Actions secret named `CF_USER_TOKEN` (preferred). Fallbacks supported: `CF_Account_API_VoicetoWebsite`, `CLOUDFLARE_API_TOKEN`, `CF_API_TOKEN`, `CF_API_TOKEN2`.
+- Manual production deploy: `npm run deploy` (runs `npm run verify` first, then `wrangler deploy --keep-vars`).
 - Set required Worker vars/secrets in Cloudflare (examples in `ENV.example` and `wrangler.toml` comments).
+- Optional remote auto-deploy on Git push:
+  - enable `CF_WORKERS_BUILDS_AUTO_DEPLOY=1` in Worker runtime vars
+  - set Worker Build API token to `VOICETOWEBSITE_WORKERS_BUILD_TOKEN`
+  - set Build variable `CLOUDFLARE_ACCOUNT_ID`
 - Local ship helper (verify → commit → optional push): `npm run ship -- -m "your message" --push`
 
 ## Makeover workflow

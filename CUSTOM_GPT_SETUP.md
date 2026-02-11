@@ -26,6 +26,12 @@ Set one of these Worker environment options:
 
 Without one of these, apply/deploy can commit but deployment status will be `skipped`.
 
+If using Workers Builds auto-deploy, also set Build settings in Cloudflare:
+
+- Worker -> Settings -> Build -> API token: select a valid token named `VOICETOWEBSITE_WORKERS_BUILD_TOKEN`.
+- Build variable `CLOUDFLARE_ACCOUNT_ID` must be set to your Cloudflare account id.
+- Keep production branch set to `main`.
+
 ## 4. Required Instruction Block in Custom GPT
 
 Keep this instruction in your GPT:

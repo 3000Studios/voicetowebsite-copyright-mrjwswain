@@ -41,6 +41,14 @@ These are new recommendations to improve site operations, flexibility, and secur
 | `CF_API_TOKEN`      | Cloudflare API Token with `Zone.Analytics:Read` permissions.                            |
 | `ADSENSE_PUBLISHER` | Google AdSense Publisher ID (`ca-pub-XXXXXXXX`).                                        |
 
+### Deploy Automation (Workers Builds)
+
+| Variable                             | Description                                                                 |
+| :----------------------------------- | :-------------------------------------------------------------------------- |
+| `CF_WORKERS_BUILDS_AUTO_DEPLOY`      | Runtime flag (`1`) to mark deploys as queued when commit is pushed to main. |
+| `VOICETOWEBSITE_WORKERS_BUILD_TOKEN` | Build token name/value used by Cloudflare Worker Builds (keep secret).      |
+| `CLOUDFLARE_ACCOUNT_ID`              | Account id required by Wrangler in cloud build environments.                |
+
 ### Security & Identity
 
 | Variable              | Description                                                                                  |
@@ -75,4 +83,9 @@ PAYPAL_CLIENT_SECRET_PROD=
 CF_ZONE_ID=
 CF_API_TOKEN=
 ADSENSE_PUBLISHER=
+
+# --- WORKERS BUILDS (AUTO DEPLOY) ---
+CF_WORKERS_BUILDS_AUTO_DEPLOY=1
+VOICETOWEBSITE_WORKERS_BUILD_TOKEN=
+CLOUDFLARE_ACCOUNT_ID=
 ```

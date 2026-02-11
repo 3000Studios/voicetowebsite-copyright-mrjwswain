@@ -73,6 +73,20 @@ Do not commit secrets to git.
 
 At minimum, to deploy from a new machine you typically need Wrangler authentication (login or API token).
 
+## Workers Builds Auto-Deploy (Optional, Phone/Remote Friendly)
+
+If you want commits pushed by `/api/execute` to deploy while your laptop is off:
+
+1. Connect Worker Builds to this repo and keep production branch on `main`.
+2. In Worker -> Settings -> Build -> API token, select token `VOICETOWEBSITE_WORKERS_BUILD_TOKEN`.
+3. In Worker runtime vars/secrets, set `CF_WORKERS_BUILDS_AUTO_DEPLOY=1`.
+4. In Build variables, set `CLOUDFLARE_ACCOUNT_ID` to your account id.
+
+Notes:
+
+- This does not require GitHub Actions deploy workflows.
+- Keep `npm run deploy` unchanged for manual production deploys (`npm run verify && wrangler deploy --keep-vars`).
+
 ## Rollback
 
 Fast rollback approach:
