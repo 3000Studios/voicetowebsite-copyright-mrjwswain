@@ -316,6 +316,11 @@ export async function onRequestPost(context) {
     if (!owner || !repo) throw new Error("GITHUB_REPO must be owner/repo.");
     return { owner, repo };
   };
+  const getHeadCommitSha = async () => {
+    const { owner, repo } = getRepoParts();
+    const baseRef = await githubRequest(`/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`);
+    return baseRef?.object?.sha || "";
+  };
   const getFileContent = async (path, ref) => {
     const { owner, repo } = getRepoParts();
     const data = await githubRequest(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${ref}`);
@@ -535,11 +540,22 @@ export async function onRequestPost(context) {
   };
   const triggerDeployment = async (commitSha, intent) => {
     const hookUrl = env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK;
+    const autoDeployOnPush =
+      String(env.CF_WORKERS_BUILDS_AUTO_DEPLOY || env.CF_AUTO_DEPLOY_ON_PUSH || "")
+        .trim()
+        .toLowerCase() === "1";
     if (!hookUrl) {
+      if (autoDeployOnPush && commitSha) {
+        return {
+          status: "queued",
+          deploymentId: commitSha,
+          message: "Queued via Workers Builds auto-deploy on Git push.",
+        };
+      }
       return {
         status: "skipped",
         deploymentId: "",
-        message: "No deploy hook configured.",
+        message: "No deploy hook configured. Configure CF_DEPLOY_HOOK_URL or enable Workers Builds auto-deploy.",
       };
     }
     try {
@@ -753,15 +769,49 @@ export async function onRequestPost(context) {
     const target = payload.target === "sandbox" ? "sandbox" : "site";
     if (mode === "rollback_last") {
       const result = await revertLastCommit();
-      return new Response(JSON.stringify({ mode, result }), {
+      const deployment = await triggerDeployment(result.revertCommit, {
+        mode: "rollback_last",
+        target,
+      });
+      await logToDB({
+        command: command || "Rollback last change",
+        actions: ["rollback_last"],
+        files: [],
+        commit: result.revertCommit,
+        intent: { mode: "rollback_last", target },
+        deployment,
+      });
+      return new Response(JSON.stringify({ mode, result, deployment }), {
         headers: { "Content-Type": "application/json" },
       });
     }
     if (mode === "rollback") {
       throw new Error("Rollback disabled for live apply mode.");
     }
-    if (!command && mode !== "rollback") {
+    if (!command && mode !== "rollback" && mode !== "deploy") {
       throw new Error("Missing command.");
+    }
+    if (mode === "deploy") {
+      const commitSha = String(payload.commitSha || "").trim() || (await getHeadCommitSha());
+      if (!commitSha) {
+        throw new Error("Unable to determine commit SHA for deployment.");
+      }
+      const deployment = await triggerDeployment(commitSha, {
+        mode: "deploy",
+        target,
+        command: command || "Deploy latest approved changes",
+      });
+      await logToDB({
+        command: command || "Deploy latest approved changes",
+        actions: ["deploy"],
+        files: [],
+        commit: commitSha,
+        intent: { mode: "deploy", target },
+        deployment,
+      });
+      return new Response(JSON.stringify({ mode, target, commitSha, deployment }), {
+        headers: { "Content-Type": "application/json" },
+      });
     }
     let plan = payload.plan;
     if (!plan) {

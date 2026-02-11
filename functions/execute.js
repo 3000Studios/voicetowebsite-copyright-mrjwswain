@@ -474,10 +474,9 @@ export async function onRequestPost(context) {
       };
     } else if (payload.action === "deploy") {
       orchestratorPayload = {
-        mode: "apply",
+        mode: "deploy",
         command: payload.command || "Deploy latest changes",
         target: payload.target,
-        confirmation: "ship it",
       };
     } else if (payload.action === "rollback") {
       orchestratorPayload = {

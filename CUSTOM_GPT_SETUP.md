@@ -14,16 +14,25 @@ Capture the stable Worker URL after deploy (for example: `https://<your-worker>.
 
 Use `ops/contracts/openapi.execute.json` and set:
 
-- `servers[0].url` to your deployed Worker API base (`https://<your-worker>.workers.dev/api`), or keep `https://voicetowebsite.com/api` if routing through the domain.
+- `servers[0].url` to `https://voicetowebsite.com/api` (production only).
 - Security header `x-orch-token` value to `supersecret` (or your configured `ORCH_TOKEN` secret).
 
-## 3. Required Instruction Block in Custom GPT
+## 3. Configure Deployment Trigger (Required for voice -> live deploy)
+
+Set one of these Worker environment options:
+
+- `CF_DEPLOY_HOOK_URL` (preferred explicit deploy hook), or
+- `CF_WORKERS_BUILDS_AUTO_DEPLOY=1` (if Cloudflare Workers Builds is connected to `main`).
+
+Without one of these, apply/deploy can commit but deployment status will be `skipped`.
+
+## 4. Required Instruction Block in Custom GPT
 
 Keep this instruction in your GPT:
 
 - "You must call `executeCommand` for every plan/preview/apply/deploy/status/rollback request before answering."
 
-## 4. First Live Verification
+## 5. First Live Verification
 
 From GPT preview chat:
 

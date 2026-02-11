@@ -139,4 +139,39 @@ describe("/api/execute", () => {
     const applyBody = await apply.json();
     expect(applyBody.eventType).toBe("applied");
   });
+
+  it("maps deploy action to orchestrator deploy mode", async () => {
+    const preview = await handleExecute({
+      request: makeRequest(
+        {
+          action: "preview",
+          idempotencyKey: "deploy-001",
+          command: "Deploy latest approved changes",
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env: {},
+      ctx: {},
+    });
+    const previewBody = await preview.json();
+
+    const deploy = await handleExecute({
+      request: makeRequest(
+        {
+          action: "deploy",
+          idempotencyKey: "deploy-001",
+          command: "Deploy latest approved changes",
+          confirmToken: previewBody.result.confirmToken,
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env: {},
+      ctx: {},
+    });
+
+    expect(deploy.status).toBe(200);
+    expect(lastOrchestratorPayload?.mode).toBe("deploy");
+    const deployBody = await deploy.json();
+    expect(deployBody.eventType).toBe("deployed");
+  });
 });
