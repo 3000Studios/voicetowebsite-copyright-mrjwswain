@@ -9,12 +9,19 @@ This repo is designed for an autonomous operator to make changes safely and keep
 - DONE means deployed to production (Cloudflare).
 - Do not add secrets to git. Use environment variables only.
 
-## One Command Rules
+## Agent Roles & Specialties
+
+- **Windsurf**: Implementation surface, UX assembly, and visual polish.
+- **Codex**: Parallel engineering, unit tests, refactoring, and performance.
+- **Gemini**: Architecture, context management, and integration reasoning.
+- **Jules**: Safety, hygiene, operational quality, and security.
+
+## Core Directives
 
 - Verify: `npm run verify`
 - Local dev: `npm run dev:all`
-- Deploy (production): `npm run deploy`
-- Auto everything (watch, verify, commit, push, deploy): `npm run auto:ship`
+- Deploy: `npm run deploy`
+- Auto everything: `npm run auto:ship`
 
 ## Deployment Policy
 
@@ -48,7 +55,15 @@ Set only what you need for the task.
 - Keep overlays behind content: use stable z-index layers and avoid `pointer-events` traps.
 - If changing animations, respect `prefers-reduced-motion`.
 
+## Debugging & Monitoring
+
+- **Tail logs**: `npx wrangler tail` to see live Worker errors.
+- **Trace**: Add `console.trace()` to locate the source of unexpected calls.
+- **Inspect**: Use `debug:*` namespaces to filter console output (if tools are installed).
+- **Verify**: Always check `npm run verify` before assuming a fix works.
+
 ## Failure Handling
 
-- If deploy fails: do not loop commits. Fix the root cause, then re-run `npm run verify`, then deploy.
-- If you need to rollback quickly: redeploy a known-good commit (or revert) and run `npm run deploy`.
+- If deploy fails: Fix the root cause, then re-run `npm run verify`, then deploy.
+- If payment fails: Check `PAYPAL_CLIENT_ID` and `VITE_PAYPAL_CLIENT_ID` parity.
+- Rollback: Redeploy a known-good commit and run `npm run deploy`.

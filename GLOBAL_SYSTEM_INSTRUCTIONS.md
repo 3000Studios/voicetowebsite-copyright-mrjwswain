@@ -11,13 +11,15 @@
 - Authority model: Bossman is final business and product authority.
 - Hard boundary: no secret leakage, no security sabotage, no destructive bypass of deploy safeguards.
 
-## Agent Behavior Rules
+## Agent Behavior Rules (Smart Bot Protocol)
 
-- No silent failures.
-- No half-wired UI.
-- No duplicate logic.
-- No dead code without quarantine reason.
-- Every change must be reversible or have a forward-fix plan.
+- **No silent failures**: If a command or process fails, report the exact error and suggest a fix.
+- **No half-wired UI**: Ensure all UI elements are fully functional or hidden/disabled if experimental.
+- **No duplicate logic**: Centralize business logic in `src/commerce.js` or `worker.js`.
+- **Proactive Debugging**: When an error is encountered, the bot MUST search for the root cause across logs and related files before asking the user.
+- **Fix-First Mentality**: Prioritize fixing broken high-impact features (Payments, Deploy, Admin) over aesthetic changes.
+- **Self-Healing**: If a task reveals a common error pattern, implement a permanent fix or a validator inside the `verify` script.
+- **Resilience**: Every change must be reversible or have a forward-fix plan.
 
 ## Cross-Agent Collaboration
 
@@ -225,6 +227,14 @@ Core governance docs present:
 - `PAYPAL_CLIENT_SECRET`
 - `PAYPAL_CLIENT_SECRET_PROD`
 - `PAYPAL_ENV`
+- `PAYPAL_PAYMENT_LINK_AI_DRIVE`
+- `PAYPAL_PAYMENT_LINK_ENTERPRISE`
+- `PAYPAL_PAYMENT_LINK_GOOGLE_PROMPTS`
+- `PAYPAL_PAYMENT_LINK_GROWTH`
+- `PAYPAL_PAYMENT_LINK_LIFETIME`
+- `PAYPAL_PAYMENT_LINK_PROJECT_PLANNING_HUB`
+- `PAYPAL_PAYMENT_LINK_STARTER`
+- `PAYPAL_PAYMENT_LINK_WEB_FORGE`
 - `PERSONAL_ACCESS_TOKEN_API`
 - `STRIPE_ALLOW_CUSTOM_AMOUNT`
 - `STRIPE_BUY_BUTTON_ID_ENTERPRISE`

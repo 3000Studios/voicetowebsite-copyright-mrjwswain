@@ -283,6 +283,15 @@
 
       // Initialize PayPal SDK Button
       const initPayPal = () => {
+        const link = window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_PROJECT_PLANNING_HUB;
+        if (link) {
+          const container = document.getElementById("paypal-button-container");
+          if (container) {
+            container.innerHTML = `<button style="background:#ffc439; color:#000; font-weight:bold; border:none; border-radius:4px; padding:0 2rem; height:45px; width:100%; cursor:pointer; font-family:sans-serif;" onclick="window.location.href='${link}'">Check out with PayPal</button>`;
+          }
+          return;
+        }
+
         if (window.paypal && PAYPAL_CLIENT) {
           window.paypal
             .Buttons({

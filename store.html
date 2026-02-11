@@ -297,6 +297,12 @@
         enterprise: (window.__ENV && window.__ENV.STRIPE_BUY_BUTTON_ID_ENTERPRISE) || "",
         lifetime: (window.__ENV && window.__ENV.STRIPE_BUY_BUTTON_ID_LIFETIME) || "",
       };
+      const PAYPAL_LINKS = {
+        starter: (window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_STARTER) || "",
+        growth: (window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_GROWTH) || "",
+        enterprise: (window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_ENTERPRISE) || "",
+        lifetime: (window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_LIFETIME) || "",
+      };
       const handleStripe = async (btn) => {
         const amount = btn.dataset.amount;
         const product = btn.dataset.product;
@@ -325,6 +331,13 @@
         const amount = btn.dataset.amount;
         const product = btn.dataset.product;
         const label = btn.dataset.label || product;
+
+        const link = (PAYPAL_LINKS[String(product || "").toLowerCase()] || "").trim();
+        if (link) {
+          window.location.href = link;
+          return;
+        }
+
         if (!PAYPAL_CLIENT || String(PAYPAL_CLIENT).startsWith("__")) {
           alert("PayPal client ID missing. Configure PAYPAL_CLIENT_ID to enable checkout.");
           return;

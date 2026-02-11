@@ -44,9 +44,47 @@ export const handleStripePurchase = async (product, amount, redirectUrl) => {
   }
 };
 
-export const handlePayPalPurchase = (sku, displayName, amount, redirectUrl) => {
-  if (!window.paypal || typeof window.paypal.Buttons !== "function") {
-    alert("PayPal SDK not loaded. Add https://www.paypal.com/sdk/js to the page.");
+const getPayPalLink = (sku, env) => {
+  const map = {
+    "project-planning-hub": env.PAYPAL_PAYMENT_LINK_PROJECT_PLANNING_HUB,
+    "ai-web-forge-pro": env.PAYPAL_PAYMENT_LINK_WEB_FORGE,
+    "ai-drive": env.PAYPAL_PAYMENT_LINK_AI_DRIVE,
+    "google-ai-prompts": env.PAYPAL_PAYMENT_LINK_GOOGLE_PROMPTS,
+    starter: env.PAYPAL_PAYMENT_LINK_STARTER,
+    growth: env.PAYPAL_PAYMENT_LINK_GROWTH,
+    enterprise: env.PAYPAL_PAYMENT_LINK_ENTERPRISE,
+    lifetime: env.PAYPAL_PAYMENT_LINK_LIFETIME,
+  };
+  return map[sku] || null;
+};
+
+export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl) => {
+  const env = window.__ENV || {};
+  const link = getPayPalLink(String(sku || "").toLowerCase(), env);
+
+  if (link) {
+    window.location.href = link;
+    return;
+  }
+
+  // Load SDK dynamically if not present
+  if (!window.paypal_sdk_promise) {
+    window.paypal_sdk_promise = (async () => {
+      const script = document.createElement("script");
+      script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&components=buttons,card-fields`;
+      script.async = true;
+      document.head.appendChild(script);
+      return new Promise((resolve, reject) => {
+        script.onload = () => resolve(window.paypal);
+        script.onerror = () => reject(new Error("Failed to load PayPal SDK"));
+      });
+    })();
+  }
+
+  try {
+    await window.paypal_sdk_promise;
+  } catch (err) {
+    alert("Could not load PayPal. Please try again or use another method.");
     return;
   }
 
@@ -102,50 +140,59 @@ export const handlePayPalPurchase = (sku, displayName, amount, redirectUrl) => {
     }
   })();
 
-  window.paypal
-    .Buttons({
-      style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
-      createOrder: async () => {
-        const res = await fetch("/api/paypal/order/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sku: String(sku || "")
-              .trim()
-              .toLowerCase(),
-          }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data?.id) {
-          throw new Error(String(data?.error || "PayPal order create failed."));
-        }
-        return data.id;
-      },
-      onApprove: async (data) => {
-        try {
-          const res = await fetch("/api/paypal/order/capture", {
+  try {
+    // Generate client token for v6 (actually v5/latest standard Buttons but with server-side createOrder)
+    // The user mentioned v6 SDK which uses createInstance, but standard Buttons also work fine with server-side createOrder.
+    // Let's stick to the Buttons API as it's more stable for this use case, but ensure the SDK is loaded.
+
+    window.paypal
+      .Buttons({
+        style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
+        createOrder: async () => {
+          const res = await fetch("/api/paypal/order/create", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              orderId: data?.orderID,
               sku: String(sku || "")
                 .trim()
                 .toLowerCase(),
             }),
           });
-          const cap = await res.json().catch(() => ({}));
-          if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
-          close();
-          window.location.href = returnUrl;
-        } catch (err) {
-          console.error(err);
-          alert("PayPal capture failed.");
-        }
-      },
-      onError: (err) => {
-        console.error("PayPal error", err);
-        alert("PayPal checkout failed.");
-      },
-    })
-    .render(`#${containerId}`);
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data?.id) {
+            throw new Error(String(data?.error || "PayPal order create failed."));
+          }
+          return data.id;
+        },
+        onApprove: async (data) => {
+          try {
+            const res = await fetch("/api/paypal/order/capture", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                orderId: data?.orderID,
+                sku: String(sku || "")
+                  .trim()
+                  .toLowerCase(),
+              }),
+            });
+            const cap = await res.json().catch(() => ({}));
+            if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
+            close();
+            window.location.href = returnUrl;
+          } catch (err) {
+            console.error(err);
+            alert("PayPal capture failed.");
+          }
+        },
+        onError: (err) => {
+          console.error("PayPal error", err);
+          alert("PayPal checkout failed.");
+        },
+      })
+      .render(`#${containerId}`);
+  } catch (err) {
+    console.error("PayPal Buttons init error", err);
+    alert("Failed to initialize PayPal.");
+  }
 };

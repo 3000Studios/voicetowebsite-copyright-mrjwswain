@@ -112,6 +112,11 @@ const ensurePayPalSdk = async () => {
 };
 
 const openPayPalModal = async (product) => {
+  if (product.paypalPaymentLink) {
+    window.location.href = product.paypalPaymentLink;
+    return;
+  }
+
   const ok = await ensurePayPalSdk();
   if (!ok || !window.paypal) {
     alert("PayPal is not configured yet. Set PAYPAL_CLIENT_ID_PROD in your deploy environment.");

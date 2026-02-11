@@ -82,5 +82,6 @@
     "webdev",
     "webforge",
     "workerd"
-  ]
+  ],
+  "editor.linkedEditing": true
 }

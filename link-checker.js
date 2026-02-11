@@ -14,6 +14,8 @@ const IGNORE_DIRS = new Set([
   "black-vault",
   // Source drops / downloadable app bundles (not served as site pages)
   "app Store apps to Sell",
+  // PayPal integration sample files (not served as site pages)
+  "v6-web-sdk-sample-integration",
 ]);
 const HTML_RE = /\.html?$/i;
 const ATTR_RE = /\s(?:href|src)\s*=\s*"([^"]+)"/gi;

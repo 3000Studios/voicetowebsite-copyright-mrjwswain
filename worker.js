@@ -139,6 +139,16 @@ const paypalApiFetch = async (env, path, init = {}) => {
   return fetch(url, { ...init, headers });
 };
 
+const getPayPalClientToken = async (env) => {
+  const { apiBase } = await getPayPalAccessToken(env);
+  const res = await paypalApiFetch(env, "/v1/identity/generate-token", {
+    method: "POST",
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || "Failed to generate PayPal client token.");
+  return data.client_token;
+};
+
 // Simple dynamic-price PayPal helpers (mirrors existing catalog flow)
 export const createPayPalOrder = async (env, product = {}) => {
   const amount = toUsdString(product.price);
@@ -346,6 +356,16 @@ export default {
     // Bot hub (coordination + shared brief for multiple AI bots)
     if (url.pathname.startsWith("/api/bot-hub")) {
       return addSecurityHeaders(await handleBotHubRequest({ request, env, ctx }));
+    }
+
+    // PayPal Client Token for v6 SDK
+    if (url.pathname === "/api/paypal/client-token" && request.method === "POST") {
+      try {
+        const token = await getPayPalClientToken(env);
+        return jsonResponse(200, { clientToken: token });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
+      }
     }
 
     // Bot status feed for the voice command center UI.
