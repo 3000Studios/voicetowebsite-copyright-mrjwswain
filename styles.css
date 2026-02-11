@@ -1423,7 +1423,7 @@ input[type="search"]:focus {
 }
 
 .features li:before {
-  content: "Ã¢ÂÂ";
+  content: "ÃÂ¢ÃÂÃÂ";
   color: var(--success-color);
   margin-right: 0.75rem;
   font-weight: bold;
@@ -1434,7 +1434,7 @@ input[type="search"]:focus {
 }
 
 .features li.not-included:before {
-  content: "Ã¢ÂÂ";
+  content: "ÃÂ¢ÃÂÃÂ";
   color: inherit;
 }
 
@@ -2304,3 +2304,7 @@ button.ghost:hover {
 
 /* Voice-injected styles */
 @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+
+/* Voice-injected styles */
+h1 { font-size: 32px; font-weight: bold; color: blue; animation: pulse 2s infinite; } @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
