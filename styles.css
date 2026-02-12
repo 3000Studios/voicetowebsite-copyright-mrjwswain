@@ -2339,3 +2339,17 @@ h1 {
   color: green;
   text-align: center;
 }
+
+
+/* Voice-injected styles */
+.commerce-dashboard::after {
+   content: '';
+   background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Golde33443.jpg/640px-Golde33443.jpg');
+   position: absolute;
+   bottom: 0;
+   right: 0;
+   width: 180px;
+   border-radius: 16px;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+}
