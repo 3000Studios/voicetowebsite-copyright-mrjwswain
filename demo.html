@@ -71,8 +71,8 @@
         <p class="eyebrow">Demo</p>
         <h1 class="vt-h1">Build by voice (in seconds)</h1>
         <p class="subhead">
-          Pick a site type, speak or type a prompt, choose a vibe, and get a generated outline instantly. Save with
-          email when you’re ready.
+          Pick a site type, speak or type a prompt, choose a vibe, and get a live generated preview. Save with email to
+          receive your preview link plus PayPal purchase options.
         </p>
         <div class="cta-row">
           <a class="btn btn-ghost" href="#gallery">Command Gallery</a>
@@ -137,12 +137,18 @@
 
           <section class="demo-panel is-hidden" data-panel="3">
             <h3>Pick a style</h3>
-            <p class="muted">Choose a theme + typography vibe.</p>
+            <p class="muted">Choose a theme + prebuilt style libraries (animations, colors, sizes, layout packs).</p>
             <div class="vt-grid">
               <button class="choice-card" data-theme="midnight" type="button">Midnight Glass</button>
               <button class="choice-card" data-theme="volt" type="button">Volt</button>
               <button class="choice-card" data-theme="ember" type="button">Ember</button>
               <button class="choice-card" data-theme="ocean" type="button">Ocean</button>
+            </div>
+            <div class="prompt-shell">
+              <label class="prompt-label">Prebuilt style libraries</label>
+              <p class="muted">Select packs to instantly apply styles to the generated preview.</p>
+              <div class="vt-grid" id="stylePackList"></div>
+              <p class="muted" id="stylePackStatus"></p>
             </div>
             <div class="demo-nav">
               <button class="btn btn-ghost" data-prev type="button">Back</button>
@@ -152,15 +158,32 @@
 
           <section class="demo-panel is-hidden" data-panel="4">
             <h3>Preview (instant)</h3>
-            <p class="muted">This is a fast outline preview. The full build happens after you save.</p>
+            <p class="muted">This creates a live preview URL right away so you can see changes immediately.</p>
             <div class="preview-shell">
               <div class="preview-card">
                 <div class="preview-title" id="previewTitle">—</div>
+                <p class="muted" id="livePreviewStatus">No live preview generated yet.</p>
+                <a id="livePreviewLink" class="btn btn-ghost is-hidden" href="#" target="_blank" rel="noreferrer">
+                  Open live preview
+                </a>
                 <ul class="preview-list" id="previewList"></ul>
               </div>
               <div class="preview-card">
                 <div class="preview-title">Recommended next</div>
                 <div class="muted" id="previewNext">Add pricing, add testimonials, and publish.</div>
+                <iframe
+                  id="livePreviewFrame"
+                  class="is-hidden"
+                  title="Live generated preview"
+                  style="
+                    width: 100%;
+                    min-height: 280px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                    border-radius: 12px;
+                    background: rgba(0, 0, 0, 0.35);
+                    margin-top: 12px;
+                  "
+                ></iframe>
               </div>
             </div>
             <div class="demo-nav">
@@ -171,7 +194,9 @@
 
           <section class="demo-panel is-hidden" data-panel="5">
             <h3>Save and publish</h3>
-            <p class="muted">Enter email to save this build. You’ll get a publish link and plan options.</p>
+            <p class="muted">
+              Enter email to save this build. You’ll get the live preview link plus PayPal purchase options.
+            </p>
             <div class="prompt-shell">
               <label class="prompt-label" for="demoEmail">Email</label>
               <input id="demoEmail" type="email" placeholder="you@example.com" autocomplete="email" />
@@ -180,6 +205,7 @@
                 <a class="btn btn-ghost" href="/pricing">Compare plans</a>
               </div>
               <p class="muted" id="demoSaveStatus" aria-live="polite"></p>
+              <ul class="preview-list" id="demoSaveLinks"></ul>
             </div>
             <div class="demo-nav">
               <button class="btn btn-ghost" data-prev type="button">Back</button>

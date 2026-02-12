@@ -13,6 +13,7 @@ import {
   handlePreviewApiRequest,
   handlePreviewPageRequest,
   handlePublishRequest,
+  handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
 import catalog from "./products.json";
 
@@ -82,6 +83,48 @@ const getPayPalCredentials = (env) => {
   };
 };
 
+const getPayPalCredentialsForMode = (env, mode) => {
+  const liveClientId = String(env.PAYPAL_CLIENT_ID_PROD || "").trim();
+  const liveSecret = String(env.PAYPAL_CLIENT_SECRET_PROD || "").trim();
+  const sandboxClientId = String(env.PAYPAL_CLIENT_ID || "").trim();
+  const sandboxSecret = String(env.PAYPAL_CLIENT_SECRET || "").trim();
+  if (mode === "live") {
+    return {
+      mode: "live",
+      clientId: liveClientId || sandboxClientId,
+      clientSecret: liveSecret || sandboxSecret,
+      apiBase: "https://api-m.paypal.com",
+    };
+  }
+  return {
+    mode: "sandbox",
+    clientId: sandboxClientId || liveClientId,
+    clientSecret: sandboxSecret || liveSecret,
+    apiBase: "https://api-m.sandbox.paypal.com",
+  };
+};
+
+const isPayPalAuthError = (status, detail) => {
+  const d = String(detail || "").toLowerCase();
+  return status === 401 || d.includes("authentication") || d.includes("invalid client");
+};
+
+const requestPayPalAccessToken = async ({ clientId, clientSecret, apiBase }) => {
+  const basic = btoa(`${clientId}:${clientSecret}`);
+  const form = new URLSearchParams();
+  form.set("grant_type", "client_credentials");
+  const res = await fetch(`${apiBase}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${basic}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: form.toString(),
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, data };
+};
+
 const getPayPalAccessToken = async (env) => {
   const { mode, clientId, clientSecret, apiBase } = getPayPalCredentials(env);
   if (!clientId) {
@@ -100,33 +143,44 @@ const getPayPalAccessToken = async (env) => {
     paypalTokenCache.clientId === clientId &&
     paypalTokenCache.expiresAtMs - 60_000 > now;
   if (validCache) return { accessToken: paypalTokenCache.accessToken, apiBase };
+  const primary = { mode, clientId, clientSecret, apiBase };
+  let tokenRes = await requestPayPalAccessToken(primary);
+  let active = primary;
 
-  const basic = btoa(`${clientId}:${clientSecret}`);
-  const form = new URLSearchParams();
-  form.set("grant_type", "client_credentials");
-  const res = await fetch(`${apiBase}/v1/oauth2/token`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${basic}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: form.toString(),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const detail = data?.error_description || data?.error || "PayPal token request failed.";
-    throw new Error(detail);
+  // If mode is misconfigured for current credentials, auto-fallback once.
+  if (!tokenRes.ok) {
+    const detail = tokenRes?.data?.error_description || tokenRes?.data?.error || "";
+    if (isPayPalAuthError(tokenRes.status, detail)) {
+      const alternateMode = mode === "live" ? "sandbox" : "live";
+      const alternate = getPayPalCredentialsForMode(env, alternateMode);
+      const hasAlternate =
+        alternate.clientId &&
+        alternate.clientSecret &&
+        (alternate.clientId !== primary.clientId || alternate.clientSecret !== primary.clientSecret);
+      if (hasAlternate) {
+        const fallbackRes = await requestPayPalAccessToken(alternate);
+        if (fallbackRes.ok) {
+          tokenRes = fallbackRes;
+          active = alternate;
+        }
+      }
+    }
   }
 
-  const accessToken = String(data?.access_token || "");
-  const expiresInSec = Number(data?.expires_in || 0);
+  if (!tokenRes.ok) {
+    const detail = tokenRes?.data?.error_description || tokenRes?.data?.error || "PayPal token request failed.";
+    throw new Error(`${detail} (Mode: ${mode}, ClientID: ${clientId.substring(0, 8)}..., API: ${apiBase})`);
+  }
+
+  const accessToken = String(tokenRes?.data?.access_token || "");
+  const expiresInSec = Number(tokenRes?.data?.expires_in || 0);
   paypalTokenCache = {
-    mode,
-    clientId,
+    mode: active.mode,
+    clientId: active.clientId,
     accessToken,
     expiresAtMs: now + Math.max(0, expiresInSec) * 1000,
   };
-  return { accessToken, apiBase };
+  return { accessToken, apiBase: active.apiBase };
 };
 
 const paypalApiFetch = async (env, path, init = {}) => {
@@ -157,6 +211,118 @@ const createErrorResponse = (status, message, code = null) => {
     code: code,
     timestamp: new Date().toISOString(),
   });
+};
+
+const escapeHtml = (value) =>
+  String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+const getPayPalPlanLinks = (env, origin) => {
+  const fallback = (plan) => `${origin}/store.html?plan=${encodeURIComponent(plan)}&pay=paypal`;
+  const fromEnv = (key, plan) => String(env[key] || "").trim() || fallback(plan);
+  return [
+    { plan: "starter", label: "Starter Site", link: fromEnv("PAYPAL_PAYMENT_LINK_STARTER", "starter") },
+    { plan: "growth", label: "Growth Voice", link: fromEnv("PAYPAL_PAYMENT_LINK_GROWTH", "growth") },
+    { plan: "enterprise", label: "Enterprise Edge", link: fromEnv("PAYPAL_PAYMENT_LINK_ENTERPRISE", "enterprise") },
+    { plan: "lifetime", label: "Lifetime App", link: fromEnv("PAYPAL_PAYMENT_LINK_LIFETIME", "lifetime") },
+  ];
+};
+
+const buildDemoEmailHtml = ({ previewUrl, prompt, plans }) => {
+  const promptSafe = escapeHtml(prompt || "");
+  const planLinks = plans
+    .map(
+      (p) =>
+        `<li style="margin:8px 0;"><a href="${escapeHtml(p.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.label)}</a></li>`
+    )
+    .join("");
+  return `
+    <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.5;color:#111;">
+      <h2>Your VoiceToWebsite preview is ready</h2>
+      <p><strong>Live preview:</strong> <a href="${escapeHtml(previewUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(previewUrl)}</a></p>
+      <p><strong>Your request:</strong> ${promptSafe || "Website build request"}</p>
+      <h3>Purchase options (PayPal)</h3>
+      <ul style="padding-left:18px;">${planLinks}</ul>
+      <p>You can reply to this email if you want us to publish directly to your domain.</p>
+    </div>
+  `;
+};
+
+const buildDemoEmailText = ({ previewUrl, prompt, plans }) => {
+  const options = plans.map((p) => `- ${p.label}: ${p.link}`).join("\n");
+  return `Your VoiceToWebsite preview is ready.\n\nLive preview: ${previewUrl}\n\nRequest: ${prompt || "Website build request"}\n\nPayPal options:\n${options}\n`;
+};
+
+const sendDemoEmail = async (env, { to, subject, html, text }) => {
+  const resendKey = String(env.RESEND_API_KEY || "").trim();
+  const sendgridKey = String(env.SENDGRID_API_KEY || "").trim();
+  const from = String(env.DEMO_EMAIL_FROM || env.EMAIL_FROM || "VoiceToWebsite <noreply@voicetowebsite.com>").trim();
+
+  if (resendKey) {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject,
+        html,
+        text,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { sent: res.ok, provider: "resend", details: data };
+  }
+
+  if (sendgridKey) {
+    const fromEmailMatch = from.match(/<([^>]+)>/);
+    const fromEmail = fromEmailMatch ? fromEmailMatch[1] : from;
+    const fromName = fromEmailMatch ? from.replace(/\s*<[^>]+>\s*/, "") : "VoiceToWebsite";
+    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${sendgridKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: to }] }],
+        from: { email: fromEmail, name: fromName },
+        subject,
+        content: [
+          { type: "text/plain", value: text },
+          { type: "text/html", value: html },
+        ],
+      }),
+    });
+    const details = await res.text().catch(() => "");
+    return { sent: res.ok, provider: "sendgrid", details };
+  }
+
+  // MailChannels fallback (no API key required for many Worker setups).
+  const fromEmailMatch = from.match(/<([^>]+)>/);
+  const fromEmail = fromEmailMatch ? fromEmailMatch[1] : from;
+  const fromName = fromEmailMatch ? from.replace(/\s*<[^>]+>\s*/, "") : "VoiceToWebsite";
+  const mcRes = await fetch("https://api.mailchannels.net/tx/v1/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      personalizations: [{ to: [{ email: to }] }],
+      from: { email: fromEmail, name: fromName },
+      subject,
+      content: [
+        { type: "text/plain", value: text },
+        { type: "text/html", value: html },
+      ],
+    }),
+  });
+  const details = await mcRes.text().catch(() => "");
+  return { sent: mcRes.ok, provider: "mailchannels", details };
 };
 
 // Generate HMAC signature using Web Crypto API
@@ -425,6 +591,127 @@ export default {
     if (url.pathname === "/api/publish" && request.method === "POST") {
       return addSecurityHeaders(await handlePublishRequest({ request, env, ctx }));
     }
+    if (url.pathname === "/api/style-packs" && request.method === "GET") {
+      return addSecurityHeaders(await handleStylePacksRequest({ request, env, ctx }));
+    }
+    if (url.pathname === "/api/demo/save" && request.method === "POST") {
+      try {
+        const body = await request.clone().json();
+        const email = String(body?.email || "")
+          .trim()
+          .toLowerCase();
+        const prompt = String(body?.prompt || "").trim();
+        const transcript = String(body?.transcript || "").trim();
+        const siteType = String(body?.siteType || "").trim();
+        const theme = String(body?.theme || "").trim();
+        const stylePackIds = Array.isArray(body?.stylePackIds)
+          ? body.stylePackIds.map((v) => String(v || "").trim()).filter(Boolean)
+          : [];
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return jsonResponse(400, { error: "Valid email required." });
+        }
+        if (!prompt) {
+          return jsonResponse(400, { error: "Prompt required." });
+        }
+
+        // Generate a live preview first so the email always contains a concrete link.
+        const generateReq = new Request(new URL("/api/generate", request.url), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt,
+            transcript,
+            tone: theme || siteType || "default",
+            stylePackIds,
+          }),
+        });
+        const generateRes = await handleGenerateRequest({ request: generateReq, env, ctx });
+        const generateData = await generateRes
+          .clone()
+          .json()
+          .catch(() => ({}));
+        if (!generateRes.ok || !generateData?.siteId) {
+          return jsonResponse(generateRes.status || 500, {
+            error: generateData?.error || "Failed to generate preview.",
+          });
+        }
+
+        const origin = `${url.protocol}//${url.host}`;
+        const previewUrl = new URL(
+          String(generateData.previewUrl || `/preview/${generateData.siteId}`),
+          origin
+        ).toString();
+        const paymentOptions = getPayPalPlanLinks(env, origin);
+
+        const subject = "Your VoiceToWebsite preview + PayPal options";
+        const html = buildDemoEmailHtml({
+          previewUrl,
+          prompt,
+          plans: paymentOptions,
+        });
+        const text = buildDemoEmailText({
+          previewUrl,
+          prompt,
+          plans: paymentOptions,
+        });
+        const emailResult = await sendDemoEmail(env, { to: email, subject, html, text });
+
+        if (env.D1) {
+          try {
+            await env.D1.prepare(
+              `CREATE TABLE IF NOT EXISTS demo_leads (
+                 id TEXT PRIMARY KEY,
+                 ts DATETIME DEFAULT CURRENT_TIMESTAMP,
+                 email TEXT,
+                 prompt TEXT,
+                 site_type TEXT,
+                 theme TEXT,
+                 style_pack_ids TEXT,
+                 site_id TEXT,
+                 preview_url TEXT,
+                 email_provider TEXT,
+                 email_sent INTEGER
+               );`
+            ).run();
+            await env.D1.prepare(
+              `INSERT INTO demo_leads (id, email, prompt, site_type, theme, style_pack_ids, site_id, preview_url, email_provider, email_sent)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            )
+              .bind(
+                crypto.randomUUID(),
+                email,
+                prompt,
+                siteType,
+                theme,
+                JSON.stringify(stylePackIds),
+                String(generateData.siteId),
+                previewUrl,
+                String(emailResult?.provider || ""),
+                emailResult?.sent ? 1 : 0
+              )
+              .run();
+          } catch (err) {
+            console.warn("demo_leads insert failed:", err);
+          }
+        }
+
+        return jsonResponse(200, {
+          ok: true,
+          siteId: String(generateData.siteId),
+          previewUrl,
+          layout: generateData.layout || null,
+          paymentOptions,
+          email: {
+            sent: Boolean(emailResult?.sent),
+            provider: emailResult?.provider || "",
+            error: emailResult?.sent ? "" : String(emailResult?.details || "Email delivery failed."),
+          },
+        });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message || "Failed to save demo lead." });
+      }
+    }
 
     // Bot hub (coordination + shared brief for multiple AI bots)
     if (url.pathname.startsWith("/api/bot-hub")) {
@@ -593,6 +880,12 @@ export default {
         paypal_client_id: !!(env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID),
         paypal_secret: !!(env.PAYPAL_CLIENT_SECRET_PROD || env.PAYPAL_CLIENT_SECRET),
         paypal_mode: getPayPalMode(env),
+        paypal_payment_links: {
+          starter: !!env.PAYPAL_PAYMENT_LINK_STARTER,
+          growth: !!env.PAYPAL_PAYMENT_LINK_GROWTH,
+          enterprise: !!env.PAYPAL_PAYMENT_LINK_ENTERPRISE,
+          lifetime: !!env.PAYPAL_PAYMENT_LINK_LIFETIME,
+        },
         adsense_publisher: !!(env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID),
         adsense_customer_id: !!env.ADSENSE_CUSTOMER_ID,
         adsense_mode: String(env.ADSENSE_MODE || "auto")
@@ -1592,6 +1885,10 @@ export default {
             STRIPE_PAYMENT_LINK_GROWTH: "${env.STRIPE_PAYMENT_LINK_GROWTH || ""}",
             STRIPE_PAYMENT_LINK_ENTERPRISE: "${env.STRIPE_PAYMENT_LINK_ENTERPRISE || ""}",
             STRIPE_PAYMENT_LINK_LIFETIME: "${env.STRIPE_PAYMENT_LINK_LIFETIME || ""}",
+            PAYPAL_PAYMENT_LINK_STARTER: "${env.PAYPAL_PAYMENT_LINK_STARTER || ""}",
+            PAYPAL_PAYMENT_LINK_GROWTH: "${env.PAYPAL_PAYMENT_LINK_GROWTH || ""}",
+            PAYPAL_PAYMENT_LINK_ENTERPRISE: "${env.PAYPAL_PAYMENT_LINK_ENTERPRISE || ""}",
+            PAYPAL_PAYMENT_LINK_LIFETIME: "${env.PAYPAL_PAYMENT_LINK_LIFETIME || ""}",
             STRIPE_BUY_BUTTON_ID_STARTER: "${env.STRIPE_BUY_BUTTON_ID_STARTER || ""}",
             STRIPE_BUY_BUTTON_ID_GROWTH: "${env.STRIPE_BUY_BUTTON_ID_GROWTH || ""}",
             STRIPE_BUY_BUTTON_ID_ENTERPRISE: "${env.STRIPE_BUY_BUTTON_ID_ENTERPRISE || ""}",

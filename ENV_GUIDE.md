@@ -33,6 +33,14 @@ These are new recommendations to improve site operations, flexibility, and secur
 | `PAYPAL_CLIENT_ID_PROD`     | PayPal Client ID for Live/Production environment.          |
 | `PAYPAL_CLIENT_SECRET_PROD` | PayPal Secret for Live/Production environment.             |
 
+### Demo Email Delivery
+
+| Variable           | Description                                                                |
+| :----------------- | :------------------------------------------------------------------------- |
+| `RESEND_API_KEY`   | Preferred provider for demo result emails (`/api/demo/save`).              |
+| `SENDGRID_API_KEY` | Fallback provider if Resend is not configured.                             |
+| `DEMO_EMAIL_FROM`  | Sender identity for outbound demo emails (example: `Brand <noreply@...>`). |
+
 ### SEO & Analytics
 
 | Variable            | Description                                                                             |

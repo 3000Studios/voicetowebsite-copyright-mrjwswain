@@ -34,7 +34,6 @@
     <meta property="twitter:image" content="https://voicetowebsite.com/assets/store-og.jpg" />
 
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD"></script>
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
@@ -278,16 +277,6 @@
           <div class="store-product-scene" id="store-product-scene"></div>
         </section>
       </section>
-      <section class="section" id="dog-picture">
-        <h2>Dog of the Day</h2>
-        <p>
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Golde33443.jpg/640px-Golde33443.jpg"
-            alt="Golden retriever dog"
-            style="max-width: 320px; width: 100%; border-radius: 16px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35)"
-          />
-        </p>
-      </section>
     </main>
     <script src="https://js.stripe.com/v3"></script>
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
@@ -471,6 +460,27 @@
       document.querySelectorAll(".pay-btn").forEach((btn) => {
         btn.addEventListener("click", () => handlePayPal(btn));
       });
+
+      const openPayPalByProduct = (product) => {
+        const btn = document.querySelector(`.pay-btn[data-product="${String(product || "").toLowerCase()}"]`);
+        if (btn) handlePayPal(btn);
+      };
+
+      // Deep-link support for email purchase links:
+      // /store.html?plan=growth&pay=paypal
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const plan = String(params.get("plan") || params.get("product") || "")
+          .trim()
+          .toLowerCase();
+        const pay = String(params.get("pay") || "")
+          .trim()
+          .toLowerCase();
+        if (plan && pay === "paypal") {
+          // Defer so the page paints before opening the overlay.
+          setTimeout(() => openPayPalByProduct(plan), 350);
+        }
+      } catch (_) {}
       const storeSearch = document.getElementById("storeSearch");
       const storeCards = Array.from(document.querySelectorAll(".pricing-deck .card"));
 

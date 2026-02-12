@@ -40,6 +40,7 @@ GH_REPO = "3000Studios/voicetowebsite-copyright-mrjwswain"
 ADSENSE_PUBLISHER = "ca-pub-5800977493749262"
 ADSENSE_CUSTOMER_ID = "7555696606"
 ADSENSE_MODE = "auto"
+PAYPAL_ENV = "live"
 # NOTE: Do not commit secrets.
 # Set runtime variables/secrets in the Cloudflare Dashboard (Worker settings) or via `wrangler secret put`.
 # Examples (dashboard): ADMIN_EMAIL, PAYPAL_CLIENT_ID, ADSENSE_*.

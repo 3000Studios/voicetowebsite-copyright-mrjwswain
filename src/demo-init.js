@@ -31,6 +31,12 @@ const getEls = () => ({
   previewTitle: document.getElementById("previewTitle"),
   previewList: document.getElementById("previewList"),
   previewNext: document.getElementById("previewNext"),
+  livePreviewStatus: document.getElementById("livePreviewStatus"),
+  livePreviewLink: document.getElementById("livePreviewLink"),
+  livePreviewFrame: document.getElementById("livePreviewFrame"),
+  stylePackList: document.getElementById("stylePackList"),
+  stylePackStatus: document.getElementById("stylePackStatus"),
+  saveLinks: document.getElementById("demoSaveLinks"),
   gallery: document.getElementById("commandGallery"),
 });
 
@@ -39,6 +45,10 @@ const defaultState = () => ({
   siteType: "creator",
   prompt: "",
   theme: "midnight",
+  stylePackIds: [],
+  generatedSiteId: "",
+  generatedPreviewUrl: "",
+  generatedLayout: null,
 });
 
 const loadState = () => {
@@ -106,19 +116,139 @@ const generateOutline = ({ siteType, prompt }) => {
   return { title, sections };
 };
 
+const toAbsoluteUrl = (value) => {
+  try {
+    return new URL(String(value || ""), window.location.origin).toString();
+  } catch {
+    return "";
+  }
+};
+
+const renderSaveLinks = (els, items = []) => {
+  if (!els.saveLinks) return;
+  els.saveLinks.innerHTML = "";
+  items.forEach((item) => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = item.href;
+    a.target = "_blank";
+    a.rel = "noreferrer";
+    a.textContent = item.label;
+    li.appendChild(a);
+    els.saveLinks.appendChild(li);
+  });
+};
+
+const renderStylePackChoices = (els, state, packs) => {
+  if (!els.stylePackList) return;
+  els.stylePackList.innerHTML = "";
+  packs.forEach((pack) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice-card";
+    btn.dataset.stylePack = pack.id;
+    btn.innerHTML = `<strong>${pack.name}</strong><br /><span class="muted">${pack.category}</span>`;
+    btn.classList.toggle("is-selected", state.stylePackIds.includes(pack.id));
+    els.stylePackList.appendChild(btn);
+  });
+  if (els.stylePackStatus) {
+    els.stylePackStatus.textContent = state.stylePackIds.length
+      ? `${state.stylePackIds.length} style libraries selected.`
+      : "No style packs selected yet.";
+  }
+};
+
+const fetchStylePacks = async (els, state) => {
+  if (!els.stylePackList) return [];
+  try {
+    const res = await fetch("/api/style-packs");
+    const data = await res.json().catch(() => ({}));
+    const packs = Array.isArray(data?.stylePacks) ? data.stylePacks : [];
+    renderStylePackChoices(els, state, packs);
+    return packs;
+  } catch {
+    if (els.stylePackStatus) els.stylePackStatus.textContent = "Style libraries unavailable right now.";
+    return [];
+  }
+};
+
+const generateLivePreview = async (state, els) => {
+  const prompt = (state.prompt || "").trim();
+  if (!prompt) return;
+  if (els.livePreviewStatus) els.livePreviewStatus.textContent = "Generating live preview...";
+  try {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt,
+        tone: state.theme,
+        stylePackIds: state.stylePackIds || [],
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.siteId) {
+      throw new Error(String(data?.error || "Generation failed."));
+    }
+    state.generatedSiteId = String(data.siteId || "");
+    state.generatedPreviewUrl = toAbsoluteUrl(data.previewUrl || "");
+    state.generatedLayout = data.layout || null;
+    saveState(state);
+
+    if (els.livePreviewStatus) els.livePreviewStatus.textContent = "Live preview ready.";
+    if (els.livePreviewLink && state.generatedPreviewUrl) {
+      els.livePreviewLink.href = state.generatedPreviewUrl;
+      els.livePreviewLink.classList.remove("is-hidden");
+    }
+    if (els.livePreviewFrame && state.generatedPreviewUrl) {
+      els.livePreviewFrame.src = state.generatedPreviewUrl;
+      els.livePreviewFrame.classList.remove("is-hidden");
+    }
+  } catch (err) {
+    if (els.livePreviewStatus) {
+      els.livePreviewStatus.textContent = `Live preview failed: ${err?.message || "unknown error"}`;
+    }
+  }
+};
+
 const renderPreview = (state, els) => {
   const outline = generateOutline({ siteType: state.siteType, prompt: state.prompt });
-  if (els.previewTitle) els.previewTitle.textContent = outline.title;
+  const generatedPages = Array.isArray(state.generatedLayout?.pages) ? state.generatedLayout.pages : [];
+  const listItems = generatedPages.length
+    ? generatedPages.map((page) => String(page?.title || page?.slug || "Page"))
+    : outline.sections;
+
+  if (els.previewTitle) {
+    els.previewTitle.textContent = state.generatedLayout?.title || outline.title;
+  }
   if (els.previewList) {
     els.previewList.innerHTML = "";
-    outline.sections.forEach((section) => {
+    listItems.forEach((section) => {
       const li = document.createElement("li");
       li.textContent = section;
       els.previewList.appendChild(li);
     });
   }
   if (els.previewNext) {
-    els.previewNext.textContent = "Add pricing, add testimonials, then publish to your domain.";
+    els.previewNext.textContent = state.generatedPreviewUrl
+      ? "Preview looks right? Save by email to get your link + PayPal options."
+      : "Generate a live preview, then save by email.";
+  }
+  if (els.livePreviewLink) {
+    if (state.generatedPreviewUrl) {
+      els.livePreviewLink.href = state.generatedPreviewUrl;
+      els.livePreviewLink.classList.remove("is-hidden");
+    } else {
+      els.livePreviewLink.classList.add("is-hidden");
+    }
+  }
+  if (els.livePreviewFrame) {
+    if (state.generatedPreviewUrl) {
+      els.livePreviewFrame.src = state.generatedPreviewUrl;
+      els.livePreviewFrame.classList.remove("is-hidden");
+    } else {
+      els.livePreviewFrame.classList.add("is-hidden");
+    }
   }
 };
 
@@ -154,6 +284,22 @@ const wireChoices = (state) => {
       setTheme(state.theme);
       saveState(state);
     }
+
+    const stylePackChoice = event.target.closest("[data-style-pack]");
+    if (stylePackChoice) {
+      const id = String(stylePackChoice.getAttribute("data-style-pack") || "").trim();
+      if (!id) return;
+      const exists = state.stylePackIds.includes(id);
+      state.stylePackIds = exists ? state.stylePackIds.filter((v) => v !== id) : [...state.stylePackIds, id];
+      stylePackChoice.classList.toggle("is-selected", !exists);
+      const status = document.getElementById("stylePackStatus");
+      if (status) {
+        status.textContent = state.stylePackIds.length
+          ? `${state.stylePackIds.length} style libraries selected.`
+          : "No style packs selected yet.";
+      }
+      saveState(state);
+    }
   });
 };
 
@@ -170,6 +316,11 @@ const wireNavButtons = (state, els) => {
           els.micStatus && (els.micStatus.textContent = "Add a prompt to continue.");
           return;
         }
+        if (text !== state.prompt) {
+          state.generatedSiteId = "";
+          state.generatedPreviewUrl = "";
+          state.generatedLayout = null;
+        }
         state.prompt = text;
       }
       state.step += 1;
@@ -178,11 +329,19 @@ const wireNavButtons = (state, els) => {
     }
 
     showStep(state, els);
+    if (state.step === 4) {
+      void generateLivePreview(state, els).then(() => renderPreview(state, els));
+    }
   });
 };
 
 const wirePrompt = (state, els) => {
   els.prompt?.addEventListener("input", () => {
+    if ((els.prompt.value || "").trim() !== (state.prompt || "").trim()) {
+      state.generatedSiteId = "";
+      state.generatedPreviewUrl = "";
+      state.generatedLayout = null;
+    }
     state.prompt = els.prompt.value;
     saveState(state);
   });
@@ -247,25 +406,71 @@ const wireSave = (state, els) => {
   const loadBuilds = () => safeJsonParse(localStorage.getItem(SAVED_BUILDS_KEY) || "[]", []);
   const saveBuilds = (list) => localStorage.setItem(SAVED_BUILDS_KEY, JSON.stringify(list.slice(0, 50)));
 
-  els.saveBtn?.addEventListener("click", () => {
+  els.saveBtn?.addEventListener("click", async () => {
     const email = (els.email?.value || "").trim();
     if (!isValidEmail(email)) {
       els.saveStatus && (els.saveStatus.textContent = "Enter a valid email.");
       return;
     }
+    if (!(state.prompt || "").trim()) {
+      els.saveStatus && (els.saveStatus.textContent = "Add a prompt first.");
+      return;
+    }
+
+    if (els.saveBtn) els.saveBtn.setAttribute("disabled", "true");
+    if (els.saveStatus) els.saveStatus.textContent = "Saving and sending email...";
+    renderSaveLinks(els, []);
 
     const build = {
       email,
       siteType: state.siteType,
       theme: state.theme,
       prompt: state.prompt,
+      stylePackIds: state.stylePackIds || [],
       ts: new Date().toISOString(),
     };
-    const list = loadBuilds();
-    list.unshift(build);
-    saveBuilds(list);
-    els.saveStatus && (els.saveStatus.textContent = "Saved locally. In production, you’ll receive a publish link.");
-    if (els.email) els.email.value = "";
+    try {
+      const res = await fetch("/api/demo/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(build),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.ok) {
+        throw new Error(String(data?.error || "Save failed."));
+      }
+      state.generatedSiteId = String(data?.siteId || state.generatedSiteId || "");
+      state.generatedPreviewUrl = toAbsoluteUrl(data?.previewUrl || state.generatedPreviewUrl || "");
+      state.generatedLayout = data?.layout || state.generatedLayout || null;
+      saveState(state);
+      renderPreview(state, els);
+
+      const linkItems = [];
+      if (state.generatedPreviewUrl) {
+        linkItems.push({ label: "Open your live preview", href: state.generatedPreviewUrl });
+      }
+      (data?.paymentOptions || []).forEach((option) => {
+        if (option?.label && option?.link) {
+          linkItems.push({ label: `Buy ${option.label} (PayPal)`, href: option.link });
+        }
+      });
+      renderSaveLinks(els, linkItems);
+
+      const emailSent = Boolean(data?.email?.sent);
+      els.saveStatus &&
+        (els.saveStatus.textContent = emailSent
+          ? "Done. Email sent with your preview link and PayPal options."
+          : `Saved, but email failed: ${data?.email?.error || "delivery issue"}`);
+      if (els.email) els.email.value = "";
+    } catch (err) {
+      els.saveStatus && (els.saveStatus.textContent = `Save failed: ${err?.message || "unknown error"}`);
+      // Keep local fallback so the user does not lose progress.
+      const list = loadBuilds();
+      list.unshift(build);
+      saveBuilds(list);
+    } finally {
+      if (els.saveBtn) els.saveBtn.removeAttribute("disabled");
+    }
   });
 };
 
@@ -310,6 +515,10 @@ document.addEventListener("DOMContentLoaded", () => {
   wireMic(state, els);
   wireSave(state, els);
   renderGallery(els, state);
+  void fetchStylePacks(els, state);
 
   showStep(state, els);
+  if (state.step === 4 && (state.prompt || "").trim()) {
+    void generateLivePreview(state, els).then(() => renderPreview(state, els));
+  }
 });

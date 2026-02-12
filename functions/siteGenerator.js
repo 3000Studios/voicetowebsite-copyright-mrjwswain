@@ -56,6 +56,172 @@ const ensureSiteTables = async (env) => {
   ).run();
 };
 
+const STYLE_PACK_LIBRARY = [
+  {
+    id: "glass-ui",
+    name: "Glass UI",
+    category: "surface",
+    description: "Frosted cards, soft borders, and subtle blur.",
+    css: `.vtw-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;backdrop-filter:blur(8px);}`,
+  },
+  {
+    id: "neon-edges",
+    name: "Neon Edges",
+    category: "surface",
+    description: "Neon borders and glow accents.",
+    css: `.vtw-section{box-shadow:0 0 0 1px rgba(56,189,248,.45),0 0 24px rgba(56,189,248,.2);} h1,h2{color:#7dd3fc;}`,
+  },
+  {
+    id: "rounded-xl",
+    name: "Rounded XL",
+    category: "layout",
+    description: "Larger corner radii and softer geometry.",
+    css: `.vtw-section,.vtw-page{border-radius:22px;} .vtw-page{padding:20px;}`,
+  },
+  {
+    id: "compact-density",
+    name: "Compact Density",
+    category: "layout",
+    description: "Reduced spacing for denser dashboards.",
+    css: `.vtw-wrap{max-width:980px;padding:18px 14px;} .vtw-page{padding:10px 0;} .vtw-section{padding:8px 0;}`,
+  },
+  {
+    id: "spacious-density",
+    name: "Spacious Density",
+    category: "layout",
+    description: "More breathing room and larger spacing.",
+    css: `.vtw-wrap{max-width:1180px;padding:36px 24px;} .vtw-page{padding:26px 0;} .vtw-section{padding:16px 0;}`,
+  },
+  {
+    id: "bold-headings",
+    name: "Bold Headings",
+    category: "typography",
+    description: "Heavier headline weight and tighter tracking.",
+    css: `h1,h2,h3{font-weight:900;letter-spacing:-.02em;}`,
+  },
+  {
+    id: "editorial-serif",
+    name: "Editorial Serif",
+    category: "typography",
+    description: "Serif forward look for premium landing pages.",
+    css: `h1,h2,h3{font-family:Georgia,'Times New Roman',serif;} p{font-family:system-ui,sans-serif;}`,
+  },
+  {
+    id: "mono-tech",
+    name: "Mono Tech",
+    category: "typography",
+    description: "Monospace technical aesthetic.",
+    css: `body{font-family:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;} h1,h2,h3{letter-spacing:.01em;}`,
+  },
+  {
+    id: "ocean-gradient",
+    name: "Ocean Gradient",
+    category: "color",
+    description: "Cool blue/cyan gradient background.",
+    css: `body{background:radial-gradient(circle at 20% 10%,#0c4a6e 0%,#020617 45%,#020617 100%);}`,
+  },
+  {
+    id: "sunset-gradient",
+    name: "Sunset Gradient",
+    category: "color",
+    description: "Orange/pink cinematic gradient.",
+    css: `body{background:radial-gradient(circle at 15% 10%,#7c2d12 0%,#3f0f46 38%,#09090b 100%);}`,
+  },
+  {
+    id: "mint-gradient",
+    name: "Mint Gradient",
+    category: "color",
+    description: "Mint/teal clean startup palette.",
+    css: `body{background:radial-gradient(circle at 30% 12%,#064e3b 0%,#052e2b 35%,#020617 100%);} a{color:#6ee7b7;}`,
+  },
+  {
+    id: "high-contrast",
+    name: "High Contrast",
+    category: "accessibility",
+    description: "Increased text contrast for readability.",
+    css: `body{color:#ffffff;} .vtw-meta{opacity:.92;} a{color:#93c5fd;} .vtw-section{border-color:rgba(255,255,255,.24);}`,
+  },
+  {
+    id: "subtle-motion",
+    name: "Subtle Motion",
+    category: "animation",
+    description: "Gentle lift animation on section load.",
+    css: `.vtw-section{animation:vtwLift .42s ease both;} @keyframes vtwLift{from{opacity:.2;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}`,
+  },
+  {
+    id: "hover-lift",
+    name: "Hover Lift",
+    category: "animation",
+    description: "Card lift on hover for interactivity.",
+    css: `.vtw-section{transition:transform .18s ease,box-shadow .18s ease;} .vtw-section:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(2,132,199,.22);}`,
+  },
+  {
+    id: "no-motion",
+    name: "No Motion",
+    category: "accessibility",
+    description: "Disables movement-heavy transitions.",
+    css: `*{animation:none!important;transition:none!important;scroll-behavior:auto!important;}`,
+  },
+  {
+    id: "soft-shadow",
+    name: "Soft Shadow",
+    category: "surface",
+    description: "Ambient depth with soft shadows.",
+    css: `.vtw-section,.vtw-page{box-shadow:0 12px 28px rgba(0,0,0,.24);}`,
+  },
+  {
+    id: "hard-shadow",
+    name: "Hard Shadow",
+    category: "surface",
+    description: "Sharper graphic shadows for cards.",
+    css: `.vtw-section,.vtw-page{box-shadow:8px 8px 0 rgba(30,41,59,.75);}`,
+  },
+  {
+    id: "outline-focus",
+    name: "Outline Focus",
+    category: "accessibility",
+    description: "Strong keyboard focus outlines.",
+    css: `a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #f59e0b;outline-offset:2px;border-radius:8px;}`,
+  },
+  {
+    id: "rich-links",
+    name: "Rich Links",
+    category: "interaction",
+    description: "Animated underlines and stronger link affordance.",
+    css: `a{position:relative;text-decoration:none;} a::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:2px;background:currentColor;transition:width .2s ease;} a:hover::after{width:100%;}`,
+  },
+  {
+    id: "large-type",
+    name: "Large Type",
+    category: "typography",
+    description: "Bigger text scale for hero-forward pages.",
+    css: `h1{font-size:clamp(2rem,4vw,3.3rem);} h2{font-size:clamp(1.4rem,2.6vw,2.2rem);} p{font-size:1.04rem;}`,
+  },
+  {
+    id: "small-type",
+    name: "Small Type",
+    category: "typography",
+    description: "Tighter text scale for data-dense pages.",
+    css: `h1{font-size:clamp(1.6rem,3vw,2.4rem);} h2{font-size:clamp(1.2rem,2vw,1.8rem);} p{font-size:.96rem;}`,
+  },
+];
+
+const STYLE_PACK_IDS = new Set(STYLE_PACK_LIBRARY.map((pack) => pack.id));
+const normalizeStylePackIds = (value) => {
+  if (!Array.isArray(value)) return [];
+  const unique = [];
+  value.forEach((item) => {
+    const id = String(item || "").trim();
+    if (id && STYLE_PACK_IDS.has(id) && !unique.includes(id)) unique.push(id);
+  });
+  return unique.slice(0, 24);
+};
+
+const getStylePacksByIds = (ids) => {
+  const set = new Set(normalizeStylePackIds(ids));
+  return STYLE_PACK_LIBRARY.filter((pack) => set.has(pack.id));
+};
+
 const renderPreviewHtml = ({ siteId, layout, css }) => {
   const title = layout?.title || "Preview";
   const description = layout?.description || "Generated preview";
@@ -124,18 +290,25 @@ export async function handleGenerateRequest({ request, env }) {
   let prompt = "";
   let transcript = "";
   let tone = "";
+  let stylePackIds = [];
 
   const contentType = request.headers.get("content-type") || "";
   try {
     if (contentType.includes("application/json")) {
-      const body = await request.json();
+      const body = await request.clone().json();
       prompt = String(body?.prompt || "");
       transcript = String(body?.transcript || "");
       tone = String(body?.tone || "");
+      stylePackIds = normalizeStylePackIds(body?.stylePackIds || []);
     } else if (contentType.includes("multipart/form-data")) {
-      const form = await request.formData();
+      const form = await request.clone().formData();
       prompt = String(form.get("prompt") || "");
       tone = String(form.get("tone") || "");
+      const rawStylePacks = String(form.get("stylePackIds") || "")
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+      stylePackIds = normalizeStylePackIds(rawStylePacks);
       const audio = form.get("audio");
       if (audio && typeof audio.arrayBuffer === "function") {
         if (!env.AI) return json(501, { error: "Workers AI binding missing (AI)." });
@@ -196,7 +369,12 @@ ${mergedPrompt}
     return json(502, { error: `Layout generation failed: ${err.message}` });
   }
 
-  const css = layout?.theme ? `:root{--vtw-theme:'${layout.theme}';}` : "";
+  const selectedStylePacks = getStylePacksByIds(stylePackIds);
+  const generatedCss = layout?.theme ? `:root{--vtw-theme:'${layout.theme}';}` : "";
+  const css =
+    [generatedCss, ...selectedStylePacks.map((pack) => `/* style-pack:${pack.id} */\n${pack.css}`)]
+      .filter(Boolean)
+      .join("\n\n") || "";
   const html = renderPreviewHtml({ siteId, layout, css });
 
   await env.D1.prepare(
@@ -210,6 +388,8 @@ ${mergedPrompt}
     siteId,
     transcript,
     layout,
+    stylePackIds: selectedStylePacks.map((pack) => pack.id),
+    stylePacks: selectedStylePacks.map(({ id, name, category, description }) => ({ id, name, category, description })),
     previewUrl: `/preview/${siteId}`,
   });
 }
@@ -241,6 +421,18 @@ export async function handlePreviewPageRequest({ request, env }) {
   const row = await env.D1.prepare("SELECT html FROM sites WHERE id = ?").bind(siteId).first();
   if (!row?.html) return new Response("Not found", { status: 404 });
   return new Response(row.html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
+}
+
+export async function handleStylePacksRequest() {
+  return json(200, {
+    stylePacks: STYLE_PACK_LIBRARY.map(({ id, name, category, description }) => ({
+      id,
+      name,
+      category,
+      description,
+    })),
+    total: STYLE_PACK_LIBRARY.length,
+  });
 }
 
 export async function handlePublishRequest({ request, env }) {
