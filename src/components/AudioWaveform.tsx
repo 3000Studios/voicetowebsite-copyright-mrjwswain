@@ -170,4 +170,5 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
   return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 };
 
-export default AudioWaveform;
+// Optimized: Memoized to detach animation loop from parent renders.
+export default React.memo(AudioWaveform);

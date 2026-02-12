@@ -66,6 +66,86 @@ const buildInstantOutline = (prompt: string) => {
   };
 };
 
+type DemoCategory = "saas" | "local" | "ecommerce" | "creator" | "portfolio" | "agency";
+type UseCaseCategory = "creators" | "agencies" | "local" | "ecommerce" | "wordpress";
+
+const REEL_VIDEOS = [
+  "https://cdn.coverr.co/videos/coverr-abstract-liquid-gold-8020/1080p.mp4",
+  "https://cdn.coverr.co/videos/coverr-futuristic-network-9220/1080p.mp4",
+  "https://cdn.coverr.co/videos/coverr-abstract-paint-1720/1080p.mp4",
+];
+
+const useCases = {
+  creators: {
+    label: "Creators",
+    prompt: "Build a creator portfolio with a reel section and email capture.",
+    bullets: ["Publish faster", "Capture emails", "Monetize content"],
+    template: "Creator Portfolio",
+    integration: "YouTube + Newsletter",
+  },
+  agencies: {
+    label: "Agencies",
+    prompt: "Create an agency homepage with services, case studies, and a contact form.",
+    bullets: ["Ship client sites", "Reuse templates", "Reduce revisions"],
+    template: "Agency Landing",
+    integration: "CRM + Scheduling",
+  },
+  local: {
+    label: "Local",
+    prompt: "Create a landing page for a barber shop with booking and pricing.",
+    bullets: ["Rank locally", "Drive calls", "Book appointments"],
+    template: "Local Service",
+    integration: "Maps + Booking",
+  },
+  ecommerce: {
+    label: "Ecommerce",
+    prompt: "Design an ecommerce storefront with bundles, reviews, and FAQs.",
+    bullets: ["Bundles + upsells", "Fast pages", "Trust-first checkout"],
+    template: "Storefront",
+    integration: "Stripe + PayPal",
+  },
+  wordpress: {
+    label: "WordPress",
+    prompt: "Create a WordPress migration landing page with SEO checklist and pricing.",
+    bullets: ["Migration plan", "SEO cleanup", "Performance lift"],
+    template: "WP Migration",
+    integration: "Analytics + Redirects",
+  },
+} as const;
+
+const demoPresets: Record<DemoCategory, { label: string; placeholder: string; chips: string[] }> = {
+  saas: {
+    label: "SaaS",
+    placeholder: "Build a landing page for an AI customer support tool with pricing, FAQ, and integrations...",
+    chips: ["B2B SaaS landing with pricing", "Add integrations + security", "Make it minimal and fast"],
+  },
+  local: {
+    label: "Local",
+    placeholder: "Create a website for a mobile car wash with booking, pricing, and service areas...",
+    chips: ["Mobile car wash + booking", "Add service areas + reviews", "Make it bold and conversion-first"],
+  },
+  ecommerce: {
+    label: "Ecommerce",
+    placeholder: "Create a storefront for premium coffee beans with bundles, subscriptions, and FAQs...",
+    chips: ["Coffee store + bundles", "Add subscriptions + upsells", "Make it luxury black + gold"],
+  },
+  creator: {
+    label: "Creator",
+    placeholder: "Build a creator homepage with a reel, newsletter capture, and brand partnerships...",
+    chips: ["Creator reel + newsletter", "Add brand kit + partnerships", "Make it playful neon"],
+  },
+  portfolio: {
+    label: "Portfolio",
+    placeholder: "Create a portfolio for a UI designer with case studies and a contact form...",
+    chips: ["Designer portfolio + case studies", "Add testimonials + process", "Make it clean and minimal"],
+  },
+  agency: {
+    label: "Agency",
+    placeholder: "Create an agency homepage with services, case studies, and an inquiry form...",
+    chips: ["Agency + services + case studies", "Add lead magnet + booking", "Make it bold and premium"],
+  },
+};
+
 const App: React.FC = () => {
   const copy = siteConfig?.copy;
 
@@ -80,9 +160,7 @@ const App: React.FC = () => {
   const [tryPrompt, setTryPrompt] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
-  const [demoCategory, setDemoCategory] = useState<"saas" | "local" | "ecommerce" | "creator" | "portfolio" | "agency">(
-    "saas"
-  );
+  const [demoCategory, setDemoCategory] = useState<DemoCategory>("saas");
   const [demoTone, setDemoTone] = useState<"default" | "luxury" | "bold" | "playful" | "minimal">("default");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
@@ -95,9 +173,7 @@ const App: React.FC = () => {
 
   const reduceMotion = useReducedMotion();
 
-  const [activeUseCase, setActiveUseCase] = useState<"creators" | "agencies" | "local" | "ecommerce" | "wordpress">(
-    "creators"
-  );
+  const [activeUseCase, setActiveUseCase] = useState<UseCaseCategory>("creators");
 
   const secretTapRef = useRef<number[]>([]);
   const handleSecretTap = () => {
@@ -336,77 +412,6 @@ const App: React.FC = () => {
   };
 
   const preview = useMemo(() => buildInstantOutline(tryPrompt), [tryPrompt]);
-
-  const useCases = {
-    creators: {
-      label: "Creators",
-      prompt: "Build a creator portfolio with a reel section and email capture.",
-      bullets: ["Publish faster", "Capture emails", "Monetize content"],
-      template: "Creator Portfolio",
-      integration: "YouTube + Newsletter",
-    },
-    agencies: {
-      label: "Agencies",
-      prompt: "Create an agency homepage with services, case studies, and a contact form.",
-      bullets: ["Ship client sites", "Reuse templates", "Reduce revisions"],
-      template: "Agency Landing",
-      integration: "CRM + Scheduling",
-    },
-    local: {
-      label: "Local",
-      prompt: "Create a landing page for a barber shop with booking and pricing.",
-      bullets: ["Rank locally", "Drive calls", "Book appointments"],
-      template: "Local Service",
-      integration: "Maps + Booking",
-    },
-    ecommerce: {
-      label: "Ecommerce",
-      prompt: "Design an ecommerce storefront with bundles, reviews, and FAQs.",
-      bullets: ["Bundles + upsells", "Fast pages", "Trust-first checkout"],
-      template: "Storefront",
-      integration: "Stripe + PayPal",
-    },
-    wordpress: {
-      label: "WordPress",
-      prompt: "Create a WordPress migration landing page with SEO checklist and pricing.",
-      bullets: ["Migration plan", "SEO cleanup", "Performance lift"],
-      template: "WP Migration",
-      integration: "Analytics + Redirects",
-    },
-  } as const;
-
-  const demoPresets: Record<typeof demoCategory, { label: string; placeholder: string; chips: string[] }> = {
-    saas: {
-      label: "SaaS",
-      placeholder: "Build a landing page for an AI customer support tool with pricing, FAQ, and integrations...",
-      chips: ["B2B SaaS landing with pricing", "Add integrations + security", "Make it minimal and fast"],
-    },
-    local: {
-      label: "Local",
-      placeholder: "Create a website for a mobile car wash with booking, pricing, and service areas...",
-      chips: ["Mobile car wash + booking", "Add service areas + reviews", "Make it bold and conversion-first"],
-    },
-    ecommerce: {
-      label: "Ecommerce",
-      placeholder: "Create a storefront for premium coffee beans with bundles, subscriptions, and FAQs...",
-      chips: ["Coffee store + bundles", "Add subscriptions + upsells", "Make it luxury black + gold"],
-    },
-    creator: {
-      label: "Creator",
-      placeholder: "Build a creator homepage with a reel, newsletter capture, and brand partnerships...",
-      chips: ["Creator reel + newsletter", "Add brand kit + partnerships", "Make it playful neon"],
-    },
-    portfolio: {
-      label: "Portfolio",
-      placeholder: "Create a portfolio for a UI designer with case studies and a contact form...",
-      chips: ["Designer portfolio + case studies", "Add testimonials + process", "Make it clean and minimal"],
-    },
-    agency: {
-      label: "Agency",
-      placeholder: "Create an agency homepage with services, case studies, and an inquiry form...",
-      chips: ["Agency + services + case studies", "Add lead magnet + booking", "Make it bold and premium"],
-    },
-  };
 
   const active = useCases[activeUseCase];
 
@@ -975,11 +980,7 @@ const App: React.FC = () => {
               Luminous, voice-led UI compositions. These are generated patterns you can deploy or remix.
             </p>
             <div className="reel-grid">
-              {[
-                "https://cdn.coverr.co/videos/coverr-abstract-liquid-gold-8020/1080p.mp4",
-                "https://cdn.coverr.co/videos/coverr-futuristic-network-9220/1080p.mp4",
-                "https://cdn.coverr.co/videos/coverr-abstract-paint-1720/1080p.mp4",
-              ].map((src) => (
+              {REEL_VIDEOS.map((src) => (
                 <div className="reel-card" key={src}>
                   <LazyVideo src={src} autoPlay muted loop playsInline />
                   <div className="reel-caption">Generated motion layer</div>

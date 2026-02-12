@@ -29,4 +29,5 @@ const LazyVideo: React.FC<LazyVideoProps> = ({ src, ...props }) => {
   return <video ref={videoRef} src={isVisible ? src : undefined} {...props} />;
 };
 
-export default LazyVideo;
+// Optimized: Memoized to prevent re-renders when parent state (like prompt input) changes.
+export default React.memo(LazyVideo);

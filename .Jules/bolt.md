@@ -7,3 +7,8 @@
 
 **Learning:** The project uses Tailwind utility classes (e.g., `w-48`, `h-48`) in `App.tsx` but lacks `tailwindcss` dependency and configuration. This results in broken layout (elements defaulting to browser defaults) in dev/build environments.
 **Action:** When working on UI in this repo, verify if utility classes are actually applying styles. For performance tasks, focus on logical structure and React render cycles rather than visual fidelity if the style system is broken.
+
+## 2026-02-12 - Optimization of Heavy UI Components in App
+
+**Learning:** `App.tsx` contains heavy UI components (`LazyVideo`, `AudioWaveform`, `WarpTunnel`) that were re-rendering on every state change (e.g., typing in the prompt input). Additionally, large static objects (`useCases`, `demoPresets`) were being recreated on every render.
+**Action:** When auditing React performance, always check if heavy children or static data structures are defined inside the component body. Move static data to module scope and wrap heavy pure components in `React.memo` to prevent unnecessary reconciliation.

@@ -69,4 +69,5 @@ const WarpTunnel: React.FC<WarpTunnelProps> = ({ isVisible }) => {
   );
 };
 
-export default WarpTunnel;
+// Optimized: Memoized to prevent re-renders during high-frequency parent updates.
+export default React.memo(WarpTunnel);
