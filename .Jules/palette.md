@@ -7,3 +7,8 @@
 
 **Learning:** Placing interactive text overlays directly inside interactive cards (e.g., a video background that acts as a link) creates nested focusable areas, confusing screen readers and keyboard navigation.
 **Action:** Decouple these into sibling elements within a parent container. Use absolute positioning to visually layer them while keeping the DOM structure flat and sequentially navigable.
+
+## 2024-05-25 - Global Async State Feedback
+
+**Learning:** When a global async action (like "Generate Site") can be triggered from multiple UI locations (Hero, Feature Card), updating only one button leaves users confused if they trigger it from elsewhere.
+**Action:** Bind the global loading state (e.g., `isGenerating`) to `disabled` and `aria-busy` attributes on ALL trigger buttons, ensuring consistent feedback regardless of the interaction point.
