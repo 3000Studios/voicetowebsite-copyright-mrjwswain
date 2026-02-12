@@ -15,3 +15,8 @@
 
 **Learning:** The custom `Checkout` modal was implemented as a simple `div` with a `fixed` position, completely missing `role="dialog"`, `aria-modal`, and focus management.
 **Action:** Any new custom modal or overlay must immediately be assigned `role="dialog"` and `aria-modal="true"`, and key inputs inside must be explicitly labeled.
+
+## 2025-02-20 - Async Action Feedback
+
+**Learning:** Reusing handler functions (like `runInstantDemo`) across multiple buttons without passing loading state led to silent failures where users could click repeatedly with no feedback.
+**Action:** Always verify that *every* invocation point of an async handler has a visible loading state (e.g., disabled attribute + text change) tied to the handler's execution state.
