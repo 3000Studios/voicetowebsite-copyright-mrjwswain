@@ -10,7 +10,7 @@ import siteConfig from "./src/site-config.json";
     { id: "ocean", label: "Ocean" },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
-  document.documentElement.dataset.navVersion = "2026-02-10-01";
+  document.documentElement.dataset.navVersion = "2026-02-12-01";
 
   const isShellDisabled = () => {
     try {
@@ -87,8 +87,7 @@ import siteConfig from "./src/site-config.json";
       { href: "/referrals.html", label: "Refer a Friend (Get 10%)", icon: "🎁" },
     ],
   };
-  const navVideoSrc = "https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4";
-  const globalVideoSrc = "https://media.voicetowebsite.com/homenavigation.mp4";
+  // Avoid third-party/background video fetches for performance and copyright hygiene.
 
   const normalizeTheme = (value) => {
     const found = THEMES.some((t) => t.id === value);
@@ -331,11 +330,6 @@ import siteConfig from "./src/site-config.json";
     const wrap = document.createElement("div");
     wrap.className = "video-bg";
     wrap.setAttribute("aria-hidden", "true");
-    wrap.innerHTML = `
-      <video autoplay muted loop playsinline>
-        <source src="${globalVideoSrc}" type="video/mp4" />
-      </video>
-    `;
     document.body.prepend(wrap);
   };
   const injectNav = () => {
@@ -355,7 +349,7 @@ import siteConfig from "./src/site-config.json";
     toggle.setAttribute("aria-hidden", "true");
     const nav = document.createElement("nav");
     nav.className = "glass-nav";
-    nav.innerHTML = `      <div class="nav-video-mask" aria-hidden="true">        <video autoplay muted loop playsinline>          <source src="${navVideoSrc}" type="video/mp4" />        </video>      </div>      <div class="brand">        <span class="brand-dot"></span>        <span class="brand-name">VoiceToWebsite</span>      </div>      <div class="nav-links">        ${buildPrimaryLinksHtml()}      </div>      <div class="nav-actions">        ${buildActionsHtml()}      </div>      <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">        <span></span>      </label>    `;
+    nav.innerHTML = `      <div class="nav-video-mask" aria-hidden="true"></div>      <div class="brand">        <span class="brand-dot"></span>        <span class="brand-name">VoiceToWebsite</span>      </div>      <div class="nav-links">        ${buildPrimaryLinksHtml()}      </div>      <div class="nav-actions">        ${buildActionsHtml()}      </div>      <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">        <span></span>      </label>    `;
     const overlay = document.createElement("div");
     overlay.className = "mobile-overlay";
     overlay.id = "mobileOverlay";
@@ -1119,28 +1113,70 @@ import siteConfig from "./src/site-config.json";
     ".lock-card",
     ".crystal-card",
   ];
+  const supportsFinePointer = () => {
+    try {
+      return window.matchMedia && window.matchMedia("(pointer: fine)").matches;
+    } catch (_) {
+      return true;
+    }
+  };
+  const glowState = new WeakMap();
   const spectralizeCards = () => {
+    if (prefersReducedMotion()) return;
+    if (!supportsFinePointer()) return;
     const seen = new Set();
     cardSelectors.forEach((selector) => {
       document.querySelectorAll(selector).forEach((el) => {
         if (seen.has(el)) return;
         seen.add(el);
         el.classList.add("spectral-card");
-        el.addEventListener("mousemove", handleGlow, { passive: true });
-        el.addEventListener("mouseleave", resetGlow, { passive: true });
+        el.addEventListener("pointerenter", cacheGlowRect, { passive: true });
+        el.addEventListener("pointermove", handleGlow, { passive: true });
+        el.addEventListener("pointerleave", resetGlow, { passive: true });
       });
     });
   };
+  const cacheGlowRect = (event) => {
+    const el = event.currentTarget;
+    const state = glowState.get(el) || { rect: null, raf: 0, lastClientX: 0, lastClientY: 0 };
+    state.rect = el.getBoundingClientRect();
+    glowState.set(el, state);
+  };
   const handleGlow = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-    event.currentTarget.style.setProperty("--glow-x", `${x}%`);
-    event.currentTarget.style.setProperty("--glow-y", `${y}%`);
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    const el = event.currentTarget;
+    const state = glowState.get(el) || { rect: null, raf: 0, lastClientX: 0, lastClientY: 0 };
+    state.lastClientX = event.clientX;
+    state.lastClientY = event.clientY;
+    if (!state.rect) state.rect = el.getBoundingClientRect();
+    if (state.raf) {
+      glowState.set(el, state);
+      return;
+    }
+    state.raf = window.requestAnimationFrame(() => {
+      const next = glowState.get(el);
+      if (!next || !next.rect) return;
+      const rect = next.rect;
+      const x = ((next.lastClientX - rect.left) / rect.width) * 100;
+      const y = ((next.lastClientY - rect.top) / rect.height) * 100;
+      el.style.setProperty("--glow-x", `${x}%`);
+      el.style.setProperty("--glow-y", `${y}%`);
+      next.raf = 0;
+      glowState.set(el, next);
+    });
+    glowState.set(el, state);
   };
   const resetGlow = (event) => {
-    event.currentTarget.style.removeProperty("--glow-x");
-    event.currentTarget.style.removeProperty("--glow-y");
+    const el = event.currentTarget;
+    const state = glowState.get(el);
+    if (state?.raf) {
+      try {
+        window.cancelAnimationFrame(state.raf);
+      } catch (_) {}
+    }
+    glowState.delete(el);
+    el.style.removeProperty("--glow-x");
+    el.style.removeProperty("--glow-y");
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -1155,15 +1191,15 @@ import siteConfig from "./src/site-config.json";
     audio.id = "vtw-bg-music";
     audio.loop = true;
     audio.volume = 0.5;
-    audio.src =
-      "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=ambient-piano-10785.mp3";
+    // Self-hosted, copyright-safe audio (silence by default).
+    audio.src = "/background-music.wav";
     document.body.appendChild(audio);
 
     const play = () => {
       audio.play().catch(() => {
         console.log("Autoplay blocked. Waiting for interaction.");
         const unlock = () => {
-          audio.play();
+          audio.play().catch(() => {});
           document.removeEventListener("click", unlock);
           document.removeEventListener("keydown", unlock);
         };

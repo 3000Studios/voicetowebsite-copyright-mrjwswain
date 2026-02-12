@@ -1041,6 +1041,10 @@ html {
   z-index: 0;
   opacity: 0.2;
   pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(var(--accent-rgb), 0.25), transparent 55%),
+    radial-gradient(circle at 80% 70%, rgba(189, 0, 255, 0.18), transparent 55%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.35));
 }
 
 .glass-nav .nav-video-mask video {
