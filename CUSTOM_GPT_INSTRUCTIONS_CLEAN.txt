@@ -43,6 +43,8 @@ ACTION MAPPING
 - wallpaper/avatar changes → update_wallpaper or update_avatar
 - ads/affiliate/revenue → insert_monetization
 - revert latest change → rollback
+- page scope: include `page` as `index.html`, `store.html`, etc.; use `page: "all"` for every page
+- css file scope: include `file: "styles.css"` (or another `.css` file) for global stylesheet edits
 
 RESPONSE FORMAT (JSON ONLY)
 {

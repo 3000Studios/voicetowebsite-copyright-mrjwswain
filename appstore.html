@@ -298,6 +298,26 @@
         box-shadow: 0 0 8px var(--conductive-cyan);
       }
 
+      .app-video-container {
+        margin-bottom: 1.5rem;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+      }
+
+      .app-preview-video {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+      }
+
+      .app-video-container:hover .app-preview-video {
+        opacity: 1;
+      }
+
       .app-card h3 {
         font-size: 1.75rem;
         margin-bottom: 1rem;
@@ -381,14 +401,20 @@
     </style>
     <script
       async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
       crossorigin="anonymous"
     ></script>
+    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
   <body>
-    <div class="flux-container" aria-hidden="true">
-      <div class="flux-membrane"></div>
-      <div class="conduction-lines"></div>
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-mobile-apps-5473/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
     </div>
 
     <main class="page">
@@ -414,21 +440,14 @@
             <div class="status-pill live">New Arrival</div>
             <h3>AI Web Forge Pro</h3>
             <p>Autonomous Web Engineering. Neural UI Generation. One-click Deployment.</p>
-            <div
-              style="
-                margin-bottom: 1.5rem;
-                border-radius: 12px;
-                overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-              "
-            >
+            <div class="app-video-container">
               <video
                 src="https://cdn.coverr.co/videos/coverr-typing-on-computer-keyboard-4638/1080p.mp4"
                 autoplay
                 muted
                 loop
                 playsinline
-                style="width: 100%; height: 140px; object-fit: cover; opacity: 0.8"
+                class="app-preview-video"
               ></video>
             </div>
           </div>
@@ -453,21 +472,14 @@
             <div class="status-pill live">New Arrival</div>
             <h3>AI Drive</h3>
             <p>Cloud Storage Optimization & AI File Sorting.</p>
-            <div
-              style="
-                margin-bottom: 1.5rem;
-                border-radius: 12px;
-                overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-              "
-            >
+            <div class="app-video-container">
               <video
                 src="https://cdn.coverr.co/videos/coverr-servers-in-data-center-5056/1080p.mp4"
                 autoplay
                 muted
                 loop
                 playsinline
-                style="width: 100%; height: 140px; object-fit: cover; opacity: 0.8"
+                class="app-preview-video"
               ></video>
             </div>
           </div>
@@ -492,21 +504,14 @@
             <div class="status-pill live">New Arrival</div>
             <h3>Google AI Prompts</h3>
             <p>Premium System Prompts to unlock Gemini Potential.</p>
-            <div
-              style="
-                margin-bottom: 1.5rem;
-                border-radius: 12px;
-                overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-              "
-            >
+            <div class="app-video-container">
               <video
-                src="https://cdn.coverr.co/videos/coverr-working-on-code-4752/1080p.mp4"
+                src="https://cdn.coverr.co/videos/coverr-ai-brain-9856/1080p.mp4"
                 autoplay
                 muted
                 loop
                 playsinline
-                style="width: 100%; height: 140px; object-fit: cover; opacity: 0.8"
+                class="app-preview-video"
               ></video>
             </div>
           </div>
@@ -530,6 +535,16 @@
             <div class="status-pill live">System Active</div>
             <h3>VoiceToWebsite</h3>
             <p>High-fidelity neural interface that converts natural language into production-ready web deployments.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-voice-assistant-8764/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="index.html">LAUNCH APP</a>
@@ -542,6 +557,16 @@
             <div class="status-pill live">System Active</div>
             <h3>Revenue Bot</h3>
             <p>Conductive monetization layer that automates lead capture and affiliate conversion cycles.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-money-growing-8765/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <button class="primary-btn" type="button" disabled>ACTIVATE</button>
@@ -554,6 +579,16 @@
             <div class="status-pill live">Tool V1.0</div>
             <h3>Color Synth</h3>
             <p>Harmonic neural palette generator. Create production-ready color schemes instantly.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-color-palette-8766/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="color-synth.html">OPEN TOOL</a>
@@ -566,6 +601,16 @@
             <div class="status-pill live">Arcade</div>
             <h3>Neon Snake</h3>
             <p>High-speed cybernetic reflex trainer. Compete for high scores in the flux grid.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-retro-games-8767/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="neon-snake.html">PLAY NOW</a>
@@ -578,6 +623,16 @@
             <div class="status-pill live">Knowledge</div>
             <h3>Cyber Insights</h3>
             <p>Critical transmissions from the edge of the digital frontier. Read the latest on AI & Web.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-cybersecurity-8768/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="cyber-blog.html">READ</a>
@@ -590,6 +645,16 @@
             <div class="status-pill live">Productivity</div>
             <h3>Focus Flux</h3>
             <p>Cybernetic timer for deep work sessions. Optimize your flow state.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-productivity-8769/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="focus-timer.html">START</a>
@@ -602,6 +667,16 @@
             <div class="status-pill live">Arcade</div>
             <h3>Memory Matrix</h3>
             <p>Test your cognitive retention. Pattern matching for the digital age.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-brain-training-8770/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="memory-matrix.html">PLAY</a>
@@ -614,6 +689,16 @@
             <div class="status-pill live">Visualizer</div>
             <h3>Zen Particles</h3>
             <p>Interactive flow system for digital relaxation and stress relief.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-meditation-8771/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="zen-particles.html">ENTER</a>
@@ -626,6 +711,16 @@
             <div class="status-pill live">New Drop</div>
             <h3>Rush Percussion</h3>
             <p>Tap-to-sync resin runner built for high-retention engagement. Includes the playable web build.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-music-production-8772/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
           </div>
           <div class="card-actions">
             <a class="primary-btn" href="rush-percussion.html">PLAY DEMO</a>
@@ -655,7 +750,6 @@
         }, 100 * index);
       });
     </script>
-    <script type="module" src="nav.js"></script>
     <script type="module" src="/src/appstore-init.js"></script>
     <script type="module" src="/nav.js"></script>
   </body>

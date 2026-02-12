@@ -23,6 +23,7 @@ const ATTR_RE = /\s(?:href|src)\s*=\s*"([^"]+)"/gi;
 const isSkippable = (raw) => {
   const link = raw.trim();
   if (!link) return true;
+  if (link.includes("{{") || link.includes("}}")) return true;
   if (link.startsWith("#")) return true;
   if (link.startsWith("mailto:")) return true;
   if (link.startsWith("tel:")) return true;

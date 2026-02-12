@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>VoiceToWebsite | Admin Login</title>
-    <meta name="description" content="Secure admin login for VoiceToWebsite command center." />
+    <title>VoiceToWebsite | Admin Access</title>
+    <meta name="description" content="Secure admin access portal for VoiceToWebsite." />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
     <style>
-      .login-container {
+      .access-container {
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -18,7 +18,7 @@
         overflow: hidden;
       }
 
-      .login-bg {
+      .access-bg {
         position: absolute;
         top: 0;
         left: 0;
@@ -45,7 +45,7 @@
         }
       }
 
-      .login-card {
+      .access-card {
         background: rgba(8, 12, 20, 0.95);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 24px;
@@ -58,12 +58,12 @@
         z-index: 10;
       }
 
-      .login-header {
+      .access-header {
         text-align: center;
         margin-bottom: 2rem;
       }
 
-      .login-logo {
+      .access-logo {
         width: 60px;
         height: 60px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -77,14 +77,14 @@
         color: white;
       }
 
-      .login-title {
+      .access-title {
         font-size: 1.5rem;
         font-weight: 700;
         color: #fff;
         margin-bottom: 0.5rem;
       }
 
-      .login-subtitle {
+      .access-subtitle {
         color: rgba(255, 255, 255, 0.7);
         font-size: 0.9rem;
       }
@@ -123,7 +123,7 @@
         color: rgba(255, 255, 255, 0.4);
       }
 
-      .login-button {
+      .access-button {
         width: 100%;
         padding: 0.875rem 1rem;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -138,16 +138,16 @@
         overflow: hidden;
       }
 
-      .login-button:hover {
+      .access-button:hover {
         transform: translateY(-1px);
         box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.5);
       }
 
-      .login-button:active {
+      .access-button:active {
         transform: translateY(0);
       }
 
-      .login-button:disabled {
+      .access-button:disabled {
         opacity: 0.5;
         cursor: not-allowed;
         transform: none;
@@ -197,16 +197,6 @@
         100% {
           transform: rotate(360deg);
         }
-      }
-
-      .copyright-footer {
-        position: absolute;
-        bottom: 1rem;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 0.75rem;
       }
 
       .video-bg {
@@ -279,127 +269,98 @@
     </div>
     <div class="edge-glow" aria-hidden="true"></div>
     <div class="edge-frame" aria-hidden="true"></div>
-    <div class="login-container">
-      <div class="login-bg"></div>
+    <div class="access-container">
+      <div class="access-bg"></div>
 
-      <div class="login-card">
-        <div class="login-header">
-          <div class="login-logo">J</div>
-          <h1 class="login-title">Admin Login</h1>
-          <p class="login-subtitle">VoiceToWebsite Command Center</p>
+      <div class="access-card">
+        <div class="access-header">
+          <div class="access-logo">🔐</div>
+          <h1 class="access-title">Admin Access</h1>
+          <p class="access-subtitle">Enter your access code to continue</p>
         </div>
 
-        <div class="error-message" id="errorMessage">Invalid credentials. Please try again.</div>
+        <div class="error-message" id="errorMessage">Invalid access code. Please try again.</div>
 
-        <form id="loginForm">
+        <form id="accessForm">
           <div class="form-group">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" id="email" name="email" class="form-input" placeholder="admin@example.com" required />
-          </div>
-
-          <div class="form-group">
-            <label for="password" class="form-label">Password</label>
+            <label for="accessCode" class="form-label">Access Code</label>
             <input
               type="password"
-              id="password"
-              name="password"
+              id="accessCode"
+              name="accessCode"
               class="form-input"
-              placeholder="Enter your password"
+              placeholder="Enter your admin access code"
               required
             />
           </div>
 
-          <button type="submit" class="login-button" id="loginButton">
-            <span id="buttonText">Sign In</span>
+          <button type="submit" class="access-button" id="accessButton">
+            <span id="buttonText">Access Admin</span>
             <div class="loading-spinner" id="loadingSpinner"></div>
           </button>
         </form>
 
         <div class="security-notice">
           <p>
-            🔒 This is a secure administrative interface.<br />
+            🔒 This is a restricted administrative interface.<br />
             Unauthorized access attempts are logged and monitored.
           </p>
         </div>
       </div>
-
-      <div class="copyright-footer">
-        <p>© 3000 Studios 2026 | Admin System v2.0</p>
-      </div>
     </div>
 
     <script>
-      const loginForm = document.getElementById("loginForm");
-      const loginButton = document.getElementById("loginButton");
+      const accessForm = document.getElementById("accessForm");
+      const accessButton = document.getElementById("accessButton");
       const buttonText = document.getElementById("buttonText");
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
 
-      loginForm.addEventListener("submit", async (e) => {
+      accessForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const accessCode = document.getElementById("accessCode").value;
 
         // Show loading state
-        loginButton.disabled = true;
+        accessButton.disabled = true;
         buttonText.style.display = "none";
         loadingSpinner.style.display = "block";
         errorMessage.style.display = "none";
 
         try {
-          const response = await fetch("/api/admin/login", {
+          const response = await fetch("/api/admin/access-code", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, password }),
-            credentials: "include",
+            body: JSON.stringify({ accessCode }),
           });
 
-          if (response.ok) {
-            // Redirect to admin dashboard
-            window.location.href = "/admin/";
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            // Store access validation and redirect to login
+            sessionStorage.setItem("adminAccessValidated", "true");
+            window.location.href = "/admin/login.html";
           } else {
-            const error = await response.json();
-            throw new Error(error.error || "Login failed");
+            throw new Error(result.error || "Access denied");
           }
         } catch (error) {
-          console.error("Login error:", error);
+          console.error("Access error:", error);
           errorMessage.style.display = "block";
-          errorMessage.textContent = error.message || "Login failed. Please check your credentials.";
+          errorMessage.textContent = error.message || "Access denied. Please check your access code.";
         } finally {
           // Reset loading state
-          loginButton.disabled = false;
+          accessButton.disabled = false;
           buttonText.style.display = "inline";
           loadingSpinner.style.display = "none";
         }
       });
 
-      // Check if access is validated
-      if (sessionStorage.getItem("adminAccessValidated") !== "true") {
-        window.location.href = "/admin/access.html";
-        return;
+      // Check if access is already validated
+      if (sessionStorage.getItem("adminAccessValidated") === "true") {
+        window.location.href = "/admin/login.html";
       }
-
-      // Check if already authenticated
-      async function checkAuth() {
-        try {
-          const response = await fetch("/api/config/status", {
-            credentials: "include",
-          });
-
-          if (response.ok) {
-            // Already authenticated, redirect to admin
-            window.location.href = "/admin/";
-          }
-        } catch (error) {
-          // Not authenticated, stay on login page
-        }
-      }
-
-      // Check authentication on page load
-      checkAuth();
     </script>
   </body>
 </html>

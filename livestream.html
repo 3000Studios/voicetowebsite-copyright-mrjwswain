@@ -12,11 +12,12 @@
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
       crossorigin="anonymous"
     ></script>
+    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
   <body class="livestream">
     <div class="video-bg" aria-hidden="true">
       <video
-        src="https://cdn.coverr.co/videos/coverr-particles-in-space-9235/1080p.mp4"
+        src="https://cdn.coverr.co/videos/coverr-live-streaming-6299/1080p.mp4"
         autoplay
         muted
         loop
@@ -184,7 +185,6 @@
       });
       renderClips(); // live page story feed    const liveStoryGrid = document.getElementById("live-story-grid");    const renderLiveStories = (posts = []) => {      if (!liveStoryGrid) return;      liveStoryGrid.innerHTML = "";      posts.slice(0, 3).forEach((post) => {        const card = document.createElement("article");        card.className = "story-card";        card.innerHTML = `          <div class="story-bg" style="background-image:url('${post.image || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80"}');"></div>          <div class="story-copy">            <p class="eyebrow">${post.tag || "Web"}</p>            <h3>${post.title}</h3>            <p class="muted">${post.desc}</p>            <a class="pill-link" href="${post.url}" target="_blank" rel="noreferrer">Read →</a>          </div>        `;        liveStoryGrid.appendChild(card);      });    };    const loadLiveBlog = async () => {      try {        const res = await fetch("https://dev.to/api/articles?tag=webdev&per_page=3");        if (!res.ok) throw new Error("bad status");        const data = await res.json();        const posts = data.map((p) => ({          title: p.title,          desc: p.description || "SEO-rich web dev insights for your next build.",          url: p.url,          tag: (p.tag_list && p.tag_list[0]) || "webdev",          image: p.cover_image || p.social_image,        }));        renderLiveStories(posts);      } catch (err) {        renderLiveStories([          {            title: "Hands-free site builds",            desc: "How voice-first flows ship accessible sites for everyone.",            url: "https://developer.mozilla.org/",            tag: "accessibility",            image: "https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?auto=format&fit=crop&w=900&q=80",          },          {            title: "Speed to launch",            desc: "From appointment to live deploy in under a day.",            url: "https://vercel.com/blog",            tag: "shipping",            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",          },          {            title: "Voice SEO wins",            desc: "Structured content that ranks while you talk.",            url: "https://ai.googleblog.com/",            tag: "seo",            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80",          },        ]);      }    };    loadLiveBlog();
     </script>
-    <script type="module" src="nav.js"></script>
     <script type="module" src="/nav.js"></script>
   </body>
 </html>

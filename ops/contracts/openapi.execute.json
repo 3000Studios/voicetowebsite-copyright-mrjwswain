@@ -221,6 +221,18 @@
             ],
             "description": "Caller identity and context."
           },
+          "page": {
+            "type": "string",
+            "description": "Optional page target (for example: \"store.html\" or \"all\")."
+          },
+          "path": {
+            "type": "string",
+            "description": "Optional alias for page target."
+          },
+          "file": {
+            "type": "string",
+            "description": "Optional file target (HTML or CSS depending on action)."
+          },
           "parameters": {
             "type": "object",
             "additionalProperties": true,

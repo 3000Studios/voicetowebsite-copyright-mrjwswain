@@ -88,6 +88,7 @@
 
 Public pages:
 
+- `/about` -> `about.html`
 - `/api-documentation` -> `api-documentation.html`
 - `/appstore-new` -> `appstore-new.html`
 - `/appstore` -> `appstore.html`
@@ -119,6 +120,7 @@ Public pages:
 - `/referrals` -> `referrals.html`
 - `/rush-percussion` -> `rush-percussion.html`
 - `/sandbox` -> `sandbox.html`
+- `/seo-template` -> `seo-template.html`
 - `/status` -> `status.html`
 - `/store` -> `store.html`
 - `/strata-design-system` -> `strata-design-system.html`
@@ -137,6 +139,7 @@ Public pages:
 
 Admin pages:
 
+- `/admin/access` -> `admin/access.html`
 - `/admin/analytics` -> `admin/analytics.html`
 - `/admin/app-store-manager` -> `admin/app-store-manager.html`
 - `/admin/bot-command-center` -> `admin/bot-command-center.html`

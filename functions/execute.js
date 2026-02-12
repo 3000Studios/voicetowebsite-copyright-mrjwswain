@@ -25,6 +25,13 @@ const readJsonBody = async (request) => {
 };
 
 const normalizeActionPayload = (payload) => {
+  const parameters =
+    payload?.parameters && typeof payload.parameters === "object" && !Array.isArray(payload.parameters)
+      ? payload.parameters
+      : {};
+  const page = String(payload?.page || parameters?.page || "").trim();
+  const path = String(payload?.path || parameters?.path || "").trim();
+  const file = String(payload?.file || parameters?.file || "").trim();
   const action = String(payload?.action || "")
     .trim()
     .toLowerCase();
@@ -51,6 +58,9 @@ const normalizeActionPayload = (payload) => {
     target,
     confirmToken,
     actor,
+    page,
+    path,
+    file,
   };
 };
 
@@ -480,6 +490,9 @@ export async function onRequestPost(context) {
         mode: "plan",
         command: payload.command,
         target: payload.target,
+        page: payload.page,
+        path: payload.path,
+        file: payload.file,
       };
     } else if (payload.action === "apply") {
       orchestratorPayload = {
@@ -487,18 +500,27 @@ export async function onRequestPost(context) {
         command: payload.command,
         target: payload.target,
         confirmation: "ship it",
+        page: payload.page,
+        path: payload.path,
+        file: payload.file,
       };
     } else if (payload.action === "deploy") {
       orchestratorPayload = {
         mode: "deploy",
         command: payload.command || "Deploy latest changes",
         target: payload.target,
+        page: payload.page,
+        path: payload.path,
+        file: payload.file,
       };
     } else if (payload.action === "rollback") {
       orchestratorPayload = {
         mode: "rollback_last",
         command: payload.command || "Rollback last change",
         target: payload.target,
+        page: payload.page,
+        path: payload.path,
+        file: payload.file,
       };
     }
 

@@ -38,6 +38,13 @@
       "script": "preview",
       "problemMatcher": [],
       "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "format:check",
+      "problemMatcher": [],
+      "label": "npm: format:check",
+      "detail": "prettier --check --ignore-unknown ."
     }
   ]
 }

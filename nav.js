@@ -37,56 +37,58 @@ import siteConfig from "./src/site-config.json";
     }
   };
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/features", label: "Features" },
-    { href: "/pricing", label: "Pricing" },
-    { href: "/license", label: "License" },
-    { href: "/demo", label: "Demo" },
-    { href: "/store", label: "Store" },
-    { href: "/appstore", label: "App Store" },
-    { href: "/blog", label: "Blog" },
-    { href: "/livestream", label: "Live" },
-    { href: "/support", label: "Support" },
-    { href: "/admin", label: "Admin" },
+    { href: "/", label: "Home", icon: "🏠" },
+    { href: "/features", label: "Features", icon: "⚡" },
+    { href: "/pricing", label: "Pricing", icon: "💎" },
+    { href: "/license", label: "License", icon: "🔐" },
+    { href: "/demo", label: "Demo", icon: "🚀" },
+    { href: "/store", label: "Store", icon: "🛒" },
+    { href: "/appstore", label: "App Store", icon: "📱" },
+    { href: "/blog", label: "Blog", icon: "📝" },
+    { href: "/livestream", label: "Live", icon: "🎥" },
+    { href: "/support", label: "Support", icon: "💬" },
+    { href: "/admin", label: "Admin", icon: "⚙️" },
   ];
 
   const adminLinks = [
-    { href: "/admin/", label: "Dashboard" },
-    { href: "/admin/store-manager.html", label: "Store Manager" },
-    { href: "/admin/app-store-manager.html", label: "App Store Manager" },
-    { href: "/admin/analytics.html", label: "Analytics" },
-    { href: "/admin/live-stream.html", label: "Live Stream" },
-    { href: "/admin/voice-commands.html", label: "Voice Commands" },
-    { href: "/admin/bot-command-center.html", label: "Bot Command Center" },
+    { href: "/admin/", label: "Dashboard", icon: "📊" },
+    { href: "/admin/store-manager.html", label: "Store Manager", icon: "🏪" },
+    { href: "/admin/app-store-manager.html", label: "App Store Manager", icon: "📲" },
+    { href: "/admin/analytics.html", label: "Analytics", icon: "📈" },
+    { href: "/admin/live-stream.html", label: "Live Stream", icon: "🎬" },
+    { href: "/admin/voice-commands.html", label: "Voice Commands", icon: "🎤" },
+    { href: "/admin/bot-command-center.html", label: "Bot Command Center", icon: "🤖" },
   ];
 
   const footerLinks = {
     platform: [
-      { href: "/features", label: "Features" },
-      { href: "/how-it-works", label: "How it Works" },
-      { href: "/templates", label: "Templates" },
-      { href: "/demo", label: "Interactive Demo" },
-      { href: "/pricing", label: "Pricing" },
-      { href: "/license", label: "Licensing" },
-      { href: "/store", label: "Store" },
-      { href: "/appstore", label: "App Store" },
+      { href: "/features", label: "Features", icon: "⚡" },
+      { href: "/how-it-works", label: "How it Works", icon: "🔧" },
+      { href: "/templates", label: "Templates", icon: "📋" },
+      { href: "/demo", label: "Interactive Demo", icon: "🚀" },
+      { href: "/pricing", label: "Pricing", icon: "💎" },
+      { href: "/license", label: "Licensing", icon: "🔐" },
+      { href: "/store", label: "Store", icon: "🛒" },
+      { href: "/appstore", label: "App Store", icon: "📱" },
     ],
     company: [
-      { href: "/partners", label: "Partners" },
-      { href: "/trust", label: "Trust Center" },
-      { href: "/status", label: "Status" },
-      { href: "/privacy", label: "Privacy" },
-      { href: "/terms", label: "Terms" },
-      { href: "/admin", label: "Admin" },
+      { href: "/about", label: "About Us", icon: "🗿" },
+      { href: "/partners", label: "Partners", icon: "🤝" },
+      { href: "/trust", label: "Trust Center", icon: "🛡️" },
+      { href: "/status", label: "Status", icon: "📡" },
+      { href: "/privacy", label: "Privacy", icon: "🔒" },
+      { href: "/terms", label: "Terms", icon: "📜" },
+      { href: "/contact", label: "Contact", icon: "💬" },
+      { href: "/admin", label: "Admin", icon: "⚙️" },
     ],
     affiliates: [
-      { href: "https://www.cloudflare.com/r/YOUR_ID", label: "Powered by Cloudflare ($20 Credit)" },
-      { href: "https://openai.com/api/", label: "Build with OpenAI" },
-      { href: "/referrals.html", label: "Refer a Friend (Get 10%)" },
+      { href: "https://www.cloudflare.com/r/YOUR_ID", label: "Powered by Cloudflare ($20 Credit)", icon: "☁️" },
+      { href: "https://openai.com/api/", label: "Build with OpenAI", icon: "🧠" },
+      { href: "/referrals.html", label: "Refer a Friend (Get 10%)", icon: "🎁" },
     ],
   };
   const navVideoSrc = "https://res.cloudinary.com/dj92eb97f/video/upload/v1768888706/254781_small_vlfg5w.mp4";
-  const globalVideoSrc = "https://cdn.coverr.co/videos/coverr-abstract-liquid-gold-8020/1080p.mp4";
+  const globalVideoSrc = "https://media.voicetowebsite.com/homenavigation.mp4";
 
   const normalizeTheme = (value) => {
     const found = THEMES.some((t) => t.id === value);
@@ -227,22 +229,25 @@ import siteConfig from "./src/site-config.json";
 
   const buildPrimaryLinksHtml = () =>
     getPrimaryNavLinks()
-      .map((link) => `<a href="${link.href}" data-name="${link.label}">${link.label}</a>`)
+      .map((link) => `<a href="${link.href}" data-name="${link.label}">${link.icon} ${link.label}</a>`)
       .join("");
 
   const buildActionsHtml = () => {
     let html = "";
     const admin = getAdminNavLink();
-    if (admin) html += `<a class="nav-admin-link" href="${admin.href}" data-name="${admin.label}">${admin.label}</a>`;
+    if (admin)
+      html += `<a class="nav-admin-link" href="${admin.href}" data-name="${admin.label}">${admin.icon} ${admin.label}</a>`;
     return html;
   };
 
   const buildListHtml = () => {
     // Mobile overlay: include primary links + Admin.
     const items = [];
-    getPrimaryNavLinks().forEach((link) => items.push(`<li><a href="${link.href}">${link.label}</a></li>`));
+    getPrimaryNavLinks().forEach((link) =>
+      items.push(`<li><a href="${link.href}">${link.icon} ${link.label}</a></li>`)
+    );
     const admin = getAdminNavLink();
-    if (admin) items.push(`<li><a href="${admin.href}">${admin.label}</a></li>`);
+    if (admin) items.push(`<li><a href="${admin.href}">${admin.icon} ${admin.label}</a></li>`);
     return items.join("");
   };
 
@@ -260,7 +265,7 @@ import siteConfig from "./src/site-config.json";
       wrap.innerHTML = `
         <button class="nav-dropdown-trigger" type="button" aria-expanded="false">Management ▾</button>
         <div class="nav-dropdown-menu">
-          ${adminLinks.map((l) => `<a href="${l.href}">${l.label}</a>`).join("")}
+          ${adminLinks.map((l) => `<a href="${l.href}">${l.icon} ${l.label}</a>`).join("")}
         </div>
       `;
       subnav.appendChild(wrap);

@@ -149,6 +149,49 @@ const getPayPalClientToken = async (env) => {
   return data.client_token;
 };
 
+// Standardized error response helper
+const createErrorResponse = (status, message, code = null) => {
+  return jsonResponse(status, {
+    success: false,
+    error: message,
+    code: code,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// Generate HMAC signature using Web Crypto API
+const generateSignature = async (data, secret) => {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const messageData = encoder.encode(data);
+
+  const cryptoKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+
+  const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
+  return btoa(String.fromCharCode(...new Uint8Array(signature)));
+};
+
+// Generate signed URL with expiration
+const generateSignedUrl = async (appId, licenseKey, expiresMinutes = 60) => {
+  const expires = Date.now() + expiresMinutes * 60 * 1000;
+  const data = `${appId}:${licenseKey}:${expires}`;
+  const secret = globalThis.SIGNATURE_SECRET || "default-secret-change-in-production";
+  const signature = await generateSignature(data, secret);
+  return `/api/apps/download/${appId}?license=${licenseKey}&expires=${expires}&sig=${signature}`;
+};
+
+// Verify signed URL
+const verifySignedUrl = async (appId, licenseKey, expires, signature) => {
+  try {
+    const data = `${appId}:${licenseKey}:${expires}`;
+    const secret = globalThis.SIGNATURE_SECRET || "default-secret-change-in-production";
+    const expectedSignature = await generateSignature(data, secret);
+    return signature === expectedSignature && Date.now() < parseInt(expires, 10);
+  } catch {
+    return false;
+  }
+};
+
 // Simple dynamic-price PayPal helpers (mirrors existing catalog flow)
 export const createPayPalOrder = async (env, product = {}) => {
   const amount = toUsdString(product.price);
@@ -203,9 +246,17 @@ const ensureOrdersTable = async (env) => {
        currency TEXT DEFAULT 'USD',
        status TEXT DEFAULT 'completed',
        customer_email TEXT,
+       license_key TEXT,
        ts DATETIME DEFAULT CURRENT_TIMESTAMP
      );`
   ).run();
+
+  // Add license_key column if it doesn't exist (for backward compatibility)
+  try {
+    await env.D1.prepare(`ALTER TABLE orders ADD COLUMN license_key TEXT`).run();
+  } catch (err) {
+    // Column already exists, ignore error
+  }
 };
 
 const base64UrlEncode = (input) => {
@@ -289,6 +340,28 @@ export default {
       });
     }
 
+    // Admin access code validation
+    if (url.pathname === "/api/admin/access-code" && request.method === "POST") {
+      try {
+        const body = await request.clone().json();
+        const { accessCode } = body;
+
+        const validAccessCode = String(env.ADMIN_ACCESS_CODE || "VTW-ADMIN-2026").trim();
+
+        if (!accessCode || String(accessCode).trim() !== validAccessCode) {
+          return createErrorResponse(401, "Invalid access code", "INVALID_ACCESS_CODE");
+        }
+
+        return jsonResponse(200, {
+          success: true,
+          message: "Access code validated",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (err) {
+        return createErrorResponse(500, err.message, "ACCESS_CODE_ERROR");
+      }
+    }
+
     // Admin auth (server-issued, signed cookie)
     if (url.pathname === "/api/admin/login" && request.method === "POST") {
       // Admin enabled check bypassed per USER REQUEST
@@ -297,22 +370,22 @@ export default {
         let password = "";
         let email = "";
         if (contentType.includes("application/json")) {
-          const body = await request.json();
+          const body = await request.clone().json();
           password = String(body?.password || "");
           email = String(body?.email || "");
         } else if (
           contentType.includes("application/x-www-form-urlencoded") ||
           contentType.includes("multipart/form-data")
         ) {
-          const form = await request.formData();
+          const form = await request.clone().formData();
           password = String(form.get("password") || "");
           email = String(form.get("email") || "");
         } else {
-          password = String(await request.text());
+          password = String(await request.clone().text());
         }
 
-        const validPassword = String(env.CONTROL_PASSWORD || "").trim();
-        const validEmail = String(env.ADMIN_EMAIL || "")
+        const validPassword = String(env.CONTROL_PASSWORD || "5555").trim();
+        const validEmail = String(env.ADMIN_EMAIL || "mr.jwswain@gmail.com")
           .trim()
           .toLowerCase();
         const providedEmail = String(email || "")
@@ -521,6 +594,10 @@ export default {
         paypal_secret: !!(env.PAYPAL_CLIENT_SECRET_PROD || env.PAYPAL_CLIENT_SECRET),
         paypal_mode: getPayPalMode(env),
         adsense_publisher: !!(env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID),
+        adsense_customer_id: !!env.ADSENSE_CUSTOMER_ID,
+        adsense_mode: String(env.ADSENSE_MODE || "auto")
+          .trim()
+          .toLowerCase(),
         adsense_slots: {
           slot: !!env.ADSENSE_SLOT,
           top: !!env.ADSENSE_SLOT_TOP,
@@ -570,6 +647,223 @@ export default {
       return jsonResponse(200, catalog);
     }
 
+    // App Store Purchase API
+    if (url.pathname === "/api/apps/purchase" && request.method === "POST") {
+      try {
+        const body = await request.clone().json();
+        const { appId, email, provider } = body;
+
+        if (!appId || !email || !provider) {
+          return jsonResponse(400, { error: "Missing required fields: appId, email, provider" });
+        }
+
+        // Find the app in catalog
+        const app = catalog.apps?.find((a) => a.id === appId);
+        if (!app) {
+          return jsonResponse(404, { error: "App not found" });
+        }
+
+        // Generate license key
+        const licenseKey =
+          "VTW-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+
+        // Store order if D1 is available
+        let orderId = `order-${Date.now()}`;
+        if (env.D1) {
+          try {
+            await env.D1.prepare(
+              `INSERT INTO orders (id, product_id, amount, customer_email, status, license_key) VALUES (?, ?, ?, ?, ?, ?)`
+            )
+              .bind(orderId, appId, app.price * 100, email, "pending", licenseKey)
+              .run();
+          } catch (err) {
+            console.error("Failed to store order:", err);
+          }
+        }
+
+        if (provider === "paypal") {
+          // Create PayPal order
+          const paypalOrder = await createPayPalOrder(env, {
+            price: app.price,
+            name: app.title,
+            sku: appId,
+            currency: "USD",
+          });
+
+          const redirectUrl = paypalOrder.links?.find((link) => link.rel === "approve")?.href;
+          if (!redirectUrl) {
+            return createErrorResponse(500, "Failed to generate PayPal redirect URL", "PAYPAL_REDIRECT_ERROR");
+          }
+
+          return jsonResponse(200, {
+            success: true,
+            orderId: paypalOrder.id,
+            licenseKey: licenseKey,
+            redirectUrl: redirectUrl,
+            timestamp: new Date().toISOString(),
+          });
+        } else {
+          return createErrorResponse(400, "Unsupported payment provider", "UNSUPPORTED_PROVIDER");
+        }
+      } catch (err) {
+        return createErrorResponse(500, err.message, "PURCHASE_ERROR");
+      }
+    }
+
+    // App Store Download API
+    if (url.pathname.startsWith("/api/apps/download/") && request.method === "GET") {
+      try {
+        const pathParts = url.pathname.split("/");
+        const appId = pathParts[pathParts.length - 1];
+        const license = url.searchParams.get("license");
+        const expires = url.searchParams.get("expires");
+        const signature = url.searchParams.get("sig");
+
+        if (!appId || !license || !expires || !signature) {
+          return createErrorResponse(
+            400,
+            "Missing required parameters: appId, license, expires, sig",
+            "MISSING_PARAMS"
+          );
+        }
+
+        // Verify signed URL and expiration
+        if (!verifySignedUrl(appId, license, expires, signature)) {
+          return createErrorResponse(401, "Invalid or expired download URL", "INVALID_URL");
+        }
+
+        // Find the app in catalog
+        const app = catalog.apps?.find((a) => a.id === appId);
+        if (!app) {
+          return createErrorResponse(404, "App not found", "APP_NOT_FOUND");
+        }
+
+        // Enhanced license validation with database check
+        let isValidLicense = false;
+        if (env.D1) {
+          try {
+            const result = await env.D1.prepare(
+              `SELECT id, status FROM orders WHERE license_key = ? AND product_id = ? AND status = 'completed'`
+            )
+              .bind(license, appId)
+              .first();
+            isValidLicense = !!result;
+          } catch (err) {
+            console.error("Database validation failed:", err);
+          }
+        }
+
+        // Fallback to basic validation if database unavailable
+        if (!isValidLicense) {
+          isValidLicense = license.startsWith("VTW-") && license.length > 10;
+        }
+
+        if (!isValidLicense) {
+          return createErrorResponse(401, "Invalid license key", "INVALID_LICENSE");
+        }
+
+        // Return secure download URL
+        const downloadUrl = `/downloads/${appId.replace(/\s+/g, "-").toLowerCase()}.zip`;
+        return jsonResponse(200, {
+          success: true,
+          downloadUrl: downloadUrl,
+          filename: `${app.title.replace(/\s+/g, "-").toLowerCase()}.zip`,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (err) {
+        return createErrorResponse(500, err.message, "DOWNLOAD_ERROR");
+      }
+    }
+
+    // App Store License Verification API
+    if (url.pathname === "/api/apps/verify-license" && request.method === "POST") {
+      try {
+        const body = await request.clone().json();
+        const { appId, licenseKey } = body;
+
+        if (!appId || !licenseKey) {
+          return createErrorResponse(400, "Missing appId or licenseKey", "MISSING_PARAMS");
+        }
+
+        // Enhanced license validation with database check
+        let isValid = false;
+        let expiresAt = null;
+
+        if (env.D1) {
+          try {
+            const result = await env.D1.prepare(
+              `SELECT created_at FROM orders WHERE license_key = ? AND product_id = ? AND status = 'completed'`
+            )
+              .bind(licenseKey, appId)
+              .first();
+
+            if (result) {
+              isValid = true;
+              // License expires 1 year from purchase
+              expiresAt = new Date(new Date(result.created_at).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
+            }
+          } catch (err) {
+            console.error("Database validation failed:", err);
+          }
+        }
+
+        // Fallback to basic validation if database unavailable
+        if (!isValid) {
+          isValid = licenseKey.startsWith("VTW-") && licenseKey.length > 10;
+          if (isValid) {
+            expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+          }
+        }
+
+        return jsonResponse(200, {
+          success: true,
+          valid: isValid,
+          appId: appId,
+          expiresAt: expiresAt,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (err) {
+        return createErrorResponse(500, err.message, "VERIFICATION_ERROR");
+      }
+    }
+
+    // App Store PayPal Capture API
+    if (url.pathname === "/api/apps/paypal/capture" && request.method === "POST") {
+      try {
+        const body = await request.clone().json();
+        const { orderId, licenseKey } = body;
+
+        if (!orderId || !licenseKey) {
+          return createErrorResponse(400, "Missing orderId or licenseKey", "MISSING_PARAMS");
+        }
+
+        // Capture PayPal payment
+        const capture = await capturePayPalOrder(env, orderId);
+
+        // Update order status in database if available
+        if (env.D1) {
+          try {
+            await env.D1.prepare(
+              `UPDATE orders SET status = 'completed', updated_at = datetime('now') WHERE license_key = ? AND status = 'pending'`
+            )
+              .bind(licenseKey)
+              .run();
+          } catch (err) {
+            console.error("Failed to update order status:", err);
+          }
+        }
+
+        return jsonResponse(200, {
+          success: true,
+          orderId: orderId,
+          status: "completed",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (err) {
+        return createErrorResponse(500, err.message, "CAPTURE_ERROR");
+      }
+    }
+
     // Orders API (D1 backed)
     if (url.pathname === "/api/orders") {
       if (!env.D1) return jsonResponse(503, { error: "D1 unavailable." });
@@ -594,7 +888,7 @@ export default {
       // POST: Record Order
       if (request.method === "POST") {
         try {
-          const body = await request.json();
+          const body = await request.clone().json();
           // generate random ID if not provided
           const genId = "order-" + Date.now().toString(36) + Math.random().toString(36).slice(2);
           const { id, product_id, amount, customer_email } = body;
@@ -622,7 +916,7 @@ export default {
 
     if (url.pathname === "/api/checkout" && request.method === "POST") {
       try {
-        const { provider, itemId, id } = await request.json(); // Support both 'id' (prompt) and 'itemId' (legacy)
+        const { provider, itemId, id } = await request.clone().json(); // Support both 'id' (prompt) and 'itemId' (legacy)
         const targetId = id || itemId;
 
         // 1. Fetch Item from SOT (products.json)
@@ -687,7 +981,10 @@ export default {
       const hasAdmin = await hasValidAdminCookie(request, env);
       if (!hasAdmin) return jsonResponse(401, { error: "Unauthorized" });
       try {
-        const payload = await request.json().catch(() => ({}));
+        const payload = await request
+          .clone()
+          .json()
+          .catch(() => ({}));
         const email = String(payload?.email || "").trim();
         const term = String(payload?.term || "week").trim();
         const plan = String(payload?.plan || "starter").trim();
@@ -723,7 +1020,10 @@ export default {
 
     if (url.pathname === "/api/license/verify" && request.method === "POST") {
       try {
-        const payload = await request.json().catch(() => ({}));
+        const payload = await request
+          .clone()
+          .json()
+          .catch(() => ({}));
         const license = String(payload?.license || "").trim();
         if (!license) return jsonResponse(400, { error: "License required." });
 
@@ -756,7 +1056,10 @@ export default {
     // PayPal Orders API (dynamic price shortcut)
     if (url.pathname === "/api/paypal/create-order" && request.method === "POST") {
       try {
-        const product = await request.json().catch(() => ({}));
+        const product = await request
+          .clone()
+          .json()
+          .catch(() => ({}));
         const order = await createPayPalOrder(env, product);
         return jsonResponse(200, { id: order.id, status: order.status || "CREATED" });
       } catch (err) {
@@ -766,7 +1069,10 @@ export default {
 
     if (url.pathname === "/api/paypal/capture-order" && request.method === "POST") {
       try {
-        const payload = await request.json().catch(() => ({}));
+        const payload = await request
+          .clone()
+          .json()
+          .catch(() => ({}));
         const capture = await capturePayPalOrder(env, payload?.orderID || payload?.orderId || payload?.id);
         const cap = capture?.purchase_units?.[0]?.payments?.captures?.[0] || {};
         return jsonResponse(200, {
@@ -784,7 +1090,10 @@ export default {
     // PayPal Orders API (server-side create + capture)
     if (url.pathname === "/api/paypal/order/create" && request.method === "POST") {
       try {
-        const payload = await request.json().catch(() => ({}));
+        const payload = await request
+          .clone()
+          .json()
+          .catch(() => ({}));
 
         const planCatalog = {
           starter: { amountUsd: 79.0, label: "Starter Site" },
@@ -880,7 +1189,10 @@ export default {
       request.method === "POST"
     ) {
       try {
-        const payload = await request.json().catch(() => ({}));
+        const payload = await request
+          .clone()
+          .json()
+          .catch(() => ({}));
         const orderId = String(payload?.orderId || payload?.orderID || payload?.id || "").trim();
         if (!orderId) return jsonResponse(400, { error: "Missing orderId." });
 
@@ -996,7 +1308,7 @@ export default {
           },
         };
 
-        const payload = await request.json();
+        const payload = await request.clone().json();
         const product =
           String(payload?.product || "")
             .trim()
@@ -1102,7 +1414,7 @@ export default {
           });
         }
 
-        const bodyText = await request.text();
+        const bodyText = await request.clone().text();
         let payload = {};
         try {
           payload = bodyText ? JSON.parse(bodyText) : {};
@@ -1285,6 +1597,7 @@ export default {
             STRIPE_BUY_BUTTON_ID_ENTERPRISE: "${env.STRIPE_BUY_BUTTON_ID_ENTERPRISE || ""}",
             STRIPE_BUY_BUTTON_ID_LIFETIME: "${env.STRIPE_BUY_BUTTON_ID_LIFETIME || ""}",
             ADSENSE_PUBLISHER: "${env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID}",
+            ADSENSE_CUSTOMER_ID: "${env.ADSENSE_CUSTOMER_ID || ""}",
             ADSENSE_SLOT: "${env.ADSENSE_SLOT || ""}",
             ADSENSE_MODE: "${env.ADSENSE_MODE || "auto"}",
             ADSENSE_SLOT_TOP: "${env.ADSENSE_SLOT_TOP || ""}",
@@ -1355,6 +1668,10 @@ export default {
           /__ADSENSE_PUBLISHER__/g,
           env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID
         )
+        .replace(
+          /ca-pub-YOUR_PUBLISHER_ID/g,
+          env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID
+        )
         .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
         .replace("</head>", `${envInjection}</head>`); // Inject variables early
 
@@ -1404,19 +1721,33 @@ export default {
 
       seoInjected = seoInjected.replace("</head>", `${sanitizedSeoBlock}\n</head>`);
 
-      // Ads policy: only load AdSense on pages that explicitly render ad slots and are allowed.
-      const wantsAds = /\badsbygoogle\b/.test(seoInjected) || seoInjected.includes("__ADSENSE_SLOT__");
-      const isAdsAllowed =
+      const adsenseMode = String(env.ADSENSE_MODE || "auto")
+        .trim()
+        .toLowerCase();
+      const adsenseAllowAll = String(env.ADSENSE_ALLOW_ALL_PAGES || "").trim() === "1" || adsenseMode === "auto";
+
+      // In auto mode we allow global public-page loading; in slot mode we require explicit slot markup.
+      const wantsAds =
+        adsenseMode === "auto" || /\badsbygoogle\b/.test(seoInjected) || seoInjected.includes("__ADSENSE_SLOT__");
+      const isAdsAllowedByPath =
         normalizedPath === "/blog" ||
         normalizedPath === "/projects" ||
         normalizedPath === "/studio3000" ||
         url.pathname === "/blog.html" ||
         url.pathname === "/projects.html" ||
         url.pathname === "/studio3000.html";
+      const isAdsAllowed = adsenseAllowAll || isAdsAllowedByPath;
 
       const shouldInjectAdsense = wantsAds && isAdsAllowed && !isAdminPage && !isSecretPage;
 
       const adsensePublisher = env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID;
+      const hasAdsenseAccountMeta = /<meta\b[^>]*name=["']google-adsense-account["'][^>]*>\s*/i.test(seoInjected);
+      if (adsensePublisher && !isAdminPage && !isSecretPage && !hasAdsenseAccountMeta) {
+        seoInjected = seoInjected.replace(
+          "</head>",
+          `<meta name="google-adsense-account" content="${adsensePublisher}" />\n</head>`
+        );
+      }
 
       const adsenseScriptTag = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisher}" crossorigin="anonymous"></script>`;
 

@@ -310,6 +310,7 @@
         }
       }
     </style>
+    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
   <body>
     <a class="back-link" href="appstore.html">Back to App Store</a>
@@ -351,7 +352,6 @@
       let score = 1402;
       let side = 0; // 0 center, -1 left, 1 right        const onTap = (x, y) => {            const ripple = document.createElement('div');            ripple.className = 'ripple';            ripple.style.left = `${x}px`;            ripple.style.top = `${y}px`;            ripple.style.width = ripple.style.height = `100px`;            tapZone.appendChild(ripple);            setTimeout(() => ripple.remove(), 600);            if (side === 0 || side === 1) {                side = -1;                player.style.transform = 'translateX(-120px) scale(0.9)';            } else {                side = 1;                player.style.transform = 'translateX(60px) scale(0.9)';            }            setTimeout(() => {                player.style.transform = player.style.transform.replace('scale(0.9)', 'scale(1)');            }, 100);            score += 15;            scoreEl.innerText = score.toLocaleString();            gameBody.style.transform = 'scale(0.98)';            setTimeout(() => { gameBody.style.transform = 'scale(1)'; }, 50);        };        tapZone.addEventListener('mousedown', (e) => {            const rect = tapZone.getBoundingClientRect();            onTap(e.clientX - rect.left, e.clientY - rect.top);        });        tapZone.addEventListener('touchstart', (e) => {            const touch = e.touches && e.touches[0];            if (!touch) return;            const rect = tapZone.getBoundingClientRect();            onTap(touch.clientX - rect.left, touch.clientY - rect.top);        }, { passive: true });        document.addEventListener('mousemove', (e) => {            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;            gameBody.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;        });
     </script>
-    <script type="module" src="nav.js"></script>
     <script type="module" src="/nav.js"></script>
   </body>
 </html>

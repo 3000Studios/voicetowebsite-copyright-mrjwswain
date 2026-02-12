@@ -3,42 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VoiceToWebsite | Autonomous Web Engineering & Monetization Platform</title>
-    <meta
-      name="description"
-      content="Transform your ideas into stunning websites using AI-powered voice commands. VoiceToWebsite offers autonomous web engineering, deployment, and monetization in one platform. Build professional websites without coding."
-    />
-    <meta
-      name="keywords"
-      content="voice to website, ai web builder, autonomous web engineering, voice commands, website monetization, 3000 studios, ai website generator, no-code website builder, voice-powered development, automated web deployment, ai website platform"
-    />
+    <title>{{PAGE_TITLE}} | VoiceToWebsite</title>
+    <meta name="description" content="{{PAGE_DESCRIPTION}}" />
+    <meta name="keywords" content="{{PAGE_KEYWORDS}}" />
     <meta name="author" content="3000 Studios" />
     <meta name="robots" content="index, follow" />
 
-    <!-- Enhanced Open Graph / Facebook -->
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://voicetowebsite.com/" />
-    <meta property="og:title" content="VoiceToWebsite | Autonomous Web Engineering & Monetization Platform" />
-    <meta
-      property="og:description"
-      content="Transform your ideas into stunning websites using AI-powered voice commands. Build, deploy, and monetize professional websites without coding."
-    />
-    <meta property="og:image" content="https://voicetowebsite.com/vtw-wallpaper.png" />
+    <meta property="og:url" content="{{PAGE_URL}}" />
+    <meta property="og:title" content="{{PAGE_TITLE}} | VoiceToWebsite" />
+    <meta property="og:description" content="{{PAGE_DESCRIPTION}}" />
+    <meta property="og:image" content="{{PAGE_IMAGE}}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="VoiceToWebsite - AI-powered web development platform" />
+    <meta property="og:image:alt" content="{{PAGE_IMAGE_ALT}}" />
     <meta property="og:site_name" content="VoiceToWebsite" />
     <meta property="og:locale" content="en_US" />
 
-    <!-- Enhanced Twitter -->
+    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://voicetowebsite.com/" />
-    <meta property="twitter:title" content="VoiceToWebsite | Autonomous Web Engineering & Monetization Platform" />
-    <meta
-      property="twitter:description"
-      content="Transform your ideas into stunning websites using AI-powered voice commands. Build, deploy, and monetize professional websites without coding."
-    />
-    <meta property="twitter:image" content="https://voicetowebsite.com/vtw-wallpaper.png" />
+    <meta property="twitter:url" content="{{PAGE_URL}}" />
+    <meta property="twitter:title" content="{{PAGE_TITLE}} | VoiceToWebsite" />
+    <meta property="twitter:description" content="{{PAGE_DESCRIPTION}}" />
+    <meta property="twitter:image" content="{{PAGE_IMAGE}}" />
     <meta property="twitter:creator" content="@3000studios" />
     <meta property="twitter:site" content="@voicetowebsite" />
 
@@ -50,10 +38,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="msapplication-TileColor" content="#7dd3fc" />
-    <meta name="msapplication-config" content="/browserconfig.xml" />
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://voicetowebsite.com/" />
+    <link rel="canonical" href="{{PAGE_URL}}" />
 
     <!-- Favicon and Icons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -86,25 +73,40 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="/src/index.css" />
     <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://voicetowebsite.com/#organization",
+            "name": "VoiceToWebsite",
+            "url": "https://voicetowebsite.com",
+            "logo": "https://voicetowebsite.com/vtw-wallpaper.png",
+            "description": "AI-powered autonomous web engineering and monetization platform"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://voicetowebsite.com/#website",
+            "url": "https://voicetowebsite.com",
+            "name": "VoiceToWebsite",
+            "publisher": { "@id": "https://voicetowebsite.com/#organization" }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "{{PAGE_URL}}#webpage",
+            "url": "{{PAGE_URL}}",
+            "name": "{{PAGE_TITLE}}",
+            "description": "{{PAGE_DESCRIPTION}}",
+            "isPartOf": { "@id": "https://voicetowebsite.com/#website" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <script type="module" src="/nav.js"></script>
-    <svg
-      style="visibility: hidden; position: absolute"
-      width="0"
-      height="0"
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-    >
-      <defs>
-        <filter id="goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
-          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
-          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-        </filter>
-      </defs>
-    </svg>
+    {{PAGE_CONTENT}}
   </body>
 </html>

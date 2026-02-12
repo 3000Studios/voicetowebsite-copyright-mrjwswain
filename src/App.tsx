@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
 import LazyVideo from "./components/LazyVideo";
 import WarpTunnel from "./components/WarpTunnel";
-import { BACKGROUND_TUNNEL, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from "./constants";
+import { HOME_VIDEO, INTRO_SONG, INTRO_VIDEO, NAV_LINKS } from "./constants";
 import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
 import { NavigationLink } from "./types";
@@ -424,7 +424,7 @@ const App: React.FC = () => {
       {/* Background atmosphere */}
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
         <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-20 brightness-50">
-          <source src={BACKGROUND_TUNNEL} type="video/mp4" />
+          <source src={HOME_VIDEO} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-radial-gradient from-transparent to-black" />
       </div>
