@@ -338,19 +338,23 @@ const generateSignature = async (data, secret) => {
 };
 
 // Generate signed URL with expiration
-const generateSignedUrl = async (appId, licenseKey, expiresMinutes = 60) => {
+const generateSignedUrl = async (env, appId, licenseKey, expiresMinutes = 60) => {
+  const secret = String(env.SIGNATURE_SECRET || "").trim();
+  if (!secret) throw new Error("SIGNATURE_SECRET missing.");
+
   const expires = Date.now() + expiresMinutes * 60 * 1000;
   const data = `${appId}:${licenseKey}:${expires}`;
-  const secret = globalThis.SIGNATURE_SECRET || "default-secret-change-in-production";
   const signature = await generateSignature(data, secret);
   return `/api/apps/download/${appId}?license=${licenseKey}&expires=${expires}&sig=${signature}`;
 };
 
 // Verify signed URL
-const verifySignedUrl = async (appId, licenseKey, expires, signature) => {
+const verifySignedUrl = async (env, appId, licenseKey, expires, signature) => {
   try {
+    const secret = String(env.SIGNATURE_SECRET || "").trim();
+    if (!secret) return false;
+
     const data = `${appId}:${licenseKey}:${expires}`;
-    const secret = globalThis.SIGNATURE_SECRET || "default-secret-change-in-production";
     const expectedSignature = await generateSignature(data, secret);
     return signature === expectedSignature && Date.now() < parseInt(expires, 10);
   } catch {
@@ -1021,7 +1025,7 @@ export default {
         }
 
         // Verify signed URL and expiration
-        if (!verifySignedUrl(appId, license, expires, signature)) {
+        if (!(await verifySignedUrl(env, appId, license, expires, signature))) {
           return createErrorResponse(401, "Invalid or expired download URL", "INVALID_URL");
         }
 
