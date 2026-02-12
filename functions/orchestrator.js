@@ -886,6 +886,19 @@ Rules:
     let allSiteHtmlFiles = null;
     const expandToAllPagesByCommand = target !== "sandbox" && commandTargetsAllPages(command);
 
+    const pLimitAll = async (items, fn, limit = 10) => {
+      const results = [];
+      let index = 0;
+      const workers = Array.from({ length: Math.min(items.length, limit) }, async () => {
+        while (index < items.length) {
+          const currentIndex = index++;
+          results[currentIndex] = await fn(items[currentIndex]);
+        }
+      });
+      await Promise.all(workers);
+      return results;
+    };
+
     const listAllSiteHtmlFiles = async () => {
       if (allSiteHtmlFiles) return allSiteHtmlFiles;
       try {
@@ -971,11 +984,11 @@ Rules:
 
       if (type === "update_copy") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = updateElementById(html, action.field, action.value || "");
           saveHtml(htmlPath, html);
-        }
+        });
         if (target !== "sandbox" && action.field && allowedFields.includes(action.field)) {
           const config = await loadSiteConfig();
           config.copy = config.copy || {};
@@ -991,21 +1004,21 @@ Rules:
         }
         if (target === "sandbox" || action?.page || action?.path || action?.allPages || expandToAllPagesByCommand) {
           const htmlTargets = await resolveActionHtmlTargets(action);
-          for (const htmlPath of htmlTargets) {
+          await pLimitAll(htmlTargets, async (htmlPath) => {
             let html = await loadHtml(htmlPath);
             html = updateHtmlTheme(html, action.theme);
             saveHtml(htmlPath, html);
-          }
+          });
         }
       }
 
       if (type === "update_meta") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = updateMeta(html, action.title, action.description);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "add_page") {
@@ -1023,18 +1036,18 @@ Rules:
         });
 
         const navTargets = await listAllSiteHtmlFiles();
-        for (const navTarget of navTargets) {
-          if (navTarget === pagePath) continue;
+        await pLimitAll(navTargets, async (navTarget) => {
+          if (navTarget === pagePath) return;
           let html = await loadHtml(navTarget);
           html = addNavLink(html, slug, title);
           html = addFooterLink(html, slug, title);
           saveHtml(navTarget, html);
-        }
+        });
       }
 
       if (type === "insert_monetization") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = insertMonetization(
             html,
@@ -1043,7 +1056,7 @@ Rules:
             action.cta || "Get the offer"
           );
           saveHtml(htmlPath, html);
-        }
+        });
         if (target !== "sandbox") {
           const cssPath = resolveActionCssPath(action);
           let css = await loadStyles(cssPath);
@@ -1054,11 +1067,11 @@ Rules:
 
       if (type === "update_background_video") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = updateBackgroundVideo(html, action.src);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "update_wallpaper" && target !== "sandbox") {
@@ -1070,78 +1083,78 @@ Rules:
 
       if (type === "update_avatar") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = updateAvatar(html, action.src);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "insert_section") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = insertSection(html, action);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "add_product") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = ensureStoreSection(html);
           html = addProductCard(html, action);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "insert_video") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = insertVideoSection(html, action);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "insert_image") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = insertImageSection(html, action);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "insert_stream") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        for (const htmlPath of htmlTargets) {
+        await pLimitAll(htmlTargets, async (htmlPath) => {
           let html = await loadHtml(htmlPath);
           html = insertStreamSection(html, action);
           saveHtml(htmlPath, html);
-        }
+        });
       }
 
       if (type === "inject_css") {
         if (target === "sandbox") {
           const htmlTargets = await resolveActionHtmlTargets(action);
-          for (const htmlPath of htmlTargets) {
+          await pLimitAll(htmlTargets, async (htmlPath) => {
             let html = await loadHtml(htmlPath);
             html = injectCssIntoHtml(html, action.css);
             saveHtml(htmlPath, html);
-          }
+          });
         } else {
           const explicitCssFile = sanitizeStylePath(action?.file || action?.styleFile || "");
           const pageScoped =
             !explicitCssFile && (action?.page || action?.path || action?.allPages || expandToAllPagesByCommand);
           if (pageScoped) {
             const htmlTargets = await resolveActionHtmlTargets(action);
-            for (const htmlPath of htmlTargets) {
+            await pLimitAll(htmlTargets, async (htmlPath) => {
               let html = await loadHtml(htmlPath);
               html = injectCssIntoHtml(html, action.css);
               saveHtml(htmlPath, html);
-            }
+            });
           } else {
             const cssPath = explicitCssFile || DEFAULT_STYLE_FILE;
             let css = await loadStyles(cssPath);
