@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | Storefront</title>
+    <meta name="description" content="Browse and purchase products from our sellers" />
+    <meta name="robots" content="index, follow" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+    <header class="site-header">
+      <div class="nav-video">
+        <video
+          src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+      </div>
+      <div class="brand">
+        <span class="brand-mark">VW</span>
+        <div class="brand-text">
+          <strong>VoiceToWebsite</strong>
+          <span>Storefront</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="stripe-connect-dashboard.html">Dashboard</a>
+        <a href="stripe-connect-storefront.html">Storefront</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="hero-text">
+          <h1>Marketplace</h1>
+          <p class="subhead">Discover amazing products from our sellers</p>
+        </div>
+      </section>
+
+      <!-- Store Selector -->
+      <section class="section" id="storeSelector">
+        <h2>Browse by Store</h2>
+        <div class="store-grid" id="storeGrid">
+          <!-- Stores will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Products Section -->
+      <section class="section" id="productsSection">
+        <h2 id="storeTitle">All Products</h2>
+        <div class="product-grid" id="productGrid">
+          <!-- Products will be loaded here -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Complete Purchase</h3>
+          <button class="modal-close" onclick="closeCheckoutModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div id="checkoutDetails"></div>
+          <div class="checkout-actions">
+            <button class="primary-btn" id="checkoutBtn" onclick="processCheckout()">Proceed to Payment</button>
+            <button class="ghost-btn" onclick="closeCheckoutModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .store-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .store-card {
+        background: rgba(8, 12, 20, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        text-align: center;
+      }
+
+      .store-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .store-card.active {
+        border-color: rgba(102, 126, 234, 0.5);
+        background: rgba(102, 126, 234, 0.1);
+      }
+
+      .store-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: white;
+      }
+
+      .store-name {
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .store-description {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+      }
+
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      .product-card {
+        background: rgba(8, 12, 20, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .product-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .product-image {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+      }
+
+      .product-name {
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .product-description {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+      }
+
+      .product-price {
+        color: #4ade80;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      .product-actions {
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+      }
+
+      .primary-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .primary-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .ghost-btn {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+      }
+
+      .ghost-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: rgba(8, 12, 20, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        width: 90%;
+        max-width: 500px;
+        backdrop-filter: blur(20px);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .modal-header h3 {
+        color: #fff;
+        margin: 0;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+      }
+
+      .modal-close:hover {
+        color: #fff;
+      }
+
+      .checkout-details {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .checkout-actions {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .success-message {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: #22c55e;
+        text-align: center;
+      }
+
+      .error-message {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: #ef4444;
+        text-align: center;
+      }
+
+      .filter-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 1rem;
+      }
+
+      .filter-tab {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.7);
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+      }
+
+      .filter-tab:hover {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .filter-tab.active {
+        color: #fff;
+        border-bottom-color: #667eea;
+      }
+    </style>
+
+    <script>
+      // Configuration - Replace with your actual API base URL
+      const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
+
+      // Mock data for demo stores (in production, fetch from your database)
+      const demoStores = [
+        {
+          id: "acct_demo1",
+          name: "Tech Solutions Inc",
+          description: "Cutting-edge software tools",
+          userId: "demo-user-1",
+        },
+        {
+          id: "acct_demo2",
+          name: "Creative Studio",
+          description: "Design and multimedia assets",
+          userId: "demo-user-2",
+        },
+        {
+          id: "acct_demo3",
+          name: "Digital Services",
+          description: "Web development and consulting",
+          userId: "demo-user-3",
+        },
+      ];
+
+      let currentStore = null;
+      let allProducts = [];
+      let selectedProduct = null;
+
+      // Initialize storefront
+      document.addEventListener("DOMContentLoaded", async () => {
+        await loadStores();
+        await loadAllProducts();
+      });
+
+      /**
+       * Load available stores
+       */
+      async function loadStores() {
+        const storeGrid = document.getElementById("storeGrid");
+
+        // In production, fetch actual stores from your database
+        // For demo, we'll use mock data
+        storeGrid.innerHTML = demoStores
+          .map(
+            (store) => `
+          <div class="store-card" onclick="selectStore('${store.id}')" data-store-id="${store.id}">
+            <div class="store-logo">${store.name.charAt(0)}</div>
+            <div class="store-name">${store.name}</div>
+            <div class="store-description">${store.description}</div>
+          </div>
+        `
+          )
+          .join("");
+
+        // Add "All Stores" option
+        const allStoresCard = document.createElement("div");
+        allStoresCard.className = "store-card active";
+        allStoresCard.setAttribute("data-store-id", "all");
+        allStoresCard.onclick = () => selectStore("all");
+        allStoresCard.innerHTML = `
+          <div class="store-logo">🛍️</div>
+          <div class="store-name">All Stores</div>
+          <div class="store-description">Browse products from all sellers</div>
+        `;
+        storeGrid.insertBefore(allStoresCard, storeGrid.firstChild);
+      }
+
+      /**
+       * Select a store to filter products
+       */
+      async function selectStore(storeId) {
+        // Update UI
+        document.querySelectorAll(".store-card").forEach((card) => {
+          card.classList.remove("active");
+        });
+        document.querySelector(`[data-store-id="${storeId}"]`).classList.add("active");
+
+        currentStore = storeId;
+
+        // Update title
+        const storeTitle = document.getElementById("storeTitle");
+        if (storeId === "all") {
+          storeTitle.textContent = "All Products";
+          displayProducts(allProducts);
+        } else {
+          const store = demoStores.find((s) => s.id === storeId);
+          storeTitle.textContent = `${store.name} - Products`;
+          const storeProducts = allProducts.filter((p) => p.storeId === storeId);
+          displayProducts(storeProducts);
+        }
+      }
+
+      /**
+       * Load all products from all stores
+       */
+      async function loadAllProducts() {
+        try {
+          // In production, you would have a different endpoint to get products from all stores
+          // For demo, we'll load from each store
+          const products = [];
+
+          for (const store of demoStores) {
+            try {
+              // Mock user ID for each store
+              const mockUserId = store.userId;
+              const headers = {
+                "Content-Type": "application/json",
+                "X-User-ID": mockUserId,
+              };
+
+              const response = await fetch(`${API_BASE_URL}/api/stripe/products`, {
+                headers: headers,
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                const storeProducts = data.products.map((product) => ({
+                  ...product,
+                  storeId: store.id,
+                  storeName: store.name,
+                }));
+                products.push(...storeProducts);
+              }
+            } catch (error) {
+              console.error(`Error loading products for store ${store.id}:`, error);
+            }
+          }
+
+          allProducts = products;
+          displayProducts(allProducts);
+        } catch (error) {
+          console.error("Error loading products:", error);
+          showError("Failed to load products");
+        }
+      }
+
+      /**
+       * Display products in the grid
+       */
+      function displayProducts(products) {
+        const productGrid = document.getElementById("productGrid");
+
+        if (products.length === 0) {
+          productGrid.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No products found.</p>';
+          return;
+        }
+
+        productGrid.innerHTML = products
+          .map(
+            (product) => `
+          <div class="product-card">
+            <div class="product-image">
+              📦 ${product.name}
+            </div>
+            <div class="product-name">${product.name}</div>
+            <div class="product-description">${product.description || "No description available"}</div>
+            <div class="product-price">$${(product.default_price?.unit_amount / 100).toFixed(2)}</div>
+            <div class="product-actions">
+              <button class="primary-btn" onclick="purchaseProduct('${product.id}', '${product.storeId}')">
+                Buy Now
+              </button>
+              <button class="ghost-btn" onclick="viewProductDetails('${product.id}')">
+                Details
+              </button>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      /**
+       * Purchase a product
+       */
+      async function purchaseProduct(productId, storeId) {
+        const product = allProducts.find((p) => p.id === productId);
+        if (!product) {
+          showError("Product not found");
+          return;
+        }
+
+        selectedProduct = { ...product, storeId };
+        showCheckoutModal();
+      }
+
+      /**
+       * Show checkout modal
+       */
+      function showCheckoutModal() {
+        if (!selectedProduct) return;
+
+        const checkoutDetails = document.getElementById("checkoutDetails");
+        checkoutDetails.innerHTML = `
+          <h4>${selectedProduct.name}</h4>
+          <p>${selectedProduct.description || "No description"}</p>
+          <p><strong>Price:</strong> $${(selectedProduct.default_price?.unit_amount / 100).toFixed(2)}</p>
+          <p><strong>Sold by:</strong> ${selectedProduct.storeName}</p>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.7);">
+            You will be redirected to Stripe's secure checkout to complete this purchase.
+          </p>
+        `;
+
+        document.getElementById("checkoutModal").style.display = "flex";
+      }
+
+      /**
+       * Close checkout modal
+       */
+      function closeCheckoutModal() {
+        document.getElementById("checkoutModal").style.display = "none";
+        selectedProduct = null;
+      }
+
+      /**
+       * Process checkout
+       */
+      async function processCheckout() {
+        if (!selectedProduct) return;
+
+        const checkoutBtn = document.getElementById("checkoutBtn");
+        const originalText = checkoutBtn.innerHTML;
+
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerHTML = '<span class="loading-spinner"></span>Processing...';
+
+        try {
+          // Get the user ID for the store owner
+          const store = demoStores.find((s) => s.id === selectedProduct.storeId);
+          const mockUserId = store.userId;
+
+          const headers = {
+            "Content-Type": "application/json",
+            "X-User-ID": mockUserId,
+          };
+
+          const response = await fetch(`${API_BASE_URL}/api/stripe/create-checkout-session`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({
+              priceId: selectedProduct.default_price.id,
+              quantity: 1,
+              applicationFeeAmount: 100, // $1.00 application fee for platform
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Redirect to Stripe Checkout
+            window.location.href = data.url;
+          } else {
+            showError(data.error || "Failed to create checkout session");
+          }
+        } catch (error) {
+          console.error("Error processing checkout:", error);
+          showError("Failed to process checkout");
+        } finally {
+          checkoutBtn.disabled = false;
+          checkoutBtn.innerHTML = originalText;
+        }
+      }
+
+      /**
+       * View product details (placeholder)
+       */
+      function viewProductDetails(productId) {
+        const product = allProducts.find((p) => p.id === productId);
+        if (product) {
+          showInfo(`Product details for ${product.name} would be shown here in a full implementation.`);
+        }
+      }
+
+      /**
+       * Utility functions for displaying messages
+       */
+      function showSuccess(message) {
+        showMessage(message, "success");
+      }
+
+      function showError(message) {
+        showMessage(message, "error");
+      }
+
+      function showInfo(message) {
+        showMessage(message, "info");
+      }
+
+      function showMessage(message, type) {
+        // Remove existing messages
+        document.querySelectorAll(".success-message, .error-message").forEach((el) => el.remove());
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `${type}-message`;
+        messageDiv.textContent = message;
+
+        document.querySelector("main").insertBefore(messageDiv, document.querySelector("main").firstChild);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => messageDiv.remove(), 5000);
+      }
+
+      // Check for URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("product");
+      if (productId) {
+        // Auto-select the product if specified in URL
+        setTimeout(() => {
+          const product = allProducts.find((p) => p.id === productId);
+          if (product) {
+            selectStore(product.storeId);
+            // Scroll to product
+            setTimeout(() => {
+              const productCard = document.querySelector(`[onclick*="${productId}"]`);
+              if (productCard) {
+                productCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                productCard.style.border = "2px solid #667eea";
+                setTimeout(() => {
+                  productCard.style.border = "";
+                }, 3000);
+              }
+            }, 1000);
+          }
+        }, 1000);
+      }
+    </script>
+  </body>
+</html>

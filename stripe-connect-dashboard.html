@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | Stripe Connect Dashboard</title>
+    <meta name="description" content="Manage your Stripe Connect account and sell your products with VoiceToWebsite" />
+    <meta name="robots" content="index, follow" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+    <header class="site-header">
+      <div class="nav-video">
+        <video
+          src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+      </div>
+      <div class="brand">
+        <span class="brand-mark">VW</span>
+        <div class="brand-text">
+          <strong>VoiceToWebsite</strong>
+          <span>Stripe Connect</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="stripe-connect-dashboard.html">Dashboard</a>
+        <a href="stripe-connect-storefront.html">Products</a>
+        <a href="stripe-connect-storefront.html">Storefront</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="hero-text">
+          <h1>Stripe Connect Dashboard</h1>
+          <p class="subhead">Manage your payment processing and product sales</p>
+        </div>
+      </section>
+
+      <!-- Account Status Section -->
+      <section class="section" id="accountSection">
+        <h2>Account Status</h2>
+        <div class="card" id="accountStatusCard">
+          <div class="card-header">
+            <h3>Connected Account</h3>
+            <span class="status-chip" id="accountStatusChip">Loading...</span>
+          </div>
+          <div class="card-content">
+            <div id="accountDetails">
+              <p>Loading account information...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Onboarding Section -->
+      <section class="section" id="onboardingSection" style="display: none">
+        <h2>Complete Your Onboarding</h2>
+        <div class="card">
+          <div class="card-content">
+            <p>To start accepting payments, you need to complete Stripe's onboarding process.</p>
+            <div id="onboardingRequirements"></div>
+            <button class="primary-btn" id="onboardingBtn" onclick="startOnboarding()">Complete Onboarding</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Product Management Section -->
+      <section class="section" id="productsSection" style="display: none">
+        <h2>Product Management</h2>
+        <div class="card">
+          <div class="card-header">
+            <h3>Your Products</h3>
+            <button class="ghost-btn" onclick="createProduct()">Add Product</button>
+          </div>
+          <div class="card-content">
+            <div id="productsList">
+              <p>Loading products...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Subscription Section -->
+      <section class="section" id="subscriptionSection" style="display: none">
+        <h2>Subscription Management</h2>
+        <div class="card">
+          <div class="card-header">
+            <h3>Your Subscription</h3>
+            <button class="ghost-btn" id="manageSubscriptionBtn" onclick="manageSubscription()">
+              Manage Subscription
+            </button>
+          </div>
+          <div class="card-content">
+            <div id="subscriptionDetails">
+              <p>Loading subscription information...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Create Product Modal -->
+    <div id="createProductModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Create New Product</h3>
+          <button class="modal-close" onclick="closeCreateProductModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="createProductForm">
+            <div class="form-group">
+              <label for="productName">Product Name</label>
+              <input type="text" id="productName" required placeholder="Enter product name" />
+            </div>
+            <div class="form-group">
+              <label for="productDescription">Description</label>
+              <textarea id="productDescription" placeholder="Enter product description"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="productPrice">Price (USD)</label>
+              <input type="number" id="productPrice" required placeholder="0.00" step="0.01" min="0.50" />
+            </div>
+            <button type="submit" class="primary-btn">Create Product</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .card {
+        background: rgba(8, 12, 20, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        margin-bottom: 2rem;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .card-header h3 {
+        color: #fff;
+        margin: 0;
+      }
+
+      .card-content {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .status-chip {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .status-chip.active {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .status-chip.pending {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+
+      .status-chip.inactive {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .primary-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .ghost-btn {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .ghost-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: rgba(8, 12, 20, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        width: 90%;
+        max-width: 500px;
+        backdrop-filter: blur(20px);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .modal-header h3 {
+        color: #fff;
+        margin: 0;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+      }
+
+      .modal-close:hover {
+        color: #fff;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: rgba(102, 126, 234, 0.5);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .product-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .product-item h4 {
+        color: #fff;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .product-item p {
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0 0 0.5rem 0;
+      }
+
+      .product-price {
+        color: #4ade80;
+        font-weight: bold;
+      }
+
+      .requirement-item {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        color: #fbbf24;
+        font-size: 0.875rem;
+      }
+
+      .success-message {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: #22c55e;
+      }
+
+      .error-message {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: #ef4444;
+      }
+    </style>
+
+    <script>
+      // Configuration - Replace with your actual API base URL
+      const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
+
+      // Mock user ID - In production, get this from your authentication system
+      const USER_ID = "demo-user-" + Math.random().toString(36).substr(2, 9);
+
+      // Set user ID header for all API calls
+      const apiHeaders = {
+        "Content-Type": "application/json",
+        "X-User-ID": USER_ID,
+      };
+
+      // Initialize dashboard
+      document.addEventListener("DOMContentLoaded", async () => {
+        await loadAccountStatus();
+        await loadSubscriptionStatus();
+      });
+
+      /**
+       * Load account status from Stripe Connect
+       */
+      async function loadAccountStatus() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/account-status`, {
+            headers: apiHeaders,
+          });
+
+          if (response.status === 404) {
+            // No account exists yet
+            showCreateAccountSection();
+            return;
+          }
+
+          const data = await response.json();
+          displayAccountStatus(data);
+
+          if (data.readyToProcessPayments) {
+            showProductsSection();
+          } else if (!data.onboardingComplete) {
+            showOnboardingSection(data);
+          }
+        } catch (error) {
+          console.error("Error loading account status:", error);
+          showError("Failed to load account status");
+        }
+      }
+
+      /**
+       * Display account status information
+       */
+      function displayAccountStatus(accountData) {
+        const accountDetails = document.getElementById("accountDetails");
+        const statusChip = document.getElementById("accountStatusChip");
+
+        statusChip.textContent = accountData.readyToProcessPayments ? "Active" : "Pending";
+        statusChip.className = `status-chip ${accountData.readyToProcessPayments ? "active" : "pending"}`;
+
+        accountDetails.innerHTML = `
+          <div class="success-message">
+            <strong>Account Connected!</strong><br>
+            Account ID: ${accountData.accountId}<br>
+            Display Name: ${accountData.displayName}<br>
+            Ready to Process Payments: ${accountData.readyToProcessPayments ? "Yes" : "No"}
+          </div>
+        `;
+      }
+
+      /**
+       * Show create account section
+       */
+      function showCreateAccountSection() {
+        const accountDetails = document.getElementById("accountDetails");
+        const statusChip = document.getElementById("accountStatusChip");
+
+        statusChip.textContent = "Not Connected";
+        statusChip.className = "status-chip inactive";
+
+        accountDetails.innerHTML = `
+          <div class="card">
+            <h3>Create Your Stripe Connect Account</h3>
+            <p>Start accepting payments by creating your Stripe Connect account.</p>
+            <form id="createAccountForm">
+              <div class="form-group">
+                <label for="displayName">Business Name</label>
+                <input type="text" id="displayName" required placeholder="Your Business Name">
+              </div>
+              <div class="form-group">
+                <label for="contactEmail">Contact Email</label>
+                <input type="email" id="contactEmail" required placeholder="your@email.com">
+              </div>
+              <button type="submit" class="primary-btn">Create Account</button>
+            </form>
+          </div>
+        `;
+
+        document.getElementById("createAccountForm").addEventListener("submit", createAccount);
+      }
+
+      /**
+       * Create new Stripe Connect account
+       */
+      async function createAccount(e) {
+        e.preventDefault();
+
+        const displayName = document.getElementById("displayName").value;
+        const contactEmail = document.getElementById("contactEmail").value;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/create-account`, {
+            method: "POST",
+            headers: apiHeaders,
+            body: JSON.stringify({ displayName, contactEmail }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showSuccess("Account created successfully! Redirecting to onboarding...");
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            showError(data.error || "Failed to create account");
+          }
+        } catch (error) {
+          console.error("Error creating account:", error);
+          showError("Failed to create account");
+        }
+      }
+
+      /**
+       * Show onboarding section
+       */
+      function showOnboardingSection(accountData) {
+        document.getElementById("onboardingSection").style.display = "block";
+
+        if (accountData.currentRequirements && accountData.currentRequirements.length > 0) {
+          const requirementsHtml = accountData.currentRequirements
+            .map((req) => `<div class="requirement-item">${req}</div>`)
+            .join("");
+          document.getElementById("onboardingRequirements").innerHTML = requirementsHtml;
+        }
+      }
+
+      /**
+       * Start Stripe onboarding process
+       */
+      async function startOnboarding() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/create-onboarding-link`, {
+            method: "POST",
+            headers: apiHeaders,
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Redirect to Stripe onboarding
+            window.location.href = data.url;
+          } else {
+            showError(data.error || "Failed to create onboarding link");
+          }
+        } catch (error) {
+          console.error("Error starting onboarding:", error);
+          showError("Failed to start onboarding");
+        }
+      }
+
+      /**
+       * Show products section
+       */
+      function showProductsSection() {
+        document.getElementById("productsSection").style.display = "block";
+        document.getElementById("subscriptionSection").style.display = "block";
+        loadProducts();
+      }
+
+      /**
+       * Load products from Stripe
+       */
+      async function loadProducts() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/products`, {
+            headers: apiHeaders,
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            displayProducts(data.products);
+          } else {
+            showError(data.error || "Failed to load products");
+          }
+        } catch (error) {
+          console.error("Error loading products:", error);
+          showError("Failed to load products");
+        }
+      }
+
+      /**
+       * Display products list
+       */
+      function displayProducts(products) {
+        const productsList = document.getElementById("productsList");
+
+        if (products.length === 0) {
+          productsList.innerHTML = "<p>No products yet. Create your first product to get started!</p>";
+          return;
+        }
+
+        productsList.innerHTML = products
+          .map(
+            (product) => `
+          <div class="product-item">
+            <h4>${product.name}</h4>
+            <p>${product.description || "No description"}</p>
+            <p class="product-price">$${(product.default_price?.unit_amount / 100).toFixed(2)}</p>
+            <button class="ghost-btn" onclick="viewStorefront('${product.id}')">View in Storefront</button>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      /**
+       * Create product modal
+       */
+      function createProduct() {
+        document.getElementById("createProductModal").style.display = "flex";
+      }
+
+      /**
+       * Close create product modal
+       */
+      function closeCreateProductModal() {
+        document.getElementById("createProductModal").style.display = "none";
+        document.getElementById("createProductForm").reset();
+      }
+
+      /**
+       * Handle create product form submission
+       */
+      document.getElementById("createProductForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("productName").value;
+        const description = document.getElementById("productDescription").value;
+        const priceInCents = Math.round(parseFloat(document.getElementById("productPrice").value) * 100);
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/create-product`, {
+            method: "POST",
+            headers: apiHeaders,
+            body: JSON.stringify({ name, description, priceInCents }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showSuccess("Product created successfully!");
+            closeCreateProductModal();
+            loadProducts(); // Reload products list
+          } else {
+            showError(data.error || "Failed to create product");
+          }
+        } catch (error) {
+          console.error("Error creating product:", error);
+          showError("Failed to create product");
+        }
+      });
+
+      /**
+       * Load subscription status
+       */
+      async function loadSubscriptionStatus() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/subscription-status`, {
+            headers: apiHeaders,
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            displaySubscriptionStatus(data);
+          }
+        } catch (error) {
+          console.error("Error loading subscription status:", error);
+        }
+      }
+
+      /**
+       * Display subscription status
+       */
+      function displaySubscriptionStatus(subscriptionData) {
+        const subscriptionDetails = document.getElementById("subscriptionDetails");
+        const manageBtn = document.getElementById("manageSubscriptionBtn");
+
+        if (!subscriptionData.hasSubscription) {
+          subscriptionDetails.innerHTML = `
+            <p>You don't have an active subscription.</p>
+            <button class="primary-btn" onclick="subscribeToPlan()">Subscribe to Plan</button>
+          `;
+          manageBtn.style.display = "none";
+        } else {
+          const sub = subscriptionData.subscription;
+          subscriptionDetails.innerHTML = `
+            <div class="success-message">
+              <strong>Active Subscription</strong><br>
+              Status: ${sub.status}<br>
+              Next billing: ${new Date(sub.current_period_end * 1000).toLocaleDateString()}<br>
+              ${sub.cancel_at_period_end ? "Cancels at period end" : "Auto-renewing"}
+            </div>
+          `;
+          manageBtn.style.display = "block";
+        }
+      }
+
+      /**
+       * Subscribe to plan (placeholder)
+       */
+      async function subscribeToPlan() {
+        // In production, you would create a subscription checkout
+        showInfo("Subscription feature coming soon!");
+      }
+
+      /**
+       * Manage subscription
+       */
+      async function manageSubscription() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/create-billing-portal`, {
+            method: "POST",
+            headers: apiHeaders,
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            window.location.href = data.url;
+          } else {
+            showError(data.error || "Failed to create billing portal session");
+          }
+        } catch (error) {
+          console.error("Error managing subscription:", error);
+          showError("Failed to manage subscription");
+        }
+      }
+
+      /**
+       * View storefront
+       */
+      function viewStorefront(productId) {
+        window.location.href = `stripe-connect-storefront.html?product=${productId}`;
+      }
+
+      /**
+       * Utility functions for displaying messages
+       */
+      function showSuccess(message) {
+        showMessage(message, "success");
+      }
+
+      function showError(message) {
+        showMessage(message, "error");
+      }
+
+      function showInfo(message) {
+        showMessage(message, "info");
+      }
+
+      function showMessage(message, type) {
+        // Remove existing messages
+        document.querySelectorAll(".success-message, .error-message").forEach((el) => el.remove());
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `${type}-message`;
+        messageDiv.textContent = message;
+
+        document.querySelector("main").insertBefore(messageDiv, document.querySelector("main").firstChild);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => messageDiv.remove(), 5000);
+      }
+
+      // Check for onboarding completion from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("onboarding_complete") === "true") {
+        showSuccess("Onboarding completed successfully! Your account is now ready.");
+      }
+    </script>
+  </body>
+</html>

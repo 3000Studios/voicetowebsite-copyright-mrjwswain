@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
 // Mock dependencies
@@ -25,22 +25,28 @@ vi.mock("./components/WarpTunnel", () => ({
 describe("App Accessibility - Use Cases", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock localStorage to skip intro
+    // Mock localStorage to skip intro and audio bootstrap
     vi.spyOn(Storage.prototype, "getItem").mockImplementation((key) => {
       if (key === "vtw-v2-seen") return "1";
+      if (key === "vtw-audio-optout") return "1";
       return null;
     });
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("should have accessible tabs for Use Cases", () => {
+  it("should have accessible tabs for Use Cases", async () => {
     render(<App />);
 
-    // Find the tablist
-    const tablist = screen.getByRole("tablist", { name: /use cases/i });
+    // If intro is active, enter site first.
+    const skipIntro = screen.queryByRole("button", { name: /skip intro/i });
+    if (skipIntro) fireEvent.click(skipIntro);
+
+    // Wait for the tablist to be rendered.
+    const tablist = await waitFor(() => screen.getByRole("tablist", { name: /use cases/i }));
     expect(tablist).toBeInTheDocument();
 
     // Find tabs

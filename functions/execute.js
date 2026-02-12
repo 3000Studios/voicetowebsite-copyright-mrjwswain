@@ -248,6 +248,16 @@ const createConfirmToken = async (env, db, { action, idempotencyKey, traceId }) 
 const matchesTokenAction = (tokenAction, requestedAction) =>
   tokenAction === requestedAction || tokenAction === "execute";
 
+const canReuseConsumedTokenForDeploy = async (db, row, idempotencyKey, action) => {
+  if (action !== "deploy") return false;
+  if (row?.action !== "execute") return false;
+  if (row?.idempotency_key !== idempotencyKey) return false;
+
+  const applied = await findExistingEvent(db, "apply", idempotencyKey);
+  const appliedStatus = Number(applied?.status || 0);
+  return Number.isFinite(appliedStatus) && appliedStatus >= 200 && appliedStatus < 300;
+};
+
 const validateAndConsumeConfirmToken = async (env, db, { token, action, idempotencyKey }) => {
   if (!token) return { ok: false, error: "confirmToken is required for this action." };
 
@@ -298,7 +308,13 @@ const validateAndConsumeConfirmToken = async (env, db, { token, action, idempote
   }
 
   if (!row) return { ok: false, error: "confirmToken not found." };
-  if (row.used_at) return { ok: false, error: "confirmToken already used." };
+  if (row.used_at) {
+    const allowDeployReuse = await canReuseConsumedTokenForDeploy(db, row, idempotencyKey, action);
+    if (!allowDeployReuse) {
+      return { ok: false, error: "confirmToken already used." };
+    }
+    return { ok: true };
+  }
   if (Date.now() > new Date(row.expires_at).getTime()) return { ok: false, error: "confirmToken has expired." };
   if (!matchesTokenAction(row.action, action) || row.idempotency_key !== idempotencyKey) {
     return { ok: false, error: "confirmToken does not match action/idempotencyKey." };
@@ -502,7 +518,8 @@ export async function onRequestPost(context) {
       result = {
         ...orchestratorResult,
         ...confirm,
-        confirmInstructions: "Use this confirmToken once with action=apply or action=deploy and same idempotencyKey.",
+        confirmInstructions:
+          "Use this confirmToken with the same idempotencyKey for apply, and optionally deploy right after apply.",
       };
     }
 

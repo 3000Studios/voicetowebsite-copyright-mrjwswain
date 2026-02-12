@@ -7,6 +7,9 @@
     <loc>https://voicetowebsite.com/api-documentation</loc>
   </url>
   <url>
+    <loc>https://voicetowebsite.com/appstore-new</loc>
+  </url>
+  <url>
     <loc>https://voicetowebsite.com/appstore</loc>
   </url>
   <url>
@@ -95,6 +98,12 @@
   </url>
   <url>
     <loc>https://voicetowebsite.com/strata-design-system</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/stripe-connect-dashboard</loc>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/stripe-connect-storefront</loc>
   </url>
   <url>
     <loc>https://voicetowebsite.com/studio3000</loc>

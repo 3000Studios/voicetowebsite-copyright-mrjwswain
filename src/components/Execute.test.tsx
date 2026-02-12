@@ -26,6 +26,99 @@ const makeRequest = (body: Record<string, unknown>, headers: Record<string, stri
     body: JSON.stringify(body),
   });
 
+class InMemoryD1 {
+  private executeEvents = new Map<string, { status: number; response_json: string }>();
+  private confirmTokens = new Map<
+    string,
+    {
+      token_hash: string;
+      action: string;
+      idempotency_key: string;
+      trace_id: string;
+      expires_at: string;
+      used_at: string | null;
+    }
+  >();
+
+  prepare(query: string) {
+    const sql = String(query).toLowerCase().replace(/\s+/g, " ").trim();
+    let params: unknown[] = [];
+    const self = this;
+
+    return {
+      bind(...args: unknown[]) {
+        params = args;
+        return this;
+      },
+      async run() {
+        if (sql.startsWith("create table")) return;
+
+        if (sql.includes("insert or ignore into execute_events")) {
+          const [, action, idempotencyKey, , status, responseJson] = params as [
+            string,
+            string,
+            string,
+            string,
+            number,
+            string,
+          ];
+          const key = `${action}::${idempotencyKey}`;
+          if (!self.executeEvents.has(key)) {
+            self.executeEvents.set(key, { status, response_json: responseJson });
+          }
+          return;
+        }
+
+        if (sql.includes("insert or replace into execute_confirm_tokens")) {
+          const [tokenHash, action, idempotencyKey, traceId, expiresAt] = params as [
+            string,
+            string,
+            string,
+            string,
+            string,
+          ];
+          self.confirmTokens.set(tokenHash, {
+            token_hash: tokenHash,
+            action,
+            idempotency_key: idempotencyKey,
+            trace_id: traceId,
+            expires_at: expiresAt,
+            used_at: null,
+          });
+          return;
+        }
+
+        if (sql.startsWith("update execute_confirm_tokens set used_at")) {
+          const [usedAt, tokenHash] = params as [string, string];
+          const row = self.confirmTokens.get(tokenHash);
+          if (row) {
+            row.used_at = usedAt;
+            self.confirmTokens.set(tokenHash, row);
+          }
+        }
+      },
+      async first() {
+        if (sql.includes("from execute_events where action = ? and idempotency_key = ?")) {
+          const [action, idempotencyKey] = params as [string, string];
+          const row = self.executeEvents.get(`${action}::${idempotencyKey}`);
+          return row ? { ...row } : null;
+        }
+
+        if (sql.includes("from execute_confirm_tokens")) {
+          const [tokenHash] = params as [string];
+          const row = self.confirmTokens.get(tokenHash);
+          return row ? { ...row } : null;
+        }
+
+        return null;
+      },
+      async all() {
+        return { results: [] };
+      },
+    };
+  }
+}
+
 describe("/api/execute", () => {
   let lastOrchestratorPayload: Record<string, unknown> | null = null;
 
@@ -171,6 +264,57 @@ describe("/api/execute", () => {
 
     expect(deploy.status).toBe(200);
     expect(lastOrchestratorPayload?.mode).toBe("deploy");
+    const deployBody = await deploy.json();
+    expect(deployBody.eventType).toBe("deployed");
+  });
+
+  it("allows deploy after apply with the same confirmToken when D1 is enabled", async () => {
+    const env = { D1: new InMemoryD1() };
+
+    const preview = await handleExecute({
+      request: makeRequest(
+        {
+          action: "preview",
+          idempotencyKey: "chain-001",
+          command: "Change homepage headline to Voice-native launch mode",
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env,
+      ctx: {},
+    });
+    const previewBody = await preview.json();
+
+    const apply = await handleExecute({
+      request: makeRequest(
+        {
+          action: "apply",
+          idempotencyKey: "chain-001",
+          command: "Change homepage headline to Voice-native launch mode",
+          confirmToken: previewBody.result.confirmToken,
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env,
+      ctx: {},
+    });
+    expect(apply.status).toBe(200);
+
+    const deploy = await handleExecute({
+      request: makeRequest(
+        {
+          action: "deploy",
+          idempotencyKey: "chain-001",
+          command: "Deploy latest approved changes",
+          confirmToken: previewBody.result.confirmToken,
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env,
+      ctx: {},
+    });
+
+    expect(deploy.status).toBe(200);
     const deployBody = await deploy.json();
     expect(deployBody.eventType).toBe("deployed");
   });

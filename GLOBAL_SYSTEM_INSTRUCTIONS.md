@@ -89,6 +89,7 @@
 Public pages:
 
 - `/api-documentation` -> `api-documentation.html`
+- `/appstore-new` -> `appstore-new.html`
 - `/appstore` -> `appstore.html`
 - `/blog` -> `blog.html`
 - `/color-synth` -> `color-synth.html`
@@ -121,6 +122,8 @@ Public pages:
 - `/status` -> `status.html`
 - `/store` -> `store.html`
 - `/strata-design-system` -> `strata-design-system.html`
+- `/stripe-connect-dashboard` -> `stripe-connect-dashboard.html`
+- `/stripe-connect-storefront` -> `stripe-connect-storefront.html`
 - `/studio3000` -> `studio3000.html`
 - `/support` -> `support.html`
 - `/templates` -> `templates.html`
@@ -139,6 +142,7 @@ Admin pages:
 - `/admin/bot-command-center` -> `admin/bot-command-center.html`
 - `/admin` -> `admin/index.html`
 - `/admin/live-stream` -> `admin/live-stream.html`
+- `/admin/login` -> `admin/login.html`
 - `/admin/store-manager` -> `admin/store-manager.html`
 - `/admin/voice-commands` -> `admin/voice-commands.html`
 

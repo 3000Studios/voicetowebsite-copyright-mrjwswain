@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3000 Studios App Store | Premium Applications</title>
+    <meta
+      name="description"
+      content="Discover and purchase premium applications by 3000 Studios. All apps are proprietary and require license keys for activation."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD"></script>
+  </head>
+  <body>
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+    <header class="site-header">
+      <div class="nav-video">
+        <video
+          src="https://cdn.coverr.co/videos/coverr-glass-building-reflections-6827/1080p.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
+      </div>
+      <div class="brand">
+        <span class="brand-mark">3000</span>
+        <div class="brand-text">
+          <strong>App Store</strong>
+          <span>Premium Applications</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="store.html">Store</a>
+        <a href="appstore.html">App Store</a>
+        <a href="blog.html">Blog</a>
+        <a href="livestream.html">Live Stream</a>
+        <a href="referrals.html">Referrals</a>
+        <a href="projects.html">Projects</a>
+        <a href="studio3000.html">3000 Studios</a>
+        <a href="/admin">Admin</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="hero-text">
+          <h1>3000 Studios App Store</h1>
+          <p class="subhead">Premium proprietary applications with advanced licensing protection</p>
+          <div class="license-notice">
+            <p>🔒 All apps require a valid license key for activation</p>
+            <p>© 3000 Studios 2026 | Creator: mr.Jwswain@gmail.com</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Available Applications</h2>
+        <div class="app-grid" id="appGrid">
+          <!-- Apps will be dynamically loaded here -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Purchase Application</h3>
+          <button class="modal-close" onclick="closePurchaseModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div id="purchaseDetails"></div>
+          <form id="purchaseForm">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" required placeholder="Enter your email for license delivery" />
+            </div>
+            <div class="form-group">
+              <label>Payment Method</label>
+              <div class="payment-options">
+                <button type="button" class="payment-btn paypal-btn" data-provider="paypal">
+                  <img
+                    src="https://www.paypalobjects.com/webstatic/mktg/logo/PP_AcceptanceMark_RGB_Large.png"
+                    alt="PayPal"
+                    style="height: 24px"
+                  />
+                  PayPal
+                </button>
+                <button type="button" class="payment-btn stripe-btn" data-provider="stripe" disabled>
+                  <img
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23635bff'%3E%3Cpath d='M14.5 10c0-2-2-2-2-2h-3v4h3c2 0 2-2 2-2zM12 14h-2v4h2c2 0 3-1 3-2s-1-2-3-2z'/%3E%3C/svg%3E"
+                    alt="Stripe"
+                    style="height: 20px"
+                  />
+                  Stripe (Coming Soon)
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="primary-btn">Complete Purchase</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- License Modal -->
+    <div id="licenseModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>License Key Required</h3>
+          <button class="modal-close" onclick="closeLicenseModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Please enter your license key to download this application:</p>
+          <form id="licenseForm">
+            <div class="form-group">
+              <label for="licenseKey">License Key</label>
+              <input type="text" id="licenseKey" required placeholder="Enter your license key" />
+            </div>
+            <button type="submit" class="primary-btn">Download Application</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentApp = null;
+      let catalog = [];
+
+      // Load app catalog
+      async function loadCatalog() {
+        try {
+          const response = await fetch("/api/products");
+          catalog = await response.json();
+          renderApps();
+        } catch (err) {
+          console.error("Failed to load catalog:", err);
+        }
+      }
+
+      // Render apps in the grid
+      function renderApps() {
+        const appGrid = document.getElementById("appGrid");
+        const apps = catalog.apps || [];
+
+        appGrid.innerHTML = apps
+          .map(
+            (app) => `
+          <div class="app-card" data-app-id="${app.id}">
+            <div class="app-header">
+              <h3>${app.title}</h3>
+              <span class="app-price">$${app.price}</span>
+            </div>
+            <div class="app-body">
+              <p class="app-description">${app.desc}</p>
+              <div class="app-meta">
+                <span class="app-label">${app.label}</span>
+                <span class="app-copyright">© ${app.copyright}</span>
+              </div>
+              <div class="app-actions">
+                <button class="primary-btn" onclick="purchaseApp('${app.id}')">Purchase & Download</button>
+                <button class="ghost-btn" onclick="showLicenseModal('${app.id}')">Enter License Key</button>
+              </div>
+            </div>
+            <div class="proprietary-badge">Proprietary</div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      // Purchase app
+      function purchaseApp(appId) {
+        currentApp = catalog.apps.find((a) => a.id === appId);
+        if (!currentApp) return;
+
+        const purchaseDetails = document.getElementById("purchaseDetails");
+        purchaseDetails.innerHTML = `
+          <div class="app-summary">
+            <h4>${currentApp.title}</h4>
+            <p>${currentApp.desc}</p>
+            <div class="price-display">
+              <span class="price">$${currentApp.price}</span>
+              <span class="copyright">© ${currentApp.copyright}</span>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("purchaseModal").style.display = "block";
+      }
+
+      // Handle purchase form submission
+      document.getElementById("purchaseForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const selectedProvider = document.querySelector(".payment-btn.active")?.dataset.provider;
+
+        if (!selectedProvider) {
+          alert("Please select a payment method");
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/apps/purchase", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              appId: currentApp.id,
+              email: email,
+              provider: selectedProvider,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            // Store license key for download
+            localStorage.setItem(`license_${currentApp.id}`, result.licenseKey);
+
+            if (selectedProvider === "paypal") {
+              // Redirect to PayPal
+              window.location.href = `https://www.paypal.com/checkoutnow?token=${result.orderId}`;
+            }
+          } else {
+            alert("Purchase failed: " + result.error);
+          }
+        } catch (err) {
+          alert("Purchase failed: " + err.message);
+        }
+      });
+
+      // Payment method selection
+      document.querySelectorAll(".payment-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".payment-btn").forEach((b) => b.classList.remove("active"));
+          this.classList.add("active");
+        });
+      });
+
+      // License modal functions
+      function showLicenseModal(appId) {
+        currentApp = catalog.apps.find((a) => a.id === appId);
+        document.getElementById("licenseModal").style.display = "block";
+      }
+
+      function closeLicenseModal() {
+        document.getElementById("licenseModal").style.display = "none";
+      }
+
+      // Handle license form submission
+      document.getElementById("licenseForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const licenseKey = document.getElementById("licenseKey").value;
+
+        try {
+          const response = await fetch(`/api/apps/download/${currentApp.id}?license=${licenseKey}`);
+          const result = await response.json();
+
+          if (response.ok) {
+            // Start download
+            const link = document.createElement("a");
+            link.href = result.downloadUrl;
+            link.download = `${currentApp.title.replace(/\s+/g, "-").toLowerCase()}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            closeLicenseModal();
+          } else {
+            alert("Download failed: " + result.error);
+          }
+        } catch (err) {
+          alert("Download failed: " + err.message);
+        }
+      });
+
+      function closePurchaseModal() {
+        document.getElementById("purchaseModal").style.display = "none";
+      }
+
+      // Close modals when clicking outside
+      window.addEventListener("click", (e) => {
+        if (e.target.classList.contains("modal")) {
+          e.target.style.display = "none";
+        }
+      });
+
+      // Check for successful purchase
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("purchase") === "success") {
+        const appId = urlParams.get("app");
+        const licenseKey = localStorage.getItem(`license_${appId}`);
+
+        if (licenseKey) {
+          alert("Purchase successful! Your license key is: " + licenseKey);
+          // Auto-download
+          setTimeout(() => {
+            window.location.href = `/api/apps/download/${appId}?license=${licenseKey}`;
+          }, 2000);
+        }
+      }
+
+      // Initialize
+      loadCatalog();
+    </script>
+
+    <style>
+      .app-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .app-card {
+        background: rgba(8, 12, 20, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .app-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .app-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .app-header h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 1.25rem;
+      }
+
+      .app-price {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .app-description {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 1rem;
+        line-height: 1.5;
+      }
+
+      .app-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        font-size: 0.85rem;
+      }
+
+      .app-label {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+      }
+
+      .app-copyright {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .app-actions {
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .proprietary-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 59, 48, 0.2);
+        color: #ff3b30;
+        padding: 0.25rem 0.5rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        border: 1px solid rgba(255, 59, 48, 0.3);
+      }
+
+      .license-notice {
+        background: rgba(255, 204, 0, 0.1);
+        border: 1px solid rgba(255, 204, 0, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        margin: 2rem 0;
+        text-align: center;
+      }
+
+      .license-notice p {
+        margin: 0.5rem 0;
+        color: rgba(255, 204, 0, 0.9);
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: rgba(8, 12, 20, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        backdrop-filter: blur(20px);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: #fff;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+      }
+
+      .modal-close:hover {
+        color: #fff;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .payment-options {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .payment-btn {
+        flex: 1;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .payment-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .payment-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        color: white;
+      }
+
+      .payment-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .app-summary {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .app-summary h4 {
+        margin: 0 0 0.5rem 0;
+        color: #fff;
+      }
+
+      .app-summary p {
+        margin: 0 0 1rem 0;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+
+      .price-display {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .price-display .price {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #4ade80;
+      }
+
+      .price-display .copyright {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+      }
+
+      .primary-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .ghost-btn {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+      }
+
+      .ghost-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+      }
+    </style>
+  </body>
+</html>
