@@ -971,6 +971,7 @@ Rules:
 
       if (type === "update_copy") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = updateElementById(html, action.field, action.value || "");
@@ -991,6 +992,7 @@ Rules:
         }
         if (target === "sandbox" || action?.page || action?.path || action?.allPages || expandToAllPagesByCommand) {
           const htmlTargets = await resolveActionHtmlTargets(action);
+          await Promise.all(htmlTargets.map((path) => loadHtml(path)));
           for (const htmlPath of htmlTargets) {
             let html = await loadHtml(htmlPath);
             html = updateHtmlTheme(html, action.theme);
@@ -1001,6 +1003,7 @@ Rules:
 
       if (type === "update_meta") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = updateMeta(html, action.title, action.description);
@@ -1023,6 +1026,7 @@ Rules:
         });
 
         const navTargets = await listAllSiteHtmlFiles();
+        await Promise.all(navTargets.map((path) => loadHtml(path)));
         for (const navTarget of navTargets) {
           if (navTarget === pagePath) continue;
           let html = await loadHtml(navTarget);
@@ -1034,6 +1038,7 @@ Rules:
 
       if (type === "insert_monetization") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = insertMonetization(
@@ -1054,6 +1059,7 @@ Rules:
 
       if (type === "update_background_video") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = updateBackgroundVideo(html, action.src);
@@ -1070,6 +1076,7 @@ Rules:
 
       if (type === "update_avatar") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = updateAvatar(html, action.src);
@@ -1079,6 +1086,7 @@ Rules:
 
       if (type === "insert_section") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = insertSection(html, action);
@@ -1088,6 +1096,7 @@ Rules:
 
       if (type === "add_product") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = ensureStoreSection(html);
@@ -1098,6 +1107,7 @@ Rules:
 
       if (type === "insert_video") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = insertVideoSection(html, action);
@@ -1107,6 +1117,7 @@ Rules:
 
       if (type === "insert_image") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = insertImageSection(html, action);
@@ -1116,6 +1127,7 @@ Rules:
 
       if (type === "insert_stream") {
         const htmlTargets = await resolveActionHtmlTargets(action);
+        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
         for (const htmlPath of htmlTargets) {
           let html = await loadHtml(htmlPath);
           html = insertStreamSection(html, action);
@@ -1126,6 +1138,7 @@ Rules:
       if (type === "inject_css") {
         if (target === "sandbox") {
           const htmlTargets = await resolveActionHtmlTargets(action);
+          await Promise.all(htmlTargets.map((path) => loadHtml(path)));
           for (const htmlPath of htmlTargets) {
             let html = await loadHtml(htmlPath);
             html = injectCssIntoHtml(html, action.css);
@@ -1137,6 +1150,7 @@ Rules:
             !explicitCssFile && (action?.page || action?.path || action?.allPages || expandToAllPagesByCommand);
           if (pageScoped) {
             const htmlTargets = await resolveActionHtmlTargets(action);
+            await Promise.all(htmlTargets.map((path) => loadHtml(path)));
             for (const htmlPath of htmlTargets) {
               let html = await loadHtml(htmlPath);
               html = injectCssIntoHtml(html, action.css);
