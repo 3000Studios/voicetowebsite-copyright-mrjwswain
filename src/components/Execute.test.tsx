@@ -181,6 +181,43 @@ describe("/api/execute", () => {
     expect(typeof body.result.confirmToken).toBe("string");
   });
 
+  it("allows read_page on public pages outside the hardcoded list", async () => {
+    const response = await handleExecute({
+      request: makeRequest(
+        {
+          action: "read_page",
+          idempotencyKey: "read-001",
+          page: "partners.html",
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env: {},
+      ctx: {},
+    });
+
+    expect(response.status).toBe(200);
+    expect(lastOrchestratorPayload?.page).toBe("partners.html");
+  });
+
+  it("rejects admin paths (e.g. admin/index.html)", async () => {
+    const response = await handleExecute({
+      request: makeRequest(
+        {
+          action: "read_page",
+          idempotencyKey: "read-002",
+          page: "admin/index.html",
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env: {},
+      ctx: {},
+    });
+
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(typeof body.error).toBe("string");
+  });
+
   it("blocks apply when confirmToken is missing", async () => {
     const response = await handleExecute({
       request: makeRequest(

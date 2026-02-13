@@ -20,27 +20,9 @@ const VALID_ACTIONS = new Set([
 ]);
 const VALID_SAFETY_LEVELS = new Set(["low", "medium", "high"]);
 
-// Valid pages that can be targeted
-const VALID_PAGES = new Set([
-  "index.html",
-  "store.html",
-  "pricing.html",
-  "features.html",
-  "blog.html",
-  "appstore.html",
-  "livestream.html",
-  "about.html",
-  "contact.html",
-  "legal.html",
-  "privacy.html",
-  "terms.html",
-  "support.html",
-  "status.html",
-  "projects.html",
-  "gallery.html",
-  "templates.html",
-  "all", // Special value for targeting all pages
-]);
+// Public page targeting: allow any safe `slug(.html)` or "all".
+// We intentionally block paths/directories so callers can't target `admin/*` or traverse.
+const VALID_PUBLIC_PAGE_RE = /^[a-z0-9-]+(?:\.html)?$/;
 
 const toJsonResponse = (status, payload, env) => {
   // Validate response schema only if enabled (default: production only)
@@ -105,12 +87,31 @@ const validatePageName = (page) => {
     return { valid: false, error: "Page name must be a non-empty string" };
   }
 
-  const trimmedPage = page.trim();
-  if (!VALID_PAGES.has(trimmedPage)) {
-    return {
-      valid: false,
-      error: `Invalid page '${trimmedPage}'. Valid pages: ${Array.from(VALID_PAGES).join(", ")}`,
-    };
+  let trimmedPage = page.trim().toLowerCase();
+  // Accept leading slash or ./ from callers.
+  trimmedPage = trimmedPage.replace(/^\/+/, "").replace(/^\.\//, "");
+
+  if (!trimmedPage) {
+    return { valid: false, error: "Page name must be a non-empty string" };
+  }
+
+  if (trimmedPage === "all") return { valid: true, page: "all" };
+
+  // Block any attempt to target directories or parent traversal.
+  if (trimmedPage.includes("/") || trimmedPage.includes("\\") || trimmedPage.includes("..")) {
+    return { valid: false, error: `Invalid page '${trimmedPage}'. Use a public page like 'partners.html'.` };
+  }
+
+  if (!VALID_PUBLIC_PAGE_RE.test(trimmedPage)) {
+    return { valid: false, error: `Invalid page '${trimmedPage}'. Use a public page like 'partners.html'.` };
+  }
+
+  // Canonicalize to .html so downstream (orchestrator) is consistent.
+  if (!trimmedPage.endsWith(".html")) trimmedPage = `${trimmedPage}.html`;
+
+  // Extra safety: don't allow the admin root to be targeted even without a slash.
+  if (trimmedPage === "admin.html") {
+    return { valid: false, error: "Admin pages cannot be targeted." };
   }
 
   return { valid: true, page: trimmedPage };
@@ -743,12 +744,14 @@ export async function onRequestPost(context) {
       payload.action === "plan" ||
       payload.action === "preview"
     ) {
-      if (payload.page && payload.page !== "") {
-        const pageValidation = validatePageName(payload.page);
+      const pageCandidate = String(payload.page || payload.path || "").trim();
+      if (pageCandidate) {
+        const pageValidation = validatePageName(pageCandidate);
         if (!pageValidation.valid) {
-          logger.warn("Invalid page name provided", { page: payload.page });
+          logger.warn("Invalid page name provided", { page: pageCandidate });
           return toJsonResponse(400, { error: pageValidation.error, traceId }, env);
         }
+        payload.page = pageValidation.page;
       }
     }
 
