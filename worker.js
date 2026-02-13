@@ -15,6 +15,7 @@ import {
   handlePublishRequest,
   handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
+import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
 import catalog from "./products.json";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
@@ -1933,3 +1934,5 @@ export default {
     return addSecurityHeaders(assetRes);
   },
 };
+
+export { BotHubDO };

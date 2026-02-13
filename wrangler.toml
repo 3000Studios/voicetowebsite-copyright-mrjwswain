@@ -60,7 +60,7 @@ class_name = "BotHubDO"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["BotHubDO"]
+new_sqlite_classes = ["BotHubDO"]
 
 [[r2_buckets]]
 binding = "R2"
