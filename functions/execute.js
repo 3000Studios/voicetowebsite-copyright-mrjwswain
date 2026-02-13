@@ -20,27 +20,7 @@ const VALID_ACTIONS = new Set([
 ]);
 const VALID_SAFETY_LEVELS = new Set(["low", "medium", "high"]);
 
-// Valid pages that can be targeted
-const VALID_PAGES = new Set([
-  "index.html",
-  "store.html",
-  "pricing.html",
-  "features.html",
-  "blog.html",
-  "appstore.html",
-  "livestream.html",
-  "about.html",
-  "contact.html",
-  "legal.html",
-  "privacy.html",
-  "terms.html",
-  "support.html",
-  "status.html",
-  "projects.html",
-  "gallery.html",
-  "templates.html",
-  "all", // Special value for targeting all pages
-]);
+const VALID_PAGE_PATTERN = /^[a-z0-9-]+\.html$/;
 
 const toJsonResponse = (status, payload, env) => {
   // Validate response schema only if enabled (default: production only)
@@ -105,11 +85,17 @@ const validatePageName = (page) => {
     return { valid: false, error: "Page name must be a non-empty string" };
   }
 
-  const trimmedPage = page.trim();
-  if (!VALID_PAGES.has(trimmedPage)) {
+  const trimmedPage = page.trim().toLowerCase().replace(/^\/+/, "");
+
+  if (trimmedPage === "all") {
+    return { valid: true, page: "all" };
+  }
+
+  if (!VALID_PAGE_PATTERN.test(trimmedPage) || trimmedPage.startsWith("admin")) {
     return {
       valid: false,
-      error: `Invalid page '${trimmedPage}'. Valid pages: ${Array.from(VALID_PAGES).join(", ")}`,
+      error:
+        "Invalid page name. Use 'all' or a public page filename like 'landing.html' (letters, numbers, dashes only).",
     };
   }
 
@@ -121,7 +107,7 @@ const normalizeActionPayload = (payload) => {
     payload?.parameters && typeof payload.parameters === "object" && !Array.isArray(payload.parameters)
       ? payload.parameters
       : {};
-  const pageValidation = validatePageName(payload?.page || parameters?.page || "");
+  const pageValidation = validatePageName(payload?.page || parameters?.page || payload?.path || parameters?.path || "");
   const page = pageValidation.valid ? pageValidation.page : "";
   const path = String(payload?.path || parameters?.path || "").trim();
   const file = String(payload?.file || parameters?.file || "").trim();
