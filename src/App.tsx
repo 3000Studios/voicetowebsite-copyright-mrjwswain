@@ -746,7 +746,12 @@ const App: React.FC = () => {
                             >
                               {isGenerating ? "Generating..." : "Generate live preview"}
                             </button>
-                            <button className="btn btn-ghost" type="button" onClick={runInstantDemo} disabled={isGenerating}>
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={runInstantDemo}
+                              disabled={isGenerating}
+                            >
                               {isGenerating ? "Building..." : "Instant build"}
                             </button>
                           </div>

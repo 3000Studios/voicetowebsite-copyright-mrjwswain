@@ -77,7 +77,7 @@
 ### Canonical Commands (from package.json)
 
 - `dev:all`: `node ./scripts/dev-all.mjs`
-- `verify`: `npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run type-check && npm run test && npm run build && npm run check:links`
+- `verify`: `npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run type-check && npm run test && npm run build && npm run governance:check && npm run check:links`
 - `deploy`: `npm run verify && wrangler deploy --keep-vars`
 - `auto:ship`: `node ./scripts/auto-ship.mjs`
 - `sync`: `node ./scripts/sync.mjs`
@@ -176,6 +176,7 @@ Scripts available:
 - `scripts/test-runner.mjs`
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
+- `scripts/validate-governance.mjs`
 
 Git hooks:
 

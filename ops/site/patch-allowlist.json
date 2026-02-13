@@ -1,0 +1,12 @@
+{
+  "pointers": [
+    "/content/hero/headline",
+    "/content/hero/subheadline",
+    "/content/hero/cta/label",
+    "/content/hero/cta/href",
+    "/seo/title",
+    "/seo/description",
+    "/nav/primary/*/label",
+    "/nav/primary/*/route"
+  ]
+}
