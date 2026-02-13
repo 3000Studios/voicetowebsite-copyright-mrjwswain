@@ -643,8 +643,8 @@ const App: React.FC = () => {
                       <a className="btn btn-ghost" href="/demo#video">
                         Watch 60-Second Demo
                       </a>
-                      <button className="btn btn-ghost" type="button" onClick={runInstantDemo}>
-                        Run instant demo
+                      <button className="btn btn-ghost" type="button" onClick={runInstantDemo} disabled={isGenerating}>
+                        {isGenerating ? "Generating..." : "Run instant demo"}
                       </button>
                       <a className="btn btn-ghost" href="/license.html">
                         Get licensed download
@@ -746,8 +746,8 @@ const App: React.FC = () => {
                             >
                               {isGenerating ? "Generating..." : "Generate live preview"}
                             </button>
-                            <button className="btn btn-ghost" type="button" onClick={runInstantDemo}>
-                              Instant build
+                            <button className="btn btn-ghost" type="button" onClick={runInstantDemo} disabled={isGenerating}>
+                              {isGenerating ? "Building..." : "Instant build"}
                             </button>
                           </div>
                         </div>
