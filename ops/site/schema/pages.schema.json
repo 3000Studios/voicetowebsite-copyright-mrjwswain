@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "route": { "type": "string" },
+          "asset": { "type": "string" },
+          "zone": { "enum": ["public", "commerce", "legal", "admin", "hidden"] },
+          "changefreq": { "type": "string" }
+        },
+        "required": ["id", "route", "asset", "zone"]
+      }
+    }
+  },
+  "required": ["pages"]
+}

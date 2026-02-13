@@ -1,0 +1,95 @@
+{
+  "products": [
+    {
+      "id": "starter",
+      "type": "service",
+      "title": "Starter Site",
+      "label": "Launch Fast",
+      "desc": "Perfect for personal brands and small projects. Includes 1 AI-generated page, basic hosting, and email support.",
+      "price": 79.0,
+      "currency": "USD",
+      "interval": "one-time",
+      "stripePriceId": "price_starter_chk123",
+      "features": ["1 AI Page", "Basic Hosting", "Email Support"]
+    },
+    {
+      "id": "growth",
+      "type": "service",
+      "title": "Growth Voice",
+      "label": "Scale Up",
+      "desc": "For growing businesses. Up to 5 AI pages, custom domain, analytics, and priority support.",
+      "price": 249.0,
+      "currency": "USD",
+      "interval": "month",
+      "stripePriceId": "price_growth_chk456",
+      "features": ["5 AI Pages", "Custom Domain", "Analytics", "Priority Support"]
+    },
+    {
+      "id": "enterprise",
+      "type": "service",
+      "title": "Enterprise Edge",
+      "label": "Maximum Power",
+      "desc": "Unlimited pages, custom AI model training, SLA, and dedicated account manager.",
+      "price": 699.0,
+      "currency": "USD",
+      "interval": "month",
+      "stripePriceId": "price_enterprise_chk789",
+      "features": ["Unlimited Pages", "Custom AI Model", "SLA", "Dedicated Manager"]
+    },
+    {
+      "id": "lifetime",
+      "type": "service",
+      "title": "Lifetime App",
+      "label": "Best Value",
+      "desc": "One-time payment for lifetime access to all current and future features. No monthly fees.",
+      "price": 4999.0,
+      "currency": "USD",
+      "interval": "one-time",
+      "stripePriceId": "price_lifetime_chk000",
+      "features": ["Lifetime Access", "All Features", "No Monthly Fees", "VIP Support"]
+    }
+  ],
+  "apps": [
+    {
+      "id": "project-planning-hub",
+      "type": "app",
+      "title": "Project Planning Hub",
+      "label": "Productivity",
+      "desc": "A comprehensive notion-style planning workspace for managing voice-to-website projects.",
+      "price": 49.0,
+      "currency": "USD",
+      "stripePriceId": "price_pph_123"
+    },
+    {
+      "id": "ai-web-forge-pro",
+      "type": "app",
+      "title": "AI Web Forge Pro",
+      "label": "Developer Tool",
+      "desc": "Advanced local development environment for fine-tuning your AI-generated sites.",
+      "price": 49.99,
+      "currency": "USD",
+      "stripePriceId": "price_forge_456"
+    },
+    {
+      "id": "ai-drive",
+      "type": "app",
+      "title": "AI Drive",
+      "label": "Storage",
+      "desc": "Secure, AI-organized cloud storage for your project assets and media.",
+      "price": 4.99,
+      "currency": "USD",
+      "stripePriceId": "price_drive_789"
+    },
+    {
+      "id": "google-ai-prompts",
+      "type": "app",
+      "title": "Google AI Prompts",
+      "label": "Asset Pack",
+      "desc": "Curated collection of high-performance system prompts for Gemini and Vertex AI.",
+      "price": 2.99,
+      "currency": "USD",
+      "stripePriceId": "price_prompts_000"
+    }
+  ],
+  "subscriptions": []
+}

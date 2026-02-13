@@ -6,7 +6,17 @@
     "/content/hero/cta/href",
     "/seo/title",
     "/seo/description",
-    "/nav/primary/*/label",
-    "/nav/primary/*/route"
+    "/nav/main/*/label",
+    "/nav/main/*/route",
+    "/nav/footer/*/label",
+    "/nav/footer/*/route",
+    "/materials/*",
+    "/adsense/enabled",
+    "/adsense/clientId",
+    "/adsense/slots/*",
+    "/affiliates/amazonTag",
+    "/affiliates/impactId",
+    "/affiliates/shareasaleId",
+    "/affiliates/cjId"
   ]
 }

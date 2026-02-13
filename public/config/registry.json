@@ -1,0 +1,106 @@
+{
+  "pages": [
+    {
+      "id": "home",
+      "route": "/",
+      "asset": "index.html",
+      "zone": "public"
+    },
+    {
+      "id": "how-it-works",
+      "route": "/how-it-works",
+      "asset": "how-it-works.html",
+      "zone": "public"
+    },
+    {
+      "id": "features",
+      "route": "/features",
+      "asset": "features.html",
+      "zone": "public"
+    },
+    {
+      "id": "pricing",
+      "route": "/pricing",
+      "asset": "pricing.html",
+      "zone": "commerce"
+    },
+    {
+      "id": "blog",
+      "route": "/blog",
+      "asset": "blog.html",
+      "zone": "public"
+    },
+    {
+      "id": "support",
+      "route": "/support",
+      "asset": "support.html",
+      "zone": "public"
+    },
+    {
+      "id": "status",
+      "route": "/status",
+      "asset": "status.html",
+      "zone": "public"
+    },
+    {
+      "id": "contact",
+      "route": "/contact",
+      "asset": "contact.html",
+      "zone": "public"
+    },
+    {
+      "id": "store",
+      "route": "/store",
+      "asset": "store.html",
+      "zone": "commerce"
+    },
+    {
+      "id": "appstore",
+      "route": "/appstore",
+      "asset": "appstore.html",
+      "zone": "commerce"
+    },
+    {
+      "id": "privacy",
+      "route": "/privacy",
+      "asset": "privacy.html",
+      "zone": "legal"
+    },
+    {
+      "id": "terms",
+      "route": "/terms",
+      "asset": "terms.html",
+      "zone": "legal"
+    },
+    {
+      "id": "license",
+      "route": "/license",
+      "asset": "license.html",
+      "zone": "legal"
+    },
+    {
+      "id": "legal",
+      "route": "/legal",
+      "asset": "legal.html",
+      "zone": "legal"
+    },
+    {
+      "id": "about",
+      "route": "/about",
+      "asset": "about.html",
+      "zone": "public"
+    },
+    {
+      "id": "admin",
+      "route": "/admin",
+      "asset": "admin/index.html",
+      "zone": "admin"
+    },
+    {
+      "id": "admin-login",
+      "route": "/admin/login",
+      "asset": "admin/login.html",
+      "zone": "admin"
+    }
+  ]
+}

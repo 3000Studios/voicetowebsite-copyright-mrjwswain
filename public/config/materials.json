@@ -1,0 +1,26 @@
+{
+  "materials": [
+    { "id": "black_marble_gold_inlay", "name": "Black Marble with Gold Inlay", "type": "marble" },
+    { "id": "black_marble_white_vein", "name": "Black Marble with White Vein", "type": "marble" },
+    { "id": "white_marble_platinum", "name": "White Marble Platinum", "type": "marble" },
+    { "id": "platinum_brushed", "name": "Brushed Platinum", "type": "metal" },
+    { "id": "platinum_mirror", "name": "Mirror Platinum", "type": "metal" },
+    { "id": "gold_brushed", "name": "Brushed Gold", "type": "metal" },
+    { "id": "gold_foil_inlay", "name": "Gold Foil Inlay", "type": "metal" },
+    { "id": "carbon_fiber_black", "name": "Black Carbon Fiber", "type": "composite" },
+    { "id": "carbon_fiber_blue", "name": "Blue Carbon Fiber", "type": "composite" },
+    { "id": "leather_brown", "name": "Brown Leather", "type": "leather" },
+    { "id": "leather_black", "name": "Black Leather", "type": "leather" },
+    { "id": "velvet_purple_royal", "name": "Royal Purple Velvet", "type": "fabric" },
+    { "id": "diamond_white_crystal", "name": "White Diamond Crystal", "type": "gem" },
+    { "id": "emerald_green_gem", "name": "Emerald Green Gem", "type": "gem" },
+    { "id": "obsidian_black_glass", "name": "Obsidian Black Glass", "type": "glass" },
+    { "id": "smoked_glass_dark", "name": "Smoked Dark Glass", "type": "glass" },
+    { "id": "aqua_ocean_glass", "name": "Aqua Ocean Glass", "type": "glass" },
+    { "id": "midnight_blue_metal", "name": "Midnight Blue Metal", "type": "metal" },
+    { "id": "ivory_lux_paper", "name": "Ivory Lux Paper", "type": "paper" },
+    { "id": "ash_concrete_lux", "name": "Ash Concrete Lux", "type": "stone" },
+    { "id": "black_sandstone", "name": "Black Sandstone", "type": "stone" },
+    { "id": "silver_mesh_tech", "name": "Silver Mesh Tech", "type": "metal" }
+  ]
+}

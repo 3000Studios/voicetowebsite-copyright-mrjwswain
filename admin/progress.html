@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | Progress Tracker</title>
+    <meta name="description" content="Project progress tracker for the Material Vault OS." />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .progress-shell {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 4rem;
+      }
+
+      .progress-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      .progress-bar {
+        position: relative;
+        height: 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        margin-top: 1rem;
+      }
+
+      .progress-bar-fill {
+        position: absolute;
+        inset: 0;
+        width: 0%;
+        background: linear-gradient(90deg, rgba(120, 255, 209, 0.85), rgba(64, 192, 255, 0.85));
+        transition: width 0.3s ease;
+      }
+
+      .progress-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .progress-note {
+        margin-top: 0.75rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .progress-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .phase-card {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .phase-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .phase-objective {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+      }
+
+      .prompt-block {
+        display: grid;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(6, 10, 18, 0.75);
+      }
+
+      .prompt-block pre {
+        margin: 0;
+        white-space: pre-wrap;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 0.75rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #dfe9f3;
+      }
+
+      .prompt-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+      }
+
+      .prompt-actions textarea {
+        width: 100%;
+        min-height: 90px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        padding: 0.7rem 0.8rem;
+        border-radius: 12px;
+      }
+
+      .prompt-badge {
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .progress-item {
+        display: grid;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(10, 12, 20, 0.7);
+      }
+
+      .progress-item-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .progress-item select,
+      .progress-item input {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        padding: 0.4rem 0.6rem;
+        border-radius: 10px;
+        min-width: 140px;
+      }
+
+      .progress-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .progress-section-title {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .progress-badge {
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .progress-badge.todo {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .progress-badge.in_progress {
+        background: rgba(0, 179, 255, 0.2);
+        color: #7fd6ff;
+      }
+
+      .progress-badge.blocked {
+        background: rgba(255, 95, 95, 0.2);
+        color: #ff9b9b;
+      }
+
+      .progress-badge.done {
+        background: rgba(86, 255, 158, 0.2);
+        color: #89ffb5;
+      }
+
+      .progress-foot {
+        margin-top: 2rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-admin-dashboard-8765/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+    <div class="noise-overlay" aria-hidden="true"></div>
+
+    <div class="admin-shell">
+      <header class="admin-header">
+        <div class="brand">
+          <div class="brand-mark">J</div>
+          <div class="brand-text">
+            <strong>JULES</strong>
+            <span>Progress Tracker</span>
+          </div>
+        </div>
+        <nav class="admin-subnav">
+          <a href="index.html">Command Center</a>
+          <a href="bot-command-center.html">Boss Bot</a>
+          <a href="voice-commands.html">Voice</a>
+          <a href="store-manager.html">Store</a>
+          <a href="app-store-manager.html">Apps</a>
+          <a href="analytics.html">Data</a>
+        </nav>
+        <div class="status-chip" id="progress-state">Loading</div>
+      </header>
+
+      <main class="progress-shell">
+        <section class="card wide">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Control Room</p>
+              <h2>Project Progress Tracker</h2>
+              <p class="muted">Edit task statuses, then export the updated JSON.</p>
+            </div>
+            <div class="status-strip">
+              <span class="status-chip" id="progress-updated">—</span>
+            </div>
+          </div>
+
+          <div class="progress-bar" aria-hidden="true">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          </div>
+          <div class="progress-stats" id="progress-stats"></div>
+          <div class="progress-note" id="current-phase">Current phase: —</div>
+
+          <div class="progress-actions">
+            <button class="primary" id="progress-export">Download progress.json</button>
+            <button class="ghost" id="progress-copy">Copy JSON</button>
+            <button class="ghost" id="progress-reload">Reload</button>
+          </div>
+          <p class="progress-note">
+            This page does not write to disk. Download or copy the JSON and replace
+            <code>ops/site/progress.json</code> manually.
+          </p>
+        </section>
+
+        <div id="phase-sections" class="progress-grid"></div>
+        <div id="progress-sections" class="progress-grid"></div>
+
+        <p class="progress-foot">Source: <code>/config/progress.json</code></p>
+      </main>
+    </div>
+
+    <script>
+      const STATUS_OPTIONS = ["todo", "in_progress", "blocked", "done"];
+      const sectionsEl = document.getElementById("progress-sections");
+      const phasesEl = document.getElementById("phase-sections");
+      const stateEl = document.getElementById("progress-state");
+      const updatedEl = document.getElementById("progress-updated");
+      const progressBarEl = document.getElementById("progress-bar-fill");
+      const progressStatsEl = document.getElementById("progress-stats");
+      const currentPhaseEl = document.getElementById("current-phase");
+      const exportBtn = document.getElementById("progress-export");
+      const copyBtn = document.getElementById("progress-copy");
+      const reloadBtn = document.getElementById("progress-reload");
+
+      let progressData = null;
+      let itemLookup = new Map();
+
+      function statusWeight(status) {
+        if (status === "done") return 1;
+        if (status === "in_progress") return 0.5;
+        return 0;
+      }
+
+      function rebuildLookup() {
+        itemLookup = new Map();
+        progressData.sections.forEach((section) => {
+          section.items.forEach((item) => {
+            itemLookup.set(item.id, item);
+          });
+        });
+      }
+
+      function computeOverallProgress() {
+        const items = Array.from(itemLookup.values());
+        if (items.length === 0) return { percent: 0, done: 0, total: 0 };
+        const total = items.length;
+        const done = items.filter((item) => item.status === "done").length;
+        const weight = items.reduce((acc, item) => acc + statusWeight(item.status), 0);
+        const percent = Math.round((weight / total) * 100);
+        return { percent, done, total };
+      }
+
+      function currentPhase() {
+        if (!progressData.phases) return null;
+        return progressData.phases.find((phase) => {
+          return phase.items.some((itemId) => {
+            const item = itemLookup.get(itemId);
+            return item && item.status !== "done";
+          });
+        });
+      }
+
+      function buildStatusBadge(status) {
+        const badge = document.createElement("span");
+        badge.className = `progress-badge ${status}`;
+        badge.textContent = status.replace(/_/g, " ");
+        return badge;
+      }
+
+      function render() {
+        sectionsEl.innerHTML = "";
+        phasesEl.innerHTML = "";
+        if (!progressData) return;
+
+        rebuildLookup();
+        updatedEl.textContent = `Updated: ${progressData.updatedAt}`;
+
+        const overall = computeOverallProgress();
+        progressBarEl.style.width = `${overall.percent}%`;
+        progressStatsEl.innerHTML = `Overall: ${overall.percent}% • Done ${overall.done}/${overall.total}`;
+
+        const activePhase = currentPhase();
+        if (activePhase) {
+          const objective = activePhase.objective ? ` — ${activePhase.objective}` : "";
+          currentPhaseEl.textContent = `Current phase: ${activePhase.title}${objective}`;
+          const phaseNote = document.createElement("div");
+          phaseNote.className = "progress-item";
+          phaseNote.innerHTML = `<strong>Current phase</strong><div class="muted">${activePhase.title}</div>`;
+          phasesEl.appendChild(phaseNote);
+        } else {
+          currentPhaseEl.textContent = "Current phase: —";
+        }
+
+        localStorage.setItem("progress-cache", JSON.stringify(progressData));
+
+        if (progressData.phases && progressData.phases.length) {
+          progressData.phases.forEach((phase) => {
+            const phaseCard = document.createElement("section");
+            phaseCard.className = "card wide phase-card";
+
+            const header = document.createElement("div");
+            header.className = "phase-header";
+
+            const left = document.createElement("div");
+            const title = document.createElement("h3");
+            title.textContent = phase.title;
+            const objective = document.createElement("div");
+            objective.className = "phase-objective";
+            objective.textContent = phase.objective || "";
+            left.appendChild(title);
+            left.appendChild(objective);
+
+            const right = document.createElement("div");
+            right.className = "status-strip";
+            const phaseBadge = document.createElement("span");
+            phaseBadge.className = "status-chip";
+            const phaseItems = phase.items.map((id) => itemLookup.get(id)).filter(Boolean);
+            const phaseDone = phaseItems.filter((item) => item.status === "done").length;
+            phaseBadge.textContent = `Done ${phaseDone}/${phaseItems.length}`;
+            right.appendChild(phaseBadge);
+
+            header.appendChild(left);
+            header.appendChild(right);
+            phaseCard.appendChild(header);
+
+            if (phase.prompts && phase.prompts.length) {
+              phase.prompts.forEach((prompt) => {
+                const promptBlock = document.createElement("div");
+                promptBlock.className = "prompt-block";
+
+                const title = document.createElement("strong");
+                title.textContent = prompt.title;
+                promptBlock.appendChild(title);
+
+                const pre = document.createElement("pre");
+                pre.textContent = prompt.prompt;
+                promptBlock.appendChild(pre);
+
+                const item = itemLookup.get(prompt.itemId);
+                const meta = document.createElement("div");
+                meta.className = "progress-meta";
+                meta.textContent = item ? `Linked task: ${item.title}` : "Linked task missing";
+                promptBlock.appendChild(meta);
+
+                const actions = document.createElement("div");
+                actions.className = "prompt-actions";
+
+                const badge = document.createElement("span");
+                badge.className = "prompt-badge";
+                badge.textContent = item ? item.status.replace(/_/g, " ") : "unlinked";
+
+                const textarea = document.createElement("textarea");
+                textarea.placeholder = "Paste the prompt you sent to a bot here to mark this task in progress.";
+                textarea.value = localStorage.getItem(`prompt-${prompt.id}`) || "";
+
+                const markInProgress = () => {
+                  localStorage.setItem(`prompt-${prompt.id}`, textarea.value);
+                  if (item && item.status === \"todo\") {
+                    item.status = \"in_progress\";
+                    item.updatedAt = new Date().toISOString().slice(0, 10);
+                    item.updatedBy = \"admin\";
+                    progressData.updatedAt = item.updatedAt;
+                    render();
+                  }
+                };
+
+                textarea.addEventListener("input", markInProgress);
+                textarea.addEventListener("paste", () => {
+                  setTimeout(markInProgress, 0);
+                });
+
+                const markDone = document.createElement("button");
+                markDone.className = "ghost small";
+                markDone.textContent = "Mark done";
+                markDone.addEventListener("click", () => {
+                  if (!item) return;
+                  item.status = \"done\";
+                  item.updatedAt = new Date().toISOString().slice(0, 10);
+                  item.updatedBy = \"admin\";
+                  progressData.updatedAt = item.updatedAt;
+                  render();
+                });
+
+                actions.appendChild(badge);
+                actions.appendChild(markDone);
+                promptBlock.appendChild(actions);
+                promptBlock.appendChild(textarea);
+
+                phaseCard.appendChild(promptBlock);
+              });
+            }
+
+            phasesEl.appendChild(phaseCard);
+          });
+        }
+
+        progressData.sections.forEach((section) => {
+          const sectionCard = document.createElement("section");
+          sectionCard.className = "card wide";
+
+          const header = document.createElement("div");
+          header.className = "card-head";
+
+          const titleWrap = document.createElement("div");
+          const title = document.createElement("h3");
+          title.className = "progress-section-title";
+          title.textContent = section.title;
+          titleWrap.appendChild(title);
+
+          header.appendChild(titleWrap);
+          sectionCard.appendChild(header);
+
+          section.items.forEach((item) => {
+            const itemEl = document.createElement("div");
+            itemEl.className = "progress-item";
+
+            const itemHeader = document.createElement("div");
+            itemHeader.className = "progress-item-header";
+
+            const title = document.createElement("strong");
+            title.textContent = item.title;
+
+            const right = document.createElement("div");
+            right.style.display = "flex";
+            right.style.alignItems = "center";
+            right.style.gap = "0.5rem";
+
+            const select = document.createElement("select");
+            STATUS_OPTIONS.forEach((status) => {
+              const option = document.createElement("option");
+              option.value = status;
+              option.textContent = status.replace(/_/g, " ");
+              if (status === item.status) option.selected = true;
+              select.appendChild(option);
+            });
+
+            select.addEventListener("change", (event) => {
+              item.status = event.target.value;
+              item.updatedAt = new Date().toISOString().slice(0, 10);
+              item.updatedBy = "admin";
+              progressData.updatedAt = item.updatedAt;
+              render();
+            });
+
+            right.appendChild(buildStatusBadge(item.status));
+            right.appendChild(select);
+
+            itemHeader.appendChild(title);
+            itemHeader.appendChild(right);
+
+            const meta = document.createElement("div");
+            meta.className = "progress-meta";
+            meta.textContent = `Updated: ${item.updatedAt} • By: ${item.updatedBy || "—"}`;
+
+            itemEl.appendChild(itemHeader);
+            itemEl.appendChild(meta);
+
+            if (item.notes) {
+              const notes = document.createElement("div");
+              notes.className = "muted";
+              notes.textContent = item.notes;
+              itemEl.appendChild(notes);
+            }
+
+            sectionCard.appendChild(itemEl);
+          });
+
+          sectionsEl.appendChild(sectionCard);
+        });
+
+        stateEl.textContent = progressData.status.replace(/_/g, " ");
+      }
+
+      function exportJson() {
+        if (!progressData) return;
+        const data = JSON.stringify(progressData, null, 2);
+        localStorage.setItem("progress-cache", data);
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "progress.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      async function copyJson() {
+        if (!progressData) return;
+        const data = JSON.stringify(progressData, null, 2);
+        localStorage.setItem("progress-cache", data);
+        try {
+          await navigator.clipboard.writeText(data);
+          copyBtn.textContent = "Copied";
+          setTimeout(() => {
+            copyBtn.textContent = "Copy JSON";
+          }, 1200);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function loadProgress() {
+        stateEl.textContent = "Loading";
+        const relativeConfig = new URL("../public/config/progress.json", window.location.href).pathname;
+        const urls = ["/config/progress.json", relativeConfig];
+        for (const url of urls) {
+          try {
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) continue;
+            progressData = await response.json();
+            render();
+            stateEl.textContent = "Ready";
+            return;
+          } catch (error) {
+            console.warn("Failed to load", url, error);
+          }
+        }
+        const cached = localStorage.getItem("progress-cache");
+        if (cached) {
+          progressData = JSON.parse(cached);
+          render();
+          stateEl.textContent = "Ready (cached)";
+          return;
+        }
+        stateEl.textContent = "Missing";
+      }
+
+      exportBtn.addEventListener("click", exportJson);
+      copyBtn.addEventListener("click", copyJson);
+      reloadBtn.addEventListener("click", loadProgress);
+
+      loadProgress();
+    </script>
+  </body>
+</html>

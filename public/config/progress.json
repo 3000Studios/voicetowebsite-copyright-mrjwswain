@@ -1,0 +1,338 @@
+{
+  "version": "1.1",
+  "updatedAt": "2026-02-13",
+  "status": "in_progress",
+  "protocol": {
+    "summary": "Every agent updates progress.json and PROJECT_PROGRESS.md when a task status changes.",
+    "statusValues": ["todo", "in_progress", "blocked", "done"],
+    "requiredFields": ["status", "updatedBy", "updatedAt"],
+    "note": "Use ISO date (YYYY-MM-DD) for updatedAt. Keep changes atomic and verified."
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Phase 1: Governance + Safety Rails",
+      "objective": "Lock down verification, workflows, and branch protections.",
+      "items": ["gov-ci-verify", "gov-precommit", "gov-branch-protection"],
+      "prompts": [
+        {
+          "id": "prompt-governance",
+          "itemId": "gov-branch-protection",
+          "title": "Enable branch protection",
+          "prompt": "Enable branch protection for main: require PR + Verify check, block force push/deletion, require up-to-date branch. Update progress.json + PROJECT_PROGRESS.md."
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Phase 2: Master Workbook Core",
+      "objective": "Deterministic routing, SEO injection, control plane safety rails, and integrity hashing.",
+      "items": ["routing-deterministic", "seo-injection", "control-plane", "hash-integrity", "ttl-overrides"],
+      "prompts": [
+        {
+          "id": "prompt-routing",
+          "itemId": "routing-deterministic",
+          "title": "Worker routing + SEO injection hardening",
+          "prompt": "Harden worker routing per Master Workbook Section R and SEO injection per Section E. Update progress.json and PROJECT_PROGRESS.md with status."
+        },
+        {
+          "id": "prompt-control-plane",
+          "itemId": "control-plane",
+          "title": "Execute API safety rails",
+          "prompt": "Implement allowlist + quotas + locks + idempotency + atomicity for /api/execute (Sections F,G,H,S). Update progress files."
+        },
+        {
+          "id": "prompt-hash-integrity",
+          "itemId": "hash-integrity",
+          "title": "Config hash integrity",
+          "prompt": "Attach X-VTW-CONFIG-HASH and enforce mismatch handling per Section I. Update progress files."
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Phase 3: Monetization + Commerce",
+      "objective": "Config-driven store/appstore, ads/affiliates, and unified checkout.",
+      "items": ["store-appstore-content", "adsense-affiliates", "checkout-unification"],
+      "prompts": [
+        {
+          "id": "prompt-monetization",
+          "itemId": "store-appstore-content",
+          "title": "Store/Appstore contentization",
+          "prompt": "Move store/appstore content to ops/site/products.json + content slots. Ensure data-vtw slots and config fetch on pages. Update progress files."
+        },
+        {
+          "id": "prompt-checkout",
+          "itemId": "checkout-unification",
+          "title": "Checkout system unification",
+          "prompt": "Unify PayPal/Stripe checkout flow: consolidate worker endpoints, update store.html, store-products.js, Checkout.tsx, commerce utils, add tests/scripts. Update progress files."
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Phase 4: Admin Control Center",
+      "objective": "Ship control center UI, sentinel, diff, audit, and rollback surfaces.",
+      "items": ["admin-shell", "admin-control-center"],
+      "prompts": [
+        {
+          "id": "prompt-admin-ui",
+          "itemId": "admin-control-center",
+          "title": "Admin control center UI",
+          "prompt": "Implement admin control center layout + features per UI Layout Workbook Section 11. Update progress files."
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "title": "Phase 5: UI/UX Layout Workbook",
+      "objective": "Align public pages with the Material Vault layout spec.",
+      "items": ["global-shell", "home-layout", "store-layout", "appstore-layout"],
+      "prompts": [
+        {
+          "id": "prompt-ui-shell",
+          "itemId": "global-shell",
+          "title": "Global shell + materials",
+          "prompt": "Implement global shell: nav/footer/widgets/material stack across all public pages. Update progress files."
+        },
+        {
+          "id": "prompt-ui-home",
+          "itemId": "home-layout",
+          "title": "Home page layout",
+          "prompt": "Implement Home layout per UI Layout Workbook Section 3. Update progress files."
+        },
+        {
+          "id": "prompt-ui-store",
+          "itemId": "store-layout",
+          "title": "Store layout",
+          "prompt": "Implement Store layout per UI Layout Workbook Section 7. Update progress files."
+        },
+        {
+          "id": "prompt-ui-appstore",
+          "itemId": "appstore-layout",
+          "title": "Appstore layout",
+          "prompt": "Implement Appstore layout per UI Layout Workbook Section 8. Update progress files."
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "title": "Phase 6: Verify + Tests + Deploy Gates",
+      "objective": "Expand verify coverage, smoke tests, and promotion gate.",
+      "items": ["verify-suite", "smoke-tests"],
+      "prompts": [
+        {
+          "id": "prompt-verify-suite",
+          "itemId": "verify-suite",
+          "title": "Verify suite expansion",
+          "prompt": "Expand verify to cover routing/SEO/locks/quotas/TTL/hash tests. Update progress files."
+        },
+        {
+          "id": "prompt-smoke-tests",
+          "itemId": "smoke-tests",
+          "title": "Smoke tests + promotion gate",
+          "prompt": "Implement smoke tests and promotion gate per Section P and V8. Update progress files."
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "governance",
+      "title": "Governance + Safety Rails",
+      "items": [
+        {
+          "id": "gov-ci-verify",
+          "title": "Verify workflow installed (CI on PRs and non-main pushes)",
+          "status": "done",
+          "updatedBy": "codex",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "gov-precommit",
+          "title": "Pre-commit verify hook installed",
+          "status": "done",
+          "updatedBy": "codex",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "gov-branch-protection",
+          "title": "Branch protection enabled (require PR + Verify + no force push)",
+          "status": "blocked",
+          "updatedBy": "codex",
+          "updatedAt": "2026-02-13",
+          "notes": "Waiting for owner to enable in GitHub UI."
+        }
+      ]
+    },
+    {
+      "id": "workbook-core",
+      "title": "Master Workbook Core",
+      "items": [
+        {
+          "id": "routing-deterministic",
+          "title": "Deterministic worker routing (registry + redirects + fallback rules)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "seo-injection",
+          "title": "Worker SEO injection on HTML responses",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "control-plane",
+          "title": "Execute API hardening (allowlist, quotas, locks, idempotency)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "hash-integrity",
+          "title": "Config hash attached + enforced",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "ttl-overrides",
+          "title": "TTL overrides + expiry sweeps",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        }
+      ]
+    },
+    {
+      "id": "monetization",
+      "title": "Monetization + Commerce",
+      "items": [
+        {
+          "id": "store-appstore-content",
+          "title": "Store/Appstore contentization (config-driven)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "adsense-affiliates",
+          "title": "AdSense + affiliate IDs editable live",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "checkout-unification",
+          "title": "Checkout system unification (PayPal + Stripe + multi-item)",
+          "status": "todo",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13",
+          "notes": "Requires backend consolidation + frontend standardization + tests."
+        }
+      ]
+    },
+    {
+      "id": "admin-ui",
+      "title": "Admin Control Center",
+      "items": [
+        {
+          "id": "admin-shell",
+          "title": "Admin shell + nav + sentinel",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "admin-control-center",
+          "title": "Control Center (preview/apply/rollback/diff/audit)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        }
+      ]
+    },
+    {
+      "id": "ui-layout",
+      "title": "UI/UX Layout Workbook",
+      "items": [
+        {
+          "id": "global-shell",
+          "title": "Global shell (nav/footer/widgets/material stack)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "home-layout",
+          "title": "Home page layout (hero + steps + features + monetization + appstore + blog + CTA)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "store-layout",
+          "title": "Store layout (filters + grid + cart drawer)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "appstore-layout",
+          "title": "Appstore layout (hero + cards + tiers + demo CTA)",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        }
+      ]
+    },
+    {
+      "id": "verification",
+      "title": "Verify + Tests + Deploy Gates",
+      "items": [
+        {
+          "id": "verify-suite",
+          "title": "Verify suite covers governance + routing + SEO + locks + quotas",
+          "status": "in_progress",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        },
+        {
+          "id": "smoke-tests",
+          "title": "Smoke tests + promotion gate",
+          "status": "todo",
+          "updatedBy": "unassigned",
+          "updatedAt": "2026-02-13"
+        }
+      ]
+    }
+  ],
+  "botCompliance": [
+    {
+      "id": "bot-read-workbook",
+      "title": "Read MASTER WORKBOOK + UI LAYOUT before changes",
+      "status": "todo"
+    },
+    {
+      "id": "bot-update-progress",
+      "title": "Update ops/site/progress.json + PROJECT_PROGRESS.md after completing tasks",
+      "status": "todo"
+    },
+    {
+      "id": "bot-verify",
+      "title": "Run npm run verify before commit",
+      "status": "todo"
+    },
+    {
+      "id": "bot-no-secrets",
+      "title": "No secrets in git; env vars only",
+      "status": "todo"
+    }
+  ],
+  "promptPack": {
+    "instructions": "Copy a prompt, assign to a bot, and require updates to progress.json + PROJECT_PROGRESS.md.",
+    "prompts": []
+  }
+}

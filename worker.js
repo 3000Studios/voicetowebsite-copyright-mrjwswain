@@ -1248,10 +1248,11 @@ export default {
     }
 
     // Unified Checkout API (Stripe + PayPal)
-    // Supports: { provider, id/itemId/product/sku, successUrl, cancelUrl }
+    // Supports: { provider, id/itemId/product/sku, successUrl, cancelUrl, items: [] }
     if (
       (url.pathname === "/api/checkout" ||
         url.pathname === "/api/stripe/checkout" ||
+        url.pathname === "/api/paypal/checkout" ||
         url.pathname === "/api/paypal/order/create" ||
         url.pathname === "/api/paypal/create-order") &&
       request.method === "POST"
@@ -1266,13 +1267,13 @@ export default {
         ).toLowerCase();
 
         // Multi-item support (basket)
-        const items = Array.isArray(payload?.items) ? payload.items : [];
-        const isBasket = items.length > 0;
+        const rawItems = Array.isArray(payload?.items) ? payload.items : [];
+        const isBasket = rawItems.length > 0;
 
         let normalizedItems = [];
         if (isBasket) {
           // Resolve items from catalog if possible
-          normalizedItems = items.map((p) => {
+          normalizedItems = rawItems.map((p) => {
             const found = findProduct(p.id || p.itemId || p.sku);
             return found
               ? {
@@ -1308,10 +1309,23 @@ export default {
               },
             ];
           } else if (targetId) {
-            return jsonResponse(404, {
-              error: `Product not found: ${targetId}`,
-              supported: [...(catalog.products || []), ...(catalog.apps || [])].map((p) => p.id),
-            });
+            // Check if it's a custom dynamic item passed in payload
+            if (payload.price && payload.name) {
+              normalizedItems = [
+                {
+                  sku: targetId || "custom",
+                  name: payload.name,
+                  price: Number(payload.price),
+                  currency: payload.currency || "USD",
+                  type: "one-time",
+                },
+              ];
+            } else {
+              return jsonResponse(404, {
+                error: `Product not found: ${targetId}`,
+                supported: [...(catalog.products || []), ...(catalog.apps || [])].map((p) => p.id),
+              });
+            }
           }
         }
 
@@ -1322,7 +1336,7 @@ export default {
         // PayPal Flow
         if (provider === "paypal") {
           const order = await createPayPalOrder(env, normalizedItems);
-          return jsonResponse(200, { id: order.id, status: order.status || "CREATED" });
+          return jsonResponse(200, { id: order.id, orderId: order.id, status: order.status || "CREATED" });
         }
 
         // Stripe Flow
@@ -1343,7 +1357,7 @@ export default {
           params.append("cancel_url", payload?.cancelUrl || `${url.origin}/store.html?checkout=cancel`);
 
           normalizedItems.forEach((item, idx) => {
-            if (item.stripePriceId) {
+            if (item.stripePriceId && item.stripePriceId.startsWith("price_")) {
               params.append(`line_items[${idx}][price]`, item.stripePriceId);
               params.append(`line_items[${idx}][quantity]`, "1");
             } else {
@@ -1367,7 +1381,7 @@ export default {
           });
           const data = await stRes.json();
           if (!stRes.ok) throw new Error(data.error?.message || "Stripe session failed");
-          return jsonResponse(200, { url: data.url, sessionId: data.id, id: data.id });
+          return jsonResponse(200, { url: data.url, sessionId: data.id, id: data.id, orderId: data.id });
         }
 
         return jsonResponse(400, { error: "Invalid provider" });
@@ -1457,7 +1471,8 @@ export default {
     if (
       (url.pathname === "/api/paypal/capture" ||
         url.pathname === "/api/paypal/order/capture" ||
-        url.pathname === "/api/paypal/capture-order") &&
+        url.pathname === "/api/paypal/capture-order" ||
+        url.pathname === "/api/apps/paypal/capture") &&
       request.method === "POST"
     ) {
       try {
@@ -1472,11 +1487,11 @@ export default {
         const status = String(capture?.status || "").toLowerCase();
         const purchaseUnit = capture?.purchase_units?.[0] || {};
         const cap = purchaseUnit.payments?.captures?.[0] || {};
-        const payerEmail = String(capture?.payer?.email_address || "");
+        const payerEmail = String(capture?.payer?.email_address || payload?.email || "");
 
         const captureAmount = Number(cap?.amount?.value || purchaseUnit.amount?.value || 0);
         const currency = String(cap?.amount?.currency_code || purchaseUnit.amount?.currency_code || "USD");
-        const productRef = String(purchaseUnit.custom_id || "").trim() || "paypal:unknown";
+        const productRef = String(purchaseUnit.custom_id || purchaseUnit.reference_id || "").trim() || "paypal:unknown";
 
         if (env.D1) {
           try {
@@ -1492,8 +1507,31 @@ export default {
           }
         }
 
+        // Email Notification for successful capture
+        if (status === "completed" && (env.RESEND_API_KEY || env.SENDGRID_API_KEY)) {
+          try {
+            const subject = "Order Confirmation - VoiceToWebsite";
+            const text = `Thank you for your purchase!\n\nOrder ID: ${orderId}\nProduct: ${productRef}\nAmount: ${currency} ${captureAmount}\n\nWe are processing your order.`;
+            const html = `
+               <div style="font-family: sans-serif; padding: 20px;">
+                 <h2>Thank you for your purchase!</h2>
+                 <p>Order ID: <strong>${orderId}</strong></p>
+                 <p>Product: ${productRef}</p>
+                 <p>Amount: ${currency} ${captureAmount}</p>
+                 <p>We are processing your order. If this was an app purchase, you will receive a license key shortly.</p>
+               </div>
+             `;
+            await sendDemoEmail(env, { to: payerEmail, subject, html, text }).catch((e) =>
+              console.warn("Email notify failed:", e)
+            );
+          } catch (err) {
+            console.warn("Follow-up email logic failed:", err);
+          }
+        }
+
         return jsonResponse(200, {
           ok: true,
+          success: true,
           id: orderId,
           orderId,
           status,

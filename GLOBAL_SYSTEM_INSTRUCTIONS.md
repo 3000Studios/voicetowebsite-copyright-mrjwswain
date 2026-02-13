@@ -77,7 +77,7 @@
 ### Canonical Commands (from package.json)
 
 - `dev:all`: `node ./scripts/dev-all.mjs`
-- `verify`: `npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run type-check && npm run test && npm run build && npm run governance:check && npm run check:links`
+- `verify`: `node ./scripts/verify.mjs && npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run type-check && npm run test && npm run build && npm run governance:check && npm run check:links`
 - `deploy`: `npm run verify && wrangler deploy --keep-vars`
 - `auto:ship`: `node ./scripts/auto-ship.mjs`
 - `sync`: `node ./scripts/sync.mjs`
@@ -146,6 +146,7 @@ Admin pages:
 - `/admin` -> `admin/index.html`
 - `/admin/live-stream` -> `admin/live-stream.html`
 - `/admin/login` -> `admin/login.html`
+- `/admin/progress` -> `admin/progress.html`
 - `/admin/store-manager` -> `admin/store-manager.html`
 - `/admin/voice-commands` -> `admin/voice-commands.html`
 
@@ -162,6 +163,7 @@ Scripts available:
 - `scripts/auto-ship.mjs`
 - `scripts/autopilot.mjs`
 - `scripts/dev-all.mjs`
+- `scripts/generate-config.mjs`
 - `scripts/generate-sitemap.mjs`
 - `scripts/guard-deploy.mjs`
 - `scripts/heal.mjs`
@@ -177,6 +179,7 @@ Scripts available:
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
 - `scripts/validate-governance.mjs`
+- `scripts/verify.mjs`
 
 Git hooks:
 
