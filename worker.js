@@ -337,20 +337,26 @@ const generateSignature = async (data, secret) => {
   return btoa(String.fromCharCode(...new Uint8Array(signature)));
 };
 
+const getSignatureSecret = (env) => String(env.SIGNATURE_SECRET || "").trim();
+
 // Generate signed URL with expiration
-const generateSignedUrl = async (appId, licenseKey, expiresMinutes = 60) => {
+const generateSignedUrl = async (env, appId, licenseKey, expiresMinutes = 60) => {
   const expires = Date.now() + expiresMinutes * 60 * 1000;
   const data = `${appId}:${licenseKey}:${expires}`;
-  const secret = globalThis.SIGNATURE_SECRET || "default-secret-change-in-production";
+  const secret = getSignatureSecret(env);
+  if (!secret) {
+    throw new Error("SIGNATURE_SECRET is required to generate signed URLs.");
+  }
   const signature = await generateSignature(data, secret);
   return `/api/apps/download/${appId}?license=${licenseKey}&expires=${expires}&sig=${signature}`;
 };
 
 // Verify signed URL
-const verifySignedUrl = async (appId, licenseKey, expires, signature) => {
+const verifySignedUrl = async (env, appId, licenseKey, expires, signature) => {
   try {
+    const secret = getSignatureSecret(env);
+    if (!secret) return false;
     const data = `${appId}:${licenseKey}:${expires}`;
-    const secret = globalThis.SIGNATURE_SECRET || "default-secret-change-in-production";
     const expectedSignature = await generateSignature(data, secret);
     return signature === expectedSignature && Date.now() < parseInt(expires, 10);
   } catch {
@@ -1055,7 +1061,7 @@ export default {
         }
 
         // Verify signed URL and expiration
-        if (!verifySignedUrl(appId, license, expires, signature)) {
+        if (!verifySignedUrl(env, appId, license, expires, signature)) {
           return createErrorResponse(401, "Invalid or expired download URL", "INVALID_URL");
         }
 
@@ -1645,13 +1651,12 @@ export default {
     }
 
     const isAdminRoot = url.pathname === "/admin" || url.pathname === "/admin/" || url.pathname === "/admin/index.html";
-    // ADMIN AUTHENTICATION DISABLED FOR TESTING - USER REQUEST
-    // if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
-    //   const hasAdmin = await hasValidAdminCookie(request, env);
-    //   if (!hasAdmin) {
-    //     return Response.redirect(new URL("/admin/", url.origin), 302);
-    //   }
-    // }
+    if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
+      const hasAdmin = await hasValidAdminCookie(request, env);
+      if (!hasAdmin) {
+        return Response.redirect(new URL("/admin/", url.origin), 302);
+      }
+    }
 
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);
