@@ -17,8 +17,8 @@ export async function onRequestPost(context) {
   const OPENAI_MODEL = env.OPENAI_MODEL || "gpt-4o-mini";
   const WORKERS_AI = env.AI;
   const GITHUB_TOKEN =
-    env.GITHUB_TOKEN ||
     env.GH_TOKEN ||
+    env.GITHUB_TOKEN ||
     env.GH_BOT_TOKEN ||
     env.PERSONAL_ACCESS_TOKEN_API ||
     env.PERSONAL_ACCESS_TOKEN ||

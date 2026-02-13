@@ -1,16 +1,74 @@
 import { adminCookieName, verifyAdminCookieValue } from "./adminAuth.js";
+import { DatabaseHelper, createCachedDatabase, createDatabaseMonitor } from "./database-cache.js";
+import { LOG_LEVELS, getLogger, initializeLogger, loggingMiddleware } from "./logger.js";
 import { onRequestPost as handleOrchestrator } from "./orchestrator.js";
+import { createRateLimitMiddleware } from "./rate-limiter.js";
+import { SchemaValidationError, validateErrorResponse, validateRequest, validateResponse } from "./schema-validator.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 const CONFIRM_TTL_MS = 10 * 60 * 1000;
-const VALID_ACTIONS = new Set(["plan", "preview", "apply", "deploy", "status", "rollback"]);
+const VALID_ACTIONS = new Set([
+  "plan",
+  "preview",
+  "apply",
+  "deploy",
+  "status",
+  "rollback",
+  "auto",
+  "list_pages",
+  "read_page",
+]);
 const VALID_SAFETY_LEVELS = new Set(["low", "medium", "high"]);
 
-const toJsonResponse = (status, payload) =>
-  new Response(JSON.stringify(payload), {
+// Valid pages that can be targeted
+const VALID_PAGES = new Set([
+  "index.html",
+  "store.html",
+  "pricing.html",
+  "features.html",
+  "blog.html",
+  "appstore.html",
+  "livestream.html",
+  "about.html",
+  "contact.html",
+  "legal.html",
+  "privacy.html",
+  "terms.html",
+  "support.html",
+  "status.html",
+  "projects.html",
+  "gallery.html",
+  "templates.html",
+  "all", // Special value for targeting all pages
+]);
+
+const toJsonResponse = (status, payload, env) => {
+  // Validate response schema only if enabled (default: production only)
+  const enableValidation =
+    env?.ENABLE_RESPONSE_VALIDATION === "true" ||
+    (env?.NODE_ENV === "production" && env?.ENABLE_RESPONSE_VALIDATION !== "false");
+
+  if (enableValidation && status >= 200 && status < 300) {
+    try {
+      validateResponse(payload, "ExecuteResponse");
+    } catch (error) {
+      // Log validation errors but don't break responses
+      console.warn("Response validation failed:", error.message);
+    }
+  } else if (status >= 400) {
+    try {
+      validateErrorResponse(payload);
+    } catch (error) {
+      // Log error response validation failures
+      console.warn("Error response validation failed:", error.message);
+    }
+  }
+
+  return new Response(JSON.stringify(payload), {
     status,
     headers: JSON_HEADERS,
   });
+};
 
 const toIso = (value) => new Date(value).toISOString();
 
@@ -18,10 +76,44 @@ const getTraceId = (request) => request.headers.get("x-trace-id") || crypto.rand
 
 const readJsonBody = async (request) => {
   try {
-    return await request.json();
-  } catch (_) {
+    // Check request size limit (default: 1MB)
+    const contentLength = request.headers.get("content-length");
+    const maxSize = 1024 * 1024; // 1MB
+
+    if (contentLength && parseInt(contentLength) > maxSize) {
+      return { error: "Request body too large", size: parseInt(contentLength) };
+    }
+
+    // Always clone before reading the body so downstream code can still use the original Request.
+    // Workers requests have a one-time-readable body stream.
+    const body = await request.clone().text();
+    if (body.length > maxSize) {
+      return { error: "Request body too large", size: body.length };
+    }
+
+    return body ? JSON.parse(body) : null;
+  } catch (error) {
+    if (error.message === "Request body too large") {
+      return { error: "Request body too large" };
+    }
     return null;
   }
+};
+
+const validatePageName = (page) => {
+  if (!page || typeof page !== "string") {
+    return { valid: false, error: "Page name must be a non-empty string" };
+  }
+
+  const trimmedPage = page.trim();
+  if (!VALID_PAGES.has(trimmedPage)) {
+    return {
+      valid: false,
+      error: `Invalid page '${trimmedPage}'. Valid pages: ${Array.from(VALID_PAGES).join(", ")}`,
+    };
+  }
+
+  return { valid: true, page: trimmedPage };
 };
 
 const normalizeActionPayload = (payload) => {
@@ -29,7 +121,8 @@ const normalizeActionPayload = (payload) => {
     payload?.parameters && typeof payload.parameters === "object" && !Array.isArray(payload.parameters)
       ? payload.parameters
       : {};
-  const page = String(payload?.page || parameters?.page || "").trim();
+  const pageValidation = validatePageName(payload?.page || parameters?.page || "");
+  const page = pageValidation.valid ? pageValidation.page : "";
   const path = String(payload?.path || parameters?.path || "").trim();
   const file = String(payload?.file || parameters?.file || "").trim();
   const action = String(payload?.action || "")
@@ -255,12 +348,28 @@ const createConfirmToken = async (env, db, { action, idempotencyKey, traceId }) 
   };
 };
 
-const matchesTokenAction = (tokenAction, requestedAction) =>
-  tokenAction === requestedAction || tokenAction === "execute";
+const matchesTokenAction = (tokenAction, requestedAction) => {
+  // Exact match for most actions
+  if (tokenAction === requestedAction) {
+    return true;
+  }
+
+  // Allow preview tokens to be used for apply (workflow: preview -> apply -> deploy)
+  if (tokenAction === "preview" && requestedAction === "apply") {
+    return true;
+  }
+
+  // Legacy compatibility: "execute" tokens can be used for apply/deploy
+  if (tokenAction === "execute" && (requestedAction === "apply" || requestedAction === "deploy")) {
+    return true;
+  }
+
+  return false;
+};
 
 const canReuseConsumedTokenForDeploy = async (db, row, idempotencyKey, action) => {
   if (action !== "deploy") return false;
-  if (row?.action !== "execute") return false;
+  if (row?.action !== "preview" && row?.action !== "execute") return false;
   if (row?.idempotency_key !== idempotencyKey) return false;
 
   const applied = await findExistingEvent(db, "apply", idempotencyKey);
@@ -269,10 +378,13 @@ const canReuseConsumedTokenForDeploy = async (db, row, idempotencyKey, action) =
 };
 
 const validateAndConsumeConfirmToken = async (env, db, { token, action, idempotencyKey }) => {
+  const logger = getLogger();
+
   if (!token) return { ok: false, error: "confirmToken is required for this action." };
 
   const parts = String(token).split(".");
   if (parts.length !== 3 || parts[0] !== "vtwcfm") {
+    logger.warn("Invalid token format received", { tokenPrefix: parts[0] });
     return { ok: false, error: "Invalid confirmToken format." };
   }
 
@@ -281,66 +393,124 @@ const validateAndConsumeConfirmToken = async (env, db, { token, action, idempote
   const secret = getConfirmSecret(env);
   const expectedSig = await signHmac(secret, payloadB64);
   if (signature !== expectedSig) {
+    logger.logSecurity("Invalid token signature", { action, idempotencyKey });
     return { ok: false, error: "Invalid confirmToken signature." };
   }
 
   let tokenPayload;
   try {
     tokenPayload = JSON.parse(decodeBase64Url(payloadB64));
-  } catch (_) {
+  } catch (error) {
+    logger.warn("Failed to parse token payload", { error: error.message });
     return { ok: false, error: "Invalid confirmToken payload." };
   }
 
   if (!tokenPayload?.exp || Date.now() > Number(tokenPayload.exp)) {
+    logger.logSecurity("Expired token used", {
+      action,
+      idempotencyKey,
+      expiredAt: tokenPayload?.exp,
+      currentTime: Date.now(),
+    });
     return { ok: false, error: "confirmToken has expired." };
   }
 
   if (!matchesTokenAction(tokenPayload?.action, action) || tokenPayload?.idempotencyKey !== idempotencyKey) {
+    logger.logSecurity("Token action/idempotency key mismatch", {
+      tokenAction: tokenPayload?.action,
+      requestedAction: action,
+      tokenIdempotencyKey: tokenPayload?.idempotencyKey,
+      requestedIdempotencyKey: idempotencyKey,
+    });
     return { ok: false, error: "confirmToken does not match action/idempotencyKey." };
   }
 
-  if (!db) return { ok: true };
-
-  const tokenHash = await sha256Hex(token);
-  let row = null;
-  try {
-    row = await db
-      .prepare(
-        `SELECT token_hash, action, idempotency_key, expires_at, used_at
-         FROM execute_confirm_tokens
-         WHERE token_hash = ?
-         LIMIT 1`
-      )
-      .bind(tokenHash)
-      .first();
-  } catch (_) {
-    row = null;
-  }
-
-  if (!row) return { ok: false, error: "confirmToken not found." };
-  if (row.used_at) {
-    const allowDeployReuse = await canReuseConsumedTokenForDeploy(db, row, idempotencyKey, action);
-    if (!allowDeployReuse) {
-      return { ok: false, error: "confirmToken already used." };
-    }
+  if (!db) {
+    logger.debug("Token validation proceeding without database (stateless mode)");
     return { ok: true };
   }
-  if (Date.now() > new Date(row.expires_at).getTime()) return { ok: false, error: "confirmToken has expired." };
-  if (!matchesTokenAction(row.action, action) || row.idempotency_key !== idempotencyKey) {
-    return { ok: false, error: "confirmToken does not match action/idempotencyKey." };
-  }
+
+  const tokenHash = await sha256Hex(token);
+  const now = toIso(Date.now());
 
   try {
-    await db
-      .prepare("UPDATE execute_confirm_tokens SET used_at = ? WHERE token_hash = ?")
-      .bind(toIso(Date.now()), tokenHash)
-      .run();
-  } catch (_) {
-    return { ok: false, error: "Failed to consume confirmToken." };
-  }
+    // Accept either a raw D1-like database (prepare/bind/run) or our cached wrapper (execute).
+    const cachedDb =
+      db && typeof db.execute === "function"
+        ? db
+        : db && typeof db.prepare === "function"
+          ? createCachedDatabase(db)
+          : null;
+    if (!cachedDb) {
+      logger.warn("Database missing execute/prepare; falling back to stateless token validation");
+      return { ok: true };
+    }
 
-  return { ok: true };
+    // Use cached database and query templates for token consumption.
+    const dbHelper = new DatabaseHelper(cachedDb, logger);
+
+    const timer = logger.startTimer("token-consumption-update");
+    const updateResult = await dbHelper.consumeToken(tokenHash, now);
+    timer.end({ changes: updateResult.changes });
+
+    if (!updateResult || updateResult.changes === 0) {
+      // Check if token exists but was already used or expired
+      const existingToken = await dbHelper.findToken(tokenHash);
+
+      if (!existingToken) {
+        logger.warn("Token not found in database", { tokenHash });
+        return { ok: false, error: "confirmToken not found." };
+      }
+
+      // If apply succeeded but token consumption wasn't recorded (rare), allow deploy based on the apply event.
+      // This keeps the UX consistent: deploy-after-apply with the same confirmToken should work.
+      if (!existingToken.used_at && action === "deploy") {
+        const allowDeployReuse = await canReuseConsumedTokenForDeploy(db, existingToken, idempotencyKey, action);
+        if (allowDeployReuse) {
+          logger.info("Token reuse allowed for deploy action", { idempotencyKey });
+          return { ok: true };
+        }
+      }
+
+      if (existingToken.used_at) {
+        logger.logSecurity("Attempted reuse of consumed token", {
+          tokenHash,
+          usedAt: existingToken.used_at,
+          action,
+          idempotencyKey,
+        });
+
+        // Check if this is a deploy action that can reuse consumed tokens
+        const allowDeployReuse = await canReuseConsumedTokenForDeploy(db, existingToken, idempotencyKey, action);
+        if (!allowDeployReuse) {
+          return { ok: false, error: "confirmToken already used." };
+        }
+        logger.info("Token reuse allowed for deploy action", { idempotencyKey });
+        return { ok: true };
+      }
+
+      if (Date.now() > new Date(existingToken.expires_at).getTime()) {
+        logger.warn("Token expired during validation", {
+          tokenHash,
+          expiresAt: existingToken.expires_at,
+        });
+        return { ok: false, error: "confirmToken has expired." };
+      }
+
+      logger.error("Token consumption failed - possible race condition", { tokenHash });
+      return { ok: false, error: "confirmToken could not be consumed (race condition)." };
+    }
+
+    logger.info("Token successfully consumed", { action, idempotencyKey });
+    return { ok: true };
+  } catch (error) {
+    logger.error("Token consumption failed", { action, idempotencyKey, error: error.message }, error);
+    return { ok: false, error: "Database transaction failed. Please try again." };
+  }
 };
+
+// Export internal helpers for unit tests.
+export { createConfirmToken, sha256Hex, validateAndConsumeConfirmToken };
 
 const buildOrchestratorRequest = (request, payload) =>
   new Request(request.url, {
@@ -369,6 +539,14 @@ const mapActionToEventType = (action) => {
       return "deployed";
     case "rollback":
       return "rolled_back";
+    case "auto":
+      return "applied"; // Auto action applies changes immediately
+    case "list_pages":
+      return "planned"; // List pages is a read-only planning operation
+    case "read_page":
+      return "planned"; // Read page is a read-only planning operation
+    case "status":
+      return "planned"; // Status check is a read-only planning operation
     default:
       return "planned";
   }
@@ -410,58 +588,447 @@ const fetchStatus = async (db) => {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const traceId = getTraceId(request);
+  const startTime = performance.now();
 
-  if (!(await isAuthorized(request, env))) {
-    return toJsonResponse(401, {
-      error: "Unauthorized. Provide valid admin cookie or x-orch-token.",
-      traceId,
-    });
-  }
+  // Initialize logger and set up request context
+  const logger = initializeLogger({
+    level: env.LOG_LEVEL ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()] : LOG_LEVELS.INFO,
+    enableConsole: true,
+    enableStructured: env.NODE_ENV === "production",
+  });
 
-  const rawPayload = await readJsonBody(request);
-  if (!rawPayload) {
-    return toJsonResponse(400, { error: "Invalid JSON payload.", traceId });
-  }
-
-  const payload = normalizeActionPayload(rawPayload);
-  if (!VALID_ACTIONS.has(payload.action)) {
-    return toJsonResponse(400, {
-      error: "Invalid action. Use plan, preview, apply, deploy, status, or rollback.",
-      traceId,
-    });
-  }
-  if (!payload.idempotencyKey) {
-    return toJsonResponse(400, { error: "Missing required field: idempotencyKey.", traceId });
-  }
-  if ((payload.action === "plan" || payload.action === "preview" || payload.action === "apply") && !payload.command) {
-    return toJsonResponse(400, { error: `Action '${payload.action}' requires command.`, traceId });
-  }
-
-  const db = dbFromEnv(env);
-  await ensureExecuteTables(db);
-
-  const existing = await findExistingEvent(db, payload.action, payload.idempotencyKey);
-  if (existing?.response_json) {
-    return new Response(existing.response_json, {
-      status: Number(existing.status) || 200,
-      headers: JSON_HEADERS,
-    });
-  }
-
-  const actionRecord = makeActionRecord(payload);
-  const eventId = crypto.randomUUID();
+  const { traceId, requestId } = loggingMiddleware(request);
+  logger.setContext({
+    traceId,
+    requestId,
+    action: "execute-api-request",
+  });
 
   try {
-    if (payload.action === "status") {
-      const statusData = await fetchStatus(db);
+    logger.info("Execute API request started", {
+      method: request.method,
+      url: request.url,
+    });
+
+    if (!(await isAuthorized(request, env))) {
+      logger.logSecurity("Unauthorized access attempt", {
+        userAgent: request.headers.get("user-agent"),
+        ip: request.headers.get("cf-connecting-ip"),
+      });
+      return toJsonResponse(
+        401,
+        {
+          error: "Unauthorized. Provide valid admin cookie or x-orch-token.",
+          traceId,
+        },
+        env
+      );
+    }
+
+    const rawPayload = await readJsonBody(request);
+    if (!rawPayload) {
+      logger.warn("Invalid JSON payload received");
+      return toJsonResponse(400, { error: "Invalid JSON payload.", traceId }, env);
+    }
+
+    if (rawPayload.error === "Request body too large") {
+      logger.warn("Request body too large", { size: rawPayload.size });
+      return toJsonResponse(
+        413,
+        {
+          error: "Request body too large. Maximum size is 1MB.",
+          traceId,
+          received: rawPayload.size,
+          max: 1024 * 1024,
+        },
+        env
+      );
+    }
+
+    // Validate request schema
+    let payload;
+    try {
+      payload = validateRequest(rawPayload, "ExecuteRequest");
+    } catch (error) {
+      if (error instanceof SchemaValidationError) {
+        logger.warn("Request schema validation failed", {
+          error: error.message,
+          field: error.field,
+          value: error.value,
+        });
+        return toJsonResponse(
+          400,
+          {
+            error: "Invalid request format.",
+            details: error.message,
+            traceId,
+          },
+          env
+        );
+      }
+      throw error;
+    }
+
+    logger.setContext({ action: payload.action });
+
+    if (!VALID_ACTIONS.has(payload.action)) {
+      logger.warn("Invalid action requested", { action: payload.action });
+      return toJsonResponse(
+        400,
+        {
+          error: "Invalid action. Use plan, preview, apply, deploy, status, rollback, auto, list_pages, or read_page.",
+          traceId,
+        },
+        env
+      );
+    }
+
+    if (!payload.idempotencyKey) {
+      logger.warn("Missing required idempotency key");
+      return toJsonResponse(400, { error: "Missing required field: idempotencyKey.", traceId }, env);
+    }
+
+    if (
+      (payload.action === "plan" ||
+        payload.action === "preview" ||
+        payload.action === "apply" ||
+        payload.action === "auto") &&
+      !payload.command
+    ) {
+      logger.warn("Missing required command field", { action: payload.action });
+      return toJsonResponse(400, { error: `Action '${payload.action}' requires command.`, traceId }, env);
+    }
+
+    // Rate limiting check
+    const db = dbFromEnv(env);
+    const cachedDb = db ? createDatabaseMonitor(db, logger) : null;
+    const rateLimitFn = createRateLimitMiddleware(cachedDb);
+    const rateLimitCheck = await rateLimitFn(request, payload.action);
+
+    if (!rateLimitCheck.allowed) {
+      logger.logSecurity("Rate limit exceeded", {
+        action: payload.action,
+        limit: rateLimitCheck.limit,
+        remaining: rateLimitCheck.remaining,
+        blocked: rateLimitCheck.blocked,
+        blockedUntil: rateLimitCheck.blockedUntil,
+      });
+
+      return new Response(
+        JSON.stringify({
+          error: rateLimitCheck.blocked
+            ? "Too many requests. You have been temporarily blocked due to excessive requests."
+            : "Rate limit exceeded. Please try again later.",
+          retryAfter: rateLimitCheck.blockedUntil
+            ? Math.ceil((rateLimitCheck.blockedUntil - Date.now()) / 1000)
+            : Math.ceil((rateLimitCheck.resetTime - Date.now()) / 1000),
+          limit: rateLimitCheck.limit,
+          windowMs: rateLimitCheck.windowMs,
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            ...rateLimitCheck.headers,
+          },
+        }
+      );
+    }
+
+    // Validate page names for actions that target specific pages
+    if (
+      payload.action === "read_page" ||
+      payload.action === "auto" ||
+      payload.action === "apply" ||
+      payload.action === "plan" ||
+      payload.action === "preview"
+    ) {
+      if (payload.page && payload.page !== "") {
+        const pageValidation = validatePageName(payload.page);
+        if (!pageValidation.valid) {
+          logger.warn("Invalid page name provided", { page: payload.page });
+          return toJsonResponse(400, { error: pageValidation.error, traceId }, env);
+        }
+      }
+    }
+
+    if (cachedDb) {
+      await ensureExecuteTables(cachedDb);
+
+      const dbHelper = new DatabaseHelper(cachedDb, logger);
+      const existing = await dbHelper.findEvent(payload.action, payload.idempotencyKey);
+      if (existing?.response_json) {
+        logger.info("Returning cached response for idempotent request", {
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+        });
+        return new Response(existing.response_json, {
+          status: Number(existing.status) || 200,
+          headers: JSON_HEADERS,
+        });
+      }
+    }
+
+    const actionRecord = makeActionRecord(payload);
+    const eventId = crypto.randomUUID();
+
+    try {
+      if (payload.action === "status") {
+        const statusTimer = logger.startTimer("status-fetch");
+        const statusData = await fetchStatus(db);
+        statusTimer.end();
+
+        const eventPayload = makeEvent({
+          eventType: "planned",
+          actionPayload: actionRecord,
+          traceId,
+          eventId,
+          result: statusData,
+        });
+        await writeEventRecord(db, {
+          eventId,
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+          traceId,
+          status: 200,
+          payload: eventPayload,
+        });
+        return toJsonResponse(200, eventPayload, env);
+      }
+
+      if (payload.action === "list_pages") {
+        logger.info("Listing all site pages");
+        const listPayload = {
+          mode: "plan",
+          command: "List all site pages",
+          target: payload.target,
+        };
+        const listResponse = await runOrchestrator(context, listPayload);
+        const listResult = await decodeJsonResponse(listResponse);
+
+        // Safely extract pages with fallback
+        const pages = listResult?.plan?.intent?.scope?.files || listResult?.files || listResult?.pages || [];
+
+        const eventPayload = makeEvent({
+          eventType: "planned",
+          actionPayload: actionRecord,
+          traceId,
+          eventId,
+          result: { pages, note: "These are the HTML pages currently in the site repository." },
+        });
+        await writeEventRecord(db, {
+          eventId,
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+          traceId,
+          status: 200,
+          payload: eventPayload,
+        });
+        return toJsonResponse(200, eventPayload, env);
+      }
+
+      if (payload.action === "read_page") {
+        const targetPage = payload.page || payload.path || payload.file || "index.html";
+
+        // Validate the target page
+        const pageValidation = validatePageName(targetPage);
+        if (!pageValidation.valid) {
+          const eventPayload = makeEvent({
+            eventType: "error",
+            actionPayload: actionRecord,
+            traceId,
+            eventId,
+            error: { message: pageValidation.error },
+          });
+          await writeEventRecord(db, {
+            eventId,
+            action: payload.action,
+            idempotencyKey: payload.idempotencyKey,
+            traceId,
+            status: 400,
+            payload: eventPayload,
+          });
+          return toJsonResponse(400, eventPayload, env);
+        }
+
+        logger.info("Reading page content", { page: pageValidation.page });
+        const readPayload = {
+          mode: "plan",
+          command: `Read the current content of ${pageValidation.page}`,
+          target: payload.target,
+          page: pageValidation.page,
+        };
+        const readResponse = await runOrchestrator(context, readPayload);
+        const readResult = await decodeJsonResponse(readResponse);
+
+        // Safely handle potentially undefined content
+        const safeContent =
+          readResult && typeof readResult === "object" ? readResult : { error: "Invalid response format" };
+
+        const eventPayload = makeEvent({
+          eventType: "planned",
+          actionPayload: actionRecord,
+          traceId,
+          eventId,
+          result: { page: pageValidation.page, content: safeContent },
+        });
+        await writeEventRecord(db, {
+          eventId,
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+          traceId,
+          status: 200,
+          payload: eventPayload,
+        });
+        return toJsonResponse(200, eventPayload, env);
+      }
+
+      if (payload.action === "auto") {
+        logger.info("Executing auto mode", { command: payload.command });
+        const autoTimer = logger.startTimer("auto-execution");
+
+        const autoApplyPayload = {
+          mode: "apply",
+          command: payload.command,
+          target: payload.target,
+          confirmation: "ship it",
+          page: payload.page,
+          path: payload.path,
+          file: payload.file,
+        };
+        const applyResponse = await runOrchestrator(context, autoApplyPayload);
+        const applyResult = await decodeJsonResponse(applyResponse);
+
+        if (!applyResponse.ok) {
+          const errorMessage = applyResult?.error || applyResult?.message || "Auto-apply failed with unknown error.";
+          logger.error("Auto mode failed", { error: errorMessage });
+          throw new Error(errorMessage);
+        }
+
+        const result = {
+          ...applyResult,
+          autoMode: true,
+          steps: [
+            "planned",
+            "applied",
+            applyResult?.deployment?.status === "skipped" ? "deploy_skipped" : "deploy_triggered",
+          ],
+          message: "Change was planned, applied, and deployment triggered in a single call.",
+        };
+
+        autoTimer.end({ steps: result.steps });
+
+        const eventPayload = makeEvent({
+          eventType: "applied",
+          actionPayload: actionRecord,
+          traceId,
+          eventId,
+          result,
+        });
+        await writeEventRecord(db, {
+          eventId,
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+          traceId,
+          status: 200,
+          payload: eventPayload,
+        });
+        return toJsonResponse(200, eventPayload, env);
+      }
+
+      if (payload.action === "apply" || payload.action === "deploy" || payload.action === "rollback") {
+        logger.info("Validating confirm token", { action: payload.action });
+        const tokenCheck = await validateAndConsumeConfirmToken(env, db, {
+          token: payload.confirmToken,
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+        });
+        if (!tokenCheck.ok) {
+          logger.logSecurity("Token validation failed", {
+            action: payload.action,
+            error: tokenCheck.error,
+          });
+          return toJsonResponse(403, { error: tokenCheck.error, traceId }, env);
+        }
+      }
+
+      let orchestratorPayload = null;
+      if (payload.action === "plan" || payload.action === "preview") {
+        orchestratorPayload = {
+          mode: "plan",
+          command: payload.command,
+          target: payload.target,
+          page: payload.page,
+          path: payload.path,
+          file: payload.file,
+        };
+      } else if (payload.action === "apply") {
+        orchestratorPayload = {
+          mode: "apply",
+          command: payload.command,
+          target: payload.target,
+          confirmation: "ship it",
+          page: payload.page,
+          path: payload.path,
+          file: payload.file,
+        };
+      } else if (payload.action === "deploy") {
+        orchestratorPayload = {
+          mode: "deploy",
+          command: payload.command || "Deploy latest changes",
+          target: payload.target,
+          page: payload.page,
+          path: payload.path,
+          file: payload.file,
+        };
+      } else if (payload.action === "rollback") {
+        orchestratorPayload = {
+          mode: "rollback_last",
+          command: payload.command || "Rollback last change",
+          target: payload.target,
+          page: payload.page,
+          path: payload.path,
+          file: payload.file,
+        };
+      }
+
+      logger.info("Calling orchestrator", {
+        action: payload.action,
+        mode: orchestratorPayload?.mode,
+      });
+
+      const orchestratorTimer = logger.startTimer("orchestrator-call");
+      const orchestratorResponse = await runOrchestrator(context, orchestratorPayload);
+      const orchestratorResult = await decodeJsonResponse(orchestratorResponse);
+      orchestratorTimer.end();
+
+      if (!orchestratorResponse.ok) {
+        throw new Error(orchestratorResult?.error || "Orchestrator request failed.");
+      }
+
+      let result = orchestratorResult;
+      if (payload.action === "preview") {
+        const confirm = await createConfirmToken(env, db, {
+          action: "execute",
+          idempotencyKey: payload.idempotencyKey,
+          traceId,
+        });
+        result = {
+          ...orchestratorResult,
+          ...confirm,
+          confirmInstructions:
+            "Use this confirmToken with the same idempotencyKey for apply, and optionally deploy right after apply.",
+        };
+      }
+
       const eventPayload = makeEvent({
-        eventType: "planned",
+        eventType: mapActionToEventType(payload.action),
         actionPayload: actionRecord,
         traceId,
         eventId,
-        result: statusData,
+        result,
       });
+
       await writeEventRecord(db, {
         eventId,
         action: payload.action,
@@ -470,119 +1037,54 @@ export async function onRequestPost(context) {
         status: 200,
         payload: eventPayload,
       });
-      return toJsonResponse(200, eventPayload);
-    }
 
-    if (payload.action === "apply" || payload.action === "deploy" || payload.action === "rollback") {
-      const tokenCheck = await validateAndConsumeConfirmToken(env, db, {
-        token: payload.confirmToken,
+      return toJsonResponse(200, eventPayload, env);
+    } catch (err) {
+      logger.error(
+        "Request processing failed",
+        {
+          action: payload.action,
+          error: err.message,
+        },
+        err
+      );
+
+      const errorPayload = makeEvent({
+        eventType: "error",
+        actionPayload: actionRecord,
+        traceId,
+        eventId,
+        error: {
+          message: err instanceof Error ? err.message : "Unknown error",
+        },
+      });
+
+      await writeEventRecord(db, {
+        eventId,
         action: payload.action,
         idempotencyKey: payload.idempotencyKey,
-      });
-      if (!tokenCheck.ok) {
-        return toJsonResponse(403, { error: tokenCheck.error, traceId });
-      }
-    }
-
-    let orchestratorPayload = null;
-    if (payload.action === "plan" || payload.action === "preview") {
-      orchestratorPayload = {
-        mode: "plan",
-        command: payload.command,
-        target: payload.target,
-        page: payload.page,
-        path: payload.path,
-        file: payload.file,
-      };
-    } else if (payload.action === "apply") {
-      orchestratorPayload = {
-        mode: "apply",
-        command: payload.command,
-        target: payload.target,
-        confirmation: "ship it",
-        page: payload.page,
-        path: payload.path,
-        file: payload.file,
-      };
-    } else if (payload.action === "deploy") {
-      orchestratorPayload = {
-        mode: "deploy",
-        command: payload.command || "Deploy latest changes",
-        target: payload.target,
-        page: payload.page,
-        path: payload.path,
-        file: payload.file,
-      };
-    } else if (payload.action === "rollback") {
-      orchestratorPayload = {
-        mode: "rollback_last",
-        command: payload.command || "Rollback last change",
-        target: payload.target,
-        page: payload.page,
-        path: payload.path,
-        file: payload.file,
-      };
-    }
-
-    const orchestratorResponse = await runOrchestrator(context, orchestratorPayload);
-    const orchestratorResult = await decodeJsonResponse(orchestratorResponse);
-    if (!orchestratorResponse.ok) {
-      throw new Error(orchestratorResult?.error || "Orchestrator request failed.");
-    }
-
-    let result = orchestratorResult;
-    if (payload.action === "preview") {
-      const confirm = await createConfirmToken(env, db, {
-        action: "execute",
-        idempotencyKey: payload.idempotencyKey,
         traceId,
+        status: 500,
+        payload: errorPayload,
       });
-      result = {
-        ...orchestratorResult,
-        ...confirm,
-        confirmInstructions:
-          "Use this confirmToken with the same idempotencyKey for apply, and optionally deploy right after apply.",
-      };
+
+      return toJsonResponse(500, errorPayload, env);
+    } finally {
+      // Log request completion with timing
+      const responseTime = performance.now() - startTime;
+      logger.logRequest(request, responseTime);
+      logger.clearContext();
     }
-
-    const eventPayload = makeEvent({
-      eventType: mapActionToEventType(payload.action),
-      actionPayload: actionRecord,
-      traceId,
-      eventId,
-      result,
-    });
-
-    await writeEventRecord(db, {
-      eventId,
-      action: payload.action,
-      idempotencyKey: payload.idempotencyKey,
-      traceId,
-      status: 200,
-      payload: eventPayload,
-    });
-
-    return toJsonResponse(200, eventPayload);
-  } catch (err) {
-    const errorPayload = makeEvent({
-      eventType: "error",
-      actionPayload: actionRecord,
-      traceId,
-      eventId,
-      error: {
-        message: err instanceof Error ? err.message : "Unknown error",
+  } catch (error) {
+    // This catches errors outside the main try block (e.g., initialization errors)
+    console.error("Execute API critical error:", error);
+    return toJsonResponse(
+      500,
+      {
+        error: "Internal server error",
+        traceId: traceId || "unknown",
       },
-    });
-
-    await writeEventRecord(db, {
-      eventId,
-      action: payload.action,
-      idempotencyKey: payload.idempotencyKey,
-      traceId,
-      status: 500,
-      payload: errorPayload,
-    });
-
-    return toJsonResponse(500, errorPayload);
+      env
+    );
   }
 }

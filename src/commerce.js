@@ -18,25 +18,19 @@ export const handleStripePurchase = async (product, amount, redirectUrl) => {
     throw new Error("Stripe SDK not loaded. Add https://js.stripe.com/v3 to the page.");
   }
 
-  // This assumes a backend endpoint exists to create a session.
-  // Since we don't have a guaranteed backend for this new app,
-  // we might just alert or mock it.
-  // However, existing store.html uses /api/stripe/checkout.
   try {
     const stripe = window.Stripe(STRIPE_PK);
-    const res = await fetch("/api/stripe/checkout", {
+    const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: Math.round(amount * 100),
-        product,
-        label: product,
-        source: "appstore",
+        provider: "stripe",
+        id: product,
         successUrl: redirectUrl,
       }),
     });
     const data = await res.json();
-    if (!data.sessionId) throw new Error("No session");
+    if (!data.sessionId) throw new Error(data.error || "No session");
     await stripe.redirectToCheckout({ sessionId: data.sessionId });
   } catch (err) {
     console.error(err);
@@ -44,34 +38,12 @@ export const handleStripePurchase = async (product, amount, redirectUrl) => {
   }
 };
 
-const getPayPalLink = (sku, env) => {
-  const map = {
-    "project-planning-hub": env.PAYPAL_PAYMENT_LINK_PROJECT_PLANNING_HUB,
-    "ai-web-forge-pro": env.PAYPAL_PAYMENT_LINK_WEB_FORGE,
-    "ai-drive": env.PAYPAL_PAYMENT_LINK_AI_DRIVE,
-    "google-ai-prompts": env.PAYPAL_PAYMENT_LINK_GOOGLE_PROMPTS,
-    starter: env.PAYPAL_PAYMENT_LINK_STARTER,
-    growth: env.PAYPAL_PAYMENT_LINK_GROWTH,
-    enterprise: env.PAYPAL_PAYMENT_LINK_ENTERPRISE,
-    lifetime: env.PAYPAL_PAYMENT_LINK_LIFETIME,
-  };
-  return map[sku] || null;
-};
-
 export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl) => {
-  const env = window.__ENV || {};
-  const link = getPayPalLink(String(sku || "").toLowerCase(), env);
-
-  if (link) {
-    window.location.href = link;
-    return;
-  }
-
   // Load SDK dynamically if not present
   if (!window.paypal_sdk_promise) {
     window.paypal_sdk_promise = (async () => {
       const script = document.createElement("script");
-      script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&components=buttons,card-fields`;
+      script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&components=buttons,card-fields&currency=USD&intent=capture`;
       script.async = true;
       document.head.appendChild(script);
       return new Promise((resolve, reject) => {
@@ -98,7 +70,7 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
   overlay.id = overlayId;
   overlay.style.position = "fixed";
   overlay.style.inset = "0";
-  overlay.style.zIndex = "9999";
+  overlay.style.zIndex = "10000";
   overlay.style.background = "rgba(0,0,0,0.72)";
   overlay.style.backdropFilter = "blur(10px)";
   overlay.style.display = "grid";
@@ -116,7 +88,7 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
           <div style="font-weight:700;">$${Number(amount).toFixed(2)}</div>
         </div>
         <div id="${containerId}"></div>
-        <div style="margin-top:10px; font-size:12px; color:rgba(255,255,255,0.55); font-family:system-ui;">
+        <div id="vtw-paypal-status" style="margin-top:10px; font-size:12px; color:rgba(255,255,255,0.55); font-family:system-ui;">
           You will be redirected after capture.
         </div>
       </div>
@@ -141,19 +113,16 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
   })();
 
   try {
-    // Generate client token for v6 (actually v5/latest standard Buttons but with server-side createOrder)
-    // The user mentioned v6 SDK which uses createInstance, but standard Buttons also work fine with server-side createOrder.
-    // Let's stick to the Buttons API as it's more stable for this use case, but ensure the SDK is loaded.
-
     window.paypal
       .Buttons({
         style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
         createOrder: async () => {
-          const res = await fetch("/api/paypal/order/create", {
+          const res = await fetch("/api/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              sku: String(sku || "")
+              provider: "paypal",
+              id: String(sku || "")
                 .trim()
                 .toLowerCase(),
             }),
@@ -166,20 +135,22 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
         },
         onApprove: async (data) => {
           try {
-            const res = await fetch("/api/paypal/order/capture", {
+            const statusEl = document.getElementById("vtw-paypal-status");
+            if (statusEl) statusEl.textContent = "Capturing payment...";
+
+            const res = await fetch("/api/paypal/capture", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                orderId: data?.orderID,
-                sku: String(sku || "")
-                  .trim()
-                  .toLowerCase(),
-              }),
+              body: JSON.stringify({ orderId: data?.orderID }),
             });
             const cap = await res.json().catch(() => ({}));
             if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
-            close();
-            window.location.href = returnUrl;
+
+            if (statusEl) statusEl.textContent = "Payment successful!";
+            setTimeout(() => {
+              close();
+              window.location.href = returnUrl;
+            }, 1000);
           } catch (err) {
             console.error(err);
             alert("PayPal capture failed.");

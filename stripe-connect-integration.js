@@ -25,14 +25,16 @@ dotenv.config();
  * Get this from: https://dashboard.stripe.com/apikeys
  */
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-if (!STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is required. Set it in your environment variables.");
-}
 
 // Create Stripe client - this will be used for all Stripe requests
-const stripeClient = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: "2026-01-28.clover", // Latest API version
-});
+const stripeClient = STRIPE_SECRET_KEY
+  ? new Stripe(STRIPE_SECRET_KEY, {
+      apiVersion: "2026-01-28.clover", // Latest API version
+    })
+  : null;
+
+// Graceful degradation flag
+const isStripeConfigured = !!stripeClient;
 
 // Express app setup
 const app = express();
@@ -40,8 +42,117 @@ app.use(cors());
 app.use(express.json());
 
 // In-memory database for demo (replace with actual database in production)
+// TODO: Replace with D1 database tables for persistent storage
 const userAccounts = new Map(); // Maps userId -> stripeAccountId
 const userSubscriptions = new Map(); // Maps accountId -> subscription info
+
+/**
+ * Database operations for persistent storage
+ * These should be replaced with actual D1 database operations
+ */
+const dbOperations = {
+  // User account operations
+  async getUserAccount(db, userId) {
+    if (!db) return null;
+    try {
+      const result = await db
+        .prepare("SELECT stripe_account_id FROM user_stripe_accounts WHERE user_id = ? LIMIT 1")
+        .bind(userId)
+        .first();
+      return result?.stripe_account_id || null;
+    } catch (error) {
+      console.error("Failed to get user account:", error);
+      return null;
+    }
+  },
+
+  async setUserAccount(db, userId, stripeAccountId) {
+    if (!db) return false;
+    try {
+      await db
+        .prepare(
+          `INSERT OR REPLACE INTO user_stripe_accounts (user_id, stripe_account_id, created_at) VALUES (?, ?, ?)`
+        )
+        .bind(userId, stripeAccountId, new Date().toISOString())
+        .run();
+      return true;
+    } catch (error) {
+      console.error("Failed to set user account:", error);
+      return false;
+    }
+  },
+
+  // Subscription operations
+  async getSubscription(db, accountId) {
+    if (!db) return null;
+    try {
+      const result = await db
+        .prepare("SELECT subscription_data FROM user_subscriptions WHERE stripe_account_id = ? LIMIT 1")
+        .bind(accountId)
+        .first();
+      return result?.subscription_data ? JSON.parse(result.subscription_data) : null;
+    } catch (error) {
+      console.error("Failed to get subscription:", error);
+      return null;
+    }
+  },
+
+  async setSubscription(db, accountId, subscriptionData) {
+    if (!db) return false;
+    try {
+      await db
+        .prepare(
+          `INSERT OR REPLACE INTO user_subscriptions (stripe_account_id, subscription_data, updated_at) VALUES (?, ?, ?)`
+        )
+        .bind(accountId, JSON.stringify(subscriptionData), new Date().toISOString())
+        .run();
+      return true;
+    } catch (error) {
+      console.error("Failed to set subscription:", error);
+      return false;
+    }
+  },
+};
+
+/**
+ * Initialize database tables for persistent storage
+ */
+const initializeDatabase = async (db) => {
+  if (!db) return;
+
+  try {
+    // User Stripe accounts table
+    await db
+      .prepare(
+        `
+      CREATE TABLE IF NOT EXISTS user_stripe_accounts (
+        user_id TEXT PRIMARY KEY,
+        stripe_account_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+      )
+      .run();
+
+    // User subscriptions table
+    await db
+      .prepare(
+        `
+      CREATE TABLE IF NOT EXISTS user_subscriptions (
+        stripe_account_id TEXT PRIMARY KEY,
+        subscription_data TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    `
+      )
+      .run();
+
+    console.log("Database tables initialized successfully");
+  } catch (error) {
+    console.error("Failed to initialize database tables:", error);
+  }
+};
 
 /**
  * Middleware to verify user is authenticated
@@ -57,6 +168,18 @@ const requireAuth = (req, res, next) => {
 };
 
 /**
+ * Health check endpoint
+ */
+app.get("/api/stripe/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    stripeConnected: isStripeConfigured,
+    mode: isStripeConfigured ? "production" : "degraded",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+/**
  * CREATE CONNECTED ACCOUNT
  *
  * This endpoint creates a new Stripe Connect account for a user
@@ -64,6 +187,14 @@ const requireAuth = (req, res, next) => {
  */
 app.post("/api/stripe/create-account", requireAuth, async (req, res) => {
   try {
+    if (!isStripeConfigured) {
+      return res.status(503).json({
+        error: "Stripe service is not configured. Please contact administrator.",
+        code: "STRIPE_NOT_CONFIGURED",
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     const { displayName, contactEmail } = req.body;
 
     // Validate required fields
@@ -99,8 +230,18 @@ app.post("/api/stripe/create-account", requireAuth, async (req, res) => {
       },
     });
 
-    // Store mapping in our database (replace with actual DB in production)
-    userAccounts.set(req.userId, account.id);
+    // Store mapping in persistent database
+    const db = req.app.locals?.db; // Assuming database is attached to app
+    if (db) {
+      const success = await dbOperations.setUserAccount(db, req.userId, account.id);
+      if (!success) {
+        console.warn("Failed to store user account in database, falling back to memory");
+        userAccounts.set(req.userId, account.id); // Fallback to in-memory
+      }
+    } else {
+      // Fallback to in-memory storage if no database available
+      userAccounts.set(req.userId, account.id);
+    }
 
     console.log(`Created connected account ${account.id} for user ${req.userId}`);
 
@@ -126,7 +267,26 @@ app.post("/api/stripe/create-account", requireAuth, async (req, res) => {
  */
 app.get("/api/stripe/account-status", requireAuth, async (req, res) => {
   try {
-    const accountId = userAccounts.get(req.userId);
+    if (!isStripeConfigured) {
+      return res.status(503).json({
+        error: "Stripe service is not configured. Please contact administrator.",
+        code: "STRIPE_NOT_CONFIGURED",
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const db = req.app.locals?.db;
+    let accountId = null;
+
+    // Try to get from persistent database first
+    if (db) {
+      accountId = await dbOperations.getUserAccount(db, req.userId);
+    }
+
+    // Fallback to in-memory if database lookup fails
+    if (!accountId) {
+      accountId = userAccounts.get(req.userId);
+    }
 
     if (!accountId) {
       return res.status(404).json({
