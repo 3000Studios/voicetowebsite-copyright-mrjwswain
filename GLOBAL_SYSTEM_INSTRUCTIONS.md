@@ -168,12 +168,9 @@ Scripts available:
 - `scripts/husky-install.mjs`
 - `scripts/install-auto-ship-task.ps1`
 - `scripts/jules-setup.sh`
-- `scripts/performance-benchmark.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/ship.mjs`
 - `scripts/sync.mjs`
-- `scripts/test-checkout-flow.mjs`
-- `scripts/test-runner.mjs`
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
 

@@ -145,6 +145,43 @@ describe("/api/execute", () => {
     });
   });
 
+  it("allows read_page for new public pages like partners.html", async () => {
+    const response = await handleExecute({
+      request: makeRequest(
+        {
+          action: "read_page",
+          idempotencyKey: "read-001",
+          page: "partners.html",
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env: {},
+      ctx: {},
+    });
+
+    expect(response.status).toBe(200);
+    expect(lastOrchestratorPayload?.page).toBe("partners.html");
+  });
+
+  it("blocks execute actions from targeting admin pages", async () => {
+    const response = await handleExecute({
+      request: makeRequest(
+        {
+          action: "read_page",
+          idempotencyKey: "read-002",
+          page: "admin.html",
+        },
+        { "x-orch-token": "supersecret" }
+      ),
+      env: {},
+      ctx: {},
+    });
+
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toContain("Admin pages");
+  });
+
   it("returns 401 when auth is missing", async () => {
     const response = await handleExecute({
       request: makeRequest({

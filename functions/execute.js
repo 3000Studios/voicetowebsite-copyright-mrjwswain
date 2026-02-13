@@ -20,27 +20,7 @@ const VALID_ACTIONS = new Set([
 ]);
 const VALID_SAFETY_LEVELS = new Set(["low", "medium", "high"]);
 
-// Valid pages that can be targeted
-const VALID_PAGES = new Set([
-  "index.html",
-  "store.html",
-  "pricing.html",
-  "features.html",
-  "blog.html",
-  "appstore.html",
-  "livestream.html",
-  "about.html",
-  "contact.html",
-  "legal.html",
-  "privacy.html",
-  "terms.html",
-  "support.html",
-  "status.html",
-  "projects.html",
-  "gallery.html",
-  "templates.html",
-  "all", // Special value for targeting all pages
-]);
+const VALID_PAGE_PATTERN = /^[a-z0-9-]+\.html$/;
 
 const toJsonResponse = (status, payload, env) => {
   // Validate response schema only if enabled (default: production only)
@@ -105,12 +85,21 @@ const validatePageName = (page) => {
     return { valid: false, error: "Page name must be a non-empty string" };
   }
 
-  const trimmedPage = page.trim();
-  if (!VALID_PAGES.has(trimmedPage)) {
+  const trimmedPage = page.trim().toLowerCase();
+  if (trimmedPage === "all") {
+    return { valid: true, page: trimmedPage };
+  }
+
+  if (!VALID_PAGE_PATTERN.test(trimmedPage)) {
     return {
       valid: false,
-      error: `Invalid page '${trimmedPage}'. Valid pages: ${Array.from(VALID_PAGES).join(", ")}`,
+      error:
+        "Invalid page format. Use 'all' or an .html filename with lowercase letters, numbers, and dashes (example: partners.html).",
     };
+  }
+
+  if (trimmedPage.startsWith("admin")) {
+    return { valid: false, error: "Admin pages are not allowed for execute actions." };
   }
 
   return { valid: true, page: trimmedPage };
