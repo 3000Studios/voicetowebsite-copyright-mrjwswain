@@ -15,3 +15,8 @@
 
 **Learning:** The custom `Checkout` modal was implemented as a simple `div` with a `fixed` position, completely missing `role="dialog"`, `aria-modal`, and focus management.
 **Action:** Any new custom modal or overlay must immediately be assigned `role="dialog"` and `aria-modal="true"`, and key inputs inside must be explicitly labeled.
+
+## 2026-02-12 - "Instant" Actions Require Immediate Feedback
+
+**Learning:** When a feature is labeled "Instant" (e.g., "Run instant demo"), users expect immediate responsiveness. A delay without feedback breaks the promise of the label and leads to frustration or re-clicks.
+**Action:** Ensure that any action labeled "Instant" provides immediate visual feedback (like a loading state or button text change) on click, bridging the gap between the user's expectation of speed and the actual processing time.
