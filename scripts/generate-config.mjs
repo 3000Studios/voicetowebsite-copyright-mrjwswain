@@ -37,7 +37,8 @@ function processFiles() {
   const pagesSrc = path.join(OPS_SITE, "pages.json");
   if (fs.existsSync(pagesSrc)) {
     const pagesData = JSON.parse(fs.readFileSync(pagesSrc, "utf8"));
-    fs.writeFileSync(path.join(PUBLIC_CONFIG, "registry.json"), JSON.stringify(pagesData, null, 2));
+    const registryPath = path.join(PUBLIC_CONFIG, "registry.json");
+    fs.writeFileSync(registryPath, `${JSON.stringify(pagesData, null, 2)}\n`);
     console.log(`Generated registry.json from pages.json`);
   }
 
