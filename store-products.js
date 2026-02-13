@@ -1,22 +1,26 @@
-const loadProducts = async () => {
+const CATALOG_URL = "/config/products.json";
+
+const loadCatalog = async () => {
+  if (window.__VTW_CATALOG) return window.__VTW_CATALOG;
   try {
-    const res = await fetch("/api/catalog");
-    if (!res.ok) throw new Error("Failed to load catalog");
+    const res = await fetch(CATALOG_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to load ${CATALOG_URL}`);
     const data = await res.json();
-
-    // Unified Schema Support
-    let products = [];
-    if (Array.isArray(data)) {
-      products = data;
-    } else if (data.products || data.apps) {
-      products = [...(data.products || []), ...(data.apps || [])];
-    }
-
-    return products;
+    window.__VTW_CATALOG = data;
+    return data;
   } catch (err) {
-    console.warn("Store loader:", err);
-    return [];
+    console.warn("Catalog loader:", err);
+    return { products: [], apps: [] };
   }
+};
+
+const loadProducts = async () => {
+  const catalog = await loadCatalog();
+  if (Array.isArray(catalog)) return catalog;
+  if (catalog.products || catalog.apps) {
+    return [...(catalog.products || []), ...(catalog.apps || [])];
+  }
+  return [];
 };
 
 const getEnv = () => {
