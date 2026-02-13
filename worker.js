@@ -359,20 +359,43 @@ const verifySignedUrl = async (appId, licenseKey, expires, signature) => {
 };
 
 // Simple dynamic-price PayPal helpers (mirrors existing catalog flow)
-export const createPayPalOrder = async (env, product = {}) => {
-  const amount = toUsdString(product.price);
-  if (!amount) throw new Error("Invalid price.");
-  const currency = (product.currency || "USD").toUpperCase();
+// Simple dynamic-price PayPal helper (supports single item or array)
+export const createPayPalOrder = async (env, itemsOrProduct) => {
+  const items = Array.isArray(itemsOrProduct) ? itemsOrProduct : [itemsOrProduct];
+  if (items.length === 0) throw new Error("No items provided.");
+
+  const total = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const currency = (items[0].currency || "USD").toUpperCase();
+  const amountStr = toUsdString(total);
+
+  if (!amountStr) throw new Error("Invalid total price.");
+
   const body = {
     intent: "CAPTURE",
     purchase_units: [
       {
-        reference_id: product.sku || "custom",
-        description: product.name || "Custom Product",
-        amount: { currency_code: currency, value: amount },
+        reference_id: items[0].sku || "custom",
+        description:
+          items
+            .map((i) => i.name)
+            .join(", ")
+            .slice(0, 127) || "Order",
+        amount: {
+          currency_code: currency,
+          value: amountStr,
+          breakdown: {
+            item_total: { currency_code: currency, value: amountStr },
+          },
+        },
+        items: items.map((i) => ({
+          name: (i.name || "Product").slice(0, 127),
+          unit_amount: { currency_code: currency, value: toUsdString(i.price) },
+          quantity: "1",
+        })),
       },
     ],
   };
+
   const res = await paypalApiFetch(env, "/v2/checkout/orders", {
     method: "POST",
     headers: { Prefer: "return=representation" },
@@ -400,6 +423,17 @@ const toUsdString = (amount) => {
   const n = Number(amount || 0);
   if (!Number.isFinite(n) || n <= 0) return "";
   return n.toFixed(2);
+};
+
+const findProduct = (idOrSlug) => {
+  const searchId = String(idOrSlug || "")
+    .trim()
+    .toLowerCase();
+  if (!searchId) return null;
+  const all = [...(catalog.products || []), ...(catalog.apps || []), ...(catalog.subscriptions || [])];
+  return all.find(
+    (p) => String(p.id || "").toLowerCase() === searchId || String(p.title || "").toLowerCase() === searchId
+  );
 };
 
 const ensureOrdersTable = async (env) => {
@@ -1207,48 +1241,115 @@ export default {
       }
     }
 
-    if (url.pathname === "/api/checkout" && request.method === "POST") {
+    // Unified Checkout API (Stripe + PayPal)
+    // Supports: { provider, id/itemId/product/sku, successUrl, cancelUrl }
+    if (
+      (url.pathname === "/api/checkout" ||
+        url.pathname === "/api/stripe/checkout" ||
+        url.pathname === "/api/paypal/order/create" ||
+        url.pathname === "/api/paypal/create-order") &&
+      request.method === "POST"
+    ) {
       try {
-        const { provider, itemId, id } = await request.clone().json(); // Support both 'id' (prompt) and 'itemId' (legacy)
-        const targetId = id || itemId;
+        const payload = await request
+          .clone()
+          .json()
+          .catch(() => ({}));
+        const provider = String(
+          payload?.provider || (url.pathname.includes("stripe") ? "stripe" : "paypal")
+        ).toLowerCase();
 
-        // 1. Fetch Item from SOT (products.json)
-        const allItems = [...(catalog.products || []), ...(catalog.apps || []), ...(catalog.subscriptions || [])];
-        const item = allItems.find((p) => p.id === targetId);
+        // Multi-item support (basket)
+        const items = Array.isArray(payload?.items) ? payload.items : [];
+        const isBasket = items.length > 0;
 
-        if (!item) return jsonResponse(404, { error: `Item not found: ${targetId}` });
-
-        // 2. PayPal Flow
-        if (provider === "paypal") {
-          const order = await createPayPalOrder(env, {
-            sku: item.id,
-            name: item.name,
-            price: item.price,
-            currency: item.currency || "USD",
+        let normalizedItems = [];
+        if (isBasket) {
+          // Resolve items from catalog if possible
+          normalizedItems = items.map((p) => {
+            const found = findProduct(p.id || p.itemId || p.sku);
+            return found
+              ? {
+                  sku: found.id,
+                  name: found.title,
+                  price: found.price,
+                  currency: found.currency || "USD",
+                  type: found.type,
+                  stripePriceId: found.stripePriceId || found.priceId,
+                }
+              : {
+                  sku: p.id || p.sku || "custom",
+                  name: p.name || p.title || "Custom Item",
+                  price: Number(p.price || 0),
+                  currency: p.currency || "USD",
+                  type: "one-time",
+                };
           });
+        } else {
+          const targetId = String(
+            payload?.id || payload?.itemId || payload?.product || payload?.sku || payload?.productId || ""
+          ).trim();
+          const item = findProduct(targetId);
+          if (item) {
+            normalizedItems = [
+              {
+                sku: item.id,
+                name: item.title,
+                price: item.price,
+                currency: item.currency || "USD",
+                type: item.type,
+                stripePriceId: item.stripePriceId || item.priceId,
+              },
+            ];
+          } else if (targetId) {
+            return jsonResponse(404, {
+              error: `Product not found: ${targetId}`,
+              supported: [...(catalog.products || []), ...(catalog.apps || [])].map((p) => p.id),
+            });
+          }
+        }
+
+        if (normalizedItems.length === 0) {
+          return jsonResponse(400, { error: "No items provided for checkout." });
+        }
+
+        // PayPal Flow
+        if (provider === "paypal") {
+          const order = await createPayPalOrder(env, normalizedItems);
           return jsonResponse(200, { id: order.id, status: order.status || "CREATED" });
         }
 
-        // 3. Stripe Flow
+        // Stripe Flow
         if (provider === "stripe") {
           const stripeKey = env.STRIPE_SECRET_KEY || env.STRIPE_SECRET;
-          if (!stripeKey) throw new Error("Stripe not configured");
-
-          const isSub = item.type === "subscription";
-          const mode = isSub ? "subscription" : "payment";
+          if (!stripeKey) return jsonResponse(501, { error: "Stripe not configured" });
 
           const params = new URLSearchParams();
-          params.append("mode", mode);
-          params.append("success_url", `${url.origin}/success.html`);
-          params.append("cancel_url", `${url.origin}/cancel.html`);
-          params.append("line_items[0][quantity]", "1");
-          params.append("line_items[0][price_data][currency]", (item.currency || "usd").toLowerCase());
-          params.append("line_items[0][price_data][product_data][name]", item.name);
-          params.append("line_items[0][price_data][unit_amount]", Math.round(item.price * 100));
+          const firstItem = normalizedItems[0];
+          const hasSubscription = normalizedItems.some((i) => i.type === "subscription");
+          const mode = hasSubscription ? "subscription" : "payment";
 
-          if (isSub) {
-            params.append("line_items[0][price_data][recurring][interval]", (item.interval || "month").toLowerCase());
-          }
+          params.append("mode", mode);
+          params.append(
+            "success_url",
+            payload?.successUrl || `${url.origin}/store.html?checkout=success&product=${firstItem.sku}`
+          );
+          params.append("cancel_url", payload?.cancelUrl || `${url.origin}/store.html?checkout=cancel`);
+
+          normalizedItems.forEach((item, idx) => {
+            if (item.stripePriceId) {
+              params.append(`line_items[${idx}][price]`, item.stripePriceId);
+              params.append(`line_items[${idx}][quantity]`, "1");
+            } else {
+              params.append(`line_items[${idx}][price_data][currency]`, (item.currency || "USD").toLowerCase());
+              params.append(`line_items[${idx}][price_data][product_data][name]`, item.name);
+              params.append(`line_items[${idx}][price_data][unit_amount]`, Math.round(item.price * 100));
+              params.append(`line_items[${idx}][quantity]`, "1");
+              if (item.type === "subscription") {
+                params.append(`line_items[${idx}][price_data][recurring][interval]`, "month");
+              }
+            }
+          });
 
           const stRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
             method: "POST",
@@ -1260,7 +1361,7 @@ export default {
           });
           const data = await stRes.json();
           if (!stRes.ok) throw new Error(data.error?.message || "Stripe session failed");
-          return jsonResponse(200, { url: data.url, id: data.id });
+          return jsonResponse(200, { url: data.url, sessionId: data.id, id: data.id });
         }
 
         return jsonResponse(400, { error: "Invalid provider" });
@@ -1346,139 +1447,11 @@ export default {
       }
     }
 
-    // PayPal Orders API (dynamic price shortcut)
-    if (url.pathname === "/api/paypal/create-order" && request.method === "POST") {
-      try {
-        const product = await request
-          .clone()
-          .json()
-          .catch(() => ({}));
-        const order = await createPayPalOrder(env, product);
-        return jsonResponse(200, { id: order.id, status: order.status || "CREATED" });
-      } catch (err) {
-        return jsonResponse(500, { error: err.message || "PayPal order create failed." });
-      }
-    }
-
-    if (url.pathname === "/api/paypal/capture-order" && request.method === "POST") {
-      try {
-        const payload = await request
-          .clone()
-          .json()
-          .catch(() => ({}));
-        const capture = await capturePayPalOrder(env, payload?.orderID || payload?.orderId || payload?.id);
-        const cap = capture?.purchase_units?.[0]?.payments?.captures?.[0] || {};
-        return jsonResponse(200, {
-          id: capture?.id,
-          status: capture?.status,
-          captureId: cap.id,
-          amount: cap?.amount?.value,
-          currency: cap?.amount?.currency_code,
-        });
-      } catch (err) {
-        return jsonResponse(500, { error: err.message || "PayPal capture failed." });
-      }
-    }
-
-    // PayPal Orders API (server-side create + capture)
-    if (url.pathname === "/api/paypal/order/create" && request.method === "POST") {
-      try {
-        const payload = await request
-          .clone()
-          .json()
-          .catch(() => ({}));
-
-        const planCatalog = {
-          starter: { amountUsd: 79.0, label: "Starter Site" },
-          growth: { amountUsd: 249.0, label: "Growth Voice" },
-          enterprise: { amountUsd: 699.0, label: "Enterprise Edge" },
-          lifetime: { amountUsd: 4999.0, label: "Lifetime App" },
-        };
-
-        const skuCatalog = {
-          "project-planning-hub": { amountUsd: 49.0, label: "Project Planning Hub" },
-          "ai-web-forge-pro": { amountUsd: 49.99, label: "AI Web Forge Pro" },
-          "ai-drive": { amountUsd: 4.99, label: "AI Drive" },
-          "google-ai-prompts": { amountUsd: 2.99, label: "Google AI Prompts" },
-        };
-
-        const plan = String(payload?.product || payload?.plan || "")
-          .trim()
-          .toLowerCase();
-        const sku = String(payload?.sku || "")
-          .trim()
-          .toLowerCase();
-        const productId = String(payload?.productId || payload?.product_id || "").trim();
-
-        let description = "";
-        let amountUsd = 0;
-        let productRef = "";
-
-        if (sku && skuCatalog[sku]) {
-          description = skuCatalog[sku].label;
-          amountUsd = skuCatalog[sku].amountUsd;
-          productRef = `sku:${sku}`;
-        } else if (plan && planCatalog[plan]) {
-          description = planCatalog[plan].label;
-          amountUsd = planCatalog[plan].amountUsd;
-          productRef = `plan:${plan}`;
-        } else if (productId) {
-          if (!env.D1) return jsonResponse(503, { error: "D1 database not available for product checkout." });
-          const row = await env.D1.prepare("SELECT id, title, price FROM products WHERE id = ? AND active = 1 LIMIT 1")
-            .bind(productId)
-            .first();
-          if (!row) return jsonResponse(404, { error: "Product not found." });
-
-          description = String(row.title || row.id || "Product");
-          amountUsd = Number(row.price || 0);
-          productRef = `product:${String(row.id || productId)}`;
-        } else {
-          return jsonResponse(400, { error: "Missing product. Provide { product: 'starter' } or { productId }." });
-        }
-
-        const amount = toUsdString(amountUsd);
-        if (!amount) return jsonResponse(400, { error: "Invalid product amount." });
-
-        const reqId = crypto?.randomUUID
-          ? crypto.randomUUID()
-          : `vtw-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-
-        const body = {
-          intent: "CAPTURE",
-          purchase_units: [
-            {
-              description: description.slice(0, 127),
-              custom_id: productRef.slice(0, 127),
-              amount: { currency_code: "USD", value: amount },
-            },
-          ],
-        };
-
-        const ppRes = await paypalApiFetch(env, "/v2/checkout/orders", {
-          method: "POST",
-          headers: { "PayPal-Request-Id": reqId, Prefer: "return=representation" },
-          body: JSON.stringify(body),
-        });
-
-        const data = await ppRes.json().catch(() => ({}));
-        if (!ppRes.ok) {
-          const detail =
-            data?.message ||
-            data?.error_description ||
-            data?.error ||
-            data?.details?.[0]?.description ||
-            "PayPal order create failed.";
-          return jsonResponse(ppRes.status || 500, { error: detail });
-        }
-
-        return jsonResponse(200, { id: data.id, status: data.status });
-      } catch (err) {
-        return jsonResponse(500, { error: err.message });
-      }
-    }
-
+    // Unified PayPal Capture
     if (
-      (url.pathname === "/api/paypal/order/capture" || url.pathname === "/api/paypal/capture") &&
+      (url.pathname === "/api/paypal/capture" ||
+        url.pathname === "/api/paypal/order/capture" ||
+        url.pathname === "/api/paypal/capture-order") &&
       request.method === "POST"
     ) {
       try {
@@ -1489,67 +1462,22 @@ export default {
         const orderId = String(payload?.orderId || payload?.orderID || payload?.id || "").trim();
         if (!orderId) return jsonResponse(400, { error: "Missing orderId." });
 
-        const plan = String(payload?.product || payload?.plan || "")
-          .trim()
-          .toLowerCase();
-        const sku = String(payload?.sku || "")
-          .trim()
-          .toLowerCase();
-        const productId = String(payload?.productId || payload?.product_id || "").trim();
-        const expectedRef = sku ? `sku:${sku}` : plan ? `plan:${plan}` : productId ? `product:${productId}` : "";
+        const capture = await capturePayPalOrder(env, orderId);
+        const status = String(capture?.status || "").toLowerCase();
+        const purchaseUnit = capture?.purchase_units?.[0] || {};
+        const cap = purchaseUnit.payments?.captures?.[0] || {};
+        const payerEmail = String(capture?.payer?.email_address || "");
 
-        if (expectedRef) {
-          const getRes = await paypalApiFetch(env, `/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
-            method: "GET",
-          });
-          const getData = await getRes.json().catch(() => ({}));
-          if (!getRes.ok) {
-            const detail = getData?.message || getData?.details?.[0]?.description || "PayPal order lookup failed.";
-            return jsonResponse(getRes.status || 500, { error: detail });
-          }
-          const actualRef = String(getData?.purchase_units?.[0]?.custom_id || "").trim();
-          if (actualRef && actualRef !== expectedRef) {
-            return jsonResponse(400, { error: "Order does not match requested product." });
-          }
-        }
-
-        const capRes = await paypalApiFetch(env, `/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, {
-          method: "POST",
-          headers: { Prefer: "return=representation" },
-          body: JSON.stringify({}),
-        });
-        const capData = await capRes.json().catch(() => ({}));
-        if (!capRes.ok) {
-          const detail =
-            capData?.message ||
-            capData?.details?.[0]?.description ||
-            capData?.error_description ||
-            capData?.error ||
-            "PayPal capture failed.";
-          return jsonResponse(capRes.status || 500, { error: detail });
-        }
-
-        const payerEmail = String(capData?.payer?.email_address || "");
-        const status = String(capData?.status || "").toLowerCase();
-        const captureAmount = Number(
-          capData?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value ||
-            capData?.purchase_units?.[0]?.amount?.value ||
-            0
-        );
-        const currency = String(
-          capData?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code ||
-            capData?.purchase_units?.[0]?.amount?.currency_code ||
-            "USD"
-        );
-        const productRef =
-          expectedRef || String(capData?.purchase_units?.[0]?.custom_id || "").trim() || "paypal:unknown";
+        const captureAmount = Number(cap?.amount?.value || purchaseUnit.amount?.value || 0);
+        const currency = String(cap?.amount?.currency_code || purchaseUnit.amount?.currency_code || "USD");
+        const productRef = String(purchaseUnit.custom_id || "").trim() || "paypal:unknown";
 
         if (env.D1) {
           try {
             await ensureOrdersTable(env);
             const rowId = `paypal:${orderId}`;
             await env.D1.prepare(
-              "INSERT OR IGNORE INTO orders (id, product_id, amount, currency, status, customer_email) VALUES (?, ?, ?, ?, ?, ?)"
+              "INSERT OR REPLACE INTO orders (id, product_id, amount, currency, status, customer_email) VALUES (?, ?, ?, ?, ?, ?)"
             )
               .bind(rowId, productRef, Number.isFinite(captureAmount) ? captureAmount : 0, currency, status, payerEmail)
               .run();
@@ -1560,134 +1488,19 @@ export default {
 
         return jsonResponse(200, {
           ok: true,
+          id: orderId,
           orderId,
           status,
           amount: Number.isFinite(captureAmount) ? captureAmount : 0,
           currency,
+          captureId: cap.id,
         });
       } catch (err) {
         return jsonResponse(500, { error: err.message });
       }
     }
 
-    if (url.pathname === "/api/stripe/checkout" && request.method === "POST") {
-      const stripeSecret = env.STRIPE_SECRET_KEY;
-      if (!stripeSecret) {
-        return jsonResponse(501, {
-          error: "Stripe secret key missing. Set STRIPE_SECRET_KEY.",
-        });
-      }
-      try {
-        const stripeProductCatalog = {
-          starter: {
-            amount: 3900,
-            label: "Starter Site",
-            priceId: env.STRIPE_PRICE_STARTER,
-          },
-          growth: {
-            amount: 9900,
-            label: "Growth Voice",
-            priceId: env.STRIPE_PRICE_GROWTH,
-          },
-          enterprise: {
-            amount: 24900,
-            label: "Enterprise Edge",
-            priceId: env.STRIPE_PRICE_ENTERPRISE,
-          },
-          lifetime: {
-            amount: 49900,
-            label: "Lifetime App",
-            priceId: env.STRIPE_PRICE_LIFETIME,
-          },
-        };
-
-        const payload = await request.clone().json();
-        const product =
-          String(payload?.product || "")
-            .trim()
-            .toLowerCase() || "product";
-
-        const allowCustomAmount = String(env.STRIPE_ALLOW_CUSTOM_AMOUNT || "") === "1";
-        const catalogEntry = stripeProductCatalog[product];
-
-        const label = catalogEntry?.label || String(payload?.label || "VoiceToWebsite");
-        const amount = catalogEntry?.amount ?? Number(payload?.amount || 0);
-        const priceId = (catalogEntry?.priceId ? String(catalogEntry.priceId) : "").trim();
-
-        if (!catalogEntry && !allowCustomAmount) {
-          return jsonResponse(400, {
-            error: "Unknown product. Use a supported product id or enable STRIPE_ALLOW_CUSTOM_AMOUNT=1.",
-            supported: Object.keys(stripeProductCatalog),
-          });
-        }
-
-        // Prefer Price IDs (prevents client-side price tampering). Fallback to amount only when explicitly allowed.
-        const usePriceId = Boolean(priceId);
-        if (!usePriceId) {
-          if (!allowCustomAmount) {
-            return jsonResponse(400, {
-              error:
-                "Stripe price ID not configured for this product. Set STRIPE_PRICE_* vars or enable STRIPE_ALLOW_CUSTOM_AMOUNT=1.",
-              supported: Object.keys(stripeProductCatalog),
-            });
-          }
-          if (!Number.isFinite(amount) || amount <= 0) return jsonResponse(400, { error: "Invalid amount." });
-        }
-
-        const paymentMethodTypes = String(env.STRIPE_PAYMENT_METHOD_TYPES || "card")
-          .split(",")
-          .map((v) => v.trim())
-          .filter(Boolean)
-          .slice(0, 6);
-
-        const origin = `${url.protocol}//${url.host}`;
-        const safeUrl = (maybeUrl, fallback) => {
-          if (!maybeUrl) return fallback;
-          try {
-            const candidate = new URL(String(maybeUrl), origin);
-            if (candidate.origin !== origin) return fallback;
-            return candidate.toString();
-          } catch (_) {
-            return fallback;
-          }
-        };
-        const defaultSuccess = `${origin}/store.html?checkout=success&product=${encodeURIComponent(product)}`;
-        const defaultCancel = `${origin}/store.html?checkout=cancel`;
-        const successUrl = safeUrl(payload?.successUrl, defaultSuccess);
-        const cancelUrl = safeUrl(payload?.cancelUrl, defaultCancel);
-        const form = new URLSearchParams();
-        form.set("mode", "payment");
-        form.set("success_url", successUrl);
-        form.set("cancel_url", cancelUrl);
-        paymentMethodTypes.forEach((t, idx) => form.set(`payment_method_types[${idx}]`, t));
-
-        form.set("line_items[0][quantity]", "1");
-        if (usePriceId) {
-          form.set("line_items[0][price]", priceId);
-        } else {
-          form.set("line_items[0][price_data][currency]", "USD");
-          form.set("line_items[0][price_data][product_data][name]", label);
-          form.set("line_items[0][price_data][unit_amount]", String(Math.round(amount)));
-        }
-        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${stripeSecret}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: form.toString(),
-        });
-        const stripeData = await stripeRes.json();
-        if (!stripeRes.ok || !stripeData?.id) {
-          return jsonResponse(stripeRes.status || 500, {
-            error: stripeData?.error?.message || "Stripe checkout failed.",
-          });
-        }
-        return jsonResponse(200, { sessionId: stripeData.id });
-      } catch (err) {
-        return jsonResponse(500, { error: err.message });
-      }
-    }
+    // (Merged into Unified Checkout above)
 
     // PayPal Webhook Handler (signature-verified)
     // Route: POST /api/paypal-webhook

@@ -104,7 +104,10 @@ export async function handleBotHubRequest({ request, env }) {
   }
 
   if (path === "/api/bot-hub/agents" && request.method === "POST") {
-    const payload = await request.json().catch(() => ({}));
+    const payload = await request
+      .clone()
+      .json()
+      .catch(() => ({}));
     const name = String(payload?.name || "").trim();
     const kind = String(payload?.kind || "agent").trim();
     const endpoint = payload?.endpoint ? String(payload.endpoint).trim() : null;
@@ -125,7 +128,10 @@ export async function handleBotHubRequest({ request, env }) {
   }
 
   if (path === "/api/bot-hub/coordinate" && request.method === "POST") {
-    const payload = await request.json().catch(() => ({}));
+    const payload = await request
+      .clone()
+      .json()
+      .catch(() => ({}));
     const notes = String(payload?.notes || "").trim();
     const agents = Array.isArray(payload?.agents) ? payload.agents.map(String) : [];
     if (!notes) return json(400, { error: "Missing notes." });

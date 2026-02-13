@@ -85,16 +85,18 @@ class InMemoryD1 {
             expires_at: expiresAt,
             used_at: null,
           });
-          return;
+          return { changes: 1 };
         }
 
         if (sql.startsWith("update execute_confirm_tokens set used_at")) {
-          const [usedAt, tokenHash] = params as [string, string];
+          const [usedAt, tokenHash, cutoff] = params as [string, string, string];
           const row = self.confirmTokens.get(tokenHash);
-          if (row) {
-            row.used_at = usedAt;
-            self.confirmTokens.set(tokenHash, row);
-          }
+          if (!row) return { changes: 0 };
+          if (row.used_at) return { changes: 0 };
+          if (new Date(row.expires_at).getTime() <= new Date(cutoff).getTime()) return { changes: 0 };
+          row.used_at = usedAt;
+          self.confirmTokens.set(tokenHash, row);
+          return { changes: 1 };
         }
       },
       async first() {

@@ -83,39 +83,41 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
 
         const button = paypalAny.Buttons({
           style: { layout: "vertical", shape: "rect", label: "paypal" },
-          createOrder: (_data: any, actions: any) => {
-            return actions.order.create({
-              purchase_units: [
-                {
-                  description: items
-                    .map((i) => i.name)
-                    .join(", ")
-                    .slice(0, 127),
-                  amount: {
-                    currency_code: "USD",
-                    value: total.toFixed(2),
-                    breakdown: {
-                      item_total: { currency_code: "USD", value: total.toFixed(2) },
-                    },
-                  },
-                  items: items.map((i) => ({
-                    name: i.name.slice(0, 127),
-                    unit_amount: { currency_code: "USD", value: i.price.toFixed(2) },
-                    quantity: "1",
-                  })),
-                },
-              ],
+          createOrder: async () => {
+            const res = await fetch("/api/checkout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                provider: "paypal",
+                items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, currency: "USD" })),
+              }),
             });
+            const data = await res.json();
+            if (!res.ok || !data.id) throw new Error(data.error || "Order creation failed");
+            return data.id;
           },
-          onApprove: async (_data: any, actions: any) => {
+          onApprove: async (data: any) => {
             setProcessing(true);
-            await actions.order.capture();
-            setProcessing(false);
-            setSuccess(true);
-            setTimeout(() => {
-              setSuccess(false);
-              onClose();
-            }, 1800);
+            try {
+              const res = await fetch("/api/paypal/capture", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId: data.orderID }),
+              });
+              const cap = await res.json();
+              if (!res.ok || !cap.ok) throw new Error(cap.error || "Capture failed");
+
+              setProcessing(false);
+              setSuccess(true);
+              setTimeout(() => {
+                setSuccess(false);
+                onClose();
+              }, 1800);
+            } catch (err) {
+              console.error(err);
+              alert("Capture failed.");
+              setProcessing(false);
+            }
           },
           onError: (err: any) => {
             console.error("PayPal error", err);

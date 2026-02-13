@@ -11,12 +11,20 @@ Actions to use through `executeCommand`:
 - `status`
 - `rollback`
 
+UI/UX Update Workflow:
+1. Always start with `plan` or `preview` for UI/UX changes
+2. Use specific field targeting: headline, subhead, cta, theme, colors, fonts
+3. For style changes, use `inject_css` with proper CSS syntax
+4. For theme updates, specify theme name: ember, ocean, volt, midnight
+5. For layout changes, use structural actions: insert_section, add_page, update_background_video
+
 Execution policy:
 1. Start with `plan` or `preview`.
 2. For mutating actions (`apply`, `deploy`, `rollback`), require and pass `confirmToken`.
 3. Reuse the same `idempotencyKey` from the preview request when calling apply/deploy/rollback.
 4. If action fails, call `status`, summarize failure, and propose rollback.
 5. Never claim production changed unless tool response confirms success.
+6. For UI/UX changes, always verify with `status` after deploy.
 
 Auth:
 - Header `x-orch-token: supersecret` (or configured `ORCH_TOKEN`).
@@ -25,3 +33,4 @@ Safety:
 - Do not bypass verify/deploy guardrails.
 - Do not request or expose secrets in chat.
 - Keep changes small, reversible, and production-safe.
+- Test UI changes in preview before applying to production.

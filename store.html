@@ -266,9 +266,7 @@
         lifetime: (window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_LIFETIME) || "",
       };
       const handleStripe = async (btn) => {
-        const amount = btn.dataset.amount;
         const product = btn.dataset.product;
-        const label = btn.dataset.label;
         try {
           const link = (STRIPE_LINKS[String(product || "").toLowerCase()] || "").trim();
           if (link) {
@@ -276,23 +274,23 @@
             return;
           }
           const stripe = Stripe(STRIPE_PK);
-          const res = await fetch("/api/stripe/checkout", {
+          const res = await fetch("/api/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount, product, label, source: "store" }),
+            body: JSON.stringify({ provider: "stripe", id: product }),
           });
           const data = await res.json();
-          if (!data.sessionId) throw new Error("No session");
+          if (!data.sessionId) throw new Error(data.error || "No session");
           await stripe.redirectToCheckout({ sessionId: data.sessionId });
         } catch (err) {
-          alert("Stripe checkout not configured. Please set STRIPE_PUBLISHABLE_KEY and backend endpoint.");
+          alert("Stripe checkout failed. " + err.message);
           console.warn(err);
         }
       };
       const handlePayPal = (btn) => {
-        const amount = btn.dataset.amount;
         const product = btn.dataset.product;
         const label = btn.dataset.label || product;
+        const amount = btn.dataset.amount;
 
         const link = (PAYPAL_LINKS[String(product || "").toLowerCase()] || "").trim();
         if (link) {
@@ -305,19 +303,14 @@
           return;
         }
         if (!window.paypal) {
-          if (!PAYPAL_CLIENT) {
-            alert("PayPal client ID missing (env var not set).");
-            return;
-          }
           const script = document.createElement("script");
-          script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT}&currency=USD`;
+          script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT}&currency=USD&intent=capture`;
           script.onload = () => handlePayPal(btn);
           document.head.appendChild(script);
           return;
         }
 
         const dollars = (Number(amount || 0) / 100).toFixed(2);
-
         const overlayId = "vtw-paypal-overlay";
         const containerId = "vtw-paypal-buttons";
 
@@ -328,7 +321,7 @@
         overlay.id = overlayId;
         overlay.style.position = "fixed";
         overlay.style.inset = "0";
-        overlay.style.zIndex = "9999";
+        overlay.style.zIndex = "10000";
         overlay.style.background = "rgba(0,0,0,0.72)";
         overlay.style.backdropFilter = "blur(10px)";
         overlay.style.display = "grid";
@@ -346,6 +339,9 @@
             <div style="font-weight:700;">$${dollars}</div>
           </div>
           <div id="${containerId}"></div>
+          <div id="vtw-paypal-status" style="margin-top:10px; font-size:12px; color:rgba(255,255,255,0.55); font-family:system-ui;">
+            You will be redirected after capture.
+          </div>
         </div>
       `;
 
@@ -361,10 +357,10 @@
           .Buttons({
             style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
             createOrder: async () => {
-              const res = await fetch("/api/paypal/order/create", {
+              const res = await fetch("/api/checkout", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ product }),
+                body: JSON.stringify({ provider: "paypal", id: product }),
               });
               const data = await res.json().catch(() => ({}));
               if (!res.ok || !data?.id) {
@@ -374,15 +370,22 @@
             },
             onApprove: async (data) => {
               try {
-                const res = await fetch("/api/paypal/order/capture", {
+                const statusEl = document.getElementById("vtw-paypal-status");
+                if (statusEl) statusEl.textContent = "Capturing payment...";
+
+                const res = await fetch("/api/paypal/capture", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ orderId: data?.orderID, product }),
+                  body: JSON.stringify({ orderId: data?.orderID }),
                 });
                 const cap = await res.json().catch(() => ({}));
                 if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
-                close();
-                window.location.href = `/store.html?checkout=success&product=${encodeURIComponent(product || "")}`;
+
+                if (statusEl) statusEl.textContent = "Payment successful!";
+                setTimeout(() => {
+                  close();
+                  window.location.href = `/store.html?checkout=success&product=${encodeURIComponent(product || "")}`;
+                }, 1000);
               } catch (err) {
                 console.warn(err);
                 alert("PayPal capture failed.");

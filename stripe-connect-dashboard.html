@@ -360,11 +360,26 @@
         margin-bottom: 1rem;
         color: #ef4444;
       }
+
+      .warning-message {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: #fbbf24;
+      }
     </style>
 
     <script>
       // Configuration - Replace with your actual API base URL
-      const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
+      const API_BASE_URL = process.env.API_BASE_URL || "https://voicetowebsite.com";
+
+      // Message timeout constants
+      const MESSAGE_TIMEOUTS = {
+        default: 5000,
+        warning: 8000,
+      };
 
       // Mock user ID - In production, get this from your authentication system
       const USER_ID = "demo-user-" + Math.random().toString(36).substr(2, 9);
@@ -375,8 +390,24 @@
         "X-User-ID": USER_ID,
       };
 
+      // Check API health on load
+      async function checkAPIHealth() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/stripe/health`);
+          const health = await response.json();
+
+          if (!health.stripeConnected) {
+            showWarning("Stripe is not configured. Some features may not work properly.");
+          }
+        } catch (error) {
+          console.error("API health check failed:", error);
+          showError("Unable to connect to the server. Please check your connection.");
+        }
+      }
+
       // Initialize dashboard
       document.addEventListener("DOMContentLoaded", async () => {
+        await checkAPIHealth();
         await loadAccountStatus();
         await loadSubscriptionStatus();
       });
@@ -729,13 +760,17 @@
         showMessage(message, "error");
       }
 
+      function showWarning(message) {
+        showMessage(message, "warning");
+      }
+
       function showInfo(message) {
         showMessage(message, "info");
       }
 
       function showMessage(message, type) {
         // Remove existing messages
-        document.querySelectorAll(".success-message, .error-message").forEach((el) => el.remove());
+        document.querySelectorAll(".success-message, .error-message, .warning-message").forEach((el) => el.remove());
 
         const messageDiv = document.createElement("div");
         messageDiv.className = `${type}-message`;
@@ -743,8 +778,9 @@
 
         document.querySelector("main").insertBefore(messageDiv, document.querySelector("main").firstChild);
 
-        // Auto-remove after 5 seconds
-        setTimeout(() => messageDiv.remove(), 5000);
+        // Auto-remove after configured timeout
+        const timeout = MESSAGE_TIMEOUTS[type] || MESSAGE_TIMEOUTS.default;
+        setTimeout(() => messageDiv.remove(), timeout);
       }
 
       // Check for onboarding completion from URL parameters

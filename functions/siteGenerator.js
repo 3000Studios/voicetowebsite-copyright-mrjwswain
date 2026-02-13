@@ -318,7 +318,7 @@ export async function handleGenerateRequest({ request, env }) {
         transcript = String(whisper?.text || whisper?.result?.text || whisper?.transcription || "");
       }
     } else {
-      prompt = String(await request.text());
+      prompt = String(await request.clone().text());
     }
   } catch (err) {
     return json(400, { error: `Invalid request body: ${err.message}` });
@@ -444,7 +444,7 @@ export async function handlePublishRequest({ request, env }) {
   await ensureSiteTables(env);
   let body;
   try {
-    body = await request.json();
+    body = await request.clone().json();
   } catch (_) {
     body = {};
   }

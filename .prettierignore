@@ -2,8 +2,10 @@ dist
 node_modules
 .wrangler
 .git
+test-results
 black-vault
 Media
 app Store apps to Sell
 app.js
 DEPOSIT.md
+CODE_REVIEW_FIXES.md

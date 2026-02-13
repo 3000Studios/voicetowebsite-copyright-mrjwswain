@@ -12,20 +12,6 @@ const loadProducts = async () => {
       products = [...(data.products || []), ...(data.apps || [])];
     }
 
-    // Inject Dropship Engine (Frontend Only Feature)
-    products.unshift({
-      id: "dropship-engine-pro",
-      type: "product",
-      title: "Dropship Description Engine",
-      name: "Dropship Description Engine",
-      label: "Best Seller",
-      desc: "Auto-generate viral, SEO-optimized product descriptions from a single image or link. Workers AI powered.",
-      price: 199.0,
-      currency: "USD",
-      stripePaymentLink: "",
-      stripeBuyButtonId: "buy_btn_1QweRtZyX",
-    });
-
     return products;
   } catch (err) {
     console.warn("Store loader:", err);
@@ -126,7 +112,7 @@ const openPayPalModal = async (product) => {
   const modal = document.createElement("div");
   modal.className = "vt-pay-modal";
   modal.innerHTML = `
-    <div class="vt-pay-shell">
+    <div class="vt-pay-shell" style="z-index: 10000">
       <button class="vt-pay-close" type="button" aria-label="Close">X</button>
       <div class="vt-pay-title">Checkout</div>
       <div class="vt-pay-sub">${product.title}</div>
@@ -154,7 +140,7 @@ const openPayPalModal = async (product) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             provider: "paypal",
-            itemId: product.id,
+            id: product.id,
           }),
         });
         const data = await res.json();
@@ -163,15 +149,17 @@ const openPayPalModal = async (product) => {
       },
       onApprove: async (data) => {
         // Capture
-        const res = await fetch("/api/paypal/capture-order", {
+        const note = modal.querySelector(".vt-pay-note");
+        if (note) note.textContent = "Capturing payment...";
+
+        const res = await fetch("/api/paypal/capture", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderID: data.orderID }),
+          body: JSON.stringify({ orderId: data.orderID }),
         });
         const cap = await res.json();
-        if (!res.ok) throw new Error(cap.error || "Capture failed");
+        if (!res.ok || !cap.ok) throw new Error(cap.error || "Capture failed");
 
-        const note = modal.querySelector(".vt-pay-note");
         if (note) note.textContent = "Payment successful!";
         setTimeout(close, 1500);
       },
@@ -208,33 +196,25 @@ const openStripeCheckout = async (product) => {
 
   const stripe = getStripeClient();
   if (!stripe) {
-    alert("Stripe client is not available on this page.");
-    return;
-  }
-
-  const amount = dollarsToCents(product.price);
-  if (!amount) {
-    alert("Invalid product amount.");
+    alert("Stripe client is not available on this page. Make sure Stripe SDK is loaded.");
     return;
   }
 
   try {
-    const res = await fetch("/api/stripe/checkout", {
+    const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount,
-        product: product.id || product.title || "product",
-        label: product.title || "Product",
-        source: "store-products",
+        provider: "stripe",
+        id: product.id,
       }),
     });
     const data = await res.json();
-    if (!data.sessionId) throw new Error("No session");
+    if (!data.sessionId) throw new Error(data.error || "No session");
     await stripe.redirectToCheckout({ sessionId: data.sessionId });
   } catch (err) {
     console.warn(err);
-    alert("Stripe checkout failed. Check STRIPE_SECRET_KEY + /api/stripe/checkout.");
+    alert("Stripe checkout failed. " + err.message);
   }
 };
 

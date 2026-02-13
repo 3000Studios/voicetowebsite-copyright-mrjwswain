@@ -268,6 +268,19 @@ const { before, after } = updateDoc();
 const normalizedBefore = before.replace(/\r\n/g, "\n");
 const formattedAfter = await formatMarkdown(after);
 
+// Write the formatted file first
+fs.writeFileSync(DOC_PATH, formattedAfter, "utf8");
+
+// Then format with prettier to ensure consistency
+try {
+  const prettier = await import("prettier");
+  const prettierFormatted = await prettier.format(formattedAfter, { parser: "markdown" });
+  const finalContent = prettierFormatted.replace(/\r\n/g, "\n");
+  fs.writeFileSync(DOC_PATH, finalContent, "utf8");
+} catch {
+  // Keep the formatted version if prettier fails
+}
+
 if (normalizedBefore === formattedAfter) {
   process.exit(0);
 }
@@ -277,5 +290,4 @@ if (CHECK_ONLY) {
   process.exit(1);
 }
 
-fs.writeFileSync(DOC_PATH, formattedAfter, "utf8");
 console.log("Updated GLOBAL_SYSTEM_INSTRUCTIONS.md");
