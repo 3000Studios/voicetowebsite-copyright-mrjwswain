@@ -5,4 +5,14 @@
     window.location.href = "/admin/access.html";
     return;
   }
+
+  // Check if authenticated (signed admin cookie) before allowing access to admin pages.
+  // This is a UX guard; server-side endpoints still enforce auth.
+  fetch("/api/config/status", { credentials: "include" })
+    .then((res) => {
+      if (!res.ok) throw new Error("unauthorized");
+    })
+    .catch(() => {
+      window.location.href = "/admin/login.html";
+    });
 })();

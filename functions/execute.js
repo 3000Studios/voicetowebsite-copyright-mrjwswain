@@ -166,6 +166,16 @@ const hasValidHeaderToken = (request, env) => {
   return provided === getOrchestratorToken(env);
 };
 
+const isSameOriginRequest = (request) => {
+  const origin = request.headers.get("origin");
+  if (!origin) return true; // Non-browser or same-origin fetch without Origin header.
+  try {
+    return origin === new URL(request.url).origin;
+  } catch (_) {
+    return false;
+  }
+};
+
 const getCookieValue = (cookieHeader, name) => {
   const parts = String(cookieHeader || "").split(";");
   for (const part of parts) {
@@ -616,6 +626,13 @@ export async function onRequestPost(context) {
       method: request.method,
       url: request.url,
     });
+
+    const usesHeaderToken = hasValidHeaderToken(request, env);
+
+    // CSRF defense-in-depth for cookie-authenticated browser requests.
+    if (!usesHeaderToken && !isSameOriginRequest(request)) {
+      return toJsonResponse(403, { error: "Forbidden.", traceId }, env);
+    }
 
     if (!(await isAuthorized(request, env))) {
       logger.logSecurity("Unauthorized access attempt", {

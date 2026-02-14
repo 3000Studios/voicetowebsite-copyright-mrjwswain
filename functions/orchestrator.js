@@ -562,6 +562,13 @@ Rules:
     if (!owner || !repo) throw new Error("GITHUB_REPO must be owner/repo.");
     return { owner, repo };
   };
+  const getAllPagesHtmlLimit = () => {
+    const raw = String(env.ORCH_MAX_ALL_PAGES_HTML || env.ORCH_MAX_ALL_PAGES_FILES || "").trim();
+    const n = raw ? Number(raw) : 10;
+    if (!Number.isFinite(n) || n <= 0) return 10;
+    // Keep below typical Worker subrequest limits to avoid platform errors.
+    return Math.min(Math.floor(n), 25);
+  };
   let rootHtmlFileCache = null;
   const listRootHtmlFiles = async (ref) => {
     if (rootHtmlFileCache) return rootHtmlFileCache;
@@ -891,6 +898,12 @@ Rules:
       try {
         const discovered = await listRootHtmlFiles(GITHUB_BASE_BRANCH);
         if (discovered.length) {
+          const limit = getAllPagesHtmlLimit();
+          if (discovered.length > limit) {
+            throw new Error(
+              `Too many pages requested (${discovered.length}). Limit is ${limit} pages per request to avoid Worker subrequest limits. Specify a page (e.g. 'pricing.html') or raise ORCH_MAX_ALL_PAGES_HTML.`
+            );
+          }
           allSiteHtmlFiles = discovered;
           return allSiteHtmlFiles;
         }
@@ -1355,8 +1368,12 @@ Rules:
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-    });
+    const message = err?.message || String(err);
+    const lower = message.toLowerCase();
+    let status = 500;
+    if (lower.includes("missing command") || lower.includes("confirmation required")) status = 400;
+    if (lower.includes("too many pages requested")) status = 413;
+    if (lower.includes("too many subrequests")) status = 429;
+    return new Response(JSON.stringify({ error: message }), { status });
   }
 }

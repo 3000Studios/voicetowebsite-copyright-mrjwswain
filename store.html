@@ -274,7 +274,17 @@
           </article>
         </div>
         <p class="subhead">Products are managed in Admin → Store Manager and rendered here automatically.</p>
-        <section class="store-products" aria-label="Products">
+        <section class="store-products" aria-label="Apps for sale">
+          <div class="store-products-head">
+            <div>
+              <p class="eyebrow">Apps for sale</p>
+              <h3 class="store-products-title">Auto-scrolling 3D carousel</h3>
+              <p class="muted">Hover or touch to pause. Search above filters this carousel instantly.</p>
+            </div>
+            <div class="store-products-actions">
+              <button type="button" class="ghost" id="vtw-carousel-toggle">Pause</button>
+            </div>
+          </div>
           <div class="store-product-scene" id="store-product-scene"></div>
         </section>
       </section>
@@ -486,20 +496,20 @@
         }
       } catch (_) {}
       const storeSearch = document.getElementById("storeSearch");
-      const storeCards = Array.from(document.querySelectorAll(".pricing-deck .card"));
+      const storeCards = Array.from(document.querySelectorAll(".storefront-card"));
 
       // Store search filter logic
       const filterStore = () => {
         if (!storeSearch) return;
         const term = storeSearch.value.trim().toLowerCase();
 
-        // Filter pricing deck
+        // Filter storefront pricing cards
         storeCards.forEach((card) => {
           const text = card.textContent.toLowerCase();
           card.style.display = text.includes(term) ? "" : "none";
         });
 
-        // Filter product scene
+        // Filter product carousel
         document.querySelectorAll("#store-product-scene .vt-store-card").forEach((card) => {
           const text = card.textContent.toLowerCase();
           card.style.display = text.includes(term) ? "" : "none";

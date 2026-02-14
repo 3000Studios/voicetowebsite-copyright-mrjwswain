@@ -11,7 +11,9 @@
 
   let activeSessionId = "";
   let pollTimer = 0;
+  let speakTimer = 0;
   let speakEnabled = false;
+  let lastSpokenIdBySession = Object.create(null);
 
   const setSpeakEnabled = (next) => {
     speakEnabled = Boolean(next);
@@ -107,6 +109,9 @@
     await loadMessages(activeSessionId);
     if (pollTimer) window.clearInterval(pollTimer);
     pollTimer = window.setInterval(() => loadMessages(activeSessionId), 2500);
+
+    // Reset speech cursor per-session to avoid reading stale messages on switch.
+    if (!lastSpokenIdBySession[activeSessionId]) lastSpokenIdBySession[activeSessionId] = "";
   };
 
   const sendReply = async () => {
@@ -190,9 +195,10 @@
     setSpeakEnabled(false);
     wire();
     await loadSessions();
-    // Speak the most recent customer message when a new one arrives (simple: speak after reload if last sender is customer).
-    let lastSpokenId = "";
-    window.setInterval(async () => {
+
+    // Speak the most recent customer message when a new one arrives.
+    if (speakTimer) window.clearInterval(speakTimer);
+    speakTimer = window.setInterval(async () => {
       if (!activeSessionId || !speakEnabled) return;
       try {
         const data = await fetchJson(`/api/support/admin/messages?sessionId=${encodeURIComponent(activeSessionId)}`);
@@ -200,12 +206,22 @@
         const last = msgs[msgs.length - 1];
         if (!last) return;
         const id = String(last.id || "");
+        const lastSpokenId = lastSpokenIdBySession[activeSessionId] || "";
         if (id && id === lastSpokenId) return;
-        lastSpokenId = id;
+        lastSpokenIdBySession[activeSessionId] = id;
         if (String(last.sender) === "customer") speak(last.message);
         renderMessages(msgs);
       } catch (_) {}
     }, 3000);
+
+    const cleanup = () => {
+      if (pollTimer) window.clearInterval(pollTimer);
+      if (speakTimer) window.clearInterval(speakTimer);
+      try {
+        window.speechSynthesis?.cancel?.();
+      } catch (_) {}
+    };
+    window.addEventListener("beforeunload", cleanup);
   };
 
   boot().catch(() => {});

@@ -7,6 +7,7 @@
     <meta name="description" content="Project progress tracker for the Material Vault OS." />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
+    <script type="module" src="./access-guard.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap"
       rel="stylesheet"
@@ -200,13 +201,7 @@
   </head>
   <body>
     <div class="video-bg" aria-hidden="true">
-      <video
-        src="https://cdn.coverr.co/videos/coverr-admin-dashboard-8765/1080p.mp4"
-        autoplay
-        muted
-        loop
-        playsinline
-      ></video>
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
     </div>
     <div class="noise-overlay" aria-hidden="true"></div>
 
@@ -349,7 +344,8 @@
           currentPhaseEl.textContent = "Current phase: —";
         }
 
-        localStorage.setItem("progress-cache", JSON.stringify(progressData));
+        // Session-only to avoid persisting admin notes/prompts on disk.
+        sessionStorage.setItem("progress-cache", JSON.stringify(progressData));
 
         if (progressData.phases && progressData.phases.length) {
           progressData.phases.forEach((phase) => {
@@ -409,10 +405,10 @@
 
                 const textarea = document.createElement("textarea");
                 textarea.placeholder = "Paste the prompt you sent to a bot here to mark this task in progress.";
-                textarea.value = localStorage.getItem(`prompt-${prompt.id}`) || "";
+                textarea.value = sessionStorage.getItem(`prompt-${prompt.id}`) || "";
 
                 const markInProgress = () => {
-                  localStorage.setItem(`prompt-${prompt.id}`, textarea.value);
+                  sessionStorage.setItem(`prompt-${prompt.id}`, textarea.value);
                   if (item && item.status === \"todo\") {
                     item.status = \"in_progress\";
                     item.updatedAt = new Date().toISOString().slice(0, 10);
@@ -532,7 +528,7 @@
       function exportJson() {
         if (!progressData) return;
         const data = JSON.stringify(progressData, null, 2);
-        localStorage.setItem("progress-cache", data);
+        sessionStorage.setItem("progress-cache", data);
         const blob = new Blob([data], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -547,7 +543,7 @@
       async function copyJson() {
         if (!progressData) return;
         const data = JSON.stringify(progressData, null, 2);
-        localStorage.setItem("progress-cache", data);
+        sessionStorage.setItem("progress-cache", data);
         try {
           await navigator.clipboard.writeText(data);
           copyBtn.textContent = "Copied";
@@ -575,7 +571,7 @@
             console.warn("Failed to load", url, error);
           }
         }
-        const cached = localStorage.getItem("progress-cache");
+        const cached = sessionStorage.getItem("progress-cache");
         if (cached) {
           progressData = JSON.parse(cached);
           render();

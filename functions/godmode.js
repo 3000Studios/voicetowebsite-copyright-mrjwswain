@@ -68,6 +68,12 @@ export async function onRequestPost(context) {
     const okAdmin = await isAdminRequest(request, env);
     if (!okAdmin) return json(401, { error: "Unauthorized. Admin access required.", traceId });
 
+    // CSRF defense-in-depth for cookie-authenticated browser requests.
+    const origin = request.headers.get("origin");
+    if (origin && origin !== new URL(request.url).origin) {
+      return json(403, { error: "Forbidden", traceId });
+    }
+
     const body = await request.json().catch(() => null);
     const rawInput = String(body?.rawInput || body?.command || "").trim();
     if (!rawInput) return json(400, { error: "Missing rawInput.", traceId });
@@ -82,7 +88,8 @@ export async function onRequestPost(context) {
     const enrichedCommand = buildEnrichedCommand(rawInput, ioo);
 
     // Orchestrator plan (preview stage)
-    const orchestratorReq = new Request("https://internal/api/orchestrator", {
+    const orchestratorUrl = new URL("/api/orchestrator", request.url).toString();
+    const orchestratorReq = new Request(orchestratorUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

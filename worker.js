@@ -1,6 +1,7 @@
 import {
   clearAdminCookieHeaders,
   hasValidAdminCookie,
+  isAdminEnabled,
   isAdminRequest,
   mintAdminCookieValue,
   setAdminCookieHeaders,
@@ -556,7 +557,10 @@ export default {
         const body = await request.clone().json();
         const { accessCode } = body;
 
-        const validAccessCode = String(env.ADMIN_ACCESS_CODE || "VTW-ADMIN-2026").trim();
+        const validAccessCode = String(env.ADMIN_ACCESS_CODE || "").trim();
+        if (!validAccessCode) {
+          return createErrorResponse(503, "Admin access code is not configured", "ADMIN_ACCESS_DISABLED");
+        }
 
         if (!accessCode || String(accessCode).trim() !== validAccessCode) {
           return createErrorResponse(401, "Invalid access code", "INVALID_ACCESS_CODE");
@@ -574,8 +578,11 @@ export default {
 
     // Admin auth (server-issued, signed cookie)
     if (url.pathname === "/api/admin/login" && request.method === "POST") {
-      // Admin enabled check bypassed per USER REQUEST
       try {
+        if (!isAdminEnabled(env)) {
+          return jsonResponse(503, { error: "Admin is disabled. Set CONTROL_PASSWORD to enable admin login." });
+        }
+
         const contentType = request.headers.get("content-type") || "";
         let password = "";
         let email = "";
@@ -594,13 +601,17 @@ export default {
           password = String(await request.clone().text());
         }
 
-        const validPassword = String(env.CONTROL_PASSWORD || "5555").trim();
-        const validEmail = String(env.ADMIN_EMAIL || "mr.jwswain@gmail.com")
+        const validPassword = String(env.CONTROL_PASSWORD || "").trim();
+        const validEmail = String(env.ADMIN_EMAIL || "")
           .trim()
           .toLowerCase();
         const providedEmail = String(email || "")
           .trim()
           .toLowerCase();
+
+        if (!validPassword) {
+          return jsonResponse(503, { error: "Admin is disabled. Set CONTROL_PASSWORD to enable admin login." });
+        }
 
         if (!password || String(password).trim() !== validPassword || (validEmail && providedEmail !== validEmail)) {
           return jsonResponse(401, { error: "Invalid credentials." });
@@ -941,6 +952,15 @@ export default {
 
     // Cloudflare zone analytics proxy (real data only)
     if (url.pathname === "/api/analytics/overview" && request.method === "GET") {
+      const hasAdmin = await hasValidAdminCookie(request, env);
+      if (!hasAdmin) {
+        return jsonResponse(401, { error: "Unauthorized" });
+      }
+      const isAdmin = await isAdminRequest(request, env);
+      if (!isAdmin) {
+        return jsonResponse(401, { error: "Unauthorized. Admin access required." });
+      }
+
       const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
       const apiToken =
         env.CF_API_TOKEN ||
@@ -1034,13 +1054,8 @@ export default {
         window: "24h",
         commands: commands?.count || 0,
         errors: errors?.count || 0,
-        deployments: {
-          success: 0,
-          failed: 0,
-        },
-        revenue: {
-          usd: 0,
-        },
+        deployments: null,
+        revenue: null,
         ts: new Date().toISOString(),
       });
     }
@@ -1060,219 +1075,22 @@ export default {
 
     // App Store Purchase API
     if (url.pathname === "/api/apps/purchase" && request.method === "POST") {
-      try {
-        const body = await request.clone().json();
-        const { appId, email, provider } = body;
-
-        if (!appId || !email || !provider) {
-          return jsonResponse(400, { error: "Missing required fields: appId, email, provider" });
-        }
-
-        // Find the app in catalog
-        const app = catalog.apps?.find((a) => a.id === appId);
-        if (!app) {
-          return jsonResponse(404, { error: "App not found" });
-        }
-
-        // Generate license key
-        const licenseKey =
-          "VTW-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-
-        // Store order if D1 is available
-        let orderId = `order-${Date.now()}`;
-        if (env.D1) {
-          try {
-            await env.D1.prepare(
-              `INSERT INTO orders (id, product_id, amount, customer_email, status, license_key) VALUES (?, ?, ?, ?, ?, ?)`
-            )
-              .bind(orderId, appId, app.price * 100, email, "pending", licenseKey)
-              .run();
-          } catch (err) {
-            console.error("Failed to store order:", err);
-          }
-        }
-
-        if (provider === "paypal") {
-          // Create PayPal order
-          const paypalOrder = await createPayPalOrder(env, {
-            price: app.price,
-            name: app.title,
-            sku: appId,
-            currency: "USD",
-          });
-
-          const redirectUrl = paypalOrder.links?.find((link) => link.rel === "approve")?.href;
-          if (!redirectUrl) {
-            return createErrorResponse(500, "Failed to generate PayPal redirect URL", "PAYPAL_REDIRECT_ERROR");
-          }
-
-          return jsonResponse(200, {
-            success: true,
-            orderId: paypalOrder.id,
-            licenseKey: licenseKey,
-            redirectUrl: redirectUrl,
-            timestamp: new Date().toISOString(),
-          });
-        } else {
-          return createErrorResponse(400, "Unsupported payment provider", "UNSUPPORTED_PROVIDER");
-        }
-      } catch (err) {
-        return createErrorResponse(500, err.message, "PURCHASE_ERROR");
-      }
+      return jsonResponse(410, { error: "Deprecated. Use /api/checkout for payments." });
     }
 
     // App Store Download API
     if (url.pathname.startsWith("/api/apps/download/") && request.method === "GET") {
-      try {
-        const pathParts = url.pathname.split("/");
-        const appId = pathParts[pathParts.length - 1];
-        const license = url.searchParams.get("license");
-        const expires = url.searchParams.get("expires");
-        const signature = url.searchParams.get("sig");
-
-        if (!appId || !license || !expires || !signature) {
-          return createErrorResponse(
-            400,
-            "Missing required parameters: appId, license, expires, sig",
-            "MISSING_PARAMS"
-          );
-        }
-
-        // Verify signed URL and expiration
-        if (!verifySignedUrl(env, appId, license, expires, signature)) {
-          return createErrorResponse(401, "Invalid or expired download URL", "INVALID_URL");
-        }
-
-        // Find the app in catalog
-        const app = catalog.apps?.find((a) => a.id === appId);
-        if (!app) {
-          return createErrorResponse(404, "App not found", "APP_NOT_FOUND");
-        }
-
-        // Enhanced license validation with database check
-        let isValidLicense = false;
-        if (env.D1) {
-          try {
-            const result = await env.D1.prepare(
-              `SELECT id, status FROM orders WHERE license_key = ? AND product_id = ? AND status = 'completed'`
-            )
-              .bind(license, appId)
-              .first();
-            isValidLicense = !!result;
-          } catch (err) {
-            console.error("Database validation failed:", err);
-          }
-        }
-
-        // Fallback to basic validation if database unavailable
-        if (!isValidLicense) {
-          isValidLicense = license.startsWith("VTW-") && license.length > 10;
-        }
-
-        if (!isValidLicense) {
-          return createErrorResponse(401, "Invalid license key", "INVALID_LICENSE");
-        }
-
-        // Return secure download URL
-        const downloadUrl = `/downloads/${appId.replace(/\s+/g, "-").toLowerCase()}.zip`;
-        return jsonResponse(200, {
-          success: true,
-          downloadUrl: downloadUrl,
-          filename: `${app.title.replace(/\s+/g, "-").toLowerCase()}.zip`,
-          timestamp: new Date().toISOString(),
-        });
-      } catch (err) {
-        return createErrorResponse(500, err.message, "DOWNLOAD_ERROR");
-      }
+      return jsonResponse(410, { error: "Deprecated. Use direct /downloads/*.zip links." });
     }
 
     // App Store License Verification API
     if (url.pathname === "/api/apps/verify-license" && request.method === "POST") {
-      try {
-        const body = await request.clone().json();
-        const { appId, licenseKey } = body;
-
-        if (!appId || !licenseKey) {
-          return createErrorResponse(400, "Missing appId or licenseKey", "MISSING_PARAMS");
-        }
-
-        // Enhanced license validation with database check
-        let isValid = false;
-        let expiresAt = null;
-
-        if (env.D1) {
-          try {
-            const result = await env.D1.prepare(
-              `SELECT created_at FROM orders WHERE license_key = ? AND product_id = ? AND status = 'completed'`
-            )
-              .bind(licenseKey, appId)
-              .first();
-
-            if (result) {
-              isValid = true;
-              // License expires 1 year from purchase
-              expiresAt = new Date(new Date(result.created_at).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
-            }
-          } catch (err) {
-            console.error("Database validation failed:", err);
-          }
-        }
-
-        // Fallback to basic validation if database unavailable
-        if (!isValid) {
-          isValid = licenseKey.startsWith("VTW-") && licenseKey.length > 10;
-          if (isValid) {
-            expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
-          }
-        }
-
-        return jsonResponse(200, {
-          success: true,
-          valid: isValid,
-          appId: appId,
-          expiresAt: expiresAt,
-          timestamp: new Date().toISOString(),
-        });
-      } catch (err) {
-        return createErrorResponse(500, err.message, "VERIFICATION_ERROR");
-      }
+      return jsonResponse(410, { error: "Deprecated." });
     }
 
     // App Store PayPal Capture API
     if (url.pathname === "/api/apps/paypal/capture" && request.method === "POST") {
-      try {
-        const body = await request.clone().json();
-        const { orderId, licenseKey } = body;
-
-        if (!orderId || !licenseKey) {
-          return createErrorResponse(400, "Missing orderId or licenseKey", "MISSING_PARAMS");
-        }
-
-        // Capture PayPal payment
-        const capture = await capturePayPalOrder(env, orderId);
-
-        // Update order status in database if available
-        if (env.D1) {
-          try {
-            await env.D1.prepare(
-              `UPDATE orders SET status = 'completed', updated_at = datetime('now') WHERE license_key = ? AND status = 'pending'`
-            )
-              .bind(licenseKey)
-              .run();
-          } catch (err) {
-            console.error("Failed to update order status:", err);
-          }
-        }
-
-        return jsonResponse(200, {
-          success: true,
-          orderId: orderId,
-          status: "completed",
-          timestamp: new Date().toISOString(),
-        });
-      } catch (err) {
-        return createErrorResponse(500, err.message, "CAPTURE_ERROR");
-      }
+      return jsonResponse(410, { error: "Deprecated. Use /api/paypal/capture." });
     }
 
     // Orders API (D1 backed)
@@ -1322,6 +1140,65 @@ export default {
 
         const { results } = await env.D1.prepare("SELECT * FROM orders ORDER BY ts DESC LIMIT 50").all();
         return jsonResponse(200, { results: results || [] });
+      }
+    }
+
+    // Sales statistics (real data only; reads D1 orders table)
+    if (url.pathname === "/api/sales/stats" && request.method === "GET") {
+      const hasAdmin = await hasValidAdminCookie(request, env);
+      if (!hasAdmin) return jsonResponse(401, { error: "Unauthorized" });
+      const isAdmin = await isAdminRequest(request, env);
+      if (!isAdmin) return jsonResponse(401, { error: "Unauthorized. Admin access required." });
+
+      if (!env.D1) {
+        return jsonResponse(501, { error: "Sales database not configured (D1 missing)." });
+      }
+
+      try {
+        // Ensure orders table exists; if empty, zeros are real.
+        await env.D1.prepare(
+          `CREATE TABLE IF NOT EXISTS orders (
+             id TEXT PRIMARY KEY,
+             product_id TEXT,
+             amount REAL,
+             currency TEXT DEFAULT 'USD',
+             status TEXT DEFAULT 'completed',
+             customer_email TEXT,
+             ts DATETIME DEFAULT CURRENT_TIMESTAMP
+           );`
+        ).run();
+
+        const recent = await env.D1.prepare(
+          "SELECT id, ts, product_id, amount, currency, status FROM orders ORDER BY ts DESC LIMIT 25"
+        ).all();
+        const summary = await env.D1.prepare(
+          "SELECT COUNT(*) AS total_orders, COALESCE(SUM(amount), 0) AS total_amount FROM orders"
+        ).first();
+
+        const totalOrders = Number(summary?.total_orders || 0);
+        const totalAmount = Number(summary?.total_amount || 0);
+        const looksLikeCents = totalAmount > 1000 && Number.isInteger(totalAmount);
+        const totalRevenueUsd = looksLikeCents ? totalAmount / 100 : totalAmount;
+
+        return jsonResponse(200, {
+          total_orders: totalOrders,
+          total_revenue_usd: totalRevenueUsd,
+          recent_orders: (recent.results || []).map((row) => {
+            const amt = typeof row.amount === "number" ? row.amount : Number(row.amount || 0);
+            const amtLooksLikeCents = amt > 1000 && Number.isInteger(amt);
+            return {
+              id: row.id,
+              ts: row.ts,
+              product_id: row.product_id,
+              currency: row.currency || "USD",
+              status: row.status || null,
+              amount_usd: amtLooksLikeCents ? amt / 100 : amt,
+            };
+          }),
+          ts: new Date().toISOString(),
+        });
+      } catch (err) {
+        return jsonResponse(500, { error: err.message });
       }
     }
 
@@ -1766,11 +1643,21 @@ export default {
       }
     }
 
+    const ADMIN_PUBLIC_PATHS = new Set([
+      "/admin/access.html",
+      "/admin/login.html",
+      "/admin/admin.css",
+      "/admin/access-guard.js",
+    ]);
     const isAdminRoot = url.pathname === "/admin" || url.pathname === "/admin/" || url.pathname === "/admin/index.html";
-    if (url.pathname.startsWith("/admin/") && !isAdminRoot) {
-      const hasAdmin = await hasValidAdminCookie(request, env);
-      if (!hasAdmin) {
-        return Response.redirect(new URL("/admin/", url.origin), 302);
+    if (url.pathname.startsWith("/admin/") || isAdminRoot) {
+      const isPublic = ADMIN_PUBLIC_PATHS.has(url.pathname);
+      if (!isPublic) {
+        const hasAdmin = await hasValidAdminCookie(request, env);
+        const isAdmin = hasAdmin ? await isAdminRequest(request, env) : false;
+        if (!hasAdmin || !isAdmin) {
+          return Response.redirect(new URL("/admin/access.html", url.origin), 302);
+        }
       }
     }
 
@@ -1788,6 +1675,17 @@ export default {
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await assets.fetch(new Request(adminUrl, request));
       return addSecurityHeaders(res, { cacheControl: "no-store", pragmaNoCache: true });
+    }
+
+    // Canonical storefront
+    if (
+      url.pathname === "/appstore" ||
+      url.pathname === "/appstore/" ||
+      url.pathname === "/appstore.html" ||
+      url.pathname === "/appstore-new" ||
+      url.pathname === "/appstore-new.html"
+    ) {
+      return Response.redirect(new URL("/store", url.origin), 302);
     }
 
     if (cleanPath && !cleanPath.includes(".") && cleanPath !== "/") {

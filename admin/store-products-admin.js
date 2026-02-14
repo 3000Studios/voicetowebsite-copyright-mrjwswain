@@ -3,13 +3,18 @@ const productForm = document.getElementById("product-form");
 const productClear = document.getElementById("product-clear");
 const productsReset = document.getElementById("products-reset");
 const productsCount = document.getElementById("products-count");
+const readonly = Boolean(document.getElementById("product-form")?.dataset?.mode === "readonly");
 
 const loadProducts = async () => {
   try {
-    const res = await fetch("/api/products");
+    const res = await fetch("/api/catalog", { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to load products");
     const data = await res.json();
-    return Array.isArray(data) ? data : [];
+    if (Array.isArray(data)) return data;
+    if (data && (Array.isArray(data.products) || Array.isArray(data.apps))) {
+      return Array.isArray(data.products) ? data.products : [];
+    }
+    return [];
   } catch (err) {
     console.warn("Product loader:", err);
     return [];
@@ -51,6 +56,7 @@ const renderProducts = async () => {
 };
 
 productTableBody?.addEventListener("click", async (e) => {
+  if (readonly) return;
   const btn = e.target.closest("button[data-product-remove]");
   if (!btn) return;
   const id = btn.getAttribute("data-product-remove");
@@ -69,6 +75,10 @@ productTableBody?.addEventListener("click", async (e) => {
 
 productForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (readonly) {
+    alert("This manager is read-only. Edit products.json and redeploy to change inventory.");
+    return;
+  }
   const formData = new FormData(productForm);
   const title = formData.get("title")?.toString() || "";
 

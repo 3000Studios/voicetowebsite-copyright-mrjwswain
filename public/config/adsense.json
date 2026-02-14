@@ -1,9 +1,5 @@
 {
-  "enabled": true,
-  "clientId": "ca-pub-1234567890123456",
-  "slots": {
-    "home_top": "1234567890",
-    "blog_sidebar": "0987654321",
-    "store_bottom": "1122334455"
-  }
+  "enabled": false,
+  "clientId": "ca-pub-5800977493749262",
+  "slots": {}
 }

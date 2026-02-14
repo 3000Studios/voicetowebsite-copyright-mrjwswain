@@ -84,6 +84,7 @@ const brief = (env) => ({
 export async function handleBotHubRequest({ request, env }) {
   const url = new URL(request.url);
   const path = url.pathname;
+  const origin = request.headers.get("origin");
 
   if (!env.D1) return json(503, { error: "D1 database not available." });
   await ensureBotHubTables(env);
@@ -95,6 +96,11 @@ export async function handleBotHubRequest({ request, env }) {
   // Everything else is admin-only (protects AI usage + prevents abuse).
   const isAdmin = await isAdminRequest(request, env);
   if (!isAdmin) return json(401, { error: "Admin required." });
+
+  // CSRF defense-in-depth for cookie-authenticated browser requests.
+  if (request.method !== "GET" && origin && origin !== url.origin) {
+    return json(403, { error: "Forbidden." });
+  }
 
   if (path === "/api/bot-hub/agents" && request.method === "GET") {
     const agents = await env.D1.prepare(

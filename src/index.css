@@ -286,6 +286,42 @@ iframe {
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
 }
 
+.glass-nav .brand-video-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(56, 189, 248, 0.22);
+  flex: 0 0 auto;
+}
+
+.glass-nav .brand-video,
+.glass-nav .brand-fallback {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.glass-nav .brand-video {
+  filter: saturate(1.1) contrast(1.05);
+}
+
+.glass-nav .brand {
+  text-decoration: none;
+  color: inherit;
+}
+
+.glass-nav .brand:focus-visible {
+  outline: 2px solid rgba(56, 189, 248, 0.8);
+  outline-offset: 6px;
+  border-radius: 14px;
+}
+
 .glass-nav .brand-name {
   color: #fff;
   white-space: nowrap;

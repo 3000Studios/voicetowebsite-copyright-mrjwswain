@@ -6,6 +6,7 @@
     <title>God Mode Voice Command Center</title>
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="/admin/admin.css" />
+    <script src="/admin/access-guard.js" type="module" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -753,33 +754,33 @@
         <div class="metrics-grid" id="profitMetrics">
           <div class="profit-metric">
             <span>Daily Revenue Est.</span>
-            <strong id="metricDaily">$450</strong>
-            <small style="color: #31f6b6">+32% vs last 7d</small>
+            <strong id="metricDaily">—</strong>
+            <small class="muted">Not connected</small>
           </div>
           <div class="profit-metric">
             <span>Monthly Revenue Est.</span>
-            <strong id="metricMonthly">$12.9K</strong>
-            <small style="color: #31f6b6">Pipeline active</small>
+            <strong id="metricMonthly">—</strong>
+            <small class="muted">Not connected</small>
           </div>
           <div class="profit-metric">
             <span>Subscription MRR</span>
-            <strong id="metricMRR">$7.4K</strong>
-            <small style="color: #facc15">Churn 2.1%</small>
+            <strong id="metricMRR">—</strong>
+            <small class="muted">Not connected</small>
           </div>
           <div class="profit-metric">
             <span>Affiliate Clicks</span>
-            <strong id="metricAffiliate">4,820</strong>
-            <small style="color: #38b6ff">+287 today</small>
+            <strong id="metricAffiliate">—</strong>
+            <small class="muted">Not connected</small>
           </div>
           <div class="profit-metric">
             <span>Ad RPM</span>
-            <strong id="metricRPM">$18.40</strong>
-            <small>Auto layout mode</small>
+            <strong id="metricRPM">—</strong>
+            <small class="muted">Not connected</small>
           </div>
           <div class="profit-metric">
             <span>Lead Conversion</span>
-            <strong id="metricLeads">158</strong>
-            <small>SMS follow-up on</small>
+            <strong id="metricLeads">—</strong>
+            <small class="muted">Not connected</small>
           </div>
         </div>
         <div class="profit-actions">
@@ -797,8 +798,8 @@
           Strategy output will be displayed here once the engine responds.
         </div>
         <div class="plan-output" id="revenueEstimate" style="min-height: 120px">
-          <small>Revenue Estimate</small>
-          Daily $0 • Monthly $0 • Yearly $0
+          <small>Estimated Revenue (AI)</small>
+          Daily — • Monthly — • Yearly —
         </div>
         <div class="plan-output" id="diffPreview" style="min-height: 120px">
           <small>Diff + Preview</small>
@@ -931,8 +932,6 @@
     </div>
 
     <script>
-      /* ADMIN GUARD REMOVED */
-
       const pipelineStages = [
         "intent",
         "strategy",
@@ -1070,7 +1069,7 @@
       const HISTORY_KEY = "vtw-command-history";
       const renderHistory = () => {
         if (!historyList) return;
-        const items = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+        const items = JSON.parse(sessionStorage.getItem(HISTORY_KEY) || "[]");
         historyList.innerHTML = "";
         if (!items.length) {
           historyList.innerHTML = "<li>No recent commands yet.</li>";
@@ -1085,14 +1084,14 @@
 
       const logCommand = (text) => {
         if (!text) return;
-        const items = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+        const items = JSON.parse(sessionStorage.getItem(HISTORY_KEY) || "[]");
         items.unshift({ text, ts: new Date().toISOString() });
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 30)));
+        sessionStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 30)));
         renderHistory();
       };
 
       document.getElementById("clearHistory")?.addEventListener("click", () => {
-        localStorage.removeItem(HISTORY_KEY);
+        sessionStorage.removeItem(HISTORY_KEY);
         renderHistory();
       });
 
@@ -1112,10 +1111,13 @@
           data.plan || data.output?.plan || data.output || data
         )}`;
         const revenue = data.estimatedRevenue || data.revenue || data.output?.estimatedRevenue;
+        const fmtMoney = (v) => (typeof v === "number" && Number.isFinite(v) ? `$${v.toFixed(2)}` : "—");
         if (revenue) {
-          revenueEstimate.innerHTML = `<small>Revenue Estimate</small>Daily $${revenue.daily || 0} • Monthly $${
-            revenue.monthly || 0
-          } • Yearly $${revenue.yearly || 0}`;
+          revenueEstimate.innerHTML = `<small>Estimated Revenue (AI)</small>Daily ${fmtMoney(
+            revenue.daily
+          )} • Monthly ${fmtMoney(revenue.monthly)} • Yearly ${fmtMoney(revenue.yearly)}`;
+        } else {
+          revenueEstimate.innerHTML = `<small>Estimated Revenue (AI)</small>Daily — • Monthly — • Yearly —`;
         }
         if (data.diff) {
           diffPreview.innerHTML = `<small>Diff + Preview</small>${stringify(data.diff)}`;
@@ -1153,6 +1155,7 @@
           if (!response.ok) {
             responseBox.innerHTML = `<small>Command Output</small>❌ Error: ${data.error || "Unknown error"}`;
             setPipelineStage("diff", { error: true });
+            endPipeline(false);
             return;
           }
 
@@ -1175,6 +1178,7 @@
           responseBox.innerHTML = `<small>Command Output</small>❌ Network Error: ${error.message}`;
           console.error("Command execution error:", error);
           setPipelineStage("strategy", { error: true });
+          endPipeline(false);
         }
       }
 
@@ -1231,7 +1235,7 @@
         responseBox.innerHTML = "<small>Command Output</small>Command responses will appear here...";
         planPreview.innerHTML =
           "<small>Revenue Strategy Output</small>Strategy output will be displayed here once the engine responds.";
-        revenueEstimate.innerHTML = "<small>Revenue Estimate</small>Daily $0 • Monthly $0 • Yearly $0";
+        revenueEstimate.innerHTML = "<small>Estimated Revenue (AI)</small>Daily — • Monthly — • Yearly —";
         diffPreview.innerHTML = "<small>Diff + Preview</small>Awaiting diff output.";
         confirmTokenBox.innerHTML = "<small>Confirm Token</small>Hash-locked token will appear once build is ready.";
         transcriptBox.textContent = "Waiting for voice input...";

@@ -9,12 +9,12 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
+    <script type="module" src="./access-guard.js"></script>
   </head>
   <body>
-    <!-- ADMIN GUARD & LOCK SCREEN REMOVED -->
-    <video autoplay muted loop playsinline class="video-bg">
-      <source src="https://cdn.coverr.co/videos/coverr-admin-dashboard-8765/1080p.mp4" type="video/mp4" />
-    </video>
+    <div class="admin-video-bg" aria-hidden="true">
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+    </div>
     <div class="noise-overlay" aria-hidden="true"></div>
 
     <div class="admin-shell">
@@ -24,8 +24,7 @@
           id="livestream-setup"
           style="
             background-image:
-              linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-              url(&quot;https://res.cloudinary.com/dj92eb97f/video/upload/v1766986161/Fire_jlrw9r.mp4&quot;);
+              linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url(&quot;/vtw-wallpaper.png&quot;);
             background-size: cover;
             background-position: center;
           "

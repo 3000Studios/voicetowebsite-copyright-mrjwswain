@@ -9,12 +9,12 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
+    <script type="module" src="./access-guard.js"></script>
   </head>
   <body>
-    <!-- ADMIN GUARD & LOCK SCREEN REMOVED -->
-    <video autoplay muted loop playsinline class="video-bg">
-      <source src="https://cdn.coverr.co/videos/coverr-admin-dashboard-8765/1080p.mp4" type="video/mp4" />
-    </video>
+    <div class="admin-video-bg" aria-hidden="true">
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+    </div>
     <div class="noise-overlay" aria-hidden="true"></div>
 
     <div class="admin-shell">
@@ -24,8 +24,7 @@
           id="store-manager"
           style="
             background-image:
-              linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-              url(&quot;https://res.cloudinary.com/dj92eb97f/video/upload/v1766986144/bluechain_rzflnz.mp4&quot;);
+              linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(&quot;/vtw-wallpaper.png&quot;);
             background-size: cover;
             background-position: center;
           "
@@ -39,8 +38,8 @@
               </p>
             </div>
             <div class="status-strip">
-              <span class="status-chip" id="products-count">0 products</span>
-              <button class="ghost small" id="products-reset" type="button">Seed</button>
+              <span class="status-chip" id="products-count">— products</span>
+              <button class="ghost small" id="products-reset" type="button">Refresh</button>
             </div>
           </div>
 
@@ -67,7 +66,7 @@
             </div>
 
             <div class="app-block">
-              <form id="product-form" class="app-form">
+              <form id="product-form" class="app-form" data-mode="readonly">
                 <div class="form-row">
                   <div class="form-group">
                     <label>Title</label>
@@ -114,9 +113,20 @@
                 </div>
 
                 <div class="form-actions">
-                  <button class="primary" type="submit">Add product</button>
+                  <button
+                    class="primary"
+                    type="submit"
+                    disabled
+                    title="Catalog is file-based. Edit products.json and redeploy."
+                  >
+                    Add product
+                  </button>
                   <button class="ghost" type="button" id="product-clear">Clear</button>
                 </div>
+                <p class="muted small" style="margin-top: 10px">
+                  This page is read-only in production. To change inventory, edit <code>products.json</code> and
+                  redeploy.
+                </p>
               </form>
             </div>
           </div>
@@ -124,7 +134,6 @@
       </main>
     </div>
 
-    <script type="module" src="./admin.js"></script>
     <script type="module" src="./store-products-admin.js"></script>
     <script type="module" src="../nav.js"></script>
   </body>

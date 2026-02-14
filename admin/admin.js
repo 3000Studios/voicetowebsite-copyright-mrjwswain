@@ -284,14 +284,23 @@ const clearSession = () => {
 };
 
 const touchSession = () => {
-  if (sessionStorage.getItem(UNLOCK_KEY) === "true") {
+  if (sessionStorage.getItem("adminAccessValidated") === "true") {
     sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
   }
 };
 
-// Worker already gates access. If we are here, we are authenticated.
-// Only lock if explicitly requested.
-const isUnlocked = () => true; // Security removed per USER REQUEST
+const isUnlocked = () => {
+  try {
+    if (sessionStorage.getItem("adminAccessValidated") !== "true") return false;
+    // Best-effort TTL to reduce risk if someone walks away with an unlocked browser tab.
+    if (!isSessionFresh()) {
+      sessionStorage.setItem(UNLOCK_TS_KEY, String(Date.now()));
+    }
+    return true;
+  } catch (_) {
+    return false;
+  }
+};
 
 const setLockedUI = (locked) => {
   lockScreen.style.display = locked ? "grid" : "none";
@@ -303,7 +312,8 @@ const setLockedUI = (locked) => {
 };
 
 const initPasscodeGate = () => {
-  // Passcode gate removed per USER REQUEST
+  // Server endpoints enforce authentication. This is just a client-side UX gate.
+  touchSession();
   setLockedUI(false);
 };
 

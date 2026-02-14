@@ -1,4 +1,5 @@
-const CATALOG_URL = "/config/products.json";
+// Prefer the Worker-backed catalog so pages never drift from server truth.
+const CATALOG_URL = "/api/catalog";
 
 const loadCatalog = async () => {
   if (window.__VTW_CATALOG) return window.__VTW_CATALOG;
@@ -52,31 +53,119 @@ const dollarsToCents = (dollars) => {
   return Math.round(n * 100);
 };
 
-const wireTilt = () => {
-  const cards = document.querySelectorAll(".vt-store-card");
-  cards.forEach((card) => {
-    card.addEventListener(
-      "mousemove",
-      (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
-        card.style.transform = `perspective(1000px) translateY(-10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      },
-      { passive: true }
-    );
-    card.addEventListener(
-      "mouseleave",
-      () => {
-        card.style.transform = "perspective(1000px) translateY(0) rotateX(0) rotateY(0)";
-      },
-      { passive: true }
-    );
+const setupCarousel = (scene) => {
+  if (!scene) return () => {};
+
+  const reduceMotion = Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const toggleBtn = document.getElementById("vtw-carousel-toggle");
+
+  let paused = reduceMotion;
+  let resumeTimer = null;
+  let raf = 0;
+  let scrollRaf = 0;
+
+  const setPaused = (next) => {
+    paused = Boolean(next);
+    if (toggleBtn) toggleBtn.textContent = paused ? "Play" : "Pause";
+  };
+
+  setPaused(paused);
+
+  const scheduleResume = (ms = 1200) => {
+    if (reduceMotion) return;
+    if (resumeTimer) window.clearTimeout(resumeTimer);
+    resumeTimer = window.setTimeout(() => setPaused(false), ms);
+  };
+
+  const compute3d = () => {
+    const rect = scene.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const cards = Array.from(scene.querySelectorAll(".vt-store-card"));
+    cards.forEach((card) => {
+      if (card.style.display === "none") return;
+      const cr = card.getBoundingClientRect();
+      const cardCenter = cr.left + cr.width / 2;
+      const dist = (cardCenter - centerX) / Math.max(rect.width, 1);
+      const abs = Math.min(Math.abs(dist) * 1.7, 1);
+
+      const rotateY = dist * -28;
+      const scale = 1 - abs * 0.18;
+      const z = (1 - abs) * 120;
+      const lift = (1 - abs) * -8;
+      const opacity = 0.55 + (1 - abs) * 0.45;
+
+      card.style.transform = `perspective(1200px) translateZ(${z}px) translateY(${lift}px) rotateY(${rotateY}deg) scale(${scale})`;
+      card.style.opacity = String(opacity);
+    });
+  };
+
+  const onScroll = () => {
+    if (scrollRaf) return;
+    scrollRaf = window.requestAnimationFrame(() => {
+      scrollRaf = 0;
+      compute3d();
+    });
+  };
+
+  const step = () => {
+    if (!paused) {
+      scene.scrollLeft += 0.6;
+      if (scene.scrollLeft >= scene.scrollWidth - scene.clientWidth - 2) {
+        scene.scrollLeft = 0;
+      }
+    }
+    compute3d();
+    raf = window.requestAnimationFrame(step);
+  };
+
+  toggleBtn?.addEventListener("click", () => {
+    setPaused(!paused);
   });
+
+  scene.addEventListener("scroll", onScroll, { passive: true });
+
+  // Touch/hover pauses so buying is easy.
+  scene.addEventListener(
+    "pointerenter",
+    () => {
+      setPaused(true);
+    },
+    { passive: true }
+  );
+  scene.addEventListener(
+    "pointerleave",
+    () => {
+      scheduleResume(800);
+    },
+    { passive: true }
+  );
+  scene.addEventListener(
+    "pointerdown",
+    () => {
+      setPaused(true);
+    },
+    { passive: true }
+  );
+  scene.addEventListener(
+    "wheel",
+    () => {
+      setPaused(true);
+      scheduleResume(1400);
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("resize", compute3d, { passive: true });
+  compute3d();
+  raf = window.requestAnimationFrame(step);
+
+  return () => {
+    if (resumeTimer) window.clearTimeout(resumeTimer);
+    if (raf) window.cancelAnimationFrame(raf);
+    if (scrollRaf) window.cancelAnimationFrame(scrollRaf);
+    scene.removeEventListener("scroll", onScroll);
+    window.removeEventListener("resize", compute3d);
+  };
 };
 
 const ensurePayPalSdk = async () => {
@@ -237,6 +326,65 @@ const injectStripeBuyButton = (host, buyButtonId) => {
   return true;
 };
 
+const openPreviewModal = (product) => {
+  const id = String(product?.id || "").trim();
+  if (!id) return;
+
+  const existing = document.getElementById("vtw-preview-modal");
+  if (existing) existing.remove();
+
+  const title = String(product?.title || "Preview");
+  const previewUrl = String(product?.previewUrl || "").trim();
+  const downloadUrl = String(product?.downloadUrl || "").trim();
+
+  const modal = document.createElement("div");
+  modal.id = "vtw-preview-modal";
+  modal.className = "vt-preview-modal";
+
+  modal.innerHTML = `
+    <div class="vt-preview-shell" role="dialog" aria-modal="true" aria-label="${title.replace(/"/g, "&quot;")}">
+      <div class="vt-preview-head">
+        <div>
+          <div class="vt-preview-kicker">Preview</div>
+          <div class="vt-preview-title">${title}</div>
+        </div>
+        <button class="vt-preview-close" type="button" aria-label="Close">✕</button>
+      </div>
+      <div class="vt-preview-body">
+        ${
+          previewUrl
+            ? `<iframe class="vt-preview-frame" src="${previewUrl}" title="${title.replace(
+                /"/g,
+                "&quot;"
+              )}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>`
+            : `<div class="vt-preview-empty muted">No live preview is available for this item.</div>`
+        }
+      </div>
+      <div class="vt-preview-actions">
+        ${previewUrl ? `<a class="vt-preview-link" href="${previewUrl}" target="_blank" rel="noopener">Open in new tab</a>` : ""}
+        ${downloadUrl ? `<a class="vt-preview-link" href="${downloadUrl}" download>Download</a>` : ""}
+        <div class="vt-preview-spacer"></div>
+        <div class="vt-preview-price">$${formatPrice(product?.price)} USD</div>
+      </div>
+    </div>
+  `;
+
+  const close = () => modal.remove();
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) close();
+  });
+  modal.querySelector(".vt-preview-close")?.addEventListener("click", close);
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key === "Escape") close();
+    },
+    { once: true }
+  );
+
+  document.body.appendChild(modal);
+};
+
 const renderProducts = (scene, products) => {
   scene.innerHTML = "";
 
@@ -247,6 +395,8 @@ const renderProducts = (scene, products) => {
 
     const buyButtonId = String(product.stripeBuyButtonId || "").trim();
     const canEmbedBuyButton = Boolean(buyButtonId && getStripePublishableKey());
+    const canPreview = Boolean(String(product.previewUrl || "").trim());
+    const canDownload = Boolean(String(product.downloadUrl || "").trim());
 
     card.innerHTML = `
       <div class="glint"></div>
@@ -264,6 +414,18 @@ const renderProducts = (scene, products) => {
         <span class="label">${product.label || "Product"}</span>
         <h2 class="title">${product.title || "Untitled"}</h2>
         <p class="description">${product.desc || ""}</p>
+      </div>
+      <div class="meta-row">
+        ${
+          canPreview
+            ? `<button class="mini-link" type="button" data-action="preview">Preview</button>`
+            : `<span class="mini-link mini-link--disabled" aria-disabled="true">Preview</span>`
+        }
+        ${
+          canDownload
+            ? `<a class="mini-link" href="${String(product.downloadUrl).trim()}" download>Download</a>`
+            : `<span class="mini-link mini-link--disabled" aria-disabled="true">Download</span>`
+        }
       </div>
       <div class="lock-indicator" aria-hidden="true">
         <div class="lock-icon">
@@ -307,23 +469,46 @@ const init = async () => {
   scene.innerHTML =
     '<div class="muted type-small" style="padding:2rem; text-align:center; opacity:0.6;">Loading inventory...</div>';
 
-  const products = await loadProducts();
-  if (!products.length) {
+  const allItems = await loadProducts();
+  const products = allItems.filter((p) => String(p?.type || "").toLowerCase() === "app");
+  const renderList = products.length ? products : allItems;
+
+  if (!renderList.length) {
     scene.innerHTML = '<div class="muted" style="padding:2rem; text-align:center;">No products available.</div>';
     return;
   }
 
-  renderProducts(scene, products);
-  wireTilt();
+  renderProducts(scene, renderList);
+  setupCarousel(scene);
 
   document.addEventListener("click", async (e) => {
+    const previewBtn = e.target.closest('button[data-action="preview"]');
     const paypalBtn = e.target.closest(".buy-btn-paypal");
     const stripeBtn = e.target.closest(".buy-btn-stripe");
+    const card = e.target.closest(".vt-store-card");
+
+    // Preview click (or click anywhere on card header/viewport).
+    if (
+      previewBtn ||
+      (card &&
+        !paypalBtn &&
+        !stripeBtn &&
+        !e.target.closest(".purchase-zone") &&
+        !e.target.closest("a") &&
+        !e.target.closest(".mini-link"))
+    ) {
+      const zone = card?.querySelector(".purchase-zone");
+      const id = zone?.getAttribute("data-product-id") || "";
+      const product = renderList.find((p) => String(p.id || "") === id);
+      if (product) openPreviewModal(product);
+      return;
+    }
+
     if (!paypalBtn && !stripeBtn) return;
 
     const zone = e.target.closest(".purchase-zone");
     const id = zone?.getAttribute("data-product-id") || "";
-    const product = products.find((p) => String(p.id || "") === id);
+    const product = renderList.find((p) => String(p.id || "") === id);
     if (!product) {
       alert("Product not found. Refresh the page.");
       return;

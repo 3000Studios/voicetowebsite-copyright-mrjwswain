@@ -9,7 +9,6 @@
       "price": 49.0,
       "currency": "USD",
       "interval": "one-time",
-      "stripePriceId": "price_solo_123",
       "features": ["1 AI Page", "Secure Hosting", "Basic SEO", "Voice Updates"]
     },
     {
@@ -21,7 +20,6 @@
       "price": 199.0,
       "currency": "USD",
       "interval": "one-time",
-      "stripePriceId": "price_business_456",
       "features": ["Up to 5 AI Pages", "Custom Domain", "Analytics", "Priority Support"]
     },
     {
@@ -33,7 +31,6 @@
       "price": 499.0,
       "currency": "USD",
       "interval": "month",
-      "stripePriceId": "price_enterprise_789",
       "features": ["Unlimited Pages", "Custom AI Model", "24/7 Support"]
     }
   ],
@@ -46,37 +43,38 @@
       "desc": "A comprehensive notion-style planning workspace for managing voice-to-website projects.",
       "price": 49.0,
       "currency": "USD",
-      "stripePriceId": "price_pph_123"
+      "previewUrl": "/project-planning-hub.html",
+      "downloadUrl": "/downloads/project-planning-hub.zip"
     },
     {
-      "id": "ai-web-forge-pro",
+      "id": "webforge",
       "type": "app",
-      "title": "AI Web Forge Pro",
-      "label": "Developer Tool",
-      "desc": "Advanced local development environment for fine-tuning your AI-generated sites.",
-      "price": 49.99,
+      "title": "Webforge",
+      "label": "Builder",
+      "desc": "Interactive web build studio: prompt, upload screenshots, and iterate fast.",
+      "price": 29.0,
       "currency": "USD",
-      "stripePriceId": "price_forge_456"
+      "previewUrl": "/webforge.html"
     },
     {
-      "id": "ai-drive",
+      "id": "audioboost-pro-ai",
       "type": "app",
-      "title": "AI Drive",
-      "label": "Storage",
-      "desc": "Secure, AI-organized cloud storage for your project assets and media.",
+      "title": "AudioBoost Pro AI",
+      "label": "Audio",
+      "desc": "Audio enhancement toolchain export (downloadable project bundle).",
+      "price": 19.0,
+      "currency": "USD",
+      "downloadUrl": "/downloads/audioboost-pro-ai.zip"
+    },
+    {
+      "id": "rush-percussion",
+      "type": "app",
+      "title": "Rush Percussion",
+      "label": "Showcase",
+      "desc": "Example app listing page used for store + checkout validation.",
       "price": 4.99,
       "currency": "USD",
-      "stripePriceId": "price_drive_789"
-    },
-    {
-      "id": "google-ai-prompts",
-      "type": "app",
-      "title": "Google AI Prompts",
-      "label": "Asset Pack",
-      "desc": "Curated collection of high-performance system prompts for Gemini and Vertex AI.",
-      "price": 2.99,
-      "currency": "USD",
-      "stripePriceId": "price_prompts_000"
+      "previewUrl": "/rush-percussion.html"
     }
   ],
   "subscriptions": []

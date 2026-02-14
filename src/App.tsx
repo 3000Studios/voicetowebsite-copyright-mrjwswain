@@ -1,12 +1,16 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
+import SiteOpener from "./components/SiteOpener";
 import WarpTunnel from "./components/WarpTunnel";
 import { HOME_VIDEO, INTRO_SONG } from "./constants";
 import { audioEngine } from "./services/audioEngine";
 
 const App: React.FC = () => {
   const reduceMotion = useReducedMotion();
+  const [showOpener, setShowOpener] = useState(false);
+  const audioPrefRef = useRef<"on" | "off" | null>(null);
+  const audioPlayingRef = useRef(false);
 
   // Core State
   const [tryPrompt, setTryPrompt] = useState("");
@@ -17,6 +21,16 @@ const App: React.FC = () => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    try {
+      // Show opener once per tab session.
+      const seen = sessionStorage.getItem("vtw-opener-seen") === "1";
+      setShowOpener(!seen);
+    } catch (_) {
+      setShowOpener(true);
+    }
+  }, []);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -56,14 +70,73 @@ const App: React.FC = () => {
     audioEngine.setVolume(0.6);
   }, []);
 
+  // Best-effort autoplay. Browsers often block sound without a user gesture, so we:
+  // 1) try once immediately, and
+  // 2) retry on the first user interaction (pointer/key) unless the user turned audio off.
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPref = () => {
+      try {
+        const raw = String(localStorage.getItem("vtw-audio-pref") || "").toLowerCase();
+        if (raw === "off") return "off";
+        if (raw === "on") return "on";
+      } catch (_) {}
+      return null;
+    };
+
+    audioPrefRef.current = loadPref();
+
+    const tryStart = async () => {
+      if (audioPrefRef.current === "off") return;
+      await audioEngine.enable();
+      const ok = await audioEngine.playMusic(INTRO_SONG);
+      if (cancelled) return;
+      audioPlayingRef.current = ok;
+      setIsAudioPlaying(ok);
+    };
+
+    const onFirstGesture = async () => {
+      if (audioPrefRef.current === "off") return;
+      if (audioPlayingRef.current) return;
+      await audioEngine.enable();
+      const ok = await audioEngine.playMusic(INTRO_SONG);
+      audioPlayingRef.current = ok;
+      setIsAudioPlaying(ok);
+    };
+
+    // Attempt immediately (may be blocked).
+    tryStart().catch(() => {});
+
+    // Retry on first interaction.
+    document.addEventListener("pointerdown", onFirstGesture, { capture: true, once: true });
+    document.addEventListener("keydown", onFirstGesture, { capture: true, once: true });
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener("pointerdown", onFirstGesture, true);
+      document.removeEventListener("keydown", onFirstGesture, true);
+    };
+  }, []);
+
   const toggleAudio = async () => {
     await audioEngine.enable();
     if (isAudioPlaying) {
       audioEngine.stopMusic();
+      audioPlayingRef.current = false;
       setIsAudioPlaying(false);
+      audioPrefRef.current = "off";
+      try {
+        localStorage.setItem("vtw-audio-pref", "off");
+      } catch (_) {}
     } else {
       const ok = await audioEngine.playMusic(INTRO_SONG);
+      audioPlayingRef.current = ok;
       setIsAudioPlaying(ok);
+      audioPrefRef.current = ok ? "on" : null;
+      try {
+        if (ok) localStorage.setItem("vtw-audio-pref", "on");
+      } catch (_) {}
     }
   };
 
@@ -94,6 +167,7 @@ const App: React.FC = () => {
     setGeneratedSiteId("");
     setGenerateError("");
     audioEngine.stopMusic();
+    audioPlayingRef.current = false;
     setIsAudioPlaying(false);
   };
 
@@ -106,6 +180,7 @@ const App: React.FC = () => {
     // Play the song as requested
     await audioEngine.enable();
     const ok = await audioEngine.playMusic(INTRO_SONG);
+    audioPlayingRef.current = ok;
     setIsAudioPlaying(ok);
 
     try {
@@ -129,13 +204,42 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
+      <SiteOpener
+        show={showOpener}
+        reduceMotion={Boolean(reduceMotion)}
+        onDone={() => {
+          try {
+            sessionStorage.setItem("vtw-opener-seen", "1");
+          } catch (_) {}
+          setShowOpener(false);
+        }}
+      />
+
       <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
 
       {/* Background atmosphere */}
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-30">
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover brightness-50">
-          <source src={HOME_VIDEO} type="video/mp4" />
-        </video>
+        {reduceMotion ? (
+          <div
+            className="w-full h-full brightness-50"
+            style={{
+              backgroundImage: "url(/vtw-wallpaper.png)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        ) : (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover brightness-50"
+          >
+            <source src={HOME_VIDEO} type="video/mp4" />
+          </video>
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
       </div>
 
