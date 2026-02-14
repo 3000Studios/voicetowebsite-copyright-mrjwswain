@@ -6,8 +6,11 @@ import {
   setAdminCookieHeaders,
 } from "./functions/adminAuth.js";
 import { handleBotHubRequest } from "./functions/botHub.js";
+import { onRequestPost as handleChatRequest } from "./functions/chat.js";
 import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
+import { onRequestPost as handleGodmodeInferRequest } from "./functions/godmode.js";
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
+import { handleSupportChatRequest } from "./functions/supportChat.js";
 import {
   handleGenerateRequest,
   handlePreviewApiRequest,
@@ -776,9 +779,67 @@ export default {
         return jsonResponse(503, { error: "D1 database not available." });
       }
       try {
-        const commandsRes = await env.D1.prepare(
-          "SELECT id, ts, command, actions, files, deployment_status FROM commands ORDER BY ts DESC LIMIT 5"
-        ).all();
+        // Legacy orchestrator commands (written by /api/orchestrator).
+        let legacyCommands = [];
+        try {
+          const commandsRes = await env.D1.prepare(
+            "SELECT id, ts, command, actions, files, deployment_status FROM commands ORDER BY ts DESC LIMIT 5"
+          ).all();
+          legacyCommands = commandsRes.results || [];
+        } catch (_) {
+          legacyCommands = [];
+        }
+
+        // Canonical execute events (written by /api/execute; Custom GPT uses this).
+        // We project them into the same shape as `commands` so the existing UI shows them.
+        let executeCommands = [];
+        try {
+          const execRes = await env.D1.prepare(
+            "SELECT event_id AS id, ts, action, idempotency_key, status, response_json FROM execute_events ORDER BY ts DESC LIMIT 5"
+          ).all();
+          const rows = execRes.results || [];
+          executeCommands = rows.map((row) => {
+            let commandText = null;
+            let files = null;
+            try {
+              const payload = JSON.parse(row.response_json || "{}");
+              commandText = payload?.action?.command || null;
+              const file = payload?.action?.file || null;
+              const page = payload?.action?.page || payload?.action?.path || null;
+              files = [file, page].filter(Boolean).join(", ") || null;
+              if (!commandText) {
+                const a = payload?.action?.action || row.action || "execute";
+                commandText = `[${a}] ${row.idempotency_key || row.id || ""}`.trim();
+              }
+            } catch (_) {
+              // Ignore parsing failures; fallback below.
+            }
+
+            if (!commandText) {
+              commandText = `[${row.action || "execute"}] ${row.idempotency_key || row.id || ""}`.trim();
+            }
+
+            const statusCode = Number(row.status || 0);
+            const deploymentStatus = statusCode >= 400 ? "failed" : "ok";
+            return {
+              id: `exec:${row.id}`,
+              ts: row.ts,
+              command: commandText,
+              actions: row.action,
+              files,
+              deployment_status: deploymentStatus,
+              source: "execute",
+            };
+          });
+        } catch (_) {
+          executeCommands = [];
+        }
+
+        const combinedCommands = [...legacyCommands, ...executeCommands]
+          .filter((c) => c && c.ts)
+          .sort((a, b) => new Date(b.ts) - new Date(a.ts))
+          .slice(0, 5);
+
         let builds = [];
         try {
           const buildsRes = await env.D1.prepare(
@@ -789,7 +850,7 @@ export default {
           builds = [];
         }
         return jsonResponse(200, {
-          commands: commandsRes.results || [],
+          commands: combinedCommands,
           builds,
         });
       } catch (err) {
@@ -800,6 +861,21 @@ export default {
     // Execute API (canonical orchestration endpoint for Custom GPT)
     if (url.pathname === "/api/execute" && request.method === "POST") {
       return addSecurityHeaders(await handleExecuteRequest({ request, env, ctx }));
+    }
+
+    // Public customer chat (AI assistant) used by the site widget.
+    if (url.pathname === "/api/chat" && request.method === "POST") {
+      return addSecurityHeaders(await handleChatRequest({ request, env, ctx }));
+    }
+
+    // Support inbox (customer -> admin) + admin replies.
+    if (url.pathname.startsWith("/api/support/")) {
+      return addSecurityHeaders(await handleSupportChatRequest({ request, env, ctx }));
+    }
+
+    // Godmode NL inference + preview (admin-only)
+    if (url.pathname === "/api/godmode/infer" && request.method === "POST") {
+      return addSecurityHeaders(await handleGodmodeInferRequest({ request, env, ctx }));
     }
 
     // Orchestrator API (primary: /api/orchestrator; legacy: /.netlify/functions/orchestrator)
@@ -916,6 +992,7 @@ export default {
         return jsonResponse(401, { error: "Unauthorized" });
       }
       return jsonResponse(200, {
+        orch_token: !!(env.ORCH_TOKEN || env.X_ORCH_TOKEN),
         stripe_publishable: !!(env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC),
         stripe_secret: !!env.STRIPE_SECRET_KEY,
         paypal_client_id: !!(env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID),

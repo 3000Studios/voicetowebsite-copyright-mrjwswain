@@ -167,9 +167,9 @@ describe("/api/execute", () => {
           idempotencyKey: "preview-002",
           command: "Update pricing hero copy",
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
 
@@ -189,9 +189,9 @@ describe("/api/execute", () => {
           idempotencyKey: "read-001",
           page: "partners.html",
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
 
@@ -207,9 +207,9 @@ describe("/api/execute", () => {
           idempotencyKey: "read-002",
           page: "admin/index.html",
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
 
@@ -226,9 +226,9 @@ describe("/api/execute", () => {
           idempotencyKey: "apply-001",
           command: "Apply homepage update",
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
 
@@ -243,9 +243,9 @@ describe("/api/execute", () => {
           idempotencyKey: "apply-002",
           command: "Change homepage headline to Edge-native Growth",
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
     const previewBody = await preview.json();
@@ -258,9 +258,9 @@ describe("/api/execute", () => {
           command: "Change homepage headline to Edge-native Growth",
           confirmToken: previewBody.result.confirmToken,
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
 
@@ -280,9 +280,9 @@ describe("/api/execute", () => {
           idempotencyKey: "deploy-001",
           command: "Deploy latest approved changes",
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
     const previewBody = await preview.json();
@@ -295,9 +295,9 @@ describe("/api/execute", () => {
           command: "Deploy latest approved changes",
           confirmToken: previewBody.result.confirmToken,
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
-      env: {},
+      env: { ORCH_TOKEN: "test-orch-token" },
       ctx: {},
     });
 
@@ -308,7 +308,7 @@ describe("/api/execute", () => {
   });
 
   it("allows deploy after apply with the same confirmToken when D1 is enabled", async () => {
-    const env = { D1: new InMemoryD1() };
+    const env = { D1: new InMemoryD1(), ORCH_TOKEN: "test-orch-token" };
 
     const preview = await handleExecute({
       request: makeRequest(
@@ -317,7 +317,7 @@ describe("/api/execute", () => {
           idempotencyKey: "chain-001",
           command: "Change homepage headline to Voice-native launch mode",
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
       env,
       ctx: {},
@@ -332,7 +332,7 @@ describe("/api/execute", () => {
           command: "Change homepage headline to Voice-native launch mode",
           confirmToken: previewBody.result.confirmToken,
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
       env,
       ctx: {},
@@ -347,7 +347,7 @@ describe("/api/execute", () => {
           command: "Deploy latest approved changes",
           confirmToken: previewBody.result.confirmToken,
         },
-        { "x-orch-token": "supersecret" }
+        { "x-orch-token": "test-orch-token" }
       ),
       env,
       ctx: {},

@@ -842,34 +842,140 @@ import siteConfig from "./src/site-config.json";
       log.scrollTop = log.scrollHeight;
     };
 
-    const answerAsk = (q) => {
-      const t = (q || "").toLowerCase();
-      if (t.includes("pricing") || t.includes("price")) {
-        return `Pricing lives on <a href="/pricing">/pricing</a>. Want a fast win? Try <a href="/demo">the demo</a> first.`;
+    const esc = (s) => String(s || "").replace(/</g, "&lt;");
+
+    let supportSessionId = "";
+    let supportSessionReady = false;
+    let supportPollTimer = 0;
+    const seenSupportMessageIds = new Set();
+    const seenSupportFingerprints = new Set();
+    const ensureSupportSession = async () => {
+      if (supportSessionReady) return true;
+      try {
+        const res = await fetch("/api/support/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        const data = await res.json().catch(() => ({}));
+        supportSessionReady = res.ok;
+        if (res.ok && data?.sessionId) supportSessionId = String(data.sessionId || "");
+        return supportSessionReady;
+      } catch (_) {
+        supportSessionReady = false;
+        return false;
       }
-      if (t.includes("demo") || t.includes("try")) {
-        return `Open the interactive demo: <a href="/demo">/demo</a>. You’ll get an outline preview in seconds.`;
-      }
-      if (t.includes("plan") || t.includes("rollback") || t.includes("apply")) {
-        return `Plan -> Apply -> Rollback is the safety gate. See <a href="/features">Features</a>, or run it in <a href="/admin/">Admin</a> (requires unlock).`;
-      }
-      if (t.includes("ads")) {
-        return `Ads are controlled by AdSense mode (auto/slots) and can be disabled per page with <code>&lt;meta name="vtw-ads" content="off"&gt;</code>.`;
-      }
-      if (t.includes("privacy") || t.includes("data") || t.includes("security")) {
-        return `For data handling + security posture, visit <a href="/trust">Trust Center</a> and <a href="/privacy">Privacy</a>.`;
-      }
-      return `Try: <a href="/demo">/demo</a> to build instantly, or <a href="/pricing">/pricing</a> to compare tiers. Want to “Build” instead of “Ask”? Switch modes.`;
     };
 
-    const handleSend = () => {
+    const mapSupportSender = (sender) => {
+      const s = String(sender || "").toLowerCase();
+      if (s === "customer") return "user";
+      if (s === "admin") return "bot";
+      if (s === "bot") return "bot";
+      return "bot";
+    };
+
+    const fingerprintSupportMessage = (sender, message) =>
+      `${String(sender || "").toLowerCase()}:${String(message || "")}`;
+
+    const appendSupportMessages = (messages) => {
+      (messages || []).forEach((m) => {
+        const id = String(m?.id || "");
+        const sender = String(m?.sender || "");
+        const message = String(m?.message || "");
+        const who = mapSupportSender(sender);
+        const fp = fingerprintSupportMessage(sender, message);
+
+        if (id && seenSupportMessageIds.has(id)) return;
+        if (fp && seenSupportFingerprints.has(fp)) {
+          if (id) seenSupportMessageIds.add(id);
+          return;
+        }
+
+        if (id) seenSupportMessageIds.add(id);
+        if (fp) seenSupportFingerprints.add(fp);
+        addMsg(who, esc(message));
+      });
+    };
+
+    const pollSupportMessages = async () => {
+      if (!supportSessionReady) return;
+      try {
+        const qp = supportSessionId ? `?sessionId=${encodeURIComponent(supportSessionId)}` : "";
+        const res = await fetch(`/api/support/messages${qp}`, { method: "GET" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) return;
+        appendSupportMessages(data?.messages || []);
+      } catch (_) {}
+    };
+
+    const startSupportPolling = () => {
+      if (supportPollTimer) return;
+      supportPollTimer = window.setInterval(pollSupportMessages, 2500);
+      pollSupportMessages();
+    };
+
+    const answerAsk = async (q) => {
+      const value = String(q || "").trim();
+      if (!value) return { reply: "", messageId: "", replyId: "" };
+      try {
+        await ensureSupportSession();
+        const res = await fetch("/api/support/message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: value, sessionId: supportSessionId || undefined }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.error || "Chat failed");
+        return {
+          reply: esc(String(data?.reply || "")),
+          messageId: String(data?.messageId || ""),
+          replyId: String(data?.replyId || ""),
+        };
+      } catch (_) {
+        const t = value.toLowerCase();
+        if (t.includes("pricing") || t.includes("price")) {
+          return `Pricing lives on <a href="/pricing">/pricing</a>. Want a fast win? Try <a href="/demo">the demo</a> first.`;
+        }
+        if (t.includes("demo") || t.includes("try")) {
+          return `Open the interactive demo: <a href="/demo">/demo</a>. You'll get an outline preview in seconds.`;
+        }
+        if (t.includes("privacy") || t.includes("data") || t.includes("security")) {
+          return `For data handling + security posture, visit <a href="/trust">Trust Center</a> and <a href="/privacy">Privacy</a>.`;
+        }
+        return `Try: <a href="/demo">/demo</a> to build instantly, or <a href="/pricing">/pricing</a> to compare tiers.`;
+      }
+    };
+
+    const handleSend = async () => {
       const value = (text?.value || "").trim();
       if (!value) return;
-      addMsg("user", value.replace(/</g, "&lt;"));
+      addMsg("user", esc(value));
+      seenSupportFingerprints.add(fingerprintSupportMessage("customer", value));
       if (text) text.value = "";
 
       if (mode === "ask") {
-        addMsg("bot", answerAsk(value));
+        if (status) status.textContent = "Thinking...";
+        const res = await answerAsk(value);
+        if (status) status.textContent = "";
+        const reply = typeof res === "string" ? res : res?.reply;
+        if (typeof res === "object" && res) {
+          if (res?.messageId) seenSupportMessageIds.add(res.messageId);
+          if (res?.replyId) seenSupportMessageIds.add(res.replyId);
+        }
+        if (reply) {
+          addMsg("bot", reply);
+          // Fingerprint uses unescaped text. This helps prevent double-render when polling.
+          try {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = reply;
+            const plain = tmp.textContent || tmp.innerText || "";
+            seenSupportFingerprints.add(fingerprintSupportMessage("bot", plain));
+          } catch (_) {}
+        } else {
+          addMsg("bot", "I couldn't generate a reply right now. Try again in a moment.");
+        }
+        startSupportPolling();
         return;
       }
 
@@ -958,8 +1064,11 @@ import siteConfig from "./src/site-config.json";
     }
 
     setMode("ask");
-    addMsg("bot", `Need help? Ask here — or switch to Build to jump into <a href="/demo">/demo</a>.`);
+    addMsg("bot", `Need help? Ask here - or switch to Build to jump into <a href="/demo">/demo</a>.`);
     renderHints();
+    ensureSupportSession().then((ok) => {
+      if (ok) startSupportPolling();
+    });
   };
   const init = () => {
     initTheme();

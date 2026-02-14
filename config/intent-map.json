@@ -1,0 +1,23 @@
+{
+  "make me money": ["make_money"],
+  "monetize": ["make_money"],
+  "ads": ["enable_adsense", "create_ad_placements"],
+  "adsense": ["enable_adsense", "create_ad_placements"],
+  "affiliate": ["enable_affiliate_engine", "generate_comparison_pages"],
+  "affiliates": ["enable_affiliate_engine", "generate_comparison_pages"],
+  "subscription": ["enable_membership", "create_pricing_page"],
+  "subscriptions": ["enable_membership", "create_pricing_page"],
+  "newsletter": ["enable_email_capture", "enable_newsletter_drip"],
+  "email capture": ["enable_email_capture"],
+  "drip": ["enable_newsletter_drip"],
+  "video background": ["update_background_video"],
+  "background video": ["update_background_video"],
+  "midnight steel": ["update_theme_midnight_steel"],
+  "midnight": ["update_theme_midnight"],
+  "ship it": ["deploy"],
+  "deploy it": ["deploy"],
+  "go live": ["deploy"],
+  "rollback": ["rollback"],
+  "revert": ["rollback"],
+  "undo": ["rollback"]
+}

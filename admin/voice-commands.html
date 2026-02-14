@@ -3,163 +3,488 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Command Center - 3000 Studios</title>
+    <title>God Mode Voice Command Center</title>
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="/admin/admin.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --god-bg: #040612;
+        --god-surface: rgba(10, 12, 27, 0.85);
+        --god-surface-2: rgba(21, 24, 45, 0.85);
+        --god-grid: rgba(255, 255, 255, 0.08);
+        --god-border: rgba(255, 255, 255, 0.12);
+        --god-green: #31f6b6;
+        --god-blue: #38b6ff;
+        --god-purple: #8b5cf6;
+        --god-gold: #facc15;
+        --god-danger: #fb7185;
+        --gradient-money: linear-gradient(120deg, #31f6b6, #38b6ff 45%, #9a7bff 85%);
+        --gradient-fire: linear-gradient(120deg, #facc15, #fb7185 60%, #f472b6);
+      }
+
       body {
-        background: #0f172a;
-        color: white;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(56, 182, 255, 0.2), transparent 45%),
+          radial-gradient(circle at 80% 0%, rgba(139, 92, 246, 0.23), transparent 50%),
+          radial-gradient(circle at 50% 80%, rgba(49, 246, 182, 0.18), transparent 50%), var(--god-bg);
+        color: #f8fafc;
         font-family:
+          "Space Grotesk",
+          "Inter",
           system-ui,
           -apple-system,
           sans-serif;
+        margin: 0;
+        min-height: 100vh;
       }
+
       .voice-command-center {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 2rem;
+        width: min(1320px, 100%);
+        margin: 100px auto 64px;
+        padding: 0 2rem 4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
       }
-      @media (max-width: 600px) {
-        .voice-command-center {
-          padding: 1rem;
-          margin: 1rem auto;
-        }
+
+      .card {
+        background: var(--god-surface);
+        border: 1px solid var(--god-border);
+        border-radius: 28px;
+        padding: clamp(1.5rem, 2vw, 2.5rem);
+        box-shadow: 0 25px 80px rgba(3, 5, 15, 0.5);
+        position: relative;
+        overflow: hidden;
       }
-      .command-header {
-        text-align: center;
-        margin-bottom: 3rem;
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 15% 20%, rgba(49, 246, 182, 0.12), transparent 45%),
+          radial-gradient(circle at 80% 10%, rgba(56, 182, 255, 0.08), transparent 55%);
+        pointer-events: none;
       }
-      .command-header h1 {
-        font-size: 2.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 1rem;
+
+      .card > * {
+        position: relative;
+        z-index: 1;
       }
-      .voice-controls {
+
+      .god-hero {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 2rem;
-        margin-bottom: 3rem;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.65), rgba(8, 11, 24, 0.95));
       }
-      .control-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 2rem;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
+
+      .hero-text h1 {
+        font-size: clamp(2.4rem, 4vw, 3.5rem);
+        margin: 0 0 1rem;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
       }
-      .control-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        border-color: rgba(102, 126, 234, 0.5);
+
+      .hero-text p {
+        color: rgba(248, 250, 252, 0.84);
+        font-size: 1.05rem;
+        margin: 0 0 1.5rem;
       }
-      .control-card h3 {
-        color: #667eea;
-        margin-bottom: 1rem;
-        font-size: 1.5rem;
+
+      .hero-cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
       }
-      .voice-button {
-        width: 100%;
-        padding: 1.5rem;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-bottom: 1rem;
-      }
-      .voice-button.primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-      }
-      .voice-button.primary:hover {
-        transform: scale(1.05);
-        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-      }
-      .voice-button.secondary {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
+
+      .hero-cta button {
+        flex: 1;
+        min-width: 180px;
+        border-radius: 18px;
         border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: #040612;
+        background: var(--gradient-money);
+        transition: transform 0.2s ease;
       }
-      .voice-button.secondary:hover {
-        background: rgba(255, 255, 255, 0.15);
+
+      .hero-cta button.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #f8fafc;
+        border-color: rgba(255, 255, 255, 0.16);
       }
-      .voice-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+
+      .hero-cta button:hover {
+        transform: translateY(-2px) scale(1.01);
       }
+
+      .hero-mission {
+        background: rgba(8, 20, 35, 0.7);
+        border-radius: 24px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .mission-tags {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.7rem;
+        margin-top: 1rem;
+      }
+
+      .mission-tags span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .pipeline-board {
+        display: flex;
+        flex-direction: column;
+        gap: 1.6rem;
+      }
+
+      .pipeline-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+      }
+
+      .pipeline-step {
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 1rem;
+        background: rgba(12, 16, 31, 0.9);
+        min-height: 130px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s ease;
+      }
+
+      .pipeline-step h4 {
+        margin: 0;
+        font-size: 0.95rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(248, 250, 252, 0.74);
+      }
+
+      .pipeline-step p {
+        margin: 0.5rem 0 0;
+        font-size: 0.9rem;
+        color: rgba(248, 250, 252, 0.65);
+      }
+
+      .pipeline-step.active {
+        border-color: rgba(49, 246, 182, 0.7);
+        box-shadow: 0 0 20px rgba(49, 246, 182, 0.3);
+      }
+
+      .pipeline-step.complete {
+        border-color: rgba(56, 182, 255, 0.4);
+        opacity: 0.85;
+      }
+
+      .pipeline-step.error {
+        border-color: var(--god-danger);
+        box-shadow: 0 0 18px rgba(251, 113, 133, 0.4);
+      }
+
+      .control-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .control-card h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+      }
+
       .status-indicator {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 1rem;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
-        margin-bottom: 1rem;
+        gap: 0.7rem;
+        padding: 0.9rem 1.1rem;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 1.25rem;
       }
+
       .status-dot {
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: 14px;
         border-radius: 50%;
-        background: #ef4444;
-        animation: pulse 2s infinite;
+        background: #fb7185;
+        box-shadow: 0 0 14px rgba(251, 113, 133, 0.5);
+        transition: background 0.2s ease;
       }
+
       .status-dot.active {
-        background: #10b981;
+        background: #31f6b6;
+        box-shadow: 0 0 16px rgba(49, 246, 182, 0.6);
       }
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-      }
-      .transcript-box {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.5rem;
-        min-height: 150px;
-        max-height: 300px;
-        overflow-y: auto;
-        margin-bottom: 1rem;
-        font-family: "Courier New", monospace;
-        color: #a0aec0;
-      }
-      .command-list {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 2rem;
-        margin-top: 2rem;
-      }
-      .command-list h2 {
-        color: #667eea;
-        margin-bottom: 1.5rem;
-      }
-      .command-item {
-        padding: 1rem;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
-        transition: all 0.2s ease;
-      }
-      .command-item:hover {
-        background: rgba(102, 126, 234, 0.1);
-        transform: translateX(5px);
-      }
-      .command-name {
+
+      .voice-button {
+        width: 100%;
+        padding: 1.1rem 1.3rem;
+        border-radius: 20px;
+        border: none;
         font-weight: 600;
-        color: #667eea;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-bottom: 0.75rem;
+        color: #040612;
+        background: var(--gradient-money);
+        transition: transform 0.2s ease;
       }
-      .command-description {
-        color: #a0aec0;
+
+      .voice-button.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #f8fafc;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .voice-button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .voice-button:not(:disabled):hover {
+        transform: translateY(-2px);
+      }
+
+      .transcript-box,
+      textarea,
+      .plan-output,
+      .profit-log {
+        background: rgba(4, 7, 20, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 1.25rem;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: rgba(248, 250, 252, 0.85);
+        min-height: 140px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        font-size: 0.95rem;
+      }
+
+      .quick-money {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+      }
+
+      .command-pill-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+
+      .command-pill {
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        padding: 1rem 1.25rem;
+        text-align: left;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          border-color 0.2s ease,
+          transform 0.15s ease;
+        color: #f8fafc;
+      }
+
+      .command-pill strong {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: rgba(248, 250, 252, 0.65);
+      }
+
+      .command-pill:hover {
+        border-color: rgba(49, 246, 182, 0.4);
+        transform: translateY(-3px);
+      }
+
+      .profit-center {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+      }
+
+      .profit-metric {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .profit-metric span {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(248, 250, 252, 0.55);
+      }
+
+      .profit-metric strong {
+        font-size: 1.6rem;
+      }
+
+      .profit-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .profit-actions button {
+        border-radius: 24px;
+        padding: 1.2rem 1.4rem;
+        font-weight: 600;
+        font-size: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: #f8fafc;
+        cursor: pointer;
+        text-align: left;
+        transition:
+          border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .profit-actions button.highlight {
+        background: var(--gradient-fire);
+        border: none;
+        color: #040612;
+      }
+
+      .profit-actions button:hover {
+        border-color: rgba(56, 182, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .activity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .history-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.6rem;
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85rem;
+      }
+
+      .history-list li {
+        padding: 0.7rem 0.9rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .commands-catalog {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.2rem;
+      }
+
+      .catalog-card {
+        border-radius: 22px;
+        padding: 1.2rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .catalog-card h4 {
+        margin: 0 0 0.8rem;
+        font-size: 1rem;
+      }
+
+      .catalog-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.4rem;
+      }
+
+      .catalog-card li {
         font-size: 0.9rem;
+        color: rgba(248, 250, 252, 0.7);
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 1.8rem;
+      }
+
+      .section-head p {
+        margin: 0;
+        color: rgba(248, 250, 252, 0.7);
+        max-width: 520px;
+      }
+
+      .plan-output small {
+        display: block;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        color: rgba(248, 250, 252, 0.5);
+      }
+
+      @media (max-width: 768px) {
+        .voice-command-center {
+          padding: 0 1rem 2rem;
+        }
+        .hero-cta button {
+          flex: 1 1 100%;
+        }
       }
     </style>
   </head>
@@ -167,121 +492,526 @@
     <script type="module" src="../nav.js"></script>
 
     <div class="voice-command-center">
-      <div class="command-header">
-        <h1>Command Center</h1>
-        <p>Control and Monitor your Autonomous Bots</p>
-      </div>
-
-      <!-- Bot Activity Section -->
-      <div class="command-list" id="botActivitySection">
-        <h2>Bot Activity</h2>
-        <div class="control-card">
-          <div id="botActivityList" style="display: grid; gap: 1rem">
-            <div style="color: #a0aec0">Connecting to bots...</div>
+      <section class="god-hero card">
+        <div class="hero-text">
+          <p class="eyebrow" style="letter-spacing: 0.2em; text-transform: uppercase; color: rgba(248, 250, 252, 0.6)">
+            God Mode Voice Command Center v3
+          </p>
+          <h1>MONEY-FIRST CONTROL PLANE</h1>
+          <p>
+            Voice. JSON. Deploy. Every command routes through the monetization engine: parse → strategy → policy →
+            preview → confirm → profit. If it doesn’t make money, it’s optional.
+          </p>
+          <div class="hero-cta">
+            <button id="startBtn">🎤 Engage Voice Capture</button>
+            <button id="stopBtn" class="secondary" disabled>⏹︎ Stop Listening</button>
           </div>
         </div>
-      </div>
+        <div class="hero-mission">
+          <h3 style="margin-top: 0">Mission: PRINT MONEY</h3>
+          <p>Traffic → Offers → Funnels → Payments → Recurring Revenue → Scale.</p>
+          <div class="mission-tags">
+            <span>🚀 Conversions</span>
+            <span>💰 Recurring Revenue</span>
+            <span>📈 Traffic Velocity</span>
+            <span>🤖 Automation</span>
+            <span>🛒 Digital Sales</span>
+            <span>📧 Pipelines</span>
+          </div>
+        </div>
+      </section>
 
-      <div class="voice-controls">
-        <div class="control-card">
-          <h3>Voice Recognition</h3>
-          <div class="status-indicator">
+      <section class="card pipeline-board">
+        <div class="section-head">
+          <div>
+            <h2>Money Pipeline</h2>
+            <p>Every voice command is executed through a deterministic, revenue-locked chain of custody.</p>
+          </div>
+          <div class="status-indicator" style="margin-bottom: 0">
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText">Ready</span>
           </div>
-          <button class="voice-button primary" id="startBtn">🎤 Start Listening</button>
-          <button class="voice-button secondary" id="stopBtn" disabled>⏹️ Stop Listening</button>
+        </div>
+        <div class="pipeline-steps" id="pipelineBoard">
+          <div class="pipeline-step" data-stage="intent">
+            <h4>Intent Capture</h4>
+            <p>Voice → Text → Structured monetization intent.</p>
+          </div>
+          <div class="pipeline-step" data-stage="strategy">
+            <h4>Revenue Strategy</h4>
+            <p>Detect niche, traffic, best-fit monetization path.</p>
+          </div>
+          <div class="pipeline-step" data-stage="policy">
+            <h4>Policy & Risk</h4>
+            <p>Role gate, risk gate, compliance, guardrails.</p>
+          </div>
+          <div class="pipeline-step" data-stage="patch">
+            <h4>Patch Engine</h4>
+            <p>Apply config, offers, assets, pricing.</p>
+          </div>
+          <div class="pipeline-step" data-stage="preview">
+            <h4>Preview Renderer</h4>
+            <p>Sandbox render + diff + tracking install.</p>
+          </div>
+          <div class="pipeline-step" data-stage="simulation">
+            <h4>Revenue Sim</h4>
+            <p>Projected daily / monthly / yearly lift.</p>
+          </div>
+          <div class="pipeline-step" data-stage="diff">
+            <h4>Diff Engine</h4>
+            <p>UI + JSON + revenue delta.</p>
+          </div>
+          <div class="pipeline-step" data-stage="confirm">
+            <h4>Confirm Token</h4>
+            <p>Hash-locked approval for prod deploy.</p>
+          </div>
+          <div class="pipeline-step" data-stage="deploy">
+            <h4>Atomic Deploy</h4>
+            <p>Cloudflare Worker + Durable Objects + KV.</p>
+          </div>
+          <div class="pipeline-step" data-stage="monitor">
+            <h4>Monitor & Optimize</h4>
+            <p>Snapshots, audit log, profit dashboard.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="control-grid">
+        <div class="control-card card">
+          <h3>Voice Recognition Engine</h3>
+          <button class="voice-button" onclick="executeCommand('make_money fast with full automation')">
+            ⚡ Make Me Money Fast
+          </button>
+          <button
+            class="voice-button secondary"
+            onclick="executeCommand('make me money long term with seo compounding')"
+          >
+            ♾️ Long-Term Compounding
+          </button>
           <div class="transcript-box" id="transcript">Waiting for voice input...</div>
         </div>
-
-        <div class="control-card">
-          <h3>Quick Actions</h3>
-          <button class="voice-button secondary" onclick="executeCommand('create new page')">📄 Create New Page</button>
-          <button class="voice-button secondary" onclick="executeCommand('update homepage')">🏠 Update Homepage</button>
-          <button class="voice-button secondary" onclick="executeCommand('add blog post')">✍️ Add Blog Post</button>
-          <button class="voice-button secondary" onclick="executeCommand('deploy website')">🚀 Deploy Website</button>
+        <div class="control-card card">
+          <h3>Manual Command Builder</h3>
+          <form id="moneyCommandForm" style="display: grid; gap: 0.9rem">
+            <label>
+              Monetization Method
+              <select
+                id="methodSelect"
+                style="
+                  border-radius: 16px;
+                  padding: 0.8rem;
+                  background: rgba(4, 7, 20, 0.9);
+                  color: #f8fafc;
+                  border: 1px solid rgba(255, 255, 255, 0.08);
+                "
+              >
+                <option value="ads">ads</option>
+                <option value="affiliate">affiliate</option>
+                <option value="subscriptions">subscriptions</option>
+                <option value="digitalProducts">digitalProducts</option>
+                <option value="leadgen">leadgen</option>
+                <option value="saas">saas</option>
+                <option value="services">services</option>
+                <option value="marketplace">marketplace</option>
+              </select>
+            </label>
+            <label>
+              Target Monthly Revenue ($)
+              <input
+                type="number"
+                id="targetRevenue"
+                value="2000"
+                min="100"
+                step="100"
+                style="
+                  border-radius: 16px;
+                  padding: 0.8rem;
+                  background: rgba(4, 7, 20, 0.9);
+                  color: #f8fafc;
+                  border: 1px solid rgba(255, 255, 255, 0.08);
+                "
+              />
+            </label>
+            <label>
+              Risk Tolerance
+              <select
+                id="riskTolerance"
+                style="
+                  border-radius: 16px;
+                  padding: 0.8rem;
+                  background: rgba(4, 7, 20, 0.9);
+                  color: #f8fafc;
+                  border: 1px solid rgba(255, 255, 255, 0.08);
+                "
+              >
+                <option value="low">low</option>
+                <option value="medium" selected>medium</option>
+                <option value="high">high</option>
+              </select>
+            </label>
+            <label>
+              Traffic Strategy
+              <select
+                id="trafficStrategy"
+                style="
+                  border-radius: 16px;
+                  padding: 0.8rem;
+                  background: rgba(4, 7, 20, 0.9);
+                  color: #f8fafc;
+                  border: 1px solid rgba(255, 255, 255, 0.08);
+                "
+              >
+                <option value="seo">seo</option>
+                <option value="ads">ads</option>
+                <option value="social">social</option>
+                <option value="mixed" selected>mixed</option>
+              </select>
+            </label>
+            <label>
+              Command Notes
+              <textarea
+                id="manualCommand"
+                placeholder="e.g. Make me money with affiliate SEO + sticky CTA bars"
+              ></textarea>
+            </label>
+            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center">
+              <button type="submit" class="voice-button" id="manualSubmit">Send Command</button>
+              <button type="button" class="voice-button secondary" id="shipButton" onclick="shipIt()" disabled>
+                Ship It
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div class="control-card">
-          <h3>Response</h3>
-          <div class="transcript-box" id="response">Command responses will appear here...</div>
-          <button class="voice-button secondary" onclick="clearResponse()">🗑️ Clear Response</button>
+        <div class="control-card card">
+          <h3>Revenue Plan + Response</h3>
+          <div class="plan-output" id="response">
+            <small>Command Output</small>
+            Command responses will appear here...
+          </div>
+          <button class="voice-button secondary" onclick="clearResponse()">🗑️ Reset Panels</button>
         </div>
-      </div>
+      </section>
 
-      <div class="command-list">
-        <h2>Type a Command</h2>
-        <div class="control-card">
-          <textarea
-            id="manualCommand"
-            placeholder="e.g. Update the headline to 'Voice Revenue Engine' and set theme ocean."
-            style="
-              width: 100%;
-              min-height: 120px;
-              background: rgba(0, 0, 0, 0.3);
-              border: 1px solid rgba(255, 255, 255, 0.1);
-              border-radius: 12px;
-              color: #e2e8f0;
-              padding: 1rem;
-              font-family: &quot;Courier New&quot;, monospace;
-            "
-          ></textarea>
-          <button class="voice-button primary" id="manualSubmit" style="margin-top: 1rem">Send Command</button>
-        </div>
-      </div>
-
-      <div class="command-list">
-        <h2>Recent Commands</h2>
-        <div class="control-card">
-          <ul
-            id="commandHistory"
-            style="list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; color: #a0aec0"
-          ></ul>
-          <button class="voice-button secondary" id="clearHistory" style="margin-top: 1rem">Clear History</button>
-        </div>
-      </div>
-
-      <div class="command-list">
-        <h2>Available Commands</h2>
-        <div class="command-item">
+      <section class="card quick-money">
+        <div class="section-head">
           <div>
-            <div class="command-name">create page [name]</div>
-            <div class="command-description">Create a new page with the specified name</div>
+            <h2>Master Money Commands</h2>
+            <p>One click voice macros that auto-build monetization flows, offers, funnels, and tracking.</p>
           </div>
         </div>
-        <div class="command-item">
+        <div class="command-pill-grid">
+          <button class="command-pill" data-command="Make me money with ads">
+            Make Money with Ads
+            <strong>enable_adsense • create_ad_placements • optimize_ad_layout</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money with affiliates">
+            Make Money with Affiliates
+            <strong>enable_affiliate_engine • generate_affiliate_blog_posts</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money with subscriptions">
+            Make Money with Subscriptions
+            <strong>create_pricing_page • enable_stripe_billing • enable_trial_period</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money selling templates">
+            Monetize Digital Products
+            <strong>create_digital_storefront • enable_instant_delivery</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money with SaaS tiers">
+            SaaS Tiers
+            <strong>enable_saas_mode • enable_credit_system • enable_api_billing</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money selling leads">
+            Lead Generation
+            <strong>enable_lead_capture • create_booking_page • enable_sms_followup</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money with a marketplace">
+            Marketplace Mode
+            <strong>enable_marketplace • enable_vendor_accounts • enable_commission_split</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money with sponsors">
+            Sponsors & Media Kits
+            <strong>generate_media_kit • enable_sponsor_slots</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money with SMS promotions">
+            SMS Monetization
+            <strong>enable_sms_capture • enable_sms_promotions</strong>
+          </button>
+          <button class="command-pill" data-command="Make me money with YouTube automation">
+            Video Money Factory
+            <strong>auto create shorts • sponsor overlays • affiliate links</strong>
+          </button>
+        </div>
+      </section>
+
+      <section class="card profit-center">
+        <div class="section-head">
           <div>
-            <div class="command-name">update [page] with [content]</div>
-            <div class="command-description">Update a page with new content</div>
+            <h2>Profit Center Dashboard</h2>
+            <p>Live revenue estimates, funnel health, and AI suggestions for the next profit patch.</p>
           </div>
         </div>
-        <div class="command-item">
-          <div>
-            <div class="command-name">add blog post about [topic]</div>
-            <div class="command-description">Create a new blog post</div>
+        <div class="metrics-grid" id="profitMetrics">
+          <div class="profit-metric">
+            <span>Daily Revenue Est.</span>
+            <strong id="metricDaily">$450</strong>
+            <small style="color: #31f6b6">+32% vs last 7d</small>
+          </div>
+          <div class="profit-metric">
+            <span>Monthly Revenue Est.</span>
+            <strong id="metricMonthly">$12.9K</strong>
+            <small style="color: #31f6b6">Pipeline active</small>
+          </div>
+          <div class="profit-metric">
+            <span>Subscription MRR</span>
+            <strong id="metricMRR">$7.4K</strong>
+            <small style="color: #facc15">Churn 2.1%</small>
+          </div>
+          <div class="profit-metric">
+            <span>Affiliate Clicks</span>
+            <strong id="metricAffiliate">4,820</strong>
+            <small style="color: #38b6ff">+287 today</small>
+          </div>
+          <div class="profit-metric">
+            <span>Ad RPM</span>
+            <strong id="metricRPM">$18.40</strong>
+            <small>Auto layout mode</small>
+          </div>
+          <div class="profit-metric">
+            <span>Lead Conversion</span>
+            <strong id="metricLeads">158</strong>
+            <small>SMS follow-up on</small>
           </div>
         </div>
-        <div class="command-item">
-          <div>
-            <div class="command-name">deploy website</div>
-            <div class="command-description">Deploy changes to production</div>
+        <div class="profit-actions">
+          <button class="highlight" data-command="Generate monetization offer now">⚡ Generate New Offer</button>
+          <button class="highlight" data-command="Build a full funnel for the highest converting offer">
+            🧠 Build New Funnel
+          </button>
+          <button data-command="Run an A/B test on pricing tiers">🧪 Run A/B Test</button>
+          <button data-command="Publish 10 SEO posts targeting high intent money keywords">📰 Publish SEO Posts</button>
+          <button data-command="Ship a profit patch to increase conversions">🚢 Ship Profit Patch</button>
+          <button data-command="Run affiliate upgrade campaign">🤝 Boost Affiliate Engine</button>
+        </div>
+        <div class="plan-output" id="planPreview" style="min-height: 180px">
+          <small>Revenue Strategy Output</small>
+          Strategy output will be displayed here once the engine responds.
+        </div>
+        <div class="plan-output" id="revenueEstimate" style="min-height: 120px">
+          <small>Revenue Estimate</small>
+          Daily $0 • Monthly $0 • Yearly $0
+        </div>
+        <div class="plan-output" id="diffPreview" style="min-height: 120px">
+          <small>Diff + Preview</small>
+          Awaiting diff output.
+        </div>
+        <div class="plan-output" id="confirmToken" style="min-height: 90px">
+          <small>Confirm Token</small>
+          Hash-locked token will appear once build is ready.
+        </div>
+        <div class="plan-output" id="aiSuggestions" style="min-height: 90px">
+          <small>AI Suggestions</small>
+          • Add a lead magnet • Launch a pricing tier • Increase CTA density
+        </div>
+      </section>
+
+      <section class="activity-grid">
+        <div class="card" id="botActivitySection">
+          <h3 style="margin-top: 0">Bot Activity + Build Queue</h3>
+          <div id="botActivityList" style="display: grid; gap: 1rem">
+            <div style="color: rgba(248, 250, 252, 0.6)">Connecting to bots...</div>
           </div>
         </div>
-        <div class="command-item">
+        <div class="card">
+          <h3 style="margin-top: 0">Command History</h3>
+          <ul class="history-list" id="commandHistory"></ul>
+          <button class="voice-button secondary" id="clearHistory">Clear History</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head" style="margin-bottom: 1.5rem">
           <div>
-            <div class="command-name">show analytics</div>
-            <div class="command-description">Display website analytics</div>
+            <h2>Monetization Command Catalog</h2>
+            <p>The system isn’t a site editor. It is a profit machine with a website attached.</p>
           </div>
         </div>
-      </div>
+        <div class="commands-catalog">
+          <div class="catalog-card">
+            <h4>Ads</h4>
+            <ul>
+              <li>enable_adsense</li>
+              <li>create_ad_placements</li>
+              <li>enable_ad_lazyload</li>
+              <li>enable_ad_ab_testing</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Affiliate</h4>
+            <ul>
+              <li>enable_affiliate_engine</li>
+              <li>add_affiliate_offer</li>
+              <li>generate_comparison_pages</li>
+              <li>enable_click_tracking</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Digital Products</h4>
+            <ul>
+              <li>create_product_download</li>
+              <li>generate_sales_page</li>
+              <li>enable_license_key_delivery</li>
+              <li>enable_watermarking</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Subscriptions</h4>
+            <ul>
+              <li>enable_membership</li>
+              <li>create_pricing_page</li>
+              <li>enable_coupon_codes</li>
+              <li>enable_cancel_flow</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Lead Gen</h4>
+            <ul>
+              <li>enable_lead_capture</li>
+              <li>create_lead_magnet</li>
+              <li>enable_sms_followup</li>
+              <li>enable_pipeline_dashboard</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Services</h4>
+            <ul>
+              <li>create_service_packages</li>
+              <li>enable_invoice_generation</li>
+              <li>enable_payment_deposits</li>
+              <li>enable_client_portal</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Courses</h4>
+            <ul>
+              <li>create_course_portal</li>
+              <li>enable_drip_release</li>
+              <li>enable_course_checkout</li>
+              <li>enable_course_upsells</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Marketplace</h4>
+            <ul>
+              <li>enable_marketplace</li>
+              <li>enable_vendor_accounts</li>
+              <li>enable_vendor_payouts</li>
+              <li>enable_featured_listings</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>SMS + Push</h4>
+            <ul>
+              <li>enable_sms_promotions</li>
+              <li>enable_sms_notifications</li>
+              <li>enable_push_optin</li>
+              <li>retargeting_push</li>
+            </ul>
+          </div>
+          <div class="catalog-card">
+            <h4>Licensing / API</h4>
+            <ul>
+              <li>enable_white_label_mode</li>
+              <li>generate_license_contract_template</li>
+              <li>enable_api_billing</li>
+              <li>issue_paid_api_keys</li>
+            </ul>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script>
       /* ADMIN GUARD REMOVED */
 
-      let recognition = null;
-      let isListening = false;
+      const pipelineStages = [
+        "intent",
+        "strategy",
+        "policy",
+        "patch",
+        "preview",
+        "simulation",
+        "diff",
+        "confirm",
+        "deploy",
+        "monitor",
+      ];
+      const pipelineEls = Array.from(document.querySelectorAll(".pipeline-step"));
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const transcriptBox = document.getElementById("transcript");
+      const responseBox = document.getElementById("response");
+      const planPreview = document.getElementById("planPreview");
+      const revenueEstimate = document.getElementById("revenueEstimate");
+      const diffPreview = document.getElementById("diffPreview");
+      const confirmTokenBox = document.getElementById("confirmToken");
+      const aiSuggestionsBox = document.getElementById("aiSuggestions");
+      const historyList = document.getElementById("commandHistory");
+      const form = document.getElementById("moneyCommandForm");
+      const defaultSuggestions = [
+        "Add a lead magnet",
+        "Launch a pricing tier",
+        "Increase CTA density",
+        "Publish 10 SEO posts",
+        "Add upsell on checkout",
+        "Build comparison funnel",
+      ];
 
+      const updateSuggestions = (extra = []) => {
+        const merged = [...extra, ...defaultSuggestions];
+        aiSuggestionsBox.innerHTML = `<small>AI Suggestions</small>• ${merged.slice(0, 5).join("<br>• ")}`;
+      };
+      updateSuggestions();
+
+      const setPipelineStage = (stage, { error = false } = {}) => {
+        const index = pipelineStages.indexOf(stage);
+        pipelineEls.forEach((el) => {
+          el.classList.remove("active", "complete", "error");
+          const stepIndex = pipelineStages.indexOf(el.dataset.stage);
+          if (stepIndex < index) {
+            el.classList.add("complete");
+          } else if (stepIndex === index) {
+            el.classList.add(error ? "error" : "active");
+          }
+        });
+        if (error) return;
+        if (index === pipelineStages.length - 1) {
+          pipelineEls.forEach((el) => {
+            if (el.dataset.stage !== stage) {
+              el.classList.add("complete");
+            }
+          });
+        }
+      };
+
+      let pipelineInterval = null;
+      const beginPipeline = () => {
+        clearInterval(pipelineInterval);
+        let idx = 0;
+        setPipelineStage(pipelineStages[idx]);
+        pipelineInterval = setInterval(() => {
+          idx = Math.min(idx + 1, pipelineStages.length - 2);
+          setPipelineStage(pipelineStages[idx]);
+        }, 1800);
+      };
+
+      const endPipeline = (success = true) => {
+        clearInterval(pipelineInterval);
+        if (success) {
+          setPipelineStage("monitor");
+        }
+      };
+
+      let recognition = null;
       if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
@@ -290,25 +1020,22 @@
         recognition.lang = "en-US";
 
         recognition.onstart = () => {
-          isListening = true;
           document.getElementById("statusText").textContent = "Listening...";
           document.getElementById("statusDot").classList.add("active");
-          document.getElementById("startBtn").disabled = true;
-          document.getElementById("stopBtn").disabled = false;
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
         };
 
         recognition.onend = () => {
-          isListening = false;
           document.getElementById("statusText").textContent = "Ready";
           document.getElementById("statusDot").classList.remove("active");
-          document.getElementById("startBtn").disabled = false;
-          document.getElementById("stopBtn").disabled = true;
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
         };
 
         recognition.onresult = (event) => {
           let interimTranscript = "";
           let finalTranscript = "";
-
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
@@ -317,11 +1044,8 @@
               interimTranscript += transcript;
             }
           }
-
-          document.getElementById("transcript").textContent =
-            finalTranscript + (interimTranscript ? `\n[${interimTranscript}]` : "");
-
-          if (finalTranscript) {
+          transcriptBox.textContent = finalTranscript + (interimTranscript ? `\n[${interimTranscript.trim()}]` : "");
+          if (finalTranscript.trim()) {
             executeCommand(finalTranscript.trim());
           }
         };
@@ -331,66 +1055,19 @@
           document.getElementById("statusText").textContent = `Error: ${event.error}`;
         };
       } else {
-        document.getElementById("startBtn").disabled = true;
-        document.getElementById("transcript").textContent =
-          "Speech recognition is not supported in this browser. Please use Chrome or Edge.";
+        startBtn.disabled = true;
+        transcriptBox.textContent = "Speech recognition is not supported in this browser. Please use Chrome or Edge.";
       }
 
-      document.getElementById("startBtn").addEventListener("click", () => {
-        if (recognition) {
-          recognition.start();
-        }
+      startBtn.addEventListener("click", () => {
+        if (recognition) recognition.start();
       });
 
-      document.getElementById("stopBtn").addEventListener("click", () => {
-        if (recognition) {
-          recognition.stop();
-        }
-      });
-
-      async function executeCommand(command) {
-        const responseBox = document.getElementById("response");
-        responseBox.textContent = `Processing: "${command}"...`;
-
-        try {
-          const response = await fetch("/api/orchestrator", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              command: command,
-              timestamp: new Date().toISOString(),
-            }),
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            responseBox.textContent = `✅ Success!\n\n${JSON.stringify(data, null, 2)}`;
-          } else {
-            responseBox.textContent = `❌ Error: ${data.error || "Unknown error"}`;
-          }
-          logCommand(command);
-        } catch (error) {
-          responseBox.textContent = `❌ Network Error: ${error.message}`;
-          console.error("Command execution error:", error);
-        }
-      }
-
-      function clearResponse() {
-        document.getElementById("response").textContent = "Command responses will appear here...";
-        document.getElementById("transcript").textContent = "Waiting for voice input...";
-      }
-
-      document.getElementById("manualSubmit")?.addEventListener("click", () => {
-        const input = document.getElementById("manualCommand");
-        const value = input?.value?.trim();
-        if (value) executeCommand(value);
+      stopBtn.addEventListener("click", () => {
+        if (recognition) recognition.stop();
       });
 
       const HISTORY_KEY = "vtw-command-history";
-      const historyList = document.getElementById("commandHistory");
       const renderHistory = () => {
         if (!historyList) return;
         const items = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
@@ -410,7 +1087,7 @@
         if (!text) return;
         const items = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
         items.unshift({ text, ts: new Date().toISOString() });
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 20)));
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 30)));
         renderHistory();
       };
 
@@ -421,6 +1098,174 @@
 
       renderHistory();
 
+      const updatePlanPanels = (data) => {
+        const stringify = (value) => {
+          if (!value) return "—";
+          if (typeof value === "string") return value;
+          try {
+            return JSON.stringify(value, null, 2);
+          } catch (err) {
+            return String(value);
+          }
+        };
+        planPreview.innerHTML = `<small>Revenue Strategy Output</small>${stringify(
+          data.plan || data.output?.plan || data.output || data
+        )}`;
+        const revenue = data.estimatedRevenue || data.revenue || data.output?.estimatedRevenue;
+        if (revenue) {
+          revenueEstimate.innerHTML = `<small>Revenue Estimate</small>Daily $${revenue.daily || 0} • Monthly $${
+            revenue.monthly || 0
+          } • Yearly $${revenue.yearly || 0}`;
+        }
+        if (data.diff) {
+          diffPreview.innerHTML = `<small>Diff + Preview</small>${stringify(data.diff)}`;
+        }
+        if (data.preview || data.previewUrl) {
+          diffPreview.innerHTML += `\nPreview: ${data.preview || data.previewUrl}`;
+        }
+        if (data.confirmToken) {
+          confirmTokenBox.innerHTML = `<small>Confirm Token</small>${data.confirmToken}`;
+        }
+        if (Array.isArray(data.suggestions)) {
+          updateSuggestions(data.suggestions);
+        }
+      };
+
+      let lastPreview = null;
+
+      async function executeCommand(command) {
+        if (!command) return;
+        beginPipeline();
+        const shipButton = document.getElementById("shipButton");
+        if (shipButton) shipButton.disabled = true;
+        responseBox.innerHTML = `<small>Command Output</small>Inferring intent + generating preview...`;
+        try {
+          const response = await fetch("/api/godmode/infer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              rawInput: command,
+              idempotencyKey: `voice-${Date.now()}`,
+            }),
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            responseBox.innerHTML = `<small>Command Output</small>❌ Error: ${data.error || "Unknown error"}`;
+            setPipelineStage("diff", { error: true });
+            return;
+          }
+
+          lastPreview = data;
+          if (shipButton) shipButton.disabled = false;
+          responseBox.innerHTML = `<small>Command Output</small>✅ Preview staged.\n\n${JSON.stringify(
+            { commandId: data.commandId, idempotencyKey: data.idempotencyKey, ioo: data.ioo },
+            null,
+            2
+          )}`;
+
+          // The orchestrator preview is nested in data.preview (mode/plan payload).
+          updatePlanPanels(data.preview || {});
+          if (data.confirmToken) {
+            confirmTokenBox.innerHTML = `<small>Confirm Token</small>${data.confirmToken}`;
+          }
+          endPipeline(true);
+          logCommand(command);
+        } catch (error) {
+          responseBox.innerHTML = `<small>Command Output</small>❌ Network Error: ${error.message}`;
+          console.error("Command execution error:", error);
+          setPipelineStage("strategy", { error: true });
+        }
+      }
+
+      async function shipIt() {
+        if (!lastPreview?.confirmToken || !lastPreview?.idempotencyKey) {
+          alert("No preview staged yet. Run a command first.");
+          return;
+        }
+        responseBox.innerHTML = `<small>Command Output</small>Applying + deploying...`;
+        try {
+          const applyRes = await fetch("/api/execute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "apply",
+              idempotencyKey: lastPreview.idempotencyKey,
+              command: lastPreview.enrichedCommand || lastPreview.ioo?.rawInput || "",
+              confirmToken: lastPreview.confirmToken,
+              target: "site",
+              actor: "admin-voice",
+            }),
+          });
+          const applyJson = await applyRes.json().catch(() => ({}));
+          if (!applyRes.ok) throw new Error(applyJson?.error?.message || applyJson?.error || "Apply failed");
+
+          const deployRes = await fetch("/api/execute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "deploy",
+              idempotencyKey: lastPreview.idempotencyKey,
+              command: "Deploy latest approved changes",
+              confirmToken: lastPreview.confirmToken,
+              target: "site",
+              actor: "admin-voice",
+            }),
+          });
+          const deployJson = await deployRes.json().catch(() => ({}));
+          if (!deployRes.ok) throw new Error(deployJson?.error?.message || deployJson?.error || "Deploy failed");
+
+          responseBox.innerHTML = `<small>Command Output</small>✅ Shipped.\n\n${JSON.stringify(
+            { apply: applyJson.eventType, deploy: deployJson.eventType, deployResult: deployJson.result || {} },
+            null,
+            2
+          )}`;
+        } catch (err) {
+          responseBox.innerHTML = `<small>Command Output</small>❌ Ship failed: ${err.message}`;
+        }
+      }
+
+      function clearResponse() {
+        const shipButton = document.getElementById("shipButton");
+        if (shipButton) shipButton.disabled = true;
+        responseBox.innerHTML = "<small>Command Output</small>Command responses will appear here...";
+        planPreview.innerHTML =
+          "<small>Revenue Strategy Output</small>Strategy output will be displayed here once the engine responds.";
+        revenueEstimate.innerHTML = "<small>Revenue Estimate</small>Daily $0 • Monthly $0 • Yearly $0";
+        diffPreview.innerHTML = "<small>Diff + Preview</small>Awaiting diff output.";
+        confirmTokenBox.innerHTML = "<small>Confirm Token</small>Hash-locked token will appear once build is ready.";
+        transcriptBox.textContent = "Waiting for voice input...";
+      }
+
+      form?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const method = document.getElementById("methodSelect").value;
+        const revenue = Number(document.getElementById("targetRevenue").value) || 2000;
+        const risk = document.getElementById("riskTolerance").value;
+        const traffic = document.getElementById("trafficStrategy").value;
+        const notes = document.getElementById("manualCommand").value?.trim();
+        const payload = {
+          intent: "make_money",
+          siteId: "voicetowebsite",
+          environment: "preview",
+          payload: {
+            method,
+            targetRevenue: { monthly: revenue },
+            riskTolerance: risk,
+            style: "midnight-steel",
+            automationLevel: "full",
+            contentAggression: "aggressive",
+            trafficStrategy: traffic,
+            notes,
+          },
+        };
+        executeCommand(JSON.stringify(payload));
+      });
+
+      document.querySelectorAll("[data-command]").forEach((btn) => {
+        btn.addEventListener("click", () => executeCommand(btn.dataset.command));
+      });
+
       // Polling Bots Status
       async function pollBots() {
         const list = document.getElementById("botActivityList");
@@ -430,7 +1275,6 @@
           if (!res.ok) throw new Error("Failed to fetch status");
           const data = await res.json();
 
-          // Combine builds and commands
           const activities = [];
           if (data.commands) {
             data.commands.forEach((c) =>
@@ -455,33 +1299,36 @@
 
           activities.sort((a, b) => new Date(b.ts) - new Date(a.ts));
 
-          if (activities.length === 0) {
-            list.innerHTML = '<div style="color:#a0aec0;">No active bots.</div>';
+          if (!activities.length) {
+            list.innerHTML = '<div style="color:rgba(248,250,252,0.65);">No active bots.</div>';
             return;
           }
 
           list.innerHTML = activities
             .map(
               (act) => `
-                <div style="background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px; border-left: 4px solid ${act.status === "failed" ? "#ef4444" : "#10b981"};">
+                <div style="background:rgba(6,10,24,0.9); padding:1rem; border-radius:18px; border-left: 4px solid ${
+                  act.status === "failed" ? "#fb7185" : "#31f6b6"
+                };">
                     <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
                         <span style="font-weight:bold;color:#fff;">${act.type}</span>
-                        <span style="color:#a0aec0;font-size:0.8rem;">${new Date(act.ts).toLocaleTimeString()}</span>
+                        <span style="color:rgba(248,250,252,0.6);font-size:0.8rem;">${new Date(act.ts).toLocaleTimeString()}</span>
                     </div>
                     <div style="color:#e2e8f0;">${act.summary}</div>
-                    <div style="margin-top:0.5rem;font-size:0.8rem;color:${act.status === "failed" ? "#ef4444" : "#10b981"};text-transform:uppercase;">${act.status}</div>
+                    <div style="margin-top:0.5rem;font-size:0.8rem;color:${
+                      act.status === "failed" ? "#fb7185" : "#31f6b6"
+                    };text-transform:uppercase;">${act.status}</div>
                 </div>
              `
             )
             .join("");
         } catch (err) {
-          // console.error(err);
+          // swallow to avoid noisy UI
         }
       }
 
-      // Start polling
       pollBots();
-      setInterval(pollBots, 5000);
+      setInterval(pollBots, 6000);
     </script>
   </body>
 </html>

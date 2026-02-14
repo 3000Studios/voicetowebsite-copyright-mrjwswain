@@ -190,8 +190,10 @@ class SchemaValidator {
         idempotencyKey: {
           type: "string",
           minLength: 3,
-          maxLength: 100,
-          pattern: "^[a-zA-Z0-9_-]+$",
+          // OpenAPI contract intentionally does not restrict the character set here.
+          // Custom GPTs may generate keys with dots/spaces/other punctuation.
+          // Keep a reasonable length cap to prevent abuse, but avoid false rejections.
+          maxLength: 200,
         },
         command: {
           type: "string",

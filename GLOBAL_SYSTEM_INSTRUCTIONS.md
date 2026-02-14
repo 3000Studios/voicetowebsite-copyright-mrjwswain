@@ -143,6 +143,7 @@ Admin pages:
 - `/admin/analytics` -> `admin/analytics.html`
 - `/admin/app-store-manager` -> `admin/app-store-manager.html`
 - `/admin/bot-command-center` -> `admin/bot-command-center.html`
+- `/admin/customer-chat` -> `admin/customer-chat.html`
 - `/admin` -> `admin/index.html`
 - `/admin/live-stream` -> `admin/live-stream.html`
 - `/admin/login` -> `admin/login.html`

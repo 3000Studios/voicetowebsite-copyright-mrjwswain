@@ -18,6 +18,26 @@
     }
   ],
   "paths": {
+    "/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "tags": ["Orchestration"],
+        "summary": "Health check (no auth)",
+        "description": "Lightweight unauthenticated health check for connectivity debugging. Returns whether the Worker is online and which bindings are available.",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/execute": {
       "post": {
         "operationId": "executeCommand",
@@ -227,6 +247,17 @@
       }
     },
     "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "status": { "type": "string" },
+          "orchestrator": { "type": "string" },
+          "d1": { "type": "boolean" },
+          "assets": { "type": "boolean" },
+          "ts": { "type": "string" }
+        }
+      },
       "ExecuteAction": {
         "type": "object",
         "additionalProperties": false,

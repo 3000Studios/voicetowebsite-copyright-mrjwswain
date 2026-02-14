@@ -1,52 +1,40 @@
 {
   "products": [
     {
-      "id": "starter",
+      "id": "single",
       "type": "service",
-      "title": "Starter Site",
-      "label": "Launch Fast",
-      "desc": "Perfect for personal brands and small projects. Includes 1 AI-generated page, basic hosting, and email support.",
-      "price": 79.0,
+      "title": "Solo Page",
+      "label": "Instant Launch",
+      "desc": "Perfect for a single landing page or personal portfolio. Includes 1 high-conversion AI page, secure hosting, and voice updates.",
+      "price": 49.0,
       "currency": "USD",
       "interval": "one-time",
-      "stripePriceId": "price_starter_chk123",
-      "features": ["1 AI Page", "Basic Hosting", "Email Support"]
+      "stripePriceId": "price_solo_123",
+      "features": ["1 AI Page", "Secure Hosting", "Basic SEO", "Voice Updates"]
     },
     {
-      "id": "growth",
+      "id": "business",
       "type": "service",
-      "title": "Growth Voice",
+      "title": "Business Bundle",
       "label": "Scale Up",
-      "desc": "For growing businesses. Up to 5 AI pages, custom domain, analytics, and priority support.",
-      "price": 249.0,
-      "currency": "USD",
-      "interval": "month",
-      "stripePriceId": "price_growth_chk456",
-      "features": ["5 AI Pages", "Custom Domain", "Analytics", "Priority Support"]
-    },
-    {
-      "id": "enterprise",
-      "type": "service",
-      "title": "Enterprise Edge",
-      "label": "Maximum Power",
-      "desc": "Unlimited pages, custom AI model training, SLA, and dedicated account manager.",
-      "price": 699.0,
-      "currency": "USD",
-      "interval": "month",
-      "stripePriceId": "price_enterprise_chk789",
-      "features": ["Unlimited Pages", "Custom AI Model", "SLA", "Dedicated Manager"]
-    },
-    {
-      "id": "lifetime",
-      "type": "service",
-      "title": "Lifetime App",
-      "label": "Best Value",
-      "desc": "One-time payment for lifetime access to all current and future features. No monthly fees.",
-      "price": 4999.0,
+      "desc": "A complete multi-page presence. Up to 5 AI-generated pages, custom domain integration, and priority support.",
+      "price": 199.0,
       "currency": "USD",
       "interval": "one-time",
-      "stripePriceId": "price_lifetime_chk000",
-      "features": ["Lifetime Access", "All Features", "No Monthly Fees", "VIP Support"]
+      "stripePriceId": "price_business_456",
+      "features": ["Up to 5 AI Pages", "Custom Domain", "Analytics", "Priority Support"]
+    },
+    {
+      "id": "unlimited",
+      "type": "service",
+      "title": "Enterprise Voice",
+      "label": "Maximum Reach",
+      "desc": "Unlimited pages, deep AI customization, and full white-label options.",
+      "price": 499.0,
+      "currency": "USD",
+      "interval": "month",
+      "stripePriceId": "price_enterprise_789",
+      "features": ["Unlimited Pages", "Custom AI Model", "24/7 Support"]
     }
   ],
   "apps": [

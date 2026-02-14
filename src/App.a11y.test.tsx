@@ -25,53 +25,35 @@ vi.mock("./components/WarpTunnel", () => ({
 describe("App Accessibility - Use Cases", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock localStorage to skip intro and audio bootstrap
-    vi.spyOn(Storage.prototype, "getItem").mockImplementation((key) => {
-      if (key === "vtw-v2-seen") return "1";
-      if (key === "vtw-audio-optout") return "1";
-      return null;
-    });
-    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("should have accessible tabs for Use Cases", async () => {
+  it("renders accessible voice flow controls", async () => {
     render(<App />);
 
-    // If intro is active, enter site first.
-    const skipIntro = screen.queryByRole("button", { name: /skip intro/i });
-    if (skipIntro) fireEvent.click(skipIntro);
+    // Audio toggle exists (name is dynamic; either VOICE OFF or VOICE ON)
+    const audioToggle = screen.getByRole("button", { name: /voice (off|on)/i });
+    expect(audioToggle).toBeInTheDocument();
 
-    // Wait for the tablist to be rendered.
-    const tablist = await waitFor(() => screen.getByRole("tablist", { name: /use cases/i }));
-    expect(tablist).toBeInTheDocument();
+    // Main CTA for voice capture exists
+    const tapToSpeak = screen.getByRole("button", { name: /tap to speak/i });
+    expect(tapToSpeak).toBeInTheDocument();
 
-    // Find tabs
-    const tabs = screen.getAllByRole("tab");
-    expect(tabs.length).toBeGreaterThan(0);
+    // Clicking it enters listening phase with a clear "Finish Command" control.
+    await waitFor(() => {
+      expect((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition).toBeTruthy();
+    });
+    fireEvent.click(tapToSpeak);
+    const finish = await waitFor(() => screen.getByRole("button", { name: /finish command/i }));
+    expect(finish).toBeInTheDocument();
 
-    // Check for aria-controls on the first tab (this should fail initially)
-    const firstTab = tabs[0];
-    expect(firstTab).toHaveAttribute("aria-controls", "use-cases-panel");
-
-    // Find the panel (this should fail initially as role="tabpanel" is missing)
-    const panel = screen.getByRole("tabpanel");
-    expect(panel).toBeInTheDocument();
-
-    // Check panel attributes
-    expect(panel).toHaveAttribute("id", "use-cases-panel");
-    expect(panel).toHaveAttribute("tabIndex", "0");
-
-    // Check connection
-    const activeTab = tabs.find((t) => t.getAttribute("aria-selected") === "true");
-    expect(activeTab).toBeDefined();
-    if (activeTab) {
-      const tabId = activeTab.getAttribute("id");
-      expect(tabId).toBeTruthy();
-      expect(panel).toHaveAttribute("aria-labelledby", tabId);
-    }
+    // Stop listening transitions to confirm phase (button exists and is clickable).
+    fireEvent.click(finish);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /make it/i })).toBeInTheDocument();
+    });
   });
 });

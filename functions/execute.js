@@ -158,7 +158,7 @@ const normalizeActionPayload = (payload) => {
   };
 };
 
-const getOrchestratorToken = (env) => String(env.ORCH_TOKEN || env.X_ORCH_TOKEN || "supersecret").trim();
+const getOrchestratorToken = (env) => String(env.ORCH_TOKEN || env.X_ORCH_TOKEN || "").trim();
 
 const hasValidHeaderToken = (request, env) => {
   const provided = String(request.headers.get("x-orch-token") || "").trim();
@@ -357,6 +357,12 @@ const matchesTokenAction = (tokenAction, requestedAction) => {
 
   // Allow preview tokens to be used for apply (workflow: preview -> apply -> deploy)
   if (tokenAction === "preview" && requestedAction === "apply") {
+    return true;
+  }
+
+  // Allow preview tokens to be used for deploy, but only after apply has succeeded.
+  // The "after apply" gate is enforced later via the database + apply event check.
+  if (tokenAction === "preview" && requestedAction === "deploy") {
     return true;
   }
 
@@ -620,6 +626,12 @@ export async function onRequestPost(context) {
         401,
         {
           error: "Unauthorized. Provide valid admin cookie or x-orch-token.",
+          auth: {
+            header: "x-orch-token",
+            env: ["ORCH_TOKEN", "X_ORCH_TOKEN"],
+            adminLogin: "/api/admin/login",
+            note: "This endpoint requires either a matching x-orch-token header or a signed admin cookie.",
+          },
           traceId,
         },
         env

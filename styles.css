@@ -2428,6 +2428,146 @@ input[type="search"]:focus {
   gap: 2rem;
 }
 
+.storefront-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-xl);
+  margin-top: var(--space-lg);
+}
+
+.storefront-card {
+  position: relative;
+  padding: var(--space-xl);
+  border-radius: var(--border-radius-2xl);
+  background: var(--card-gradient);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.storefront-card.flagship {
+  grid-column: span 2;
+  background: linear-gradient(140deg, rgba(125, 211, 252, 0.12), rgba(15, 23, 42, 0.92));
+}
+
+.storefront-card.enterprise {
+  border-image: linear-gradient(180deg, rgba(99, 102, 241, 0.35), rgba(14, 165, 233, 0.35)) 1;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.storefront-card.lifetime {
+  background: linear-gradient(120deg, rgba(14, 165, 233, 0.08), rgba(251, 191, 36, 0.08));
+}
+
+.storefront-card header h3 {
+  margin: 0;
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+}
+
+.storefront-copy {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.storefront-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.storefront-price .amount {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  font-weight: 700;
+}
+
+.storefront-price .meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.storefront-price.compact {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.feature-grid,
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.feature-grid li,
+.stat-grid div {
+  background: rgba(15, 23, 42, 0.55);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-md);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.feature-grid span,
+.stat-grid span {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.feature-grid strong,
+.stat-grid strong {
+  font-size: 1rem;
+}
+
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.chip-grid span {
+  border-radius: var(--border-radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.badge.pill {
+  align-self: flex-start;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--border-radius-full);
+  background: rgba(125, 211, 252, 0.15);
+  border: 1px solid rgba(125, 211, 252, 0.4);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.badge.pill.warm {
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+@media (max-width: 960px) {
+  .storefront-card.flagship {
+    grid-column: span 1;
+  }
+
+  .feature-grid,
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .card {
   background: var(--card-gradient);
   border: 1px solid var(--glass-border);

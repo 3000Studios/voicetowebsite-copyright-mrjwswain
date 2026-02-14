@@ -98,141 +98,180 @@
       <section class="section">
         <h2>Storefront</h2>
         <p class="subhead">
-          Subscription-ready plans and one-time app purchase options. Licenses are issued after payment confirmation.
+          Match your operations pace: mix memberships with drop-in automations, then check out via PayPal or Stripe
+          without leaving this grid.
         </p>
-        <div class="pricing-deck">
-          <div class="card luxe" data-tier="starter">
-            <div class="card-header">
-              <div class="tier">Starter Site</div>
-              <div class="price">
-                <span class="currency">$</span>
-                <span class="amount">79</span>
-                <span class="period">/month</span>
-              </div>
-            </div>
-            <div class="card-content">
-              <ul class="features">
-                <li>Single brand with AI edits</li>
-                <li>3 live pages + contact</li>
-                <li>Weekly deploys</li>
-                <li>Weekly license key (7 days)</li>
-                <li>Email support</li>
-                <li class="not-included">Livestream pack</li>
-                <li class="not-included">Team seats</li>
-              </ul>
-              <div class="button-row">
-                <button class="primary pay-btn" data-product="starter" data-amount="7900" data-label="Starter Site">
-                  PayPal
-                </button>
-                <button class="ghost stripe-btn" data-product="starter" data-amount="7900" data-label="Starter Site">
-                  Stripe
-                </button>
-              </div>
-            </div>
-            <div class="shine"></div>
-          </div>
-          <div class="card luxe premium premium-border-glow glass-morphism" data-tier="growth">
-            <div class="popular-tag">Most Popular</div>
-            <div class="card-header">
-              <div class="tier">Growth Voice</div>
-              <div class="price">
+        <div class="storefront-grid">
+          <article class="storefront-card flagship" data-tier="growth">
+            <div class="badge pill">Most requested</div>
+            <header>
+              <p class="eyebrow">Growth Voice</p>
+              <h3>Daily co-pilot for high-volume sites</h3>
+            </header>
+            <p class="storefront-copy">
+              Hand off day-to-day edits, preview gating, and live deploys. Includes livestream scenes and automated
+              rollbacks.
+            </p>
+            <div class="storefront-price">
+              <div>
                 <span class="currency">$</span>
                 <span class="amount">249</span>
                 <span class="period">/month</span>
               </div>
+              <div class="meta">3 brands · unlimited variants</div>
             </div>
-            <div class="card-content">
-              <ul class="features">
-                <li>Up to 3 brands</li>
-                <li>Unlimited pages & variants</li>
-                <li>Livestream pack included</li>
-                <li>Daily deploys + rollback</li>
-                <li>Monthly license keys</li>
-                <li>Slack priority support</li>
-                <li class="not-included">Dedicated engineer</li>
-              </ul>
-              <div class="button-row">
-                <button class="primary pay-btn" data-product="growth" data-amount="24900" data-label="Growth Voice">
-                  PayPal
-                </button>
-                <button class="ghost stripe-btn" data-product="growth" data-amount="24900" data-label="Growth Voice">
-                  Stripe
-                </button>
+            <ul class="feature-grid">
+              <li>
+                <span>Deploy cadence</span>
+                <strong>Daily + instant rollback</strong>
+              </li>
+              <li>
+                <span>Support lane</span>
+                <strong>Slack priority</strong>
+              </li>
+              <li>
+                <span>Licensing</span>
+                <strong>Monthly keys</strong>
+              </li>
+              <li>
+                <span>Media</span>
+                <strong>Livestream pack</strong>
+              </li>
+            </ul>
+            <div class="button-row">
+              <button class="primary pay-btn" data-product="growth" data-amount="24900" data-label="Growth Voice">
+                PayPal
+              </button>
+              <button class="ghost stripe-btn" data-product="growth" data-amount="24900" data-label="Growth Voice">
+                Stripe
+              </button>
+            </div>
+          </article>
+
+          <article class="storefront-card stack" data-tier="starter">
+            <header>
+              <p class="eyebrow">Starter Capsule</p>
+              <div class="storefront-price compact">
+                <div>
+                  <span class="currency">$</span>
+                  <span class="amount">79</span>
+                  <span class="period">/month</span>
+                </div>
+                <span class="meta">Single brand</span>
               </div>
+            </header>
+            <p class="storefront-copy">Perfect for a single site with weekly refreshes and lightweight support.</p>
+            <div class="chip-grid">
+              <span>3 live pages + contact</span>
+              <span>AI edit requests</span>
+              <span>Weekly deploy window</span>
+              <span>7-day license rotation</span>
             </div>
-            <div class="shine"></div>
-          </div>
-          <div class="card luxe" data-tier="enterprise">
-            <div class="card-header">
-              <div class="tier">Enterprise Edge</div>
-              <div class="price">
+            <div class="button-row">
+              <button class="primary pay-btn" data-product="starter" data-amount="7900" data-label="Starter Site">
+                PayPal
+              </button>
+              <button class="ghost stripe-btn" data-product="starter" data-amount="7900" data-label="Starter Site">
+                Stripe
+              </button>
+            </div>
+          </article>
+
+          <article class="storefront-card enterprise" data-tier="enterprise">
+            <header>
+              <p class="eyebrow">Enterprise Edge</p>
+              <h3>Governed automation for regulated teams</h3>
+            </header>
+            <div class="storefront-price">
+              <div>
                 <span class="currency">$</span>
                 <span class="amount">699</span>
                 <span class="period">/month</span>
               </div>
+              <div class="meta">Unlimited brands & seats</div>
             </div>
-            <div class="card-content">
-              <ul class="features">
-                <li>Unlimited brands & seats</li>
-                <li>Custom data & KV/D1 setup</li>
-                <li>Live ops desk 24/7</li>
-                <li>Governed deploy approvals</li>
-                <li>Dedicated engineer</li>
-                <li>Monthly + annual license options</li>
-                <li>Custom branding & SSO</li>
-              </ul>
-              <div class="button-row">
-                <button
-                  class="primary pay-btn"
-                  data-product="enterprise"
-                  data-amount="69900"
-                  data-label="Enterprise Edge"
-                >
-                  PayPal
-                </button>
-                <button
-                  class="ghost stripe-btn"
-                  data-product="enterprise"
-                  data-amount="69900"
-                  data-label="Enterprise Edge"
-                >
-                  Stripe
-                </button>
+            <div class="stat-grid">
+              <div>
+                <span>Ops desk</span>
+                <strong>24/7</strong>
+              </div>
+              <div>
+                <span>Data work</span>
+                <strong>KV · D1 · R2</strong>
+              </div>
+              <div>
+                <span>Security</span>
+                <strong>SSO + custom branding</strong>
+              </div>
+              <div>
+                <span>Controls</span>
+                <strong>Approval workflow</strong>
               </div>
             </div>
-            <div class="shine"></div>
-          </div>
-          <div class="card luxe" data-tier="lifetime">
-            <div class="popular-tag">One-Time</div>
-            <div class="card-header">
-              <div class="tier">Lifetime App Buyout</div>
-              <div class="price">
+            <p class="storefront-copy">
+              Includes dedicated engineer, incident bridge, and hybrid annual/monthly license catalog.
+            </p>
+            <div class="button-row">
+              <button
+                class="primary pay-btn"
+                data-product="enterprise"
+                data-amount="69900"
+                data-label="Enterprise Edge"
+              >
+                PayPal
+              </button>
+              <button
+                class="ghost stripe-btn"
+                data-product="enterprise"
+                data-amount="69900"
+                data-label="Enterprise Edge"
+              >
+                Stripe
+              </button>
+            </div>
+          </article>
+
+          <article class="storefront-card lifetime" data-tier="lifetime">
+            <div class="badge pill warm">One-time license</div>
+            <header>
+              <p class="eyebrow">Lifetime App Buyout</p>
+              <h3>Own the full VoiceToWebsite stack</h3>
+            </header>
+            <div class="storefront-price">
+              <div>
                 <span class="currency">$</span>
                 <span class="amount">4999</span>
                 <span class="period">one-time</span>
               </div>
+              <div class="meta">Self-host or edge-host</div>
             </div>
-            <div class="card-content">
-              <ul class="features">
-                <li>Full VoiceToWebsite app</li>
-                <li>Self-host or edge-host</li>
-                <li>White-label rights</li>
-                <li>1 year updates</li>
-                <li>Perpetual license key</li>
-                <li>Priority onboarding</li>
-                <li>Optional support retainer</li>
-              </ul>
-              <div class="button-row">
-                <button class="primary pay-btn" data-product="lifetime" data-amount="499900" data-label="Lifetime App">
-                  PayPal
-                </button>
-                <button class="ghost stripe-btn" data-product="lifetime" data-amount="499900" data-label="Lifetime App">
-                  Stripe
-                </button>
-              </div>
+            <ul class="feature-grid">
+              <li>
+                <span>Rights</span>
+                <strong>White-label + resale</strong>
+              </li>
+              <li>
+                <span>Updates</span>
+                <strong>12 months included</strong>
+              </li>
+              <li>
+                <span>Onboarding</span>
+                <strong>Priority team</strong>
+              </li>
+              <li>
+                <span>Support</span>
+                <strong>Opt-in retainer</strong>
+              </li>
+            </ul>
+            <div class="button-row">
+              <button class="primary pay-btn" data-product="lifetime" data-amount="499900" data-label="Lifetime App">
+                PayPal
+              </button>
+              <button class="ghost stripe-btn" data-product="lifetime" data-amount="499900" data-label="Lifetime App">
+                Stripe
+              </button>
             </div>
-            <div class="shine"></div>
-          </div>
+          </article>
         </div>
         <p class="subhead">Products are managed in Admin → Store Manager and rendered here automatically.</p>
         <section class="store-products" aria-label="Products">

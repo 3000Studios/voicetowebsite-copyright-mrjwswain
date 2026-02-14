@@ -1,0 +1,26 @@
+{
+  "ads": {
+    "stack": ["adsense", "analytics", "ad_placements"],
+    "dependencies": ["verify adsense publisher + slots", "add ad placements"]
+  },
+  "affiliate": {
+    "stack": ["affiliate_links", "disclosure", "comparison_pages", "tracking"],
+    "dependencies": ["add disclosure page", "generate affiliate landing pages", "add CTA blocks", "install tracking"]
+  },
+  "leadgen": {
+    "stack": ["lead_magnet", "email_capture", "calendar_or_booking", "deposit_checkout"],
+    "dependencies": ["add lead magnet landing page", "add email capture form", "set up newsletter drip campaign"]
+  },
+  "subscriptions": {
+    "stack": ["pricing", "checkout", "account_access"],
+    "dependencies": ["create pricing page", "wire checkout", "add subscriber access gating"]
+  },
+  "digitalProducts": {
+    "stack": ["storefront", "checkout", "delivery"],
+    "dependencies": ["add product pages", "wire checkout", "add delivery flow"]
+  },
+  "hybrid": {
+    "stack": ["adsense", "affiliate_links", "email_capture", "seo"],
+    "dependencies": ["add disclosure page", "add email capture form", "enable analytics"]
+  }
+}

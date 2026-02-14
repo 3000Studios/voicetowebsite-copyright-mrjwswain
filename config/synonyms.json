@@ -1,0 +1,16 @@
+{
+  "ship it": "deploy",
+  "deploy it": "deploy",
+  "push it live": "deploy",
+  "go live": "deploy",
+  "publish it": "deploy",
+  "full send": "deploy",
+  "send it": "deploy",
+  "stop": "cancel",
+  "cancel": "cancel",
+  "abort": "cancel",
+  "nevermind": "cancel",
+  "undo": "rollback",
+  "rollback": "rollback",
+  "revert it": "rollback"
+}

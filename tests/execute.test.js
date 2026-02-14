@@ -9,7 +9,7 @@ import { sha256Hex, createConfirmToken, validateAndConsumeConfirmToken } from ".
 // Mock environment and dependencies
 const mockEnv = {
   CONFIRM_TOKEN_SECRET: "test-secret-key-for-testing",
-  ORCH_TOKEN: "supersecret",
+  ORCH_TOKEN: "test-orch-token",
   NODE_ENV: "test",
   ENABLE_RESPONSE_VALIDATION: "false",
 };

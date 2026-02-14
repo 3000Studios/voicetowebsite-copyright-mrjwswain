@@ -1,0 +1,14 @@
+{
+  "ads": {
+    "default": "adsense"
+  },
+  "payments": {
+    "default": ["stripe", "paypal"]
+  },
+  "email": {
+    "default": "default"
+  },
+  "affiliates": {
+    "defaultNetworks": ["amazon", "impact", "cj"]
+  }
+}

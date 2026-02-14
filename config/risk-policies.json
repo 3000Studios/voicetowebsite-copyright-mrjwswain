@@ -1,0 +1,14 @@
+{
+  "highRiskWords": ["delete", "remove", "wipe", "drop", "destroy", "rollback", "revert", "deploy", "ship", "go live"],
+  "mediumRiskWords": ["monetize", "make me money", "payment", "checkout", "stripe", "paypal"],
+  "intentRisk": {
+    "deploy": "high",
+    "rollback": "high",
+    "enable_adsense": "medium",
+    "enable_affiliate_engine": "medium",
+    "enable_membership": "high",
+    "update_theme": "low",
+    "update_background_video": "low",
+    "enable_email_capture": "medium"
+  }
+}

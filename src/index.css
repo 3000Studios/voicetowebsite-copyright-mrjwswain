@@ -122,12 +122,16 @@ iframe {
   font-family: "Orbitron", sans-serif;
 }
 
-.font-syncopate {
-  font-family: "Syncopate", sans-serif;
+.font-outfit {
+  font-family: "Outfit", sans-serif;
 }
 
-.font-playfair {
-  font-family: "Playfair Display", serif;
+.vtw-metallic-heading {
+  background: linear-gradient(to bottom, #ffffff 20%, #d1d5db 45%, #9ca3af 50%, #4b5563 55%, #d1d5db 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
 }
 
 .gold-platinum-text {
