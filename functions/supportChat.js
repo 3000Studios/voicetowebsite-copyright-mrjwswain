@@ -1,5 +1,6 @@
 import { hasValidAdminCookie, isAdminRequest } from "./adminAuth.js";
 import { getLogger, initializeLogger, LOG_LEVELS, loggingMiddleware } from "./logger.js";
+import { createRateLimitMiddleware, rateLimitMiddleware } from "./rate-limiter.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -72,6 +73,26 @@ const pickAiText = (result) => {
   return "";
 };
 
+const buildStaticReply = (message) => {
+  const t = String(message || "")
+    .trim()
+    .toLowerCase();
+  if (!t) return "";
+  if (t.includes("pricing") || t.includes("price")) {
+    return "Pricing is on /pricing. Want a fast win? Try /demo first.";
+  }
+  if (t.includes("demo") || t.includes("try")) {
+    return "Open the interactive demo at /demo. You will get an outline preview in seconds.";
+  }
+  if (t.includes("privacy") || t.includes("data") || t.includes("security")) {
+    return "For data handling + security posture, see /trust and /privacy.";
+  }
+  if (t.includes("status") || t.includes("down") || t.includes("outage")) {
+    return "Check /status for current incidents. If you need escalation, email support@voicetowebsite.com.";
+  }
+  return "Try /demo to build instantly, or /pricing to compare tiers. For urgent help, email support@voicetowebsite.com.";
+};
+
 const generateAutoReply = async (env, message) => {
   const userText = String(message || "").trim();
   if (!userText) return "";
@@ -134,8 +155,19 @@ export async function handleSupportChatRequest({ request, env }) {
   const db = env?.D1 || env?.DB || null;
   await ensureTables(db);
 
+  const rateLimit = rateLimitMiddleware(createRateLimitMiddleware(db));
+
   // Visitor: create/restore session
   if (url.pathname === "/api/support/start" && request.method === "POST") {
+    const rl = await rateLimit(request, "support_start");
+    if (rl.blocked) return new Response(rl.response.body, { status: rl.response.status, headers: rl.response.headers });
+
+    // CSRF defense-in-depth for browser requests (allow non-browser clients without Origin).
+    const origin = request.headers.get("origin");
+    if (origin && origin !== new URL(request.url).origin) {
+      return json(403, { error: "Forbidden", traceId });
+    }
+
     const body = await readJson(request);
     const customer_email = String(body?.email || "")
       .trim()
@@ -168,6 +200,15 @@ export async function handleSupportChatRequest({ request, env }) {
 
   // Visitor: send message
   if (url.pathname === "/api/support/message" && request.method === "POST") {
+    const rl = await rateLimit(request, "support_message");
+    if (rl.blocked) return new Response(rl.response.body, { status: rl.response.status, headers: rl.response.headers });
+
+    // CSRF defense-in-depth for browser requests (allow non-browser clients without Origin).
+    const origin = request.headers.get("origin");
+    if (origin && origin !== new URL(request.url).origin) {
+      return json(403, { error: "Forbidden", traceId });
+    }
+
     const body = await readJson(request);
     const message = String(body?.message || "").trim();
     const sessionId = String(body?.sessionId || getCookie(request, cookieName) || "").trim();
@@ -188,15 +229,17 @@ export async function handleSupportChatRequest({ request, env }) {
         .run();
     }
 
-    // Optional: auto-reply (AI). On by default.
+    // Optional: auto-reply (AI). Off by default (enable with PUBLIC_SUPPORT_AI=1).
     let reply = "";
     let replyMessageId = "";
     try {
-      if (String(env?.PUBLIC_SUPPORT_AI || "1") !== "0") {
+      if (String(env?.PUBLIC_SUPPORT_AI || "").trim() === "1") {
         reply = await generateAutoReply(env, message);
+      } else {
+        reply = buildStaticReply(message);
       }
     } catch (_) {
-      reply = "";
+      reply = buildStaticReply(message);
     }
 
     if (db && reply) {
@@ -258,6 +301,12 @@ export async function handleSupportChatRequest({ request, env }) {
   if (url.pathname === "/api/support/admin/reply" && request.method === "POST") {
     if (!(await requireAdmin(request, env))) return json(401, { error: "Unauthorized", traceId });
     if (!db) return json(503, { error: "D1 database not available.", traceId });
+
+    // CSRF defense-in-depth for cookie-authenticated browser requests.
+    const origin = request.headers.get("origin");
+    if (origin && origin !== new URL(request.url).origin) {
+      return json(403, { error: "Forbidden", traceId });
+    }
 
     const body = await readJson(request);
     const sessionId = String(body?.sessionId || "").trim();

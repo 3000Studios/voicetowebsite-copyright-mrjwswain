@@ -32,6 +32,18 @@ const RATE_LIMIT_CONFIGS = {
     maxRequests: 5, // 5 auto operations per 5 minutes
     blockDurationMs: 600000, // 10 minute block
   },
+
+  // Public support chat endpoints (AI can be expensive; keep tighter limits)
+  supportStart: {
+    windowMs: 60000, // 1 minute window
+    maxRequests: 30,
+    blockDurationMs: 300000, // 5 minutes
+  },
+  supportMessage: {
+    windowMs: 60000, // 1 minute window
+    maxRequests: 20,
+    blockDurationMs: 300000, // 5 minutes
+  },
 };
 
 /**
@@ -58,6 +70,10 @@ class RateLimiter {
         return this.config.token;
       case "auto":
         return this.config.auto;
+      case "support_start":
+        return this.config.supportStart;
+      case "support_message":
+        return this.config.supportMessage;
       default:
         return this.config.default;
     }

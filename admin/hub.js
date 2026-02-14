@@ -22,7 +22,13 @@ const isSessionFresh = () => {
   }
 };
 
-const isUnlocked = () => true; // Security removed per USER REQUEST
+const isUnlocked = () => {
+  try {
+    return sessionStorage.getItem("adminAccessValidated") === "true";
+  } catch (_) {
+    return false;
+  }
+};
 
 const setChip = (el, text, tone) => {
   if (!el) return;
@@ -79,8 +85,30 @@ const loadSnapshot = async () => {
 
     const products = Array.isArray(productsPayload?.products) ? productsPayload.products : [];
     productsEl.textContent = fmtNumber(products.length);
-    const missingButtons = products.filter((p) => p && p.active !== 0 && !String(p.stripe_buy_button_id || "").trim());
-    missingEl.textContent = fmtNumber(missingButtons.length);
+
+    // Catalog does not guarantee checkout metadata; do not invent "missing" counts.
+    // If a product explicitly declares any checkout field, we can validate; otherwise show "—".
+    const hasAnyCheckoutMeta = products.some(
+      (p) =>
+        String(p?.stripeBuyButtonId || "").trim() ||
+        String(p?.stripePriceId || "").trim() ||
+        String(p?.stripePaymentLink || "").trim() ||
+        String(p?.paypalPaymentLink || "").trim()
+    );
+    if (!hasAnyCheckoutMeta) {
+      missingEl.textContent = "—";
+    } else {
+      const missingButtons = products.filter((p) => {
+        if (!p) return false;
+        const any =
+          String(p?.stripeBuyButtonId || "").trim() ||
+          String(p?.stripePriceId || "").trim() ||
+          String(p?.stripePaymentLink || "").trim() ||
+          String(p?.paypalPaymentLink || "").trim();
+        return !any;
+      });
+      missingEl.textContent = fmtNumber(missingButtons.length);
+    }
 
     stripePubEl.textContent = config.stripe_publishable ? "Connected" : "Missing";
     stripeSecretEl.textContent = config.stripe_secret ? "Connected" : "Missing";
@@ -102,14 +130,9 @@ const init = () => {
   const refreshBtn = byId("hub-refresh");
   refreshBtn?.addEventListener("click", () => loadSnapshot());
 
-  // Load once, then retry a few times in case the user just unlocked.
+  // Load once, then keep updating while unlocked.
   loadSnapshot();
-  let tries = 0;
-  const timer = window.setInterval(() => {
-    tries += 1;
-    loadSnapshot();
-    if (tries >= 30) window.clearInterval(timer);
-  }, 2000);
+  window.setInterval(loadSnapshot, 60000);
 };
 
 if (document.readyState === "loading") {

@@ -9,12 +9,12 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
+    <script type="module" src="./access-guard.js"></script>
   </head>
   <body>
-    <!-- ADMIN GUARD & LOCK SCREEN REMOVED -->
-    <video autoplay muted loop playsinline class="video-bg">
-      <source src="https://cdn.coverr.co/videos/coverr-admin-dashboard-8765/1080p.mp4" type="video/mp4" />
-    </video>
+    <div class="admin-video-bg" aria-hidden="true">
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+    </div>
     <div class="noise-overlay" aria-hidden="true"></div>
 
     <div class="admin-shell">
@@ -24,8 +24,7 @@
           id="app-manager"
           style="
             background-image:
-              linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-              url(&quot;https://res.cloudinary.com/dj92eb97f/video/upload/v1766986154/Coin_stack_lhwjax.mp4&quot;);
+              linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(&quot;/vtw-wallpaper.png&quot;);
             background-size: cover;
             background-position: center;
           "
@@ -37,8 +36,8 @@
               <p class="muted">Control listings, track sales, and push apps directly to the Store.</p>
             </div>
             <div class="status-strip">
-              <span class="status-chip" id="apps-count">0 apps</span>
-              <span class="status-chip" id="apps-sales">$0 sales</span>
+              <span class="status-chip" id="apps-count">— apps</span>
+              <span class="status-chip" id="apps-sales">Sales: —</span>
             </div>
           </div>
 
@@ -51,26 +50,26 @@
                 </div>
                 <div class="kpi-card">
                   <div class="kpi-label">MRR</div>
-                  <div class="kpi-value" id="kpi-mrr">$0</div>
+                  <div class="kpi-value" id="kpi-mrr">—</div>
                 </div>
                 <div class="kpi-card">
                   <div class="kpi-label">New this week</div>
-                  <div class="kpi-value" id="kpi-new">0</div>
+                  <div class="kpi-value" id="kpi-new">—</div>
                 </div>
               </div>
 
               <div class="table-shell">
                 <div class="table-head">
                   <h3>Listings</h3>
-                  <button class="ghost small" id="apps-reset">Reset sample data</button>
+                  <button class="ghost small" id="apps-reset" type="button">Refresh</button>
                 </div>
                 <table class="app-table">
                   <thead>
                     <tr>
                       <th>Title</th>
+                      <th>Label</th>
                       <th>Price</th>
-                      <th>Tag</th>
-                      <th>Sales</th>
+                      <th>ID</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -87,7 +86,7 @@
               <h3>Add or Upload App</h3>
               <p class="muted">Create a listing that will sync to the Store page.</p>
 
-              <form id="app-form" class="app-form">
+              <form id="app-form" class="app-form" data-mode="readonly">
                 <div class="form-grid">
                   <label>
                     <span class="form-label">Title</span>
@@ -118,11 +117,21 @@
                 </label>
 
                 <div class="button-grid">
-                  <button type="submit" class="primary">Save to Store</button>
+                  <button
+                    type="submit"
+                    class="primary"
+                    disabled
+                    title="Catalog is file-based. Edit products.json and redeploy."
+                  >
+                    Save to Store
+                  </button>
                   <button type="button" class="ghost" id="app-clear">Clear</button>
                 </div>
 
-                <p class="muted small">Saved apps appear in the table and sync to the Store in a future API hook.</p>
+                <p class="muted small">
+                  This page is read-only in production. To change inventory, edit <code>products.json</code> and
+                  redeploy.
+                </p>
               </form>
             </div>
           </div>
@@ -130,7 +139,7 @@
       </main>
     </div>
 
-    <script type="module" src="./admin.js"></script>
+    <script type="module" src="./app-store-admin.js"></script>
     <script type="module" src="../nav.js"></script>
   </body>
 </html>

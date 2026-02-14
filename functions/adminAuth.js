@@ -67,9 +67,20 @@ export const verifyAdminCookieValue = async (env, value) => {
   return timingSafeEqual(sig, expected);
 };
 
-export const hasValidAdminCookie = async (request, env) => true; // Security removed per USER REQUEST
+export const hasValidAdminCookie = async (request, env) => {
+  const cookieHeader = request.headers.get("cookie") || "";
+  const value = getCookie(cookieHeader, adminCookieName);
+  return verifyAdminCookieValue(env, value);
+};
 
-export const isAdminRequest = async (request, env) => true; // Security removed per USER REQUEST
+export const isAdminRequest = async (request, env) => {
+  // Allows non-browser admin callers (e.g., internal tools) to authenticate without cookies.
+  const headerToken = request.headers.get("x-admin-token") || "";
+  if (headerToken && env.CONTROL_PASSWORD && timingSafeEqual(headerToken, String(env.CONTROL_PASSWORD))) {
+    return true;
+  }
+  return hasValidAdminCookie(request, env);
+};
 
 export const setAdminCookieHeaders = (headers, cookieValue, { secure = true } = {}) => {
   headers.append(

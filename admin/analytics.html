@@ -9,18 +9,11 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
+    <script src="/admin/access-guard.js" type="module" defer></script>
   </head>
   <body>
-    <!-- ADMIN GUARD REMOVED -->
-
     <div class="admin-video-bg" aria-hidden="true">
-      <video
-        src="https://res.cloudinary.com/dj92eb97f/video/upload/v1768852259/203021-919745637_ftl2bl.mp4"
-        autoplay
-        muted
-        loop
-        playsinline
-      ></video>
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
     </div>
 
     <div class="admin-shell">
@@ -110,7 +103,6 @@
     </div>
 
     <script type="module" src="../nav.js"></script>
-    <script type="module" src="./access-guard.js"></script>
     <script type="module">
       const requestsEl = document.getElementById("metric-requests");
       const bandwidthEl = document.getElementById("metric-bandwidth");
@@ -201,7 +193,7 @@
               data.recent_orders.forEach((o) => {
                 html += `<tr>
                             <td class="small muted">${o.id}</td>
-                            <td>$${Number(o.amount || 0).toFixed(2)}</td>
+                            <td>$${Number(o.amount_usd || 0).toFixed(2)}</td>
                             <td>${o.product_id}</td>
                             <td class="small">${new Date(o.ts).toLocaleString()}</td>
                         </tr>`;
@@ -213,7 +205,7 @@
                 `<div class="analytics-kpis" style="margin-bottom:1rem;">
                         <div class="metric-card">
                             <div class="metric-label">Total Revenue</div>
-                            <div class="metric-value">$${Number(data.total_revenue || 0).toFixed(2)}</div>
+                            <div class="metric-value">$${Number(data.total_revenue_usd || 0).toFixed(2)}</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-label">Orders</div>
@@ -242,6 +234,7 @@
       };
 
       loadAnalytics();
+      setInterval(loadAnalytics, 60000);
     </script>
   </body>
 </html>

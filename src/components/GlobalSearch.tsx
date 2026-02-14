@@ -56,7 +56,7 @@ const GlobalSearch: React.FC = () => {
       id: "5",
       title: "AudioBoost Pro AI",
       description: "Professional audio enhancement powered by AI",
-      url: "/appstore-new.html#audioboost",
+      url: "/store",
       type: "product",
       icon: <Zap className="w-4 h-4" />,
     },

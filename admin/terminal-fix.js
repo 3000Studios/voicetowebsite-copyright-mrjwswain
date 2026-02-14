@@ -16,13 +16,14 @@ const getEl = (id) => document.getElementById(id);
 
 const appendExecutionLog = (entry) => {
   try {
-    const logs = JSON.parse(localStorage.getItem("vtw-exec-log") || "[]");
+    // Session-only to avoid persisting potentially sensitive admin commands on disk.
+    const logs = JSON.parse(sessionStorage.getItem("vtw-exec-log") || "[]");
     logs.unshift({
       ...entry,
       ts: new Date().toISOString(),
       state: terminalState,
     });
-    localStorage.setItem("vtw-exec-log", JSON.stringify(logs.slice(0, 100)));
+    sessionStorage.setItem("vtw-exec-log", JSON.stringify(logs.slice(0, 100)));
   } catch (_) {}
 };
 

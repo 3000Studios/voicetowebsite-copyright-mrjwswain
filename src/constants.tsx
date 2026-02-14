@@ -2,7 +2,7 @@ import { NavigationLink } from "./types";
 
 export const BACKGROUND_TUNNEL = "https://pub-6293369f8afa4d849c26002fd232f5ac.r2.dev/looping%20tunnel.mp4";
 export const INTRO_SONG = "https://media.voicetowebsite.com/Intro%20funk.mp3";
-export const HOME_VIDEO = "https://media.voicetowebsite.com/homenavigation.mp4";
+export const HOME_VIDEO = "/media/vtw-home-wallpaper.mp4";
 
 export const NAV_LINKS: NavigationLink[] = [
   {

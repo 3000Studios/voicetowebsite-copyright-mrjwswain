@@ -9,6 +9,36 @@ import siteConfig from "./src/site-config.json";
     { id: "ember", label: "Ember" },
     { id: "ocean", label: "Ocean" },
   ];
+  const hexToRgb = (hex) => {
+    const normalized = String(hex || "")
+      .replace(/[^0-9a-f]/gi, "")
+      .substring(0, 6);
+    if (normalized.length !== 6) return { r: 125, g: 211, b: 252 };
+    return {
+      r: parseInt(normalized.substring(0, 2), 16),
+      g: parseInt(normalized.substring(2, 4), 16),
+      b: parseInt(normalized.substring(4, 6), 16),
+    };
+  };
+
+  const WAVE_COLOR_PRESETS = [
+    {
+      id: "cobalt-ocean",
+      layers: ["#142c54", "#1e3a8a", "#38bdf8", "#fdf7ef"],
+    },
+    {
+      id: "ion-sky",
+      layers: ["#0b233d", "#0ea5e9", "#7dd3fc", "#bae6fd"],
+    },
+    {
+      id: "sunrise",
+      layers: ["#1d1f2a", "#2563eb", "#3b82f6", "#f8fafc"],
+    },
+    {
+      id: "ivory-wave",
+      layers: ["#111827", "#1d4ed8", "#60a5fa", "#fff7e6"],
+    },
+  ];
   // Force cache-bust/version stamp so new nav bundle propagates
   document.documentElement.dataset.navVersion = "2026-02-12-01";
 
@@ -43,7 +73,6 @@ import siteConfig from "./src/site-config.json";
     { href: "/license", label: "License", icon: "🔐" },
     { href: "/demo", label: "Demo", icon: "🚀" },
     { href: "/store", label: "Store", icon: "🛒" },
-    { href: "/appstore", label: "App Store", icon: "📱" },
     { href: "/blog", label: "Blog", icon: "📝" },
     { href: "/livestream", label: "Live", icon: "🎥" },
     { href: "/support", label: "Support", icon: "💬" },
@@ -69,7 +98,7 @@ import siteConfig from "./src/site-config.json";
       { href: "/pricing", label: "Pricing", icon: "💎" },
       { href: "/license", label: "Licensing", icon: "🔐" },
       { href: "/store", label: "Store", icon: "🛒" },
-      { href: "/appstore", label: "App Store", icon: "📱" },
+      { href: "/store", label: "Apps", icon: "📱" },
     ],
     company: [
       { href: "/about", label: "About Us", icon: "🗿" },
@@ -82,7 +111,7 @@ import siteConfig from "./src/site-config.json";
       { href: "/admin", label: "Admin", icon: "⚙️" },
     ],
     affiliates: [
-      { href: "https://www.cloudflare.com/r/YOUR_ID", label: "Powered by Cloudflare ($20 Credit)", icon: "☁️" },
+      { href: "https://www.cloudflare.com/", label: "Powered by Cloudflare", icon: "☁️" },
       { href: "https://openai.com/api/", label: "Build with OpenAI", icon: "🧠" },
       { href: "/referrals.html", label: "Refer a Friend (Get 10%)", icon: "🎁" },
     ],
@@ -218,7 +247,17 @@ import siteConfig from "./src/site-config.json";
       return false;
     }
   };
-  const hasAdminAccess = () => true; // Security removed per USER REQUEST
+  const hasAdminAccess = () => {
+    try {
+      // Session unlock (client-side UX guard) must be present.
+      const unlocked = sessionStorage.getItem("adminAccessValidated") === "true";
+      if (!unlocked) return false;
+      // And the user must have an authenticated admin cookie OR a fresh unlock timer.
+      return hasAdminCookie() || isAdminSessionFresh();
+    } catch (_) {
+      return false;
+    }
+  };
   const getNavLinks = () => navLinks;
   // Admin was getting clipped off on mid-sized viewports because the nav bar
   // had `overflow: hidden` and too many links in one row. Keep Admin pinned
@@ -228,25 +267,30 @@ import siteConfig from "./src/site-config.json";
 
   const buildPrimaryLinksHtml = () =>
     getPrimaryNavLinks()
-      .map((link) => `<a href="${link.href}" data-name="${link.label}">${link.icon} ${link.label}</a>`)
+      .map(
+        (link, idx) =>
+          `<a href="${link.href}" data-name="${link.label}" data-vtw-scrollfx="label" style="--vtw-i:${idx}">${link.icon} ${link.label}</a>`
+      )
       .join("");
 
   const buildActionsHtml = () => {
     let html = "";
     const admin = getAdminNavLink();
     if (admin)
-      html += `<a class="nav-admin-link" href="${admin.href}" data-name="${admin.label}">${admin.icon} ${admin.label}</a>`;
+      html += `<a class="nav-admin-link" href="${admin.href}" data-name="${admin.label}" data-vtw-scrollfx="label" style="--vtw-i:99">${admin.icon} ${admin.label}</a>`;
     return html;
   };
 
   const buildListHtml = () => {
     // Mobile overlay: include primary links + Admin.
     const items = [];
-    getPrimaryNavLinks().forEach((link) =>
-      items.push(`<li><a href="${link.href}">${link.icon} ${link.label}</a></li>`)
-    );
+    let i = 0;
+    getPrimaryNavLinks().forEach((link) => {
+      items.push(`<li style="--vtw-i:${i}"><a href="${link.href}">${link.icon} ${link.label}</a></li>`);
+      i += 1;
+    });
     const admin = getAdminNavLink();
-    if (admin) items.push(`<li><a href="${admin.href}">${admin.icon} ${admin.label}</a></li>`);
+    if (admin) items.push(`<li style="--vtw-i:${i}"><a href="${admin.href}">${admin.icon} ${admin.label}</a></li>`);
     return items.join("");
   };
 
@@ -327,9 +371,16 @@ import siteConfig from "./src/site-config.json";
   const ensureVideoBg = () => {
     if (prefersReducedMotion()) return;
     if (document.querySelector(".video-bg")) return;
+    // The React home app already renders its own video atmosphere.
+    if (document.getElementById("root")) return;
     const wrap = document.createElement("div");
     wrap.className = "video-bg";
     wrap.setAttribute("aria-hidden", "true");
+    wrap.innerHTML = `
+      <video autoplay muted loop playsinline preload="metadata">
+        <source src="/media/vtw-home-wallpaper.mp4" type="video/mp4" />
+      </video>
+    `;
     document.body.prepend(wrap);
   };
   const injectNav = () => {
@@ -349,7 +400,36 @@ import siteConfig from "./src/site-config.json";
     toggle.setAttribute("aria-hidden", "true");
     const nav = document.createElement("nav");
     nav.className = "glass-nav";
-    nav.innerHTML = `      <div class="nav-video-mask" aria-hidden="true"></div>      <div class="brand">        <span class="brand-dot"></span>        <span class="brand-name">VoiceToWebsite</span>      </div>      <div class="nav-links">        ${buildPrimaryLinksHtml()}      </div>      <div class="nav-actions">        ${buildActionsHtml()}      </div>      <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">        <span></span>      </label>    `;
+    const brandMark = prefersReducedMotion()
+      ? `
+        <span class="brand-video-wrap" aria-hidden="true">
+          <img class="brand-fallback" src="/vtw-wallpaper.png" alt="" />
+        </span>
+      `
+      : `
+        <span class="brand-video-wrap" aria-hidden="true">
+          <video class="brand-video" autoplay muted loop playsinline preload="metadata">
+            <source src="/media/vtw-animated-logo.mp4" type="video/mp4" />
+          </video>
+        </span>
+      `;
+    nav.innerHTML = `
+      <div class="nav-video-mask" aria-hidden="true"></div>
+      <a class="brand" href="/" aria-label="VoiceToWebsite home">
+        ${brandMark}
+        <span class="brand-name" data-vtw-scrollfx="brand">VoiceToWebsite</span>
+      </a>
+      <div class="nav-links">
+        ${buildPrimaryLinksHtml()}
+      </div>
+      <div class="nav-actions">
+        ${buildActionsHtml()}
+      </div>
+      <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">
+        <span class="nav-toggle-bars" aria-hidden="true"></span>
+        <span class="nav-toggle-waves" aria-hidden="true"><i></i><i></i><i></i></span>
+      </label>
+    `;
     const overlay = document.createElement("div");
     overlay.className = "mobile-overlay";
     overlay.id = "mobileOverlay";
@@ -385,6 +465,10 @@ import siteConfig from "./src/site-config.json";
       const open = Boolean(toggle.checked);
       overlay.setAttribute("aria-hidden", open ? "false" : "true");
       toggleButton?.setAttribute("aria-expanded", open ? "true" : "false");
+      document.documentElement.classList.toggle("vtw-mobile-nav-open", open);
+      try {
+        SoundEngine.play(open ? "success" : "click");
+      } catch (_) {}
     };
     toggle.addEventListener("change", syncOverlayA11y);
     syncOverlayA11y();
@@ -399,6 +483,84 @@ import siteConfig from "./src/site-config.json";
       },
       { passive: true }
     );
+  };
+
+  const initTextFx = () => {
+    try {
+      if (prefersReducedMotion()) return;
+      if (!("IntersectionObserver" in window)) return;
+
+      const headlineSelector = "h1, h2, h3, h4, h5, h6, .vt-h1, .vt-h2, .strata-heading";
+      const headlines = Array.from(document.querySelectorAll(headlineSelector));
+      const variants = ["scan", "glitch", "float", "spark", "slice", "press"];
+
+      headlines.forEach((el, idx) => {
+        if (el.dataset.vtwHeadInit) return;
+        el.dataset.vtwHeadInit = "1";
+        el.classList.add("vtw-headline");
+        const key = `${el.textContent || ""}:${idx}`;
+        const v = variants[hashString(key) % variants.length];
+        el.dataset.vtwHeadAnim = v;
+      });
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("vtw-inview");
+            observer.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -15% 0px" }
+      );
+
+      headlines.forEach((el) => observer.observe(el));
+    } catch (_) {}
+  };
+
+  const initScrollChromeFx = () => {
+    try {
+      if (prefersReducedMotion()) return;
+
+      const nav = document.querySelector(".glass-nav");
+      const fxEls = Array.from(document.querySelectorAll("[data-vtw-scrollfx]"));
+      if (!nav || !fxEls.length) return;
+
+      fxEls.forEach((el, idx) => {
+        if (el.dataset.vtwScrollSeed) return;
+        const key = `${el.getAttribute("data-vtw-scrollfx") || ""}:${el.textContent || ""}:${idx}`;
+        const seed = (hashString(key) % 97) / 97;
+        el.dataset.vtwScrollSeed = String(seed);
+      });
+
+      let raf = 0;
+      const tick = () => {
+        raf = 0;
+        const y = Math.max(0, window.scrollY || 0);
+        const p = Math.min(1, y / 900);
+
+        nav.style.setProperty("--vtw-scroll-p", String(p));
+
+        fxEls.forEach((el) => {
+          const seed = Number(el.dataset.vtwScrollSeed || 0) || 0;
+          const base = 6 + seed * 18;
+          const lift = Math.min(base, y * (0.012 + seed * 0.01));
+          const twist = (seed - 0.5) * 8 * p;
+          el.style.setProperty("--vtw-scroll-y", `${lift.toFixed(2)}px`);
+          el.style.setProperty("--vtw-scroll-r", `${twist.toFixed(2)}deg`);
+          el.style.setProperty("--vtw-scroll-o", `${(0.75 + (1 - p) * 0.25).toFixed(3)}`);
+        });
+      };
+
+      const onScroll = () => {
+        if (raf) return;
+        raf = window.requestAnimationFrame(tick);
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      tick();
+    } catch (_) {}
   };
 
   const injectWidget = () => {
@@ -1083,9 +1245,12 @@ import siteConfig from "./src/site-config.json";
         injectFooter();
         wireWidget();
         initFooterTimestamp();
+        initFooterLatency();
         initFooterParallax();
         electrifyLinks();
         spectralizeCards();
+        initTextFx();
+        initScrollChromeFx();
         if (!prefersReducedMotion()) initScrollReveals();
       }
     }
@@ -1143,7 +1308,7 @@ import siteConfig from "./src/site-config.json";
     const themeButtons = THEMES.map(
       (t) => `<button type="button" class="theme-btn" data-theme="${t.id}" data-vtw-theme-btn>${t.label}</button>`
     ).join("");
-    footer.innerHTML = `      <div class="footer-container">        <div class="strata-cell">          <div class="etched-brand">VOICE<br>TO<br>WEBSITE</div>          <p class="vt-footer-tagline">            Erosion-resistant digital infrastructure for the vocal era.          </p>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Platform</h4>          <ul class="footer-links">            ${platformLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Company</h4>          <ul class="footer-links">            ${companyLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Earn</h4>          <ul class="footer-links">            ${affiliateLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Trending Now</h4>          <a href="/lexicon-pro.html" class="hot-product-card">            <div>              <div class="hot-tag">NEW RELEASE</div>              <div class="product-name">LEXICON PRO</div>              <p class="hot-product-desc">                Real-time site stratification from live audio feeds.              </p>            </div>            <div class="product-cta">ACQUIRE LICENSE</div>          </a>        </div>      </div>      <div class="status-bar">        <div class="live-indicator">          <div class="pulse-stack">            <div class="pulse" aria-hidden="true"></div>            <span>SYSTEMS NOMINAL</span>          </div>          <span>LATENCY: 14MS</span>          <span class="timestamp" id="vt-footer-timestamp"></span>        </div>        <div>          &copy; ${new Date().getFullYear()} VOICETOWEBSITE.COM
+    footer.innerHTML = `      <div class="footer-container">        <div class="strata-cell">          <div class="etched-brand">VOICE<br>TO<br>WEBSITE</div>          <p class="vt-footer-tagline">            Erosion-resistant digital infrastructure for the vocal era.          </p>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Platform</h4>          <ul class="footer-links">            ${platformLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Company</h4>          <ul class="footer-links">            ${companyLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Earn</h4>          <ul class="footer-links">            ${affiliateLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Trending Now</h4>          <a href="/lexicon-pro.html" class="hot-product-card">            <div>              <div class="hot-tag">FEATURED</div>              <div class="product-name">LEXICON PRO</div>              <p class="hot-product-desc">                Real-time site stratification from live audio feeds.              </p>            </div>            <div class="product-cta">ACQUIRE LICENSE</div>          </a>        </div>      </div>      <div class="status-bar">        <div class="live-indicator">          <div class="pulse-stack">            <div class="pulse" aria-hidden="true"></div>            <span>SYSTEMS NOMINAL</span>          </div>          <span>LATENCY: <span id="vt-footer-latency">—</span></span>          <span class="timestamp" id="vt-footer-timestamp"></span>        </div>        <div>          &copy; ${new Date().getFullYear()} VOICETOWEBSITE.COM
 
         </div>      </div>    `;
 
@@ -1165,6 +1330,25 @@ import siteConfig from "./src/site-config.json";
     };
     updateTime();
     window.setInterval(updateTime, 1000);
+  };
+  const initFooterLatency = () => {
+    const el = document.getElementById("vt-footer-latency");
+    if (!el) return;
+
+    const ping = async () => {
+      try {
+        const t0 = performance.now();
+        const res = await fetch("/api/health", { cache: "no-store" });
+        if (!res.ok) throw new Error("bad status");
+        const ms = Math.max(0, Math.round(performance.now() - t0));
+        el.textContent = `${ms}ms`;
+      } catch (_) {
+        el.textContent = "—";
+      }
+    };
+
+    ping();
+    window.setInterval(ping, 30000);
   };
   const initFooterParallax = () => {
     const cells = document.querySelectorAll(".vt-footer .strata-cell");
@@ -1296,12 +1480,15 @@ import siteConfig from "./src/site-config.json";
   /* Music Autoplay */
   const ensureMusic = () => {
     if (document.getElementById("vtw-bg-music")) return;
+    // Home app owns its own music engine; avoid double-play.
+    if (document.getElementById("root")) return;
     const audio = document.createElement("audio");
     audio.id = "vtw-bg-music";
     audio.loop = true;
-    audio.volume = 0.5;
-    // Self-hosted, copyright-safe audio (silence by default).
-    audio.src = "/background-music.wav";
+    audio.volume = 0.65;
+    audio.preload = "auto";
+    audio.crossOrigin = "anonymous";
+    audio.src = "https://media.voicetowebsite.com/Intro%20funk.mp3";
     document.body.appendChild(audio);
 
     const play = () => {
