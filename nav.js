@@ -1487,8 +1487,8 @@ import siteConfig from "./src/site-config.json";
     audio.loop = true;
     audio.volume = 0.65;
     audio.preload = "auto";
-    audio.crossOrigin = "anonymous";
-    audio.src = "https://media.voicetowebsite.com/Intro%20funk.mp3";
+    // Same-origin media is more reliable across browsers and ad-blockers.
+    audio.src = "/background-music.wav";
     document.body.appendChild(audio);
 
     const play = () => {
@@ -1510,5 +1510,73 @@ import siteConfig from "./src/site-config.json";
     document.addEventListener("DOMContentLoaded", ensureMusic);
   } else {
     ensureMusic();
+  }
+
+  /* Heading + Label Scroll FX (site-wide) */
+  const decorateScrollFx = () => {
+    if (prefersReducedMotion()) return;
+    const pickFx = (seed) => {
+      const fxs = ["scan", "glitch", "drift", "snap", "prism", "ember"];
+      return fxs[seed % fxs.length];
+    };
+    const hash = (s) => {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return Math.abs(h);
+    };
+    const isExcluded = (el) => {
+      try {
+        return Boolean(el.closest(".glass-nav, .mobile-overlay, footer, .vtw-widget, .admin-topbar, .admin-shell"));
+      } catch (_) {
+        return false;
+      }
+    };
+
+    const headings = Array.from(document.querySelectorAll("h1,h2,h3")).filter((el) => !isExcluded(el));
+    headings.forEach((el, idx) => {
+      if (el.dataset.vtwHeadingFxApplied) return;
+      el.dataset.vtwHeadingFxApplied = "1";
+      const seed = hash(`${location.pathname}::${el.textContent || ""}::${idx}`);
+      const fx = pickFx(seed);
+      el.classList.add("vtw-riser", "vtw-reveal", "vtw-headingfx", `vtw-headingfx--${fx}`);
+      el.dataset.vtwHeadingfx = fx;
+    });
+
+    const labels = Array.from(document.querySelectorAll("label,.form-label,.badge,.chip,small")).filter(
+      (el) => !isExcluded(el)
+    );
+    labels.forEach((el, idx) => {
+      if (el.dataset.vtwLabelFxApplied) return;
+      el.dataset.vtwLabelFxApplied = "1";
+      const seed = hash(`${location.pathname}::${el.textContent || ""}::${idx}`);
+      el.classList.add("vtw-riser", "vtw-reveal", "vtw-labelfx");
+      el.style.setProperty("--vtw-reveal-d", `${Math.min(420, (seed % 8) * 55)}ms`);
+    });
+
+    const revealTargets = Array.from(document.querySelectorAll(".vtw-reveal,[data-vtw-scrollfx]")).filter(
+      (el) => !isExcluded(el)
+    );
+    if (!revealTargets.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-inview");
+          io.unobserve(entry.target);
+        });
+      },
+      { root: null, threshold: 0.15, rootMargin: "0px 0px -10% 0px" }
+    );
+    revealTargets.forEach((el) => io.observe(el));
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", decorateScrollFx);
+  } else {
+    decorateScrollFx();
   }
 })();

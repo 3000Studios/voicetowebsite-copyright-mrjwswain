@@ -87,6 +87,186 @@
   --gradient-dark: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
 }
 
+/* Smooth scrolling (respect reduced motion) */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Riser look + always-on shadow for non-plain text elements */
+:root {
+  --vtw-rise-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.55), 0 10px 28px rgba(0, 0, 0, 0.38), 0 0 18px rgba(var(--accent-rgb), 0.14);
+  --vtw-rise-shadow-soft: 0 1px 0 rgba(0, 0, 0, 0.45), 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+.vtw-riser {
+  text-shadow: var(--vtw-rise-shadow);
+}
+
+/* Apply shadow to “non-plain” UI text */
+h1,
+h2,
+h3,
+.btn,
+.pill,
+.chip,
+.badge,
+.glass-nav a,
+.glass-nav .brand-name,
+.card-title,
+.feature-card h3,
+.product-name {
+  text-shadow: var(--vtw-rise-shadow-soft);
+}
+
+/* Scroll reveal */
+.vtw-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0) scale(0.99);
+  filter: blur(10px);
+  transition:
+    opacity 700ms cubic-bezier(0.18, 0.9, 0.2, 1),
+    transform 900ms cubic-bezier(0.18, 0.9, 0.2, 1),
+    filter 900ms cubic-bezier(0.18, 0.9, 0.2, 1);
+  transition-delay: var(--vtw-reveal-d, 0ms);
+  will-change: opacity, transform, filter;
+}
+.vtw-reveal.is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vtw-reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
+
+/* Unique heading animations (picked deterministically by nav.js) */
+.vtw-headingfx {
+  position: relative;
+  display: inline-block;
+}
+.vtw-headingfx.is-inview {
+  animation-duration: 1150ms;
+  animation-timing-function: cubic-bezier(0.12, 0.9, 0.18, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes vtw-h-scan {
+  0% {
+    letter-spacing: 0.02em;
+    clip-path: inset(0 0 100% 0);
+    filter: blur(10px);
+  }
+  45% {
+    clip-path: inset(0 0 0 0);
+    filter: blur(0px);
+  }
+  100% {
+    letter-spacing: 0.01em;
+  }
+}
+@keyframes vtw-h-glitch {
+  0% {
+    transform: translate3d(0, 0, 0);
+    filter: blur(10px);
+  }
+  20% {
+    transform: translate3d(1px, -1px, 0);
+  }
+  40% {
+    transform: translate3d(-2px, 1px, 0);
+  }
+  60% {
+    transform: translate3d(2px, 0, 0);
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes vtw-h-drift {
+  0% {
+    transform: translate3d(0, 10px, 0);
+    filter: blur(10px);
+  }
+  65% {
+    transform: translate3d(0, -2px, 0);
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes vtw-h-snap {
+  0% {
+    transform: scale(0.96);
+    filter: blur(10px);
+  }
+  70% {
+    transform: scale(1.02);
+    filter: blur(0px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes vtw-h-prism {
+  0% {
+    filter: blur(10px);
+    text-shadow:
+      var(--vtw-rise-shadow),
+      -10px 0 18px rgba(125, 211, 252, 0.14),
+      10px 0 18px rgba(255, 255, 255, 0.08);
+  }
+  70% {
+    filter: blur(0px);
+  }
+  100% {
+    text-shadow: var(--vtw-rise-shadow);
+  }
+}
+@keyframes vtw-h-ember {
+  0% {
+    transform: translate3d(0, 18px, 0);
+    filter: blur(10px);
+  }
+  55% {
+    transform: translate3d(0, -3px, 0);
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.vtw-headingfx--scan.is-inview {
+  animation-name: vtw-h-scan;
+}
+.vtw-headingfx--glitch.is-inview {
+  animation-name: vtw-h-glitch;
+}
+.vtw-headingfx--drift.is-inview {
+  animation-name: vtw-h-drift;
+}
+.vtw-headingfx--snap.is-inview {
+  animation-name: vtw-h-snap;
+}
+.vtw-headingfx--prism.is-inview {
+  animation-name: vtw-h-prism;
+}
+.vtw-headingfx--ember.is-inview {
+  animation-name: vtw-h-ember;
+}
+
 html {
   scroll-behavior: smooth;
 }

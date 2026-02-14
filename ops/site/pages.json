@@ -9,7 +9,6 @@
     { "id": "status", "route": "/status", "asset": "status.html", "zone": "public" },
     { "id": "contact", "route": "/contact", "asset": "contact.html", "zone": "public" },
     { "id": "store", "route": "/store", "asset": "store.html", "zone": "commerce" },
-    { "id": "appstore", "route": "/appstore", "asset": "appstore.html", "zone": "commerce" },
     { "id": "privacy", "route": "/privacy", "asset": "privacy.html", "zone": "legal" },
     { "id": "terms", "route": "/terms", "asset": "terms.html", "zone": "legal" },
     { "id": "license", "route": "/license", "asset": "license.html", "zone": "legal" },

@@ -4,7 +4,7 @@
     { "label": "How It Works", "route": "/how-it-works" },
     { "label": "Features", "route": "/features" },
     { "label": "Pricing", "route": "/pricing" },
-    { "label": "Apps", "route": "/appstore" },
+    { "label": "Apps", "route": "/store" },
     { "label": "Store", "route": "/store" },
     { "label": "Blog", "route": "/blog" }
   ],

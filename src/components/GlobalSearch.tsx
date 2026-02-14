@@ -32,7 +32,7 @@ const GlobalSearch: React.FC = () => {
       id: "2",
       title: "App Store",
       description: "Browse and purchase premium applications",
-      url: "/appstore.html",
+      url: "/store",
       type: "page",
       icon: <ShoppingCart className="w-4 h-4" />,
     },

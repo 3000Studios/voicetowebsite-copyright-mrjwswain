@@ -55,12 +55,6 @@
       "zone": "commerce"
     },
     {
-      "id": "appstore",
-      "route": "/appstore",
-      "asset": "appstore.html",
-      "zone": "commerce"
-    },
-    {
       "id": "privacy",
       "route": "/privacy",
       "asset": "privacy.html",
