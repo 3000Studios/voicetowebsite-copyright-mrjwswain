@@ -19,9 +19,9 @@ import {
   handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
 import { handleSupportChatRequest } from "./functions/supportChat.js";
-import { handleUICommand } from "./src/functions/uiCommand.js";
 import catalog from "./products.json";
 import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
+import { handleUICommand } from "./src/functions/uiCommand.js";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
 
