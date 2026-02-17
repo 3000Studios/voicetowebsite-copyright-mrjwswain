@@ -152,6 +152,7 @@ Admin pages:
 - `/admin` -> `admin/index.html`
 - `/admin/live-stream` -> `admin/live-stream.html`
 - `/admin/login` -> `admin/login.html`
+- `/admin/nexus` -> `admin/nexus.html`
 - `/admin/progress` -> `admin/progress.html`
 - `/admin/store-manager` -> `admin/store-manager.html`
 - `/admin/voice-commands` -> `admin/voice-commands.html`
