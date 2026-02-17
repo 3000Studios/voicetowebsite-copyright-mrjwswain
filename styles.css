@@ -4297,3 +4297,10 @@ h1 {
   -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 60%, transparent 76%);
   mask-image: radial-gradient(circle at 50% 45%, #000 60%, transparent 76%);
 }
+
+
+/* Voice-injected styles */
+.hero-overlay {
+   background: rgba(0, 0, 0, 0.5);
+
+}
