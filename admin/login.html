@@ -52,6 +52,7 @@
         padding: 3rem;
         width: 100%;
         max-width: 420px;
+        -webkit-backdrop-filter: blur(20px);
         backdrop-filter: blur(20px);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         position: relative;
@@ -269,7 +270,6 @@
         autoplay
         muted
         loop
-        playsinline
         onerror="
           this.style.display = 'none';
           document.querySelector('.video-fallback').style.display = 'flex';
@@ -293,18 +293,14 @@
 
         <form id="loginForm">
           <div class="form-group">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" id="email" name="email" class="form-input" placeholder="admin@example.com" required />
-          </div>
-
-          <div class="form-group">
-            <label for="password" class="form-label">Password</label>
+            <label for="accessCode" class="form-label">Access Code</label>
             <input
               type="password"
-              id="password"
-              name="password"
+              id="accessCode"
+              name="accessCode"
               class="form-input"
-              placeholder="Enter your password"
+              placeholder="Enter your access code"
+              autocomplete="off"
               required
             />
           </div>
@@ -335,11 +331,27 @@
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
 
+      const bgVideo = document.querySelector(".video-bg video");
+      if (bgVideo) {
+        const enableInlinePlayback = () => {
+          try {
+            bgVideo.playsInline = true;
+            bgVideo.setAttribute("playsinline", "");
+            bgVideo.setAttribute("webkit-playsinline", "");
+            bgVideo.setAttribute("x5-playsinline", "");
+          } catch (_) {}
+        };
+        if (bgVideo.readyState >= 1) {
+          enableInlinePlayback();
+        } else {
+          bgVideo.addEventListener("loadedmetadata", enableInlinePlayback, { once: true });
+        }
+      }
+
       loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const accessCode = document.getElementById("accessCode").value;
 
         // Show loading state
         loginButton.disabled = true;
@@ -353,7 +365,7 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ accessCode }),
             credentials: "include",
           });
 

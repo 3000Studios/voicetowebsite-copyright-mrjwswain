@@ -11,7 +11,6 @@ import { onRequestPost as handleChatRequest } from "./functions/chat.js";
 import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
 import { onRequestPost as handleGodmodeInferRequest } from "./functions/godmode.js";
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
-import { handleSupportChatRequest } from "./functions/supportChat.js";
 import {
   handleGenerateRequest,
   handlePreviewApiRequest,
@@ -19,8 +18,9 @@ import {
   handlePublishRequest,
   handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
-import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
+import { handleSupportChatRequest } from "./functions/supportChat.js";
 import catalog from "./products.json";
+import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
 
@@ -584,37 +584,28 @@ export default {
         }
 
         const contentType = request.headers.get("content-type") || "";
-        let password = "";
-        let email = "";
+        let accessCode = "";
         if (contentType.includes("application/json")) {
           const body = await request.clone().json();
-          password = String(body?.password || "");
-          email = String(body?.email || "");
+          accessCode = String(body?.accessCode || body?.password || "");
         } else if (
           contentType.includes("application/x-www-form-urlencoded") ||
           contentType.includes("multipart/form-data")
         ) {
           const form = await request.clone().formData();
-          password = String(form.get("password") || "");
-          email = String(form.get("email") || "");
+          accessCode = String(form.get("accessCode") || form.get("password") || "");
         } else {
-          password = String(await request.clone().text());
+          accessCode = String(await request.clone().text());
         }
 
-        const validPassword = String(env.CONTROL_PASSWORD || "").trim();
-        const validEmail = String(env.ADMIN_EMAIL || "")
-          .trim()
-          .toLowerCase();
-        const providedEmail = String(email || "")
-          .trim()
-          .toLowerCase();
+        const validAccessCode = String(env.CONTROL_PASSWORD || "").trim();
 
-        if (!validPassword) {
+        if (!validAccessCode) {
           return jsonResponse(503, { error: "Admin is disabled. Set CONTROL_PASSWORD to enable admin login." });
         }
 
-        if (!password || String(password).trim() !== validPassword || (validEmail && providedEmail !== validEmail)) {
-          return jsonResponse(401, { error: "Invalid credentials." });
+        if (!accessCode || String(accessCode).trim() !== validAccessCode) {
+          return jsonResponse(401, { error: "Invalid access code." });
         }
         const cookieValue = await mintAdminCookieValue(env);
         const headers = new Headers({ "Content-Type": "application/json" });

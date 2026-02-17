@@ -158,7 +158,7 @@ const normalizeActionPayload = (payload) => {
   };
 };
 
-const getOrchestratorToken = (env) => String(env.ORCH_TOKEN || env.X_ORCH_TOKEN || "").trim();
+const getOrchestratorToken = (env) => String(env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || "").trim();
 
 const hasValidHeaderToken = (request, env) => {
   const provided = String(request.headers.get("x-orch-token") || "").trim();
