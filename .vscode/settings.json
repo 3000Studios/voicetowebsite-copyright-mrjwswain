@@ -244,6 +244,36 @@
   "extensions.ignoreRecommendations": false,
 
   // ============================================
+  // CONTINUE.DEV SETTINGS (AI Chat & Commands)
+  // ============================================
+  "continue.enableDebugLogging": true,
+  "continue.enableServerAutoLaunch": true,
+  "continue.customAttributes": {
+    "voiceToWebsiteIntegration": "enabled",
+    "uiCommandAPI": "https://voicetowebsite.com/api/ui-command",
+    "voiceEnabled": true,
+    "customGptEnabled": true
+  },
+
+  // ============================================
+  // VOICE COMMAND SETTINGS
+  // ============================================
+  "voiceCommand.enabled": true,
+  "voiceCommand.language": "en-US",
+  "voiceCommand.continuous": true,
+  "voiceCommand.keywords": ["update", "set", "change", "apply", "headline", "cta", "theme"],
+
+  // ============================================
+  // COMMAND SHORTCUTS
+  // ============================================
+  "commandShortcuts": {
+    "alt+cmd+u": "ui-commands.executeCommand",
+    "alt+cmd+g": "ui-commands.getState",
+    "alt+cmd+l": "ui-commands.listCommands",
+    "alt+cmd+v": "voiceCommand.toggle"
+  },
+
+  // ============================================
   // EMMET
   // ============================================
   "emmet.includeLanguages": {

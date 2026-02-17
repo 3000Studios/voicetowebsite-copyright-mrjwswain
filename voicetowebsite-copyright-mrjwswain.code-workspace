@@ -7,5 +7,6 @@
   "settings": {
     "editor.linkedEditing": true,
     "php.linkedEditing.variables": true,
+    "todo-tree.tree.scanMode": "workspace only",
   },
 }

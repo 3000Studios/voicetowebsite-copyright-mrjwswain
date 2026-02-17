@@ -17,6 +17,90 @@ const controlPassword =
   window.__ENV && window.__ENV.CONTROL_PASSWORD
     ? window.__ENV.CONTROL_PASSWORD
     : "5555";
+
+// ============================================
+// UNIFIED COMMAND HANDLER
+// ============================================
+// This handler processes commands from: voice, chat, custom GPT, and API
+const commandHandler = {
+  apiEndpoint: "https://voicetowebsite.com/api/ui-command",
+  isProcessing: false,
+
+  async execute(action, args = {}, source = "app") {
+    if (this.isProcessing) return { error: "Command already processing" };
+    this.isProcessing = true;
+
+    try {
+      const response = await fetch(this.apiEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, args, source, timestamp: Date.now() }),
+      });
+
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+      const result = await response.json();
+      addCommandLog(`[${source}] ${action}: ✓`);
+      return result;
+    } catch (err) {
+      console.error("Command execution failed:", err);
+      addCommandLog(`[${source}] ${action}: ✗ ${err.message}`);
+      return { error: err.message };
+    } finally {
+      this.isProcessing = false;
+    }
+  },
+
+  parseVoiceCommand(transcript) {
+    const text = transcript.toLowerCase();
+
+    // Pattern: "set headline to [value]"
+    const headlineMatch = text.match(/set\s+headline\s+(?:to\s+)?(.+)/i);
+    if (headlineMatch)
+      return {
+        action: "set-headline",
+        args: { value: headlineMatch[1].trim() },
+      };
+
+    // Pattern: "update cta to [value]"
+    const ctaMatch = text.match(/(?:update|set)\s+cta\s+(?:to\s+)?(.+)/i);
+    if (ctaMatch)
+      return { action: "set-cta", args: { value: ctaMatch[1].trim() } };
+
+    // Pattern: "apply theme [theme]"
+    const themeMatch = text.match(
+      /apply\s+theme\s+(ember|ocean|volt|midnight)/i
+    );
+    if (themeMatch)
+      return { action: "apply-theme", args: { theme: themeMatch[1] } };
+
+    // Pattern: "toggle testimonials"
+    if (text.includes("toggle testimonials"))
+      return { action: "toggle-testimonials", args: {} };
+
+    // Pattern: "show modal [name]"
+    const showMatch = text.match(/show\s+modal\s+(\w+)/i);
+    if (showMatch)
+      return { action: "show-modal", args: { modalName: showMatch[1] } };
+
+    return null;
+  },
+};
+
+// Listen for voice commands from window events (from voice.js or speech recognition)
+window.addEventListener("command-executed", (e) => {
+  const { action, args, source } = e.detail;
+  commandHandler.execute(action, args, source).catch(console.error);
+});
+
+// Listen for window message commands (from custom GPT or Continue.dev iframe)
+window.addEventListener("message", (e) => {
+  if (e.data?.type === "ui-command") {
+    const { action, args } = e.data;
+    commandHandler.execute(action, args, "message").catch(console.error);
+  }
+});
+
 const audioTracks = [
   "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
   "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
@@ -655,15 +739,22 @@ const setupVoice = (onCommand) => {
     const last = event.results[event.results.length - 1];
     if (!last.isFinal) return;
     const transcript = last[0].transcript.trim();
-    if (onCommand) {
-      try {
-        await onCommand(transcript);
-      } catch (err) {
-        logTranscript(`Command error: ${err.message}`);
-      }
+    logTranscript(transcript);
+
+    // Try to parse as UI command
+    const voiceCmd = commandHandler.parseVoiceCommand(transcript);
+    if (voiceCmd) {
+      await commandHandler.execute(voiceCmd.action, voiceCmd.args, "voice");
     } else {
-      logTranscript(transcript);
+      // Fallback to existing command handler if no UI command matched
       parseCommand(transcript);
+      if (onCommand) {
+        try {
+          await onCommand(transcript);
+        } catch (err) {
+          logTranscript(`Command error: ${err.message}`);
+        }
+      }
     }
   };
   recognition.onerror = (event) => {

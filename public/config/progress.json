@@ -27,7 +27,13 @@
       "id": "phase-2",
       "title": "Phase 2: Master Workbook Core",
       "objective": "Deterministic routing, SEO injection, control plane safety rails, and integrity hashing.",
-      "items": ["routing-deterministic", "seo-injection", "control-plane", "hash-integrity", "ttl-overrides"],
+      "items": [
+        "routing-deterministic",
+        "seo-injection",
+        "control-plane",
+        "hash-integrity",
+        "ttl-overrides"
+      ],
       "prompts": [
         {
           "id": "prompt-routing",
