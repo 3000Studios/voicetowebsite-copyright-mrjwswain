@@ -4298,13 +4298,10 @@ h1 {
   mask-image: radial-gradient(circle at 50% 45%, #000 60%, transparent 76%);
 }
 
-
 /* Voice-injected styles */
 .hero-overlay {
-   background: rgba(0, 0, 0, 0.5);
-
+  background: rgba(0, 0, 0, 0.5);
 }
-
 
 /* Voice-injected styles */
 /* redeploy trigger 2026-02-17 */
