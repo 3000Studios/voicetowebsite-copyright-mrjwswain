@@ -19,6 +19,7 @@ import {
   handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
 import { handleSupportChatRequest } from "./functions/supportChat.js";
+import { handleUICommand } from "./src/functions/uiCommand.js";
 import catalog from "./products.json";
 import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
 
@@ -1020,6 +1021,11 @@ export default {
       } catch (err) {
         return jsonResponse(500, { error: err.message });
       }
+    }
+
+    // UI Command API (Custom GPT webhook + device UI control)
+    if (url.pathname === "/api/ui-command" && request.method === "POST") {
+      return addSecurityHeaders(await handleUICommand(request, env, ctx));
     }
 
     // Execute API (canonical orchestration endpoint for Custom GPT)
