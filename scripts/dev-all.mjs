@@ -11,8 +11,12 @@ const spawnNpm = (label, args) => {
     env: process.env,
   });
 
-  child.stdout.on("data", (chunk) => process.stdout.write(`[${label}] ${chunk}`));
-  child.stderr.on("data", (chunk) => process.stderr.write(`[${label}] ${chunk}`));
+  child.stdout.on("data", (chunk) =>
+    process.stdout.write(`[${label}] ${chunk}`)
+  );
+  child.stderr.on("data", (chunk) =>
+    process.stderr.write(`[${label}] ${chunk}`)
+  );
 
   return child;
 };

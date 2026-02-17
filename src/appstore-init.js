@@ -1,4 +1,8 @@
-import { checkCredentials, handlePayPalPurchase, handleStripePurchase } from "./commerce.js";
+import {
+  checkCredentials,
+  handlePayPalPurchase,
+  handleStripePurchase,
+} from "./commerce.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   checkCredentials();

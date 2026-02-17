@@ -26,7 +26,8 @@ let listening = false;
 let inactivityTimer = null;
 let lastPlan = null;
 
-const getTargetMode = () => (targetModeEl && targetModeEl.value === "site" ? "site" : "sandbox");
+const getTargetMode = () =>
+  targetModeEl && targetModeEl.value === "site" ? "site" : "sandbox";
 
 const UNLOCK_KEY = "yt-admin-unlocked";
 const UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
@@ -79,7 +80,8 @@ const clickSound = () => {
   }
 };
 
-const getFrameDoc = () => previewFrame?.contentDocument || previewFrame?.contentWindow?.document;
+const getFrameDoc = () =>
+  previewFrame?.contentDocument || previewFrame?.contentWindow?.document;
 
 const setFrameText = (selector, value) => {
   if (!value) return;
@@ -137,11 +139,14 @@ const applyLocalPreview = (command) => {
 
   if (hexMatch) setFrameStyle("#headline", { color: `#${hexMatch[1]}` });
   if (fontMatch) {
-    setFrameStyle("#headline", { fontFamily: `'${fontMatch[2].trim()}', "Playfair Display", serif` });
+    setFrameStyle("#headline", {
+      fontFamily: `'${fontMatch[2].trim()}', "Playfair Display", serif`,
+    });
   }
 
   if (text.includes("blue")) {
-    doc.body.style.backgroundImage = "linear-gradient(135deg, rgba(80,120,255,0.15), rgba(20,30,60,0.6))";
+    doc.body.style.backgroundImage =
+      "linear-gradient(135deg, rgba(80,120,255,0.15), rgba(20,30,60,0.6))";
   }
 
   if (previewExtras) previewExtras.innerHTML = "";
@@ -318,9 +323,11 @@ const initPasscodeGate = () => {
 };
 
 const initSpeech = () => {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    micStateEl.textContent = "Speech recognition not supported in this browser.";
+    micStateEl.textContent =
+      "Speech recognition not supported in this browser.";
     return;
   }
 
@@ -376,7 +383,8 @@ startBtn.addEventListener("click", () => {
   if (!recognition) return;
   listening = true;
   recognition.start();
-  if (speechController?.scheduleInactivity) speechController.scheduleInactivity();
+  if (speechController?.scheduleInactivity)
+    speechController.scheduleInactivity();
   micStateEl.textContent = "Listening...";
 });
 
@@ -397,7 +405,9 @@ commandEl.addEventListener("input", () => {
 planBtn.addEventListener("click", async () => {
   try {
     if (!isUnlocked()) {
-      setResponse({ error: "Unlock with the access code before generating a plan." });
+      setResponse({
+        error: "Unlock with the access code before generating a plan.",
+      });
       speak("Unlock required");
       return;
     }
@@ -423,7 +433,9 @@ applyBtn.addEventListener("click", async () => {
   try {
     speak("Hell ya Boss man, I'm making those changes for you right now");
     if (!isUnlocked()) {
-      setResponse({ error: "Unlock with the access code before applying changes." });
+      setResponse({
+        error: "Unlock with the access code before applying changes.",
+      });
       speak("Unlock required");
       return;
     }
@@ -434,11 +446,18 @@ applyBtn.addEventListener("click", async () => {
         setResponse({ error: "Provide a command first." });
         return;
       }
-      const data = await callOrchestrator({ mode: "plan", command: fallbackCommand });
+      const data = await callOrchestrator({
+        mode: "plan",
+        command: fallbackCommand,
+      });
       lastPlan = data;
     }
     setResponse({ status: `Applying to ${getTargetMode()}...` });
-    const data = await callOrchestrator({ mode: "apply", plan: lastPlan.plan, command: lastPlan.command });
+    const data = await callOrchestrator({
+      mode: "apply",
+      plan: lastPlan.plan,
+      command: lastPlan.command,
+    });
     setResponse(data);
     logActivity();
   } catch (err) {

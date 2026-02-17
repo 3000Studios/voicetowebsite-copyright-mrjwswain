@@ -1,0 +1,110 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // ============================================
+    // BROWSER DEBUGGING
+    // ============================================
+    {
+      "name": "🌐 Launch Chrome (Dev Server)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./src/*": "${webRoot}/src/*"
+      },
+      "preLaunchTask": "🚀 Dev: Site (Vite)"
+    },
+    {
+      "name": "🌐 Launch Edge (Dev Server)",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./src/*": "${webRoot}/src/*"
+      },
+      "preLaunchTask": "🚀 Dev: Site (Vite)"
+    },
+    {
+      "name": "🌐 Attach to Chrome",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}"
+    },
+
+    // ============================================
+    // NODE.JS DEBUGGING
+    // ============================================
+    {
+      "name": "🟢 Debug: Node Script",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "🟢 Debug: Current Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${file}"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "🟢 Debug: All Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "args": ["run"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+
+    // ============================================
+    // CLOUDFLARE WORKERS DEBUGGING
+    // ============================================
+    {
+      "name": "⚡ Debug: Cloudflare Worker (Local)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:worker"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "DEBUG": "vtw:*"
+      }
+    },
+
+    // ============================================
+    // ORCHESTRATOR DEBUGGING
+    // ============================================
+    {
+      "name": "🤖 Debug: Orchestrator",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/voicetowebsite-orchestrator",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🔥 Debug: Full Stack (Site + Worker)",
+      "configurations": ["🌐 Launch Chrome (Dev Server)", "⚡ Debug: Cloudflare Worker (Local)"],
+      "presentation": {
+        "hidden": false,
+        "group": "fullstack",
+        "order": 1
+      }
+    }
+  ]
+}

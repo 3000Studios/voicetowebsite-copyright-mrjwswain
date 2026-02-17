@@ -11,11 +11,14 @@ const applyBilling = (mode) => {
   if (!deck) return;
   deck.dataset.billing = mode;
 
-  document.querySelectorAll(".vt-pricing .amount[data-monthly]").forEach((el) => {
-    const monthly = el.getAttribute("data-monthly");
-    const yearly = el.getAttribute("data-yearly");
-    el.textContent = mode === "yearly" ? (yearly ?? monthly ?? "—") : (monthly ?? "—");
-  });
+  document
+    .querySelectorAll(".vt-pricing .amount[data-monthly]")
+    .forEach((el) => {
+      const monthly = el.getAttribute("data-monthly");
+      const yearly = el.getAttribute("data-yearly");
+      el.textContent =
+        mode === "yearly" ? (yearly ?? monthly ?? "—") : (monthly ?? "—");
+    });
 
   localStorage.setItem(STORAGE_KEY, mode);
 };

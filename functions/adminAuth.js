@@ -24,18 +24,26 @@ const getCookie = (cookieHeader, name) => {
 };
 
 const importHmacKey = async (secret) =>
-  crypto.subtle.importKey("raw", textEncoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [
-    "sign",
-    "verify",
-  ]);
+  crypto.subtle.importKey(
+    "raw",
+    textEncoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
 
 const sign = async (secret, message) => {
   const key = await importHmacKey(secret);
-  const sig = await crypto.subtle.sign("HMAC", key, textEncoder.encode(message));
+  const sig = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    textEncoder.encode(message)
+  );
   return base64UrlEncode(new Uint8Array(sig));
 };
 
-export const getAdminSigningSecret = (env) => env.ADMIN_COOKIE_SECRET || env.CONTROL_PASSWORD || "";
+export const getAdminSigningSecret = (env) =>
+  env.ADMIN_COOKIE_SECRET || env.CONTROL_PASSWORD || "";
 
 export const isAdminEnabled = (env) => Boolean(env.CONTROL_PASSWORD);
 
@@ -76,13 +84,21 @@ export const hasValidAdminCookie = async (request, env) => {
 export const isAdminRequest = async (request, env) => {
   // Allows non-browser admin callers (e.g., internal tools) to authenticate without cookies.
   const headerToken = request.headers.get("x-admin-token") || "";
-  if (headerToken && env.CONTROL_PASSWORD && timingSafeEqual(headerToken, String(env.CONTROL_PASSWORD))) {
+  if (
+    headerToken &&
+    env.CONTROL_PASSWORD &&
+    timingSafeEqual(headerToken, String(env.CONTROL_PASSWORD))
+  ) {
     return true;
   }
   return hasValidAdminCookie(request, env);
 };
 
-export const setAdminCookieHeaders = (headers, cookieValue, { secure = true } = {}) => {
+export const setAdminCookieHeaders = (
+  headers,
+  cookieValue,
+  { secure = true } = {}
+) => {
   headers.append(
     "Set-Cookie",
     `${adminCookieName}=${cookieValue}; Path=/; Max-Age=${adminCookieTtlSeconds}; ${

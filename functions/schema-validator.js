@@ -59,7 +59,14 @@ class SchemaValidator {
 
     // Type validation
     if (schema.type && !this.validateType(data, schema.type)) {
-      errors.push(new SchemaValidationError(`Expected type ${schema.type}, got ${typeof data}`, path, data, schema));
+      errors.push(
+        new SchemaValidationError(
+          `Expected type ${schema.type}, got ${typeof data}`,
+          path,
+          data,
+          schema
+        )
+      );
     }
 
     // Required fields validation
@@ -83,8 +90,14 @@ class SchemaValidator {
       for (const [propName, propSchema] of Object.entries(schema.properties)) {
         if (propName in data) {
           const propPath = path ? `${path}.${propName}` : propName;
-          const propResult = this.validateAgainstSchema(data[propName], propSchema, propPath);
-          const nestedErrors = Array.isArray(propResult?.errors) ? propResult.errors : [];
+          const propResult = this.validateAgainstSchema(
+            data[propName],
+            propSchema,
+            propPath
+          );
+          const nestedErrors = Array.isArray(propResult?.errors)
+            ? propResult.errors
+            : [];
           errors.push(...nestedErrors);
         }
       }
@@ -92,54 +105,112 @@ class SchemaValidator {
 
     // Enum validation
     if (schema.enum && !schema.enum.includes(data)) {
-      errors.push(new SchemaValidationError(`Value must be one of: ${schema.enum.join(", ")}`, path, data, schema));
+      errors.push(
+        new SchemaValidationError(
+          `Value must be one of: ${schema.enum.join(", ")}`,
+          path,
+          data,
+          schema
+        )
+      );
     }
 
     // String validations
     if (schema.type === "string" && typeof data === "string") {
       if (schema.minLength !== undefined && data.length < schema.minLength) {
         errors.push(
-          new SchemaValidationError(`String must be at least ${schema.minLength} characters long`, path, data, schema)
+          new SchemaValidationError(
+            `String must be at least ${schema.minLength} characters long`,
+            path,
+            data,
+            schema
+          )
         );
       }
 
       if (schema.maxLength !== undefined && data.length > schema.maxLength) {
         errors.push(
-          new SchemaValidationError(`String must be at most ${schema.maxLength} characters long`, path, data, schema)
+          new SchemaValidationError(
+            `String must be at most ${schema.maxLength} characters long`,
+            path,
+            data,
+            schema
+          )
         );
       }
 
       if (schema.pattern && !new RegExp(schema.pattern).test(data)) {
-        errors.push(new SchemaValidationError(`String does not match pattern: ${schema.pattern}`, path, data, schema));
+        errors.push(
+          new SchemaValidationError(
+            `String does not match pattern: ${schema.pattern}`,
+            path,
+            data,
+            schema
+          )
+        );
       }
     }
 
     // Number validations
     if (schema.type === "number" && typeof data === "number") {
       if (schema.minimum !== undefined && data < schema.minimum) {
-        errors.push(new SchemaValidationError(`Number must be at least ${schema.minimum}`, path, data, schema));
+        errors.push(
+          new SchemaValidationError(
+            `Number must be at least ${schema.minimum}`,
+            path,
+            data,
+            schema
+          )
+        );
       }
 
       if (schema.maximum !== undefined && data > schema.maximum) {
-        errors.push(new SchemaValidationError(`Number must be at most ${schema.maximum}`, path, data, schema));
+        errors.push(
+          new SchemaValidationError(
+            `Number must be at most ${schema.maximum}`,
+            path,
+            data,
+            schema
+          )
+        );
       }
     }
 
     // Array validations
     if (schema.type === "array" && Array.isArray(data)) {
       if (schema.minItems !== undefined && data.length < schema.minItems) {
-        errors.push(new SchemaValidationError(`Array must have at least ${schema.minItems} items`, path, data, schema));
+        errors.push(
+          new SchemaValidationError(
+            `Array must have at least ${schema.minItems} items`,
+            path,
+            data,
+            schema
+          )
+        );
       }
 
       if (schema.maxItems !== undefined && data.length > schema.maxItems) {
-        errors.push(new SchemaValidationError(`Array must have at most ${schema.maxItems} items`, path, data, schema));
+        errors.push(
+          new SchemaValidationError(
+            `Array must have at most ${schema.maxItems} items`,
+            path,
+            data,
+            schema
+          )
+        );
       }
 
       if (schema.items) {
         data.forEach((item, index) => {
           const itemPath = `${path}[${index}]`;
-          const itemResult = this.validateAgainstSchema(item, schema.items, itemPath);
-          const nestedErrors = Array.isArray(itemResult?.errors) ? itemResult.errors : [];
+          const itemResult = this.validateAgainstSchema(
+            item,
+            schema.items,
+            itemPath
+          );
+          const nestedErrors = Array.isArray(itemResult?.errors)
+            ? itemResult.errors
+            : [];
           errors.push(...nestedErrors);
         });
       }
@@ -164,7 +235,9 @@ class SchemaValidator {
       case "boolean":
         return typeof data === "boolean";
       case "object":
-        return typeof data === "object" && data !== null && !Array.isArray(data);
+        return (
+          typeof data === "object" && data !== null && !Array.isArray(data)
+        );
       case "array":
         return Array.isArray(data);
       case "null":
@@ -185,7 +258,17 @@ class SchemaValidator {
       properties: {
         action: {
           type: "string",
-          enum: ["plan", "preview", "apply", "deploy", "status", "rollback", "auto", "list_pages", "read_page"],
+          enum: [
+            "plan",
+            "preview",
+            "apply",
+            "deploy",
+            "status",
+            "rollback",
+            "auto",
+            "list_pages",
+            "read_page",
+          ],
         },
         idempotencyKey: {
           type: "string",
@@ -252,7 +335,14 @@ class SchemaValidator {
         },
         eventType: {
           type: "string",
-          enum: ["planned", "previewed", "applied", "deployed", "rolled_back", "error"],
+          enum: [
+            "planned",
+            "previewed",
+            "applied",
+            "deployed",
+            "rolled_back",
+            "error",
+          ],
         },
         action: {
           type: "object",
@@ -348,9 +438,16 @@ export function createValidationMiddleware(schemaName) {
     const result = globalValidator.validate(schemaName, data);
 
     if (!result.valid) {
-      const errorMessages = result.errors.map((err) => `${err.field}: ${err.message}`).join("; ");
+      const errorMessages = result.errors
+        .map((err) => `${err.field}: ${err.message}`)
+        .join("; ");
 
-      throw new SchemaValidationError(`Validation failed: ${errorMessages}`, "validation", data, schemaName);
+      throw new SchemaValidationError(
+        `Validation failed: ${errorMessages}`,
+        "validation",
+        data,
+        schemaName
+      );
     }
 
     return result.data;
@@ -360,22 +457,26 @@ export function createValidationMiddleware(schemaName) {
 /**
  * Request validator for execute API
  */
-export const validateExecuteRequest = createValidationMiddleware("ExecuteRequest");
+export const validateExecuteRequest =
+  createValidationMiddleware("ExecuteRequest");
 
 /**
  * Response validator for execute API
  */
-export const validateExecuteResponse = createValidationMiddleware("ExecuteResponse");
+export const validateExecuteResponse =
+  createValidationMiddleware("ExecuteResponse");
 
 /**
  * Error response validator
  */
-export const validateErrorResponse = createValidationMiddleware("ErrorResponse");
+export const validateErrorResponse =
+  createValidationMiddleware("ErrorResponse");
 
 /**
  * Rate limit response validator
  */
-export const validateRateLimitResponse = createValidationMiddleware("RateLimitResponse");
+export const validateRateLimitResponse =
+  createValidationMiddleware("RateLimitResponse");
 
 /**
  * Validate and sanitize request data
@@ -386,7 +487,12 @@ export function validateRequest(request, schemaName) {
     return validateExecuteRequest(data);
   } catch (error) {
     if (error instanceof SyntaxError) {
-      throw new SchemaValidationError("Invalid JSON format", "request", request, "json");
+      throw new SchemaValidationError(
+        "Invalid JSON format",
+        "request",
+        request,
+        "json"
+      );
     }
     throw error;
   }

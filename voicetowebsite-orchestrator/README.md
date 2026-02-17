@@ -1,10 +1,12 @@
 # VoiceToWebsite Local Orchestrator
 
-This is a local Express server that enables remote execution of npm scripts on your development machine.
+This is a local Express server that enables remote execution of npm scripts on your development
+machine.
 
 ## Purpose
 
-The orchestrator server allows the `/api/execute` endpoint (running on Cloudflare Workers) to trigger local development tasks like:
+The orchestrator server allows the `/api/execute` endpoint (running on Cloudflare Workers) to
+trigger local development tasks like:
 
 - `npm run verify` - Run tests and validation
 - `npm run deploy` - Deploy to production

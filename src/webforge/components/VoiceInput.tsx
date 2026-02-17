@@ -5,7 +5,10 @@ interface VoiceInputProps {
   className?: string;
 }
 
-const VoiceInput: React.FC<VoiceInputProps> = ({ onResult, className = "" }) => {
+const VoiceInput: React.FC<VoiceInputProps> = ({
+  onResult,
+  className = "",
+}) => {
   const [isListening, setIsListening] = useState(false);
   const [supported, setSupported] = useState(false);
 
@@ -18,7 +21,9 @@ const VoiceInput: React.FC<VoiceInputProps> = ({ onResult, className = "" }) => 
   const toggleListening = () => {
     if (!supported) return;
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
 
     recognition.lang = "en-US";
@@ -58,7 +63,9 @@ const VoiceInput: React.FC<VoiceInputProps> = ({ onResult, className = "" }) => 
       } border rounded-xl p-3`}
       title={isListening ? "Listening..." : "Voice Command"}
     >
-      <i className={`fa-solid ${isListening ? "fa-microphone-lines" : "fa-microphone"}`}></i>
+      <i
+        className={`fa-solid ${isListening ? "fa-microphone-lines" : "fa-microphone"}`}
+      ></i>
     </button>
   );
 };

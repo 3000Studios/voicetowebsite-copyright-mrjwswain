@@ -104,7 +104,8 @@ voicetowebsite-copyright-mrjwswain/
 
 ## Conclusion
 
-The orchestrator folder is **exactly where it should be**. It's an integral part of your autonomous deployment system and needs to be in the workspace to:
+The orchestrator folder is **exactly where it should be**. It's an integral part of your autonomous
+deployment system and needs to be in the workspace to:
 
 - Access repository files
 - Execute npm scripts

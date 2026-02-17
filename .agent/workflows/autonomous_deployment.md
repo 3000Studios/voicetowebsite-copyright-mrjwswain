@@ -15,8 +15,7 @@ description: Fully automate the project build, verify, and deploy pipeline (Clou
    npm run verify
    ```
 
-2. **Deploy to Cloudflare**:
-   (Builds then runs `wrangler deploy`)
+2. **Deploy to Cloudflare**: (Builds then runs `wrangler deploy`)
    ```bash
    npm run deploy
    ```
@@ -37,5 +36,4 @@ npm run auto:ship
 npm run dev:all
 ```
 
-// turbo
-npm run deploy
+// turbo npm run deploy

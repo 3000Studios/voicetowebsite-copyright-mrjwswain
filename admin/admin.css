@@ -4,7 +4,11 @@
 :root {
   color-scheme: dark;
   --bg: #0a0f18;
-  --surface: linear-gradient(145deg, rgba(23, 32, 48, 0.9), rgba(6, 10, 18, 0.92));
+  --surface: linear-gradient(
+    145deg,
+    rgba(23, 32, 48, 0.9),
+    rgba(6, 10, 18, 0.92)
+  );
   --surface-2: #111827;
   --text: #e5e7eb;
   --muted: #9ca3af;
@@ -24,7 +28,9 @@
 body {
   margin: 0;
   font-family: "Playfair Display", serif;
-  background: linear-gradient(180deg, rgba(5, 7, 10, 0.72), rgba(5, 7, 10, 0.45)), var(--bg);
+  background:
+    linear-gradient(180deg, rgba(5, 7, 10, 0.72), rgba(5, 7, 10, 0.45)),
+    var(--bg);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.55;
@@ -312,7 +318,11 @@ body {
 .admin-lock .ion-1 {
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(0, 242, 255, 0.8) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 242, 255, 0.8) 0%,
+    transparent 70%
+  );
   top: -10%;
   left: -10%;
 }
@@ -320,7 +330,11 @@ body {
 .admin-lock .ion-2 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(112, 0, 255, 0.8) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(112, 0, 255, 0.8) 0%,
+    transparent 70%
+  );
   bottom: -5%;
   right: -5%;
   animation-delay: -5s;
@@ -329,7 +343,11 @@ body {
 .admin-lock .ion-3 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(255, 0, 200, 0.75) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 0, 200, 0.75) 0%,
+    transparent 70%
+  );
   top: 40%;
   left: 50%;
   animation-delay: -10s;
@@ -353,14 +371,20 @@ body {
   left: 0;
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.8), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 242, 255, 0.8),
+    transparent
+  );
   opacity: 0.2;
   animation: admin-scan 4s linear infinite;
 }
 
 .admin-lock .id-label {
   font-family:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
   font-size: 10px;
   letter-spacing: 0.4em;
   text-transform: uppercase;
@@ -375,7 +399,11 @@ body {
   font-weight: 700;
   font-size: 2rem;
   letter-spacing: -0.03em;
-  background: linear-gradient(to bottom, #fff 0%, rgba(255, 255, 255, 0.4) 100%);
+  background: linear-gradient(
+    to bottom,
+    #fff 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -392,7 +420,8 @@ body {
 
 .admin-lock .input-tag {
   font-family:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
   font-size: 9px;
   color: rgba(255, 255, 255, 0.4);
   position: absolute;
@@ -440,7 +469,8 @@ body {
   border: 1px solid rgba(0, 242, 255, 0.9);
   color: rgba(0, 242, 255, 0.9);
   font-family:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -456,7 +486,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 242, 255, 0.2),
+    transparent
+  );
   transition: left 0.6s ease;
 }
 
@@ -476,7 +511,8 @@ body {
   gap: 1rem;
   margin-top: 22px;
   font-family:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
   font-size: 10px;
   color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
@@ -1735,7 +1771,13 @@ pre {
     top: 100%;
     right: 0;
     left: 0;
-    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 55%), rgba(8, 12, 18, 0.95);
+    background:
+      radial-gradient(
+        circle at top,
+        rgba(255, 255, 255, 0.08),
+        transparent 55%
+      ),
+      rgba(8, 12, 18, 0.95);
     padding: 1rem 1.25rem 1.5rem;
     display: grid;
     gap: 0.8rem;

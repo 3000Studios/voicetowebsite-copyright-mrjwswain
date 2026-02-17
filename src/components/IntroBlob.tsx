@@ -62,8 +62,14 @@ const IntroBlob: React.FC<IntroBlobProps> = ({ splatterActive, onStart }) => {
     return { x: 0, y: 0 };
   };
 
-  const xPull = useTransform([mouseX, mouseY], ([mx, my]) => calculatePull(mx as number, my as number).x);
-  const yPull = useTransform([mouseX, mouseY], ([mx, my]) => calculatePull(mx as number, my as number).y);
+  const xPull = useTransform(
+    [mouseX, mouseY],
+    ([mx, my]) => calculatePull(mx as number, my as number).x
+  );
+  const yPull = useTransform(
+    [mouseX, mouseY],
+    ([mx, my]) => calculatePull(mx as number, my as number).y
+  );
 
   const springConfig = { damping: 15, stiffness: 60 };
   const x = useSpring(xPull, springConfig);
@@ -76,7 +82,9 @@ const IntroBlob: React.FC<IntroBlobProps> = ({ splatterActive, onStart }) => {
       animate={{
         opacity: 1,
         scale: splatterActive ? 25 : [1, 1.05, 1],
-        borderRadius: splatterActive ? "50%" : ["50% 50% 50% 50%", "48% 52% 45% 55%", "52% 48% 55% 45%"],
+        borderRadius: splatterActive
+          ? "50%"
+          : ["50% 50% 50% 50%", "48% 52% 45% 55%", "52% 48% 55% 45%"],
       }}
       style={{ x, y }}
       transition={{
@@ -94,7 +102,10 @@ const IntroBlob: React.FC<IntroBlobProps> = ({ splatterActive, onStart }) => {
       <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
       {!splatterActive && (
         <motion.span
-          animate={{ opacity: [0.6, 1, 0.6], letterSpacing: ["0.3em", "0.5em", "0.3em"] }}
+          animate={{
+            opacity: [0.6, 1, 0.6],
+            letterSpacing: ["0.3em", "0.5em", "0.3em"],
+          }}
           transition={{ duration: 3, repeat: Infinity }}
           className="font-orbitron text-[8px] md:text-[9px] text-black font-black uppercase pointer-events-none z-20 text-center px-4"
         >

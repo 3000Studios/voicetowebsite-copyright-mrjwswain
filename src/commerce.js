@@ -1,21 +1,31 @@
-const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || (window.__ENV && window.__ENV.PAYPAL_CLIENT_ID);
-const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || (window.__ENV && window.__ENV.STRIPE_PUBLISHABLE_KEY);
+const PAYPAL_CLIENT_ID =
+  import.meta.env.VITE_PAYPAL_CLIENT_ID ||
+  (window.__ENV && window.__ENV.PAYPAL_CLIENT_ID);
+const STRIPE_PK =
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
+  (window.__ENV && window.__ENV.STRIPE_PUBLISHABLE_KEY);
 
 export const checkCredentials = () => {
   if (!PAYPAL_CLIENT_ID) {
     console.warn("VITE_PAYPAL_CLIENT_ID is missing in .env and window.__ENV");
   }
   if (!STRIPE_PK) {
-    console.warn("VITE_STRIPE_PUBLISHABLE_KEY is missing in .env and window.__ENV");
+    console.warn(
+      "VITE_STRIPE_PUBLISHABLE_KEY is missing in .env and window.__ENV"
+    );
   }
 };
 
 export const handleStripePurchase = async (product, amount, redirectUrl) => {
   if (!STRIPE_PK) {
-    throw new Error("Stripe is not configured (missing VITE_STRIPE_PUBLISHABLE_KEY).");
+    throw new Error(
+      "Stripe is not configured (missing VITE_STRIPE_PUBLISHABLE_KEY)."
+    );
   }
   if (!window.Stripe) {
-    throw new Error("Stripe SDK not loaded. Add https://js.stripe.com/v3 to the page.");
+    throw new Error(
+      "Stripe SDK not loaded. Add https://js.stripe.com/v3 to the page."
+    );
   }
 
   try {
@@ -38,7 +48,12 @@ export const handleStripePurchase = async (product, amount, redirectUrl) => {
   }
 };
 
-export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl) => {
+export const handlePayPalPurchase = async (
+  sku,
+  displayName,
+  amount,
+  redirectUrl
+) => {
   // Load SDK dynamically if not present
   if (!window.paypal_sdk_promise) {
     window.paypal_sdk_promise = (async () => {
@@ -105,7 +120,8 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
   const returnUrl = (() => {
     try {
       const u = new URL(String(redirectUrl || ""), window.location.origin);
-      if (u.protocol !== "http:" && u.protocol !== "https:") return window.location.href;
+      if (u.protocol !== "http:" && u.protocol !== "https:")
+        return window.location.href;
       return u.href;
     } catch (_) {
       return window.location.href;
@@ -115,7 +131,12 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
   try {
     window.paypal
       .Buttons({
-        style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal" },
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+        },
         createOrder: async () => {
           const res = await fetch("/api/checkout", {
             method: "POST",
@@ -129,7 +150,9 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
           });
           const data = await res.json().catch(() => ({}));
           if (!res.ok || !data?.id) {
-            throw new Error(String(data?.error || "PayPal order create failed."));
+            throw new Error(
+              String(data?.error || "PayPal order create failed.")
+            );
           }
           return data.id;
         },
@@ -144,7 +167,8 @@ export const handlePayPalPurchase = async (sku, displayName, amount, redirectUrl
               body: JSON.stringify({ orderId: data?.orderID }),
             });
             const cap = await res.json().catch(() => ({}));
-            if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
+            if (!res.ok || !cap?.ok)
+              throw new Error(String(cap?.error || "PayPal capture failed."));
 
             if (statusEl) statusEl.textContent = "Payment successful!";
             setTimeout(() => {

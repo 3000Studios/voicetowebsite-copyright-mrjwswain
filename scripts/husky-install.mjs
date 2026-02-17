@@ -9,5 +9,8 @@ const npxCmd = isWin ? process.env.ComSpec || "cmd.exe" : "npx";
 const npxPrefixArgs = isWin ? ["/d", "/s", "/c", "npx"] : [];
 
 // `husky install` is deprecated in v9; invoking `husky` with no args installs hooks.
-const res = spawnSync(npxCmd, [...npxPrefixArgs, "--no-install", "husky"], { stdio: "inherit", shell: false });
+const res = spawnSync(npxCmd, [...npxPrefixArgs, "--no-install", "husky"], {
+  stdio: "inherit",
+  shell: false,
+});
 process.exit(res.status ?? 0);

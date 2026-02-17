@@ -5,7 +5,10 @@ interface ScreenshotUploadProps {
   isLoading: boolean;
 }
 
-const ScreenshotUpload: React.FC<ScreenshotUploadProps> = ({ onUpload, isLoading }) => {
+const ScreenshotUpload: React.FC<ScreenshotUploadProps> = ({
+  onUpload,
+  isLoading,
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,12 +37,20 @@ const ScreenshotUpload: React.FC<ScreenshotUploadProps> = ({ onUpload, isLoading
               : "bg-white border-blue-200 hover:border-blue-400 hover:bg-blue-50"
           }`}
       >
-        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/*"
+          className="hidden"
+        />
 
         <div
           className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-transform ${isLoading ? "animate-pulse" : "group-hover:scale-110"} bg-blue-100 text-blue-600`}
         >
-          <i className={`fa-solid ${isLoading ? "fa-spinner fa-spin" : "fa-cloud-arrow-up"} text-2xl`}></i>
+          <i
+            className={`fa-solid ${isLoading ? "fa-spinner fa-spin" : "fa-cloud-arrow-up"} text-2xl`}
+          ></i>
         </div>
 
         <h3 className="text-xl font-semibold text-gray-800 mb-2">

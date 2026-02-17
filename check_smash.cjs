@@ -10,7 +10,13 @@ function findHtmlFiles(dir, fileList = []) {
       const stat = fs.statSync(filePath);
 
       if (stat.isDirectory()) {
-        if (file !== "dist" && file !== "node_modules" && file !== ".git" && file !== ".vscode" && file !== ".gemini") {
+        if (
+          file !== "dist" &&
+          file !== "node_modules" &&
+          file !== ".git" &&
+          file !== ".vscode" &&
+          file !== ".gemini"
+        ) {
           findHtmlFiles(filePath, fileList);
         }
       } else {

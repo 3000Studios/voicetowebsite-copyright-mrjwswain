@@ -9,8 +9,10 @@ export async function injectSEO(response, pageConfig, env) {
   const defaults = config.defaults || {};
   const content = config.content || {};
 
-  const title = content.title || config.title || defaults.title || "Material Vault";
-  const description = content.description || config.description || defaults.description || "";
+  const title =
+    content.title || config.title || defaults.title || "Material Vault";
+  const description =
+    content.description || config.description || defaults.description || "";
 
   // Simple SEO injection (replaces existing tags or adds new ones in head)
   // In a real production app, we'd use a proper HTMLRewriter
@@ -49,12 +51,18 @@ export class SEORewriter {
     if (element.tagName === "meta") {
       const name = element.getAttribute("name");
       const property = element.getAttribute("property");
-      if (name === "description") element.setAttribute("content", this.config.description);
-      if (property === "og:title") element.setAttribute("content", this.config.title);
-      if (property === "og:description") element.setAttribute("content", this.config.description);
-      if (name === "twitter:title") element.setAttribute("content", this.config.title);
-      if (name === "twitter:description") element.setAttribute("content", this.config.description);
-      if (name === "robots") element.setAttribute("content", this.config.robots);
+      if (name === "description")
+        element.setAttribute("content", this.config.description);
+      if (property === "og:title")
+        element.setAttribute("content", this.config.title);
+      if (property === "og:description")
+        element.setAttribute("content", this.config.description);
+      if (name === "twitter:title")
+        element.setAttribute("content", this.config.title);
+      if (name === "twitter:description")
+        element.setAttribute("content", this.config.description);
+      if (name === "robots")
+        element.setAttribute("content", this.config.robots);
     }
   }
 }

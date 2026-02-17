@@ -1,11 +1,66 @@
-dist
-node_modules
-.wrangler
-.git
-test-results
-black-vault
-Media
-app Store apps to Sell
-app.js
-DEPOSIT.md
-CODE_REVIEW_FIXES.md
+# Prettier ignore file
+# Files and directories to exclude from Prettier formatting
+
+# Dependencies
+node_modules/
+voicetowebsite-orchestrator/node_modules/
+
+# Build outputs
+dist/
+.wrangler/
+public/
+
+# Media and assets
+Media/
+black-vault/
+
+# Logs
+*.log
+logs/
+
+# Auto-generated docs (formatted by their own scripts)
+GLOBAL_SYSTEM_INSTRUCTIONS.md
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Generated files
+*.min.js
+*.min.css
+
+# Vendor files
+vendor/
+
+# Cache
+.cache/
+.vscode-test/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# App Store apps (external projects)
+app Store apps to Sell/
+
+# Large binary files
+*.mp4
+*.webm
+*.mov
+*.avi
+*.mp3
+*.wav
+*.ogg
+*.pdf
+*.zip
+*.tar.gz
+*.rar
+
+# Generated documentation
+coverage/
+.nyc_output/

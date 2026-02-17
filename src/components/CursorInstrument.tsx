@@ -86,8 +86,10 @@ const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const lerp = 0.3;
-      cursorPosRef.current.x += (mouseRef.current.x - cursorPosRef.current.x) * lerp;
-      cursorPosRef.current.y += (mouseRef.current.y - cursorPosRef.current.y) * lerp;
+      cursorPosRef.current.x +=
+        (mouseRef.current.x - cursorPosRef.current.x) * lerp;
+      cursorPosRef.current.y +=
+        (mouseRef.current.y - cursorPosRef.current.y) * lerp;
 
       const hx = cursorPosRef.current.x;
       const hy = cursorPosRef.current.y;
@@ -109,7 +111,8 @@ const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
         };
 
         if (nextPoint.x < 0 || nextPoint.x > canvas.width) arc.velocity.x *= -1;
-        if (nextPoint.y < 0 || nextPoint.y > canvas.height) arc.velocity.y *= -1;
+        if (nextPoint.y < 0 || nextPoint.y > canvas.height)
+          arc.velocity.y *= -1;
 
         arc.points.push(nextPoint);
         if (arc.points.length > 12) arc.points.shift();
@@ -156,7 +159,12 @@ const CursorInstrument: React.FC<CursorInstrumentProps> = ({ isShooting }) => {
     };
   }, [isShooting]);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[9999]" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-[9999]"
+    />
+  );
 };
 
 export default CursorInstrument;

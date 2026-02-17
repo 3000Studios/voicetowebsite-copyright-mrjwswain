@@ -12,7 +12,13 @@ function findHtmlFiles(dir, fileList = []) {
       const stat = fs.statSync(filePath);
 
       if (stat.isDirectory()) {
-        if (file !== "dist" && file !== "node_modules" && file !== ".git" && file !== ".vscode" && file !== ".gemini") {
+        if (
+          file !== "dist" &&
+          file !== "node_modules" &&
+          file !== ".git" &&
+          file !== ".vscode" &&
+          file !== ".gemini"
+        ) {
           findHtmlFiles(filePath, fileList);
         }
       } else {
@@ -63,7 +69,8 @@ htmlFiles.forEach((file) => {
 
   // 1a. Inject AdSense Auto-Ads (Global)
   if (!content.includes("adsbygoogle.js")) {
-    const publisher = process.env.ADSENSE_PUBLISHER || "ca-pub-5800977493749262";
+    const publisher =
+      process.env.ADSENSE_PUBLISHER || "ca-pub-5800977493749262";
     const adScript = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisher}" crossorigin="anonymous"></script>`;
     if (content.includes("</head>")) {
       content = content.replace("</head>", `  ${adScript}\n</head>`);

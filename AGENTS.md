@@ -26,7 +26,8 @@ This repo is designed for an autonomous operator to make changes safely and keep
 ## Deployment Policy
 
 - GitHub Actions deployment is intentionally disabled for this repo.
-- Production deploy is performed via local `wrangler deploy` (`npm run deploy`), typically driven by `npm run auto:ship`.
+- Production deploy is performed via local `wrangler deploy` (`npm run deploy`), typically driven by
+  `npm run auto:ship`.
   - `npm run deploy` runs `npm run verify` first, then `wrangler deploy --keep-vars`.
 
 ## Environment Variables (Typical)
@@ -35,7 +36,8 @@ Set only what you need for the task.
 
 - Cloudflare deploy:
   - `CLOUDFLARE_API_TOKEN` (required to deploy from a hosted agent environment)
-  - `VOICETOWEBSITE_WORKERS_BUILD_TOKEN` (required in Cloudflare Worker Builds API token settings for auto-deploy)
+  - `VOICETOWEBSITE_WORKERS_BUILD_TOKEN` (required in Cloudflare Worker Builds API token settings
+    for auto-deploy)
   - `CF_WORKERS_BUILDS_AUTO_DEPLOY=1` (runtime flag when using push-triggered Workers Builds)
 - Admin auth:
   - `CONTROL_PASSWORD` (enables `/api/admin/login`)

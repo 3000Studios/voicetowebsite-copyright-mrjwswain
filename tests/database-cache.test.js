@@ -4,7 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { StatementCache, CachedDatabase, createCachedDatabase, QUERY_TEMPLATES } from "../functions/database-cache.js";
+import {
+  StatementCache,
+  CachedDatabase,
+  createCachedDatabase,
+  QUERY_TEMPLATES,
+} from "../functions/database-cache.js";
 
 // Mock database for testing
 class MockDatabase {
@@ -15,7 +20,10 @@ class MockDatabase {
 
   prepare(query) {
     if (!this.preparedStatements.has(query)) {
-      this.preparedStatements.set(query, new MockStatement(query, this.queryResults.get(query)));
+      this.preparedStatements.set(
+        query,
+        new MockStatement(query, this.queryResults.get(query))
+      );
     }
     return this.preparedStatements.get(query);
   }
@@ -78,7 +86,9 @@ describe("StatementCache", () => {
     // Prepared statements are reusable across different param values; only count matters.
     expect(cache.generateKey(query1, [1])).toBe(cache.generateKey(query1, [2]));
     // Different parameter counts must not collide.
-    expect(cache.generateKey(query1, [1])).not.toBe(cache.generateKey(query1, [1, 2]));
+    expect(cache.generateKey(query1, [1])).not.toBe(
+      cache.generateKey(query1, [1, 2])
+    );
   });
 
   it("should cache and retrieve statements", () => {
@@ -280,7 +290,10 @@ describe("Cache Performance Optimization", () => {
 
   it("should handle large numbers of cache operations efficiently", () => {
     const cache = new StatementCache(1000, 10000);
-    const queries = Array.from({ length: 100 }, (_, i) => `SELECT * FROM table_${i} WHERE id = ?`);
+    const queries = Array.from(
+      { length: 100 },
+      (_, i) => `SELECT * FROM table_${i} WHERE id = ?`
+    );
 
     const startTime = performance.now();
 

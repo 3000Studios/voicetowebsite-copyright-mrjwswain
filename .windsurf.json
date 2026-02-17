@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "name": "Voice-to-Website - 3000 Studios",
+  "description": "Autonomous Web Engineering & Monetization Engine powered by AI",
+
+  "ai": {
+    "enabled": true,
+    "contextAware": true,
+    "autoSuggest": true,
+    "codeCompletion": {
+      "enabled": true,
+      "triggerCharacters": [".", "(", "[", "{", "<", "\"", "'"],
+      "languages": [
+        "javascript",
+        "typescript",
+        "typescriptreact",
+        "javascriptreact",
+        "html",
+        "css",
+        "json"
+      ]
+    },
+    "chatAssistant": {
+      "enabled": true,
+      "contextFiles": ["PROJECT_PROGRESS.md", "README.md", "package.json", "ops/site/progress.json"]
+    }
+  },
+
+  "project": {
+    "type": "cloudflare-workers",
+    "framework": "vite",
+    "language": "typescript",
+    "packageManager": "npm",
+    "buildCommand": "npm run build",
+    "devCommand": "npm run dev:all",
+    "testCommand": "npm run test",
+    "deployCommand": "npm run deploy"
+  },
+
+  "paths": {
+    "source": "src",
+    "output": "dist",
+    "public": "public",
+    "tests": "src/**/*.test.{ts,tsx,js,jsx}",
+    "config": "ops/site"
+  },
+
+  "exclude": {
+    "search": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.wrangler/**",
+      "**/Media/**",
+      "**/black-vault/**",
+      "**/voicetowebsite-orchestrator/node_modules/**"
+    ],
+    "watch": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.wrangler/**",
+      "**/Media/**",
+      "**/black-vault/**"
+    ]
+  },
+
+  "codeStyle": {
+    "indentSize": 2,
+    "useTabs": false,
+    "quoteStyle": "double",
+    "semicolons": true,
+    "trailingComma": "es5",
+    "lineEnding": "lf"
+  },
+
+  "integrations": {
+    "cloudflare": {
+      "enabled": true,
+      "accountId": "${CLOUDFLARE_ACCOUNT_ID}",
+      "workersEnabled": true,
+      "pagesEnabled": true
+    },
+    "git": {
+      "enabled": true,
+      "autoCommit": false,
+      "branchProtection": true
+    }
+  },
+
+  "tasks": {
+    "dev": {
+      "command": "npm run dev:all",
+      "description": "Start development servers (Vite + Wrangler)"
+    },
+    "build": {
+      "command": "npm run build",
+      "description": "Build production bundle"
+    },
+    "verify": {
+      "command": "npm run verify",
+      "description": "Run all verification checks"
+    },
+    "deploy": {
+      "command": "npm run deploy",
+      "description": "Deploy to Cloudflare Workers"
+    }
+  },
+
+  "documentation": {
+    "readme": "README.md",
+    "progress": "PROJECT_PROGRESS.md",
+    "workflows": ".agent/workflows"
+  }
+}

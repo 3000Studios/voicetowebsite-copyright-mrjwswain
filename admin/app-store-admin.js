@@ -4,7 +4,9 @@ const appsSales = document.getElementById("apps-sales");
 const appsReset = document.getElementById("apps-reset");
 const kpiApps = document.getElementById("kpi-apps");
 
-const readonly = Boolean(document.getElementById("app-form")?.dataset?.mode === "readonly");
+const readonly = Boolean(
+  document.getElementById("app-form")?.dataset?.mode === "readonly"
+);
 
 const loadCatalog = async () => {
   try {

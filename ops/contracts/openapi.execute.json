@@ -265,7 +265,17 @@
         "properties": {
           "action": {
             "type": "string",
-            "enum": ["auto", "plan", "preview", "apply", "deploy", "status", "rollback", "list_pages", "read_page"],
+            "enum": [
+              "auto",
+              "plan",
+              "preview",
+              "apply",
+              "deploy",
+              "status",
+              "rollback",
+              "list_pages",
+              "read_page"
+            ],
             "description": "Operation to perform. Use 'auto' for instant one-call changes (PREFERRED). Use 'list_pages' to see all pages. Use 'read_page' to inspect a page. Use 'status' to check health. Use 'rollback' to undo. Only use preview/apply/deploy if the user explicitly wants to review before shipping."
           },
           "idempotencyKey": {
@@ -374,7 +384,15 @@
           },
           "eventType": {
             "type": "string",
-            "enum": ["planned", "previewed", "confirmed", "applied", "deployed", "rolled_back", "error"],
+            "enum": [
+              "planned",
+              "previewed",
+              "confirmed",
+              "applied",
+              "deployed",
+              "rolled_back",
+              "error"
+            ],
             "description": "Lifecycle event type."
           },
           "action": {

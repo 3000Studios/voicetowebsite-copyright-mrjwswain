@@ -1,6 +1,7 @@
 # VoiceToWebsite Stripe Connect Integration
 
-A comprehensive Stripe Connect integration for the VoiceToWebsite platform that enables multi-vendor marketplaces, connected account management, and seamless payment processing.
+A comprehensive Stripe Connect integration for the VoiceToWebsite platform that enables multi-vendor
+marketplaces, connected account management, and seamless payment processing.
 
 ## 🚀 Features
 

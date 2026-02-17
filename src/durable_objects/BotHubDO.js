@@ -12,7 +12,8 @@ export class BotHubDO {
     this.locks = new Map(); // route -> lock object
 
     this.state.blockConcurrencyWhile(async () => {
-      this.systemState = (await this.state.storage.get("systemState")) || "STABLE";
+      this.systemState =
+        (await this.state.storage.get("systemState")) || "STABLE";
     });
   }
 
@@ -45,7 +46,8 @@ export class BotHubDO {
   async handleGetConfig(request) {
     const url = new URL(request.url);
     const route = url.searchParams.get("route") || "/";
-    const overrides = (await this.state.storage.get(`overrides:${route}`)) || {};
+    const overrides =
+      (await this.state.storage.get(`overrides:${route}`)) || {};
 
     // TODO: Merge with base config from assets (this should probably happen in the Worker for performance)
     return new Response(JSON.stringify(overrides), {
@@ -70,12 +72,17 @@ export class BotHubDO {
     // TODO: Implement idempotency check, allowlist, quotas
 
     const lock = await this.getActiveLock(route);
-    if (lock && lock.expiresAt > Date.now() && lock.idempotencyKey !== idempotencyKey) {
+    if (
+      lock &&
+      lock.expiresAt > Date.now() &&
+      lock.idempotencyKey !== idempotencyKey
+    ) {
       return new Response("Route Locked", { status: 409 });
     }
 
     // Apply patch
-    const overrides = (await this.state.storage.get(`overrides:${route}`)) || {};
+    const overrides =
+      (await this.state.storage.get(`overrides:${route}`)) || {};
     this.applyOps(overrides, ops);
 
     await this.state.storage.put(`overrides:${route}`, overrides);
@@ -106,8 +113,11 @@ export class BotHubDO {
       return new Response("Invalid patch payload", { status: 400 });
     }
 
-    const overrides = (await this.state.storage.get(`overrides:${route}`)) || {};
-    const preview = structuredClone ? structuredClone(overrides) : JSON.parse(JSON.stringify(overrides));
+    const overrides =
+      (await this.state.storage.get(`overrides:${route}`)) || {};
+    const preview = structuredClone
+      ? structuredClone(overrides)
+      : JSON.parse(JSON.stringify(overrides));
     this.applyOps(preview, ops);
 
     return new Response(
@@ -129,19 +139,27 @@ export class BotHubDO {
 
     const ttlMs = this.clampTtl(Number(payload.ttlMs) || DEFAULT_LOCK_TTL_MS);
     const actor = String(payload.actor || "unknown");
-    const incomingKey = payload.idempotencyKey ? String(payload.idempotencyKey) : null;
+    const incomingKey = payload.idempotencyKey
+      ? String(payload.idempotencyKey)
+      : null;
 
     const existing = await this.getActiveLock(route);
     if (existing) {
       if (incomingKey && existing.idempotencyKey === incomingKey) {
-        return new Response(JSON.stringify({ ok: true, lock: existing, reused: true }), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ ok: true, lock: existing, reused: true }),
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
-      return new Response(JSON.stringify({ error: "Route Locked", lock: existing }), {
-        status: 409,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "Route Locked", lock: existing }),
+        {
+          status: 409,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     const lock = {
@@ -169,7 +187,9 @@ export class BotHubDO {
 
     const lock = await this.getActiveLock(route);
     const actor = payload.actor ? String(payload.actor) : null;
-    const incomingKey = payload.idempotencyKey ? String(payload.idempotencyKey) : null;
+    const incomingKey = payload.idempotencyKey
+      ? String(payload.idempotencyKey)
+      : null;
 
     if (!lock) {
       await this.clearLock(route);
@@ -181,10 +201,13 @@ export class BotHubDO {
     const sameActor = actor && lock.actor === actor;
     const sameKey = incomingKey && lock.idempotencyKey === incomingKey;
     if (!sameActor && !sameKey && payload.force !== true) {
-      return new Response(JSON.stringify({ error: "Lock owned by another actor", lock }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "Lock owned by another actor", lock }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     await this.clearLock(route);

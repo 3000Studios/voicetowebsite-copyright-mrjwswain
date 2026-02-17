@@ -14,7 +14,9 @@ const App: React.FC = () => {
 
   // Core State
   const [tryPrompt, setTryPrompt] = useState("");
-  const [flowPhase, setFlowPhase] = useState<"idle" | "listening" | "confirm" | "generating" | "result">("idle");
+  const [flowPhase, setFlowPhase] = useState<
+    "idle" | "listening" | "confirm" | "generating" | "result"
+  >("idle");
   const [generatedPreviewUrl, setGeneratedPreviewUrl] = useState("");
   const [generatedSiteId, setGeneratedSiteId] = useState("");
   const [generateError, setGenerateError] = useState("");
@@ -34,7 +36,9 @@ const App: React.FC = () => {
 
   // Initialize Speech Recognition
   useEffect(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
@@ -78,7 +82,9 @@ const App: React.FC = () => {
 
     const loadPref = () => {
       try {
-        const raw = String(localStorage.getItem("vtw-audio-pref") || "").toLowerCase();
+        const raw = String(
+          localStorage.getItem("vtw-audio-pref") || ""
+        ).toLowerCase();
         if (raw === "off") return "off";
         if (raw === "on") return "on";
       } catch (_) {}
@@ -109,8 +115,14 @@ const App: React.FC = () => {
     tryStart().catch(() => {});
 
     // Retry on first interaction.
-    document.addEventListener("pointerdown", onFirstGesture, { capture: true, once: true });
-    document.addEventListener("keydown", onFirstGesture, { capture: true, once: true });
+    document.addEventListener("pointerdown", onFirstGesture, {
+      capture: true,
+      once: true,
+    });
+    document.addEventListener("keydown", onFirstGesture, {
+      capture: true,
+      once: true,
+    });
 
     return () => {
       cancelled = true;
@@ -190,7 +202,8 @@ const App: React.FC = () => {
         body: JSON.stringify({ prompt: tryPrompt, tone: "default" }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.error || `Generate failed (HTTP ${res.status})`);
+      if (!res.ok)
+        throw new Error(data?.error || `Generate failed (HTTP ${res.status})`);
 
       setGeneratedSiteId(String(data?.siteId || ""));
       setGeneratedPreviewUrl(String(data?.previewUrl || ""));
@@ -245,8 +258,14 @@ const App: React.FC = () => {
 
       {/* Persistent audio control */}
       <div className="fixed top-6 right-6 z-[160] flex items-center gap-3 bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full">
-        <button type="button" onClick={toggleAudio} className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isAudioPlaying ? "bg-cyan-400 animate-pulse" : "bg-white/20"}`} />
+        <button
+          type="button"
+          onClick={toggleAudio}
+          className="flex items-center gap-2"
+        >
+          <div
+            className={`w-2 h-2 rounded-full ${isAudioPlaying ? "bg-cyan-400 animate-pulse" : "bg-white/20"}`}
+          />
           <span className="font-orbitron text-[10px] tracking-widest text-white/60 uppercase">
             {isAudioPlaying ? "VOICE ON" : "VOICE OFF"}
           </span>
@@ -278,7 +297,8 @@ const App: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
           >
-            The world's first one-command website engine. No steps. No crap. Just your voice.
+            The world's first one-command website engine. No steps. No crap.
+            Just your voice.
           </motion.p>
         </div>
 
@@ -297,10 +317,15 @@ const App: React.FC = () => {
               playsInline
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             >
-              <source src="https://media.voicetowebsite.com/homenavigation.mp4" type="video/mp4" />
+              <source
+                src="https://media.voicetowebsite.com/homenavigation.mp4"
+                type="video/mp4"
+              />
             </video>
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="font-orbitron tracking-widest text-xs">How it works</span>
+              <span className="font-orbitron tracking-widest text-xs">
+                How it works
+              </span>
             </div>
           </div>
         </motion.section>
@@ -318,9 +343,12 @@ const App: React.FC = () => {
                   className="text-center"
                 >
                   <div className="mb-10">
-                    <h2 className="font-orbitron text-2xl mb-4 font-bold">Example: Build a Portfolio</h2>
+                    <h2 className="font-orbitron text-2xl mb-4 font-bold">
+                      Example: Build a Portfolio
+                    </h2>
                     <p className="text-white/40 italic">
-                      "Make a luxury portfolio for a photographer with a dark theme and gallery."
+                      "Make a luxury portfolio for a photographer with a dark
+                      theme and gallery."
                     </p>
                   </div>
 
@@ -331,10 +359,16 @@ const App: React.FC = () => {
                     <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-700"></span>
                     <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
                     <span className="relative flex flex-col items-center justify-center w-48 h-48 bg-black rounded-full text-white group-hover:text-cyan-400 transition-colors">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                      <svg
+                        className="w-12 h-12 mb-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
                         <path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H7a1 1 0 100 2h6a1 1 0 100-2h-1.93v-2.07z" />
                       </svg>
-                      <span className="font-orbitron tracking-widest text-sm uppercase">Tap to Speak</span>
+                      <span className="font-orbitron tracking-widest text-sm uppercase">
+                        Tap to Speak
+                      </span>
                     </span>
                   </button>
                 </motion.div>
@@ -349,7 +383,11 @@ const App: React.FC = () => {
                   className="text-center py-10"
                 >
                   <div className="mb-12">
-                    <AudioWaveform active={true} mode="opener" className="mx-auto scale-150" />
+                    <AudioWaveform
+                      active={true}
+                      mode="opener"
+                      className="mx-auto scale-150"
+                    />
                   </div>
                   <div className="text-2xl font-light text-white/80 min-h-[4rem] px-4">
                     {tryPrompt || "Listening for your command..."}
@@ -373,7 +411,9 @@ const App: React.FC = () => {
                   <div className="text-sm font-orbitron tracking-[0.4em] text-cyan-400 uppercase mb-8">
                     System Check
                   </div>
-                  <h3 className="text-3xl font-orbitron mb-4 font-black">Are you ready?</h3>
+                  <h3 className="text-3xl font-orbitron mb-4 font-black">
+                    Are you ready?
+                  </h3>
                   <div className="bg-white/5 border border-white/10 p-6 rounded-2xl max-w-2xl mx-auto mb-10 text-xl font-light text-white/90 shadow-inner">
                     "{tryPrompt}"
                   </div>
@@ -426,8 +466,12 @@ const App: React.FC = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center"
                 >
-                  <div className="text-sm font-orbitron tracking-[0.4em] text-green-400 uppercase mb-8">Success</div>
-                  <h3 className="text-3xl font-orbitron mb-10 font-black">Site Identity: {generatedSiteId}</h3>
+                  <div className="text-sm font-orbitron tracking-[0.4em] text-green-400 uppercase mb-8">
+                    Success
+                  </div>
+                  <h3 className="text-3xl font-orbitron mb-10 font-black">
+                    Site Identity: {generatedSiteId}
+                  </h3>
 
                   {/* Protected Preview Box */}
                   <div className="relative mb-12 rounded-3xl overflow-hidden border border-white/20 bg-black shadow-2xl group">
@@ -471,13 +515,22 @@ const App: React.FC = () => {
         {/* 3. Pricing / Licenses */}
         <section className="mt-32 border-t border-white/10 pt-32">
           <div className="text-center mb-16">
-            <h2 className="font-orbitron font-black text-3xl md:text-5xl uppercase mb-4">Ownership Tiers</h2>
-            <p className="text-white/40 text-lg">Transparent pricing for autonomous engineering.</p>
+            <h2 className="font-orbitron font-black text-3xl md:text-5xl uppercase mb-4">
+              Ownership Tiers
+            </h2>
+            <p className="text-white/40 text-lg">
+              Transparent pricing for autonomous engineering.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { name: "Solo", pages: "1 Page", price: "$49", desc: "For single landing pages or personal brands." },
+              {
+                name: "Solo",
+                pages: "1 Page",
+                price: "$49",
+                desc: "For single landing pages or personal brands.",
+              },
               {
                 name: "Business",
                 pages: "5 Pages",
@@ -485,7 +538,12 @@ const App: React.FC = () => {
                 desc: "A full presence for your growing company.",
                 highlight: true,
               },
-              { name: "Enterprise", pages: "Unlimited", price: "$499", desc: "Maximum power and white-label options." },
+              {
+                name: "Enterprise",
+                pages: "Unlimited",
+                price: "$499",
+                desc: "Maximum power and white-label options.",
+              },
             ].map((tier, i) => (
               <motion.div
                 key={tier.name}
@@ -494,10 +552,18 @@ const App: React.FC = () => {
                 transition={{ delay: 0.5 + i * 0.1 }}
                 className={`p-10 rounded-[2.5rem] border ${tier.highlight ? "border-cyan-500 bg-white/5 shadow-[0_0_50px_rgba(34,211,238,0.1)]" : "border-white/10 bg-white/[0.02]"}`}
               >
-                <div className="font-orbitron text-xs tracking-widest text-white/40 uppercase mb-6">{tier.pages}</div>
-                <h3 className="font-orbitron text-2xl font-black mb-2">{tier.name}</h3>
-                <div className="text-4xl font-orbitron font-black mb-6">{tier.price}</div>
-                <p className="text-white/40 text-sm leading-relaxed mb-8">{tier.desc}</p>
+                <div className="font-orbitron text-xs tracking-widest text-white/40 uppercase mb-6">
+                  {tier.pages}
+                </div>
+                <h3 className="font-orbitron text-2xl font-black mb-2">
+                  {tier.name}
+                </h3>
+                <div className="text-4xl font-orbitron font-black mb-6">
+                  {tier.price}
+                </div>
+                <p className="text-white/40 text-sm leading-relaxed mb-8">
+                  {tier.desc}
+                </p>
                 <a
                   href="/license.html"
                   className={`block w-full text-center py-4 rounded-full font-orbitron text-xs tracking-widest uppercase transition-all ${tier.highlight ? "bg-white text-black font-black" : "border border-white/20 hover:bg-white/5"}`}
@@ -511,7 +577,9 @@ const App: React.FC = () => {
 
         {/* Footer simple tag */}
         <div className="mt-40 text-center opacity-20 hover:opacity-100 transition-opacity">
-          <p className="font-orbitron text-[10px] tracking-[1em] uppercase">Sometimes it's better to keep it simple.</p>
+          <p className="font-orbitron text-[10px] tracking-[1em] uppercase">
+            Sometimes it's better to keep it simple.
+          </p>
         </div>
       </main>
     </div>

@@ -10,7 +10,11 @@ type Props = {
 const VIDEO_SRC = "/media/vtw-admin-dashboard.mp4";
 const FALLBACK_IMG = "/vtw-wallpaper.png";
 
-export default function SiteOpener({ show, onDone, reduceMotion = false }: Props) {
+export default function SiteOpener({
+  show,
+  onDone,
+  reduceMotion = false,
+}: Props) {
   const doneRef = useRef(false);
 
   useEffect(() => {
@@ -82,9 +86,15 @@ export default function SiteOpener({ show, onDone, reduceMotion = false }: Props
 
           <div className="relative z-10 h-full w-full flex flex-col items-center justify-end pb-10 md:pb-16 px-6">
             <div className="text-center">
-              <div className="font-orbitron text-[10px] tracking-[0.6em] text-white/70 uppercase">VoiceToWebsite</div>
-              <div className="mt-3 font-orbitron text-3xl md:text-5xl tracking-[0.18em] text-white">Command Center</div>
-              <div className="mt-4 text-white/60 max-w-xl mx-auto">Speak it. Ship it. Securely.</div>
+              <div className="font-orbitron text-[10px] tracking-[0.6em] text-white/70 uppercase">
+                VoiceToWebsite
+              </div>
+              <div className="mt-3 font-orbitron text-3xl md:text-5xl tracking-[0.18em] text-white">
+                Command Center
+              </div>
+              <div className="mt-4 text-white/60 max-w-xl mx-auto">
+                Speak it. Ship it. Securely.
+              </div>
             </div>
 
             <button

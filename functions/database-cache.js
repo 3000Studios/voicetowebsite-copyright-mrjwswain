@@ -196,7 +196,8 @@ class CachedDatabase {
    */
   async execute(query, params = []) {
     const statement = this.prepare(query);
-    const boundStatement = params.length > 0 ? statement.bind(...params) : statement;
+    const boundStatement =
+      params.length > 0 ? statement.bind(...params) : statement;
 
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -243,7 +244,10 @@ class CachedDatabase {
       queries: {
         total: this.queryStats.size,
         topSlowest: queryStats,
-        totalExecutions: Array.from(this.queryStats.values()).reduce((sum, stats) => sum + stats.count, 0),
+        totalExecutions: Array.from(this.queryStats.values()).reduce(
+          (sum, stats) => sum + stats.count,
+          0
+        ),
       },
     };
   }
@@ -287,7 +291,9 @@ export function createDatabaseMonitor(db, logger) {
       const stats = cachedDb.getPerformanceStats();
       logger.debug("Database performance metrics", stats);
     } catch (error) {
-      logger.warn("Failed to log database performance metrics", { error: error.message });
+      logger.warn("Failed to log database performance metrics", {
+        error: error.message,
+      });
     }
   }, 60000);
 
@@ -349,10 +355,16 @@ export class DatabaseHelper {
     const timer = this.logger.startTimer("db-consume-token");
 
     try {
-      const result = await this.db.execute(QUERY_TEMPLATES.CONSUME_TOKEN, [now, tokenHash, now]);
+      const result = await this.db.execute(QUERY_TEMPLATES.CONSUME_TOKEN, [
+        now,
+        tokenHash,
+        now,
+      ]);
       const changes = Number(result?.changes ?? result?.meta?.changes ?? 0);
       timer.end({ changes });
-      return result && typeof result === "object" ? { ...result, changes } : { changes };
+      return result && typeof result === "object"
+        ? { ...result, changes }
+        : { changes };
     } catch (error) {
       timer.end({ error: error.message });
       throw error;
@@ -366,7 +378,9 @@ export class DatabaseHelper {
     const timer = this.logger.startTimer("db-find-token");
 
     try {
-      const result = await this.db.execute(QUERY_TEMPLATES.FIND_TOKEN, [tokenHash]);
+      const result = await this.db.execute(QUERY_TEMPLATES.FIND_TOKEN, [
+        tokenHash,
+      ]);
       timer.end();
       return result;
     } catch (error) {
@@ -405,7 +419,10 @@ export class DatabaseHelper {
     const timer = this.logger.startTimer("db-find-event");
 
     try {
-      const result = await this.db.execute(QUERY_TEMPLATES.FIND_EVENT, [action, idempotencyKey]);
+      const result = await this.db.execute(QUERY_TEMPLATES.FIND_EVENT, [
+        action,
+        idempotencyKey,
+      ]);
       timer.end();
       return result;
     } catch (error) {

@@ -22,11 +22,23 @@ const intentPayload = (intent, entities, providerDefaults) => {
     case "update_theme":
       return { theme: entities?.design?.theme || "" };
     case "enable_affiliate_engine":
-      return { networks: providerDefaults?.affiliates?.defaultNetworks || ["amazon", "impact", "cj"] };
+      return {
+        networks: providerDefaults?.affiliates?.defaultNetworks || [
+          "amazon",
+          "impact",
+          "cj",
+        ],
+      };
     case "enable_ads":
-      return { provider: providerDefaults?.ads?.default || "adsense", mode: "auto" };
+      return {
+        provider: providerDefaults?.ads?.default || "adsense",
+        mode: "auto",
+      };
     case "enable_email_capture":
-      return { placement: "sticky", provider: providerDefaults?.email?.default || "default" };
+      return {
+        placement: "sticky",
+        provider: providerDefaults?.email?.default || "default",
+      };
     case "update_background_video":
       return { src: "" };
     default:

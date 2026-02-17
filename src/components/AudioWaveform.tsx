@@ -12,11 +12,19 @@ interface AudioWaveformProps {
 const parseAccentRgb = (value: string) => {
   const raw = (value || "").trim();
   const parts = raw.split(",").map((p) => Number(p.trim()));
-  if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return [56, 189, 248] as const;
+  if (parts.length !== 3 || parts.some((n) => Number.isNaN(n)))
+    return [56, 189, 248] as const;
   return [parts[0], parts[1], parts[2]] as const;
 };
 
-const roundRectPath = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
+const roundRectPath = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) => {
   const radius = Math.max(0, Math.min(r, Math.min(w, h) / 2));
   const anyCtx = ctx as any;
   if (typeof anyCtx.roundRect === "function") {
@@ -32,12 +40,18 @@ const roundRectPath = (ctx: CanvasRenderingContext2D, x: number, y: number, w: n
   ctx.arcTo(x, y, x + w, y, radius);
 };
 
-const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "opener", className = "" }) => {
+const AudioWaveform: React.FC<AudioWaveformProps> = ({
+  active = false,
+  mode = "opener",
+  className = "",
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number | null>(null);
   const tRef = useRef(0);
   const lastSizeRef = useRef({ w: 0, h: 0, dpr: 1 });
-  const accentRgbRef = useRef<readonly [number, number, number]>([56, 189, 248]);
+  const accentRgbRef = useRef<readonly [number, number, number]>([
+    56, 189, 248,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -56,7 +70,9 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
     // --- Optimization: Cache accent color ---
     const updateAccent = () => {
       const style = getComputedStyle(document.documentElement);
-      accentRgbRef.current = parseAccentRgb(style.getPropertyValue("--accent-rgb"));
+      accentRgbRef.current = parseAccentRgb(
+        style.getPropertyValue("--accent-rgb")
+      );
     };
     updateAccent();
 
@@ -67,7 +83,10 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
         }
       }
     });
-    mutationObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    mutationObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
 
     // --- Optimization: ResizeObserver instead of per-frame reads ---
     const updateSize = () => {
@@ -112,8 +131,14 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
       const base = Math.max(0.08, mode === "bumper" ? 0.12 : 0.09);
 
       const gradient = ctx.createLinearGradient(0, 0, 0, h);
-      gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${Math.min(0.92, base + glow)})`);
-      gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${Math.max(0.06, base * 0.55)})`);
+      gradient.addColorStop(
+        0,
+        `rgba(${r}, ${g}, ${b}, ${Math.min(0.92, base + glow)})`
+      );
+      gradient.addColorStop(
+        1,
+        `rgba(${r}, ${g}, ${b}, ${Math.max(0.06, base * 0.55)})`
+      );
 
       const totalGap = barGap * (barCount - 1);
       const barWidth = Math.max(2, Math.floor((w - totalGap) / barCount));
@@ -130,7 +155,10 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ active = false, mode = "o
       for (let i = 0; i < barCount; i++) {
         let v = 0.12;
         if (freq && freq.length) {
-          const idx = Math.min(freq.length - 1, Math.floor((i / barCount) * freq.length));
+          const idx = Math.min(
+            freq.length - 1,
+            Math.floor((i / barCount) * freq.length)
+          );
           v = freq[idx] / 255;
         } else {
           v = 0.18 + 0.18 * Math.sin(tRef.current * 1.6 + i * 0.55);

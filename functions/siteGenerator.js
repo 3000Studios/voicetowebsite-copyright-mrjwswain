@@ -227,12 +227,17 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
   const description = layout?.description || "Generated preview";
   const theme = layout?.theme || "midnight";
   const pages = Array.isArray(layout?.pages) ? layout.pages : [];
-  const nav = pages.map((p) => `<a href="#${p.slug || ""}">${p.title || p.slug || "Page"}</a>`).join("");
+  const nav = pages
+    .map((p) => `<a href="#${p.slug || ""}">${p.title || p.slug || "Page"}</a>`)
+    .join("");
   const sections = pages
     .map((p) => {
       const blocks = Array.isArray(p.sections) ? p.sections : [];
       const rendered = blocks
-        .map((s) => `<section class="vtw-section"><h3>${s.title || ""}</h3><p>${s.body || ""}</p></section>`)
+        .map(
+          (s) =>
+            `<section class="vtw-section"><h3>${s.title || ""}</h3><p>${s.body || ""}</p></section>`
+        )
         .join("");
       return `<article id="${p.slug || ""}" class="vtw-page"><h2>${p.title || ""}</h2>${rendered}</article>`;
     })
@@ -311,11 +316,16 @@ export async function handleGenerateRequest({ request, env }) {
       stylePackIds = normalizeStylePackIds(rawStylePacks);
       const audio = form.get("audio");
       if (audio && typeof audio.arrayBuffer === "function") {
-        if (!env.AI) return json(501, { error: "Workers AI binding missing (AI)." });
+        if (!env.AI)
+          return json(501, { error: "Workers AI binding missing (AI)." });
         const buf = await audio.arrayBuffer();
         const bytes = [...new Uint8Array(buf)];
-        const whisper = await env.AI.run("@cf/openai/whisper", { audio: bytes });
-        transcript = String(whisper?.text || whisper?.result?.text || whisper?.transcription || "");
+        const whisper = await env.AI.run("@cf/openai/whisper", {
+          audio: bytes,
+        });
+        transcript = String(
+          whisper?.text || whisper?.result?.text || whisper?.transcription || ""
+        );
       }
     } else {
       prompt = String(await request.clone().text());
@@ -326,7 +336,8 @@ export async function handleGenerateRequest({ request, env }) {
 
   const siteId = crypto.randomUUID();
   const mergedPrompt = [prompt, transcript].filter(Boolean).join("\n\n").trim();
-  if (!mergedPrompt) return json(400, { error: "Missing prompt and transcript." });
+  if (!mergedPrompt)
+    return json(400, { error: "Missing prompt and transcript." });
 
   if (!env.AI) return json(501, { error: "Workers AI binding missing (AI)." });
 
@@ -370,9 +381,16 @@ ${mergedPrompt}
   }
 
   const selectedStylePacks = getStylePacksByIds(stylePackIds);
-  const generatedCss = layout?.theme ? `:root{--vtw-theme:'${layout.theme}';}` : "";
+  const generatedCss = layout?.theme
+    ? `:root{--vtw-theme:'${layout.theme}';}`
+    : "";
   const css =
-    [generatedCss, ...selectedStylePacks.map((pack) => `/* style-pack:${pack.id} */\n${pack.css}`)]
+    [
+      generatedCss,
+      ...selectedStylePacks.map(
+        (pack) => `/* style-pack:${pack.id} */\n${pack.css}`
+      ),
+    ]
       .filter(Boolean)
       .join("\n\n") || "";
   const html = renderPreviewHtml({ siteId, layout, css });
@@ -380,7 +398,15 @@ ${mergedPrompt}
   await env.D1.prepare(
     "INSERT INTO sites (id, prompt, transcript, layout_json, html, css, status) VALUES (?,?,?,?,?,?,?)"
   )
-    .bind(siteId, prompt, transcript, JSON.stringify(layout), html, css, "draft")
+    .bind(
+      siteId,
+      prompt,
+      transcript,
+      JSON.stringify(layout),
+      html,
+      css,
+      "draft"
+    )
     .run();
 
   return json(200, {
@@ -389,7 +415,14 @@ ${mergedPrompt}
     transcript,
     layout,
     stylePackIds: selectedStylePacks.map((pack) => pack.id),
-    stylePacks: selectedStylePacks.map(({ id, name, category, description }) => ({ id, name, category, description })),
+    stylePacks: selectedStylePacks.map(
+      ({ id, name, category, description }) => ({
+        id,
+        name,
+        category,
+        description,
+      })
+    ),
     previewUrl: `/preview/${siteId}`,
   });
 }
@@ -400,7 +433,9 @@ export async function handlePreviewApiRequest({ request, env }) {
   const url = new URL(request.url);
   const id = url.searchParams.get("id") || "";
   if (!id) return json(400, { error: "Missing id query param." });
-  const row = await env.D1.prepare("SELECT id, ts, prompt, transcript, layout_json, status FROM sites WHERE id = ?")
+  const row = await env.D1.prepare(
+    "SELECT id, ts, prompt, transcript, layout_json, status FROM sites WHERE id = ?"
+  )
     .bind(id)
     .first();
   if (!row) return json(404, { error: "Not found." });
@@ -418,19 +453,26 @@ export async function handlePreviewPageRequest({ request, env }) {
   const url = new URL(request.url);
   const siteId = url.pathname.split("/").pop() || "";
   if (!siteId) return new Response("Missing site id", { status: 400 });
-  const row = await env.D1.prepare("SELECT html FROM sites WHERE id = ?").bind(siteId).first();
+  const row = await env.D1.prepare("SELECT html FROM sites WHERE id = ?")
+    .bind(siteId)
+    .first();
   if (!row?.html) return new Response("Not found", { status: 404 });
-  return new Response(row.html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return new Response(row.html, {
+    status: 200,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 }
 
 export async function handleStylePacksRequest() {
   return json(200, {
-    stylePacks: STYLE_PACK_LIBRARY.map(({ id, name, category, description }) => ({
-      id,
-      name,
-      category,
-      description,
-    })),
+    stylePacks: STYLE_PACK_LIBRARY.map(
+      ({ id, name, category, description }) => ({
+        id,
+        name,
+        category,
+        description,
+      })
+    ),
     total: STYLE_PACK_LIBRARY.length,
   });
 }
@@ -451,7 +493,11 @@ export async function handlePublishRequest({ request, env }) {
   const siteId = String(body?.siteId || "");
   if (!siteId) return json(400, { error: "Missing siteId." });
 
-  const row = await env.D1.prepare("SELECT id, html, css, layout_json FROM sites WHERE id = ?").bind(siteId).first();
+  const row = await env.D1.prepare(
+    "SELECT id, html, css, layout_json FROM sites WHERE id = ?"
+  )
+    .bind(siteId)
+    .first();
   if (!row) return json(404, { error: "Not found." });
 
   const base = `sites/${siteId}`;
@@ -478,13 +524,19 @@ export async function handlePublishRequest({ request, env }) {
 
   for (const asset of assets) {
     const buf = new TextEncoder().encode(String(asset.body));
-    await env.R2.put(asset.key, buf, { httpMetadata: { contentType: asset.contentType } });
-    await env.D1.prepare("INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)")
+    await env.R2.put(asset.key, buf, {
+      httpMetadata: { contentType: asset.contentType },
+    });
+    await env.D1.prepare(
+      "INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)"
+    )
       .bind(siteId, asset.kind, asset.key, asset.contentType, buf.byteLength)
       .run();
   }
 
-  await env.D1.prepare("UPDATE sites SET status = ? WHERE id = ?").bind("published", siteId).run();
+  await env.D1.prepare("UPDATE sites SET status = ? WHERE id = ?")
+    .bind("published", siteId)
+    .run();
 
   return json(200, { ok: true, siteId, r2Prefix: base });
 }

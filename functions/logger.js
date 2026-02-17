@@ -85,7 +85,10 @@ class Logger {
     }
 
     const redacted = { ...data };
-    const sensitivePattern = new RegExp(this.config.sensitiveFields.join("|"), "i");
+    const sensitivePattern = new RegExp(
+      this.config.sensitiveFields.join("|"),
+      "i"
+    );
 
     const redactValue = (obj, path = "") => {
       if (Array.isArray(obj)) {
@@ -163,7 +166,10 @@ class Logger {
    * Get level name from number
    */
   getLevelName(level) {
-    return Object.keys(LOG_LEVELS).find((key) => LOG_LEVELS[key] === level) || "UNKNOWN";
+    return (
+      Object.keys(LOG_LEVELS).find((key) => LOG_LEVELS[key] === level) ||
+      "UNKNOWN"
+    );
   }
 
   /**
@@ -179,8 +185,11 @@ class Logger {
   logToConsole(entry) {
     if (!this.config.enableConsole) return;
 
-    const { level, message, timestamp, traceId, requestId, data, error } = entry;
-    const contextStr = traceId ? ` [${traceId}${requestId ? `:${requestId}` : ""}]` : "";
+    const { level, message, timestamp, traceId, requestId, data, error } =
+      entry;
+    const contextStr = traceId
+      ? ` [${traceId}${requestId ? `:${requestId}` : ""}]`
+      : "";
     const dataStr = data ? ` ${JSON.stringify(data)}` : "";
     const errorStr = error ? ` ${error.message}` : "";
 
@@ -280,7 +289,9 @@ class Logger {
       method: request.method,
       url: request.url,
       userAgent: request.headers.get("user-agent"),
-      ip: request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for"),
+      ip:
+        request.headers.get("cf-connecting-ip") ||
+        request.headers.get("x-forwarded-for"),
     };
 
     if (responseTime !== null) {
@@ -288,7 +299,11 @@ class Logger {
     }
 
     if (error) {
-      this.error(`API Request Failed: ${request.method} ${request.url}`, data, error);
+      this.error(
+        `API Request Failed: ${request.method} ${request.url}`,
+        data,
+        error
+      );
     } else {
       this.info(`API Request: ${request.method} ${request.url}`, data);
     }
@@ -305,7 +320,11 @@ class Logger {
     };
 
     if (error) {
-      this.error(`Database Operation Failed: ${operation} on ${table}`, data, error);
+      this.error(
+        `Database Operation Failed: ${operation} on ${table}`,
+        data,
+        error
+      );
     } else {
       this.debug(`Database Operation: ${operation} on ${table}`, data);
     }
@@ -369,7 +388,12 @@ export function loggingMiddleware(request) {
  * Decorator for automatic function logging
  */
 export function logFunction(options = {}) {
-  const { level = "debug", includeArgs = false, includeResult = false, logErrors = true } = options;
+  const {
+    level = "debug",
+    includeArgs = false,
+    includeResult = false,
+    logErrors = true,
+  } = options;
 
   return function (target, propertyKey, descriptor) {
     const originalMethod = descriptor.value;
@@ -391,7 +415,8 @@ export function logFunction(options = {}) {
         const result = await originalMethod.apply(this, args);
 
         if (includeResult) {
-          logData.result = typeof result === "object" ? result : { value: result };
+          logData.result =
+            typeof result === "object" ? result : { value: result };
         }
 
         timer.end(logData);

@@ -45,7 +45,9 @@ const createCommitParallel = async () => {
 };
 
 async function runBenchmark() {
-  console.log(`Running benchmark with ${UPDATES_COUNT} files and ${LATENCY_MS}ms latency per request...`);
+  console.log(
+    `Running benchmark with ${UPDATES_COUNT} files and ${LATENCY_MS}ms latency per request...`
+  );
 
   // Warmup (optional, but good practice)
   await createCommitSequential();

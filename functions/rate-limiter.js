@@ -109,11 +109,16 @@ class RateLimiter {
 
     try {
       // Clean old entries
-      await this.db.prepare(`DELETE FROM rate_limits WHERE timestamp < ?`).bind(windowStart).run();
+      await this.db
+        .prepare(`DELETE FROM rate_limits WHERE timestamp < ?`)
+        .bind(windowStart)
+        .run();
 
       // Count current requests in window
       const result = await this.db
-        .prepare(`SELECT COUNT(*) as count FROM rate_limits WHERE key = ? AND timestamp >= ?`)
+        .prepare(
+          `SELECT COUNT(*) as count FROM rate_limits WHERE key = ? AND timestamp >= ?`
+        )
         .bind(key, windowStart)
         .first();
 
@@ -121,7 +126,9 @@ class RateLimiter {
 
       // Check if blocked
       const blockResult = await this.db
-        .prepare(`SELECT blocked_until FROM rate_limit_blocks WHERE key = ? AND blocked_until > ?`)
+        .prepare(
+          `SELECT blocked_until FROM rate_limit_blocks WHERE key = ? AND blocked_until > ?`
+        )
         .bind(key, now)
         .first();
 
@@ -143,7 +150,9 @@ class RateLimiter {
 
         // Add block
         await this.db
-          .prepare(`INSERT OR REPLACE INTO rate_limit_blocks (key, blocked_until) VALUES (?, ?)`)
+          .prepare(
+            `INSERT OR REPLACE INTO rate_limit_blocks (key, blocked_until) VALUES (?, ?)`
+          )
           .bind(key, blockedUntil)
           .run();
 
@@ -159,7 +168,10 @@ class RateLimiter {
       }
 
       // Add current request
-      await this.db.prepare(`INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)`).bind(key, now).run();
+      await this.db
+        .prepare(`INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)`)
+        .bind(key, now)
+        .run();
 
       return {
         allowed: true,
@@ -298,14 +310,22 @@ class RateLimiter {
         .run();
 
       // Create indexes for performance
-      await this.db.prepare(`CREATE INDEX IF NOT EXISTS idx_rate_limits_timestamp ON rate_limits(timestamp)`).run();
-
       await this.db
-        .prepare(`CREATE INDEX IF NOT EXISTS idx_rate_limits_key_timestamp ON rate_limits(key, timestamp)`)
+        .prepare(
+          `CREATE INDEX IF NOT EXISTS idx_rate_limits_timestamp ON rate_limits(timestamp)`
+        )
         .run();
 
       await this.db
-        .prepare(`CREATE INDEX IF NOT EXISTS idx_rate_limit_blocks_until ON rate_limit_blocks(blocked_until)`)
+        .prepare(
+          `CREATE INDEX IF NOT EXISTS idx_rate_limits_key_timestamp ON rate_limits(key, timestamp)`
+        )
+        .run();
+
+      await this.db
+        .prepare(
+          `CREATE INDEX IF NOT EXISTS idx_rate_limit_blocks_until ON rate_limit_blocks(blocked_until)`
+        )
         .run();
     } catch (error) {
       console.error("Failed to initialize rate limit tables:", error);
@@ -340,7 +360,11 @@ export function createRateLimitMiddleware(db) {
         "X-RateLimit-Limit": result.limit.toString(),
         "X-RateLimit-Remaining": result.remaining.toString(),
         "X-RateLimit-Reset": new Date(result.resetTime).toISOString(),
-        ...(result.blocked && { "X-RateLimit-Retry-After": new Date(result.blockedUntil).toISOString() }),
+        ...(result.blocked && {
+          "X-RateLimit-Retry-After": new Date(
+            result.blockedUntil
+          ).toISOString(),
+        }),
       },
     };
   };

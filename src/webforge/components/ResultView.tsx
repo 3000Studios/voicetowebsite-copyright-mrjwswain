@@ -9,7 +9,12 @@ interface ResultViewProps {
   setIsAnalyzing: (v: boolean) => void;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, setIsAnalyzing }) => {
+const ResultView: React.FC<ResultViewProps> = ({
+  result,
+  onUpdate,
+  isAnalyzing,
+  setIsAnalyzing,
+}) => {
   const [activeTab, setActiveTab] = useState<TabType>(TabType.PREVIEW);
   const [copied, setCopied] = useState(false);
   const [refineInput, setRefineInput] = useState("");
@@ -23,19 +28,25 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(result.html);
     setCopied(true);
-    playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258525");
+    playSound(
+      "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258525"
+    );
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleRefine = async () => {
     if (!refineInput || isAnalyzing) return;
     setIsAnalyzing(true);
-    playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+    playSound(
+      "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529"
+    );
     try {
       const newResult = await refineCode(result.html, refineInput);
       onUpdate(newResult);
       setRefineInput("");
-      playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
+      playSound(
+        "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532"
+      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -46,11 +57,15 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
   const handleEnhance = async () => {
     if (isAnalyzing) return;
     setIsAnalyzing(true);
-    playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+    playSound(
+      "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529"
+    );
     try {
       const newResult = await enhanceCode(result.html);
       onUpdate(newResult);
-      playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
+      playSound(
+        "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532"
+      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -66,7 +81,9 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
             <button
               onClick={() => {
                 setActiveTab(TabType.PREVIEW);
-                playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+                playSound(
+                  "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529"
+                );
               }}
               className={`px-6 py-2 rounded-lg text-xs font-black orbitron transition-all ${activeTab === TabType.PREVIEW ? "bg-slate-100 text-slate-900 shadow-lg" : "text-slate-500 hover:text-slate-300"}`}
             >
@@ -75,7 +92,9 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
             <button
               onClick={() => {
                 setActiveTab(TabType.CODE);
-                playSound("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+                playSound(
+                  "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529"
+                );
               }}
               className={`px-6 py-2 rounded-lg text-xs font-black orbitron transition-all ${activeTab === TabType.CODE ? "bg-slate-100 text-slate-900 shadow-lg" : "text-slate-500 hover:text-slate-300"}`}
             >
@@ -95,7 +114,9 @@ const ResultView: React.FC<ResultViewProps> = ({ result, onUpdate, isAnalyzing, 
               onClick={copyToClipboard}
               className={`btn-3d px-6 py-2.5 rounded-xl text-xs font-black orbitron flex items-center ${copied ? "text-green-400 border-green-500/50" : "text-slate-200"}`}
             >
-              <i className={`fa-solid ${copied ? "fa-check" : "fa-skull"} mr-2`}></i>
+              <i
+                className={`fa-solid ${copied ? "fa-check" : "fa-skull"} mr-2`}
+              ></i>
               {copied ? "COPIED!" : "GET OVER HERE!"}
             </button>
             <button

@@ -1,4 +1,9 @@
-import { getLogger, initializeLogger, LOG_LEVELS, loggingMiddleware } from "./logger.js";
+import {
+  getLogger,
+  initializeLogger,
+  LOG_LEVELS,
+  loggingMiddleware,
+} from "./logger.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -37,7 +42,8 @@ const callWorkersAI = async (env, messages) => {
 };
 
 const callOpenAI = async (env, messages) => {
-  const OPENAI_API = env?.OPENAI_API || env?.OPENAI_API_KEY || env?.OPENAI_API_KEY3;
+  const OPENAI_API =
+    env?.OPENAI_API || env?.OPENAI_API_KEY || env?.OPENAI_API_KEY3;
   const OPENAI_MODEL = env?.OPENAI_MODEL || "gpt-4o-mini";
   if (!OPENAI_API) return "";
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -62,7 +68,9 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   const logger = initializeLogger({
-    level: env.LOG_LEVEL ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()] : LOG_LEVELS.INFO,
+    level: env.LOG_LEVEL
+      ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()]
+      : LOG_LEVELS.INFO,
     enableConsole: true,
     enableStructured: env.NODE_ENV === "production",
   });
@@ -75,7 +83,8 @@ export async function onRequestPost(context) {
     const history = Array.isArray(body?.history) ? body.history : [];
 
     if (!message) return json(400, { error: "Missing message.", traceId });
-    if (message.length > 2000) return json(413, { error: "Message too long.", traceId });
+    if (message.length > 2000)
+      return json(413, { error: "Message too long.", traceId });
 
     const safeHistory = history
       .slice(-8)
@@ -105,7 +114,12 @@ export async function onRequestPost(context) {
 
     return json(200, { ok: true, reply, traceId });
   } catch (err) {
-    getLogger()?.error?.("Public chat failed", { error: err?.message || String(err) });
-    return json(500, { error: err?.message || "Chat failed.", traceId: request.headers.get("x-trace-id") || "" });
+    getLogger()?.error?.("Public chat failed", {
+      error: err?.message || String(err),
+    });
+    return json(500, {
+      error: err?.message || "Chat failed.",
+      traceId: request.headers.get("x-trace-id") || "",
+    });
   }
 }

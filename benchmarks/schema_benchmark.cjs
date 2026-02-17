@@ -66,22 +66,39 @@ const logToDB_Current = async () => {
     const columns = await db.prepare("PRAGMA table_info(commands);").all();
     const columnNames = new Set((columns.results || []).map((col) => col.name));
     if (!columnNames.has("intent_json")) {
-      await db.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
+      await db
+        .prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;")
+        .run();
     }
     if (!columnNames.has("deployment_id")) {
-      await db.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
+      await db
+        .prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;")
+        .run();
     }
     if (!columnNames.has("deployment_status")) {
-      await db.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
+      await db
+        .prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;")
+        .run();
     }
     if (!columnNames.has("deployment_message")) {
-      await db.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
+      await db
+        .prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;")
+        .run();
     }
     await db
       .prepare(
         "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
-      .bind("test command", "[]", "[]", "sha123", "{}", "dep123", "success", "deployed")
+      .bind(
+        "test command",
+        "[]",
+        "[]",
+        "sha123",
+        "{}",
+        "dep123",
+        "success",
+        "deployed"
+      )
       .run();
   } catch (_) {
     // ignore logging errors
@@ -96,7 +113,16 @@ const logToDB_Optimized = async () => {
       .prepare(
         "INSERT INTO commands (command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
-      .bind("test command", "[]", "[]", "sha123", "{}", "dep123", "success", "deployed")
+      .bind(
+        "test command",
+        "[]",
+        "[]",
+        "sha123",
+        "{}",
+        "dep123",
+        "success",
+        "deployed"
+      )
       .run();
   } catch (_) {
     // ignore logging errors
@@ -124,7 +150,9 @@ async function runBenchmark() {
 
   console.log(`Current Implementation: ${durationCurrent.toFixed(2)} ms`);
   console.log(`Optimized Implementation: ${durationOptimized.toFixed(2)} ms`);
-  console.log(`Improvement: ${(durationCurrent / durationOptimized).toFixed(2)}x faster`);
+  console.log(
+    `Improvement: ${(durationCurrent / durationOptimized).toFixed(2)}x faster`
+  );
 }
 
 runBenchmark();

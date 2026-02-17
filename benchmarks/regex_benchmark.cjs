@@ -1,6 +1,15 @@
 const { performance } = require("perf_hooks");
 
-const allowedFields = ["eyebrow", "headline", "subhead", "cta", "price", "metric1", "metric2", "metric3"];
+const allowedFields = [
+  "eyebrow",
+  "headline",
+  "subhead",
+  "cta",
+  "price",
+  "metric1",
+  "metric2",
+  "metric3",
+];
 
 const toSafeJsString = (v) => v.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 
@@ -29,7 +38,8 @@ const updateAppState_Optimized = (content, field, value) => {
 
 async function runBenchmark() {
   const iterations = 100000;
-  const content = "headline: 'Old Headline', subhead: 'Old Subhead', cta: 'Old CTA'";
+  const content =
+    "headline: 'Old Headline', subhead: 'Old Subhead', cta: 'Old CTA'";
   const value = "New Value";
 
   console.log(`Running regex benchmark with ${iterations} iterations...`);
@@ -59,7 +69,9 @@ async function runBenchmark() {
 
   console.log(`Current Implementation: ${durationCurrent.toFixed(2)} ms`);
   console.log(`Optimized Implementation: ${durationOptimized.toFixed(2)} ms`);
-  console.log(`Improvement: ${(durationCurrent / durationOptimized).toFixed(2)}x faster`);
+  console.log(
+    `Improvement: ${(durationCurrent / durationOptimized).toFixed(2)}x faster`
+  );
 }
 
 runBenchmark();

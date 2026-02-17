@@ -4,7 +4,11 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { sha256Hex, createConfirmToken, validateAndConsumeConfirmToken } from "../functions/execute.js";
+import {
+  sha256Hex,
+  createConfirmToken,
+  validateAndConsumeConfirmToken,
+} from "../functions/execute.js";
 
 // Mock environment and dependencies
 const mockEnv = {
@@ -46,7 +50,8 @@ class MockStatement {
     const q = String(this.query).toLowerCase().replace(/\s+/g, " ").trim();
 
     if (q.includes("insert or replace into execute_confirm_tokens")) {
-      const [tokenHash, action, idempotencyKey, traceId, expiresAt] = this.boundParams;
+      const [tokenHash, action, idempotencyKey, traceId, expiresAt] =
+        this.boundParams;
       this.db.tokens.set(tokenHash, {
         token_hash: tokenHash,
         action,
@@ -58,10 +63,17 @@ class MockStatement {
       return { changes: 1 };
     }
 
-    if (q.includes("update execute_confirm_tokens") && q.includes("set used_at")) {
+    if (
+      q.includes("update execute_confirm_tokens") &&
+      q.includes("set used_at")
+    ) {
       const [now, tokenHash, cutoff] = this.boundParams;
       const token = this.db.tokens.get(tokenHash);
-      if (token && token.used_at === null && new Date(token.expires_at).getTime() > new Date(cutoff).getTime()) {
+      if (
+        token &&
+        token.used_at === null &&
+        new Date(token.expires_at).getTime() > new Date(cutoff).getTime()
+      ) {
         token.used_at = now;
         return { changes: 1 };
       }
@@ -124,8 +136,12 @@ describe("Token Security", () => {
         traceId: "trace-123",
       });
 
-      expect(result.confirmToken).toMatch(/^vtwcfm\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/);
-      expect(result.confirmBy).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(result.confirmToken).toMatch(
+        /^vtwcfm\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/
+      );
+      expect(result.confirmBy).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      );
     });
 
     it("should store token in database with correct action", async () => {
@@ -233,7 +249,9 @@ describe("Token Security", () => {
       });
 
       expect(result.ok).toBe(false);
-      expect(result.error).toBe("confirmToken does not match action/idempotencyKey.");
+      expect(result.error).toBe(
+        "confirmToken does not match action/idempotencyKey."
+      );
     });
 
     it("should reject tokens with mismatched idempotency key", async () => {
@@ -250,7 +268,9 @@ describe("Token Security", () => {
       });
 
       expect(result.ok).toBe(false);
-      expect(result.error).toBe("confirmToken does not match action/idempotencyKey.");
+      expect(result.error).toBe(
+        "confirmToken does not match action/idempotencyKey."
+      );
     });
 
     it("should reject already used tokens", async () => {

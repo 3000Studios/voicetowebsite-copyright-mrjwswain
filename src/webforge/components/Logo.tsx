@@ -1,8 +1,12 @@
 import React from "react";
 
-const Logo: React.FC<{ className?: string }> = ({ className = "w-32 h-32" }) => {
+const Logo: React.FC<{ className?: string }> = ({
+  className = "w-32 h-32",
+}) => {
   return (
-    <div className={`${className} relative group transition-all duration-700 hover:rotate-[360deg]`}>
+    <div
+      className={`${className} relative group transition-all duration-700 hover:rotate-[360deg]`}
+    >
       <svg
         viewBox="0 0 512 512"
         fill="none"
@@ -32,7 +36,14 @@ const Logo: React.FC<{ className?: string }> = ({ className = "w-32 h-32" }) => 
           strokeDasharray="10 5"
           opacity="0.3"
         />
-        <circle cx="256" cy="256" r="220" stroke="#1e293b" strokeWidth="20" fill="#020617" />
+        <circle
+          cx="256"
+          cy="256"
+          r="220"
+          stroke="#1e293b"
+          strokeWidth="20"
+          fill="#020617"
+        />
 
         {/* Scorpion Body Segments */}
         <path
@@ -78,7 +89,13 @@ const Logo: React.FC<{ className?: string }> = ({ className = "w-32 h-32" }) => 
         />
 
         {/* The Spear (Lightning/Energy) */}
-        <path d="M420 180 L200 400" stroke="#00e5ff" strokeWidth="8" filter="url(#neon-glow)" strokeLinecap="round" />
+        <path
+          d="M420 180 L200 400"
+          stroke="#00e5ff"
+          strokeWidth="8"
+          filter="url(#neon-glow)"
+          strokeLinecap="round"
+        />
         <path
           d="M200 400 L180 420 M200 400 L210 380 M200 400 L180 390"
           stroke="#00e5ff"
@@ -93,8 +110,20 @@ const Logo: React.FC<{ className?: string }> = ({ className = "w-32 h-32" }) => 
         />
 
         {/* Cyber Eyes */}
-        <circle cx="235" cy="205" r="4" fill="#00e5ff" filter="url(#neon-glow)" />
-        <circle cx="277" cy="205" r="4" fill="#00e5ff" filter="url(#neon-glow)" />
+        <circle
+          cx="235"
+          cy="205"
+          r="4"
+          fill="#00e5ff"
+          filter="url(#neon-glow)"
+        />
+        <circle
+          cx="277"
+          cy="205"
+          r="4"
+          fill="#00e5ff"
+          filter="url(#neon-glow)"
+        />
       </svg>
     </div>
   );

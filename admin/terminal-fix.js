@@ -67,7 +67,12 @@ const wrapFetch = () => {
   const originalFetch = window.fetch.bind(window);
 
   window.fetch = async (input, init) => {
-    const url = typeof input === "string" ? input : input instanceof Request ? input.url : "";
+    const url =
+      typeof input === "string"
+        ? input
+        : input instanceof Request
+          ? input.url
+          : "";
 
     const isOrchestrator = url.includes("/api/orchestrator");
     let mode = "";
@@ -77,8 +82,10 @@ const wrapFetch = () => {
         const body = init?.body ? JSON.parse(String(init.body)) : {};
         mode = String(body?.mode || "");
         appendExecutionLog({ type: "orchestrator_request", mode });
-        if (mode === "plan") setTerminalState(TERMINAL_STATE.PLANNING, "Planning…");
-        if (mode === "apply") setTerminalState(TERMINAL_STATE.EXECUTING, "Applying…");
+        if (mode === "plan")
+          setTerminalState(TERMINAL_STATE.PLANNING, "Planning…");
+        if (mode === "apply")
+          setTerminalState(TERMINAL_STATE.EXECUTING, "Applying…");
       } catch (_) {}
     }
 
@@ -96,10 +103,16 @@ const wrapFetch = () => {
             local: Boolean(data?.local),
           });
           if (mode === "plan" && res.ok) {
-            setTerminalState(TERMINAL_STATE.AWAITING_CONFIRMATION, data?.local ? "Offline preview" : "Plan ready");
+            setTerminalState(
+              TERMINAL_STATE.AWAITING_CONFIRMATION,
+              data?.local ? "Offline preview" : "Plan ready"
+            );
           }
           if (mode === "apply" && res.ok) {
-            setTerminalState(TERMINAL_STATE.COMPLETE, data?.local ? "Simulated" : "Complete");
+            setTerminalState(
+              TERMINAL_STATE.COMPLETE,
+              data?.local ? "Simulated" : "Complete"
+            );
           }
           if (!res.ok) {
             setTerminalState(TERMINAL_STATE.ERROR, "Request failed");
@@ -174,8 +187,14 @@ const installGuards = () => {
       if (phrase !== "ship it") {
         e.preventDefault();
         e.stopImmediatePropagation();
-        setTerminalState(TERMINAL_STATE.AWAITING_CONFIRMATION, 'Type "ship it"');
-        appendExecutionLog({ type: "apply_blocked", reason: "no_confirmation" });
+        setTerminalState(
+          TERMINAL_STATE.AWAITING_CONFIRMATION,
+          'Type "ship it"'
+        );
+        appendExecutionLog({
+          type: "apply_blocked",
+          reason: "no_confirmation",
+        });
         return;
       }
 

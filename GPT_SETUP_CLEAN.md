@@ -27,17 +27,13 @@ Upload these 5 files:
 
 ## Test Commands
 
-**Status Check**:
-"Check production status"
+**Status Check**: "Check production status"
 
-**Text Update**:
-"Change headline to Welcome"
+**Text Update**: "Change headline to Welcome"
 
-**Theme Change**:
-"Change theme to ocean"
+**Theme Change**: "Change theme to ocean"
 
-**High-Risk Change**:
-"Create new pricing page"
+**High-Risk Change**: "Create new pricing page"
 
 ## Done
 

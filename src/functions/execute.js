@@ -9,7 +9,9 @@ export async function handleExecuteRequest({ request, env }) {
   if (!isValidOwner) {
     // Check for admin session/cookie if not owner
     // For now, allow owner key as primary bypass
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
   }
 
   const id = env.BOT_HUB.idFromName("global");

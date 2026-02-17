@@ -13,9 +13,17 @@ const AUTO_DEPLOY = String(process.env.AUTO_SHIP_DEPLOY || "1").trim() !== "0";
 // NOTE: auto-ship already runs `npm run verify` before commit/push.
 // Default deploy command intentionally skips re-running verify (unlike `npm run deploy`).
 // When started via `npm run auto:ship`, `wrangler` is available on PATH (node_modules/.bin).
-const DEPLOY_CMD = process.env.AUTO_SHIP_DEPLOY_CMD || "wrangler deploy --keep-vars";
+const DEPLOY_CMD =
+  process.env.AUTO_SHIP_DEPLOY_CMD || "wrangler deploy --keep-vars";
 
-const IGNORE_DIRS = new Set([".git", "node_modules", "dist", ".wrangler", ".vite", "coverage"]);
+const IGNORE_DIRS = new Set([
+  ".git",
+  "node_modules",
+  "dist",
+  ".wrangler",
+  ".vite",
+  "coverage",
+]);
 const IGNORE_FILES = new Set([
   // Prevent churn from editor/temp files
   ".DS_Store",
@@ -58,15 +66,27 @@ const runCapture = (cmd, args) => {
   };
 };
 
-const hasGit = () => runCapture("git", ["rev-parse", "--is-inside-work-tree"]).code === 0;
-const isDirty = () => runCapture("git", ["status", "--porcelain=v1"]).out.length > 0;
+const hasGit = () =>
+  runCapture("git", ["rev-parse", "--is-inside-work-tree"]).code === 0;
+const isDirty = () =>
+  runCapture("git", ["status", "--porcelain=v1"]).out.length > 0;
 const isRebasingOrMerging = () => {
   const gitDir = path.join(ROOT, ".git");
-  const markers = ["rebase-apply", "rebase-merge", "MERGE_HEAD", "CHERRY_PICK_HEAD"];
+  const markers = [
+    "rebase-apply",
+    "rebase-merge",
+    "MERGE_HEAD",
+    "CHERRY_PICK_HEAD",
+  ];
   return markers.some((m) => fs.existsSync(path.join(gitDir, m)));
 };
 const ensureUpstream = () => {
-  const r = runCapture("git", ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
+  const r = runCapture("git", [
+    "rev-parse",
+    "--abbrev-ref",
+    "--symbolic-full-name",
+    "@{u}",
+  ]);
   return r.code === 0;
 };
 
@@ -108,7 +128,9 @@ if (!hasGit()) {
   process.exit(1);
 }
 if (!ensureUpstream()) {
-  console.error("auto-ship: no upstream configured (set it with `git push -u origin main`)");
+  console.error(
+    "auto-ship: no upstream configured (set it with `git push -u origin main`)"
+  );
   process.exit(1);
 }
 
@@ -135,7 +157,9 @@ const tick = () => {
   }
 
   if (isRebasingOrMerging()) {
-    console.log("auto-ship: git operation in progress (merge/rebase/cherry-pick); waiting...");
+    console.log(
+      "auto-ship: git operation in progress (merge/rebase/cherry-pick); waiting..."
+    );
     schedule();
     return;
   }
@@ -148,12 +172,16 @@ const tick = () => {
 
   lastRunAt = Date.now();
   try {
-    console.log(`auto-ship: change detected -> verify -> commit -> push (${fmtTs()})`);
+    console.log(
+      `auto-ship: change detected -> verify -> commit -> push (${fmtTs()})`
+    );
 
     // Re-generate derived files (sitemap) as part of verify/build.
     const verifyCode = run("npm", ["run", "verify"]);
     if (verifyCode !== 0) {
-      console.log("auto-ship: verify failed; not committing. Fix issues and save again.");
+      console.log(
+        "auto-ship: verify failed; not committing. Fix issues and save again."
+      );
       schedule();
       return;
     }
@@ -170,7 +198,9 @@ const tick = () => {
     const commitCode = run("git", ["commit", "-m", msg]);
     if (commitCode !== 0) {
       // Most common: nothing to commit (race), hooks failure, etc.
-      console.log("auto-ship: git commit did not succeed; will retry on next change.");
+      console.log(
+        "auto-ship: git commit did not succeed; will retry on next change."
+      );
       schedule();
       return;
     }
@@ -218,6 +248,8 @@ const watchDir = (dir) => {
   }
 };
 
-console.log(`auto-ship: watching repo (debounce=${DEBOUNCE_MS}ms minInterval=${MIN_INTERVAL_MS}ms)`);
+console.log(
+  `auto-ship: watching repo (debounce=${DEBOUNCE_MS}ms minInterval=${MIN_INTERVAL_MS}ms)`
+);
 watchDir(ROOT);
 schedule(); // run once on start if dirty

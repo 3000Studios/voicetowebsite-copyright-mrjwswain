@@ -71,7 +71,8 @@ Do not commit secrets to git.
 - Runtime vars/secrets must be configured in the Cloudflare Dashboard (Worker settings) or via:
   - `wrangler secret put <NAME>`
 
-At minimum, to deploy from a new machine you typically need Wrangler authentication (login or API token).
+At minimum, to deploy from a new machine you typically need Wrangler authentication (login or API
+token).
 
 ## Workers Builds Auto-Deploy (Optional, Phone/Remote Friendly)
 
@@ -85,7 +86,8 @@ If you want commits pushed by `/api/execute` to deploy while your laptop is off:
 Notes:
 
 - This does not require GitHub Actions deploy workflows.
-- Keep `npm run deploy` unchanged for manual production deploys (`npm run verify && wrangler deploy --keep-vars`).
+- Keep `npm run deploy` unchanged for manual production deploys
+  (`npm run verify && wrangler deploy --keep-vars`).
 
 ## Rollback
 

@@ -1,9 +1,23 @@
 import { adminCookieName, verifyAdminCookieValue } from "./adminAuth.js";
-import { DatabaseHelper, createCachedDatabase, createDatabaseMonitor } from "./database-cache.js";
-import { LOG_LEVELS, getLogger, initializeLogger, loggingMiddleware } from "./logger.js";
+import {
+  DatabaseHelper,
+  createCachedDatabase,
+  createDatabaseMonitor,
+} from "./database-cache.js";
+import {
+  LOG_LEVELS,
+  getLogger,
+  initializeLogger,
+  loggingMiddleware,
+} from "./logger.js";
 import { onRequestPost as handleOrchestrator } from "./orchestrator.js";
 import { createRateLimitMiddleware } from "./rate-limiter.js";
-import { SchemaValidationError, validateErrorResponse, validateRequest, validateResponse } from "./schema-validator.js";
+import {
+  SchemaValidationError,
+  validateErrorResponse,
+  validateRequest,
+  validateResponse,
+} from "./schema-validator.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 const CONFIRM_TTL_MS = 10 * 60 * 1000;
@@ -28,7 +42,8 @@ const toJsonResponse = (status, payload, env) => {
   // Validate response schema only if enabled (default: production only)
   const enableValidation =
     env?.ENABLE_RESPONSE_VALIDATION === "true" ||
-    (env?.NODE_ENV === "production" && env?.ENABLE_RESPONSE_VALIDATION !== "false");
+    (env?.NODE_ENV === "production" &&
+      env?.ENABLE_RESPONSE_VALIDATION !== "false");
 
   if (enableValidation && status >= 200 && status < 300) {
     try {
@@ -54,7 +69,8 @@ const toJsonResponse = (status, payload, env) => {
 
 const toIso = (value) => new Date(value).toISOString();
 
-const getTraceId = (request) => request.headers.get("x-trace-id") || crypto.randomUUID();
+const getTraceId = (request) =>
+  request.headers.get("x-trace-id") || crypto.randomUUID();
 
 const readJsonBody = async (request) => {
   try {
@@ -98,12 +114,22 @@ const validatePageName = (page) => {
   if (trimmedPage === "all") return { valid: true, page: "all" };
 
   // Block any attempt to target directories or parent traversal.
-  if (trimmedPage.includes("/") || trimmedPage.includes("\\") || trimmedPage.includes("..")) {
-    return { valid: false, error: `Invalid page '${trimmedPage}'. Use a public page like 'partners.html'.` };
+  if (
+    trimmedPage.includes("/") ||
+    trimmedPage.includes("\\") ||
+    trimmedPage.includes("..")
+  ) {
+    return {
+      valid: false,
+      error: `Invalid page '${trimmedPage}'. Use a public page like 'partners.html'.`,
+    };
   }
 
   if (!VALID_PUBLIC_PAGE_RE.test(trimmedPage)) {
-    return { valid: false, error: `Invalid page '${trimmedPage}'. Use a public page like 'partners.html'.` };
+    return {
+      valid: false,
+      error: `Invalid page '${trimmedPage}'. Use a public page like 'partners.html'.`,
+    };
   }
 
   // Canonicalize to .html so downstream (orchestrator) is consistent.
@@ -119,10 +145,14 @@ const validatePageName = (page) => {
 
 const normalizeActionPayload = (payload) => {
   const parameters =
-    payload?.parameters && typeof payload.parameters === "object" && !Array.isArray(payload.parameters)
+    payload?.parameters &&
+    typeof payload.parameters === "object" &&
+    !Array.isArray(payload.parameters)
       ? payload.parameters
       : {};
-  const pageValidation = validatePageName(payload?.page || parameters?.page || "");
+  const pageValidation = validatePageName(
+    payload?.page || parameters?.page || ""
+  );
   const page = pageValidation.valid ? pageValidation.page : "";
   const path = String(payload?.path || parameters?.path || "").trim();
   const file = String(payload?.file || parameters?.file || "").trim();
@@ -130,12 +160,18 @@ const normalizeActionPayload = (payload) => {
     .trim()
     .toLowerCase();
   const idempotencyKey = String(payload?.idempotencyKey || "").trim();
-  const safetyLevel = VALID_SAFETY_LEVELS.has(String(payload?.safetyLevel || "").toLowerCase())
+  const safetyLevel = VALID_SAFETY_LEVELS.has(
+    String(payload?.safetyLevel || "").toLowerCase()
+  )
     ? String(payload.safetyLevel).toLowerCase()
     : "medium";
-  const command = String(payload?.command || payload?.parameters?.command || "").trim();
+  const command = String(
+    payload?.command || payload?.parameters?.command || ""
+  ).trim();
   const target = payload?.target === "sandbox" ? "sandbox" : "site";
-  const confirmToken = String(payload?.confirmToken || payload?.parameters?.confirmToken || "").trim();
+  const confirmToken = String(
+    payload?.confirmToken || payload?.parameters?.confirmToken || ""
+  ).trim();
   const actor =
     typeof payload?.actor === "string" && payload.actor.trim()
       ? payload.actor.trim()
@@ -158,7 +194,10 @@ const normalizeActionPayload = (payload) => {
   };
 };
 
-const getOrchestratorToken = (env) => String(env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || "").trim();
+const getOrchestratorToken = (env) =>
+  String(
+    env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || ""
+  ).trim();
 
 const hasValidHeaderToken = (request, env) => {
   const provided = String(request.headers.get("x-orch-token") || "").trim();
@@ -234,7 +273,9 @@ const findExistingEvent = async (db, action, idempotencyKey) => {
   if (!db) return null;
   try {
     return await db
-      .prepare("SELECT status, response_json FROM execute_events WHERE action = ? AND idempotency_key = ? LIMIT 1")
+      .prepare(
+        "SELECT status, response_json FROM execute_events WHERE action = ? AND idempotency_key = ? LIMIT 1"
+      )
       .bind(action, idempotencyKey)
       .first();
   } catch (_) {
@@ -242,7 +283,10 @@ const findExistingEvent = async (db, action, idempotencyKey) => {
   }
 };
 
-const writeEventRecord = async (db, { eventId, action, idempotencyKey, traceId, status, payload }) => {
+const writeEventRecord = async (
+  db,
+  { eventId, action, idempotencyKey, traceId, status, payload }
+) => {
   if (!db) return;
   try {
     await db
@@ -251,14 +295,28 @@ const writeEventRecord = async (db, { eventId, action, idempotencyKey, traceId, 
          (event_id, action, idempotency_key, trace_id, status, response_json)
          VALUES (?, ?, ?, ?, ?, ?)`
       )
-      .bind(eventId, action, idempotencyKey, traceId, status, JSON.stringify(payload))
+      .bind(
+        eventId,
+        action,
+        idempotencyKey,
+        traceId,
+        status,
+        JSON.stringify(payload)
+      )
       .run();
   } catch (_) {
     // Ignore logging failures; execution should still return a result.
   }
 };
 
-const makeActionRecord = ({ action, idempotencyKey, safetyLevel, command, target, actor }) => ({
+const makeActionRecord = ({
+  action,
+  idempotencyKey,
+  safetyLevel,
+  command,
+  target,
+  actor,
+}) => ({
   action,
   idempotencyKey,
   safetyLevel,
@@ -294,7 +352,8 @@ const decodeJsonResponse = async (response) => {
   }
 };
 
-const encodeBase64Url = (value) => btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+const encodeBase64Url = (value) =>
+  btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 
 const decodeBase64Url = (value) => {
   const input = String(value || "")
@@ -305,25 +364,42 @@ const decodeBase64Url = (value) => {
 };
 
 const importHmacKey = async (secret) =>
-  crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [
-    "sign",
-    "verify",
-  ]);
+  crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
 
 const signHmac = async (secret, message) => {
   const key = await importHmacKey(secret);
-  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(message)
+  );
   return encodeBase64Url(String.fromCharCode(...new Uint8Array(signature)));
 };
 
 const sha256Hex = async (value) => {
-  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const hash = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value)
+  );
+  return [...new Uint8Array(hash)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 };
 
-const getConfirmSecret = (env) => String(env.CONFIRM_TOKEN_SECRET || getOrchestratorToken(env)).trim();
+const getConfirmSecret = (env) =>
+  String(env.CONFIRM_TOKEN_SECRET || getOrchestratorToken(env)).trim();
 
-const createConfirmToken = async (env, db, { action, idempotencyKey, traceId }) => {
+const createConfirmToken = async (
+  env,
+  db,
+  { action, idempotencyKey, traceId }
+) => {
   const secret = getConfirmSecret(env);
   const expiresAtMs = Date.now() + CONFIRM_TTL_MS;
   const payload = JSON.stringify({
@@ -377,27 +453,44 @@ const matchesTokenAction = (tokenAction, requestedAction) => {
   }
 
   // Legacy compatibility: "execute" tokens can be used for apply/deploy
-  if (tokenAction === "execute" && (requestedAction === "apply" || requestedAction === "deploy")) {
+  if (
+    tokenAction === "execute" &&
+    (requestedAction === "apply" || requestedAction === "deploy")
+  ) {
     return true;
   }
 
   return false;
 };
 
-const canReuseConsumedTokenForDeploy = async (db, row, idempotencyKey, action) => {
+const canReuseConsumedTokenForDeploy = async (
+  db,
+  row,
+  idempotencyKey,
+  action
+) => {
   if (action !== "deploy") return false;
   if (row?.action !== "preview" && row?.action !== "execute") return false;
   if (row?.idempotency_key !== idempotencyKey) return false;
 
   const applied = await findExistingEvent(db, "apply", idempotencyKey);
   const appliedStatus = Number(applied?.status || 0);
-  return Number.isFinite(appliedStatus) && appliedStatus >= 200 && appliedStatus < 300;
+  return (
+    Number.isFinite(appliedStatus) &&
+    appliedStatus >= 200 &&
+    appliedStatus < 300
+  );
 };
 
-const validateAndConsumeConfirmToken = async (env, db, { token, action, idempotencyKey }) => {
+const validateAndConsumeConfirmToken = async (
+  env,
+  db,
+  { token, action, idempotencyKey }
+) => {
   const logger = getLogger();
 
-  if (!token) return { ok: false, error: "confirmToken is required for this action." };
+  if (!token)
+    return { ok: false, error: "confirmToken is required for this action." };
 
   const parts = String(token).split(".");
   if (parts.length !== 3 || parts[0] !== "vtwcfm") {
@@ -432,18 +525,26 @@ const validateAndConsumeConfirmToken = async (env, db, { token, action, idempote
     return { ok: false, error: "confirmToken has expired." };
   }
 
-  if (!matchesTokenAction(tokenPayload?.action, action) || tokenPayload?.idempotencyKey !== idempotencyKey) {
+  if (
+    !matchesTokenAction(tokenPayload?.action, action) ||
+    tokenPayload?.idempotencyKey !== idempotencyKey
+  ) {
     logger.logSecurity("Token action/idempotency key mismatch", {
       tokenAction: tokenPayload?.action,
       requestedAction: action,
       tokenIdempotencyKey: tokenPayload?.idempotencyKey,
       requestedIdempotencyKey: idempotencyKey,
     });
-    return { ok: false, error: "confirmToken does not match action/idempotencyKey." };
+    return {
+      ok: false,
+      error: "confirmToken does not match action/idempotencyKey.",
+    };
   }
 
   if (!db) {
-    logger.debug("Token validation proceeding without database (stateless mode)");
+    logger.debug(
+      "Token validation proceeding without database (stateless mode)"
+    );
     return { ok: true };
   }
 
@@ -459,7 +560,9 @@ const validateAndConsumeConfirmToken = async (env, db, { token, action, idempote
           ? createCachedDatabase(db)
           : null;
     if (!cachedDb) {
-      logger.warn("Database missing execute/prepare; falling back to stateless token validation");
+      logger.warn(
+        "Database missing execute/prepare; falling back to stateless token validation"
+      );
       return { ok: true };
     }
 
@@ -482,9 +585,16 @@ const validateAndConsumeConfirmToken = async (env, db, { token, action, idempote
       // If apply succeeded but token consumption wasn't recorded (rare), allow deploy based on the apply event.
       // This keeps the UX consistent: deploy-after-apply with the same confirmToken should work.
       if (!existingToken.used_at && action === "deploy") {
-        const allowDeployReuse = await canReuseConsumedTokenForDeploy(db, existingToken, idempotencyKey, action);
+        const allowDeployReuse = await canReuseConsumedTokenForDeploy(
+          db,
+          existingToken,
+          idempotencyKey,
+          action
+        );
         if (allowDeployReuse) {
-          logger.info("Token reuse allowed for deploy action", { idempotencyKey });
+          logger.info("Token reuse allowed for deploy action", {
+            idempotencyKey,
+          });
           return { ok: true };
         }
       }
@@ -498,11 +608,18 @@ const validateAndConsumeConfirmToken = async (env, db, { token, action, idempote
         });
 
         // Check if this is a deploy action that can reuse consumed tokens
-        const allowDeployReuse = await canReuseConsumedTokenForDeploy(db, existingToken, idempotencyKey, action);
+        const allowDeployReuse = await canReuseConsumedTokenForDeploy(
+          db,
+          existingToken,
+          idempotencyKey,
+          action
+        );
         if (!allowDeployReuse) {
           return { ok: false, error: "confirmToken already used." };
         }
-        logger.info("Token reuse allowed for deploy action", { idempotencyKey });
+        logger.info("Token reuse allowed for deploy action", {
+          idempotencyKey,
+        });
         return { ok: true };
       }
 
@@ -514,15 +631,27 @@ const validateAndConsumeConfirmToken = async (env, db, { token, action, idempote
         return { ok: false, error: "confirmToken has expired." };
       }
 
-      logger.error("Token consumption failed - possible race condition", { tokenHash });
-      return { ok: false, error: "confirmToken could not be consumed (race condition)." };
+      logger.error("Token consumption failed - possible race condition", {
+        tokenHash,
+      });
+      return {
+        ok: false,
+        error: "confirmToken could not be consumed (race condition).",
+      };
     }
 
     logger.info("Token successfully consumed", { action, idempotencyKey });
     return { ok: true };
   } catch (error) {
-    logger.error("Token consumption failed", { action, idempotencyKey, error: error.message }, error);
-    return { ok: false, error: "Database transaction failed. Please try again." };
+    logger.error(
+      "Token consumption failed",
+      { action, idempotencyKey, error: error.message },
+      error
+    );
+    return {
+      ok: false,
+      error: "Database transaction failed. Please try again.",
+    };
   }
 };
 
@@ -588,18 +717,26 @@ const fetchStatus = async (db) => {
     .catch(() => []);
 
   const buildsPromise = db
-    .prepare("SELECT id, ts, status, message FROM builds ORDER BY ts DESC LIMIT 10")
+    .prepare(
+      "SELECT id, ts, status, message FROM builds ORDER BY ts DESC LIMIT 10"
+    )
     .all()
     .then((res) => res.results || [])
     .catch(() => []);
 
   const executeEventsPromise = db
-    .prepare("SELECT ts, action, idempotency_key, status, trace_id FROM execute_events ORDER BY ts DESC LIMIT 10")
+    .prepare(
+      "SELECT ts, action, idempotency_key, status, trace_id FROM execute_events ORDER BY ts DESC LIMIT 10"
+    )
     .all()
     .then((res) => res.results || [])
     .catch(() => []);
 
-  const [commands, builds, executeEvents] = await Promise.all([commandsPromise, buildsPromise, executeEventsPromise]);
+  const [commands, builds, executeEvents] = await Promise.all([
+    commandsPromise,
+    buildsPromise,
+    executeEventsPromise,
+  ]);
   return { commands, builds, executeEvents };
 };
 
@@ -609,7 +746,9 @@ export async function onRequestPost(context) {
 
   // Initialize logger and set up request context
   const logger = initializeLogger({
-    level: env.LOG_LEVEL ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()] : LOG_LEVELS.INFO,
+    level: env.LOG_LEVEL
+      ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()]
+      : LOG_LEVELS.INFO,
     enableConsole: true,
     enableStructured: env.NODE_ENV === "production",
   });
@@ -658,7 +797,11 @@ export async function onRequestPost(context) {
     const rawPayload = await readJsonBody(request);
     if (!rawPayload) {
       logger.warn("Invalid JSON payload received");
-      return toJsonResponse(400, { error: "Invalid JSON payload.", traceId }, env);
+      return toJsonResponse(
+        400,
+        { error: "Invalid JSON payload.", traceId },
+        env
+      );
     }
 
     if (rawPayload.error === "Request body too large") {
@@ -706,7 +849,8 @@ export async function onRequestPost(context) {
       return toJsonResponse(
         400,
         {
-          error: "Invalid action. Use plan, preview, apply, deploy, status, rollback, auto, list_pages, or read_page.",
+          error:
+            "Invalid action. Use plan, preview, apply, deploy, status, rollback, auto, list_pages, or read_page.",
           traceId,
         },
         env
@@ -715,7 +859,11 @@ export async function onRequestPost(context) {
 
     if (!payload.idempotencyKey) {
       logger.warn("Missing required idempotency key");
-      return toJsonResponse(400, { error: "Missing required field: idempotencyKey.", traceId }, env);
+      return toJsonResponse(
+        400,
+        { error: "Missing required field: idempotencyKey.", traceId },
+        env
+      );
     }
 
     if (
@@ -726,7 +874,11 @@ export async function onRequestPost(context) {
       !payload.command
     ) {
       logger.warn("Missing required command field", { action: payload.action });
-      return toJsonResponse(400, { error: `Action '${payload.action}' requires command.`, traceId }, env);
+      return toJsonResponse(
+        400,
+        { error: `Action '${payload.action}' requires command.`, traceId },
+        env
+      );
     }
 
     // Rate limiting check
@@ -778,7 +930,11 @@ export async function onRequestPost(context) {
         const pageValidation = validatePageName(pageCandidate);
         if (!pageValidation.valid) {
           logger.warn("Invalid page name provided", { page: pageCandidate });
-          return toJsonResponse(400, { error: pageValidation.error, traceId }, env);
+          return toJsonResponse(
+            400,
+            { error: pageValidation.error, traceId },
+            env
+          );
         }
         payload.page = pageValidation.page;
       }
@@ -788,7 +944,10 @@ export async function onRequestPost(context) {
       await ensureExecuteTables(cachedDb);
 
       const dbHelper = new DatabaseHelper(cachedDb, logger);
-      const existing = await dbHelper.findEvent(payload.action, payload.idempotencyKey);
+      const existing = await dbHelper.findEvent(
+        payload.action,
+        payload.idempotencyKey
+      );
       if (existing?.response_json) {
         logger.info("Returning cached response for idempotent request", {
           action: payload.action,
@@ -839,14 +998,21 @@ export async function onRequestPost(context) {
         const listResult = await decodeJsonResponse(listResponse);
 
         // Safely extract pages with fallback
-        const pages = listResult?.plan?.intent?.scope?.files || listResult?.files || listResult?.pages || [];
+        const pages =
+          listResult?.plan?.intent?.scope?.files ||
+          listResult?.files ||
+          listResult?.pages ||
+          [];
 
         const eventPayload = makeEvent({
           eventType: "planned",
           actionPayload: actionRecord,
           traceId,
           eventId,
-          result: { pages, note: "These are the HTML pages currently in the site repository." },
+          result: {
+            pages,
+            note: "These are the HTML pages currently in the site repository.",
+          },
         });
         await writeEventRecord(db, {
           eventId,
@@ -860,7 +1026,8 @@ export async function onRequestPost(context) {
       }
 
       if (payload.action === "read_page") {
-        const targetPage = payload.page || payload.path || payload.file || "index.html";
+        const targetPage =
+          payload.page || payload.path || payload.file || "index.html";
 
         // Validate the target page
         const pageValidation = validatePageName(targetPage);
@@ -895,7 +1062,9 @@ export async function onRequestPost(context) {
 
         // Safely handle potentially undefined content
         const safeContent =
-          readResult && typeof readResult === "object" ? readResult : { error: "Invalid response format" };
+          readResult && typeof readResult === "object"
+            ? readResult
+            : { error: "Invalid response format" };
 
         const eventPayload = makeEvent({
           eventType: "planned",
@@ -932,7 +1101,10 @@ export async function onRequestPost(context) {
         const applyResult = await decodeJsonResponse(applyResponse);
 
         if (!applyResponse.ok) {
-          const errorMessage = applyResult?.error || applyResult?.message || "Auto-apply failed with unknown error.";
+          const errorMessage =
+            applyResult?.error ||
+            applyResult?.message ||
+            "Auto-apply failed with unknown error.";
           logger.error("Auto mode failed", { error: errorMessage });
           throw new Error(errorMessage);
         }
@@ -943,9 +1115,12 @@ export async function onRequestPost(context) {
           steps: [
             "planned",
             "applied",
-            applyResult?.deployment?.status === "skipped" ? "deploy_skipped" : "deploy_triggered",
+            applyResult?.deployment?.status === "skipped"
+              ? "deploy_skipped"
+              : "deploy_triggered",
           ],
-          message: "Change was planned, applied, and deployment triggered in a single call.",
+          message:
+            "Change was planned, applied, and deployment triggered in a single call.",
         };
 
         autoTimer.end({ steps: result.steps });
@@ -968,7 +1143,11 @@ export async function onRequestPost(context) {
         return toJsonResponse(200, eventPayload, env);
       }
 
-      if (payload.action === "apply" || payload.action === "deploy" || payload.action === "rollback") {
+      if (
+        payload.action === "apply" ||
+        payload.action === "deploy" ||
+        payload.action === "rollback"
+      ) {
         logger.info("Validating confirm token", { action: payload.action });
         const tokenCheck = await validateAndConsumeConfirmToken(env, db, {
           token: payload.confirmToken,
@@ -1030,12 +1209,17 @@ export async function onRequestPost(context) {
       });
 
       const orchestratorTimer = logger.startTimer("orchestrator-call");
-      const orchestratorResponse = await runOrchestrator(context, orchestratorPayload);
+      const orchestratorResponse = await runOrchestrator(
+        context,
+        orchestratorPayload
+      );
       const orchestratorResult = await decodeJsonResponse(orchestratorResponse);
       orchestratorTimer.end();
 
       if (!orchestratorResponse.ok) {
-        throw new Error(orchestratorResult?.error || "Orchestrator request failed.");
+        throw new Error(
+          orchestratorResult?.error || "Orchestrator request failed."
+        );
       }
 
       let result = orchestratorResult;

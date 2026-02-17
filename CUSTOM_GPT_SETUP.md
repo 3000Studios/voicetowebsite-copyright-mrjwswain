@@ -14,7 +14,8 @@ In your Custom GPT settings:
 
 1. Go to **Configure → Actions → Create new action**.
 2. Paste the contents of `ops/contracts/openapi.execute.json` into the schema field.
-3. Under **Authentication**, select **API Key**, header name `x-orch-token`, and paste your `ORCH_TOKEN` secret value.
+3. Under **Authentication**, select **API Key**, header name `x-orch-token`, and paste your
+   `ORCH_TOKEN` secret value.
 4. The schema already points to `https://voicetowebsite.com/api` — no URL changes needed.
 
 ## 3. Configure Deployment Trigger (Required for voice → live deploy)
@@ -28,7 +29,8 @@ Without one of these, apply/deploy can commit but deployment status will be `ski
 
 If using Workers Builds auto-deploy, also set Build settings in Cloudflare:
 
-- Worker → Settings → Build → API token: select a valid token named `VOICETOWEBSITE_WORKERS_BUILD_TOKEN`.
+- Worker → Settings → Build → API token: select a valid token named
+  `VOICETOWEBSITE_WORKERS_BUILD_TOKEN`.
 - Build variable `CLOUDFLARE_ACCOUNT_ID` must be set to your Cloudflare account id.
 - Keep production branch set to `main`.
 

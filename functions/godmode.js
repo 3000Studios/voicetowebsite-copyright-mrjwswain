@@ -55,7 +55,9 @@ export async function onRequestPost(context) {
   const { request, env, ctx } = context;
 
   const logger = initializeLogger({
-    level: env.LOG_LEVEL ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()] : LOG_LEVELS.INFO,
+    level: env.LOG_LEVEL
+      ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()]
+      : LOG_LEVELS.INFO,
     enableConsole: true,
     enableStructured: env.NODE_ENV === "production",
   });
@@ -66,7 +68,11 @@ export async function onRequestPost(context) {
     const okCookie = await hasValidAdminCookie(request, env);
     if (!okCookie) return json(401, { error: "Unauthorized", traceId });
     const okAdmin = await isAdminRequest(request, env);
-    if (!okAdmin) return json(401, { error: "Unauthorized. Admin access required.", traceId });
+    if (!okAdmin)
+      return json(401, {
+        error: "Unauthorized. Admin access required.",
+        traceId,
+      });
 
     // CSRF defense-in-depth for cookie-authenticated browser requests.
     const origin = request.headers.get("origin");
@@ -79,16 +85,23 @@ export async function onRequestPost(context) {
     if (!rawInput) return json(400, { error: "Missing rawInput.", traceId });
 
     const engine = new NaturalLanguageInferenceEngine();
-    const { ioo, revenue, suggestions } = engine.infer(rawInput, { siteId: "voicetowebsite" });
+    const { ioo, revenue, suggestions } = engine.infer(rawInput, {
+      siteId: "voicetowebsite",
+    });
 
-    const idempotencyKey = String(body?.idempotencyKey || `infer-${ioo.commandId.slice(0, 8)}`)
+    const idempotencyKey = String(
+      body?.idempotencyKey || `infer-${ioo.commandId.slice(0, 8)}`
+    )
       .trim()
       .slice(0, 200);
 
     const enrichedCommand = buildEnrichedCommand(rawInput, ioo);
 
     // Orchestrator plan (preview stage)
-    const orchestratorUrl = new URL("/api/orchestrator", request.url).toString();
+    const orchestratorUrl = new URL(
+      "/api/orchestrator",
+      request.url
+    ).toString();
     const orchestratorReq = new Request(orchestratorUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -98,7 +111,11 @@ export async function onRequestPost(context) {
         target: "site",
       }),
     });
-    const orchestratorRes = await handleOrchestrator({ request: orchestratorReq, env, ctx });
+    const orchestratorRes = await handleOrchestrator({
+      request: orchestratorReq,
+      env,
+      ctx,
+    });
     const orchestratorText = await orchestratorRes.text();
     let orchestratorJson = {};
     try {
@@ -119,7 +136,11 @@ export async function onRequestPost(context) {
         .bind(ioo.commandId, idempotencyKey, rawInput, JSON.stringify(ioo))
         .run();
     }
-    const token = await createConfirmToken(env, db, { action: "preview", idempotencyKey, traceId });
+    const token = await createConfirmToken(env, db, {
+      action: "preview",
+      idempotencyKey,
+      traceId,
+    });
 
     return json(200, {
       ok: true,
@@ -135,7 +156,14 @@ export async function onRequestPost(context) {
       confirmBy: token.confirmBy,
     });
   } catch (err) {
-    logger.error("Godmode infer failed", { error: err?.message || String(err) }, err);
-    return json(500, { error: err?.message || "Infer failed.", traceId: request.headers.get("x-trace-id") || "" });
+    logger.error(
+      "Godmode infer failed",
+      { error: err?.message || String(err) },
+      err
+    );
+    return json(500, {
+      error: err?.message || "Infer failed.",
+      traceId: request.headers.get("x-trace-id") || "",
+    });
   }
 }

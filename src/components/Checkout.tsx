@@ -11,7 +11,9 @@ interface CheckoutProps {
 }
 
 export default function Checkout({ items, onClose }: CheckoutProps) {
-  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal" | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<
+    "stripe" | "paypal" | null
+  >(null);
   const [formData, setFormData] = useState({
     email: "",
     cardNumber: "",
@@ -23,8 +25,13 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
   const [success, setSuccess] = useState(false);
   const paypalHostRef = useRef<HTMLDivElement | null>(null);
 
-  const total = useMemo(() => items.reduce((sum, item) => sum + item.price, 0), [items]);
-  const paypalClientId = (import.meta as any).env?.VITE_PAYPAL_CLIENT_ID as string | undefined;
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.price, 0),
+    [items]
+  );
+  const paypalClientId = (import.meta as any).env?.VITE_PAYPAL_CLIENT_ID as
+    | string
+    | undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +54,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
     if (!paypalClientId) {
       throw new Error("Missing VITE_PAYPAL_CLIENT_ID");
     }
-    const existing = document.querySelector<HTMLScriptElement>('script[data-paypal-sdk="true"]');
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[data-paypal-sdk="true"]'
+    );
     if (existing) return;
 
     await new Promise<void>((resolve, reject) => {
@@ -89,11 +98,17 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 provider: "paypal",
-                items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, currency: "USD" })),
+                items: items.map((i) => ({
+                  id: i.id,
+                  name: i.name,
+                  price: i.price,
+                  currency: "USD",
+                })),
               }),
             });
             const data = await res.json();
-            if (!res.ok || !data.id) throw new Error(data.error || "Order creation failed");
+            if (!res.ok || !data.id)
+              throw new Error(data.error || "Order creation failed");
             return data.id;
           },
           onApprove: async (data: any) => {
@@ -105,7 +120,8 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                 body: JSON.stringify({ orderId: data.orderID }),
               });
               const cap = await res.json();
-              if (!res.ok || !cap.ok) throw new Error(cap.error || "Capture failed");
+              if (!res.ok || !cap.ok)
+                throw new Error(cap.error || "Capture failed");
 
               setProcessing(false);
               setSuccess(true);
@@ -397,7 +413,11 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
       >
-        <button className="checkout-close" onClick={onClose} aria-label="Close checkout">
+        <button
+          className="checkout-close"
+          onClick={onClose}
+          aria-label="Close checkout"
+        >
           ×
         </button>
 
@@ -405,7 +425,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
           <div className="success-animation">
             <div className="success-icon">✓</div>
             <h2 className="success-title">Payment Successful!</h2>
-            <p className="success-message">Thank you for your purchase. Check your email for download links.</p>
+            <p className="success-message">
+              Thank you for your purchase. Check your email for download links.
+            </p>
           </div>
         ) : (
           <>
@@ -414,11 +436,15 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
             </h2>
 
             <div className="order-summary">
-              <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>Order Summary</h3>
+              <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>
+                Order Summary
+              </h3>
               {items.map((item) => (
                 <div key={item.id} className="order-item">
                   <span>{item.name}</span>
-                  <span style={{ fontWeight: "700" }}>${item.price.toFixed(2)}</span>
+                  <span style={{ fontWeight: "700" }}>
+                    ${item.price.toFixed(2)}
+                  </span>
                 </div>
               ))}
               <div className="order-total">
@@ -427,7 +453,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
               </div>
             </div>
 
-            <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>Payment Method</h3>
+            <h3 style={{ marginBottom: "1rem", fontSize: "1.3rem" }}>
+              Payment Method
+            </h3>
             <div className="payment-methods">
               <button
                 type="button"
@@ -468,7 +496,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                       className="form-input"
                       placeholder="your@email.com"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -482,7 +512,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                       className="form-input"
                       placeholder="John Doe"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -496,7 +528,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                       className="form-input"
                       placeholder="1234 5678 9012 3456"
                       value={formData.cardNumber}
-                      onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, cardNumber: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -511,7 +545,9 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                         className="form-input"
                         placeholder="MM/YY"
                         value={formData.expiry}
-                        onChange={(e) => setFormData({ ...formData, expiry: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, expiry: e.target.value })
+                        }
                         required
                       />
                     </div>
@@ -525,13 +561,23 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                         className="form-input"
                         placeholder="123"
                         value={formData.cvc}
-                        onChange={(e) => setFormData({ ...formData, cvc: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, cvc: e.target.value })
+                        }
                         required
                       />
                     </div>
                   </div>
-                  <button type="submit" className="submit-btn" disabled={processing}>
-                    {processing ? <div className="spinner" /> : `Pay $${total.toFixed(2)}`}
+                  <button
+                    type="submit"
+                    className="submit-btn"
+                    disabled={processing}
+                  >
+                    {processing ? (
+                      <div className="spinner" />
+                    ) : (
+                      `Pay $${total.toFixed(2)}`
+                    )}
                   </button>
                 </motion.form>
               )}
@@ -552,7 +598,8 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                         color: "#b0b0b0",
                       }}
                     >
-                      Missing <code>VITE_PAYPAL_CLIENT_ID</code>. Add it to your env to enable PayPal checkout.
+                      Missing <code>VITE_PAYPAL_CLIENT_ID</code>. Add it to your
+                      env to enable PayPal checkout.
                     </div>
                   ) : (
                     <>

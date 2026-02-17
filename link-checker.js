@@ -31,7 +31,12 @@ const isSkippable = (raw) => {
   if (link.startsWith("javascript:")) return true;
   if (link.startsWith("http://") || link.startsWith("https://")) return true;
   if (link.startsWith("//")) return true;
-  if (link.includes("${") || link.includes("__ADSENSE_") || link.includes("__PAYPAL_")) return true;
+  if (
+    link.includes("${") ||
+    link.includes("__ADSENSE_") ||
+    link.includes("__PAYPAL_")
+  )
+    return true;
   if (link.startsWith("/api/")) return true;
   return false;
 };

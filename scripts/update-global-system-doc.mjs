@@ -50,11 +50,16 @@ const getPublicHtml = () =>
   listDir(
     ROOT,
     (d) =>
-      d.isFile() && d.name.toLowerCase().endsWith(".html") && !d.name.toLowerCase().startsWith("verification_error")
+      d.isFile() &&
+      d.name.toLowerCase().endsWith(".html") &&
+      !d.name.toLowerCase().startsWith("verification_error")
   );
 
 const getAdminHtml = () =>
-  listDir(path.join(ROOT, "admin"), (d) => d.isFile() && d.name.toLowerCase().endsWith(".html"));
+  listDir(
+    path.join(ROOT, "admin"),
+    (d) => d.isFile() && d.name.toLowerCase().endsWith(".html")
+  );
 
 const getAppStorePages = () => {
   const base = path.join(ROOT, "app Store apps to Sell");
@@ -62,10 +67,15 @@ const getAppStorePages = () => {
   const entries = listDir(base, (d) => d.isDirectory());
   for (const folder of entries) {
     const folderPath = path.join(base, folder);
-    const html = listDir(folderPath, (d) => d.isFile() && d.name.toLowerCase().endsWith(".html"));
+    const html = listDir(
+      folderPath,
+      (d) => d.isFile() && d.name.toLowerCase().endsWith(".html")
+    );
     for (const f of html) {
       const route =
-        f.toLowerCase() === "index.html" ? `/apps/${folder}` : `/apps/${folder}/${f.replace(/\.html$/i, "")}`;
+        f.toLowerCase() === "index.html"
+          ? `/apps/${folder}`
+          : `/apps/${folder}/${f.replace(/\.html$/i, "")}`;
       out.push({ route, asset: `app Store apps to Sell/${folder}/${f}` });
     }
   }
@@ -74,7 +84,10 @@ const getAppStorePages = () => {
 
 const getTopLevelAppStoreHtml = () => {
   const base = path.join(ROOT, "app Store apps to Sell");
-  return listDir(base, (d) => d.isFile() && d.name.toLowerCase().endsWith(".html")).map((f) => ({
+  return listDir(
+    base,
+    (d) => d.isFile() && d.name.toLowerCase().endsWith(".html")
+  ).map((f) => ({
     route: `/apps/${f.replace(/\.html$/i, "")}`,
     asset: `app Store apps to Sell/${f}`,
   }));
@@ -105,9 +118,15 @@ const toRouteRows = (rows, empty = "_None found_") => {
 
 const buildAutoBlock = () => {
   const pkg = readJsonSafe(path.join(ROOT, "package.json"), { scripts: {} });
-  const vscodeExt = readJsonSafe(path.join(ROOT, ".vscode", "extensions.json"), { recommendations: [] });
+  const vscodeExt = readJsonSafe(
+    path.join(ROOT, ".vscode", "extensions.json"),
+    { recommendations: [] }
+  );
   const scriptsDir = listDir(path.join(ROOT, "scripts"), (d) => d.isFile());
-  const huskyHooks = listDir(path.join(ROOT, ".husky"), (d) => d.isFile() && d.name !== "_");
+  const huskyHooks = listDir(
+    path.join(ROOT, ".husky"),
+    (d) => d.isFile() && d.name !== "_"
+  );
   const docs = [
     "AGENTS.md",
     "DEPLOYMENT.md",
@@ -119,18 +138,30 @@ const buildAutoBlock = () => {
 
   const publicHtml = getPublicHtml();
   const adminHtml = getAdminHtml();
-  const appStoreRoutes = [...getAppStorePages(), ...getTopLevelAppStoreHtml()].sort((a, b) =>
-    a.route.localeCompare(b.route)
-  );
+  const appStoreRoutes = [
+    ...getAppStorePages(),
+    ...getTopLevelAppStoreHtml(),
+  ].sort((a, b) => a.route.localeCompare(b.route));
   const envKeys = getEnvKeys();
 
-  const highValueScripts = ["dev:all", "verify", "deploy", "auto:ship", "sync", "ship", "ship:push"]
+  const highValueScripts = [
+    "dev:all",
+    "verify",
+    "deploy",
+    "auto:ship",
+    "sync",
+    "ship",
+    "ship:push",
+  ]
     .filter((k) => pkg.scripts && pkg.scripts[k])
     .map((k) => `- \`${k}\`: \`${pkg.scripts[k]}\``)
     .join("\n");
 
   const publicRoutes = publicHtml.map((f) => ({ route: toRoute(f), asset: f }));
-  const adminRoutes = adminHtml.map((f) => ({ route: toAdminRoute(f), asset: `admin/${f}` }));
+  const adminRoutes = adminHtml.map((f) => ({
+    route: toAdminRoute(f),
+    asset: `admin/${f}`,
+  }));
 
   return `
 ## Auto-Generated Workbook Snapshot
@@ -248,7 +279,10 @@ const updateDoc = () => {
 
   const hasMarkers = text.includes(AUTO_START) && text.includes(AUTO_END);
   const next = hasMarkers
-    ? text.replace(new RegExp(`${AUTO_START}[\\s\\S]*?${AUTO_END}`, "m"), generated)
+    ? text.replace(
+        new RegExp(`${AUTO_START}[\\s\\S]*?${AUTO_END}`, "m"),
+        generated
+      )
     : `${text.trimEnd()}\n\n${generated}\n`;
 
   return { before: text, after: next };
@@ -274,7 +308,9 @@ fs.writeFileSync(DOC_PATH, formattedAfter, "utf8");
 // Then format with prettier to ensure consistency
 try {
   const prettier = await import("prettier");
-  const prettierFormatted = await prettier.format(formattedAfter, { parser: "markdown" });
+  const prettierFormatted = await prettier.format(formattedAfter, {
+    parser: "markdown",
+  });
   const finalContent = prettierFormatted.replace(/\r\n/g, "\n");
   fs.writeFileSync(DOC_PATH, finalContent, "utf8");
 } catch {
@@ -286,7 +322,9 @@ if (normalizedBefore === formattedAfter) {
 }
 
 if (CHECK_ONLY) {
-  console.error("GLOBAL_SYSTEM_INSTRUCTIONS.md is out of date. Run: npm run ops:global-doc:update");
+  console.error(
+    "GLOBAL_SYSTEM_INSTRUCTIONS.md is out of date. Run: npm run ops:global-doc:update"
+  );
   process.exit(1);
 }
 

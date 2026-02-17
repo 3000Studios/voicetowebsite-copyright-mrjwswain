@@ -13,7 +13,8 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
   const blobRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const updateMouse = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
+    const updateMouse = (e: MouseEvent) =>
+      setMousePos({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", updateMouse);
     return () => window.removeEventListener("mousemove", updateMouse);
   }, []);
@@ -55,7 +56,13 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black"
     >
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40 scale-105">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-40 scale-105"
+        >
           <source src={INTRO_VIDEO} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black" />
@@ -68,7 +75,9 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
           animate={{
             opacity: 1,
             scale: splatterActive ? 25 : [1, 1.05, 1],
-            borderRadius: splatterActive ? "50%" : ["50% 50% 50% 50%", "48% 52% 45% 55%", "52% 48% 55% 45%"],
+            borderRadius: splatterActive
+              ? "50%"
+              : ["50% 50% 50% 50%", "48% 52% 45% 55%", "52% 48% 55% 45%"],
             ...getBlobStyles(),
           }}
           transition={{
@@ -97,7 +106,10 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
           <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
           {!splatterActive && (
             <motion.span
-              animate={{ opacity: [0.6, 1, 0.6], letterSpacing: ["0.3em", "0.5em", "0.3em"] }}
+              animate={{
+                opacity: [0.6, 1, 0.6],
+                letterSpacing: ["0.3em", "0.5em", "0.3em"],
+              }}
               transition={{ duration: 3, repeat: Infinity }}
               className="font-orbitron text-[8px] md:text-[9px] text-black font-black uppercase pointer-events-none z-20 text-center px-4"
             >

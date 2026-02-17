@@ -49,7 +49,9 @@ const main = () => {
     if (!page.asset) missing.push("asset");
     if (!page.zone) missing.push("zone");
     if (missing.length) {
-      failures.push(`pages.json: missing required fields (${missing.join(", ")}) in ${JSON.stringify(page)}`);
+      failures.push(
+        `pages.json: missing required fields (${missing.join(", ")}) in ${JSON.stringify(page)}`
+      );
       continue;
     }
 
@@ -61,7 +63,9 @@ const main = () => {
   }
 
   const redirects = loadJson(path.join(OPS_DIR, "redirects.json"));
-  const redirectList = Array.isArray(redirects.redirects) ? redirects.redirects : [];
+  const redirectList = Array.isArray(redirects.redirects)
+    ? redirects.redirects
+    : [];
   const redirectSet = new Set();
   for (const redirect of redirectList) {
     const from = normalizeRoute(redirect.from);

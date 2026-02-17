@@ -1,6 +1,7 @@
 import { NavigationLink } from "./types";
 
-export const BACKGROUND_TUNNEL = "https://pub-6293369f8afa4d849c26002fd232f5ac.r2.dev/looping%20tunnel.mp4";
+export const BACKGROUND_TUNNEL =
+  "https://pub-6293369f8afa4d849c26002fd232f5ac.r2.dev/looping%20tunnel.mp4";
 // Keep music same-origin to avoid CORS/autoplay inconsistencies and third-party dependency.
 export const INTRO_SONG = "/background-music.wav";
 export const HOME_VIDEO = "/media/vtw-home-wallpaper.mp4";
@@ -48,4 +49,5 @@ export const NAV_LINKS: NavigationLink[] = [
   },
 ];
 
-export const INTRO_VIDEO = "https://cdn.pixabay.com/video/2024/02/10/199890-911494511_tiny.mp4";
+export const INTRO_VIDEO =
+  "https://cdn.pixabay.com/video/2024/02/10/199890-911494511_tiny.mp4";

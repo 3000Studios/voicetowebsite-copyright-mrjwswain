@@ -18,7 +18,11 @@ const run = (cmd, args, { capture = false } = {}) => {
 run(gitCmd, ["fetch", "--prune", "origin"]);
 
 // Block pushing if local is behind origin/main to keep "always synced" discipline.
-const out = run(gitCmd, ["rev-list", "--left-right", "--count", "origin/main...HEAD"], { capture: true }).trim();
+const out = run(
+  gitCmd,
+  ["rev-list", "--left-right", "--count", "origin/main...HEAD"],
+  { capture: true }
+).trim();
 const [behindRaw, aheadRaw] = out.split(/\s+/);
 const behind = Number(behindRaw || 0);
 const ahead = Number(aheadRaw || 0);

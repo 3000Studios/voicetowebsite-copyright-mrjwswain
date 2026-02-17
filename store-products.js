@@ -56,7 +56,10 @@ const dollarsToCents = (dollars) => {
 const setupCarousel = (scene) => {
   if (!scene) return () => {};
 
-  const reduceMotion = Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const reduceMotion = Boolean(
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
   const toggleBtn = document.getElementById("vtw-carousel-toggle");
 
   let paused = reduceMotion;
@@ -175,7 +178,9 @@ const ensurePayPalSdk = async () => {
 
   const existing = document.querySelector('script[data-paypal-sdk="true"]');
   if (existing) {
-    return new Promise((resolve) => existing.addEventListener("load", () => resolve(true), { once: true }));
+    return new Promise((resolve) =>
+      existing.addEventListener("load", () => resolve(true), { once: true })
+    );
   }
 
   return new Promise((resolve) => {
@@ -198,7 +203,9 @@ const openPayPalModal = async (product) => {
 
   const ok = await ensurePayPalSdk();
   if (!ok || !window.paypal) {
-    alert("PayPal is not configured yet. Set PAYPAL_CLIENT_ID_PROD in your deploy environment.");
+    alert(
+      "PayPal is not configured yet. Set PAYPAL_CLIENT_ID_PROD in your deploy environment."
+    );
     return;
   }
 
@@ -277,7 +284,9 @@ const getStripeClient = () => {
 const openStripeCheckout = async (product) => {
   const pk = getStripePublishableKey();
   if (!pk) {
-    alert("Stripe is not configured. Set STRIPE_PUBLISHABLE_KEY in your deploy environment.");
+    alert(
+      "Stripe is not configured. Set STRIPE_PUBLISHABLE_KEY in your deploy environment."
+    );
     return;
   }
 
@@ -289,7 +298,9 @@ const openStripeCheckout = async (product) => {
 
   const stripe = getStripeClient();
   if (!stripe) {
-    alert("Stripe client is not available on this page. Make sure Stripe SDK is loaded.");
+    alert(
+      "Stripe client is not available on this page. Make sure Stripe SDK is loaded."
+    );
     return;
   }
 
@@ -470,11 +481,14 @@ const init = async () => {
     '<div class="muted type-small" style="padding:2rem; text-align:center; opacity:0.6;">Loading inventory...</div>';
 
   const allItems = await loadProducts();
-  const products = allItems.filter((p) => String(p?.type || "").toLowerCase() === "app");
+  const products = allItems.filter(
+    (p) => String(p?.type || "").toLowerCase() === "app"
+  );
   const renderList = products.length ? products : allItems;
 
   if (!renderList.length) {
-    scene.innerHTML = '<div class="muted" style="padding:2rem; text-align:center;">No products available.</div>';
+    scene.innerHTML =
+      '<div class="muted" style="padding:2rem; text-align:center;">No products available.</div>';
     return;
   }
 

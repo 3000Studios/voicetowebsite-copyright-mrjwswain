@@ -44,7 +44,10 @@ const env = {
   },
 };
 
-const jsonResponse = (status, payload) => ({ status, body: JSON.stringify(payload) });
+const jsonResponse = (status, payload) => ({
+  status,
+  body: JSON.stringify(payload),
+});
 
 async function currentHandler(request, env) {
   if (!env.D1) {
@@ -70,16 +73,24 @@ async function currentHandler(request, env) {
     const columnNames = new Set((columns.results || []).map((col) => col.name));
 
     if (!columnNames.has("intent_json")) {
-      await env.D1.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
+      await env.D1.prepare(
+        "ALTER TABLE commands ADD COLUMN intent_json TEXT;"
+      ).run();
     }
     if (!columnNames.has("deployment_id")) {
-      await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
+      await env.D1.prepare(
+        "ALTER TABLE commands ADD COLUMN deployment_id TEXT;"
+      ).run();
     }
     if (!columnNames.has("deployment_status")) {
-      await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
+      await env.D1.prepare(
+        "ALTER TABLE commands ADD COLUMN deployment_status TEXT;"
+      ).run();
     }
     if (!columnNames.has("deployment_message")) {
-      await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
+      await env.D1.prepare(
+        "ALTER TABLE commands ADD COLUMN deployment_message TEXT;"
+      ).run();
     }
 
     const data = await env.D1.prepare(
@@ -115,7 +126,9 @@ async function runBenchmark() {
   }
   const end1 = performance.now();
   const time1 = end1 - start1;
-  console.log(`Current Handler: ${time1.toFixed(2)}ms total, ${(time1 / iterations).toFixed(2)}ms per request`);
+  console.log(
+    `Current Handler: ${time1.toFixed(2)}ms total, ${(time1 / iterations).toFixed(2)}ms per request`
+  );
 
   const start2 = performance.now();
   for (let i = 0; i < iterations; i++) {
@@ -123,7 +136,9 @@ async function runBenchmark() {
   }
   const end2 = performance.now();
   const time2 = end2 - start2;
-  console.log(`Optimized Handler: ${time2.toFixed(2)}ms total, ${(time2 / iterations).toFixed(2)}ms per request`);
+  console.log(
+    `Optimized Handler: ${time2.toFixed(2)}ms total, ${(time2 / iterations).toFixed(2)}ms per request`
+  );
 
   const improvement = ((time1 - time2) / time1) * 100;
   console.log(`Improvement: ${improvement.toFixed(2)}%`);

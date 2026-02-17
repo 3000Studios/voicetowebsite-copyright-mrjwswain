@@ -70,7 +70,8 @@ const setTheme = (theme) => {
   } catch {}
 };
 
-const hasKeyword = (text, keyword) => (text || "").toLowerCase().includes(keyword.toLowerCase());
+const hasKeyword = (text, keyword) =>
+  (text || "").toLowerCase().includes(keyword.toLowerCase());
 
 const generateOutline = ({ siteType, prompt }) => {
   const normalizedPrompt = (prompt || "").trim();
@@ -101,17 +102,26 @@ const generateOutline = ({ siteType, prompt }) => {
   ];
 
   if (siteType === "creator") sections.splice(2, 0, "Reel / highlights grid");
-  if (siteType === "agency") sections.splice(2, 0, "Case studies (before/after)");
+  if (siteType === "agency")
+    sections.splice(2, 0, "Case studies (before/after)");
   if (siteType === "local") sections.splice(2, 0, "Booking + hours + location");
-  if (siteType === "ecommerce") sections.splice(2, 0, "Featured products + bundles");
+  if (siteType === "ecommerce")
+    sections.splice(2, 0, "Featured products + bundles");
 
-  if (hasKeyword(normalizedPrompt, "pricing") && !sections.includes("Pricing")) {
+  if (
+    hasKeyword(normalizedPrompt, "pricing") &&
+    !sections.includes("Pricing")
+  ) {
     sections.splice(5, 0, "Pricing (plans + add-ons)");
   }
-  if (hasKeyword(normalizedPrompt, "booking") && !sections.join(" ").includes("Booking")) {
+  if (
+    hasKeyword(normalizedPrompt, "booking") &&
+    !sections.join(" ").includes("Booking")
+  ) {
     sections.splice(3, 0, "Booking (calendar + form)");
   }
-  if (hasKeyword(normalizedPrompt, "blog")) sections.splice(6, 0, "Blog hub (topic clusters)");
+  if (hasKeyword(normalizedPrompt, "blog"))
+    sections.splice(6, 0, "Blog hub (topic clusters)");
 
   return { title, sections };
 };
@@ -167,7 +177,9 @@ const fetchStylePacks = async (els, state) => {
     renderStylePackChoices(els, state, packs);
     return packs;
   } catch {
-    if (els.stylePackStatus) els.stylePackStatus.textContent = "Style libraries unavailable right now.";
+    if (els.stylePackStatus)
+      els.stylePackStatus.textContent =
+        "Style libraries unavailable right now.";
     return [];
   }
 };
@@ -175,7 +187,8 @@ const fetchStylePacks = async (els, state) => {
 const generateLivePreview = async (state, els) => {
   const prompt = (state.prompt || "").trim();
   if (!prompt) return;
-  if (els.livePreviewStatus) els.livePreviewStatus.textContent = "Generating live preview...";
+  if (els.livePreviewStatus)
+    els.livePreviewStatus.textContent = "Generating live preview...";
   try {
     const res = await fetch("/api/generate", {
       method: "POST",
@@ -195,7 +208,8 @@ const generateLivePreview = async (state, els) => {
     state.generatedLayout = data.layout || null;
     saveState(state);
 
-    if (els.livePreviewStatus) els.livePreviewStatus.textContent = "Live preview ready.";
+    if (els.livePreviewStatus)
+      els.livePreviewStatus.textContent = "Live preview ready.";
     if (els.livePreviewLink && state.generatedPreviewUrl) {
       els.livePreviewLink.href = state.generatedPreviewUrl;
       els.livePreviewLink.classList.remove("is-hidden");
@@ -212,14 +226,20 @@ const generateLivePreview = async (state, els) => {
 };
 
 const renderPreview = (state, els) => {
-  const outline = generateOutline({ siteType: state.siteType, prompt: state.prompt });
-  const generatedPages = Array.isArray(state.generatedLayout?.pages) ? state.generatedLayout.pages : [];
+  const outline = generateOutline({
+    siteType: state.siteType,
+    prompt: state.prompt,
+  });
+  const generatedPages = Array.isArray(state.generatedLayout?.pages)
+    ? state.generatedLayout.pages
+    : [];
   const listItems = generatedPages.length
     ? generatedPages.map((page) => String(page?.title || page?.slug || "Page"))
     : outline.sections;
 
   if (els.previewTitle) {
-    els.previewTitle.textContent = state.generatedLayout?.title || outline.title;
+    els.previewTitle.textContent =
+      state.generatedLayout?.title || outline.title;
   }
   if (els.previewList) {
     els.previewList.innerHTML = "";
@@ -263,7 +283,8 @@ const showStep = (state, els) => {
     el.classList.toggle("is-hidden", Number(el.dataset.panel) !== step);
   });
 
-  if (els.prompt && els.prompt.value !== state.prompt) els.prompt.value = state.prompt || "";
+  if (els.prompt && els.prompt.value !== state.prompt)
+    els.prompt.value = state.prompt || "";
   if (step === 4) renderPreview(state, els);
   saveState(state);
 };
@@ -273,24 +294,34 @@ const wireChoices = (state) => {
     const siteChoice = event.target.closest("[data-choice]");
     if (siteChoice) {
       state.siteType = siteChoice.getAttribute("data-choice") || state.siteType;
-      document.querySelectorAll("[data-choice]").forEach((el) => el.classList.toggle("is-selected", el === siteChoice));
+      document
+        .querySelectorAll("[data-choice]")
+        .forEach((el) => el.classList.toggle("is-selected", el === siteChoice));
       saveState(state);
     }
 
     const themeChoice = event.target.closest("[data-theme]");
     if (themeChoice) {
       state.theme = themeChoice.getAttribute("data-theme") || state.theme;
-      document.querySelectorAll("[data-theme]").forEach((el) => el.classList.toggle("is-selected", el === themeChoice));
+      document
+        .querySelectorAll("[data-theme]")
+        .forEach((el) =>
+          el.classList.toggle("is-selected", el === themeChoice)
+        );
       setTheme(state.theme);
       saveState(state);
     }
 
     const stylePackChoice = event.target.closest("[data-style-pack]");
     if (stylePackChoice) {
-      const id = String(stylePackChoice.getAttribute("data-style-pack") || "").trim();
+      const id = String(
+        stylePackChoice.getAttribute("data-style-pack") || ""
+      ).trim();
       if (!id) return;
       const exists = state.stylePackIds.includes(id);
-      state.stylePackIds = exists ? state.stylePackIds.filter((v) => v !== id) : [...state.stylePackIds, id];
+      state.stylePackIds = exists
+        ? state.stylePackIds.filter((v) => v !== id)
+        : [...state.stylePackIds, id];
       stylePackChoice.classList.toggle("is-selected", !exists);
       const status = document.getElementById("stylePackStatus");
       if (status) {
@@ -313,7 +344,8 @@ const wireNavButtons = (state, els) => {
       if (state.step === 2) {
         const text = (els.prompt?.value || "").trim();
         if (!text) {
-          els.micStatus && (els.micStatus.textContent = "Add a prompt to continue.");
+          els.micStatus &&
+            (els.micStatus.textContent = "Add a prompt to continue.");
           return;
         }
         if (text !== state.prompt) {
@@ -330,7 +362,9 @@ const wireNavButtons = (state, els) => {
 
     showStep(state, els);
     if (state.step === 4) {
-      void generateLivePreview(state, els).then(() => renderPreview(state, els));
+      void generateLivePreview(state, els).then(() =>
+        renderPreview(state, els)
+      );
     }
   });
 };
@@ -348,7 +382,8 @@ const wirePrompt = (state, els) => {
 };
 
 const createRecognition = (els) => {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return null;
 
   const recognition = new SpeechRecognition();
@@ -401,10 +436,13 @@ const wireMic = (state, els) => {
 };
 
 const wireSave = (state, els) => {
-  const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((value || "").trim());
+  const isValidEmail = (value) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((value || "").trim());
 
-  const loadBuilds = () => safeJsonParse(localStorage.getItem(SAVED_BUILDS_KEY) || "[]", []);
-  const saveBuilds = (list) => localStorage.setItem(SAVED_BUILDS_KEY, JSON.stringify(list.slice(0, 50)));
+  const loadBuilds = () =>
+    safeJsonParse(localStorage.getItem(SAVED_BUILDS_KEY) || "[]", []);
+  const saveBuilds = (list) =>
+    localStorage.setItem(SAVED_BUILDS_KEY, JSON.stringify(list.slice(0, 50)));
 
   els.saveBtn?.addEventListener("click", async () => {
     const email = (els.email?.value || "").trim();
@@ -418,7 +456,8 @@ const wireSave = (state, els) => {
     }
 
     if (els.saveBtn) els.saveBtn.setAttribute("disabled", "true");
-    if (els.saveStatus) els.saveStatus.textContent = "Saving and sending email...";
+    if (els.saveStatus)
+      els.saveStatus.textContent = "Saving and sending email...";
     renderSaveLinks(els, []);
 
     const build = {
@@ -439,19 +478,29 @@ const wireSave = (state, els) => {
       if (!res.ok || !data?.ok) {
         throw new Error(String(data?.error || "Save failed."));
       }
-      state.generatedSiteId = String(data?.siteId || state.generatedSiteId || "");
-      state.generatedPreviewUrl = toAbsoluteUrl(data?.previewUrl || state.generatedPreviewUrl || "");
+      state.generatedSiteId = String(
+        data?.siteId || state.generatedSiteId || ""
+      );
+      state.generatedPreviewUrl = toAbsoluteUrl(
+        data?.previewUrl || state.generatedPreviewUrl || ""
+      );
       state.generatedLayout = data?.layout || state.generatedLayout || null;
       saveState(state);
       renderPreview(state, els);
 
       const linkItems = [];
       if (state.generatedPreviewUrl) {
-        linkItems.push({ label: "Open your live preview", href: state.generatedPreviewUrl });
+        linkItems.push({
+          label: "Open your live preview",
+          href: state.generatedPreviewUrl,
+        });
       }
       (data?.paymentOptions || []).forEach((option) => {
         if (option?.label && option?.link) {
-          linkItems.push({ label: `Buy ${option.label} (PayPal)`, href: option.link });
+          linkItems.push({
+            label: `Buy ${option.label} (PayPal)`,
+            href: option.link,
+          });
         }
       });
       renderSaveLinks(els, linkItems);
@@ -463,7 +512,8 @@ const wireSave = (state, els) => {
           : `Saved, but email failed: ${data?.email?.error || "delivery issue"}`);
       if (els.email) els.email.value = "";
     } catch (err) {
-      els.saveStatus && (els.saveStatus.textContent = `Save failed: ${err?.message || "unknown error"}`);
+      els.saveStatus &&
+        (els.saveStatus.textContent = `Save failed: ${err?.message || "unknown error"}`);
       // Keep local fallback so the user does not lose progress.
       const list = loadBuilds();
       list.unshift(build);

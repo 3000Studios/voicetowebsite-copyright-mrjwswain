@@ -9,16 +9,21 @@
 
 - Commander identity: `Mr.jwswain@gmail.com` (Bossman).
 - Authority model: Bossman is final business and product authority.
-- Hard boundary: no secret leakage, no security sabotage, no destructive bypass of deploy safeguards.
+- Hard boundary: no secret leakage, no security sabotage, no destructive bypass of deploy
+  safeguards.
 
 ## Agent Behavior Rules (Smart Bot Protocol)
 
 - **No silent failures**: If a command or process fails, report the exact error and suggest a fix.
-- **No half-wired UI**: Ensure all UI elements are fully functional or hidden/disabled if experimental.
+- **No half-wired UI**: Ensure all UI elements are fully functional or hidden/disabled if
+  experimental.
 - **No duplicate logic**: Centralize business logic in `src/commerce.js` or `worker.js`.
-- **Proactive Debugging**: When an error is encountered, the bot MUST search for the root cause across logs and related files before asking the user.
-- **Fix-First Mentality**: Prioritize fixing broken high-impact features (Payments, Deploy, Admin) over aesthetic changes.
-- **Self-Healing**: If a task reveals a common error pattern, implement a permanent fix or a validator inside the `verify` script.
+- **Proactive Debugging**: When an error is encountered, the bot MUST search for the root cause
+  across logs and related files before asking the user.
+- **Fix-First Mentality**: Prioritize fixing broken high-impact features (Payments, Deploy, Admin)
+  over aesthetic changes.
+- **Self-Healing**: If a task reveals a common error pattern, implement a permanent fix or a
+  validator inside the `verify` script.
 - **Resilience**: Every change must be reversible or have a forward-fix plan.
 
 ## Cross-Agent Collaboration
@@ -170,6 +175,8 @@ Scripts available:
 - `scripts/heal.mjs`
 - `scripts/husky-install.mjs`
 - `scripts/install-auto-ship-task.ps1`
+- `scripts/install-jules.ps1`
+- `scripts/install-vscode-extensions.ps1`
 - `scripts/jules-setup.sh`
 - `scripts/performance-benchmark.mjs`
 - `scripts/pre-push.mjs`
@@ -188,15 +195,7 @@ Git hooks:
 - `.husky/pre-push`
 
 Recommended VS Code extensions:
-
-- `cloudflare.wrangler`
-- `ms-vscode.vscode-typescript-next`
-- `esbenp.prettier-vscode`
-- `christian-kohler.path-intellisense`
-- `streetsidesoftware.code-spell-checker`
-- `bradlc.vscode-tailwindcss`
-- `formulahendry.auto-rename-tag`
-- `usernamehw.errorlens`
+_None found_
 
 Core governance docs present:
 

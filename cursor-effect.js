@@ -27,7 +27,9 @@ export class LuminousRibbon {
     window.addEventListener("resize", () => this.resize());
 
     document.addEventListener("mousemove", (e) => this.handleMouseMove(e));
-    document.addEventListener("touchmove", (e) => this.handleTouchMove(e), { passive: false });
+    document.addEventListener("touchmove", (e) => this.handleTouchMove(e), {
+      passive: false,
+    });
 
     this.animate();
   }

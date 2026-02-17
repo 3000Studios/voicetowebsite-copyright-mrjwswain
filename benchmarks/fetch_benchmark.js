@@ -1,7 +1,9 @@
 async function getFileContent(path, ref) {
   // Simulate network latency between 100ms and 300ms
   const delay = Math.floor(Math.random() * 200) + 100;
-  return new Promise((resolve) => setTimeout(() => resolve(`Content of ${path}`), delay));
+  return new Promise((resolve) =>
+    setTimeout(() => resolve(`Content of ${path}`), delay)
+  );
 }
 
 async function runSequential(needsIndex, needsApp, needsStyles) {
@@ -49,7 +51,9 @@ async function benchmark() {
 
   const improvement = seqTime - concTime;
   const percent = (improvement / seqTime) * 100;
-  console.log(`Improvement: ${improvement.toFixed(2)}ms (${percent.toFixed(1)}%)`);
+  console.log(
+    `Improvement: ${improvement.toFixed(2)}ms (${percent.toFixed(1)}%)`
+  );
 
   // Scenario: Index and Styles needed
   console.log("\nScenario: Index and Styles needed");
@@ -61,7 +65,9 @@ async function benchmark() {
 
   const improvement2 = seqTime2 - concTime2;
   const percent2 = (improvement2 / seqTime2) * 100;
-  console.log(`Improvement: ${improvement2.toFixed(2)}ms (${percent2.toFixed(1)}%)`);
+  console.log(
+    `Improvement: ${improvement2.toFixed(2)}ms (${percent2.toFixed(1)}%)`
+  );
 }
 
 benchmark();

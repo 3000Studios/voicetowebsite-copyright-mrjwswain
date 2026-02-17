@@ -1,7 +1,8 @@
 # Copyright Deposit Excerpt
+
 First 25 pages (approx. 55 lines/page):
 
-```text
+````text
 ===== BEGIN worker.js =====
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
 
@@ -1377,11 +1378,11 @@ const parseCommand = (command) => {
       return;
     }
   }
-```
+````
 
 Last 25 pages (approx. 55 lines/page):
 
-```text
+````text
   align-items: center;
 }
 
@@ -2719,7 +2720,7 @@ export default async function handler(req, res) {
   }
 
   // Shim for Netlify context (using env vars since clientContext isn't available on Vercel)
-  // On Vercel, we'll assume the user is authorized if the request comes through, 
+  // On Vercel, we'll assume the user is authorized if the request comes through,
   // but for production you'd use Vercel Auth or a custom middleware.
   const context = { clientContext: { user: { app_metadata: { roles: [ADMIN_ROLE] } } } };
 
@@ -2757,4 +2758,4 @@ export default async function handler(req, res) {
   }
 }
 ===== END api/orchestrator.js =====
-```
+````

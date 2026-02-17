@@ -1,6 +1,7 @@
 # System Operations (Authoritative)
 
-This repo is designed to be operated by humans and autonomous agents ("bots") without breaking production.
+This repo is designed to be operated by humans and autonomous agents ("bots") without breaking
+production.
 
 ## Non-Negotiables (Ship Gates)
 
@@ -18,7 +19,8 @@ This repo is designed to be operated by humans and autonomous agents ("bots") wi
   - D1 (`D1` binding)
   - KV (`KV` binding)
   - R2 (`R2` binding)
-- Global shell UI: `nav.js`, `styles.css` (Worker forces `no-store` caching on these to avoid stale nav).
+- Global shell UI: `nav.js`, `styles.css` (Worker forces `no-store` caching on these to avoid stale
+  nav).
 
 ## Deployment (The Truth)
 
@@ -40,7 +42,8 @@ Source of truth: `DEPLOYMENT.md`.
 - `.github/workflows/*` deploy workflows
   - `npm run verify` includes `scripts/guard-deploy.mjs` which blocks CI deploy workflows by design.
 - `cloudflare.pages.toml.disabled`
-  - Do not rename it back to `cloudflare.pages.toml` or Wrangler may detect Pages and fail `wrangler deploy`.
+  - Do not rename it back to `cloudflare.pages.toml` or Wrangler may detect Pages and fail
+    `wrangler deploy`.
 
 ## Bot Roles (Multi-Agent System)
 
@@ -100,7 +103,8 @@ Practical guidance:
 - OK to inject publicly safe values at runtime (Worker does this in HTML):
   - PayPal client id, Stripe publishable key, AdSense publisher/slots.
 - Not OK to inject:
-  - `CONTROL_PASSWORD`, `LICENSE_SECRET`, `ADMIN_COOKIE_SECRET`, Stripe secret key, PayPal secret, OpenAI keys, Gemini keys.
+  - `CONTROL_PASSWORD`, `LICENSE_SECRET`, `ADMIN_COOKIE_SECRET`, Stripe secret key, PayPal secret,
+    OpenAI keys, Gemini keys.
 
 ## Monitoring + Debugging (Cloudflare)
 

@@ -8,7 +8,9 @@ const ROOT_DIR = process.cwd();
 const DEFAULT_PRIORITY = "0.8";
 const DEFAULT_CHANGEFREQ = "weekly";
 const FILE_EXCLUSIONS = new Set(["sandbox.html", "404.html"]);
-const SUBSTRING_EXCLUSIONS = ["google", "preview", "workers"].map((s) => s.toLowerCase());
+const SUBSTRING_EXCLUSIONS = ["google", "preview", "workers"].map((s) =>
+  s.toLowerCase()
+);
 
 function generateSitemap() {
   const urlMap = new Map();
@@ -59,7 +61,11 @@ function generateSitemap() {
 
 function addRoute(map, route, meta = {}) {
   const normalized = normalizeRoute(route);
-  if (!normalized || normalized.startsWith("/admin") || normalized.startsWith("/labs")) {
+  if (
+    !normalized ||
+    normalized.startsWith("/admin") ||
+    normalized.startsWith("/labs")
+  ) {
     return;
   }
 
@@ -79,7 +85,9 @@ function readOpsPages() {
 
   try {
     const data = JSON.parse(fs.readFileSync(pagesSrc, "utf8"));
-    return (data.pages || []).filter((page) => page.zone !== "admin" && page.zone !== "hidden");
+    return (data.pages || []).filter(
+      (page) => page.zone !== "admin" && page.zone !== "hidden"
+    );
   } catch (err) {
     console.error("Failed to parse pages.json", err);
     return [];
@@ -92,7 +100,12 @@ function discoverStaticRoutes() {
     return entries
       .filter((entry) => entry.isFile() && entry.name.endsWith(".html"))
       .filter((entry) => !FILE_EXCLUSIONS.has(entry.name))
-      .filter((entry) => !SUBSTRING_EXCLUSIONS.some((substring) => entry.name.toLowerCase().includes(substring)))
+      .filter(
+        (entry) =>
+          !SUBSTRING_EXCLUSIONS.some((substring) =>
+            entry.name.toLowerCase().includes(substring)
+          )
+      )
       .map((entry) => {
         if (entry.name === "index.html") return "/";
         const base = path.basename(entry.name, ".html");

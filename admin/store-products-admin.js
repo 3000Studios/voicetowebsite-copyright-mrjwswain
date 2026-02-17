@@ -3,7 +3,9 @@ const productForm = document.getElementById("product-form");
 const productClear = document.getElementById("product-clear");
 const productsReset = document.getElementById("products-reset");
 const productsCount = document.getElementById("products-count");
-const readonly = Boolean(document.getElementById("product-form")?.dataset?.mode === "readonly");
+const readonly = Boolean(
+  document.getElementById("product-form")?.dataset?.mode === "readonly"
+);
 
 const loadProducts = async () => {
   try {
@@ -76,7 +78,9 @@ productTableBody?.addEventListener("click", async (e) => {
 productForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (readonly) {
-    alert("This manager is read-only. Edit products.json and redeploy to change inventory.");
+    alert(
+      "This manager is read-only. Edit products.json and redeploy to change inventory."
+    );
     return;
   }
   const formData = new FormData(productForm);

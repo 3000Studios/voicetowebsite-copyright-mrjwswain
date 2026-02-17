@@ -50,10 +50,15 @@ class MockRateLimiter {
 
     try {
       // Mock database operations
-      await this.db.prepare(`DELETE FROM rate_limits WHERE timestamp < ?`).bind(windowStart).run();
+      await this.db
+        .prepare(`DELETE FROM rate_limits WHERE timestamp < ?`)
+        .bind(windowStart)
+        .run();
 
       const result = await this.db
-        .prepare(`SELECT COUNT(*) as count FROM rate_limits WHERE key = ? AND timestamp >= ?`)
+        .prepare(
+          `SELECT COUNT(*) as count FROM rate_limits WHERE key = ? AND timestamp >= ?`
+        )
         .bind(key, windowStart)
         .first();
 
@@ -61,7 +66,9 @@ class MockRateLimiter {
 
       // Check if blocked
       const blockResult = await this.db
-        .prepare(`SELECT blocked_until FROM rate_limit_blocks WHERE key = ? AND blocked_until > ?`)
+        .prepare(
+          `SELECT blocked_until FROM rate_limit_blocks WHERE key = ? AND blocked_until > ?`
+        )
         .bind(key, now)
         .first();
 
@@ -78,7 +85,9 @@ class MockRateLimiter {
       if (currentCount >= config.maxRequests) {
         const blockedUntil = now + config.blockDurationMs;
         await this.db
-          .prepare(`INSERT OR REPLACE INTO rate_limit_blocks (key, blocked_until) VALUES (?, ?)`)
+          .prepare(
+            `INSERT OR REPLACE INTO rate_limit_blocks (key, blocked_until) VALUES (?, ?)`
+          )
           .bind(key, blockedUntil)
           .run();
 
@@ -92,7 +101,10 @@ class MockRateLimiter {
       }
 
       // Add current request
-      await this.db.prepare(`INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)`).bind(key, now).run();
+      await this.db
+        .prepare(`INSERT INTO rate_limits (key, timestamp) VALUES (?, ?)`)
+        .bind(key, now)
+        .run();
 
       return {
         allowed: true,
@@ -199,7 +211,9 @@ class MockStatement {
   async run() {
     if (this.query.includes("DELETE FROM rate_limits")) {
       const [timestamp] = this.boundParams;
-      this.db.rateLimits = this.db.rateLimits.filter((rl) => rl.timestamp >= timestamp);
+      this.db.rateLimits = this.db.rateLimits.filter(
+        (rl) => rl.timestamp >= timestamp
+      );
       return { changes: 1 };
     }
 
@@ -222,13 +236,17 @@ class MockStatement {
   async first() {
     if (this.query.includes("SELECT COUNT(*)")) {
       const [key, timestamp] = this.boundParams;
-      const count = this.db.rateLimits.filter((rl) => rl.key === key && rl.timestamp >= timestamp).length;
+      const count = this.db.rateLimits.filter(
+        (rl) => rl.key === key && rl.timestamp >= timestamp
+      ).length;
       return { count };
     }
 
     if (this.query.includes("SELECT blocked_until")) {
       const [key, timestamp] = this.boundParams;
-      const block = this.db.blocks.find((b) => b.key === key && b.blocked_until > timestamp);
+      const block = this.db.blocks.find(
+        (b) => b.key === key && b.blocked_until > timestamp
+      );
       return block || null;
     }
 
@@ -288,8 +306,12 @@ describe("Rate Limiter", () => {
 
     it("should select default config for other actions", () => {
       expect(rateLimiter.getConfigForAction("status")).toBe(testConfig.default);
-      expect(rateLimiter.getConfigForAction("list_pages")).toBe(testConfig.default);
-      expect(rateLimiter.getConfigForAction("unknown")).toBe(testConfig.default);
+      expect(rateLimiter.getConfigForAction("list_pages")).toBe(
+        testConfig.default
+      );
+      expect(rateLimiter.getConfigForAction("unknown")).toBe(
+        testConfig.default
+      );
     });
   });
 
@@ -448,12 +470,18 @@ describe("Rate Limiter", () => {
       }
 
       // Get blocked
-      const blockedResult = await rateLimiter.checkRateLimit(identifier, "auto");
+      const blockedResult = await rateLimiter.checkRateLimit(
+        identifier,
+        "auto"
+      );
       expect(blockedResult.allowed).toBe(false);
       expect(blockedResult.blocked).toBe(true);
 
       // Should remain blocked for duration
-      const stillBlockedResult = await rateLimiter.checkRateLimit(identifier, "auto");
+      const stillBlockedResult = await rateLimiter.checkRateLimit(
+        identifier,
+        "auto"
+      );
       expect(stillBlockedResult.allowed).toBe(false);
       expect(stillBlockedResult.blocked).toBe(true);
     });

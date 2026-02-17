@@ -25,11 +25,15 @@ export function classifyIntents(rawInput, entities, intentMap) {
   const intentBundle = [];
 
   // Phrase-based intent extraction (deterministic: stable order by key length desc, then key).
-  const keys = Object.keys(intentMap || {}).sort((a, b) => b.length - a.length || a.localeCompare(b));
+  const keys = Object.keys(intentMap || {}).sort(
+    (a, b) => b.length - a.length || a.localeCompare(b)
+  );
   for (const key of keys) {
     if (!key) continue;
     if (!t.includes(normalize(key))) continue;
-    const intents = Array.isArray(intentMap[key]) ? intentMap[key] : [intentMap[key]];
+    const intents = Array.isArray(intentMap[key])
+      ? intentMap[key]
+      : [intentMap[key]];
     intents.forEach((i) => {
       const intent = baseIntentFromPhrase(String(i || ""));
       if (!intent) return;
@@ -44,28 +48,49 @@ export function classifyIntents(rawInput, entities, intentMap) {
   // Entity-based backstops.
   const features = new Set(entities?.features || []);
   if (features.has("affiliate")) {
-    intentBundle.push({ intent: "enable_affiliate_engine", confidence: 0.9, source: "feature:affiliate" });
+    intentBundle.push({
+      intent: "enable_affiliate_engine",
+      confidence: 0.9,
+      source: "feature:affiliate",
+    });
   }
   if (features.has("ads")) {
-    intentBundle.push({ intent: "enable_ads", confidence: 0.86, source: "feature:ads" });
+    intentBundle.push({
+      intent: "enable_ads",
+      confidence: 0.86,
+      source: "feature:ads",
+    });
   }
   if (features.has("email")) {
-    intentBundle.push({ intent: "enable_email_capture", confidence: 0.84, source: "feature:email" });
+    intentBundle.push({
+      intent: "enable_email_capture",
+      confidence: 0.84,
+      source: "feature:email",
+    });
   }
   if (features.has("background_video")) {
-    intentBundle.push({ intent: "update_background_video", confidence: 0.8, source: "feature:background_video" });
+    intentBundle.push({
+      intent: "update_background_video",
+      confidence: 0.8,
+      source: "feature:background_video",
+    });
   }
 
   // Theme intent if detected.
   if (entities?.design?.theme) {
-    intentBundle.push({ intent: "update_theme", confidence: 0.95, source: "design:theme" });
+    intentBundle.push({
+      intent: "update_theme",
+      confidence: 0.95,
+      source: "design:theme",
+    });
   }
 
   // Deterministic de-dupe: keep max confidence per intent.
   const byIntent = new Map();
   for (const entry of intentBundle) {
     const prev = byIntent.get(entry.intent);
-    if (!prev || Number(entry.confidence) > Number(prev.confidence)) byIntent.set(entry.intent, entry);
+    if (!prev || Number(entry.confidence) > Number(prev.confidence))
+      byIntent.set(entry.intent, entry);
   }
 
   return uniq([...byIntent.values()]);

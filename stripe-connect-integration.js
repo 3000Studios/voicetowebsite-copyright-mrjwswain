@@ -56,7 +56,9 @@ const dbOperations = {
     if (!db) return null;
     try {
       const result = await db
-        .prepare("SELECT stripe_account_id FROM user_stripe_accounts WHERE user_id = ? LIMIT 1")
+        .prepare(
+          "SELECT stripe_account_id FROM user_stripe_accounts WHERE user_id = ? LIMIT 1"
+        )
         .bind(userId)
         .first();
       return result?.stripe_account_id || null;
@@ -87,10 +89,14 @@ const dbOperations = {
     if (!db) return null;
     try {
       const result = await db
-        .prepare("SELECT subscription_data FROM user_subscriptions WHERE stripe_account_id = ? LIMIT 1")
+        .prepare(
+          "SELECT subscription_data FROM user_subscriptions WHERE stripe_account_id = ? LIMIT 1"
+        )
         .bind(accountId)
         .first();
-      return result?.subscription_data ? JSON.parse(result.subscription_data) : null;
+      return result?.subscription_data
+        ? JSON.parse(result.subscription_data)
+        : null;
     } catch (error) {
       console.error("Failed to get subscription:", error);
       return null;
@@ -104,7 +110,11 @@ const dbOperations = {
         .prepare(
           `INSERT OR REPLACE INTO user_subscriptions (stripe_account_id, subscription_data, updated_at) VALUES (?, ?, ?)`
         )
-        .bind(accountId, JSON.stringify(subscriptionData), new Date().toISOString())
+        .bind(
+          accountId,
+          JSON.stringify(subscriptionData),
+          new Date().toISOString()
+        )
         .run();
       return true;
     } catch (error) {
@@ -189,7 +199,8 @@ app.post("/api/stripe/create-account", requireAuth, async (req, res) => {
   try {
     if (!isStripeConfigured) {
       return res.status(503).json({
-        error: "Stripe service is not configured. Please contact administrator.",
+        error:
+          "Stripe service is not configured. Please contact administrator.",
         code: "STRIPE_NOT_CONFIGURED",
         timestamp: new Date().toISOString(),
       });
@@ -233,9 +244,15 @@ app.post("/api/stripe/create-account", requireAuth, async (req, res) => {
     // Store mapping in persistent database
     const db = req.app.locals?.db; // Assuming database is attached to app
     if (db) {
-      const success = await dbOperations.setUserAccount(db, req.userId, account.id);
+      const success = await dbOperations.setUserAccount(
+        db,
+        req.userId,
+        account.id
+      );
       if (!success) {
-        console.warn("Failed to store user account in database, falling back to memory");
+        console.warn(
+          "Failed to store user account in database, falling back to memory"
+        );
         userAccounts.set(req.userId, account.id); // Fallback to in-memory
       }
     } else {
@@ -243,7 +260,9 @@ app.post("/api/stripe/create-account", requireAuth, async (req, res) => {
       userAccounts.set(req.userId, account.id);
     }
 
-    console.log(`Created connected account ${account.id} for user ${req.userId}`);
+    console.log(
+      `Created connected account ${account.id} for user ${req.userId}`
+    );
 
     res.json({
       accountId: account.id,
@@ -269,7 +288,8 @@ app.get("/api/stripe/account-status", requireAuth, async (req, res) => {
   try {
     if (!isStripeConfigured) {
       return res.status(503).json({
-        error: "Stripe service is not configured. Please contact administrator.",
+        error:
+          "Stripe service is not configured. Please contact administrator.",
         code: "STRIPE_NOT_CONFIGURED",
         timestamp: new Date().toISOString(),
       });
@@ -300,11 +320,16 @@ app.get("/api/stripe/account-status", requireAuth, async (req, res) => {
     });
 
     // Check if ready to process payments
-    const readyToProcessPayments = account?.configuration?.merchant?.capabilities?.card_payments?.status === "active";
+    const readyToProcessPayments =
+      account?.configuration?.merchant?.capabilities?.card_payments?.status ===
+      "active";
 
     // Check onboarding completion status
-    const requirementsStatus = account.requirements?.summary?.minimum_deadline?.status;
-    const onboardingComplete = requirementsStatus !== "currently_due" && requirementsStatus !== "past_due";
+    const requirementsStatus =
+      account.requirements?.summary?.minimum_deadline?.status;
+    const onboardingComplete =
+      requirementsStatus !== "currently_due" &&
+      requirementsStatus !== "past_due";
 
     res.json({
       accountId: account.id,
@@ -330,41 +355,45 @@ app.get("/api/stripe/account-status", requireAuth, async (req, res) => {
  * Generates an account link for the user to complete their onboarding
  * The user will be redirected to Stripe's hosted onboarding flow
  */
-app.post("/api/stripe/create-onboarding-link", requireAuth, async (req, res) => {
-  try {
-    const accountId = userAccounts.get(req.userId);
+app.post(
+  "/api/stripe/create-onboarding-link",
+  requireAuth,
+  async (req, res) => {
+    try {
+      const accountId = userAccounts.get(req.userId);
 
-    if (!accountId) {
-      return res.status(404).json({
-        error: "No connected account found for this user",
+      if (!accountId) {
+        return res.status(404).json({
+          error: "No connected account found for this user",
+        });
+      }
+
+      // Create account link for onboarding
+      const accountLink = await stripeClient.v2.core.accountLinks.create({
+        account: accountId,
+        use_case: {
+          type: "account_onboarding",
+          account_onboarding: {
+            configurations: ["merchant", "customer"],
+            refresh_url: `${process.env.BASE_URL || "http://localhost:3000"}/api/stripe/onboarding-refresh`,
+            return_url: `${process.env.BASE_URL || "http://localhost:3000"}/dashboard?onboarding_complete=true&accountId=${accountId}`,
+          },
+        },
+      });
+
+      res.json({
+        url: accountLink.url,
+        expires_at: accountLink.expires_at,
+      });
+    } catch (error) {
+      console.error("Error creating onboarding link:", error);
+      res.status(500).json({
+        error: "Failed to create onboarding link",
+        details: error.message,
       });
     }
-
-    // Create account link for onboarding
-    const accountLink = await stripeClient.v2.core.accountLinks.create({
-      account: accountId,
-      use_case: {
-        type: "account_onboarding",
-        account_onboarding: {
-          configurations: ["merchant", "customer"],
-          refresh_url: `${process.env.BASE_URL || "http://localhost:3000"}/api/stripe/onboarding-refresh`,
-          return_url: `${process.env.BASE_URL || "http://localhost:3000"}/dashboard?onboarding_complete=true&accountId=${accountId}`,
-        },
-      },
-    });
-
-    res.json({
-      url: accountLink.url,
-      expires_at: accountLink.expires_at,
-    });
-  } catch (error) {
-    console.error("Error creating onboarding link:", error);
-    res.status(500).json({
-      error: "Failed to create onboarding link",
-      details: error.message,
-    });
   }
-});
+);
 
 /**
  * CREATE PRODUCT
@@ -480,60 +509,66 @@ app.get("/api/stripe/products", requireAuth, async (req, res) => {
  * Creates a Stripe Checkout session for a customer to purchase a product
  * Uses Direct Charge with application fee to monetize the transaction
  */
-app.post("/api/stripe/create-checkout-session", requireAuth, async (req, res) => {
-  try {
-    const accountId = userAccounts.get(req.userId);
+app.post(
+  "/api/stripe/create-checkout-session",
+  requireAuth,
+  async (req, res) => {
+    try {
+      const accountId = userAccounts.get(req.userId);
 
-    if (!accountId) {
-      return res.status(404).json({
-        error: "No connected account found for this user",
-      });
-    }
-
-    const { priceId, quantity = 1, applicationFeeAmount = 0 } = req.body;
-
-    if (!priceId) {
-      return res.status(400).json({
-        error: "priceId is required",
-      });
-    }
-
-    // Create checkout session with application fee
-    const session = await stripeClient.checkout.sessions.create(
-      {
-        line_items: [
-          {
-            price: priceId,
-            quantity: quantity,
-          },
-        ],
-        payment_intent_data: {
-          // Application fee for monetization (in cents)
-          application_fee_amount: applicationFeeAmount,
-        },
-        mode: "payment",
-        success_url: `${process.env.BASE_URL || "http://localhost:3000"}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.BASE_URL || "http://localhost:3000"}/cancel`,
-      },
-      {
-        stripeAccount: accountId, // This sets the Stripe-Account header
+      if (!accountId) {
+        return res.status(404).json({
+          error: "No connected account found for this user",
+        });
       }
-    );
 
-    console.log(`Created checkout session ${session.id} for account ${accountId}`);
+      const { priceId, quantity = 1, applicationFeeAmount = 0 } = req.body;
 
-    res.json({
-      sessionId: session.id,
-      url: session.url,
-    });
-  } catch (error) {
-    console.error("Error creating checkout session:", error);
-    res.status(500).json({
-      error: "Failed to create checkout session",
-      details: error.message,
-    });
+      if (!priceId) {
+        return res.status(400).json({
+          error: "priceId is required",
+        });
+      }
+
+      // Create checkout session with application fee
+      const session = await stripeClient.checkout.sessions.create(
+        {
+          line_items: [
+            {
+              price: priceId,
+              quantity: quantity,
+            },
+          ],
+          payment_intent_data: {
+            // Application fee for monetization (in cents)
+            application_fee_amount: applicationFeeAmount,
+          },
+          mode: "payment",
+          success_url: `${process.env.BASE_URL || "http://localhost:3000"}/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${process.env.BASE_URL || "http://localhost:3000"}/cancel`,
+        },
+        {
+          stripeAccount: accountId, // This sets the Stripe-Account header
+        }
+      );
+
+      console.log(
+        `Created checkout session ${session.id} for account ${accountId}`
+      );
+
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+      });
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      res.status(500).json({
+        error: "Failed to create checkout session",
+        details: error.message,
+      });
+    }
   }
-});
+);
 
 /**
  * CREATE SUBSCRIPTION CHECKOUT
@@ -541,47 +576,53 @@ app.post("/api/stripe/create-checkout-session", requireAuth, async (req, res) =>
  * Creates a subscription checkout for the connected account
  * Uses customer_account to identify both customer and connected account
  */
-app.post("/api/stripe/create-subscription-checkout", requireAuth, async (req, res) => {
-  try {
-    const accountId = userAccounts.get(req.userId);
+app.post(
+  "/api/stripe/create-subscription-checkout",
+  requireAuth,
+  async (req, res) => {
+    try {
+      const accountId = userAccounts.get(req.userId);
 
-    if (!accountId) {
-      return res.status(404).json({
-        error: "No connected account found for this user",
+      if (!accountId) {
+        return res.status(404).json({
+          error: "No connected account found for this user",
+        });
+      }
+
+      const { priceId } = req.body;
+
+      if (!priceId) {
+        return res.status(400).json({
+          error: "priceId is required",
+        });
+      }
+
+      // Create subscription checkout session
+      const session = await stripeClient.checkout.sessions.create({
+        customer_account: accountId, // V2 accounts use same ID for customer and account
+        mode: "subscription",
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: `${process.env.BASE_URL || "http://localhost:3000"}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.BASE_URL || "http://localhost:3000"}/subscription-cancel`,
+      });
+
+      console.log(
+        `Created subscription checkout ${session.id} for account ${accountId}`
+      );
+
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+      });
+    } catch (error) {
+      console.error("Error creating subscription checkout:", error);
+      res.status(500).json({
+        error: "Failed to create subscription checkout",
+        details: error.message,
       });
     }
-
-    const { priceId } = req.body;
-
-    if (!priceId) {
-      return res.status(400).json({
-        error: "priceId is required",
-      });
-    }
-
-    // Create subscription checkout session
-    const session = await stripeClient.checkout.sessions.create({
-      customer_account: accountId, // V2 accounts use same ID for customer and account
-      mode: "subscription",
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.BASE_URL || "http://localhost:3000"}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.BASE_URL || "http://localhost:3000"}/subscription-cancel`,
-    });
-
-    console.log(`Created subscription checkout ${session.id} for account ${accountId}`);
-
-    res.json({
-      sessionId: session.id,
-      url: session.url,
-    });
-  } catch (error) {
-    console.error("Error creating subscription checkout:", error);
-    res.status(500).json({
-      error: "Failed to create subscription checkout",
-      details: error.message,
-    });
   }
-});
+);
 
 /**
  * CREATE BILLING PORTAL SESSION
@@ -624,54 +665,64 @@ app.post("/api/stripe/create-billing-portal", requireAuth, async (req, res) => {
  * - Subscription updates
  * - Payment events
  */
-app.post("/api/stripe/webhooks", express.raw({ type: "application/json" }), async (req, res) => {
-  const sig = req.headers["stripe-signature"];
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+app.post(
+  "/api/stripe/webhooks",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  if (!webhookSecret) {
-    console.warn("STRIPE_WEBHOOK_SECRET not set, webhook verification disabled");
+    if (!webhookSecret) {
+      console.warn(
+        "STRIPE_WEBHOOK_SECRET not set, webhook verification disabled"
+      );
+    }
+
+    try {
+      let event;
+
+      // Verify webhook signature if secret is provided
+      if (webhookSecret) {
+        event = stripeClient.webhooks.constructEvent(
+          req.body,
+          sig,
+          webhookSecret
+        );
+      } else {
+        // For development without webhook secret
+        event = JSON.parse(req.body);
+      }
+
+      console.log(`Processing webhook event: ${event.type}`);
+
+      // Handle V2 account requirement changes (thin events)
+      if (event.type.startsWith("v2.core.account")) {
+        await handleV2AccountEvent(event);
+      }
+      // Handle subscription events
+      else if (event.type.startsWith("customer.subscription")) {
+        await handleSubscriptionEvent(event);
+      }
+      // Handle payment method events
+      else if (event.type.startsWith("payment_method")) {
+        await handlePaymentMethodEvent(event);
+      }
+      // Handle billing portal events
+      else if (event.type.startsWith("billing_portal")) {
+        await handleBillingPortalEvent(event);
+      }
+      // Handle customer events
+      else if (event.type.startsWith("customer")) {
+        await handleCustomerEvent(event);
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(400).json({ error: `Webhook Error: ${error.message}` });
+    }
   }
-
-  try {
-    let event;
-
-    // Verify webhook signature if secret is provided
-    if (webhookSecret) {
-      event = stripeClient.webhooks.constructEvent(req.body, sig, webhookSecret);
-    } else {
-      // For development without webhook secret
-      event = JSON.parse(req.body);
-    }
-
-    console.log(`Processing webhook event: ${event.type}`);
-
-    // Handle V2 account requirement changes (thin events)
-    if (event.type.startsWith("v2.core.account")) {
-      await handleV2AccountEvent(event);
-    }
-    // Handle subscription events
-    else if (event.type.startsWith("customer.subscription")) {
-      await handleSubscriptionEvent(event);
-    }
-    // Handle payment method events
-    else if (event.type.startsWith("payment_method")) {
-      await handlePaymentMethodEvent(event);
-    }
-    // Handle billing portal events
-    else if (event.type.startsWith("billing_portal")) {
-      await handleBillingPortalEvent(event);
-    }
-    // Handle customer events
-    else if (event.type.startsWith("customer")) {
-      await handleCustomerEvent(event);
-    }
-
-    res.json({ received: true });
-  } catch (error) {
-    console.error("Webhook error:", error);
-    res.status(400).json({ error: `Webhook Error: ${error.message}` });
-  }
-});
+);
 
 /**
  * Handle V2 Account Events (Thin Events)
@@ -701,14 +752,18 @@ async function handleV2AccountEvent(event) {
 
       case "v2.core.account.configuration.merchant.capability_status_updated":
         // Merchant capability status changed
-        console.log(`Merchant capability status updated: ${fullEvent.data.object.id}`);
+        console.log(
+          `Merchant capability status updated: ${fullEvent.data.object.id}`
+        );
 
         // TODO: Update capability status in database
         break;
 
       case "v2.core.account.configuration.customer.capability_status_updated":
         // Customer capability status changed
-        console.log(`Customer capability status updated: ${fullEvent.data.object.id}`);
+        console.log(
+          `Customer capability status updated: ${fullEvent.data.object.id}`
+        );
 
         // TODO: Update capability status in database
         break;
@@ -729,7 +784,9 @@ async function handleSubscriptionEvent(event) {
     const subscription = event.data.object;
     const accountId = subscription.customer_account; // V2 accounts use customer_account
 
-    console.log(`Processing subscription event: ${event.type} for account: ${accountId}`);
+    console.log(
+      `Processing subscription event: ${event.type} for account: ${accountId}`
+    );
 
     switch (event.type) {
       case "customer.subscription.updated":

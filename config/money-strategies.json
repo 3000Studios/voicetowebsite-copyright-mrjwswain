@@ -5,11 +5,20 @@
   },
   "affiliate": {
     "stack": ["affiliate_links", "disclosure", "comparison_pages", "tracking"],
-    "dependencies": ["add disclosure page", "generate affiliate landing pages", "add CTA blocks", "install tracking"]
+    "dependencies": [
+      "add disclosure page",
+      "generate affiliate landing pages",
+      "add CTA blocks",
+      "install tracking"
+    ]
   },
   "leadgen": {
     "stack": ["lead_magnet", "email_capture", "calendar_or_booking", "deposit_checkout"],
-    "dependencies": ["add lead magnet landing page", "add email capture form", "set up newsletter drip campaign"]
+    "dependencies": [
+      "add lead magnet landing page",
+      "add email capture form",
+      "set up newsletter drip campaign"
+    ]
   },
   "subscriptions": {
     "stack": ["pricing", "checkout", "account_access"],

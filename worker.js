@@ -36,11 +36,17 @@ const addSecurityHeaders = (response, options = {}) => {
   const headers = new Headers(response.headers);
   if (options.cacheControl) headers.set("Cache-Control", options.cacheControl);
   if (options.pragmaNoCache) headers.set("Pragma", "no-cache");
-  headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  headers.set(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains; preload"
+  );
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "SAMEORIGIN");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  headers.set("Permissions-Policy", "geolocation=(), microphone=(self), camera=(self)");
+  headers.set(
+    "Permissions-Policy",
+    "geolocation=(), microphone=(self), camera=(self)"
+  );
   // Preserve status + statusText; clone body to avoid locking the original response stream.
   return new Response(response.body, {
     status: response.status,
@@ -111,10 +117,18 @@ const getPayPalCredentialsForMode = (env, mode) => {
 
 const isPayPalAuthError = (status, detail) => {
   const d = String(detail || "").toLowerCase();
-  return status === 401 || d.includes("authentication") || d.includes("invalid client");
+  return (
+    status === 401 ||
+    d.includes("authentication") ||
+    d.includes("invalid client")
+  );
 };
 
-const requestPayPalAccessToken = async ({ clientId, clientSecret, apiBase }) => {
+const requestPayPalAccessToken = async ({
+  clientId,
+  clientSecret,
+  apiBase,
+}) => {
   const basic = btoa(`${clientId}:${clientSecret}`);
   const form = new URLSearchParams();
   form.set("grant_type", "client_credentials");
@@ -133,7 +147,9 @@ const requestPayPalAccessToken = async ({ clientId, clientSecret, apiBase }) => 
 const getPayPalAccessToken = async (env) => {
   const { mode, clientId, clientSecret, apiBase } = getPayPalCredentials(env);
   if (!clientId) {
-    throw new Error("PayPal client id missing. Set PAYPAL_CLIENT_ID (sandbox) or PAYPAL_CLIENT_ID_PROD (live).");
+    throw new Error(
+      "PayPal client id missing. Set PAYPAL_CLIENT_ID (sandbox) or PAYPAL_CLIENT_ID_PROD (live)."
+    );
   }
   if (!clientSecret) {
     throw new Error(
@@ -154,14 +170,16 @@ const getPayPalAccessToken = async (env) => {
 
   // If mode is misconfigured for current credentials, auto-fallback once.
   if (!tokenRes.ok) {
-    const detail = tokenRes?.data?.error_description || tokenRes?.data?.error || "";
+    const detail =
+      tokenRes?.data?.error_description || tokenRes?.data?.error || "";
     if (isPayPalAuthError(tokenRes.status, detail)) {
       const alternateMode = mode === "live" ? "sandbox" : "live";
       const alternate = getPayPalCredentialsForMode(env, alternateMode);
       const hasAlternate =
         alternate.clientId &&
         alternate.clientSecret &&
-        (alternate.clientId !== primary.clientId || alternate.clientSecret !== primary.clientSecret);
+        (alternate.clientId !== primary.clientId ||
+          alternate.clientSecret !== primary.clientSecret);
       if (hasAlternate) {
         const fallbackRes = await requestPayPalAccessToken(alternate);
         if (fallbackRes.ok) {
@@ -173,8 +191,13 @@ const getPayPalAccessToken = async (env) => {
   }
 
   if (!tokenRes.ok) {
-    const detail = tokenRes?.data?.error_description || tokenRes?.data?.error || "PayPal token request failed.";
-    throw new Error(`${detail} (Mode: ${mode}, ClientID: ${clientId.substring(0, 8)}..., API: ${apiBase})`);
+    const detail =
+      tokenRes?.data?.error_description ||
+      tokenRes?.data?.error ||
+      "PayPal token request failed.";
+    throw new Error(
+      `${detail} (Mode: ${mode}, ClientID: ${clientId.substring(0, 8)}..., API: ${apiBase})`
+    );
   }
 
   const accessToken = String(tokenRes?.data?.access_token || "");
@@ -193,7 +216,10 @@ const paypalApiFetch = async (env, path, init = {}) => {
   const url = `${apiBase}${path.startsWith("/") ? path : `/${path}`}`;
   const headers = new Headers(init.headers || {});
   headers.set("Authorization", `Bearer ${accessToken}`);
-  headers.set("Content-Type", headers.get("Content-Type") || "application/json");
+  headers.set(
+    "Content-Type",
+    headers.get("Content-Type") || "application/json"
+  );
   headers.set("Accept", headers.get("Accept") || "application/json");
   return fetch(url, { ...init, headers });
 };
@@ -204,7 +230,8 @@ const getPayPalClientToken = async (env) => {
     method: "POST",
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.message || "Failed to generate PayPal client token.");
+  if (!res.ok)
+    throw new Error(data?.message || "Failed to generate PayPal client token.");
   return data.client_token;
 };
 
@@ -226,13 +253,31 @@ const escapeHtml = (value) =>
     .replace(/"/g, "&quot;");
 
 const getPayPalPlanLinks = (env, origin) => {
-  const fallback = (plan) => `${origin}/store.html?plan=${encodeURIComponent(plan)}&pay=paypal`;
-  const fromEnv = (key, plan) => String(env[key] || "").trim() || fallback(plan);
+  const fallback = (plan) =>
+    `${origin}/store.html?plan=${encodeURIComponent(plan)}&pay=paypal`;
+  const fromEnv = (key, plan) =>
+    String(env[key] || "").trim() || fallback(plan);
   return [
-    { plan: "starter", label: "Starter Site", link: fromEnv("PAYPAL_PAYMENT_LINK_STARTER", "starter") },
-    { plan: "growth", label: "Growth Voice", link: fromEnv("PAYPAL_PAYMENT_LINK_GROWTH", "growth") },
-    { plan: "enterprise", label: "Enterprise Edge", link: fromEnv("PAYPAL_PAYMENT_LINK_ENTERPRISE", "enterprise") },
-    { plan: "lifetime", label: "Lifetime App", link: fromEnv("PAYPAL_PAYMENT_LINK_LIFETIME", "lifetime") },
+    {
+      plan: "starter",
+      label: "Starter Site",
+      link: fromEnv("PAYPAL_PAYMENT_LINK_STARTER", "starter"),
+    },
+    {
+      plan: "growth",
+      label: "Growth Voice",
+      link: fromEnv("PAYPAL_PAYMENT_LINK_GROWTH", "growth"),
+    },
+    {
+      plan: "enterprise",
+      label: "Enterprise Edge",
+      link: fromEnv("PAYPAL_PAYMENT_LINK_ENTERPRISE", "enterprise"),
+    },
+    {
+      plan: "lifetime",
+      label: "Lifetime App",
+      link: fromEnv("PAYPAL_PAYMENT_LINK_LIFETIME", "lifetime"),
+    },
   ];
 };
 
@@ -264,7 +309,11 @@ const buildDemoEmailText = ({ previewUrl, prompt, plans }) => {
 const sendDemoEmail = async (env, { to, subject, html, text }) => {
   const resendKey = String(env.RESEND_API_KEY || "").trim();
   const sendgridKey = String(env.SENDGRID_API_KEY || "").trim();
-  const from = String(env.DEMO_EMAIL_FROM || env.EMAIL_FROM || "VoiceToWebsite <noreply@voicetowebsite.com>").trim();
+  const from = String(
+    env.DEMO_EMAIL_FROM ||
+      env.EMAIL_FROM ||
+      "VoiceToWebsite <noreply@voicetowebsite.com>"
+  ).trim();
 
   if (resendKey) {
     const res = await fetch("https://api.resend.com/emails", {
@@ -288,7 +337,9 @@ const sendDemoEmail = async (env, { to, subject, html, text }) => {
   if (sendgridKey) {
     const fromEmailMatch = from.match(/<([^>]+)>/);
     const fromEmail = fromEmailMatch ? fromEmailMatch[1] : from;
-    const fromName = fromEmailMatch ? from.replace(/\s*<[^>]+>\s*/, "") : "VoiceToWebsite";
+    const fromName = fromEmailMatch
+      ? from.replace(/\s*<[^>]+>\s*/, "")
+      : "VoiceToWebsite";
     const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
@@ -312,7 +363,9 @@ const sendDemoEmail = async (env, { to, subject, html, text }) => {
   // MailChannels fallback (no API key required for many Worker setups).
   const fromEmailMatch = from.match(/<([^>]+)>/);
   const fromEmail = fromEmailMatch ? fromEmailMatch[1] : from;
-  const fromName = fromEmailMatch ? from.replace(/\s*<[^>]+>\s*/, "") : "VoiceToWebsite";
+  const fromName = fromEmailMatch
+    ? from.replace(/\s*<[^>]+>\s*/, "")
+    : "VoiceToWebsite";
   const mcRes = await fetch("https://api.mailchannels.net/tx/v1/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -336,7 +389,13 @@ const generateSignature = async (data, secret) => {
   const keyData = encoder.encode(secret);
   const messageData = encoder.encode(data);
 
-  const cryptoKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
 
   const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
   return btoa(String.fromCharCode(...new Uint8Array(signature)));
@@ -345,7 +404,12 @@ const generateSignature = async (data, secret) => {
 const getSignatureSecret = (env) => String(env.SIGNATURE_SECRET || "").trim();
 
 // Generate signed URL with expiration
-const generateSignedUrl = async (env, appId, licenseKey, expiresMinutes = 60) => {
+const generateSignedUrl = async (
+  env,
+  appId,
+  licenseKey,
+  expiresMinutes = 60
+) => {
   const expires = Date.now() + expiresMinutes * 60 * 1000;
   const data = `${appId}:${licenseKey}:${expires}`;
   const secret = getSignatureSecret(env);
@@ -363,7 +427,9 @@ const verifySignedUrl = async (env, appId, licenseKey, expires, signature) => {
     if (!secret) return false;
     const data = `${appId}:${licenseKey}:${expires}`;
     const expectedSignature = await generateSignature(data, secret);
-    return signature === expectedSignature && Date.now() < parseInt(expires, 10);
+    return (
+      signature === expectedSignature && Date.now() < parseInt(expires, 10)
+    );
   } catch {
     return false;
   }
@@ -372,7 +438,9 @@ const verifySignedUrl = async (env, appId, licenseKey, expires, signature) => {
 // Simple dynamic-price PayPal helpers (mirrors existing catalog flow)
 // Simple dynamic-price PayPal helper (supports single item or array)
 export const createPayPalOrder = async (env, itemsOrProduct) => {
-  const items = Array.isArray(itemsOrProduct) ? itemsOrProduct : [itemsOrProduct];
+  const items = Array.isArray(itemsOrProduct)
+    ? itemsOrProduct
+    : [itemsOrProduct];
   if (items.length === 0) throw new Error("No items provided.");
 
   const total = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
@@ -413,20 +481,34 @@ export const createPayPalOrder = async (env, itemsOrProduct) => {
     body: JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.message || data?.details?.[0]?.description || "PayPal order create failed");
+  if (!res.ok)
+    throw new Error(
+      data?.message ||
+        data?.details?.[0]?.description ||
+        "PayPal order create failed"
+    );
   return data;
 };
 
 export const capturePayPalOrder = async (env, orderID) => {
   const id = String(orderID || "").trim();
   if (!id) throw new Error("orderID required.");
-  const res = await paypalApiFetch(env, `/v2/checkout/orders/${encodeURIComponent(id)}/capture`, {
-    method: "POST",
-    headers: { Prefer: "return=representation" },
-    body: JSON.stringify({}),
-  });
+  const res = await paypalApiFetch(
+    env,
+    `/v2/checkout/orders/${encodeURIComponent(id)}/capture`,
+    {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({}),
+    }
+  );
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.message || data?.details?.[0]?.description || "PayPal capture failed");
+  if (!res.ok)
+    throw new Error(
+      data?.message ||
+        data?.details?.[0]?.description ||
+        "PayPal capture failed"
+    );
   return data;
 };
 
@@ -441,9 +523,15 @@ const findProduct = (idOrSlug) => {
     .trim()
     .toLowerCase();
   if (!searchId) return null;
-  const all = [...(catalog.products || []), ...(catalog.apps || []), ...(catalog.subscriptions || [])];
+  const all = [
+    ...(catalog.products || []),
+    ...(catalog.apps || []),
+    ...(catalog.subscriptions || []),
+  ];
   return all.find(
-    (p) => String(p.id || "").toLowerCase() === searchId || String(p.title || "").toLowerCase() === searchId
+    (p) =>
+      String(p.id || "").toLowerCase() === searchId ||
+      String(p.title || "").toLowerCase() === searchId
   );
 };
 
@@ -464,17 +552,25 @@ const ensureOrdersTable = async (env) => {
 
   // Add license_key column if it doesn't exist (for backward compatibility)
   try {
-    await env.D1.prepare(`ALTER TABLE orders ADD COLUMN license_key TEXT`).run();
+    await env.D1.prepare(
+      `ALTER TABLE orders ADD COLUMN license_key TEXT`
+    ).run();
   } catch (err) {
     // Column already exists, ignore error
   }
 };
 
 const base64UrlEncode = (input) => {
-  const bytes = input instanceof Uint8Array ? input : new TextEncoder().encode(String(input));
+  const bytes =
+    input instanceof Uint8Array
+      ? input
+      : new TextEncoder().encode(String(input));
   let binary = "";
   bytes.forEach((b) => (binary += String.fromCharCode(b)));
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 };
 
 const base64UrlDecode = (input) => {
@@ -496,7 +592,11 @@ const signLicensePayload = async (secret, payloadB64) => {
     false,
     ["sign", "verify"]
   );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payloadB64));
+  const sig = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(payloadB64)
+  );
   return base64UrlEncode(new Uint8Array(sig));
 };
 
@@ -506,7 +606,14 @@ const issueLicenseToken = async (env, { email, term, plan, orderId }) => {
 
   const now = Math.floor(Date.now() / 1000);
   const termKey = String(term || "week").toLowerCase();
-  const days = termKey === "month" ? 30 : termKey === "year" ? 365 : termKey === "perpetual" ? 3650 : 7;
+  const days =
+    termKey === "month"
+      ? 30
+      : termKey === "year"
+        ? 365
+        : termKey === "perpetual"
+          ? 3650
+          : 7;
   const exp = termKey === "perpetual" ? now + days * 86400 : now + days * 86400;
 
   const payload = {
@@ -527,7 +634,8 @@ const verifyLicenseToken = async (env, token) => {
   const secret = String(env.LICENSE_SECRET || "").trim();
   if (!secret) throw new Error("License secret missing. Set LICENSE_SECRET.");
   const parts = String(token || "").split(".");
-  if (parts.length !== 3 || parts[0] !== "vtw1") throw new Error("Invalid license format.");
+  if (parts.length !== 3 || parts[0] !== "vtw1")
+    throw new Error("Invalid license format.");
   const payloadB64 = parts[1];
   const sig = parts[2];
   const expected = await signLicensePayload(secret, payloadB64);
@@ -552,18 +660,29 @@ export default {
     }
 
     // Admin access code validation
-    if (url.pathname === "/api/admin/access-code" && request.method === "POST") {
+    if (
+      url.pathname === "/api/admin/access-code" &&
+      request.method === "POST"
+    ) {
       try {
         const body = await request.clone().json();
         const { accessCode } = body;
 
         const validAccessCode = String(env.ADMIN_ACCESS_CODE || "").trim();
         if (!validAccessCode) {
-          return createErrorResponse(503, "Admin access code is not configured", "ADMIN_ACCESS_DISABLED");
+          return createErrorResponse(
+            503,
+            "Admin access code is not configured",
+            "ADMIN_ACCESS_DISABLED"
+          );
         }
 
         if (!accessCode || String(accessCode).trim() !== validAccessCode) {
-          return createErrorResponse(401, "Invalid access code", "INVALID_ACCESS_CODE");
+          return createErrorResponse(
+            401,
+            "Invalid access code",
+            "INVALID_ACCESS_CODE"
+          );
         }
 
         return jsonResponse(200, {
@@ -580,7 +699,10 @@ export default {
     if (url.pathname === "/api/admin/login" && request.method === "POST") {
       try {
         if (!isAdminEnabled(env)) {
-          return jsonResponse(503, { error: "Admin is disabled. Set CONTROL_PASSWORD to enable admin login." });
+          return jsonResponse(503, {
+            error:
+              "Admin is disabled. Set CONTROL_PASSWORD to enable admin login.",
+          });
         }
 
         const contentType = request.headers.get("content-type") || "";
@@ -593,7 +715,9 @@ export default {
           contentType.includes("multipart/form-data")
         ) {
           const form = await request.clone().formData();
-          accessCode = String(form.get("accessCode") || form.get("password") || "");
+          accessCode = String(
+            form.get("accessCode") || form.get("password") || ""
+          );
         } else {
           accessCode = String(await request.clone().text());
         }
@@ -601,7 +725,10 @@ export default {
         const validAccessCode = String(env.CONTROL_PASSWORD || "").trim();
 
         if (!validAccessCode) {
-          return jsonResponse(503, { error: "Admin is disabled. Set CONTROL_PASSWORD to enable admin login." });
+          return jsonResponse(503, {
+            error:
+              "Admin is disabled. Set CONTROL_PASSWORD to enable admin login.",
+          });
         }
 
         if (!accessCode || String(accessCode).trim() !== validAccessCode) {
@@ -612,7 +739,9 @@ export default {
         setAdminCookieHeaders(headers, cookieValue, {
           secure: url.protocol === "https:",
         });
-        return addSecurityHeaders(new Response(JSON.stringify({ ok: true }), { status: 200, headers }));
+        return addSecurityHeaders(
+          new Response(JSON.stringify({ ok: true }), { status: 200, headers })
+        );
       } catch (err) {
         return jsonResponse(500, { error: err.message });
       }
@@ -621,24 +750,36 @@ export default {
     if (url.pathname === "/api/admin/logout" && request.method === "POST") {
       const headers = new Headers({ "Content-Type": "application/json" });
       clearAdminCookieHeaders(headers, { secure: url.protocol === "https:" });
-      return addSecurityHeaders(new Response(JSON.stringify({ ok: true }), { status: 200, headers }));
+      return addSecurityHeaders(
+        new Response(JSON.stringify({ ok: true }), { status: 200, headers })
+      );
     }
 
     // Voice-to-layout routes (edge / Workers AI + D1 + R2)
     if (url.pathname === "/api/generate" && request.method === "POST") {
-      return addSecurityHeaders(await handleGenerateRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handleGenerateRequest({ request, env, ctx })
+      );
     }
     if (url.pathname === "/api/preview" && request.method === "GET") {
-      return addSecurityHeaders(await handlePreviewApiRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handlePreviewApiRequest({ request, env, ctx })
+      );
     }
     if (url.pathname.startsWith("/preview/") && request.method === "GET") {
-      return addSecurityHeaders(await handlePreviewPageRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handlePreviewPageRequest({ request, env, ctx })
+      );
     }
     if (url.pathname === "/api/publish" && request.method === "POST") {
-      return addSecurityHeaders(await handlePublishRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handlePublishRequest({ request, env, ctx })
+      );
     }
     if (url.pathname === "/api/style-packs" && request.method === "GET") {
-      return addSecurityHeaders(await handleStylePacksRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handleStylePacksRequest({ request, env, ctx })
+      );
     }
     if (url.pathname === "/api/demo/save" && request.method === "POST") {
       try {
@@ -672,7 +813,11 @@ export default {
             stylePackIds,
           }),
         });
-        const generateRes = await handleGenerateRequest({ request: generateReq, env, ctx });
+        const generateRes = await handleGenerateRequest({
+          request: generateReq,
+          env,
+          ctx,
+        });
         const generateData = await generateRes
           .clone()
           .json()
@@ -701,7 +846,12 @@ export default {
           prompt,
           plans: paymentOptions,
         });
-        const emailResult = await sendDemoEmail(env, { to: email, subject, html, text });
+        const emailResult = await sendDemoEmail(env, {
+          to: email,
+          subject,
+          html,
+          text,
+        });
 
         if (env.D1) {
           try {
@@ -751,21 +901,30 @@ export default {
           email: {
             sent: Boolean(emailResult?.sent),
             provider: emailResult?.provider || "",
-            error: emailResult?.sent ? "" : String(emailResult?.details || "Email delivery failed."),
+            error: emailResult?.sent
+              ? ""
+              : String(emailResult?.details || "Email delivery failed."),
           },
         });
       } catch (err) {
-        return jsonResponse(500, { error: err.message || "Failed to save demo lead." });
+        return jsonResponse(500, {
+          error: err.message || "Failed to save demo lead.",
+        });
       }
     }
 
     // Bot hub (coordination + shared brief for multiple AI bots)
     if (url.pathname.startsWith("/api/bot-hub")) {
-      return addSecurityHeaders(await handleBotHubRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handleBotHubRequest({ request, env, ctx })
+      );
     }
 
     // PayPal Client Token for v6 SDK
-    if (url.pathname === "/api/paypal/client-token" && request.method === "POST") {
+    if (
+      url.pathname === "/api/paypal/client-token" &&
+      request.method === "POST"
+    ) {
       try {
         const token = await getPayPalClientToken(env);
         return jsonResponse(200, { clientToken: token });
@@ -807,18 +966,21 @@ export default {
               const payload = JSON.parse(row.response_json || "{}");
               commandText = payload?.action?.command || null;
               const file = payload?.action?.file || null;
-              const page = payload?.action?.page || payload?.action?.path || null;
+              const page =
+                payload?.action?.page || payload?.action?.path || null;
               files = [file, page].filter(Boolean).join(", ") || null;
               if (!commandText) {
                 const a = payload?.action?.action || row.action || "execute";
-                commandText = `[${a}] ${row.idempotency_key || row.id || ""}`.trim();
+                commandText =
+                  `[${a}] ${row.idempotency_key || row.id || ""}`.trim();
               }
             } catch (_) {
               // Ignore parsing failures; fallback below.
             }
 
             if (!commandText) {
-              commandText = `[${row.action || "execute"}] ${row.idempotency_key || row.id || ""}`.trim();
+              commandText =
+                `[${row.action || "execute"}] ${row.idempotency_key || row.id || ""}`.trim();
             }
 
             const statusCode = Number(row.status || 0);
@@ -862,7 +1024,9 @@ export default {
 
     // Execute API (canonical orchestration endpoint for Custom GPT)
     if (url.pathname === "/api/execute" && request.method === "POST") {
-      return addSecurityHeaders(await handleExecuteRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handleExecuteRequest({ request, env, ctx })
+      );
     }
 
     // Public customer chat (AI assistant) used by the site widget.
@@ -872,16 +1036,23 @@ export default {
 
     // Support inbox (customer -> admin) + admin replies.
     if (url.pathname.startsWith("/api/support/")) {
-      return addSecurityHeaders(await handleSupportChatRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handleSupportChatRequest({ request, env, ctx })
+      );
     }
 
     // Godmode NL inference + preview (admin-only)
     if (url.pathname === "/api/godmode/infer" && request.method === "POST") {
-      return addSecurityHeaders(await handleGodmodeInferRequest({ request, env, ctx }));
+      return addSecurityHeaders(
+        await handleGodmodeInferRequest({ request, env, ctx })
+      );
     }
 
     // Orchestrator API (primary: /api/orchestrator; legacy: /.netlify/functions/orchestrator)
-    if (url.pathname === "/api/orchestrator" || url.pathname === "/.netlify/functions/orchestrator") {
+    if (
+      url.pathname === "/api/orchestrator" ||
+      url.pathname === "/.netlify/functions/orchestrator"
+    ) {
       const hasAdmin = await hasValidAdminCookie(request, env);
       if (!hasAdmin) {
         return jsonResponse(401, { error: "Unauthorized" });
@@ -892,7 +1063,9 @@ export default {
 
       const isAdmin = await isAdminRequest(request, env);
       if (!isAdmin) {
-        return jsonResponse(401, { error: "Unauthorized. Admin access required." });
+        return jsonResponse(401, {
+          error: "Unauthorized. Admin access required.",
+        });
       }
 
       // Delegate to the Cloudflare function implementation for orchestration.
@@ -921,16 +1094,28 @@ export default {
              deployment_message TEXT
            );`
         ).run();
-        const columns = await env.D1.prepare("PRAGMA table_info(commands);").all();
-        const columnNames = new Set((columns.results || []).map((col) => col.name));
+        const columns = await env.D1.prepare(
+          "PRAGMA table_info(commands);"
+        ).all();
+        const columnNames = new Set(
+          (columns.results || []).map((col) => col.name)
+        );
         if (!columnNames.has("intent_json"))
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN intent_json TEXT;").run();
+          await env.D1.prepare(
+            "ALTER TABLE commands ADD COLUMN intent_json TEXT;"
+          ).run();
         if (!columnNames.has("deployment_id"))
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_id TEXT;").run();
+          await env.D1.prepare(
+            "ALTER TABLE commands ADD COLUMN deployment_id TEXT;"
+          ).run();
         if (!columnNames.has("deployment_status"))
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_status TEXT;").run();
+          await env.D1.prepare(
+            "ALTER TABLE commands ADD COLUMN deployment_status TEXT;"
+          ).run();
         if (!columnNames.has("deployment_message"))
-          await env.D1.prepare("ALTER TABLE commands ADD COLUMN deployment_message TEXT;").run();
+          await env.D1.prepare(
+            "ALTER TABLE commands ADD COLUMN deployment_message TEXT;"
+          ).run();
 
         const data = await env.D1.prepare(
           "SELECT id, ts, command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message FROM commands ORDER BY ts DESC LIMIT 20"
@@ -942,14 +1127,19 @@ export default {
     }
 
     // Cloudflare zone analytics proxy (real data only)
-    if (url.pathname === "/api/analytics/overview" && request.method === "GET") {
+    if (
+      url.pathname === "/api/analytics/overview" &&
+      request.method === "GET"
+    ) {
       const hasAdmin = await hasValidAdminCookie(request, env);
       if (!hasAdmin) {
         return jsonResponse(401, { error: "Unauthorized" });
       }
       const isAdmin = await isAdminRequest(request, env);
       if (!isAdmin) {
-        return jsonResponse(401, { error: "Unauthorized. Admin access required." });
+        return jsonResponse(401, {
+          error: "Unauthorized. Admin access required.",
+        });
       }
 
       const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
@@ -1007,7 +1197,9 @@ export default {
         stripe_publishable: !!(env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC),
         stripe_secret: !!env.STRIPE_SECRET_KEY,
         paypal_client_id: !!(env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID),
-        paypal_secret: !!(env.PAYPAL_CLIENT_SECRET_PROD || env.PAYPAL_CLIENT_SECRET),
+        paypal_secret: !!(
+          env.PAYPAL_CLIENT_SECRET_PROD || env.PAYPAL_CLIENT_SECRET
+        ),
         paypal_mode: getPayPalMode(env),
         paypal_payment_links: {
           starter: !!env.PAYPAL_PAYMENT_LINK_STARTER,
@@ -1015,7 +1207,9 @@ export default {
           enterprise: !!env.PAYPAL_PAYMENT_LINK_ENTERPRISE,
           lifetime: !!env.PAYPAL_PAYMENT_LINK_LIFETIME,
         },
-        adsense_publisher: !!(env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID),
+        adsense_publisher: !!(
+          env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID
+        ),
         adsense_customer_id: !!env.ADSENSE_CUSTOMER_ID,
         adsense_mode: String(env.ADSENSE_MODE || "auto")
           .trim()
@@ -1036,8 +1230,12 @@ export default {
       }
       const since = "datetime('now','-24 hours')";
       const [commands, errors] = await Promise.all([
-        env.D1.prepare(`SELECT COUNT(*) AS count FROM commands WHERE ts > ${since}`).first(),
-        env.D1.prepare(`SELECT COUNT(*) AS count FROM errors WHERE ts > ${since}`)
+        env.D1.prepare(
+          `SELECT COUNT(*) AS count FROM commands WHERE ts > ${since}`
+        ).first(),
+        env.D1.prepare(
+          `SELECT COUNT(*) AS count FROM errors WHERE ts > ${since}`
+        )
           .first()
           .catch(() => ({ count: 0 })),
       ]);
@@ -1055,7 +1253,11 @@ export default {
       if (!env.D1) return jsonResponse(200, { ok: true });
       const id = crypto.randomUUID();
       const ua = request.headers.get("user-agent") || "unknown";
-      await env.D1.prepare("INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)").bind(id, ua).run();
+      await env.D1.prepare(
+        "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)"
+      )
+        .bind(id, ua)
+        .run();
       return jsonResponse(200, { ok: true });
     }
 
@@ -1066,22 +1268,37 @@ export default {
 
     // App Store Purchase API
     if (url.pathname === "/api/apps/purchase" && request.method === "POST") {
-      return jsonResponse(410, { error: "Deprecated. Use /api/checkout for payments." });
+      return jsonResponse(410, {
+        error: "Deprecated. Use /api/checkout for payments.",
+      });
     }
 
     // App Store Download API
-    if (url.pathname.startsWith("/api/apps/download/") && request.method === "GET") {
-      return jsonResponse(410, { error: "Deprecated. Use direct /downloads/*.zip links." });
+    if (
+      url.pathname.startsWith("/api/apps/download/") &&
+      request.method === "GET"
+    ) {
+      return jsonResponse(410, {
+        error: "Deprecated. Use direct /downloads/*.zip links.",
+      });
     }
 
     // App Store License Verification API
-    if (url.pathname === "/api/apps/verify-license" && request.method === "POST") {
+    if (
+      url.pathname === "/api/apps/verify-license" &&
+      request.method === "POST"
+    ) {
       return jsonResponse(410, { error: "Deprecated." });
     }
 
     // App Store PayPal Capture API
-    if (url.pathname === "/api/apps/paypal/capture" && request.method === "POST") {
-      return jsonResponse(410, { error: "Deprecated. Use /api/paypal/capture." });
+    if (
+      url.pathname === "/api/apps/paypal/capture" &&
+      request.method === "POST"
+    ) {
+      return jsonResponse(410, {
+        error: "Deprecated. Use /api/paypal/capture.",
+      });
     }
 
     // Orders API (D1 backed)
@@ -1110,12 +1327,22 @@ export default {
         try {
           const body = await request.clone().json();
           // generate random ID if not provided
-          const genId = "order-" + Date.now().toString(36) + Math.random().toString(36).slice(2);
+          const genId =
+            "order-" +
+            Date.now().toString(36) +
+            Math.random().toString(36).slice(2);
           const { id, product_id, amount, customer_email } = body;
           const finalId = id || genId;
 
-          await env.D1.prepare(`INSERT INTO orders (id, product_id, amount, customer_email) VALUES (?, ?, ?, ?)`)
-            .bind(finalId, product_id || "unknown", Number(amount || 0), customer_email || "")
+          await env.D1.prepare(
+            `INSERT INTO orders (id, product_id, amount, customer_email) VALUES (?, ?, ?, ?)`
+          )
+            .bind(
+              finalId,
+              product_id || "unknown",
+              Number(amount || 0),
+              customer_email || ""
+            )
             .run();
 
           return jsonResponse(200, { ok: true, id: finalId });
@@ -1129,7 +1356,9 @@ export default {
         const hasAdmin = await hasValidAdminCookie(request, env);
         if (!hasAdmin) return jsonResponse(401, { error: "Unauthorized" });
 
-        const { results } = await env.D1.prepare("SELECT * FROM orders ORDER BY ts DESC LIMIT 50").all();
+        const { results } = await env.D1.prepare(
+          "SELECT * FROM orders ORDER BY ts DESC LIMIT 50"
+        ).all();
         return jsonResponse(200, { results: results || [] });
       }
     }
@@ -1139,10 +1368,15 @@ export default {
       const hasAdmin = await hasValidAdminCookie(request, env);
       if (!hasAdmin) return jsonResponse(401, { error: "Unauthorized" });
       const isAdmin = await isAdminRequest(request, env);
-      if (!isAdmin) return jsonResponse(401, { error: "Unauthorized. Admin access required." });
+      if (!isAdmin)
+        return jsonResponse(401, {
+          error: "Unauthorized. Admin access required.",
+        });
 
       if (!env.D1) {
-        return jsonResponse(501, { error: "Sales database not configured (D1 missing)." });
+        return jsonResponse(501, {
+          error: "Sales database not configured (D1 missing).",
+        });
       }
 
       try {
@@ -1168,14 +1402,20 @@ export default {
 
         const totalOrders = Number(summary?.total_orders || 0);
         const totalAmount = Number(summary?.total_amount || 0);
-        const looksLikeCents = totalAmount > 1000 && Number.isInteger(totalAmount);
-        const totalRevenueUsd = looksLikeCents ? totalAmount / 100 : totalAmount;
+        const looksLikeCents =
+          totalAmount > 1000 && Number.isInteger(totalAmount);
+        const totalRevenueUsd = looksLikeCents
+          ? totalAmount / 100
+          : totalAmount;
 
         return jsonResponse(200, {
           total_orders: totalOrders,
           total_revenue_usd: totalRevenueUsd,
           recent_orders: (recent.results || []).map((row) => {
-            const amt = typeof row.amount === "number" ? row.amount : Number(row.amount || 0);
+            const amt =
+              typeof row.amount === "number"
+                ? row.amount
+                : Number(row.amount || 0);
             const amtLooksLikeCents = amt > 1000 && Number.isInteger(amt);
             return {
               id: row.id,
@@ -1209,7 +1449,8 @@ export default {
           .json()
           .catch(() => ({}));
         const provider = String(
-          payload?.provider || (url.pathname.includes("stripe") ? "stripe" : "paypal")
+          payload?.provider ||
+            (url.pathname.includes("stripe") ? "stripe" : "paypal")
         ).toLowerCase();
 
         // Multi-item support (basket)
@@ -1240,7 +1481,12 @@ export default {
           });
         } else {
           const targetId = String(
-            payload?.id || payload?.itemId || payload?.product || payload?.sku || payload?.productId || ""
+            payload?.id ||
+              payload?.itemId ||
+              payload?.product ||
+              payload?.sku ||
+              payload?.productId ||
+              ""
           ).trim();
           const item = findProduct(targetId);
           if (item) {
@@ -1269,65 +1515,102 @@ export default {
             } else {
               return jsonResponse(404, {
                 error: `Product not found: ${targetId}`,
-                supported: [...(catalog.products || []), ...(catalog.apps || [])].map((p) => p.id),
+                supported: [
+                  ...(catalog.products || []),
+                  ...(catalog.apps || []),
+                ].map((p) => p.id),
               });
             }
           }
         }
 
         if (normalizedItems.length === 0) {
-          return jsonResponse(400, { error: "No items provided for checkout." });
+          return jsonResponse(400, {
+            error: "No items provided for checkout.",
+          });
         }
 
         // PayPal Flow
         if (provider === "paypal") {
           const order = await createPayPalOrder(env, normalizedItems);
-          return jsonResponse(200, { id: order.id, orderId: order.id, status: order.status || "CREATED" });
+          return jsonResponse(200, {
+            id: order.id,
+            orderId: order.id,
+            status: order.status || "CREATED",
+          });
         }
 
         // Stripe Flow
         if (provider === "stripe") {
           const stripeKey = env.STRIPE_SECRET_KEY || env.STRIPE_SECRET;
-          if (!stripeKey) return jsonResponse(501, { error: "Stripe not configured" });
+          if (!stripeKey)
+            return jsonResponse(501, { error: "Stripe not configured" });
 
           const params = new URLSearchParams();
           const firstItem = normalizedItems[0];
-          const hasSubscription = normalizedItems.some((i) => i.type === "subscription");
+          const hasSubscription = normalizedItems.some(
+            (i) => i.type === "subscription"
+          );
           const mode = hasSubscription ? "subscription" : "payment";
 
           params.append("mode", mode);
           params.append(
             "success_url",
-            payload?.successUrl || `${url.origin}/store.html?checkout=success&product=${firstItem.sku}`
+            payload?.successUrl ||
+              `${url.origin}/store.html?checkout=success&product=${firstItem.sku}`
           );
-          params.append("cancel_url", payload?.cancelUrl || `${url.origin}/store.html?checkout=cancel`);
+          params.append(
+            "cancel_url",
+            payload?.cancelUrl || `${url.origin}/store.html?checkout=cancel`
+          );
 
           normalizedItems.forEach((item, idx) => {
             if (item.stripePriceId && item.stripePriceId.startsWith("price_")) {
               params.append(`line_items[${idx}][price]`, item.stripePriceId);
               params.append(`line_items[${idx}][quantity]`, "1");
             } else {
-              params.append(`line_items[${idx}][price_data][currency]`, (item.currency || "USD").toLowerCase());
-              params.append(`line_items[${idx}][price_data][product_data][name]`, item.name);
-              params.append(`line_items[${idx}][price_data][unit_amount]`, Math.round(item.price * 100));
+              params.append(
+                `line_items[${idx}][price_data][currency]`,
+                (item.currency || "USD").toLowerCase()
+              );
+              params.append(
+                `line_items[${idx}][price_data][product_data][name]`,
+                item.name
+              );
+              params.append(
+                `line_items[${idx}][price_data][unit_amount]`,
+                Math.round(item.price * 100)
+              );
               params.append(`line_items[${idx}][quantity]`, "1");
               if (item.type === "subscription") {
-                params.append(`line_items[${idx}][price_data][recurring][interval]`, "month");
+                params.append(
+                  `line_items[${idx}][price_data][recurring][interval]`,
+                  "month"
+                );
               }
             }
           });
 
-          const stRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${stripeKey}`,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: params,
-          });
+          const stRes = await fetch(
+            "https://api.stripe.com/v1/checkout/sessions",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${stripeKey}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: params,
+            }
+          );
           const data = await stRes.json();
-          if (!stRes.ok) throw new Error(data.error?.message || "Stripe session failed");
-          return jsonResponse(200, { url: data.url, sessionId: data.id, id: data.id, orderId: data.id });
+          if (!stRes.ok)
+            throw new Error(data.error?.message || "Stripe session failed");
+          return jsonResponse(200, {
+            url: data.url,
+            sessionId: data.id,
+            id: data.id,
+            orderId: data.id,
+          });
         }
 
         return jsonResponse(400, { error: "Invalid provider" });
@@ -1351,7 +1634,12 @@ export default {
         const orderId = String(payload?.orderId || "").trim();
         if (!email) return jsonResponse(400, { error: "Email required." });
 
-        const license = await issueLicenseToken(env, { email, term, plan, orderId });
+        const license = await issueLicenseToken(env, {
+          email,
+          term,
+          plan,
+          orderId,
+        });
 
         if (env.D1) {
           await env.D1.prepare(
@@ -1401,7 +1689,11 @@ export default {
                  issued_at DATETIME DEFAULT CURRENT_TIMESTAMP
                );`
             ).run();
-            const row = await env.D1.prepare("SELECT status FROM licenses WHERE id = ? LIMIT 1").bind(license).first();
+            const row = await env.D1.prepare(
+              "SELECT status FROM licenses WHERE id = ? LIMIT 1"
+            )
+              .bind(license)
+              .first();
             if (row && String(row.status || "").toLowerCase() !== "active") {
               return jsonResponse(403, { error: "License revoked." });
             }
@@ -1426,18 +1718,31 @@ export default {
           .clone()
           .json()
           .catch(() => ({}));
-        const orderId = String(payload?.orderId || payload?.orderID || payload?.id || "").trim();
+        const orderId = String(
+          payload?.orderId || payload?.orderID || payload?.id || ""
+        ).trim();
         if (!orderId) return jsonResponse(400, { error: "Missing orderId." });
 
         const capture = await capturePayPalOrder(env, orderId);
         const status = String(capture?.status || "").toLowerCase();
         const purchaseUnit = capture?.purchase_units?.[0] || {};
         const cap = purchaseUnit.payments?.captures?.[0] || {};
-        const payerEmail = String(capture?.payer?.email_address || payload?.email || "");
+        const payerEmail = String(
+          capture?.payer?.email_address || payload?.email || ""
+        );
 
-        const captureAmount = Number(cap?.amount?.value || purchaseUnit.amount?.value || 0);
-        const currency = String(cap?.amount?.currency_code || purchaseUnit.amount?.currency_code || "USD");
-        const productRef = String(purchaseUnit.custom_id || purchaseUnit.reference_id || "").trim() || "paypal:unknown";
+        const captureAmount = Number(
+          cap?.amount?.value || purchaseUnit.amount?.value || 0
+        );
+        const currency = String(
+          cap?.amount?.currency_code ||
+            purchaseUnit.amount?.currency_code ||
+            "USD"
+        );
+        const productRef =
+          String(
+            purchaseUnit.custom_id || purchaseUnit.reference_id || ""
+          ).trim() || "paypal:unknown";
 
         if (env.D1) {
           try {
@@ -1446,7 +1751,14 @@ export default {
             await env.D1.prepare(
               "INSERT OR REPLACE INTO orders (id, product_id, amount, currency, status, customer_email) VALUES (?, ?, ?, ?, ?, ?)"
             )
-              .bind(rowId, productRef, Number.isFinite(captureAmount) ? captureAmount : 0, currency, status, payerEmail)
+              .bind(
+                rowId,
+                productRef,
+                Number.isFinite(captureAmount) ? captureAmount : 0,
+                currency,
+                status,
+                payerEmail
+              )
               .run();
           } catch (err) {
             console.warn("PayPal order log failed:", err);
@@ -1454,7 +1766,10 @@ export default {
         }
 
         // Email Notification for successful capture
-        if (status === "completed" && (env.RESEND_API_KEY || env.SENDGRID_API_KEY)) {
+        if (
+          status === "completed" &&
+          (env.RESEND_API_KEY || env.SENDGRID_API_KEY)
+        ) {
           try {
             const subject = "Order Confirmation - VoiceToWebsite";
             const text = `Thank you for your purchase!\n\nOrder ID: ${orderId}\nProduct: ${productRef}\nAmount: ${currency} ${captureAmount}\n\nWe are processing your order.`;
@@ -1467,9 +1782,12 @@ export default {
                  <p>We are processing your order. If this was an app purchase, you will receive a license key shortly.</p>
                </div>
              `;
-            await sendDemoEmail(env, { to: payerEmail, subject, html, text }).catch((e) =>
-              console.warn("Email notify failed:", e)
-            );
+            await sendDemoEmail(env, {
+              to: payerEmail,
+              subject,
+              html,
+              text,
+            }).catch((e) => console.warn("Email notify failed:", e));
           } catch (err) {
             console.warn("Follow-up email logic failed:", err);
           }
@@ -1499,14 +1817,17 @@ export default {
       try {
         const mode = getPayPalMode(env);
         const webhookId = String(
-          (mode === "live" ? env.PAYPAL_WEBHOOK_ID_PROD : env.PAYPAL_WEBHOOK_ID) ||
+          (mode === "live"
+            ? env.PAYPAL_WEBHOOK_ID_PROD
+            : env.PAYPAL_WEBHOOK_ID) ||
             env.PAYPAL_WEBHOOK_ID_PROD ||
             env.PAYPAL_WEBHOOK_ID ||
             ""
         ).trim();
         if (!webhookId) {
           return jsonResponse(501, {
-            error: "PayPal webhook not configured. Set PAYPAL_WEBHOOK_ID (sandbox) or PAYPAL_WEBHOOK_ID_PROD (live).",
+            error:
+              "PayPal webhook not configured. Set PAYPAL_WEBHOOK_ID (sandbox) or PAYPAL_WEBHOOK_ID_PROD (live).",
           });
         }
 
@@ -1518,36 +1839,55 @@ export default {
           return jsonResponse(400, { error: "Invalid JSON body." });
         }
 
-        const transmissionId = request.headers.get("PAYPAL-TRANSMISSION-ID") || "";
-        const transmissionTime = request.headers.get("PAYPAL-TRANSMISSION-TIME") || "";
-        const transmissionSig = request.headers.get("PAYPAL-TRANSMISSION-SIG") || "";
+        const transmissionId =
+          request.headers.get("PAYPAL-TRANSMISSION-ID") || "";
+        const transmissionTime =
+          request.headers.get("PAYPAL-TRANSMISSION-TIME") || "";
+        const transmissionSig =
+          request.headers.get("PAYPAL-TRANSMISSION-SIG") || "";
         const certUrl = request.headers.get("PAYPAL-CERT-URL") || "";
         const authAlgo = request.headers.get("PAYPAL-AUTH-ALGO") || "";
 
-        if (!transmissionId || !transmissionTime || !transmissionSig || !certUrl || !authAlgo) {
-          return jsonResponse(400, { error: "Missing PayPal signature headers." });
+        if (
+          !transmissionId ||
+          !transmissionTime ||
+          !transmissionSig ||
+          !certUrl ||
+          !authAlgo
+        ) {
+          return jsonResponse(400, {
+            error: "Missing PayPal signature headers.",
+          });
         }
 
-        const verifyRes = await paypalApiFetch(env, "/v1/notifications/verify-webhook-signature", {
-          method: "POST",
-          body: JSON.stringify({
-            auth_algo: authAlgo,
-            cert_url: certUrl,
-            transmission_id: transmissionId,
-            transmission_sig: transmissionSig,
-            transmission_time: transmissionTime,
-            webhook_id: webhookId,
-            webhook_event: payload,
-          }),
-        });
+        const verifyRes = await paypalApiFetch(
+          env,
+          "/v1/notifications/verify-webhook-signature",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              auth_algo: authAlgo,
+              cert_url: certUrl,
+              transmission_id: transmissionId,
+              transmission_sig: transmissionSig,
+              transmission_time: transmissionTime,
+              webhook_id: webhookId,
+              webhook_event: payload,
+            }),
+          }
+        );
         const verifyData = await verifyRes.json().catch(() => ({}));
         if (!verifyRes.ok) {
           const detail =
-            verifyData?.message || verifyData?.details?.[0]?.description || "PayPal signature verify failed.";
+            verifyData?.message ||
+            verifyData?.details?.[0]?.description ||
+            "PayPal signature verify failed.";
           return jsonResponse(verifyRes.status || 500, { error: detail });
         }
 
-        const status = String(verifyData?.verification_status || "").toUpperCase();
+        const status = String(
+          verifyData?.verification_status || ""
+        ).toUpperCase();
         if (status !== "SUCCESS") {
           return jsonResponse(401, { error: "Invalid webhook signature." });
         }
@@ -1557,28 +1897,40 @@ export default {
         const resource = payload?.resource || {};
 
         const resourceId = String(resource?.id || "");
-        const resourceStatus = String(resource?.status || payload?.summary || "");
+        const resourceStatus = String(
+          resource?.status || payload?.summary || ""
+        );
         const email =
           String(
-            resource?.payer?.email_address || resource?.subscriber?.email_address || resource?.email_address || ""
+            resource?.payer?.email_address ||
+              resource?.subscriber?.email_address ||
+              resource?.email_address ||
+              ""
           ) || "";
 
         const amountValue =
           Number(resource?.amount?.value) ||
           Number(resource?.purchase_units?.[0]?.amount?.value) ||
-          Number(resource?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value) ||
+          Number(
+            resource?.purchase_units?.[0]?.payments?.captures?.[0]?.amount
+              ?.value
+          ) ||
           0;
         const currencyCode =
           String(
             resource?.amount?.currency_code ||
               resource?.purchase_units?.[0]?.amount?.currency_code ||
-              resource?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code ||
+              resource?.purchase_units?.[0]?.payments?.captures?.[0]?.amount
+                ?.currency_code ||
               "USD"
           ) || "USD";
 
         // Extract related order id for capture events where possible.
         const relatedOrderId = String(
-          resource?.supplementary_data?.related_ids?.order_id || resource?.invoice_id || resourceId || ""
+          resource?.supplementary_data?.related_ids?.order_id ||
+            resource?.invoice_id ||
+            resourceId ||
+            ""
         ).trim();
 
         // Persist minimal audit record.
@@ -1617,7 +1969,9 @@ export default {
             if (relatedOrderId) {
               await ensureOrdersTable(env);
               const rowId = `paypal:${relatedOrderId}`;
-              await env.D1.prepare("UPDATE orders SET status = ?, ts = CURRENT_TIMESTAMP WHERE id = ?")
+              await env.D1.prepare(
+                "UPDATE orders SET status = ?, ts = CURRENT_TIMESTAMP WHERE id = ?"
+              )
                 .bind(String(resourceStatus || "webhook").toLowerCase(), rowId)
                 .run();
             }
@@ -1626,7 +1980,11 @@ export default {
           }
         }
 
-        console.log("PayPal webhook verified:", eventType, resourceId || eventId);
+        console.log(
+          "PayPal webhook verified:",
+          eventType,
+          resourceId || eventId
+        );
         return jsonResponse(200, { ok: true });
       } catch (err) {
         console.error("PayPal webhook error:", err);
@@ -1640,14 +1998,20 @@ export default {
       "/admin/admin.css",
       "/admin/access-guard.js",
     ]);
-    const isAdminRoot = url.pathname === "/admin" || url.pathname === "/admin/" || url.pathname === "/admin/index.html";
+    const isAdminRoot =
+      url.pathname === "/admin" ||
+      url.pathname === "/admin/" ||
+      url.pathname === "/admin/index.html";
     if (url.pathname.startsWith("/admin/") || isAdminRoot) {
       const isPublic = ADMIN_PUBLIC_PATHS.has(url.pathname);
       if (!isPublic) {
         const hasAdmin = await hasValidAdminCookie(request, env);
         const isAdmin = hasAdmin ? await isAdminRequest(request, env) : false;
         if (!hasAdmin || !isAdmin) {
-          return Response.redirect(new URL("/admin/access.html", url.origin), 302);
+          return Response.redirect(
+            new URL("/admin/access.html", url.origin),
+            302
+          );
         }
       }
     }
@@ -1655,17 +2019,26 @@ export default {
     if (url.pathname === "/admin") {
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await assets.fetch(new Request(adminUrl, request));
-      return addSecurityHeaders(res, { cacheControl: "no-store", pragmaNoCache: true });
+      return addSecurityHeaders(res, {
+        cacheControl: "no-store",
+        pragmaNoCache: true,
+      });
     }
 
     if (url.pathname.startsWith("/admin/")) {
       const adminRes = await assets.fetch(request);
       if (adminRes.status !== 404) {
-        return addSecurityHeaders(adminRes, { cacheControl: "no-store", pragmaNoCache: true });
+        return addSecurityHeaders(adminRes, {
+          cacheControl: "no-store",
+          pragmaNoCache: true,
+        });
       }
       const adminUrl = new URL("/admin/index.html", url.origin);
       const res = await assets.fetch(new Request(adminUrl, request));
-      return addSecurityHeaders(res, { cacheControl: "no-store", pragmaNoCache: true });
+      return addSecurityHeaders(res, {
+        cacheControl: "no-store",
+        pragmaNoCache: true,
+      });
     }
 
     // Canonical storefront
@@ -1692,7 +2065,10 @@ export default {
     // Never cache global "shell" assets (nav/wave/theme). This avoids getting stuck on an older navbar
     // when Cloudflare serves a stale response during revalidation.
     if (pathname === "/nav.js" || pathname === "/styles.css") {
-      return addSecurityHeaders(assetRes, { cacheControl: "no-store", pragmaNoCache: true });
+      return addSecurityHeaders(assetRes, {
+        cacheControl: "no-store",
+        pragmaNoCache: true,
+      });
     }
     const contentType = assetRes.headers.get("Content-Type") || "";
     if (contentType.includes("text/html")) {
@@ -1741,7 +2117,8 @@ export default {
         }
       })();
       const canonicalUrl = `${url.origin}${seoPath === "/" ? "/" : seoPath}`;
-      const isAdminPage = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
+      const isAdminPage =
+        url.pathname === "/admin" || url.pathname.startsWith("/admin/");
       const isSecretPage = url.pathname.startsWith("/the3000");
       const robotsTag =
         isAdminPage || isSecretPage
@@ -1749,9 +2126,11 @@ export default {
           : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
       const defaultOgImage = `${url.origin}/vtw-wallpaper.png`;
-      const defaultDescription = "VoiceToWebsite — autonomous web engineering, deployment, and monetization.";
+      const defaultDescription =
+        "VoiceToWebsite — autonomous web engineering, deployment, and monetization.";
       const descriptionByPath = {
-        "/rush-percussion": "RUSH PERCUSSION: an interactive microgame demo from the VoiceToWebsite App Store.",
+        "/rush-percussion":
+          "RUSH PERCUSSION: an interactive microgame demo from the VoiceToWebsite App Store.",
       };
       const seoJsonLd = JSON.stringify(
         {
@@ -1782,15 +2161,25 @@ export default {
        * We also continue to support direct text replacement for HTML-embedded tokens.
        */
       const injected = text
-        .replace(/__PAYPAL_CLIENT_ID__/g, env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID || "")
-        .replace(/__STRIPE_PUBLISHABLE_KEY__/g, env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC || "")
+        .replace(
+          /__PAYPAL_CLIENT_ID__/g,
+          env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_ID || ""
+        )
+        .replace(
+          /__STRIPE_PUBLISHABLE_KEY__/g,
+          env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC || ""
+        )
         .replace(
           /__ADSENSE_PUBLISHER__/g,
-          env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID
+          env.ADSENSE_PUBLISHER ||
+            env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID ||
+            ADSENSE_CLIENT_ID
         )
         .replace(
           /ca-pub-YOUR_PUBLISHER_ID/g,
-          env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID
+          env.ADSENSE_PUBLISHER ||
+            env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID ||
+            ADSENSE_CLIENT_ID
         )
         .replace(/__ADSENSE_SLOT__/g, env.ADSENSE_SLOT || "")
         .replace("</head>", `${envInjection}</head>`); // Inject variables early
@@ -1806,19 +2195,35 @@ export default {
         .replace(/<link\b[^>]*rel=["']canonical["'][^>]*>\s*/gi, "")
         .replace(/<meta\b[^>]*name=["']robots["'][^>]*>\s*/gi, "")
         .replace(/<meta\b[^>]*property=["']og:url["'][^>]*>\s*/gi, "")
-        .replace(/<meta\b[^>]*(?:name|property)=["']twitter:url["'][^>]*>\s*/gi, "")
+        .replace(
+          /<meta\b[^>]*(?:name|property)=["']twitter:url["'][^>]*>\s*/gi,
+          ""
+        )
         .replace(
           /<script\b[^>]*type=["']application\/ld\+json["'][^>]*id=["']vtw-jsonld["'][\s\S]*?<\/script>\s*/gi,
           ""
         );
 
-      const hasOgImage = /<meta\b[^>]*property=["']og:image["']/i.test(seoInjected);
-      const hasTwitterImage = /<meta\b[^>]*(?:name|property)=["']twitter:image["']/i.test(seoInjected);
-      const hasTwitterCard = /<meta\b[^>]*(?:name|property)=["']twitter:card["']/i.test(seoInjected);
-      const hasOgType = /<meta\b[^>]*property=["']og:type["']/i.test(seoInjected);
-      const hasOgSiteName = /<meta\b[^>]*property=["']og:site_name["']/i.test(seoInjected);
-      const hasDescription = /<meta\b[^>]*name=["']description["']/i.test(seoInjected);
-      const fallbackDescription = descriptionByPath[seoPath] || defaultDescription;
+      const hasOgImage = /<meta\b[^>]*property=["']og:image["']/i.test(
+        seoInjected
+      );
+      const hasTwitterImage =
+        /<meta\b[^>]*(?:name|property)=["']twitter:image["']/i.test(
+          seoInjected
+        );
+      const hasTwitterCard =
+        /<meta\b[^>]*(?:name|property)=["']twitter:card["']/i.test(seoInjected);
+      const hasOgType = /<meta\b[^>]*property=["']og:type["']/i.test(
+        seoInjected
+      );
+      const hasOgSiteName = /<meta\b[^>]*property=["']og:site_name["']/i.test(
+        seoInjected
+      );
+      const hasDescription = /<meta\b[^>]*name=["']description["']/i.test(
+        seoInjected
+      );
+      const fallbackDescription =
+        descriptionByPath[seoPath] || defaultDescription;
 
       const seoBlock = `
         <link rel="canonical" href="${canonicalUrl}" />
@@ -1839,16 +2244,23 @@ export default {
         .replace(/<meta property="og:type" content=""\s*\/>\s*/g, "")
         .replace(/<meta property="og:site_name" content=""\s*\/>\s*/g, "");
 
-      seoInjected = seoInjected.replace("</head>", `${sanitizedSeoBlock}\n</head>`);
+      seoInjected = seoInjected.replace(
+        "</head>",
+        `${sanitizedSeoBlock}\n</head>`
+      );
 
       const adsenseMode = String(env.ADSENSE_MODE || "auto")
         .trim()
         .toLowerCase();
-      const adsenseAllowAll = String(env.ADSENSE_ALLOW_ALL_PAGES || "").trim() === "1" || adsenseMode === "auto";
+      const adsenseAllowAll =
+        String(env.ADSENSE_ALLOW_ALL_PAGES || "").trim() === "1" ||
+        adsenseMode === "auto";
 
       // In auto mode we allow global public-page loading; in slot mode we require explicit slot markup.
       const wantsAds =
-        adsenseMode === "auto" || /\badsbygoogle\b/.test(seoInjected) || seoInjected.includes("__ADSENSE_SLOT__");
+        adsenseMode === "auto" ||
+        /\badsbygoogle\b/.test(seoInjected) ||
+        seoInjected.includes("__ADSENSE_SLOT__");
       const isAdsAllowedByPath =
         normalizedPath === "/blog" ||
         normalizedPath === "/projects" ||
@@ -1858,11 +2270,23 @@ export default {
         url.pathname === "/studio3000.html";
       const isAdsAllowed = adsenseAllowAll || isAdsAllowedByPath;
 
-      const shouldInjectAdsense = wantsAds && isAdsAllowed && !isAdminPage && !isSecretPage;
+      const shouldInjectAdsense =
+        wantsAds && isAdsAllowed && !isAdminPage && !isSecretPage;
 
-      const adsensePublisher = env.ADSENSE_PUBLISHER || env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || ADSENSE_CLIENT_ID;
-      const hasAdsenseAccountMeta = /<meta\b[^>]*name=["']google-adsense-account["'][^>]*>\s*/i.test(seoInjected);
-      if (adsensePublisher && !isAdminPage && !isSecretPage && !hasAdsenseAccountMeta) {
+      const adsensePublisher =
+        env.ADSENSE_PUBLISHER ||
+        env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID ||
+        ADSENSE_CLIENT_ID;
+      const hasAdsenseAccountMeta =
+        /<meta\b[^>]*name=["']google-adsense-account["'][^>]*>\s*/i.test(
+          seoInjected
+        );
+      if (
+        adsensePublisher &&
+        !isAdminPage &&
+        !isSecretPage &&
+        !hasAdsenseAccountMeta
+      ) {
         seoInjected = seoInjected.replace(
           "</head>",
           `<meta name="google-adsense-account" content="${adsensePublisher}" />\n</head>`
@@ -1872,7 +2296,9 @@ export default {
       const adsenseScriptTag = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisher}" crossorigin="anonymous"></script>`;
 
       const withAdsense = shouldInjectAdsense
-        ? seoInjected.includes("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+        ? seoInjected.includes(
+            "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+          )
           ? seoInjected.replace(
               /pagead\/js\/adsbygoogle\.js\?client=[^"'\s>]+/g,
               `pagead/js/adsbygoogle.js?client=${adsensePublisher}`

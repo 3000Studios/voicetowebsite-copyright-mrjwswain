@@ -16,7 +16,10 @@ import { onRequestPost as handleOrchestrator } from "../../functions/orchestrato
 const mockedVerifyAdminCookieValue = vi.mocked(verifyAdminCookieValue);
 const mockedHandleOrchestrator = vi.mocked(handleOrchestrator);
 
-const makeRequest = (body: Record<string, unknown>, headers: Record<string, string> = {}) =>
+const makeRequest = (
+  body: Record<string, unknown>,
+  headers: Record<string, string> = {}
+) =>
   new Request("https://example.com/api/execute", {
     method: "POST",
     headers: {
@@ -27,7 +30,10 @@ const makeRequest = (body: Record<string, unknown>, headers: Record<string, stri
   });
 
 class InMemoryD1 {
-  private executeEvents = new Map<string, { status: number; response_json: string }>();
+  private executeEvents = new Map<
+    string,
+    { status: number; response_json: string }
+  >();
   private confirmTokens = new Map<
     string,
     {
@@ -64,19 +70,17 @@ class InMemoryD1 {
           ];
           const key = `${action}::${idempotencyKey}`;
           if (!self.executeEvents.has(key)) {
-            self.executeEvents.set(key, { status, response_json: responseJson });
+            self.executeEvents.set(key, {
+              status,
+              response_json: responseJson,
+            });
           }
           return;
         }
 
         if (sql.includes("insert or replace into execute_confirm_tokens")) {
-          const [tokenHash, action, idempotencyKey, traceId, expiresAt] = params as [
-            string,
-            string,
-            string,
-            string,
-            string,
-          ];
+          const [tokenHash, action, idempotencyKey, traceId, expiresAt] =
+            params as [string, string, string, string, string];
           self.confirmTokens.set(tokenHash, {
             token_hash: tokenHash,
             action,
@@ -89,18 +93,27 @@ class InMemoryD1 {
         }
 
         if (sql.startsWith("update execute_confirm_tokens set used_at")) {
-          const [usedAt, tokenHash, cutoff] = params as [string, string, string];
+          const [usedAt, tokenHash, cutoff] = params as [
+            string,
+            string,
+            string,
+          ];
           const row = self.confirmTokens.get(tokenHash);
           if (!row) return { changes: 0 };
           if (row.used_at) return { changes: 0 };
-          if (new Date(row.expires_at).getTime() <= new Date(cutoff).getTime()) return { changes: 0 };
+          if (new Date(row.expires_at).getTime() <= new Date(cutoff).getTime())
+            return { changes: 0 };
           row.used_at = usedAt;
           self.confirmTokens.set(tokenHash, row);
           return { changes: 1 };
         }
       },
       async first() {
-        if (sql.includes("from execute_events where action = ? and idempotency_key = ?")) {
+        if (
+          sql.includes(
+            "from execute_events where action = ? and idempotency_key = ?"
+          )
+        ) {
           const [action, idempotencyKey] = params as [string, string];
           const row = self.executeEvents.get(`${action}::${idempotencyKey}`);
           return row ? { ...row } : null;
@@ -128,21 +141,23 @@ describe("/api/execute", () => {
     lastOrchestratorPayload = null;
     vi.clearAllMocks();
     mockedVerifyAdminCookieValue.mockResolvedValue(false);
-    mockedHandleOrchestrator.mockImplementation(async ({ request }: { request: Request }) => {
-      const payload = await request.json();
-      lastOrchestratorPayload = payload;
-      return new Response(
-        JSON.stringify({
-          mode: payload.mode,
-          command: payload.command,
-          ok: true,
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    });
+    mockedHandleOrchestrator.mockImplementation(
+      async ({ request }: { request: Request }) => {
+        const payload = await request.json();
+        lastOrchestratorPayload = payload;
+        return new Response(
+          JSON.stringify({
+            mode: payload.mode,
+            command: payload.command,
+            ok: true,
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+    );
   });
 
   it("returns 401 when auth is missing", async () => {

@@ -13,7 +13,8 @@ const FALLBACK_REGEX = {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const OPENAI_API = env.OPENAI_API || env.OPENAI_API_KEY || env.OPENAI_API_KEY3;
+  const OPENAI_API =
+    env.OPENAI_API || env.OPENAI_API_KEY || env.OPENAI_API_KEY3;
   const OPENAI_MODEL = env.OPENAI_MODEL || "gpt-4o-mini";
   const WORKERS_AI = env.AI;
   const GITHUB_TOKEN =
@@ -24,10 +25,28 @@ export async function onRequestPost(context) {
     env.PERSONAL_ACCESS_TOKEN ||
     env.GITHUB_PAT;
   const GITHUB_REPO = env.GITHUB_REPO || env.GH_REPO;
-  const GITHUB_BASE_BRANCH = env.GITHUB_BASE_BRANCH || env.GH_BASE_BRANCH || "main";
+  const GITHUB_BASE_BRANCH =
+    env.GITHUB_BASE_BRANCH || env.GH_BASE_BRANCH || "main";
   const ADMIN_ROLE = env.ADMIN_ROLE;
-  const allowedFields = ["eyebrow", "headline", "subhead", "cta", "price", "metric1", "metric2", "metric3"];
-  const positiveWords = ["apply now", "ship it", "go ahead", "do it", "yes", "confirm", "send it"];
+  const allowedFields = [
+    "eyebrow",
+    "headline",
+    "subhead",
+    "cta",
+    "price",
+    "metric1",
+    "metric2",
+    "metric3",
+  ];
+  const positiveWords = [
+    "apply now",
+    "ship it",
+    "go ahead",
+    "do it",
+    "yes",
+    "confirm",
+    "send it",
+  ];
   const toSafeJsString = (v) => v.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   const extractJson = (text) => {
     const trimmed = text.trim();
@@ -75,7 +94,8 @@ export async function onRequestPost(context) {
     };
     const urlMatch = command.match(FALLBACK_REGEX.url);
     const url = urlMatch ? urlMatch[0] : "";
-    const sayMatch = command.match(FALLBACK_REGEX.say) || command.match(FALLBACK_REGEX.sayAlt);
+    const sayMatch =
+      command.match(FALLBACK_REGEX.say) || command.match(FALLBACK_REGEX.sayAlt);
     const headlineMatch = command.match(FALLBACK_REGEX.headline);
     const subheadMatch = command.match(FALLBACK_REGEX.subhead);
     const ctaMatch = command.match(FALLBACK_REGEX.cta);
@@ -131,22 +151,47 @@ export async function onRequestPost(context) {
       actions.push({ type: "update_theme", theme: themeMatch[1] });
     }
     if (text.includes("background video") && url) {
-      actions.push(withPageScope({ type: "update_background_video", src: url }));
+      actions.push(
+        withPageScope({ type: "update_background_video", src: url })
+      );
     }
-    if ((text.includes("wallpaper") || text.includes("background image")) && url) {
+    if (
+      (text.includes("wallpaper") || text.includes("background image")) &&
+      url
+    ) {
       actions.push({ type: "update_wallpaper", src: url });
     }
     if (text.includes("avatar") && url) {
       actions.push(withPageScope({ type: "update_avatar", src: url }));
     }
     if ((text.includes("video") || text.includes("music video")) && url) {
-      actions.push(withPageScope({ type: "insert_video", src: url, title: "Featured Video" }));
+      actions.push(
+        withPageScope({
+          type: "insert_video",
+          src: url,
+          title: "Featured Video",
+        })
+      );
     }
-    if ((text.includes("image") || text.includes("picture") || text.includes("photo")) && url) {
-      actions.push(withPageScope({ type: "insert_image", src: url, title: "Featured Image", alt: "Featured image" }));
+    if (
+      (text.includes("image") ||
+        text.includes("picture") ||
+        text.includes("photo")) &&
+      url
+    ) {
+      actions.push(
+        withPageScope({
+          type: "insert_image",
+          src: url,
+          title: "Featured Image",
+          alt: "Featured image",
+        })
+      );
     }
     if ((text.includes("livestream") || text.includes("stream")) && url) {
-      actions.push(withPageScope({ type: "insert_stream", url, title: "Live Stream" }));
+      actions.push(
+        withPageScope({ type: "insert_stream", url, title: "Live Stream" })
+      );
     }
     if (text.includes("add page")) {
       const name = command.replace(/.*add page/i, "").trim();
@@ -190,13 +235,19 @@ export async function onRequestPost(context) {
   const SITE_CONFIG = "src/site-config.json";
   const DEFAULT_STYLE_FILE = "styles.css";
   const PAGE_HINT_TO_HTML = [
-    { regex: /\bapp\s*store\b|\bappstore\b|appstore\.html/i, html: "appstore.html" },
+    {
+      regex: /\bapp\s*store\b|\bappstore\b|appstore\.html/i,
+      html: "appstore.html",
+    },
     { regex: /\bstore page\b|\bstore\b|store\.html/i, html: "store.html" },
     { regex: /\bpricing\b|pricing\.html/i, html: "pricing.html" },
     { regex: /\bfeatures\b|features\.html/i, html: "features.html" },
     { regex: /\bblog\b|blog\.html/i, html: "blog.html" },
     { regex: /\bprojects\b|projects\.html/i, html: "projects.html" },
-    { regex: /\blive\s*stream\b|\blivestream\b|livestream\.html/i, html: "livestream.html" },
+    {
+      regex: /\blive\s*stream\b|\blivestream\b|livestream\.html/i,
+      html: "livestream.html",
+    },
     { regex: /\bsupport\b|support\.html/i, html: "support.html" },
     { regex: /\bcontact\b|contact\.html/i, html: "contact.html" },
   ];
@@ -206,7 +257,17 @@ export async function onRequestPost(context) {
       .toLowerCase()
       .replace(/^\/+/, "");
     if (!normalized) return "";
-    if (["all", "*", "all-pages", "all_pages", "every-page", "every_page"].includes(normalized)) return "";
+    if (
+      [
+        "all",
+        "*",
+        "all-pages",
+        "all_pages",
+        "every-page",
+        "every_page",
+      ].includes(normalized)
+    )
+      return "";
     if (!normalized.endsWith(".html")) normalized = `${normalized}.html`;
     if (normalized === "all.html" || normalized === "*.html") return "";
     if (!/^[a-z0-9-]+\.html$/.test(normalized)) return "";
@@ -222,7 +283,11 @@ export async function onRequestPost(context) {
     if (!normalized.endsWith(".css")) return "";
     if (!/^[a-z0-9/_-]+\.css$/.test(normalized)) return "";
     if (normalized.includes("..")) return "";
-    if (normalized.startsWith("admin/") || normalized.startsWith("functions/") || normalized.startsWith("api/")) {
+    if (
+      normalized.startsWith("admin/") ||
+      normalized.startsWith("functions/") ||
+      normalized.startsWith("api/")
+    ) {
       return "";
     }
     return normalized;
@@ -243,7 +308,8 @@ export async function onRequestPost(context) {
     }
     return SITE_HTML;
   };
-  const commandTargetsAllPages = (command) => /\b(all|every)\s+pages?\b/i.test(String(command || ""));
+  const commandTargetsAllPages = (command) =>
+    /\b(all|every)\s+pages?\b/i.test(String(command || ""));
   const resolveActionHtmlHint = (action, siteHtmlPath = SITE_HTML) => {
     const requested = action?.page ?? action?.path ?? "";
     const normalized = sanitizeSiteHtmlPath(requested);
@@ -257,7 +323,8 @@ export async function onRequestPost(context) {
     if (fromFile) return fromFile;
     return DEFAULT_STYLE_FILE;
   };
-  const PLAN_SCHEMA_PROMPT = `You are a site editor for a static HTML/CSS/JS site.
+  const PLAN_SCHEMA_PROMPT =
+    `You are a site editor for a static HTML/CSS/JS site.
 Return ONLY valid JSON with this schema:
 {
   "summary": "short summary",
@@ -403,16 +470,30 @@ Rules:
     ) {
       files.add(actionHtmlPath);
     }
-    const actionCssPath = sanitizeStylePath(action?.file || action?.styleFile || "");
-    if (target !== "sandbox" && actionCssPath && ["inject_css", "update_wallpaper"].includes(action.type)) {
+    const actionCssPath = sanitizeStylePath(
+      action?.file || action?.styleFile || ""
+    );
+    if (
+      target !== "sandbox" &&
+      actionCssPath &&
+      ["inject_css", "update_wallpaper"].includes(action.type)
+    ) {
       files.add(actionCssPath);
     }
     if (action.type === "add_page" && action.slug) {
       files.add(`${action.slug}.html`);
     }
     const sections = [];
-    if (action.type === "update_copy" && action.field) sections.push(action.field);
-    if (["insert_section", "insert_video", "insert_image", "insert_stream"].includes(action.type)) {
+    if (action.type === "update_copy" && action.field)
+      sections.push(action.field);
+    if (
+      [
+        "insert_section",
+        "insert_video",
+        "insert_image",
+        "insert_stream",
+      ].includes(action.type)
+    ) {
       sections.push(action.id || action.title || action.type);
     }
     if (action.type === "insert_monetization") sections.push("monetization");
@@ -437,10 +518,16 @@ Rules:
         summary: previewText,
         files: actionScope.files,
       });
-      const fileTargets = actionScope.files.length ? actionScope.files.join(", ") : "(no file changes)";
+      const fileTargets = actionScope.files.length
+        ? actionScope.files.join(", ")
+        : "(no file changes)";
       diffLines.push(`+ ${fileTargets}: ${previewText}`);
     });
-    const safetyLevel = requiresConfirmation ? "high" : actions.length ? "medium" : "low";
+    const safetyLevel = requiresConfirmation
+      ? "high"
+      : actions.length
+        ? "medium"
+        : "low";
     const safetyRationale = requiresConfirmation
       ? "Structural/layout changes detected; explicit confirmation required."
       : "Content or configuration update.";
@@ -463,7 +550,8 @@ Rules:
     };
   };
   const githubRequest = async (path, options = {}) => {
-    if (!GITHUB_TOKEN || !GITHUB_REPO) throw new Error("Missing GITHUB_TOKEN or GITHUB_REPO.");
+    if (!GITHUB_TOKEN || !GITHUB_REPO)
+      throw new Error("Missing GITHUB_TOKEN or GITHUB_REPO.");
     const res = await fetch(`https://api.github.com${path}`, {
       ...options,
       headers: {
@@ -563,7 +651,9 @@ Rules:
     return { owner, repo };
   };
   const getAllPagesHtmlLimit = () => {
-    const raw = String(env.ORCH_MAX_ALL_PAGES_HTML || env.ORCH_MAX_ALL_PAGES_FILES || "").trim();
+    const raw = String(
+      env.ORCH_MAX_ALL_PAGES_HTML || env.ORCH_MAX_ALL_PAGES_FILES || ""
+    ).trim();
     const n = raw ? Number(raw) : 10;
     if (!Number.isFinite(n) || n <= 0) return 10;
     // Keep below typical Worker subrequest limits to avoid platform errors.
@@ -577,7 +667,9 @@ Rules:
       `/repos/${owner}/${repo}/contents?ref=${encodeURIComponent(ref || GITHUB_BASE_BRANCH)}`
     );
     const files = (Array.isArray(data) ? data : [])
-      .filter((entry) => entry?.type === "file" && /\.html$/i.test(entry.name || ""))
+      .filter(
+        (entry) => entry?.type === "file" && /\.html$/i.test(entry.name || "")
+      )
       .map((entry) => String(entry.name || "").toLowerCase())
       .filter((name) => name !== SANDBOX_HTML)
       .sort();
@@ -586,12 +678,16 @@ Rules:
   };
   const getHeadCommitSha = async () => {
     const { owner, repo } = getRepoParts();
-    const baseRef = await githubRequest(`/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`);
+    const baseRef = await githubRequest(
+      `/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`
+    );
     return baseRef?.object?.sha || "";
   };
   const getFileContent = async (path, ref) => {
     const { owner, repo } = getRepoParts();
-    const data = await githubRequest(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${ref}`);
+    const data = await githubRequest(
+      `/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${ref}`
+    );
     return decodeBase64Utf8(data.content);
   };
   const updateAppState = (content, field, value) => {
@@ -600,11 +696,15 @@ Rules:
     const pattern = new RegExp(`${field}:\\s*'[^']*'`);
     return content.replace(pattern, `${field}: '${safeValue}'`);
   };
-  const escapeHtml = (value) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const escapeHtml = (value) =>
+    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const updateElementById = (content, id, value) => {
     if (!value) return content;
     const safeValue = escapeHtml(value).replace(/\n/g, "<br />");
-    const pattern = new RegExp(`(<[^>]*id=["']${id}["'][^>]*>)([\\s\\S]*?)(</[^>]+>)`, "i");
+    const pattern = new RegExp(
+      `(<[^>]*id=["']${id}["'][^>]*>)([\\s\\S]*?)(</[^>]+>)`,
+      "i"
+    );
     if (!pattern.test(content)) return content;
     return content.replace(pattern, `$1${safeValue}$3`);
   };
@@ -616,7 +716,10 @@ Rules:
     const t = String(theme || "").trim();
     if (!t) return content;
     if (/<html[^>]*\bdata-theme=/i.test(content)) {
-      return content.replace(/(<html[^>]*\bdata-theme=["'])([^"']*)(["'])/i, `$1${t}$3`);
+      return content.replace(
+        /(<html[^>]*\bdata-theme=["'])([^"']*)(["'])/i,
+        `$1${t}$3`
+      );
     }
     return content.replace(/<html(\s[^>]*)?>/i, (match) => {
       if (match.includes("data-theme")) return match;
@@ -629,18 +732,25 @@ Rules:
     if (content.includes('id="vtw-sandbox-injected"')) {
       return content.replace(
         /<style\b[^>]*id=["']vtw-sandbox-injected["'][^>]*>([\s\S]*?)<\/style>/i,
-        (_m, existing) => `<style id="vtw-sandbox-injected">\n${existing}\n${safe}\n</style>`
+        (_m, existing) =>
+          `<style id="vtw-sandbox-injected">\n${existing}\n${safe}\n</style>`
       );
     }
     if (content.includes("</head>")) {
-      return content.replace("</head>", `<style id="vtw-sandbox-injected">\n${safe}\n</style>\n</head>`);
+      return content.replace(
+        "</head>",
+        `<style id="vtw-sandbox-injected">\n${safe}\n</style>\n</head>`
+      );
     }
     return `${content}\n<style id="vtw-sandbox-injected">\n${safe}\n</style>\n`;
   };
   const updateMeta = (content, title, description) => {
     let updated = content;
     if (title) {
-      updated = updated.replace(/<title>.*<\/title>/, `<title>${title}</title>`);
+      updated = updated.replace(
+        /<title>.*<\/title>/,
+        `<title>${title}</title>`
+      );
     }
     if (description) {
       updated = updated.replace(
@@ -658,7 +768,10 @@ Rules:
   const addFooterLink = (content, slug, title) => {
     const link = `<a href="${slug}.html">${title}</a>`;
     if (content.includes(link)) return content;
-    return content.replace("</div>\n  </footer>", `  ${link}\n    </div>\n  </footer>`);
+    return content.replace(
+      "</div>\n  </footer>",
+      `  ${link}\n    </div>\n  </footer>`
+    );
   };
   const insertMonetization = (content, headline, description, cta) => {
     if (content.includes('id="monetization"')) return content;
@@ -671,23 +784,33 @@ Rules:
   };
   const updateBackgroundVideo = (content, src) => {
     if (!src) return content;
-    return content.replace(/<video[^>]*src="[^"]*"[^>]*>/, (match) => match.replace(/src="[^"]*"/, `src="${src}"`));
+    return content.replace(/<video[^>]*src="[^"]*"[^>]*>/, (match) =>
+      match.replace(/src="[^"]*"/, `src="${src}"`)
+    );
   };
   const updateWallpaper = (stylesContent, src) => {
     if (!src) return stylesContent;
     if (stylesContent.includes("background-image: url(")) {
-      return stylesContent.replace(/background-image:\s*url\([^)]*\)/, `background-image: url("${src}")`);
+      return stylesContent.replace(
+        /background-image:\s*url\([^)]*\)/,
+        `background-image: url("${src}")`
+      );
     }
     return `${stylesContent}\nbody { background-image: url("${src}"); background-size: cover; background-repeat: no-repeat; }\n`;
   };
   const updateAvatar = (content, src) => {
     if (!src) return content;
-    return content.replace(/<div class="avatar"[^>]*>\s*<img[^>]*src="[^"]*"/, (match) =>
-      match.replace(/src="[^"]*"/, `src="${src}"`)
+    return content.replace(
+      /<div class="avatar"[^>]*>\s*<img[^>]*src="[^"]*"/,
+      (match) => match.replace(/src="[^"]*"/, `src="${src}"`)
     );
   };
   const insertSection = (content, section) => {
-    const { id = "custom-block", title = "New Section", body = "Details here." } = section;
+    const {
+      id = "custom-block",
+      title = "New Section",
+      body = "Details here.",
+    } = section;
     const block = `    <section class="section custom-block" id="${id}">      <h2>${title}</h2>      <p>${body}</p>    </section>`;
     if (content.includes(`id="${id}"`)) return content;
     return content.replace("</main>", `${block}\n  </main>`);
@@ -698,19 +821,38 @@ Rules:
     return content.replace("</main>", `${block}\n  </main>`);
   };
   const addProductCard = (content, product) => {
-    const { name = "New Product", price = "", description = "", image = "" } = product;
+    const {
+      name = "New Product",
+      price = "",
+      description = "",
+      image = "",
+    } = product;
     const card = `        <div class="product-card">          <div class="product-media" style="background-image:url('${image}')"></div>          <h3>${name}</h3>          <p>${description}</p>          <strong>${price}</strong>          <button class="primary">Buy</button>        </div>`;
     if (!content.includes('class="store-grid"')) return content;
-    return content.replace("</div>\n    </section>", `${card}\n      </div>\n    </section>`);
+    return content.replace(
+      "</div>\n    </section>",
+      `${card}\n      </div>\n    </section>`
+    );
   };
   const insertVideoSection = (content, video) => {
-    const { id = "video-block", title = "Featured Video", src = "", poster = "" } = video;
+    const {
+      id = "video-block",
+      title = "Featured Video",
+      src = "",
+      poster = "",
+    } = video;
     const block = `    <section class="section video-block" id="${id}">      <h2>${title}</h2>      <video controls playsinline ${poster ? `poster="${poster}"` : ""} style="width:100%;border-radius:16px;">        <source src="${src}" type="video/mp4" />        Your browser does not support the video tag.      </video>    </section>`;
     if (content.includes(`id="${id}"`)) return content;
     return content.replace("</main>", `${block}\n  </main>`);
   };
   const insertImageSection = (content, image) => {
-    const { id = "image-block", title = "Featured Image", src = "", alt = title, caption = "" } = image;
+    const {
+      id = "image-block",
+      title = "Featured Image",
+      src = "",
+      alt = title,
+      caption = "",
+    } = image;
     if (!src) return content;
     const block = `    <section class="section image-block" id="${id}">      <h2>${title}</h2>      <figure>        <img src="${src}" alt="${alt}" loading="lazy" style="width:100%;border-radius:16px;" />        ${caption ? `<figcaption>${caption}</figcaption>` : ""}      </figure>    </section>`;
     if (content.includes(`id="${id}"`)) return content;
@@ -733,9 +875,13 @@ Rules:
   };
   const createCommitOnMain = async (updates, message) => {
     const { owner, repo } = getRepoParts();
-    const baseRef = await githubRequest(`/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`);
+    const baseRef = await githubRequest(
+      `/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`
+    );
     const baseCommitSha = baseRef.object.sha;
-    const baseCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits/${baseCommitSha}`);
+    const baseCommit = await githubRequest(
+      `/repos/${owner}/${repo}/git/commits/${baseCommitSha}`
+    );
     const baseTreeSha = baseCommit.tree.sha;
     const entries = Object.entries(updates);
     const blobs = await Promise.all(
@@ -756,43 +902,68 @@ Rules:
       method: "POST",
       body: JSON.stringify({ base_tree: baseTreeSha, tree: treeItems }),
     });
-    const newCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits`, {
-      method: "POST",
-      body: JSON.stringify({
-        message,
-        tree: newTree.sha,
-        parents: [baseCommitSha],
-      }),
-    });
-    await githubRequest(`/repos/${owner}/${repo}/git/refs/heads/${GITHUB_BASE_BRANCH}`, {
-      method: "PATCH",
-      body: JSON.stringify({ sha: newCommit.sha }),
-    });
+    const newCommit = await githubRequest(
+      `/repos/${owner}/${repo}/git/commits`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          message,
+          tree: newTree.sha,
+          parents: [baseCommitSha],
+        }),
+      }
+    );
+    await githubRequest(
+      `/repos/${owner}/${repo}/git/refs/heads/${GITHUB_BASE_BRANCH}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ sha: newCommit.sha }),
+      }
+    );
     return { commitSha: newCommit.sha };
   };
   const revertLastCommit = async () => {
     const { owner, repo } = getRepoParts();
-    const headRef = await githubRequest(`/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`);
+    const headRef = await githubRequest(
+      `/repos/${owner}/${repo}/git/ref/heads/${GITHUB_BASE_BRANCH}`
+    );
     const headSha = headRef.object.sha;
-    const headCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits/${headSha}`);
+    const headCommit = await githubRequest(
+      `/repos/${owner}/${repo}/git/commits/${headSha}`
+    );
     const parentSha = headCommit.parents?.[0]?.sha;
     if (!parentSha) throw new Error("No parent commit to revert to.");
-    const parentCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits/${parentSha}`);
-    const revertCommit = await githubRequest(`/repos/${owner}/${repo}/git/commits`, {
-      method: "POST",
-      body: JSON.stringify({
-        message: `Revert: ${headCommit.message || "latest deploy"}`,
-        tree: parentCommit.tree.sha,
-        parents: [headSha],
-      }),
-    });
-    await githubRequest(`/repos/${owner}/${repo}/git/refs/heads/${GITHUB_BASE_BRANCH}`, {
-      method: "PATCH",
-      body: JSON.stringify({ sha: revertCommit.sha }),
-    });
+    const parentCommit = await githubRequest(
+      `/repos/${owner}/${repo}/git/commits/${parentSha}`
+    );
+    const revertCommit = await githubRequest(
+      `/repos/${owner}/${repo}/git/commits`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          message: `Revert: ${headCommit.message || "latest deploy"}`,
+          tree: parentCommit.tree.sha,
+          parents: [headSha],
+        }),
+      }
+    );
+    await githubRequest(
+      `/repos/${owner}/${repo}/git/refs/heads/${GITHUB_BASE_BRANCH}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ sha: revertCommit.sha }),
+      }
+    );
     return { revertedTo: parentSha, revertCommit: revertCommit.sha };
   };
-  const logToDB = async ({ command, actions, files, commit, intent, deployment }) => {
+  const logToDB = async ({
+    command,
+    actions,
+    files,
+    commit,
+    intent,
+    deployment,
+  }) => {
     const db = env.D1 || env.DB;
     if (!db) return;
     try {
@@ -816,11 +987,17 @@ Rules:
     }
   };
   const triggerDeployment = async (commitSha, intent) => {
-    const allowLegacyHooks = String(env.CF_ALLOW_LEGACY_DEPLOY_HOOKS || "").trim() === "1";
-    const legacyHookUrl = allowLegacyHooks ? env.Webhook || env.VOICETOWEBSITE_HOOK : "";
-    const hookUrl = env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK || legacyHookUrl;
+    const allowLegacyHooks =
+      String(env.CF_ALLOW_LEGACY_DEPLOY_HOOKS || "").trim() === "1";
+    const legacyHookUrl = allowLegacyHooks
+      ? env.Webhook || env.VOICETOWEBSITE_HOOK
+      : "";
+    const hookUrl =
+      env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK || legacyHookUrl;
     const autoDeployOnPush =
-      String(env.CF_WORKERS_BUILDS_AUTO_DEPLOY || env.CF_AUTO_DEPLOY_ON_PUSH || "")
+      String(
+        env.CF_WORKERS_BUILDS_AUTO_DEPLOY || env.CF_AUTO_DEPLOY_ON_PUSH || ""
+      )
         .trim()
         .toLowerCase() === "1";
     if (!hookUrl) {
@@ -834,7 +1011,8 @@ Rules:
       return {
         status: "skipped",
         deploymentId: "",
-        message: "No deploy hook configured. Configure CF_DEPLOY_HOOK_URL or enable Workers Builds auto-deploy.",
+        message:
+          "No deploy hook configured. Configure CF_DEPLOY_HOOK_URL or enable Workers Builds auto-deploy.",
       };
     }
     try {
@@ -847,7 +1025,8 @@ Rules:
       let deploymentId = "";
       try {
         const parsed = text ? JSON.parse(text) : {};
-        deploymentId = parsed?.id || parsed?.deploymentId || parsed?.deployment_id || "";
+        deploymentId =
+          parsed?.id || parsed?.deploymentId || parsed?.deployment_id || "";
       } catch (_) {
         deploymentId = res.headers.get("cf-ray") || "";
       }
@@ -860,11 +1039,19 @@ Rules:
       return { status: "failed", deploymentId: "", message: err.message };
     }
   };
-  const applyActions = async (actions, command, intent, target, siteHtmlPath = SITE_HTML) => {
+  const applyActions = async (
+    actions,
+    command,
+    intent,
+    target,
+    siteHtmlPath = SITE_HTML
+  ) => {
     if (target === "sandbox") {
       for (const action of actions || []) {
         if (!SANDBOX_ALLOWED_ACTIONS.has(action?.type)) {
-          throw new Error(`Action not allowed in sandbox mode: ${action?.type}`);
+          throw new Error(
+            `Action not allowed in sandbox mode: ${action?.type}`
+          );
         }
       }
     }
@@ -891,7 +1078,8 @@ Rules:
     let siteConfig = null;
     let siteConfigLoaded = false;
     let allSiteHtmlFiles = null;
-    const expandToAllPagesByCommand = target !== "sandbox" && commandTargetsAllPages(command);
+    const expandToAllPagesByCommand =
+      target !== "sandbox" && commandTargetsAllPages(command);
 
     const listAllSiteHtmlFiles = async () => {
       if (allSiteHtmlFiles) return allSiteHtmlFiles;
@@ -918,7 +1106,10 @@ Rules:
       const normalized = sanitizeSiteHtmlPath(path);
       if (!normalized) throw new Error(`Invalid HTML path: ${path}`);
       if (!htmlCache.has(normalized)) {
-        htmlCache.set(normalized, await getFileContent(normalized, GITHUB_BASE_BRANCH));
+        htmlCache.set(
+          normalized,
+          await getFileContent(normalized, GITHUB_BASE_BRANCH)
+        );
       }
       return htmlCache.get(normalized);
     };
@@ -932,7 +1123,10 @@ Rules:
     const loadStyles = async (path) => {
       const normalized = sanitizeStylePath(path) || DEFAULT_STYLE_FILE;
       if (!styleCache.has(normalized)) {
-        styleCache.set(normalized, await getFileContent(normalized, GITHUB_BASE_BRANCH));
+        styleCache.set(
+          normalized,
+          await getFileContent(normalized, GITHUB_BASE_BRANCH)
+        );
       }
       return styleCache.get(normalized);
     };
@@ -944,7 +1138,9 @@ Rules:
 
     const loadSiteConfig = async () => {
       if (siteConfigLoaded) return siteConfig;
-      siteConfig = JSON.parse(await getFileContent(SITE_CONFIG, GITHUB_BASE_BRANCH));
+      siteConfig = JSON.parse(
+        await getFileContent(SITE_CONFIG, GITHUB_BASE_BRANCH)
+      );
       siteConfigLoaded = true;
       return siteConfig;
     };
@@ -952,7 +1148,8 @@ Rules:
     const actionWantsAllPages = (action) => {
       if (target === "sandbox") return false;
       if (action?.allPages === true) return true;
-      if (isAllPagesValue(action?.page) || isAllPagesValue(action?.path)) return true;
+      if (isAllPagesValue(action?.page) || isAllPagesValue(action?.path))
+        return true;
       if (
         isAllPagesValue(action?.file) &&
         String(action?.file || "")
@@ -960,7 +1157,13 @@ Rules:
           .endsWith(".html")
       )
         return true;
-      if (expandToAllPagesByCommand && !action?.page && !action?.path && !action?.file) return true;
+      if (
+        expandToAllPagesByCommand &&
+        !action?.page &&
+        !action?.path &&
+        !action?.file
+      )
+        return true;
       return false;
     };
 
@@ -971,7 +1174,10 @@ Rules:
         return listAllSiteHtmlFiles();
       }
       const fileHint = String(action?.file || "");
-      const pageHint = action?.page ?? action?.path ?? (fileHint.toLowerCase().endsWith(".html") ? fileHint : "");
+      const pageHint =
+        action?.page ??
+        action?.path ??
+        (fileHint.toLowerCase().endsWith(".html") ? fileHint : "");
       const explicit = sanitizeSiteHtmlPath(pageHint);
       if (explicit) return [explicit];
       return [siteHtmlPath];
@@ -990,7 +1196,11 @@ Rules:
           html = updateElementById(html, action.field, action.value || "");
           saveHtml(htmlPath, html);
         }
-        if (target !== "sandbox" && action.field && allowedFields.includes(action.field)) {
+        if (
+          target !== "sandbox" &&
+          action.field &&
+          allowedFields.includes(action.field)
+        ) {
           const config = await loadSiteConfig();
           config.copy = config.copy || {};
           config.copy[action.field] = String(action.value || "");
@@ -1003,7 +1213,13 @@ Rules:
           config.theme = config.theme || {};
           config.theme.default = action.theme;
         }
-        if (target === "sandbox" || action?.page || action?.path || action?.allPages || expandToAllPagesByCommand) {
+        if (
+          target === "sandbox" ||
+          action?.page ||
+          action?.path ||
+          action?.allPages ||
+          expandToAllPagesByCommand
+        ) {
           const htmlTargets = await resolveActionHtmlTargets(action);
           await Promise.all(htmlTargets.map((path) => loadHtml(path)));
           for (const htmlPath of htmlTargets) {
@@ -1057,7 +1273,8 @@ Rules:
           html = insertMonetization(
             html,
             action.headline || "Monetize this page",
-            action.description || "Add a revenue block to capture leads or offers.",
+            action.description ||
+              "Add a revenue block to capture leads or offers.",
             action.cta || "Get the offer"
           );
           saveHtml(htmlPath, html);
@@ -1158,9 +1375,15 @@ Rules:
             saveHtml(htmlPath, html);
           }
         } else {
-          const explicitCssFile = sanitizeStylePath(action?.file || action?.styleFile || "");
+          const explicitCssFile = sanitizeStylePath(
+            action?.file || action?.styleFile || ""
+          );
           const pageScoped =
-            !explicitCssFile && (action?.page || action?.path || action?.allPages || expandToAllPagesByCommand);
+            !explicitCssFile &&
+            (action?.page ||
+              action?.path ||
+              action?.allPages ||
+              expandToAllPagesByCommand);
           if (pageScoped) {
             const htmlTargets = await resolveActionHtmlTargets(action);
             await Promise.all(htmlTargets.map((path) => loadHtml(path)));
@@ -1243,7 +1466,10 @@ Rules:
         payload?.parameters?.file ||
         ""
     ).trim();
-    const siteHtmlPath = target === "sandbox" ? SANDBOX_HTML : resolveSiteHtmlPath(command, requestedPath);
+    const siteHtmlPath =
+      target === "sandbox"
+        ? SANDBOX_HTML
+        : resolveSiteHtmlPath(command, requestedPath);
     if (mode === "rollback_last") {
       const result = await revertLastCommit();
       const deployment = await triggerDeployment(result.revertCommit, {
@@ -1269,7 +1495,8 @@ Rules:
       throw new Error("Missing command.");
     }
     if (mode === "deploy") {
-      const commitSha = String(payload.commitSha || "").trim() || (await getHeadCommitSha());
+      const commitSha =
+        String(payload.commitSha || "").trim() || (await getHeadCommitSha());
       if (!commitSha) {
         throw new Error("Unable to determine commit SHA for deployment.");
       }
@@ -1286,23 +1513,29 @@ Rules:
         intent: { mode: "deploy", target },
         deployment,
       });
-      return new Response(JSON.stringify({ mode, target, commitSha, deployment }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ mode, target, commitSha, deployment }),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
     let plan = payload.plan;
     if (!plan) {
       if (!OPENAI_API && WORKERS_AI) {
         try {
           const systemPrompt = PLAN_SCHEMA_PROMPT;
-          const result = await WORKERS_AI.run("@cf/meta/llama-3.1-8b-instruct", {
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: command },
-            ],
-            temperature: 0.2,
-            max_tokens: 900,
-          });
+          const result = await WORKERS_AI.run(
+            "@cf/meta/llama-3.1-8b-instruct",
+            {
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: command },
+              ],
+              temperature: 0.2,
+              max_tokens: 900,
+            }
+          );
           plan = extractJson(pickAiText(result));
         } catch (err) {
           const fallback = buildFallbackPlan(command);
@@ -1311,24 +1544,27 @@ Rules:
         }
       } else if (OPENAI_API) {
         try {
-          const res = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${OPENAI_API}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: OPENAI_MODEL,
-              messages: [
-                {
-                  role: "system",
-                  content: PLAN_SCHEMA_PROMPT,
-                },
-                { role: "user", content: command },
-              ],
-              temperature: 0.2,
-            }),
-          });
+          const res = await fetch(
+            "https://api.openai.com/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${OPENAI_API}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: OPENAI_MODEL,
+                messages: [
+                  {
+                    role: "system",
+                    content: PLAN_SCHEMA_PROMPT,
+                  },
+                  { role: "user", content: command },
+                ],
+                temperature: 0.2,
+              }),
+            }
+          );
           const raw = await res.text();
           if (!res.ok) {
             throw new Error(`OpenAI error ${res.status}: ${raw}`);
@@ -1347,7 +1583,9 @@ Rules:
       } else {
         const fallback = buildFallbackPlan(command);
         if (!fallback.actions.length) {
-          throw new Error('No AI configured. Bind Workers AI (wrangler.toml [ai] binding = "AI") or set OPENAI_API.');
+          throw new Error(
+            'No AI configured. Bind Workers AI (wrangler.toml [ai] binding = "AI") or set OPENAI_API.'
+          );
         }
         plan = fallback;
       }
@@ -1360,18 +1598,36 @@ Rules:
       });
     }
     const actions = plan.actions || [];
-    if (intent?.confirmation?.required && payload.confirmation !== intent.confirmation.phrase) {
-      throw new Error(`Confirmation required. Send confirmation phrase: ${intent.confirmation.phrase}`);
+    if (
+      intent?.confirmation?.required &&
+      payload.confirmation !== intent.confirmation.phrase
+    ) {
+      throw new Error(
+        `Confirmation required. Send confirmation phrase: ${intent.confirmation.phrase}`
+      );
     }
-    const applied = await applyActions(actions, command, intent, target, siteHtmlPath);
-    return new Response(JSON.stringify({ mode, command, target, plan, ...applied }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    const applied = await applyActions(
+      actions,
+      command,
+      intent,
+      target,
+      siteHtmlPath
+    );
+    return new Response(
+      JSON.stringify({ mode, command, target, plan, ...applied }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (err) {
     const message = err?.message || String(err);
     const lower = message.toLowerCase();
     let status = 500;
-    if (lower.includes("missing command") || lower.includes("confirmation required")) status = 400;
+    if (
+      lower.includes("missing command") ||
+      lower.includes("confirmation required")
+    )
+      status = 400;
     if (lower.includes("too many pages requested")) status = 413;
     if (lower.includes("too many subrequests")) status = 429;
     return new Response(JSON.stringify({ error: message }), { status });

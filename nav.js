@@ -45,7 +45,11 @@ import siteConfig from "./src/site-config.json";
   const isShellDisabled = () => {
     try {
       const meta = document.querySelector('meta[name="vtw-shell"]');
-      if (meta && String(meta.getAttribute("content") || "").toLowerCase() === "off") return true;
+      if (
+        meta &&
+        String(meta.getAttribute("content") || "").toLowerCase() === "off"
+      )
+        return true;
       if (document.documentElement?.dataset?.vtwShell === "off") return true;
       if (document.body?.dataset?.vtwShell === "off") return true;
     } catch (_) {}
@@ -61,7 +65,10 @@ import siteConfig from "./src/site-config.json";
   };
   const prefersReducedMotion = () => {
     try {
-      return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      return (
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      );
     } catch (_) {
       return false;
     }
@@ -82,11 +89,19 @@ import siteConfig from "./src/site-config.json";
   const adminLinks = [
     { href: "/admin/", label: "Dashboard", icon: "📊" },
     { href: "/admin/store-manager.html", label: "Store Manager", icon: "🏪" },
-    { href: "/admin/app-store-manager.html", label: "App Store Manager", icon: "📲" },
+    {
+      href: "/admin/app-store-manager.html",
+      label: "App Store Manager",
+      icon: "📲",
+    },
     { href: "/admin/analytics.html", label: "Analytics", icon: "📈" },
     { href: "/admin/live-stream.html", label: "Live Stream", icon: "🎬" },
     { href: "/admin/voice-commands.html", label: "Voice Commands", icon: "🎤" },
-    { href: "/admin/bot-command-center.html", label: "Bot Command Center", icon: "🤖" },
+    {
+      href: "/admin/bot-command-center.html",
+      label: "Bot Command Center",
+      icon: "🤖",
+    },
   ];
 
   const footerLinks = {
@@ -111,9 +126,21 @@ import siteConfig from "./src/site-config.json";
       { href: "/admin", label: "Admin", icon: "⚙️" },
     ],
     affiliates: [
-      { href: "https://www.cloudflare.com/", label: "Powered by Cloudflare", icon: "☁️" },
-      { href: "https://openai.com/api/", label: "Build with OpenAI", icon: "🧠" },
-      { href: "/referrals.html", label: "Refer a Friend (Get 10%)", icon: "🎁" },
+      {
+        href: "https://www.cloudflare.com/",
+        label: "Powered by Cloudflare",
+        icon: "☁️",
+      },
+      {
+        href: "https://openai.com/api/",
+        label: "Build with OpenAI",
+        icon: "🧠",
+      },
+      {
+        href: "/referrals.html",
+        label: "Refer a Friend (Get 10%)",
+        icon: "🎁",
+      },
     ],
   };
   // Avoid third-party/background video fetches for performance and copyright hygiene.
@@ -132,7 +159,10 @@ import siteConfig from "./src/site-config.json";
 
     document.querySelectorAll("[data-vtw-theme-btn]").forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.theme === next);
-      btn.setAttribute("aria-pressed", btn.dataset.theme === next ? "true" : "false");
+      btn.setAttribute(
+        "aria-pressed",
+        btn.dataset.theme === next ? "true" : "false"
+      );
     });
   };
 
@@ -164,7 +194,9 @@ import siteConfig from "./src/site-config.json";
     ctx: null,
     init: () => {
       if (!SoundEngine.ctx) {
-        SoundEngine.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        SoundEngine.ctx = new (
+          window.AudioContext || window.webkitAudioContext
+        )();
       }
       if (SoundEngine.ctx.state === "suspended") {
         SoundEngine.ctx.resume();
@@ -233,7 +265,9 @@ import siteConfig from "./src/site-config.json";
   const ADMIN_SESSION_TTL_MS = 1000 * 60 * 60 * 2;
   const hasAdminCookie = () => {
     try {
-      return document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+      return document.cookie
+        .split(";")
+        .some((part) => part.trim().startsWith("vtw_admin=1"));
     } catch (_) {
       return false;
     }
@@ -250,7 +284,8 @@ import siteConfig from "./src/site-config.json";
   const hasAdminAccess = () => {
     try {
       // Session unlock (client-side UX guard) must be present.
-      const unlocked = sessionStorage.getItem("adminAccessValidated") === "true";
+      const unlocked =
+        sessionStorage.getItem("adminAccessValidated") === "true";
       if (!unlocked) return false;
       // And the user must have an authenticated admin cookie OR a fresh unlock timer.
       return hasAdminCookie() || isAdminSessionFresh();
@@ -262,8 +297,10 @@ import siteConfig from "./src/site-config.json";
   // Admin was getting clipped off on mid-sized viewports because the nav bar
   // had `overflow: hidden` and too many links in one row. Keep Admin pinned
   // in a right-side "actions" area so it's always reachable.
-  const getPrimaryNavLinks = () => getNavLinks().filter((l) => l.label !== "Admin");
-  const getAdminNavLink = () => getNavLinks().find((l) => l.label === "Admin") || null;
+  const getPrimaryNavLinks = () =>
+    getNavLinks().filter((l) => l.label !== "Admin");
+  const getAdminNavLink = () =>
+    getNavLinks().find((l) => l.label === "Admin") || null;
 
   const buildPrimaryLinksHtml = () =>
     getPrimaryNavLinks()
@@ -286,11 +323,16 @@ import siteConfig from "./src/site-config.json";
     const items = [];
     let i = 0;
     getPrimaryNavLinks().forEach((link) => {
-      items.push(`<li style="--vtw-i:${i}"><a href="${link.href}">${link.icon} ${link.label}</a></li>`);
+      items.push(
+        `<li style="--vtw-i:${i}"><a href="${link.href}">${link.icon} ${link.label}</a></li>`
+      );
       i += 1;
     });
     const admin = getAdminNavLink();
-    if (admin) items.push(`<li style="--vtw-i:${i}"><a href="${admin.href}">${admin.icon} ${admin.label}</a></li>`);
+    if (admin)
+      items.push(
+        `<li style="--vtw-i:${i}"><a href="${admin.href}">${admin.icon} ${admin.label}</a></li>`
+      );
     return items.join("");
   };
 
@@ -350,7 +392,9 @@ import siteConfig from "./src/site-config.json";
     } catch (_) {}
   };
   const clearExistingNav = () => {
-    document.querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav").forEach((el) => el.remove());
+    document
+      .querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav")
+      .forEach((el) => el.remove());
     const skip = document.querySelector(".vtw-skip-link");
     if (skip) skip.remove();
     const toggle = document.getElementById("mobileNavToggle");
@@ -490,7 +534,8 @@ import siteConfig from "./src/site-config.json";
       if (prefersReducedMotion()) return;
       if (!("IntersectionObserver" in window)) return;
 
-      const headlineSelector = "h1, h2, h3, h4, h5, h6, .vt-h1, .vt-h2, .strata-heading";
+      const headlineSelector =
+        "h1, h2, h3, h4, h5, h6, .vt-h1, .vt-h2, .strata-heading";
       const headlines = Array.from(document.querySelectorAll(headlineSelector));
       const variants = ["scan", "glitch", "float", "spark", "slice", "press"];
 
@@ -523,7 +568,9 @@ import siteConfig from "./src/site-config.json";
       if (prefersReducedMotion()) return;
 
       const nav = document.querySelector(".glass-nav");
-      const fxEls = Array.from(document.querySelectorAll("[data-vtw-scrollfx]"));
+      const fxEls = Array.from(
+        document.querySelectorAll("[data-vtw-scrollfx]")
+      );
       if (!nav || !fxEls.length) return;
 
       fxEls.forEach((el, idx) => {
@@ -548,7 +595,10 @@ import siteConfig from "./src/site-config.json";
           const twist = (seed - 0.5) * 8 * p;
           el.style.setProperty("--vtw-scroll-y", `${lift.toFixed(2)}px`);
           el.style.setProperty("--vtw-scroll-r", `${twist.toFixed(2)}deg`);
-          el.style.setProperty("--vtw-scroll-o", `${(0.75 + (1 - p) * 0.25).toFixed(3)}`);
+          el.style.setProperty(
+            "--vtw-scroll-o",
+            `${(0.75 + (1 - p) * 0.25).toFixed(3)}`
+          );
         });
       };
 
@@ -647,8 +697,16 @@ import siteConfig from "./src/site-config.json";
     const lit = 0.58 + ((seed >>> 15) % 12) / 100;
     return [
       hslToRgb(hue, sat, lit),
-      hslToRgb((hue + 28 + ((seed >>> 3) % 16)) % 360, Math.min(0.92, sat + 0.08), Math.min(0.82, lit + 0.09)),
-      hslToRgb((hue + 330 + ((seed >>> 19) % 24)) % 360, Math.max(0.5, sat - 0.12), Math.max(0.48, lit - 0.12)),
+      hslToRgb(
+        (hue + 28 + ((seed >>> 3) % 16)) % 360,
+        Math.min(0.92, sat + 0.08),
+        Math.min(0.82, lit + 0.09)
+      ),
+      hslToRgb(
+        (hue + 330 + ((seed >>> 19) % 24)) % 360,
+        Math.max(0.5, sat - 0.12),
+        Math.max(0.48, lit - 0.12)
+      ),
     ];
   };
 
@@ -673,7 +731,10 @@ import siteConfig from "./src/site-config.json";
       const resize = () => {
         dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
         w = Math.max(1, Math.floor(window.innerWidth));
-        h = Math.max(1, Math.floor(canvas.getBoundingClientRect().height || 140));
+        h = Math.max(
+          1,
+          Math.floor(canvas.getBoundingClientRect().height || 140)
+        );
         canvas.width = Math.floor(w * dpr);
         canvas.height = Math.floor(h * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -703,9 +764,15 @@ import siteConfig from "./src/site-config.json";
           const rightMix = Math.max(0, (mix - 0.5) * 2);
           const midMix = 1 - leftMix - rightMix;
 
-          const r = Math.floor(rgb1.r * leftMix + rgb2.r * midMix + rgb3.r * rightMix);
-          const g = Math.floor(rgb1.g * leftMix + rgb2.g * midMix + rgb3.g * rightMix);
-          const b = Math.floor(rgb1.b * leftMix + rgb2.b * midMix + rgb3.b * rightMix);
+          const r = Math.floor(
+            rgb1.r * leftMix + rgb2.r * midMix + rgb3.r * rightMix
+          );
+          const g = Math.floor(
+            rgb1.g * leftMix + rgb2.g * midMix + rgb3.g * rightMix
+          );
+          const b = Math.floor(
+            rgb1.b * leftMix + rgb2.b * midMix + rgb3.b * rightMix
+          );
 
           const glow = 0.22 + amp * 0.68;
           ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(0.92, glow)})`;
@@ -780,8 +847,10 @@ import siteConfig from "./src/site-config.json";
       const setting = String(meta?.getAttribute("content") || "")
         .trim()
         .toLowerCase();
-      if (setting === "off" || setting === "false" || setting === "0") return false;
-      if (setting === "on" || setting === "true" || setting === "1") return true;
+      if (setting === "off" || setting === "false" || setting === "0")
+        return false;
+      if (setting === "on" || setting === "true" || setting === "1")
+        return true;
 
       // Maximize by default: show ads everywhere except admin/secret or pages that explicitly opt out.
       return true;
@@ -793,8 +862,11 @@ import siteConfig from "./src/site-config.json";
   const ensureAdsenseLoader = (publisher) => {
     try {
       if (!publisher) return Promise.resolve(false);
-      if (document.getElementById("vtw-adsense-loader")) return Promise.resolve(true);
-      const existing = document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
+      if (document.getElementById("vtw-adsense-loader"))
+        return Promise.resolve(true);
+      const existing = document.querySelector(
+        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
+      );
       if (existing) return Promise.resolve(true);
 
       const script = document.createElement("script");
@@ -838,8 +910,13 @@ import siteConfig from "./src/site-config.json";
 
   const insertSlot = (wrap, placement) => {
     const footer = document.querySelector(".vt-footer");
-    const main = document.querySelector("main.page") || document.querySelector("main") || document.body;
-    const sections = main ? Array.from(main.querySelectorAll("section.section")) : [];
+    const main =
+      document.querySelector("main.page") ||
+      document.querySelector("main") ||
+      document.body;
+    const sections = main
+      ? Array.from(main.querySelectorAll("section.section"))
+      : [];
 
     if (placement === "top") {
       const anchor = sections[0] || main.firstElementChild;
@@ -849,7 +926,12 @@ import siteConfig from "./src/site-config.json";
     }
 
     if (placement === "mid") {
-      const idx = sections.length ? Math.min(sections.length - 1, Math.max(0, Math.floor(sections.length / 2))) : -1;
+      const idx = sections.length
+        ? Math.min(
+            sections.length - 1,
+            Math.max(0, Math.floor(sections.length / 2))
+          )
+        : -1;
       const anchor = idx >= 0 ? sections[idx] : main.firstElementChild;
       if (anchor) anchor.insertAdjacentElement("afterend", wrap);
       else main.appendChild(wrap);
@@ -868,14 +950,22 @@ import siteConfig from "./src/site-config.json";
       const mode = normalizeAdsMode(env.ADSENSE_MODE);
       if (mode === "off") return;
 
-      const publisher = String(env.ADSENSE_PUBLISHER || detectPublisherFromDom() || "").trim();
+      const publisher = String(
+        env.ADSENSE_PUBLISHER || detectPublisherFromDom() || ""
+      ).trim();
       if (!publisher) return;
 
       const slotFallback = String(env.ADSENSE_SLOT || "").trim();
       const slotTopRaw = String(env.ADSENSE_SLOT_TOP || "").trim();
       const slotMidRaw = String(env.ADSENSE_SLOT_MID || "").trim();
       const slotBottomRaw = String(env.ADSENSE_SLOT_BOTTOM || "").trim();
-      const maxSlots = Math.max(0, Math.min(6, Number.parseInt(String(env.ADSENSE_MAX_SLOTS || "3"), 10) || 3));
+      const maxSlots = Math.max(
+        0,
+        Math.min(
+          6,
+          Number.parseInt(String(env.ADSENSE_MAX_SLOTS || "3"), 10) || 3
+        )
+      );
 
       // Auto ads: just ensure the loader is present. Google will place units based on account settings.
       if (mode === "auto") {
@@ -883,8 +973,14 @@ import siteConfig from "./src/site-config.json";
         return;
       }
 
-      const providedSlots = [slotTopRaw, slotMidRaw, slotBottomRaw].filter(Boolean);
-      const candidateSlots = providedSlots.length ? providedSlots : slotFallback ? [slotFallback] : [];
+      const providedSlots = [slotTopRaw, slotMidRaw, slotBottomRaw].filter(
+        Boolean
+      );
+      const candidateSlots = providedSlots.length
+        ? providedSlots
+        : slotFallback
+          ? [slotFallback]
+          : [];
       const distinctSlots = [...new Set(candidateSlots)];
 
       // Avoid reusing the same slot ID in multiple placements unless explicitly provided.
@@ -898,7 +994,9 @@ import siteConfig from "./src/site-config.json";
           { placement: "bottom", slot: slotBottomRaw || slotFallback },
         ]
           .filter((p) => p.slot)
-          .filter((p, idx, arr) => arr.findIndex((x) => x.slot === p.slot) === idx);
+          .filter(
+            (p, idx, arr) => arr.findIndex((x) => x.slot === p.slot) === idx
+          );
       }
 
       if (!placements.length) {
@@ -915,8 +1013,17 @@ import siteConfig from "./src/site-config.json";
       const inserts = [];
       for (const p of placements) {
         if (!remaining) break;
-        if (document.querySelector(`.vtw-adsense-slot[data-vtw-placement="${p.placement}"]`)) continue;
-        const wrap = createAdsenseSlot({ publisher, slot: p.slot, placement: p.placement });
+        if (
+          document.querySelector(
+            `.vtw-adsense-slot[data-vtw-placement="${p.placement}"]`
+          )
+        )
+          continue;
+        const wrap = createAdsenseSlot({
+          publisher,
+          slot: p.slot,
+          placement: p.placement,
+        });
         insertSlot(wrap, p.placement);
         inserts.push(wrap);
         remaining--;
@@ -1021,7 +1128,8 @@ import siteConfig from "./src/site-config.json";
         });
         const data = await res.json().catch(() => ({}));
         supportSessionReady = res.ok;
-        if (res.ok && data?.sessionId) supportSessionId = String(data.sessionId || "");
+        if (res.ok && data?.sessionId)
+          supportSessionId = String(data.sessionId || "");
         return supportSessionReady;
       } catch (_) {
         supportSessionReady = false;
@@ -1063,8 +1171,12 @@ import siteConfig from "./src/site-config.json";
     const pollSupportMessages = async () => {
       if (!supportSessionReady) return;
       try {
-        const qp = supportSessionId ? `?sessionId=${encodeURIComponent(supportSessionId)}` : "";
-        const res = await fetch(`/api/support/messages${qp}`, { method: "GET" });
+        const qp = supportSessionId
+          ? `?sessionId=${encodeURIComponent(supportSessionId)}`
+          : "";
+        const res = await fetch(`/api/support/messages${qp}`, {
+          method: "GET",
+        });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) return;
         appendSupportMessages(data?.messages || []);
@@ -1085,7 +1197,10 @@ import siteConfig from "./src/site-config.json";
         const res = await fetch("/api/support/message", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: value, sessionId: supportSessionId || undefined }),
+          body: JSON.stringify({
+            message: value,
+            sessionId: supportSessionId || undefined,
+          }),
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data?.error || "Chat failed");
@@ -1102,7 +1217,11 @@ import siteConfig from "./src/site-config.json";
         if (t.includes("demo") || t.includes("try")) {
           return `Open the interactive demo: <a href="/demo">/demo</a>. You'll get an outline preview in seconds.`;
         }
-        if (t.includes("privacy") || t.includes("data") || t.includes("security")) {
+        if (
+          t.includes("privacy") ||
+          t.includes("data") ||
+          t.includes("security")
+        ) {
           return `For data handling + security posture, visit <a href="/trust">Trust Center</a> and <a href="/privacy">Privacy</a>.`;
         }
         return `Try: <a href="/demo">/demo</a> to build instantly, or <a href="/pricing">/pricing</a> to compare tiers.`;
@@ -1132,17 +1251,25 @@ import siteConfig from "./src/site-config.json";
             const tmp = document.createElement("div");
             tmp.innerHTML = reply;
             const plain = tmp.textContent || tmp.innerText || "";
-            seenSupportFingerprints.add(fingerprintSupportMessage("bot", plain));
+            seenSupportFingerprints.add(
+              fingerprintSupportMessage("bot", plain)
+            );
           } catch (_) {}
         } else {
-          addMsg("bot", "I couldn't generate a reply right now. Try again in a moment.");
+          addMsg(
+            "bot",
+            "I couldn't generate a reply right now. Try again in a moment."
+          );
         }
         startSupportPolling();
         return;
       }
 
       try {
-        localStorage.setItem("vtw-demo-prefill", JSON.stringify({ prompt: value, ts: Date.now() }));
+        localStorage.setItem(
+          "vtw-demo-prefill",
+          JSON.stringify({ prompt: value, ts: Date.now() })
+        );
       } catch (_) {}
       addMsg("bot", `Opening <a href="/demo">/demo</a> with your prompt...`);
       setTimeout(() => {
@@ -1163,7 +1290,9 @@ import siteConfig from "./src/site-config.json";
       if (status) status.textContent = "";
     };
 
-    toggle?.addEventListener("click", () => setExpanded(!root.classList.contains("is-open")));
+    toggle?.addEventListener("click", () =>
+      setExpanded(!root.classList.contains("is-open"))
+    );
     closeBtn?.addEventListener("click", () => setExpanded(false));
     send?.addEventListener("click", handleSend);
 
@@ -1184,7 +1313,8 @@ import siteConfig from "./src/site-config.json";
       if (event.key === "Escape") setExpanded(false);
     });
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       micBtn?.setAttribute("disabled", "true");
       micBtn && (micBtn.title = "Voice input not supported in this browser.");
@@ -1226,7 +1356,10 @@ import siteConfig from "./src/site-config.json";
     }
 
     setMode("ask");
-    addMsg("bot", `Need help? Ask here - or switch to Build to jump into <a href="/demo">/demo</a>.`);
+    addMsg(
+      "bot",
+      `Need help? Ask here - or switch to Build to jump into <a href="/demo">/demo</a>.`
+    );
     renderHints();
     ensureSupportSession().then((ok) => {
       if (ok) startSupportPolling();
@@ -1303,10 +1436,14 @@ import siteConfig from "./src/site-config.json";
       .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
       .join("");
     const affiliateLinks = footerLinks.affiliates
-      .map((link) => `<li><a href="${link.href}" target="_blank" rel="noopener">${link.label}</a></li>`)
+      .map(
+        (link) =>
+          `<li><a href="${link.href}" target="_blank" rel="noopener">${link.label}</a></li>`
+      )
       .join("");
     const themeButtons = THEMES.map(
-      (t) => `<button type="button" class="theme-btn" data-theme="${t.id}" data-vtw-theme-btn>${t.label}</button>`
+      (t) =>
+        `<button type="button" class="theme-btn" data-theme="${t.id}" data-vtw-theme-btn>${t.label}</button>`
     ).join("");
     footer.innerHTML = `      <div class="footer-container">        <div class="strata-cell">          <div class="etched-brand">VOICE<br>TO<br>WEBSITE</div>          <p class="vt-footer-tagline">            Erosion-resistant digital infrastructure for the vocal era.          </p>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Platform</h4>          <ul class="footer-links">            ${platformLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Company</h4>          <ul class="footer-links">            ${companyLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Earn</h4>          <ul class="footer-links">            ${affiliateLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Trending Now</h4>          <a href="/lexicon-pro.html" class="hot-product-card">            <div>              <div class="hot-tag">FEATURED</div>              <div class="product-name">LEXICON PRO</div>              <p class="hot-product-desc">                Real-time site stratification from live audio feeds.              </p>            </div>            <div class="product-cta">ACQUIRE LICENSE</div>          </a>        </div>      </div>      <div class="status-bar">        <div class="live-indicator">          <div class="pulse-stack">            <div class="pulse" aria-hidden="true"></div>            <span>SYSTEMS NOMINAL</span>          </div>          <span>LATENCY: <span id="vt-footer-latency">—</span></span>          <span class="timestamp" id="vt-footer-timestamp"></span>        </div>        <div>          &copy; ${new Date().getFullYear()} VOICETOWEBSITE.COM
 
@@ -1431,14 +1568,24 @@ import siteConfig from "./src/site-config.json";
   };
   const cacheGlowRect = (event) => {
     const el = event.currentTarget;
-    const state = glowState.get(el) || { rect: null, raf: 0, lastClientX: 0, lastClientY: 0 };
+    const state = glowState.get(el) || {
+      rect: null,
+      raf: 0,
+      lastClientX: 0,
+      lastClientY: 0,
+    };
     state.rect = el.getBoundingClientRect();
     glowState.set(el, state);
   };
   const handleGlow = (event) => {
     if (event.pointerType && event.pointerType !== "mouse") return;
     const el = event.currentTarget;
-    const state = glowState.get(el) || { rect: null, raf: 0, lastClientX: 0, lastClientY: 0 };
+    const state = glowState.get(el) || {
+      rect: null,
+      raf: 0,
+      lastClientX: 0,
+      lastClientY: 0,
+    };
     state.lastClientX = event.clientX;
     state.lastClientY = event.clientY;
     if (!state.rect) state.rect = el.getBoundingClientRect();
@@ -1529,36 +1676,54 @@ import siteConfig from "./src/site-config.json";
     };
     const isExcluded = (el) => {
       try {
-        return Boolean(el.closest(".glass-nav, .mobile-overlay, footer, .vtw-widget, .admin-topbar, .admin-shell"));
+        return Boolean(
+          el.closest(
+            ".glass-nav, .mobile-overlay, footer, .vtw-widget, .admin-topbar, .admin-shell"
+          )
+        );
       } catch (_) {
         return false;
       }
     };
 
-    const headings = Array.from(document.querySelectorAll("h1,h2,h3")).filter((el) => !isExcluded(el));
+    const headings = Array.from(document.querySelectorAll("h1,h2,h3")).filter(
+      (el) => !isExcluded(el)
+    );
     headings.forEach((el, idx) => {
       if (el.dataset.vtwHeadingFxApplied) return;
       el.dataset.vtwHeadingFxApplied = "1";
-      const seed = hash(`${location.pathname}::${el.textContent || ""}::${idx}`);
+      const seed = hash(
+        `${location.pathname}::${el.textContent || ""}::${idx}`
+      );
       const fx = pickFx(seed);
-      el.classList.add("vtw-riser", "vtw-reveal", "vtw-headingfx", `vtw-headingfx--${fx}`);
+      el.classList.add(
+        "vtw-riser",
+        "vtw-reveal",
+        "vtw-headingfx",
+        `vtw-headingfx--${fx}`
+      );
       el.dataset.vtwHeadingfx = fx;
     });
 
-    const labels = Array.from(document.querySelectorAll("label,.form-label,.badge,.chip,small")).filter(
-      (el) => !isExcluded(el)
-    );
+    const labels = Array.from(
+      document.querySelectorAll("label,.form-label,.badge,.chip,small")
+    ).filter((el) => !isExcluded(el));
     labels.forEach((el, idx) => {
       if (el.dataset.vtwLabelFxApplied) return;
       el.dataset.vtwLabelFxApplied = "1";
-      const seed = hash(`${location.pathname}::${el.textContent || ""}::${idx}`);
+      const seed = hash(
+        `${location.pathname}::${el.textContent || ""}::${idx}`
+      );
       el.classList.add("vtw-riser", "vtw-reveal", "vtw-labelfx");
-      el.style.setProperty("--vtw-reveal-d", `${Math.min(420, (seed % 8) * 55)}ms`);
+      el.style.setProperty(
+        "--vtw-reveal-d",
+        `${Math.min(420, (seed % 8) * 55)}ms`
+      );
     });
 
-    const revealTargets = Array.from(document.querySelectorAll(".vtw-reveal,[data-vtw-scrollfx]")).filter(
-      (el) => !isExcluded(el)
-    );
+    const revealTargets = Array.from(
+      document.querySelectorAll(".vtw-reveal,[data-vtw-scrollfx]")
+    ).filter((el) => !isExcluded(el));
     if (!revealTargets.length) return;
 
     const io = new IntersectionObserver(

@@ -9,8 +9,12 @@ export async function resolveRoute(request, env) {
 
   // Load registry and redirects from KV or Static Assets
   // For now, assume they are available in the public/config directory as static assets
-  const registryResponse = await env.ASSETS.fetch(new URL("/config/registry.json", url.origin));
-  const redirectsResponse = await env.ASSETS.fetch(new URL("/config/redirects.json", url.origin));
+  const registryResponse = await env.ASSETS.fetch(
+    new URL("/config/registry.json", url.origin)
+  );
+  const redirectsResponse = await env.ASSETS.fetch(
+    new URL("/config/redirects.json", url.origin)
+  );
 
   if (!registryResponse.ok) {
     console.error("Failed to load registry.json");
@@ -18,7 +22,9 @@ export async function resolveRoute(request, env) {
   }
 
   const registry = await registryResponse.json();
-  const redirects = redirectsResponse.ok ? await redirectsResponse.json() : { redirects: [] };
+  const redirects = redirectsResponse.ok
+    ? await redirectsResponse.json()
+    : { redirects: [] };
 
   // 2) Apply redirects.json
   const redirect = redirects.redirects?.find((r) => r.from === pathname);
@@ -35,7 +41,8 @@ export async function resolveRoute(request, env) {
   // 4) Fallback
   // If no extension: try <path>.html
   if (!pathname.includes(".")) {
-    const potentialAsset = pathname === "/" ? "index.html" : `${pathname.slice(1)}.html`;
+    const potentialAsset =
+      pathname === "/" ? "index.html" : `${pathname.slice(1)}.html`;
 
     // Fallback block for /admin or /labs
     if (pathname.startsWith("/admin") || pathname.startsWith("/labs")) {

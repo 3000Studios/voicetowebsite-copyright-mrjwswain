@@ -45,7 +45,9 @@
         const id = String(s.session_id || "");
         const isActive = id && id === activeSessionId;
         const last = String(s.last_message || "").slice(0, 140);
-        const title = String(s.customer_email || s.customer_name || "Anonymous");
+        const title = String(
+          s.customer_email || s.customer_name || "Anonymous"
+        );
         return `
           <div class="session ${isActive ? "is-active" : ""}" data-session-id="${esc(id)}">
             <div class="session-top">
@@ -87,7 +89,8 @@
       sessionsMeta && (sessionsMeta.textContent = "Loading...");
       const data = await fetchJson("/api/support/admin/sessions");
       const sessions = data.sessions || [];
-      sessionsMeta && (sessionsMeta.textContent = `${sessions.length} sessions`);
+      sessionsMeta &&
+        (sessionsMeta.textContent = `${sessions.length} sessions`);
       renderSessions(sessions);
     } catch (err) {
       sessionsMeta && (sessionsMeta.textContent = `Error: ${err.message}`);
@@ -97,21 +100,27 @@
   const loadMessages = async (sessionId) => {
     if (!sessionId) return;
     try {
-      const data = await fetchJson(`/api/support/admin/messages?sessionId=${encodeURIComponent(sessionId)}`);
+      const data = await fetchJson(
+        `/api/support/admin/messages?sessionId=${encodeURIComponent(sessionId)}`
+      );
       renderMessages(data.messages || []);
     } catch (_) {}
   };
 
   const setActive = async (sessionId) => {
     activeSessionId = String(sessionId || "");
-    activeMeta && (activeMeta.textContent = activeSessionId ? `Session ${activeSessionId}` : "Select a session");
+    activeMeta &&
+      (activeMeta.textContent = activeSessionId
+        ? `Session ${activeSessionId}`
+        : "Select a session");
     await loadSessions();
     await loadMessages(activeSessionId);
     if (pollTimer) window.clearInterval(pollTimer);
     pollTimer = window.setInterval(() => loadMessages(activeSessionId), 2500);
 
     // Reset speech cursor per-session to avoid reading stale messages on switch.
-    if (!lastSpokenIdBySession[activeSessionId]) lastSpokenIdBySession[activeSessionId] = "";
+    if (!lastSpokenIdBySession[activeSessionId])
+      lastSpokenIdBySession[activeSessionId] = "";
   };
 
   const sendReply = async () => {
@@ -135,7 +144,8 @@
   };
 
   const initMic = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition || !micBtn) {
       micBtn && (micBtn.disabled = true);
       return;
@@ -187,7 +197,9 @@
         sendReply();
       }
     });
-    speakToggle?.addEventListener("click", () => setSpeakEnabled(!speakEnabled));
+    speakToggle?.addEventListener("click", () =>
+      setSpeakEnabled(!speakEnabled)
+    );
     initMic();
   };
 
@@ -201,7 +213,9 @@
     speakTimer = window.setInterval(async () => {
       if (!activeSessionId || !speakEnabled) return;
       try {
-        const data = await fetchJson(`/api/support/admin/messages?sessionId=${encodeURIComponent(activeSessionId)}`);
+        const data = await fetchJson(
+          `/api/support/admin/messages?sessionId=${encodeURIComponent(activeSessionId)}`
+        );
         const msgs = data.messages || [];
         const last = msgs[msgs.length - 1];
         if (!last) return;

@@ -14,7 +14,12 @@ const hasAny = (t, words) => {
 
 const extractPages = (t) => {
   const pages = new Set();
-  if (t.includes("home") || t.includes("homepage") || t.includes("landing page")) pages.add("homepage");
+  if (
+    t.includes("home") ||
+    t.includes("homepage") ||
+    t.includes("landing page")
+  )
+    pages.add("homepage");
   if (t.includes("pricing")) pages.add("pricing");
   if (t.includes("blog") || t.includes("posts")) pages.add("blog");
   if (t.includes("admin")) pages.add("admin");
@@ -25,11 +30,22 @@ const extractFeatures = (t) => {
   const features = new Set();
   if (hasAny(t, ["adsense", "ads"])) features.add("ads");
   if (hasAny(t, ["affiliate", "affiliates"])) features.add("affiliate");
-  if (hasAny(t, ["stripe", "paypal", "checkout", "payment"])) features.add("payments");
-  if (hasAny(t, ["newsletter", "email capture", "drip", "lead magnet"])) features.add("email");
-  if (hasAny(t, ["video background", "background video"])) features.add("background_video");
+  if (hasAny(t, ["stripe", "paypal", "checkout", "payment"]))
+    features.add("payments");
+  if (hasAny(t, ["newsletter", "email capture", "drip", "lead magnet"]))
+    features.add("email");
+  if (hasAny(t, ["video background", "background video"]))
+    features.add("background_video");
   if (hasAny(t, ["seo", "search", "rank"])) features.add("seo");
-  if (hasAny(t, ["voice command", "voice commands", "speech to speech", "speech-to-speech"])) features.add("voice");
+  if (
+    hasAny(t, [
+      "voice command",
+      "voice commands",
+      "speech to speech",
+      "speech-to-speech",
+    ])
+  )
+    features.add("voice");
   return [...features];
 };
 
@@ -39,7 +55,10 @@ const extractDesign = (t) => {
     tone: "",
   };
 
-  if (t.includes("midnight steel") || (t.includes("midnight") && t.includes("steel"))) {
+  if (
+    t.includes("midnight steel") ||
+    (t.includes("midnight") && t.includes("steel"))
+  ) {
     design.theme = "midnight-steel";
     design.tone = "futuristic";
     return design;
@@ -63,11 +82,14 @@ const extractDesign = (t) => {
 
 const extractActions = (t) => {
   const actions = new Set();
-  if (hasAny(t, ["add", "create", "build", "enable", "turn on"])) actions.add("add");
-  if (hasAny(t, ["update", "change", "make", "turn into"])) actions.add("update");
+  if (hasAny(t, ["add", "create", "build", "enable", "turn on"]))
+    actions.add("add");
+  if (hasAny(t, ["update", "change", "make", "turn into"]))
+    actions.add("update");
   if (hasAny(t, ["remove", "delete", "wipe", "drop"])) actions.add("remove");
   if (hasAny(t, ["optimize", "improve", "fix"])) actions.add("optimize");
-  if (hasAny(t, ["ship it", "deploy", "go live", "publish"])) actions.add("deploy");
+  if (hasAny(t, ["ship it", "deploy", "go live", "publish"]))
+    actions.add("deploy");
   if (hasAny(t, ["rollback", "revert", "undo"])) actions.add("rollback");
   return [...actions];
 };
@@ -80,6 +102,13 @@ export function extractEntities(rawInput) {
     features: extractFeatures(text),
     actions: extractActions(text),
     design: extractDesign(text),
-    moneyKeywords: hasAny(text, ["make me money", "monetize", "revenue", "conversions"]) ? ["money"] : [],
+    moneyKeywords: hasAny(text, [
+      "make me money",
+      "monetize",
+      "revenue",
+      "conversions",
+    ])
+      ? ["money"]
+      : [],
   };
 }

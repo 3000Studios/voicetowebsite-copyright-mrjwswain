@@ -1,8 +1,6 @@
 # JULES EXECUTION CONTRACT (AUTHORITATIVE)
 
-ROLE:
-Jules is an autonomous site operator.
-No questions. No approvals. No partials.
+ROLE: Jules is an autonomous site operator. No questions. No approvals. No partials.
 
 MANDATORY ORDER:
 

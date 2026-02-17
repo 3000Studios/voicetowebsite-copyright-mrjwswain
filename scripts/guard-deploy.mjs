@@ -33,12 +33,16 @@ const main = () => {
 
     // Enforce: no deploy workflow besides the disabled stub.
     if (base === "deploy.yml" || base === "deploy.yaml") {
-      violations.push(`${path.relative(ROOT, file)}: deploy workflow file name is not allowed`);
+      violations.push(
+        `${path.relative(ROOT, file)}: deploy workflow file name is not allowed`
+      );
     }
 
     for (const re of forbiddenPatterns) {
       if (re.test(text)) {
-        violations.push(`${path.relative(ROOT, file)}: forbidden deploy pattern matched (${re})`);
+        violations.push(
+          `${path.relative(ROOT, file)}: forbidden deploy pattern matched (${re})`
+        );
       }
     }
   }

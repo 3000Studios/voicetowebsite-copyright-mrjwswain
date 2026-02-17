@@ -48,7 +48,12 @@ export const analyzeSource = async (
       ? prompt
       : {
           parts: [
-            { inlineData: { mimeType: "image/png", data: source.replace(/^data:image\/(png|jpeg|jpg);base64,/, "") } },
+            {
+              inlineData: {
+                mimeType: "image/png",
+                data: source.replace(/^data:image\/(png|jpeg|jpg);base64,/, ""),
+              },
+            },
             { text: prompt },
           ],
         },
@@ -114,7 +119,10 @@ export const forgeWebsite = async (
   return JSON.parse(response.text!) as GeneratedCode;
 };
 
-export const refineCode = async (currentHtml: string, instructions: string): Promise<GeneratedCode> => {
+export const refineCode = async (
+  currentHtml: string,
+  instructions: string
+): Promise<GeneratedCode> => {
   const prompt = `
     Refine the following code based on these instructions: "${instructions}"
     Maintain the 100% store-ready quality (Social sharing, animations, accessibility, responsiveness).
@@ -140,7 +148,9 @@ export const refineCode = async (currentHtml: string, instructions: string): Pro
   return JSON.parse(response.text!) as GeneratedCode;
 };
 
-export const enhanceCode = async (currentHtml: string): Promise<GeneratedCode> => {
+export const enhanceCode = async (
+  currentHtml: string
+): Promise<GeneratedCode> => {
   const prompt = `
     AUTO-ENHANCE PROTOCOL (PLATINUM GRADE):
     - Inject high-end animations (framer-motion inspired).

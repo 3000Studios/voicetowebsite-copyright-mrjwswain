@@ -1,6 +1,14 @@
 import { hasValidAdminCookie, isAdminRequest } from "./adminAuth.js";
-import { getLogger, initializeLogger, LOG_LEVELS, loggingMiddleware } from "./logger.js";
-import { createRateLimitMiddleware, rateLimitMiddleware } from "./rate-limiter.js";
+import {
+  getLogger,
+  initializeLogger,
+  LOG_LEVELS,
+  loggingMiddleware,
+} from "./logger.js";
+import {
+  createRateLimitMiddleware,
+  rateLimitMiddleware,
+} from "./rate-limiter.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -55,7 +63,9 @@ const ensureTables = async (db) => {
     .run();
 
   await db
-    .prepare("CREATE INDEX IF NOT EXISTS idx_support_messages_session_ts ON support_messages(session_id, ts);")
+    .prepare(
+      "CREATE INDEX IF NOT EXISTS idx_support_messages_session_ts ON support_messages(session_id, ts);"
+    )
     .run();
 };
 
@@ -111,13 +121,17 @@ const generateAutoReply = async (env, message) => {
     return pickAiText(result).trim();
   }
 
-  const OPENAI_API = env?.OPENAI_API || env?.OPENAI_API_KEY || env?.OPENAI_API_KEY3;
+  const OPENAI_API =
+    env?.OPENAI_API || env?.OPENAI_API_KEY || env?.OPENAI_API_KEY3;
   const OPENAI_MODEL = env?.OPENAI_MODEL || "gpt-4o-mini";
   if (!OPENAI_API) return "";
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
-    headers: { Authorization: `Bearer ${OPENAI_API}`, "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${OPENAI_API}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ model: OPENAI_MODEL, messages, temperature: 0.2 }),
   });
   const raw = await res.text();
@@ -144,7 +158,9 @@ const readJson = async (request) => {
 
 export async function handleSupportChatRequest({ request, env }) {
   const logger = initializeLogger({
-    level: env.LOG_LEVEL ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()] : LOG_LEVELS.INFO,
+    level: env.LOG_LEVEL
+      ? LOG_LEVELS[env.LOG_LEVEL.toUpperCase()]
+      : LOG_LEVELS.INFO,
     enableConsole: true,
     enableStructured: env.NODE_ENV === "production",
   });
@@ -160,7 +176,11 @@ export async function handleSupportChatRequest({ request, env }) {
   // Visitor: create/restore session
   if (url.pathname === "/api/support/start" && request.method === "POST") {
     const rl = await rateLimit(request, "support_start");
-    if (rl.blocked) return new Response(rl.response.body, { status: rl.response.status, headers: rl.response.headers });
+    if (rl.blocked)
+      return new Response(rl.response.body, {
+        status: rl.response.status,
+        headers: rl.response.headers,
+      });
 
     // CSRF defense-in-depth for browser requests (allow non-browser clients without Origin).
     const origin = request.headers.get("origin");
@@ -185,23 +205,37 @@ export async function handleSupportChatRequest({ request, env }) {
           `INSERT OR IGNORE INTO support_sessions (session_id, customer_email, customer_name, customer_meta)
            VALUES (?, ?, ?, ?)`
         )
-        .bind(sessionId, customer_email, customer_name, JSON.stringify({ ua: request.headers.get("user-agent") || "" }))
+        .bind(
+          sessionId,
+          customer_email,
+          customer_name,
+          JSON.stringify({ ua: request.headers.get("user-agent") || "" })
+        )
         .run();
       await db
-        .prepare("UPDATE support_sessions SET last_seen_at = ? WHERE session_id = ?")
+        .prepare(
+          "UPDATE support_sessions SET last_seen_at = ? WHERE session_id = ?"
+        )
         .bind(nowIso(), sessionId)
         .run();
     }
 
     const headers = new Headers(JSON_HEADERS);
     setCookie(headers, cookieName, sessionId);
-    return new Response(JSON.stringify({ ok: true, sessionId, traceId }), { status: 200, headers });
+    return new Response(JSON.stringify({ ok: true, sessionId, traceId }), {
+      status: 200,
+      headers,
+    });
   }
 
   // Visitor: send message
   if (url.pathname === "/api/support/message" && request.method === "POST") {
     const rl = await rateLimit(request, "support_message");
-    if (rl.blocked) return new Response(rl.response.body, { status: rl.response.status, headers: rl.response.headers });
+    if (rl.blocked)
+      return new Response(rl.response.body, {
+        status: rl.response.status,
+        headers: rl.response.headers,
+      });
 
     // CSRF defense-in-depth for browser requests (allow non-browser clients without Origin).
     const origin = request.headers.get("origin");
@@ -211,20 +245,31 @@ export async function handleSupportChatRequest({ request, env }) {
 
     const body = await readJson(request);
     const message = String(body?.message || "").trim();
-    const sessionId = String(body?.sessionId || getCookie(request, cookieName) || "").trim();
+    const sessionId = String(
+      body?.sessionId || getCookie(request, cookieName) || ""
+    ).trim();
 
-    if (!sessionId) return json(400, { error: "Missing sessionId. Call /api/support/start first.", traceId });
+    if (!sessionId)
+      return json(400, {
+        error: "Missing sessionId. Call /api/support/start first.",
+        traceId,
+      });
     if (!message) return json(400, { error: "Missing message.", traceId });
-    if (message.length > 2000) return json(413, { error: "Message too long.", traceId });
+    if (message.length > 2000)
+      return json(413, { error: "Message too long.", traceId });
 
     const customerMessageId = crypto.randomUUID();
     if (db) {
       await db
-        .prepare("INSERT INTO support_messages (id, session_id, sender, message) VALUES (?, ?, ?, ?)")
+        .prepare(
+          "INSERT INTO support_messages (id, session_id, sender, message) VALUES (?, ?, ?, ?)"
+        )
         .bind(customerMessageId, sessionId, "customer", message)
         .run();
       await db
-        .prepare("UPDATE support_sessions SET last_seen_at = ? WHERE session_id = ?")
+        .prepare(
+          "UPDATE support_sessions SET last_seen_at = ? WHERE session_id = ?"
+        )
         .bind(nowIso(), sessionId)
         .run();
     }
@@ -245,30 +290,46 @@ export async function handleSupportChatRequest({ request, env }) {
     if (db && reply) {
       replyMessageId = crypto.randomUUID();
       await db
-        .prepare("INSERT INTO support_messages (id, session_id, sender, message) VALUES (?, ?, ?, ?)")
+        .prepare(
+          "INSERT INTO support_messages (id, session_id, sender, message) VALUES (?, ?, ?, ?)"
+        )
         .bind(replyMessageId, sessionId, "bot", reply)
         .run();
     }
 
-    return json(200, { ok: true, reply, traceId, messageId: customerMessageId, replyId: replyMessageId });
+    return json(200, {
+      ok: true,
+      reply,
+      traceId,
+      messageId: customerMessageId,
+      replyId: replyMessageId,
+    });
   }
 
   // Visitor: poll messages for current session (used by the site widget)
   if (url.pathname === "/api/support/messages" && request.method === "GET") {
-    const sessionId = String(url.searchParams.get("sessionId") || getCookie(request, cookieName) || "").trim();
+    const sessionId = String(
+      url.searchParams.get("sessionId") || getCookie(request, cookieName) || ""
+    ).trim();
     if (!sessionId) return json(400, { error: "Missing sessionId.", traceId });
     if (!db) return json(503, { error: "D1 database not available.", traceId });
 
     const rows = await db
-      .prepare("SELECT id, ts, sender, message FROM support_messages WHERE session_id = ? ORDER BY ts ASC LIMIT 80")
+      .prepare(
+        "SELECT id, ts, sender, message FROM support_messages WHERE session_id = ? ORDER BY ts ASC LIMIT 80"
+      )
       .bind(sessionId)
       .all();
     return json(200, { ok: true, messages: rows.results || [], traceId });
   }
 
   // Admin: list sessions
-  if (url.pathname === "/api/support/admin/sessions" && request.method === "GET") {
-    if (!(await requireAdmin(request, env))) return json(401, { error: "Unauthorized", traceId });
+  if (
+    url.pathname === "/api/support/admin/sessions" &&
+    request.method === "GET"
+  ) {
+    if (!(await requireAdmin(request, env)))
+      return json(401, { error: "Unauthorized", traceId });
     if (!db) return json(503, { error: "D1 database not available.", traceId });
 
     const rows = await db
@@ -284,22 +345,32 @@ export async function handleSupportChatRequest({ request, env }) {
   }
 
   // Admin: list messages
-  if (url.pathname === "/api/support/admin/messages" && request.method === "GET") {
-    if (!(await requireAdmin(request, env))) return json(401, { error: "Unauthorized", traceId });
+  if (
+    url.pathname === "/api/support/admin/messages" &&
+    request.method === "GET"
+  ) {
+    if (!(await requireAdmin(request, env)))
+      return json(401, { error: "Unauthorized", traceId });
     if (!db) return json(503, { error: "D1 database not available.", traceId });
     const sessionId = String(url.searchParams.get("sessionId") || "").trim();
     if (!sessionId) return json(400, { error: "Missing sessionId.", traceId });
 
     const rows = await db
-      .prepare("SELECT id, ts, sender, message FROM support_messages WHERE session_id = ? ORDER BY ts ASC LIMIT 200")
+      .prepare(
+        "SELECT id, ts, sender, message FROM support_messages WHERE session_id = ? ORDER BY ts ASC LIMIT 200"
+      )
       .bind(sessionId)
       .all();
     return json(200, { ok: true, messages: rows.results || [], traceId });
   }
 
   // Admin: reply
-  if (url.pathname === "/api/support/admin/reply" && request.method === "POST") {
-    if (!(await requireAdmin(request, env))) return json(401, { error: "Unauthorized", traceId });
+  if (
+    url.pathname === "/api/support/admin/reply" &&
+    request.method === "POST"
+  ) {
+    if (!(await requireAdmin(request, env)))
+      return json(401, { error: "Unauthorized", traceId });
     if (!db) return json(503, { error: "D1 database not available.", traceId });
 
     // CSRF defense-in-depth for cookie-authenticated browser requests.
@@ -313,15 +384,20 @@ export async function handleSupportChatRequest({ request, env }) {
     const message = String(body?.message || "").trim();
     if (!sessionId) return json(400, { error: "Missing sessionId.", traceId });
     if (!message) return json(400, { error: "Missing message.", traceId });
-    if (message.length > 4000) return json(413, { error: "Message too long.", traceId });
+    if (message.length > 4000)
+      return json(413, { error: "Message too long.", traceId });
 
     const adminMessageId = crypto.randomUUID();
     await db
-      .prepare("INSERT INTO support_messages (id, session_id, sender, message) VALUES (?, ?, ?, ?)")
+      .prepare(
+        "INSERT INTO support_messages (id, session_id, sender, message) VALUES (?, ?, ?, ?)"
+      )
       .bind(adminMessageId, sessionId, "admin", message)
       .run();
     await db
-      .prepare("UPDATE support_sessions SET last_seen_at = ? WHERE session_id = ?")
+      .prepare(
+        "UPDATE support_sessions SET last_seen_at = ? WHERE session_id = ?"
+      )
       .bind(nowIso(), sessionId)
       .run();
 

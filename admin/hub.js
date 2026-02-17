@@ -6,7 +6,9 @@ const byId = (id) => document.getElementById(id);
 
 const hasAdminCookie = () => {
   try {
-    return document.cookie.split(";").some((part) => part.trim().startsWith("vtw_admin=1"));
+    return document.cookie
+      .split(";")
+      .some((part) => part.trim().startsWith("vtw_admin=1"));
   } catch (_) {
     return false;
   }
@@ -75,15 +77,20 @@ const loadSnapshot = async () => {
       productsRes.json().catch(() => ({})),
     ]);
 
-    if (!configRes.ok || config?.error) throw new Error(config?.error || "Config unavailable");
-    if (!analyticsRes.ok || analytics?.error) throw new Error(analytics?.error || "Analytics unavailable");
-    if (!productsRes.ok || productsPayload?.error) throw new Error(productsPayload?.error || "Products unavailable");
+    if (!configRes.ok || config?.error)
+      throw new Error(config?.error || "Config unavailable");
+    if (!analyticsRes.ok || analytics?.error)
+      throw new Error(analytics?.error || "Analytics unavailable");
+    if (!productsRes.ok || productsPayload?.error)
+      throw new Error(productsPayload?.error || "Products unavailable");
 
     const totals = analytics?.result?.totals || {};
     requestsEl.textContent = fmtNumber(totals?.requests?.all);
     uniquesEl.textContent = fmtNumber(totals?.uniques?.all);
 
-    const products = Array.isArray(productsPayload?.products) ? productsPayload.products : [];
+    const products = Array.isArray(productsPayload?.products)
+      ? productsPayload.products
+      : [];
     productsEl.textContent = fmtNumber(products.length);
 
     // Catalog does not guarantee checkout metadata; do not invent "missing" counts.
@@ -110,11 +117,15 @@ const loadSnapshot = async () => {
       missingEl.textContent = fmtNumber(missingButtons.length);
     }
 
-    stripePubEl.textContent = config.stripe_publishable ? "Connected" : "Missing";
+    stripePubEl.textContent = config.stripe_publishable
+      ? "Connected"
+      : "Missing";
     stripeSecretEl.textContent = config.stripe_secret ? "Connected" : "Missing";
     paypalEl.textContent = config.paypal_client_id ? "Connected" : "Missing";
 
-    const paymentsReady = !!(config.stripe_publishable && config.stripe_secret) || !!config.paypal_client_id;
+    const paymentsReady =
+      !!(config.stripe_publishable && config.stripe_secret) ||
+      !!config.paypal_client_id;
     setChip(
       configChip,
       paymentsReady ? "Config: payments ready" : "Config: missing payments",

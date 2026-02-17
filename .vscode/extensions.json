@@ -1,12 +1,78 @@
 {
   "recommendations": [
-    "cloudflare.wrangler",
-    "ms-vscode.vscode-typescript-next",
+    // ============================================
+    // ESSENTIAL - Core Development Tools
+    // ============================================
+    "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
+    "EditorConfig.EditorConfig",
+
+    // ============================================
+    // CLOUDFLARE WORKERS
+    // ============================================
+    "cloudflare.wrangler",
+
+    // ============================================
+    // TYPESCRIPT & JAVASCRIPT
+    // ============================================
+    "ms-vscode.vscode-typescript-next",
+
+    // ============================================
+    // GIT & VERSION CONTROL
+    // ============================================
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // ============================================
+    // PRODUCTIVITY & INTELLISENSE
+    // ============================================
     "christian-kohler.path-intellisense",
     "streetsidesoftware.code-spell-checker",
-    "bradlc.vscode-tailwindcss",
+    "usernamehw.errorlens",
+
+    // ============================================
+    // HTML & CSS
+    // ============================================
+    "formulahendry.auto-close-tag",
     "formulahendry.auto-rename-tag",
-    "usernamehw.errorlens"
-  ]
+    "bradlc.vscode-tailwindcss",
+
+    // ============================================
+    // NPM & PACKAGE MANAGEMENT
+    // ============================================
+    "eg2.vscode-npm-script",
+    "christian-kohler.npm-intellisense",
+
+    // ============================================
+    // REACT & MODERN WEB
+    // ============================================
+    "dsznajder.es7-react-js-snippets",
+
+    // ============================================
+    // LIVE PREVIEW & TESTING
+    // ============================================
+    "ritwickdey.LiveServer",
+
+    // ============================================
+    // AI-POWERED CODING (Windsurf Compatible)
+    // ============================================
+    "GitHub.copilot",
+    "Continue.continue",
+    "Codeium.codeium",
+
+    // ============================================
+    // CODE QUALITY & FORMATTING
+    // ============================================
+    "aaron-bond.better-comments",
+    "oderwat.indent-rainbow",
+
+    // ============================================
+    // UTILITIES
+    // ============================================
+    "wayou.vscode-todo-highlight",
+    "Gruntfuggly.todo-tree",
+    "PKief.material-icon-theme"
+  ],
+
+  "unwantedRecommendations": ["vscodevim.vim", "ms-vscode.vscode-typescript-tslint-plugin"]
 }

@@ -72,26 +72,68 @@ const App: React.FC = () => {
 
   const runAnalysis = async (source: string, isUrl: boolean) => {
     playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
-    setState((prev) => ({ ...prev, isAnalyzing: true, screenshot: isUrl ? null : source, error: null }));
+    setState((prev) => ({
+      ...prev,
+      isAnalyzing: true,
+      screenshot: isUrl ? null : source,
+      error: null,
+    }));
     try {
-      const result = await analyzeSource(source, state.preferences, state.componentType, state.customContent, isUrl);
-      setState((prev) => ({ ...prev, isAnalyzing: false, progress: 100, result }));
-      playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
+      const result = await analyzeSource(
+        source,
+        state.preferences,
+        state.componentType,
+        state.customContent,
+        isUrl
+      );
+      setState((prev) => ({
+        ...prev,
+        isAnalyzing: false,
+        progress: 100,
+        result,
+      }));
+      playSfx(
+        "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532"
+      );
     } catch (err) {
-      setState((prev) => ({ ...prev, isAnalyzing: false, error: "CRITICAL ERROR: NEURAL LINK SEVERED." }));
+      setState((prev) => ({
+        ...prev,
+        isAnalyzing: false,
+        error: "CRITICAL ERROR: NEURAL LINK SEVERED.",
+      }));
     }
   };
 
   const runForge = async () => {
     if (!state.forgeDescription) return;
     playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
-    setState((prev) => ({ ...prev, isAnalyzing: true, error: null, result: null }));
+    setState((prev) => ({
+      ...prev,
+      isAnalyzing: true,
+      error: null,
+      result: null,
+    }));
     try {
-      const result = await forgeWebsite(state.forgeDescription, state.forgeSections, state.preferences);
-      setState((prev) => ({ ...prev, isAnalyzing: false, progress: 100, result }));
-      playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532");
+      const result = await forgeWebsite(
+        state.forgeDescription,
+        state.forgeSections,
+        state.preferences
+      );
+      setState((prev) => ({
+        ...prev,
+        isAnalyzing: false,
+        progress: 100,
+        result,
+      }));
+      playSfx(
+        "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258532"
+      );
     } catch (err) {
-      setState((prev) => ({ ...prev, isAnalyzing: false, error: "FORGE OVERLOAD: NEURAL COLLAPSE." }));
+      setState((prev) => ({
+        ...prev,
+        isAnalyzing: false,
+        error: "FORGE OVERLOAD: NEURAL COLLAPSE.",
+      }));
     }
   };
 
@@ -103,7 +145,11 @@ const App: React.FC = () => {
 
     setState((prev) => ({
       ...prev,
-      preferences: { ...prev.preferences, primaryColor: randomColor, fontFamily: randomFont },
+      preferences: {
+        ...prev.preferences,
+        primaryColor: randomColor,
+        fontFamily: randomFont,
+      },
     }));
     playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
   };
@@ -111,7 +157,10 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 relative selection:bg-cyan-500/40">
       <audio ref={audioRef} loop autoPlay>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg" />
+        <source
+          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+          type="audio/mpeg"
+        />
       </audio>
 
       <header className="relative h-[550px] flex flex-col items-center justify-center overflow-hidden border-b-8 border-slate-900 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
@@ -152,7 +201,9 @@ const App: React.FC = () => {
             <button
               onClick={() => {
                 setState((s) => ({ ...s, mode: "CLONE", result: null }));
-                playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+                playSfx(
+                  "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529"
+                );
               }}
               className={`px-12 py-5 rounded-2xl orbitron font-black tracking-widest text-sm transition-all border-2 btn-3d ${state.mode === "CLONE" ? "bg-white text-slate-950 border-white shadow-[0_0_40px_rgba(255,255,255,0.4)]" : "bg-transparent text-white border-slate-700 hover:border-white"}`}
             >
@@ -161,7 +212,9 @@ const App: React.FC = () => {
             <button
               onClick={() => {
                 setState((s) => ({ ...s, mode: "FORGE", result: null }));
-                playSfx("https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529");
+                playSfx(
+                  "https://www.soundboard.com/handler/Downloadaudio.ashx?id=258529"
+                );
               }}
               className={`px-12 py-5 rounded-2xl orbitron font-black tracking-widest text-sm transition-all border-2 btn-3d ${state.mode === "FORGE" ? "bg-white text-slate-950 border-white shadow-[0_0_40px_rgba(255,255,255,0.4)]" : "bg-transparent text-white border-slate-700 hover:border-white"}`}
             >
@@ -174,13 +227,17 @@ const App: React.FC = () => {
           onClick={handleEnhanceGlobal}
           className="absolute bottom-10 right-10 btn-3d bg-cyan-400 text-slate-950 px-8 py-4 rounded-2xl font-black orbitron text-xs animate-pulse shadow-[0_0_30px_#00e5ff] z-20"
         >
-          <i className="fa-solid fa-wand-magic-sparkles mr-3"></i> AUTO-ENHANCE INTERFACE
+          <i className="fa-solid fa-wand-magic-sparkles mr-3"></i> AUTO-ENHANCE
+          INTERFACE
         </button>
       </header>
 
       {state.isAnalyzing && (
         <div className="fixed top-[550px] left-0 w-full h-3 bg-slate-900 z-50 overflow-hidden">
-          <div className="h-full progress-bar-fill shadow-[0_0_40px_#fff]" style={{ width: `${state.progress}%` }} />
+          <div
+            className="h-full progress-bar-fill shadow-[0_0_40px_#fff]"
+            style={{ width: `${state.progress}%` }}
+          />
           <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white font-black orbitron text-xl italic tracking-widest animate-pulse drop-shadow-[0_0_10px_rgba(0,0,0,1)]">
             {statusMessages[statusIdx]}
           </div>
@@ -202,7 +259,8 @@ const App: React.FC = () => {
                 <div className="beveled-box p-16 border-slate-700/50 space-y-12">
                   <div className="space-y-8">
                     <h3 className="text-sm font-black orbitron text-slate-400 uppercase tracking-[0.4em] border-b border-slate-800 pb-6">
-                      <i className="fa-solid fa-bolt mr-3 text-cyan-500"></i> Acquisition Protocol
+                      <i className="fa-solid fa-bolt mr-3 text-cyan-500"></i>{" "}
+                      Acquisition Protocol
                     </h3>
                     <form
                       onSubmit={(e) => {
@@ -219,7 +277,10 @@ const App: React.FC = () => {
                           onChange={(e) => setUrlInput(e.target.value)}
                           className="flex-1 bg-slate-950 border-2 border-slate-800 rounded-2xl py-6 px-8 text-sm font-black orbitron text-white outline-none focus:border-cyan-400 transition-all shadow-inner"
                         />
-                        <VoiceInput onResult={(t) => setUrlInput(t)} className="h-[74px] w-[74px] text-xl" />
+                        <VoiceInput
+                          onResult={(t) => setUrlInput(t)}
+                          className="h-[74px] w-[74px] text-xl"
+                        />
                       </div>
                       <button
                         type="submit"
@@ -236,24 +297,35 @@ const App: React.FC = () => {
                     </span>
                     <div className="h-px bg-slate-800 flex-1"></div>
                   </div>
-                  <ScreenshotUpload onUpload={(b) => runAnalysis(b, false)} isLoading={false} />
+                  <ScreenshotUpload
+                    onUpload={(b) => runAnalysis(b, false)}
+                    isLoading={false}
+                  />
                 </div>
               </div>
 
               <div className="lg:col-span-5 space-y-10">
                 <div className="beveled-box p-12 border-slate-700/50 space-y-10">
                   <h3 className="text-sm font-black orbitron text-slate-400 uppercase tracking-[0.4em] border-b border-slate-800 pb-6">
-                    <i className="fa-solid fa-code-merge mr-3 text-cyan-500"></i> Content Injector
+                    <i className="fa-solid fa-code-merge mr-3 text-cyan-500"></i>{" "}
+                    Content Injector
                   </h3>
                   <textarea
                     placeholder="Input custom restaurant data, menus, or branding overrides here..."
                     value={state.customContent}
-                    onChange={(e) => setState((s) => ({ ...s, customContent: e.target.value }))}
+                    onChange={(e) =>
+                      setState((s) => ({ ...s, customContent: e.target.value }))
+                    }
                     className="w-full h-72 bg-slate-950 border-2 border-slate-800 rounded-2xl p-10 text-xs font-bold text-slate-300 outline-none focus:border-cyan-500 code-scrollbar resize-none shadow-inner"
                   />
                   <div className="flex justify-end">
                     <VoiceInput
-                      onResult={(t) => setState((s) => ({ ...s, customContent: s.customContent + " " + t }))}
+                      onResult={(t) =>
+                        setState((s) => ({
+                          ...s,
+                          customContent: s.customContent + " " + t,
+                        }))
+                      }
                       className="w-[60px] h-[60px]"
                     />
                   </div>
@@ -264,7 +336,8 @@ const App: React.FC = () => {
             <div className="max-w-5xl mx-auto space-y-16">
               <div className="beveled-box p-16 border-slate-700/50 space-y-12">
                 <h3 className="text-3xl font-black orbitron text-white uppercase tracking-tighter italic glow-text">
-                  <i className="fa-solid fa-atom mr-4 text-cyan-400"></i> Neural Forge: Universal Synthesis
+                  <i className="fa-solid fa-atom mr-4 text-cyan-400"></i> Neural
+                  Forge: Universal Synthesis
                 </h3>
 
                 <div className="space-y-8">
@@ -273,16 +346,23 @@ const App: React.FC = () => {
                   </label>
                   <div className="flex flex-wrap gap-12">
                     {["Header", "Main", "Footer"].map((s) => (
-                      <label key={s} className="flex items-center space-x-5 cursor-pointer group">
+                      <label
+                        key={s}
+                        className="flex items-center space-x-5 cursor-pointer group"
+                      >
                         <input
                           type="checkbox"
-                          checked={(state.forgeSections as any)[s.toLowerCase()]}
+                          checked={
+                            (state.forgeSections as any)[s.toLowerCase()]
+                          }
                           onChange={() =>
                             setState((prev) => ({
                               ...prev,
                               forgeSections: {
                                 ...prev.forgeSections,
-                                [s.toLowerCase()]: !(prev.forgeSections as any)[s.toLowerCase()],
+                                [s.toLowerCase()]: !(prev.forgeSections as any)[
+                                  s.toLowerCase()
+                                ],
                               },
                             }))
                           }
@@ -302,14 +382,24 @@ const App: React.FC = () => {
                       Forge Concept Transmission
                     </label>
                     <VoiceInput
-                      onResult={(t) => setState((s) => ({ ...s, forgeDescription: s.forgeDescription + " " + t }))}
+                      onResult={(t) =>
+                        setState((s) => ({
+                          ...s,
+                          forgeDescription: s.forgeDescription + " " + t,
+                        }))
+                      }
                       className="w-[70px] h-[70px]"
                     />
                   </div>
                   <textarea
                     placeholder="Detailed vision: 'A high-converting SaaS landing page for cyber-security, featuring futuristic data-viz, glowing blue accents, and a tiered pricing table'..."
                     value={state.forgeDescription}
-                    onChange={(e) => setState((s) => ({ ...s, forgeDescription: e.target.value }))}
+                    onChange={(e) =>
+                      setState((s) => ({
+                        ...s,
+                        forgeDescription: e.target.value,
+                      }))
+                    }
                     className="w-full h-64 bg-slate-950 border-2 border-slate-800 rounded-2xl p-10 text-lg font-bold text-slate-200 outline-none focus:border-cyan-400 transition-all resize-none shadow-inner"
                   />
                 </div>
@@ -390,7 +480,9 @@ const App: React.FC = () => {
               result={state.result}
               onUpdate={(r) => setState((s) => ({ ...s, result: r }))}
               isAnalyzing={state.isAnalyzing}
-              setIsAnalyzing={(v) => setState((s) => ({ ...s, isAnalyzing: v }))}
+              setIsAnalyzing={(v) =>
+                setState((s) => ({ ...s, isAnalyzing: v }))
+              }
             />
           </div>
         ) : null}
@@ -419,8 +511,9 @@ const App: React.FC = () => {
                 </div>
               </div>
               <p className="text-slate-500 text-sm font-bold uppercase tracking-[0.2em] leading-loose max-w-lg">
-                Universal Neural Web Acquisition Engine. Designed, engineered, and deployed by J.W. Swain. 3000 Studios
-                Proprietary Protocol Alpha-9. Optimized for store-ready deployment.
+                Universal Neural Web Acquisition Engine. Designed, engineered,
+                and deployed by J.W. Swain. 3000 Studios Proprietary Protocol
+                Alpha-9. Optimized for store-ready deployment.
               </p>
             </div>
 
@@ -430,17 +523,26 @@ const App: React.FC = () => {
               </h4>
               <ul className="space-y-6 text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">
                 <li>
-                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                  <a
+                    href="#"
+                    className="hover:text-cyan-400 transition-all hover:translate-x-2 block"
+                  >
                     Neural Sync v4.8
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                  <a
+                    href="#"
+                    className="hover:text-cyan-400 transition-all hover:translate-x-2 block"
+                  >
                     DOM Deconstruction
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                  <a
+                    href="#"
+                    className="hover:text-cyan-400 transition-all hover:translate-x-2 block"
+                  >
                     Acquisition Engine
                   </a>
                 </li>
@@ -453,17 +555,26 @@ const App: React.FC = () => {
               </h4>
               <ul className="space-y-6 text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">
                 <li>
-                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                  <a
+                    href="#"
+                    className="hover:text-cyan-400 transition-all hover:translate-x-2 block"
+                  >
                     Store Access
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                  <a
+                    href="#"
+                    className="hover:text-cyan-400 transition-all hover:translate-x-2 block"
+                  >
                     Private Vault
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-cyan-400 transition-all hover:translate-x-2 block">
+                  <a
+                    href="#"
+                    className="hover:text-cyan-400 transition-all hover:translate-x-2 block"
+                  >
                     Architect SDK
                   </a>
                 </li>
@@ -473,8 +584,12 @@ const App: React.FC = () => {
 
           <div className="mt-48 pt-16 border-t border-slate-900 flex flex-col md:flex-row justify-between items-end text-[12px] font-black orbitron text-slate-700 tracking-[0.5em]">
             <div className="space-y-3">
-              <p className="text-slate-500">&copy; 2024 J.W. SWAIN | ARCHITECT & OWNER</p>
-              <p className="text-slate-800 font-black italic shadow-text">3000STUDIOS.COM | TOTAL DESIGN DOMINANCE</p>
+              <p className="text-slate-500">
+                &copy; 2024 J.W. SWAIN | ARCHITECT & OWNER
+              </p>
+              <p className="text-slate-800 font-black italic shadow-text">
+                3000STUDIOS.COM | TOTAL DESIGN DOMINANCE
+              </p>
             </div>
             <div className="mt-12 md:mt-0 text-right space-y-4">
               <div className="flex items-center justify-end space-x-4 text-slate-500">
@@ -482,8 +597,9 @@ const App: React.FC = () => {
                 <p>IDENTIFIED AS PROPRIETARY 3000TECH</p>
               </div>
               <p className="text-slate-800 text-[10px] max-w-sm ml-auto font-black uppercase">
-                Protected by 3000 Studios Proprietary Technology. Copyright 2024 J.W. Swain. Unauthorized replication
-                detected will trigger neural purge protocols.
+                Protected by 3000 Studios Proprietary Technology. Copyright 2024
+                J.W. Swain. Unauthorized replication detected will trigger
+                neural purge protocols.
               </p>
             </div>
           </div>

@@ -10,15 +10,22 @@ export function buildDependencies(intents, moneyStrategies, strategy) {
   for (const i of intents || []) {
     switch (String(i.intent || "")) {
       case "enable_affiliate_engine":
-        ["add disclosure page", "generate affiliate landing pages", "add CTA blocks", "install tracking"].forEach((d) =>
+        [
+          "add disclosure page",
+          "generate affiliate landing pages",
+          "add CTA blocks",
+          "install tracking",
+        ].forEach((d) => deps.add(d));
+        break;
+      case "enable_ads":
+        ["verify adsense publisher + slots", "add ad placements"].forEach((d) =>
           deps.add(d)
         );
         break;
-      case "enable_ads":
-        ["verify adsense publisher + slots", "add ad placements"].forEach((d) => deps.add(d));
-        break;
       case "enable_email_capture":
-        ["add email capture form", "set up newsletter drip campaign"].forEach((d) => deps.add(d));
+        ["add email capture form", "set up newsletter drip campaign"].forEach(
+          (d) => deps.add(d)
+        );
         break;
       default:
         break;

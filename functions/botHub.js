@@ -72,7 +72,8 @@ const brief = (env) => ({
   },
   policy: {
     productionEnv: String(env.ENVIRONMENT || "production"),
-    adminCookie: "vtw_admin=1.<ts>.<sig> (signed by CONTROL_PASSWORD/ADMIN_COOKIE_SECRET)",
+    adminCookie:
+      "vtw_admin=1.<ts>.<sig> (signed by CONTROL_PASSWORD/ADMIN_COOKIE_SECRET)",
     note: "Do not leak secrets to the client; use server-issued signed cookies or x-admin-token header.",
   },
   coordination: {
@@ -120,7 +121,9 @@ export async function handleBotHubRequest({ request, env }) {
     const notes = payload?.notes ? String(payload.notes).trim() : null;
     if (!name) return json(400, { error: "Missing name." });
     const id = crypto.randomUUID();
-    await env.D1.prepare("INSERT INTO bot_agents (id, name, kind, endpoint, notes) VALUES (?,?,?,?,?)")
+    await env.D1.prepare(
+      "INSERT INTO bot_agents (id, name, kind, endpoint, notes) VALUES (?,?,?,?,?)"
+    )
       .bind(id, name, kind, endpoint, notes)
       .run();
     return json(200, { ok: true, id });
@@ -139,9 +142,12 @@ export async function handleBotHubRequest({ request, env }) {
       .json()
       .catch(() => ({}));
     const notes = String(payload?.notes || "").trim();
-    const agents = Array.isArray(payload?.agents) ? payload.agents.map(String) : [];
+    const agents = Array.isArray(payload?.agents)
+      ? payload.agents.map(String)
+      : [];
     if (!notes) return json(400, { error: "Missing notes." });
-    if (!env.AI) return json(501, { error: "Workers AI binding missing (AI)." });
+    if (!env.AI)
+      return json(501, { error: "Workers AI binding missing (AI)." });
 
     const system = `
 You are the "Boss Bot" orchestrator for the VoiceToWebsite swarm.
@@ -163,7 +169,8 @@ Return ONLY JSON:
 }
 `.trim();
 
-    const user = `Agents: ${agents.join(", ") || "(unspecified)"}\n\nNotes:\n${notes}`.trim();
+    const user =
+      `Agents: ${agents.join(", ") || "(unspecified)"}\n\nNotes:\n${notes}`.trim();
 
     const taskId = crypto.randomUUID();
     try {
@@ -177,14 +184,30 @@ Return ONLY JSON:
       });
       const output = extractJson(pickAiText(aiResult));
 
-      await env.D1.prepare("INSERT INTO bot_tasks (id, status, agent_name, input_json, output_json) VALUES (?,?,?,?,?)")
-        .bind(taskId, "done", agents.join(","), JSON.stringify({ notes, agents }), JSON.stringify(output))
+      await env.D1.prepare(
+        "INSERT INTO bot_tasks (id, status, agent_name, input_json, output_json) VALUES (?,?,?,?,?)"
+      )
+        .bind(
+          taskId,
+          "done",
+          agents.join(","),
+          JSON.stringify({ notes, agents }),
+          JSON.stringify(output)
+        )
         .run();
 
       return json(200, { ok: true, taskId, output });
     } catch (err) {
-      await env.D1.prepare("INSERT INTO bot_tasks (id, status, agent_name, input_json, error) VALUES (?,?,?,?,?)")
-        .bind(taskId, "error", agents.join(","), JSON.stringify({ notes, agents }), String(err.message || err))
+      await env.D1.prepare(
+        "INSERT INTO bot_tasks (id, status, agent_name, input_json, error) VALUES (?,?,?,?,?)"
+      )
+        .bind(
+          taskId,
+          "error",
+          agents.join(","),
+          JSON.stringify({ notes, agents }),
+          String(err.message || err)
+        )
         .run();
       return json(502, { error: err.message, taskId });
     }

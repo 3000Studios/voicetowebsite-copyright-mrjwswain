@@ -1,6 +1,7 @@
 # VoiceToWebsite
 
-Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admin tools + app store).
+Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admin tools + app
+store).
 
 ## Local dev
 
@@ -17,9 +18,12 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 
 - Copy `ENV.example` → `.env` (or set env vars in your deploy platform)
 - Cloudflare settings live in `wrangler.toml`
-- If you want `/api/analytics/overview` to return real Cloudflare data, set `CF_ZONE_ID` + `CF_API_TOKEN` (see `ENV.example`).
-- Admin login uses `CONTROL_PASSWORD` and server-issued signed cookies. Optional hardening: set `ADMIN_COOKIE_SECRET`.
-- PayPal server-side checkout uses `PAYPAL_CLIENT_ID(_PROD)` + `PAYPAL_CLIENT_SECRET(_PROD)` and optional `PAYPAL_ENV=sandbox|live`.
+- If you want `/api/analytics/overview` to return real Cloudflare data, set `CF_ZONE_ID` +
+  `CF_API_TOKEN` (see `ENV.example`).
+- Admin login uses `CONTROL_PASSWORD` and server-issued signed cookies. Optional hardening: set
+  `ADMIN_COOKIE_SECRET`.
+- PayPal server-side checkout uses `PAYPAL_CLIENT_ID(_PROD)` + `PAYPAL_CLIENT_SECRET(_PROD)` and
+  optional `PAYPAL_ENV=sandbox|live`.
 
 ## Edge AI + R2
 
@@ -43,8 +47,10 @@ Static + Vite-powered site for the VoiceToWebsite ecosystem (public pages + admi
 
 ## Deploy
 
-- Manual production deploy: `npm run deploy` (runs `npm run verify` first, then `wrangler deploy --keep-vars`).
-- Set required Worker vars/secrets in Cloudflare (examples in `ENV.example` and `wrangler.toml` comments).
+- Manual production deploy: `npm run deploy` (runs `npm run verify` first, then
+  `wrangler deploy --keep-vars`).
+- Set required Worker vars/secrets in Cloudflare (examples in `ENV.example` and `wrangler.toml`
+  comments).
 - Optional remote auto-deploy on Git push:
   - enable `CF_WORKERS_BUILDS_AUTO_DEPLOY=1` in Worker runtime vars
   - set Worker Build API token to `VOICETOWEBSITE_WORKERS_BUILD_TOKEN`

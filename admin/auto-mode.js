@@ -27,8 +27,18 @@ const observer = new MutationObserver(() => {
   maybeAutoApply();
 });
 
-if (responseEl) observer.observe(responseEl, { childList: true, subtree: true, characterData: true });
-if (planSummary) observer.observe(planSummary, { childList: true, subtree: true, characterData: true });
+if (responseEl)
+  observer.observe(responseEl, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+if (planSummary)
+  observer.observe(planSummary, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
 
 // Fallback polling in case mutation misses async updates.
 setInterval(maybeAutoApply, 1500);

@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, X, Globe, FileText, User, Settings, ShoppingCart, Zap } from "lucide-react";
+import {
+  Search,
+  X,
+  Globe,
+  FileText,
+  User,
+  Settings,
+  ShoppingCart,
+  Zap,
+} from "lucide-react";
 
 interface SearchResult {
   id: string;
@@ -163,7 +172,10 @@ const GlobalSearch: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={() => setIsOpen(false)}
+      />
       <div
         ref={searchRef}
         className="relative w-full max-w-2xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden"
@@ -202,7 +214,9 @@ const GlobalSearch: React.FC = () => {
                   onClick={() => handleResultClick(result)}
                   className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-gray-800/50 transition-colors text-left group"
                 >
-                  <div className={`p-2 rounded-lg border ${getTypeColor(result.type)} flex-shrink-0`}>
+                  <div
+                    className={`p-2 rounded-lg border ${getTypeColor(result.type)} flex-shrink-0`}
+                  >
                     {result.icon}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -210,11 +224,15 @@ const GlobalSearch: React.FC = () => {
                       <h3 className="text-white font-medium group-hover:text-blue-400 transition-colors">
                         {result.title}
                       </h3>
-                      <span className={`px-2 py-0.5 text-xs rounded-full border ${getTypeColor(result.type)}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full border ${getTypeColor(result.type)}`}
+                      >
                         {result.type}
                       </span>
                     </div>
-                    <p className="text-gray-400 text-sm line-clamp-1">{result.description}</p>
+                    <p className="text-gray-400 text-sm line-clamp-1">
+                      {result.description}
+                    </p>
                   </div>
                 </button>
               ))}
@@ -228,17 +246,21 @@ const GlobalSearch: React.FC = () => {
           ) : (
             <div className="p-4">
               <div className="mb-4">
-                <h3 className="text-white font-medium mb-2">Popular Searches</h3>
+                <h3 className="text-white font-medium mb-2">
+                  Popular Searches
+                </h3>
                 <div className="flex flex-wrap gap-2">
-                  {["Voice to Website", "App Store", "Pricing", "Admin"].map((term) => (
-                    <button
-                      key={term}
-                      onClick={() => setQuery(term)}
-                      className="px-3 py-1.5 bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white rounded-lg text-sm transition-colors"
-                    >
-                      {term}
-                    </button>
-                  ))}
+                  {["Voice to Website", "App Store", "Pricing", "Admin"].map(
+                    (term) => (
+                      <button
+                        key={term}
+                        onClick={() => setQuery(term)}
+                        className="px-3 py-1.5 bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white rounded-lg text-sm transition-colors"
+                      >
+                        {term}
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
               <div>
@@ -250,8 +272,14 @@ const GlobalSearch: React.FC = () => {
                       onClick={() => handleResultClick(item)}
                       className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-gray-800/50 transition-colors text-left"
                     >
-                      <div className={`p-1.5 rounded border ${getTypeColor(item.type)}`}>{item.icon}</div>
-                      <span className="text-gray-300 hover:text-white transition-colors">{item.title}</span>
+                      <div
+                        className={`p-1.5 rounded border ${getTypeColor(item.type)}`}
+                      >
+                        {item.icon}
+                      </div>
+                      <span className="text-gray-300 hover:text-white transition-colors">
+                        {item.title}
+                      </span>
                     </button>
                   ))}
                 </div>

@@ -11,7 +11,9 @@ class AudioEngine {
 
   constructor() {
     if (typeof window !== "undefined") {
-      this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.context = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
     }
   }
 
@@ -72,8 +74,12 @@ class AudioEngine {
         this.musicSource = source;
         this.analyser = analyser;
         this.musicGain = gain;
-        this.analyserTimeData = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
-        this.analyserFreqData = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
+        this.analyserTimeData = new Uint8Array(
+          analyser.frequencyBinCount
+        ) as Uint8Array<ArrayBuffer>;
+        this.analyserFreqData = new Uint8Array(
+          analyser.frequencyBinCount
+        ) as Uint8Array<ArrayBuffer>;
       } catch (err) {
         // Fallback to direct element playback if the graph cannot be constructed.
         audio.volume = this.currentVolume;
@@ -103,7 +109,11 @@ class AudioEngine {
   public setVolume(volume: number) {
     this.currentVolume = Math.max(0, Math.min(1, volume));
     if (this.musicGain && this.context) {
-      this.musicGain.gain.setTargetAtTime(this.currentVolume, this.context.currentTime, 0.03);
+      this.musicGain.gain.setTargetAtTime(
+        this.currentVolume,
+        this.context.currentTime,
+        0.03
+      );
       return;
     }
     if (this.bgMusic) this.bgMusic.volume = this.currentVolume;
@@ -148,9 +158,15 @@ class AudioEngine {
     osc.type = type;
     osc.frequency.setValueAtTime(freq, this.context.currentTime);
 
-    gain.gain.setValueAtTime(volume * this.currentVolume * 2, this.context.currentTime);
+    gain.gain.setValueAtTime(
+      volume * this.currentVolume * 2,
+      this.context.currentTime
+    );
     if (ramp === "exp") {
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.context.currentTime + duration);
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        this.context.currentTime + duration
+      );
     } else {
       gain.gain.linearRampToValueAtTime(0, this.context.currentTime + duration);
     }
@@ -188,14 +204,26 @@ class AudioEngine {
 
     osc.type = "sawtooth";
     osc.frequency.setValueAtTime(100, this.context.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(2000, this.context.currentTime + 0.5);
+    osc.frequency.exponentialRampToValueAtTime(
+      2000,
+      this.context.currentTime + 0.5
+    );
 
     filter.type = "lowpass";
     filter.frequency.setValueAtTime(100, this.context.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(5000, this.context.currentTime + 0.5);
+    filter.frequency.exponentialRampToValueAtTime(
+      5000,
+      this.context.currentTime + 0.5
+    );
 
-    gain.gain.setValueAtTime(0.2 * this.currentVolume * 2, this.context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + 0.6);
+    gain.gain.setValueAtTime(
+      0.2 * this.currentVolume * 2,
+      this.context.currentTime
+    );
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      this.context.currentTime + 0.6
+    );
 
     osc.connect(filter);
     filter.connect(gain);
@@ -210,8 +238,14 @@ class AudioEngine {
     const osc = this.context.createOscillator();
     const gain = this.context.createGain();
     osc.frequency.setValueAtTime(100, this.context.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(3000, this.context.currentTime + 1);
-    gain.gain.setValueAtTime(0.1 * this.currentVolume * 2, this.context.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(
+      3000,
+      this.context.currentTime + 1
+    );
+    gain.gain.setValueAtTime(
+      0.1 * this.currentVolume * 2,
+      this.context.currentTime
+    );
     gain.gain.linearRampToValueAtTime(0, this.context.currentTime + 1);
     osc.connect(gain);
     gain.connect(this.context.destination);

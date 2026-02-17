@@ -68,20 +68,25 @@ Saved on: 2026-02-12
 
 - `allowCustomerCancel` in `readerBehavior` is not broadly available.
 - `print()` is only available on Verifone V660p.
-- `readReusableCard()` is for online reuse flows and does not get standard in-person Terminal liability shift/pricing benefits.
+- `readReusableCard()` is for online reuse flows and does not get standard in-person Terminal
+  liability shift/pricing benefits.
 - `collectPaymentMethod()` and `processPayment()` both support `config_override`.
-- Cancellation APIs exist for collection/processing flows (`cancelCollect*`, `cancelProcess*`, `cancelConfirm*`).
+- Cancellation APIs exist for collection/processing flows (`cancelCollect*`, `cancelProcess*`,
+  `cancelConfirm*`).
 
 ## Changelog Items Included In Your Paste
 
-- `2025-10-30`: Added surcharge consent support in `processPayment` (custom message up to 220 chars).
+- `2025-10-30`: Added surcharge consent support in `processPayment` (custom message up to 220
+  chars).
 - `2025-10-06`: Preview `print` support on Verifone V660p.
-- `2025-06-02`: Simulated reader support for input collection, plus cancellable `processPayment`, `confirmSetupIntent`, `processRefund`.
+- `2025-06-02`: Simulated reader support for input collection, plus cancellable `processPayment`,
+  `confirmSetupIntent`, `processRefund`.
 
 ## Canonical Docs
 
 - API reference: https://docs.stripe.com/terminal/references/api/js-sdk.md
-- Setup integration: https://docs.stripe.com/terminal/payments/setup-integration.md?terminal-sdk-platform=js
+- Setup integration:
+  https://docs.stripe.com/terminal/payments/setup-integration.md?terminal-sdk-platform=js
 - Collect card payment: https://docs.stripe.com/terminal/payments/collect-card-payment.md
 - Testing/simulated readers: https://docs.stripe.com/terminal/references/testing.md
 - Migration guide: https://docs.stripe.com/terminal/references/sdk-migration-guide.md

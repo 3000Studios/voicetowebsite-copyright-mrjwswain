@@ -44,16 +44,23 @@ describe("App Accessibility - Use Cases", () => {
 
     // Clicking it enters listening phase with a clear "Finish Command" control.
     await waitFor(() => {
-      expect((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition).toBeTruthy();
+      expect(
+        (window as any).SpeechRecognition ||
+          (window as any).webkitSpeechRecognition
+      ).toBeTruthy();
     });
     fireEvent.click(tapToSpeak);
-    const finish = await waitFor(() => screen.getByRole("button", { name: /finish command/i }));
+    const finish = await waitFor(() =>
+      screen.getByRole("button", { name: /finish command/i })
+    );
     expect(finish).toBeInTheDocument();
 
     // Stop listening transitions to confirm phase (button exists and is clickable).
     fireEvent.click(finish);
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /make it/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /make it/i })
+      ).toBeInTheDocument();
     });
   });
 });

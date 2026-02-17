@@ -6,7 +6,12 @@ const npmCmd = isWin ? process.env.ComSpec || "cmd.exe" : "npm";
 const npmPrefixArgs = isWin ? ["/d", "/s", "/c", "npm"] : [];
 
 const run = (cmd, args, opts = {}) => {
-  const res = spawnSync(cmd, args, { stdio: "inherit", shell: false, env: process.env, ...opts });
+  const res = spawnSync(cmd, args, {
+    stdio: "inherit",
+    shell: false,
+    env: process.env,
+    ...opts,
+  });
   if (res.status !== 0) process.exit(res.status ?? 1);
 };
 

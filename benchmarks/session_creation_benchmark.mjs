@@ -35,7 +35,9 @@ function runCurrent() {
     )`);
     createStmt.run();
 
-    const insertStmt = db.prepare("INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)");
+    const insertStmt = db.prepare(
+      "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)"
+    );
     insertStmt.run(id, UA);
   }
   const end = performance.now();
@@ -57,7 +59,9 @@ function runOptimized() {
     const id = `optimized-${i}`;
 
     // Optimized code: Just insert
-    const stmt = db.prepare("INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)");
+    const stmt = db.prepare(
+      "INSERT OR IGNORE INTO sessions (id, user_agent) VALUES (?,?)"
+    );
     stmt.run(id, UA);
   }
   const end = performance.now();
@@ -72,5 +76,6 @@ console.log(`Current (Create Check + Insert): ${currentDuration.toFixed(2)}ms`);
 const optimizedDuration = runOptimized();
 console.log(`Optimized (Insert Only): ${optimizedDuration.toFixed(2)}ms`);
 
-const improvement = ((currentDuration - optimizedDuration) / currentDuration) * 100;
+const improvement =
+  ((currentDuration - optimizedDuration) / currentDuration) * 100;
 console.log(`Improvement: ${improvement.toFixed(2)}%`);

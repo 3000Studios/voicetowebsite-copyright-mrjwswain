@@ -5,7 +5,10 @@ describe("support chat", () => {
   it("start creates a session without D1", async () => {
     const req = new Request("https://example.com/api/support/start", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Origin: "https://example.com" },
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://example.com",
+      },
       body: JSON.stringify({}),
     });
     const res = await handleSupportChatRequest({ request: req, env: {} });
@@ -19,10 +22,19 @@ describe("support chat", () => {
   it("message returns a static reply when PUBLIC_SUPPORT_AI is disabled", async () => {
     const req = new Request("https://example.com/api/support/message", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Origin: "https://example.com" },
-      body: JSON.stringify({ sessionId: "sess1", message: "Where is pricing?" }),
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://example.com",
+      },
+      body: JSON.stringify({
+        sessionId: "sess1",
+        message: "Where is pricing?",
+      }),
     });
-    const res = await handleSupportChatRequest({ request: req, env: { PUBLIC_SUPPORT_AI: "0" } });
+    const res = await handleSupportChatRequest({
+      request: req,
+      env: { PUBLIC_SUPPORT_AI: "0" },
+    });
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.ok).toBe(true);

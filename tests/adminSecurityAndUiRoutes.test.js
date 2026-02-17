@@ -6,14 +6,20 @@ const mockAssets = {
     const url = new URL(request.url);
     const headers = new Headers();
 
-    if (url.pathname.endsWith(".js")) headers.set("Content-Type", "application/javascript; charset=utf-8");
-    else if (url.pathname.endsWith(".css")) headers.set("Content-Type", "text/css; charset=utf-8");
+    if (url.pathname.endsWith(".js"))
+      headers.set("Content-Type", "application/javascript; charset=utf-8");
+    else if (url.pathname.endsWith(".css"))
+      headers.set("Content-Type", "text/css; charset=utf-8");
     else headers.set("Content-Type", "text/html; charset=utf-8");
 
     // Return 404 only for a clearly missing path so we can still cover the admin fallback logic if needed.
-    if (url.pathname.includes("definitely-missing")) return new Response("not found", { status: 404, headers });
+    if (url.pathname.includes("definitely-missing"))
+      return new Response("not found", { status: 404, headers });
 
-    return new Response(`<html><body>asset:${url.pathname}</body></html>`, { status: 200, headers });
+    return new Response(`<html><body>asset:${url.pathname}</body></html>`, {
+      status: 200,
+      headers,
+    });
   },
 };
 
@@ -33,7 +39,11 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
       NODE_ENV: "test",
     };
 
-    const res = await worker.fetch(new Request("https://example.com/admin/customer-chat.html"), env, {});
+    const res = await worker.fetch(
+      new Request("https://example.com/admin/customer-chat.html"),
+      env,
+      {}
+    );
     expect(res.status).toBe(302);
     expect(res.headers.get("Location")).toContain("/admin/access.html");
   });
@@ -46,7 +56,11 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
       NODE_ENV: "test",
     };
 
-    const res = await worker.fetch(new Request("https://example.com/admin/access.html"), env, {});
+    const res = await worker.fetch(
+      new Request("https://example.com/admin/access.html"),
+      env,
+      {}
+    );
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type") || "").toContain("text/html");
   });
@@ -99,7 +113,11 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
       NODE_ENV: "test",
     };
 
-    const res = await worker.fetch(new Request("https://example.com/api/support/admin/sessions"), env, {});
+    const res = await worker.fetch(
+      new Request("https://example.com/api/support/admin/sessions"),
+      env,
+      {}
+    );
     expect(res.status).toBe(401);
   });
 
@@ -134,7 +152,10 @@ describe("CSRF origin checks (defense-in-depth)", () => {
     const res = await worker.fetch(
       new Request("https://example.com/api/support/start", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Origin: "https://evil.example" },
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "https://evil.example",
+        },
         body: JSON.stringify({ email: "a@b.com", name: "A" }),
       }),
       env,
