@@ -108,7 +108,6 @@ export class ImageDiscoverySystem {
       // Use a simple image optimization approach
       // For production, consider using ImageMagick or similar
       const buffer = await blob.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
 
       // Store in R2 or KV
       const filename = `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;

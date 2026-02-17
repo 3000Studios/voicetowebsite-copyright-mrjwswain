@@ -10,6 +10,7 @@ import { handleBotHubRequest } from "./functions/botHub.js";
 import { onRequestPost as handleChatRequest } from "./functions/chat.js";
 import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
 import { onRequestPost as handleGodmodeInferRequest } from "./functions/godmode.js";
+import { handleImageSearchRequest } from "./functions/imageSearch.js";
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
 import {
   handleGenerateRequest,
@@ -1044,6 +1045,16 @@ export default {
     if (url.pathname.startsWith("/api/support/")) {
       return addSecurityHeaders(
         await handleSupportChatRequest({ request, env, ctx })
+      );
+    }
+
+    // Image & Video Discovery API (for Custom GPT "add image of X" commands)
+    if (
+      url.pathname === "/api/image-search" &&
+      (request.method === "POST" || request.method === "GET")
+    ) {
+      return addSecurityHeaders(
+        await handleImageSearchRequest(request, env, ctx)
       );
     }
 

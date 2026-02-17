@@ -373,7 +373,7 @@ export class CheckoutModal {
 
     // Payment method selection
     modal.querySelectorAll(".vtw-payment-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", () => {
         modal
           .querySelectorAll(".vtw-payment-btn")
           .forEach((b) => b.classList.remove("active"));
