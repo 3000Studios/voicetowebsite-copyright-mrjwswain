@@ -34,7 +34,7 @@ const SYSTEM_PROMPT = `You are the VoiceToWebsite AI Controller. You have full a
 - toggle-section [name] → Toggle section visibility
 
 ### Data & Media
-- play-audio [url] → Play audio/video  
+- play-audio [url] → Play audio/video
 - search [query] → Search website or external data
 - get-state [property] → Query current UI state
 

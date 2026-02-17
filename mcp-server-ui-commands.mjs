@@ -9,7 +9,6 @@ import { StdIO } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
-  TextContent,
 } from "@modelcontextprotocol/sdk/types.js";
 
 class UICommandServer {

@@ -105,10 +105,8 @@ You are the VoiceToWebsite AI Controller. You have full access to modify the web
 
 In the GPT configuration, add this webhook:
 
-**Name:** `execute-ui-command`  
-**URL:** `https://voicetowebsite.com/api/ui-command`  
-**Method:** `POST`  
-**Schema:**
+**Name:** `execute-ui-command` **URL:** `https://voicetowebsite.com/api/ui-command` **Method:**
+`POST` **Schema:**
 
 ```json
 {
