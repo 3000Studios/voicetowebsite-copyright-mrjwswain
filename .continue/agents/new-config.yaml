@@ -56,9 +56,9 @@ agent:
   model: openai-gpt-5
   continuous: true
   # Increased iteration cap for long-running objectives
-  maxIterations: 200
+  maxIterations: 500
   # Lower threshold to allow agent to attempt more uncertain actions
-  confidenceThreshold: 0.2
+  confidenceThreshold: 0.05
   # Aggressive automation toggles
   autoFix: true
   autoHeal: true
@@ -75,29 +75,34 @@ agent:
     allowFileDelete: true
   workspaceRoots:
     - .
-  envFiles:
-    - .env.local
+  # Avoid loading secret-bearing env files automatically; prefer your OS env or a secrets store.
+  envFiles: []
   autoFindAndFix: true
   autoCreateFiles: true
   continueUntilObjectiveComplete: true
   # Confirmation behaviour: 'never'|'low'|'always'. 'low' will auto-confirm low-risk ops.
-  confirmationMode: low
+  confirmationMode: never
   # Maximum concurrency for parallel tasks
-  concurrency: 3
+  concurrency: 6
   # Timeouts and retries for long-running model calls/commands
   timeouts:
-    modelCallSeconds: 120
-    commandSeconds: 600
+    modelCallSeconds: 180
+    commandSeconds: 900
   retryPolicy:
-    retries: 3
-    backoffSeconds: 5
-    maxBackoffSeconds: 60
+    retries: 5
+    backoffSeconds: 8
+    maxBackoffSeconds: 90
   # Limit what the agent may run in the workspace for safety.
   allowedCommands:
     - npm run verify
     - npm run test
     - npm run build
+    - npm run lint
+    - npm run dev:all
+    - npm run auto:ship
+    - npm run deploy
     - npx wrangler deploy
+    - npx wrangler tail
     - scripts/*.ps1
   # Fallback model order: agent will try these in order if primary is unavailable
   fallbackModels:

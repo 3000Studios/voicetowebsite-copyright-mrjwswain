@@ -59,9 +59,11 @@ These are new recommendations to improve site operations, flexibility, and secur
 
 ### Security & Identity
 
-| Variable              | Description                                                                                  |
-| :-------------------- | :------------------------------------------------------------------------------------------- |
-| `ADMIN_COOKIE_SECRET` | Optional. If set, uses a different secret for cookie signing than the login password. Safer. |
+| Variable                             | Description                                                                                                                        |
+| :----------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| `ADMIN_COOKIE_SECRET`                | Recommended. Secret used to sign the admin cookie; keep separate from the login password.                                          |
+| `ALLOW_ADMIN_HEADER_TOKEN`           | Optional (default off). If set to `1`, allows `x-admin-token: <CONTROL_PASSWORD>` for non-browser admin callers.                   |
+| `ALLOW_INSECURE_ADMIN_COOKIE_SECRET` | Optional (default off). If set to `1`, allows cookie signing to fall back to `CONTROL_PASSWORD` if `ADMIN_COOKIE_SECRET` is unset. |
 
 ---
 
@@ -72,6 +74,8 @@ These are new recommendations to improve site operations, flexibility, and secur
 CONTROL_PASSWORD=5555
 ADMIN_EMAIL=you@example.com
 ADMIN_COOKIE_SECRET=
+ALLOW_ADMIN_HEADER_TOKEN=
+ALLOW_INSECURE_ADMIN_COOKIE_SECRET=
 
 # --- AI CONFIGURATION ---
 GEMINIAPIKEY2=your_key_here

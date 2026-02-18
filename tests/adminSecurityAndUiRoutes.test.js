@@ -35,6 +35,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -52,6 +53,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -69,6 +71,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -109,6 +112,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -125,6 +129,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };

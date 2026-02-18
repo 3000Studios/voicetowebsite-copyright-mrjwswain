@@ -43,7 +43,7 @@ const sign = async (secret, message) => {
 };
 
 export const getAdminSigningSecret = (env) =>
-  env.ADMIN_COOKIE_SECRET || env.CONTROL_PASSWORD || "";
+  String(env.ADMIN_COOKIE_SECRET || "").trim();
 
 export const isAdminEnabled = (env) => Boolean(env.CONTROL_PASSWORD);
 
@@ -52,16 +52,30 @@ export const adminCookieTtlSeconds = 60 * 60 * 2; // 2 hours
 
 export const mintAdminCookieValue = async (env) => {
   const secret = getAdminSigningSecret(env);
-  if (!secret) throw new Error("Missing ADMIN_COOKIE_SECRET/CONTROL_PASSWORD.");
+  const allowInsecureFallback =
+    String(env.ALLOW_INSECURE_ADMIN_COOKIE_SECRET || "").trim() === "1";
+  const fallbackSecret = String(env.CONTROL_PASSWORD || "").trim();
+  const effectiveSecret =
+    secret || (allowInsecureFallback ? fallbackSecret : "");
+  if (!effectiveSecret) {
+    throw new Error(
+      "Missing ADMIN_COOKIE_SECRET. Set ADMIN_COOKIE_SECRET (recommended) or set ALLOW_INSECURE_ADMIN_COOKIE_SECRET=1 to fall back to CONTROL_PASSWORD."
+    );
+  }
   const ts = Date.now();
   const msg = `1.${ts}`;
-  const sig = await sign(secret, msg);
+  const sig = await sign(effectiveSecret, msg);
   return `${msg}.${sig}`;
 };
 
 export const verifyAdminCookieValue = async (env, value) => {
   const secret = getAdminSigningSecret(env);
-  if (!secret) return false;
+  const allowInsecureFallback =
+    String(env.ALLOW_INSECURE_ADMIN_COOKIE_SECRET || "").trim() === "1";
+  const fallbackSecret = String(env.CONTROL_PASSWORD || "").trim();
+  const effectiveSecret =
+    secret || (allowInsecureFallback ? fallbackSecret : "");
+  if (!effectiveSecret) return false;
   const parts = String(value || "").split(".");
   if (parts.length !== 3) return false;
   const [v, tsRaw, sig] = parts;
@@ -71,7 +85,7 @@ export const verifyAdminCookieValue = async (env, value) => {
   const ageSeconds = (Date.now() - ts) / 1000;
   if (ageSeconds < 0 || ageSeconds > adminCookieTtlSeconds) return false;
   const msg = `1.${ts}`;
-  const expected = await sign(secret, msg);
+  const expected = await sign(effectiveSecret, msg);
   return timingSafeEqual(sig, expected);
 };
 
@@ -83,8 +97,11 @@ export const hasValidAdminCookie = async (request, env) => {
 
 export const isAdminRequest = async (request, env) => {
   // Allows non-browser admin callers (e.g., internal tools) to authenticate without cookies.
+  const allowHeaderToken =
+    String(env.ALLOW_ADMIN_HEADER_TOKEN || "").trim() === "1";
   const headerToken = request.headers.get("x-admin-token") || "";
   if (
+    allowHeaderToken &&
     headerToken &&
     env.CONTROL_PASSWORD &&
     timingSafeEqual(headerToken, String(env.CONTROL_PASSWORD))

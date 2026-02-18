@@ -1,0 +1,27 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "ignorePaths": [
+    "dist/**",
+    "node_modules/**",
+    ".wrangler/**",
+    "package-lock.json",
+    "voicetowebsite-orchestrator/package-lock.json"
+  ],
+  "words": [
+    "Cloudflare",
+    "D1",
+    "KV",
+    "Mailchannels",
+    "PayPal",
+    "Resend",
+    "Sendgrid",
+    "Stripe",
+    "Vite",
+    "Vitest",
+    "WebForge",
+    "Wrangler",
+    "voicetowebsite"
+  ]
+}

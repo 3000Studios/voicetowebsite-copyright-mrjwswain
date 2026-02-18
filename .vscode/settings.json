@@ -7,5 +7,8 @@
   "eslint.format.enable": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-  }
+  },
+  "cSpell.enabled": true,
+  "cSpell.language": "en",
+  "cSpell.configFile": "cspell.json"
 }

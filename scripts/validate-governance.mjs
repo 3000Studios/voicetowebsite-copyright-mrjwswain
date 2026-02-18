@@ -4,6 +4,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 const OPS_DIR = path.join(ROOT, "ops", "site");
 const PUBLIC_DIR = path.join(ROOT, "public");
+const ENV_FILES = [path.join(ROOT, ".env"), path.join(ROOT, ".env.local")];
 
 const requiredFiles = [
   path.join(OPS_DIR, "pages.json"),
@@ -20,12 +21,41 @@ const normalizeRoute = (value) => {
   return raw.replace(/\/+$/, "");
 };
 
+const looksLikeLiveSecretLeak = (contents) => {
+  const text = String(contents || "");
+  // Keep this intentionally narrow to avoid breaking local dev while still catching high-risk mistakes.
+  // If any of these are present with real values, rotate them immediately.
+  const patterns = [
+    /(^|\r?\n)[ \t]*STRIPE_SECRET_KEY[ \t]*=[ \t]*sk_live_[^ \t\r\n#]+/i,
+    /(^|\r?\n)[ \t]*STRIPE_WEBHOOK_SECRET[ \t]*=[ \t]*whsec_[^ \t\r\n#]+/i,
+    /(^|\r?\n)[ \t]*PAYPAL_CLIENT_SECRET(?:_PROD)?[ \t]*=[ \t]*[^ \t\r\n#]+/i,
+    /(^|\r?\n)[ \t]*LICENSE_SECRET[ \t]*=[ \t]*[^ \t\r\n#]+/i,
+  ];
+  return patterns.some((re) => re.test(text));
+};
+
 const main = () => {
   const failures = [];
 
   for (const file of requiredFiles) {
     if (!fs.existsSync(file)) {
       failures.push(`missing required file: ${path.relative(ROOT, file)}`);
+    }
+  }
+
+  for (const envFile of ENV_FILES) {
+    if (!fs.existsSync(envFile)) continue;
+    try {
+      const contents = fs.readFileSync(envFile, "utf8");
+      if (looksLikeLiveSecretLeak(contents)) {
+        failures.push(
+          `${path.relative(ROOT, envFile)}: appears to contain live secrets (rotate keys and remove values from local env files)`
+        );
+      }
+    } catch (error) {
+      failures.push(
+        `${path.relative(ROOT, envFile)}: unable to read (${error?.message || "unknown error"})`
+      );
     }
   }
 
