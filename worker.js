@@ -9,6 +9,7 @@ import {
 import { handleBotHubRequest } from "./functions/botHub.js";
 import { onRequestPost as handleChatRequest } from "./functions/chat.js";
 import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
+import { getCapabilityManifest } from "./functions/capabilities.js";
 import { onRequestPost as handleGodmodeInferRequest } from "./functions/godmode.js";
 import { handleImageSearchRequest } from "./functions/imageSearch.js";
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
@@ -1205,6 +1206,26 @@ export default {
         d1: !!env.D1,
         assets: !!(env.ASSETS || env.SITE_ASSETS),
         ts: new Date().toISOString(),
+      });
+    }
+
+    // Capability manifest (machine-readable). Used by admin tooling, Voice Command Center,
+    // and Custom GPT clients to self-calibrate against the canonical command surface.
+    if (url.pathname === "/api/capabilities" && request.method === "GET") {
+      const isAdmin = await isAdminRequest(request, env);
+      const provided = String(request.headers.get("x-orch-token") || "").trim();
+      const orchToken = String(
+        env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || ""
+      ).trim();
+      const orchOk = Boolean(provided && orchToken && provided === orchToken);
+
+      if (!isAdmin && !orchOk) {
+        return jsonResponse(401, { error: "Unauthorized" });
+      }
+
+      return jsonResponse(200, {
+        ok: true,
+        manifest: getCapabilityManifest(env),
       });
     }
 

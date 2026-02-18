@@ -491,6 +491,21 @@
   </head>
   <body>
     <script type="module" src="../nav.js"></script>
+    <script>
+      // Load the machine-readable capability manifest so the Voice Command Center stays aligned
+      // with the canonical Worker command surface (also used by Custom GPT clients).
+      (async () => {
+        try {
+          const res = await fetch("/api/capabilities", { cache: "no-store" });
+          const data = await res.json().catch(() => ({}));
+          if (data && data.manifest) {
+            window.__VTW_CAPABILITIES__ = data.manifest;
+          }
+        } catch (_) {
+          // Non-fatal.
+        }
+      })();
+    </script>
 
     <div class="voice-command-center">
       <section class="god-hero card">
