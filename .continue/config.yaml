@@ -1,0 +1,58 @@
+models:
+  # Primary coding model - best for edits/completions (~13GB)
+  - title: DeepSeek Coder 6.7B
+    provider: ollama
+    model: deepseek-coder:6.7b
+    apiBase: http://localhost:11434
+
+  # Primary chat model - fast & capable (~14GB)
+  - title: Mistral 7B
+    provider: ollama
+    model: mistral:latest
+    apiBase: http://localhost:11434
+
+  # Backup general purpose (~14GB)
+  - title: Neural Chat 7B
+    provider: ollama
+    model: neural-chat:latest
+    apiBase: http://localhost:11434
+
+  # Optional high-capacity model (~26GB) - enable if needed
+  - title: Llama 2 13B
+    provider: ollama
+    model: llama2:13b
+    apiBase: http://localhost:11434
+
+  # Lightweight embedding model
+  - title: Nomic Embed Text
+    provider: ollama
+    model: nomic-embed-text
+    apiBase: http://localhost:11434
+
+chat:
+  model: Mistral 7B
+
+autocomplete:
+  model: DeepSeek Coder 6.7B
+
+edit:
+  model: DeepSeek Coder 6.7B
+
+apply:
+  model: DeepSeek Coder 6.7B
+
+embed:
+  provider: ollama
+  model: nomic-embed-text
+  apiBase: http://localhost:11434
+
+rerank:
+  provider: ollama
+  model: nomic-embed-text
+  apiBase: http://localhost:11434
+
+agent:
+  enabled: true
+  maxIterations: 8
+  temperature: 0.2
+  model: Mistral 7B

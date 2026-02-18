@@ -176,6 +176,7 @@ Scripts available:
 - `scripts/heal.mjs`
 - `scripts/husky-install.mjs`
 - `scripts/install-auto-ship-task.ps1`
+- `scripts/install-bots.ps1`
 - `scripts/install-jules.ps1`
 - `scripts/install-vscode-extensions.ps1`
 - `scripts/jules-setup.sh`

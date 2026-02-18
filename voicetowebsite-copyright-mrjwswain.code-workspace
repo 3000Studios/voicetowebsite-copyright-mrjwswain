@@ -8,5 +8,10 @@
     "editor.linkedEditing": true,
     "php.linkedEditing.variables": true,
     "todo-tree.tree.scanMode": "workspace only",
+    "geminicodeassist.project": "studios-ai-agent-3k",
+    "chat.mcp.assisted.nuget.enabled": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.alternateGeminiModelFPrompt.enabled": true,
+    "codeium.enableSearch": true,
   },
 }

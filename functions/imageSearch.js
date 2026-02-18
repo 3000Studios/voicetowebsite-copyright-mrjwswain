@@ -4,8 +4,8 @@
  * Integrates with ImageDiscoverySystem
  */
 
-import { ImageDiscoverySystem } from "../utils/imageDiscovery.js";
-import { logError, logImage } from "../utils/vaultLogger.js";
+import { ImageDiscoverySystem } from "../src/utils/imageDiscovery.js";
+import { logError, logImage } from "../src/utils/vaultLogger.js";
 
 export async function handleImageSearchRequest(request, env) {
   const { method } = request;

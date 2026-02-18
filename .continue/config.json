@@ -1,0 +1,4 @@
+{
+  "rules": [".continue/rules.md"],
+  "allowAnonymousTelemetry": false
+}

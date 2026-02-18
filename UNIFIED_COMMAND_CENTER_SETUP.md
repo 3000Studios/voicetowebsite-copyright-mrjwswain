@@ -262,7 +262,8 @@ Alt+Cmd+V → Toggle voice commands
 
 ## Testing Checklist
 
-- [ ] Continue.dev chat can list commands
+]- [ ] Continue.dev chat can list commands
+
 - [ ] Continue.dev chat can execute "set headline" command
 - [ ] Custom GPT configured and responds to commands
 - [ ] Voice on website: click 🎤, speak "Set headline to Test"

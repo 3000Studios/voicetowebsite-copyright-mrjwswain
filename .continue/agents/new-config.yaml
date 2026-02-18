@@ -1,0 +1,132 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: Example Config
+version: 1.0.0
+schema: v1
+
+# Define which models can be used
+# https://docs.continue.dev/customization/models
+models:
+  - name: openai-gpt-5
+    provider: openai
+    model: gpt-5
+    apiKey: ${{ secrets.OPENAI_API }}
+  - name: gemini
+    provider: google
+    model: gemini
+    apiKey: ${{ secrets.GEMINI_API_KEY }}
+  - uses: ollama/qwen2.5-coder-7b
+    with:
+      OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
+  # Recommended free / local models (will use local runtimes when available)
+  - uses: ollama/vicuna-13b
+    name: vicuna-13b
+    with:
+      OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
+  - uses: ollama/llama-2-13b-chat
+    name: llama2-13b-chat
+    with:
+      OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
+  - uses: huggingface/gpt-j-6b
+    name: gpt-j-6b
+    with:
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_TOKEN }}
+  - uses: huggingface/falcon-7b-instruct
+    name: falcon-7b-instruct
+    with:
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_TOKEN }}
+  - name: local-ggml-vicuna
+    provider: local
+    model: ggml-vicuna-13b
+    runtime: llama.cpp
+    path: ./models/ggml-vicuna-13b.bin
+
+# MCP Servers that Continue can access
+# https://docs.continue.dev/customization/mcp-tools
+mcpServers:
+  - uses: anthropic/memory-mcp
+
+# Workspace agent configuration: safe defaults with optional full access
+# Review and adjust `allowedCommands` and `allowDeploy` before enabling in production.
+agent:
+  id: workspace-agent
+  name: Workspace Auto Agent
+  description: "Per-user enabled agent for automations: auto-fix, auto-heal, run scripts, and optional deploy. Review allowedCommands before running."
+  model: openai-gpt-5
+  continuous: true
+  # Increased iteration cap for long-running objectives
+  maxIterations: 200
+  # Lower threshold to allow agent to attempt more uncertain actions
+  confidenceThreshold: 0.2
+  # Aggressive automation toggles
+  autoFix: true
+  autoHeal: true
+  autoTest: true
+  autoCommit: true
+  autoDeploy: true
+  # Runtime permissions: these are powerful. I set sensible defaults below.
+  permissions:
+    filesystem: true
+    run: true
+    network: true
+    git: true
+    allowFileCreate: true
+    allowFileDelete: true
+  workspaceRoots:
+    - .
+  envFiles:
+    - .env.local
+  autoFindAndFix: true
+  autoCreateFiles: true
+  continueUntilObjectiveComplete: true
+  # Confirmation behaviour: 'never'|'low'|'always'. 'low' will auto-confirm low-risk ops.
+  confirmationMode: low
+  # Maximum concurrency for parallel tasks
+  concurrency: 3
+  # Timeouts and retries for long-running model calls/commands
+  timeouts:
+    modelCallSeconds: 120
+    commandSeconds: 600
+  retryPolicy:
+    retries: 3
+    backoffSeconds: 5
+    maxBackoffSeconds: 60
+  # Limit what the agent may run in the workspace for safety.
+  allowedCommands:
+    - npm run verify
+    - npm run test
+    - npm run build
+    - npx wrangler deploy
+    - scripts/*.ps1
+  # Fallback model order: agent will try these in order if primary is unavailable
+  fallbackModels:
+    - gemini
+    - ollama/qwen2.5-coder-7b
+    - anthropic/claude-4-sonnet
+  # Prefer local models (if running Ollama or local LLM runtimes)
+  preferLocalModels: true
+  # If you want the agent to also deploy automatically set allowDeploy: true
+  allowDeploy: true
+  # Command the agent will run to deploy; adjust the command to your workflow.
+  deployCommand: npm run deploy
+  # Secret to use for deployment (ensure this is set in .env.local or secret store)
+  deploySecret: CLOUDFLARE_API_TOKEN
+  # Secrets available to the agent (referenced from environment/.env or secret store)
+  secrets:
+    - OPENAI_API
+    - GEMINI_API_KEY
+    - OLLAMA
+  # Logging and telemetry
+  logging:
+    level: info
+    persist: true
+  # Optional telemetry: set to false to minimize external calls
+  telemetry: false
+  # Prefer human-friendly natural language responses and minimize raw code dumps
+  responsePreferences:
+    naturalLanguage: true
+    avoidCodeOnlyResponses: true
+    showCodeBlocks: false
+    preferActionableSteps: true
+    language: auto

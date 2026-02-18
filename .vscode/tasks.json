@@ -1,312 +1,35 @@
 {
   "version": "2.0.0",
   "tasks": [
-    // ============================================
-    // DEVELOPMENT TASKS
-    // ============================================
     {
-      "label": "🚀 Dev: Site (Vite)",
-      "type": "npm",
-      "script": "dev",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "dev"
-      }
-    },
-    {
-      "label": "⚡ Dev: Worker (Wrangler)",
-      "type": "npm",
-      "script": "dev:worker",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "dev"
-      }
-    },
-    {
-      "label": "🔥 Dev: All (Site + Worker)",
-      "type": "npm",
-      "script": "dev:all",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "dev"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
-    },
-    {
-      "label": "🎯 Dev: Orchestrator",
-      "type": "npm",
-      "script": "orch:start",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "dev"
-      }
-    },
-
-    // ============================================
-    // BUILD TASKS
-    // ============================================
-    {
-      "label": "🏗️ Build: Production",
-      "type": "npm",
-      "script": "build",
-      "group": "build",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "📦 Build: Preview",
-      "type": "npm",
-      "script": "preview",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // VERIFICATION & TESTING
-    // ============================================
-    {
-      "label": "✅ Verify: All Checks",
-      "type": "npm",
-      "script": "verify",
-      "group": "test",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🧪 Test: Run Tests",
-      "type": "npm",
-      "script": "test",
-      "group": "test",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🔍 Type Check",
-      "type": "npm",
-      "script": "type-check",
-      "problemMatcher": ["$tsc"],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🔗 Check Links",
-      "type": "npm",
-      "script": "check:links",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // FORMATTING & LINTING
-    // ============================================
-    {
-      "label": "✨ Format: Check",
-      "type": "npm",
-      "script": "format:check",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "💅 Format: Fix",
-      "type": "npm",
-      "script": "format",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // DEPLOYMENT
-    // ============================================
-    {
-      "label": "🚢 Deploy: Production",
-      "type": "npm",
-      "script": "deploy",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "📤 Ship: Commit & Push",
-      "type": "npm",
-      "script": "ship:push",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // CONFIGURATION & GENERATION
-    // ============================================
-    {
-      "label": "⚙️ Generate: Config",
-      "type": "npm",
-      "script": "generate:config",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🗺️ Generate: Sitemap",
-      "type": "npm",
-      "script": "generate:sitemap",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // GOVERNANCE & OPERATIONS
-    // ============================================
-    {
-      "label": "🛡️ Governance: Check",
-      "type": "npm",
-      "script": "governance:check",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🔐 Guard: Deploy Check",
-      "type": "npm",
-      "script": "guard:deploy",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // UTILITIES
-    // ============================================
-    {
-      "label": "🩺 Heal: Auto-fix Issues",
-      "type": "npm",
-      "script": "heal",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🔄 Sync: Project State",
-      "type": "npm",
-      "script": "sync",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "🧹 Clean: Build Artifacts",
-      "type": "npm",
-      "script": "clean",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // INSTALLATION & SETUP
-    // ============================================
-    {
-      "label": "📥 Install: VS Code Extensions",
+      "label": "Repo: Install",
       "type": "shell",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-vscode-extensions.ps1",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
+      "command": "npm install",
+      "problemMatcher": []
     },
     {
-      "label": "🤖 Install: Orchestrator Dependencies",
-      "type": "npm",
-      "script": "orch:install",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-
-    // ============================================
-    // DEBUGGING
-    // ============================================
-    {
-      "label": "🐛 Debug: Tail Logs",
-      "type": "npm",
-      "script": "debug:tail",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+      "label": "Repo: Lint",
+      "type": "shell",
+      "command": "npm run lint",
+      "problemMatcher": []
     },
     {
-      "label": "🔬 Debug: Local (Verbose)",
-      "type": "npm",
-      "script": "debug:local",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+      "label": "Repo: Build",
+      "type": "shell",
+      "command": "npm run build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Repo: Test",
+      "type": "shell",
+      "command": "npm test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Repo: Full Check",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Repo: Install", "Repo: Lint", "Repo: Build", "Repo: Test"],
+      "problemMatcher": []
     }
   ]
 }

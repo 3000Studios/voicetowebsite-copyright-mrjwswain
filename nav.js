@@ -95,6 +95,7 @@ import siteConfig from "./src/site-config.json";
       icon: "📲",
     },
     { href: "/admin/analytics.html", label: "Analytics", icon: "📈" },
+    { href: "/admin/nexus.html", label: "Nexus", icon: "🧬" },
     { href: "/admin/live-stream.html", label: "Live Stream", icon: "🎬" },
     { href: "/admin/voice-commands.html", label: "Voice Commands", icon: "🎤" },
     {

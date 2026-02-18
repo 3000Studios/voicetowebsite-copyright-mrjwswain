@@ -1,0 +1,11 @@
+version: 1
+
+agents:
+  - name: "ShadowFixer"
+    description: "Autonomous repo fixer bot"
+    rules:
+      - "C:/Users/voice/.continue/rules.md"
+    commands:
+      - "npm install"
+      - "npm run build"
+      - "npm test"
