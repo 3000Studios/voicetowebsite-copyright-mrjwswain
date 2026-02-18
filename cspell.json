@@ -22,6 +22,12 @@
     "Vitest",
     "WebForge",
     "Wrangler",
-    "voicetowebsite"
+    "voicetowebsite",
+    "automations",
+    "behaviour",
+    "ggml",
+    "huggingface",
+    "ollama",
+    "qwen"
   ]
 }
