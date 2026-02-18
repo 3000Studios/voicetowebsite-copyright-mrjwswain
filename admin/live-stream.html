@@ -39,14 +39,31 @@
                 id="admin-live-player"
                 controls
                 muted
+                playsinline
                 style="width: 100%; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1)"
                 src=""
               ></video>
 
               <div class="live-admin__controls">
-                <input type="url" id="admin-live-url" placeholder="https://www.youtube.com/embed/..." />
-                <button class="primary" id="admin-live-load">Load Stream</button>
-                <button class="secondary" id="admin-live-save">Save Clip</button>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%">
+                  <label class="small muted">Camera source</label>
+                  <select id="admin-live-device" style="width: 100%"></select>
+                  <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                    <button class="primary" id="admin-live-start">Start streaming</button>
+                    <button class="secondary" id="admin-live-stop" disabled>Stop</button>
+                    <button class="secondary" id="admin-live-record" disabled>Record clip</button>
+                    <button class="secondary" id="admin-live-record-stop" disabled>Stop recording</button>
+                  </div>
+
+                  <label class="small muted" style="margin-top: 6px">External embed/stream URL (optional)</label>
+                  <input type="url" id="admin-live-url" placeholder="https://... (HLS .m3u8, MP4, etc.)" />
+                  <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                    <button class="secondary" id="admin-live-load">Load URL</button>
+                    <button class="secondary" id="admin-live-clear">Clear URL</button>
+                  </div>
+
+                  <div class="muted small" id="admin-live-status" style="min-height: 18px"></div>
+                </div>
               </div>
             </div>
 
@@ -61,5 +78,197 @@
 
     <script type="module" src="./admin.js"></script>
     <script type="module" src="../nav.js"></script>
+    <script type="module">
+      const els = {
+        video: document.getElementById("admin-live-player"),
+        device: document.getElementById("admin-live-device"),
+        start: document.getElementById("admin-live-start"),
+        stop: document.getElementById("admin-live-stop"),
+        record: document.getElementById("admin-live-record"),
+        recordStop: document.getElementById("admin-live-record-stop"),
+        clips: document.getElementById("admin-live-clips"),
+        url: document.getElementById("admin-live-url"),
+        load: document.getElementById("admin-live-load"),
+        clear: document.getElementById("admin-live-clear"),
+        status: document.getElementById("admin-live-status"),
+      };
+
+      let stream = null;
+      let recorder = null;
+      let recordedChunks = [];
+
+      const setStatus = (msg) => {
+        if (els.status) els.status.textContent = msg || "";
+      };
+
+      const stopStream = () => {
+        if (stream) {
+          for (const t of stream.getTracks()) t.stop();
+          stream = null;
+        }
+        if (els.video) {
+          els.video.srcObject = null;
+        }
+      };
+
+      const listDevices = async () => {
+        if (!navigator.mediaDevices?.enumerateDevices) {
+          setStatus("Camera APIs not available in this browser.");
+          return;
+        }
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cams = devices.filter((d) => d.kind === "videoinput");
+        els.device.innerHTML = "";
+        cams.forEach((cam, idx) => {
+          const opt = document.createElement("option");
+          opt.value = cam.deviceId;
+          opt.textContent = cam.label || `Camera ${idx + 1}`;
+          els.device.appendChild(opt);
+        });
+        if (!cams.length) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "No cameras found";
+          els.device.appendChild(opt);
+        }
+      };
+
+      const ensurePermissions = async () => {
+        // Request minimal stream once so labels show up in enumerateDevices.
+        const tmp = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+        tmp.getTracks().forEach((t) => t.stop());
+      };
+
+      const startStreaming = async () => {
+        setStatus("");
+        const deviceId = String(els.device.value || "");
+        stopStream();
+        const constraints = {
+          video: deviceId ? { deviceId: { exact: deviceId } } : true,
+          audio: false,
+        };
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        els.video.srcObject = stream;
+        await els.video.play().catch(() => {});
+      };
+
+      const canRecord = () => typeof window.MediaRecorder !== "undefined" && stream;
+
+      const startRecording = () => {
+        if (!canRecord()) return;
+        recordedChunks = [];
+        const options = {};
+        recorder = new MediaRecorder(stream, options);
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+        };
+        recorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: recorder.mimeType });
+          const url = URL.createObjectURL(blob);
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `vtw-clip-${new Date().toISOString().replace(/[:.]/g, "-")}.webm`;
+          a.textContent = a.download;
+          a.style.color = "rgba(255,255,255,0.9)";
+          li.appendChild(a);
+          els.clips.prepend(li);
+          setStatus("Clip ready for download.");
+        };
+        recorder.start();
+      };
+
+      const stopRecording = () => {
+        if (recorder && recorder.state !== "inactive") recorder.stop();
+      };
+
+      const loadUrl = async () => {
+        const u = String(els.url.value || "").trim();
+        if (!u) return;
+        stopRecording();
+        stopStream();
+        els.video.srcObject = null;
+        els.video.src = u;
+        await els.video.play().catch(() => {});
+      };
+
+      const clearUrl = () => {
+        els.url.value = "";
+        els.video.pause?.();
+        els.video.src = "";
+        setStatus("");
+      };
+
+      const syncButtons = () => {
+        const hasStream = Boolean(stream);
+        els.stop.disabled = !hasStream;
+        els.record.disabled = !hasStream || typeof window.MediaRecorder === "undefined";
+        els.recordStop.disabled = !recorder || recorder.state !== "recording";
+      };
+
+      els.start.addEventListener("click", async () => {
+        try {
+          await startStreaming();
+          setStatus("Live preview started.");
+        } catch (err) {
+          setStatus(`Failed to start camera: ${err.message || err}`);
+        } finally {
+          syncButtons();
+        }
+      });
+
+      els.stop.addEventListener("click", () => {
+        stopRecording();
+        stopStream();
+        setStatus("Stopped.");
+        syncButtons();
+      });
+
+      els.record.addEventListener("click", () => {
+        try {
+          startRecording();
+          setStatus("Recording...");
+        } catch (err) {
+          setStatus(`Recording failed: ${err.message || err}`);
+        } finally {
+          syncButtons();
+        }
+      });
+
+      els.recordStop.addEventListener("click", () => {
+        stopRecording();
+        syncButtons();
+      });
+
+      els.load.addEventListener("click", async () => {
+        try {
+          await loadUrl();
+          setStatus("Loaded URL.");
+        } catch (err) {
+          setStatus(`Failed to load URL: ${err.message || err}`);
+        } finally {
+          syncButtons();
+        }
+      });
+
+      els.clear.addEventListener("click", () => {
+        clearUrl();
+        syncButtons();
+      });
+
+      // Init
+      (async () => {
+        try {
+          await ensurePermissions();
+        } catch (_) {
+          // Permissions may be denied; still listDevices (labels may be blank).
+        }
+        await listDevices();
+        syncButtons();
+      })();
+    </script>
   </body>
 </html>

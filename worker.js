@@ -670,7 +670,11 @@ export default {
         const body = await request.clone().json();
         const { accessCode } = body;
 
-        const validAccessCode = String(env.ADMIN_ACCESS_CODE || "").trim();
+        // Access-code gate. Prefer a distinct ADMIN_ACCESS_CODE, but fall back to CONTROL_PASSWORD
+        // so a single configured value can unlock the admin UX flow.
+        const validAccessCode = String(
+          env.ADMIN_ACCESS_CODE || env.CONTROL_PASSWORD || ""
+        ).trim();
         if (!validAccessCode) {
           return createErrorResponse(
             503,
@@ -1209,7 +1213,11 @@ export default {
       if (!hasAdmin) {
         return jsonResponse(401, { error: "Unauthorized" });
       }
+      const adminAccessCodeConfigured = Boolean(
+        String(env.ADMIN_ACCESS_CODE || env.CONTROL_PASSWORD || "").trim()
+      );
       return jsonResponse(200, {
+        admin_access_code_configured: adminAccessCodeConfigured,
         orch_token: !!(env.ORCH_TOKEN || env.X_ORCH_TOKEN),
         stripe_publishable: !!(env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC),
         stripe_secret: !!env.STRIPE_SECRET_KEY,
@@ -1236,6 +1244,15 @@ export default {
           top: !!env.ADSENSE_SLOT_TOP,
           mid: !!env.ADSENSE_SLOT_MID,
           bottom: !!env.ADSENSE_SLOT_BOTTOM,
+        },
+        cloudflare_analytics: {
+          zone_id: !!(request.cf?.zoneId || env.CF_ZONE_ID),
+          api_token: !!(
+            env.CF_API_TOKEN ||
+            env.CF_API_TOKEN2 ||
+            env.CF_USER_TOKEN ||
+            env.CLOUDFLARE_API_TOKEN
+          ),
         },
         ts: new Date().toISOString(),
       });

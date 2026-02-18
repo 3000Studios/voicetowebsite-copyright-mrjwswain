@@ -155,6 +155,9 @@ Admin pages:
 - `/admin/nexus` -> `admin/nexus.html`
 - `/admin/progress` -> `admin/progress.html`
 - `/admin/store-manager` -> `admin/store-manager.html`
+- `/admin/test-lab-1` -> `admin/test-lab-1.html`
+- `/admin/test-lab-2` -> `admin/test-lab-2.html`
+- `/admin/test-lab-3` -> `admin/test-lab-3.html`
 - `/admin/voice-commands` -> `admin/voice-commands.html`
 
 App Store pages:
