@@ -49,17 +49,20 @@
                   <label class="small muted">Camera source</label>
                   <select id="admin-live-device" style="width: 100%"></select>
                   <div style="display: flex; gap: 10px; flex-wrap: wrap">
-                    <button class="primary" id="admin-live-start">Start streaming</button>
-                    <button class="secondary" id="admin-live-stop" disabled>Stop</button>
-                    <button class="secondary" id="admin-live-record" disabled>Record clip</button>
-                    <button class="secondary" id="admin-live-record-stop" disabled>Stop recording</button>
+                    <button class="secondary" id="admin-live-refresh" type="button">Refresh devices</button>
+                  </div>
+                  <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                    <button class="primary" id="admin-live-start" type="button">Start streaming</button>
+                    <button class="secondary" id="admin-live-stop" type="button" disabled>Stop</button>
+                    <button class="secondary" id="admin-live-record" type="button" disabled>Record clip</button>
+                    <button class="secondary" id="admin-live-record-stop" type="button" disabled>Stop recording</button>
                   </div>
 
                   <label class="small muted" style="margin-top: 6px">External embed/stream URL (optional)</label>
                   <input type="url" id="admin-live-url" placeholder="https://... (HLS .m3u8, MP4, etc.)" />
                   <div style="display: flex; gap: 10px; flex-wrap: wrap">
-                    <button class="secondary" id="admin-live-load">Load URL</button>
-                    <button class="secondary" id="admin-live-clear">Clear URL</button>
+                    <button class="secondary" id="admin-live-load" type="button">Load URL</button>
+                    <button class="secondary" id="admin-live-clear" type="button">Clear URL</button>
                   </div>
 
                   <div class="muted small" id="admin-live-status" style="min-height: 18px"></div>
@@ -90,6 +93,7 @@
         url: document.getElementById("admin-live-url"),
         load: document.getElementById("admin-live-load"),
         clear: document.getElementById("admin-live-clear"),
+        refresh: document.getElementById("admin-live-refresh"),
         status: document.getElementById("admin-live-status"),
       };
 
@@ -119,7 +123,16 @@
         const devices = await navigator.mediaDevices.enumerateDevices();
         const cams = devices.filter((d) => d.kind === "videoinput");
         els.device.innerHTML = "";
-        cams.forEach((cam, idx) => {
+        const sorted = cams.slice().sort((a, b) => {
+          const al = String(a.label || "").toLowerCase();
+          const bl = String(b.label || "").toLowerCase();
+          const aObs = al.includes("obs") ? 0 : 1;
+          const bObs = bl.includes("obs") ? 0 : 1;
+          if (aObs !== bObs) return aObs - bObs;
+          return al.localeCompare(bl);
+        });
+
+        sorted.forEach((cam, idx) => {
           const opt = document.createElement("option");
           opt.value = cam.deviceId;
           opt.textContent = cam.label || `Camera ${idx + 1}`;
@@ -130,6 +143,20 @@
           opt.value = "";
           opt.textContent = "No cameras found";
           els.device.appendChild(opt);
+          return;
+        }
+
+        // Auto-select OBS Virtual Camera if available.
+        const obs = sorted.find((d) =>
+          String(d.label || "")
+            .toLowerCase()
+            .includes("obs")
+        );
+        if (obs) els.device.value = obs.deviceId;
+
+        const hasLabels = sorted.some((d) => Boolean(String(d.label || "").trim()));
+        if (!hasLabels) {
+          setStatus("Tip: allow camera permission so device names (e.g. OBS Virtual Camera) show up.");
         }
       };
 
@@ -257,6 +284,19 @@
       els.clear.addEventListener("click", () => {
         clearUrl();
         syncButtons();
+      });
+
+      els.refresh.addEventListener("click", async () => {
+        try {
+          setStatus("Refreshing devices...");
+          await ensurePermissions();
+        } catch (_) {
+          // Ignore; enumerateDevices may still work with blank labels.
+        }
+        await listDevices();
+        setStatus(
+          'Devices refreshed. If you don’t see "OBS Virtual Camera", start it in OBS first (Start Virtual Camera) and refresh again.'
+        );
       });
 
       // Init
