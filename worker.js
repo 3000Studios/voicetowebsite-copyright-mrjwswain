@@ -656,7 +656,9 @@ export default {
     const cleanPath = url.pathname.replace(/\/$/, "");
     const assets = env.ASSETS || env.SITE_ASSETS;
 
-    if (!assets) {
+    // Allow API routes to function even if the static assets binding is misconfigured.
+    // This helps with emergency debugging and admin recovery.
+    if (!assets && !url.pathname.startsWith("/api/")) {
       return jsonResponse(500, {
         error: "Static assets binding is missing on this Worker route.",
       });

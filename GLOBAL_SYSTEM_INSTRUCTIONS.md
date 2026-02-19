@@ -186,6 +186,7 @@ Scripts available:
 - `scripts/performance-benchmark.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/ship.mjs`
+- `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
 - `scripts/test-checkout-flow.mjs`
 - `scripts/test-runner.mjs`

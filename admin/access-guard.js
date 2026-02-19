@@ -1,18 +1,19 @@
-// Admin access validation script
+// Admin access guard (UX). Server-side routes still enforce auth.
 (function () {
-  // Check if access is validated
-  if (sessionStorage.getItem("adminAccessValidated") !== "true") {
-    window.location.href = "/admin/access.html";
-    return;
-  }
+  try {
+    document.documentElement.classList.add("admin-auth-pending");
+  } catch (_) {}
 
-  // Check if authenticated (signed admin cookie) before allowing access to admin pages.
-  // This is a UX guard; server-side endpoints still enforce auth.
-  fetch("/api/config/status", { credentials: "include" })
+  const redirectToAccess = () => {
+    window.location.replace("/admin/access.html");
+  };
+
+  fetch("/api/config/status", { credentials: "include", cache: "no-store" })
     .then((res) => {
       if (!res.ok) throw new Error("unauthorized");
+      try {
+        document.documentElement.classList.remove("admin-auth-pending");
+      } catch (_) {}
     })
-    .catch(() => {
-      window.location.href = "/admin/login.html";
-    });
+    .catch(() => redirectToAccess());
 })();

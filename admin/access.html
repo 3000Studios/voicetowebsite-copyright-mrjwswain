@@ -138,6 +138,17 @@
         overflow: hidden;
       }
 
+      .access-card {
+        transition:
+          transform 280ms ease,
+          opacity 280ms ease;
+      }
+
+      .access-card.success {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+      }
+
       .access-button:hover {
         transform: translateY(-1px);
         box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.5);
@@ -315,6 +326,7 @@
       const buttonText = document.getElementById("buttonText");
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
+      const accessCard = document.querySelector(".access-card");
 
       accessForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -328,23 +340,27 @@
         errorMessage.style.display = "none";
 
         try {
-          const response = await fetch("/api/admin/access-code", {
+          // Mint the signed admin cookie directly (single-step sign-in).
+          const response = await fetch("/api/admin/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ accessCode }),
+            credentials: "include",
           });
 
-          const result = await response.json();
-
-          if (response.ok && result.success) {
-            // Store access validation and redirect to login
-            sessionStorage.setItem("adminAccessValidated", "true");
-            window.location.href = "/admin/login.html";
-          } else {
+          if (!response.ok) {
+            const result = await response.json().catch(() => ({}));
             throw new Error(result.error || "Access denied");
           }
+
+          // Success transition and redirect to admin.
+          accessButton.disabled = true;
+          accessCard?.classList.add("success");
+          window.setTimeout(() => {
+            window.location.href = "/admin/";
+          }, 260);
         } catch (error) {
           console.error("Access error:", error);
           errorMessage.style.display = "block";
@@ -357,10 +373,12 @@
         }
       });
 
-      // Check if access is already validated
-      if (sessionStorage.getItem("adminAccessValidated") === "true") {
-        window.location.href = "/admin/login.html";
-      }
+      // If already authenticated, go straight to admin.
+      fetch("/api/config/status", { credentials: "include" })
+        .then((res) => {
+          if (res.ok) window.location.href = "/admin/";
+        })
+        .catch(() => {});
     </script>
   </body>
 </html>

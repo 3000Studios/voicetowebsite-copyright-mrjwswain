@@ -15,7 +15,7 @@
     "ops:global-doc:check": "node ./scripts/update-global-system-doc.mjs --check",
     "generate:config": "node ./scripts/generate-config.mjs",
     "generate:sitemap": "node ./scripts/generate-sitemap.mjs",
-    "prebuild": "npm run generate:config && npm run generate:sitemap",
+    "prebuild": "node ./scripts/sync-public-assets.mjs && npm run generate:config && npm run generate:sitemap",
     "build": "vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
