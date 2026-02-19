@@ -104,6 +104,7 @@ Public pages:
 - `/cursor-demo` -> `cursor-demo.html`
 - `/cyber-blog` -> `cyber-blog.html`
 - `/demo` -> `demo.html`
+- `/disclosure` -> `disclosure.html`
 - `/features` -> `features.html`
 - `/focus-timer` -> `focus-timer.html`
 - `/gallery` -> `gallery.html`
@@ -183,13 +184,10 @@ Scripts available:
 - `scripts/install-jules.ps1`
 - `scripts/install-vscode-extensions.ps1`
 - `scripts/jules-setup.sh`
-- `scripts/performance-benchmark.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/ship.mjs`
 - `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
-- `scripts/test-checkout-flow.mjs`
-- `scripts/test-runner.mjs`
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
 - `scripts/validate-governance.mjs`
