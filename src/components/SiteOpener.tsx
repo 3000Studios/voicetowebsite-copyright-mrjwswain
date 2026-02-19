@@ -7,7 +7,7 @@ type Props = {
   reduceMotion?: boolean;
 };
 
-const VIDEO_SRC = "/media/vtw-admin-dashboard.mp4";
+const VIDEO_SRC = "/media/vtw-opener.mp4";
 const FALLBACK_IMG = "/vtw-wallpaper.png";
 
 export default function SiteOpener({

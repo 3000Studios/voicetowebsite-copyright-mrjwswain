@@ -106,6 +106,7 @@ const App: React.FC = () => {
       if (audioPrefRef.current === "off") return;
       if (audioPlayingRef.current) return;
       await audioEngine.enable();
+      audioEngine.unmuteMusicIfNeeded();
       const ok = await audioEngine.playMusic(INTRO_SONG);
       audioPlayingRef.current = ok;
       setIsAudioPlaying(ok);
