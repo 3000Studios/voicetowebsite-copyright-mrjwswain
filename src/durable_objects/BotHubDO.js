@@ -2,6 +2,15 @@ const DEFAULT_LOCK_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_LOCK_TTL_MS = 15 * 60 * 1000; // safety cap
 const MIN_LOCK_TTL_MS = 15 * 1000; // 15 seconds to avoid thrash
 
+const MAX_OPS_PER_PATCH = 200;
+const MAX_IDEMPOTENCY_CACHE_PER_ROUTE = 250;
+const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+const PATCH_RATE_WINDOW_MS = 60 * 1000; // 1 min
+const DEFAULT_PATCH_RATE_LIMIT = 30; // per actor per minute
+
+const SAFE_PATH_RE = /^[a-zA-Z0-9._/-]+$/;
+
 export class BotHubDO {
   constructor(state, env) {
     this.state = state;
@@ -63,13 +72,44 @@ export class BotHubDO {
     const patch = await request.json().catch(() => ({}));
     const route = this.normalizeRoute(patch.route);
     const ops = Array.isArray(patch.ops) ? patch.ops : [];
-    const { idempotencyKey, actor } = patch;
+    const actor = typeof patch.actor === "string" ? patch.actor.trim() : "";
+    const idempotencyKey =
+      typeof patch.idempotencyKey === "string"
+        ? patch.idempotencyKey.trim()
+        : "";
 
     if (!route || ops.length === 0) {
       return new Response("Invalid patch payload", { status: 400 });
     }
 
-    // TODO: Implement idempotency check, allowlist, quotas
+    if (!actor) {
+      return new Response("Missing actor", { status: 400 });
+    }
+
+    if (!idempotencyKey) {
+      return new Response("Missing idempotencyKey", { status: 400 });
+    }
+
+    if (ops.length > MAX_OPS_PER_PATCH) {
+      return new Response("Too many ops", { status: 400 });
+    }
+
+    const opsValidation = this.validateOps(ops);
+    if (!opsValidation.ok) {
+      return new Response(opsValidation.error, { status: 400 });
+    }
+
+    const prior = await this.getIdempotentResult(route, idempotencyKey);
+    if (prior) {
+      return new Response(JSON.stringify(prior), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const quotaOk = await this.checkAndConsumeQuota(actor);
+    if (!quotaOk) {
+      return new Response("Rate limited", { status: 429 });
+    }
 
     const lock = await this.getActiveLock(route);
     if (
@@ -88,6 +128,7 @@ export class BotHubDO {
     await this.state.storage.put(`overrides:${route}`, overrides);
 
     // Audit log
+    const resultPayload = { success: true, route, overrides };
     const auditEntry = {
       id: crypto.randomUUID(),
       timestamp: Date.now(),
@@ -99,7 +140,9 @@ export class BotHubDO {
     };
     await this.state.storage.put(`audit:${auditEntry.id}`, auditEntry);
 
-    return new Response(JSON.stringify({ success: true, route, overrides }), {
+    await this.putIdempotentResult(route, idempotencyKey, resultPayload);
+
+    return new Response(JSON.stringify(resultPayload), {
       headers: { "Content-Type": "application/json" },
     });
   }
@@ -307,5 +350,104 @@ export class BotHubDO {
   async clearLock(route) {
     this.locks.delete(route);
     await this.state.storage.delete(this.getLockKey(route));
+  }
+
+  validateOps(ops) {
+    for (const op of ops) {
+      if (!op || typeof op !== "object") {
+        return { ok: false, error: "Invalid op" };
+      }
+      if (op.op !== "set" && op.op !== "unset") {
+        return { ok: false, error: "Invalid op type" };
+      }
+      const path = typeof op.path === "string" ? op.path.trim() : "";
+      if (!path) return { ok: false, error: "Missing op.path" };
+      if (path.includes("..")) return { ok: false, error: "Invalid op.path" };
+      if (!SAFE_PATH_RE.test(path)) {
+        return { ok: false, error: "Invalid op.path" };
+      }
+      if (op.op === "set" && op.path.split("/").filter(Boolean).length > 32) {
+        return { ok: false, error: "op.path too deep" };
+      }
+    }
+    return { ok: true };
+  }
+
+  getIdempotencyKey(route, idempotencyKey) {
+    return `idempotency:${route}:${idempotencyKey}`;
+  }
+
+  getIdempotencyIndexKey(route) {
+    return `idempotency_index:${route}`;
+  }
+
+  async getIdempotentResult(route, idempotencyKey) {
+    const stored = await this.state.storage.get(
+      this.getIdempotencyKey(route, idempotencyKey)
+    );
+    if (!stored) return null;
+    if (
+      typeof stored?.ts === "number" &&
+      stored.ts > 0 &&
+      Date.now() - stored.ts <= IDEMPOTENCY_TTL_MS &&
+      stored?.payload &&
+      typeof stored.payload === "object"
+    ) {
+      return stored.payload;
+    }
+
+    await this.state.storage.delete(
+      this.getIdempotencyKey(route, idempotencyKey)
+    );
+    return null;
+  }
+
+  async putIdempotentResult(route, idempotencyKey, payload) {
+    await this.state.storage.put(
+      this.getIdempotencyKey(route, idempotencyKey),
+      {
+        ts: Date.now(),
+        payload,
+      }
+    );
+
+    const indexKey = this.getIdempotencyIndexKey(route);
+    const index = (await this.state.storage.get(indexKey)) || [];
+    const nextIndex = Array.isArray(index) ? index : [];
+    nextIndex.push({ idempotencyKey, ts: Date.now() });
+
+    // Prune: keep newest entries and also remove expired ones.
+    const cutoff = Date.now() - IDEMPOTENCY_TTL_MS;
+    const pruned = nextIndex
+      .filter((e) => e && typeof e.ts === "number" && e.ts >= cutoff)
+      .slice(-MAX_IDEMPOTENCY_CACHE_PER_ROUTE);
+
+    await this.state.storage.put(indexKey, pruned);
+
+    // Opportunistic deletion of a few old entries to prevent unbounded storage.
+    // We don't delete everything (could be expensive); just drop the oldest overflow entries.
+    if (nextIndex.length > pruned.length) {
+      const overflow = nextIndex.slice(0, nextIndex.length - pruned.length);
+      for (const entry of overflow) {
+        const key = entry?.idempotencyKey;
+        if (typeof key !== "string" || !key) continue;
+        await this.state.storage.delete(this.getIdempotencyKey(route, key));
+      }
+    }
+  }
+
+  async checkAndConsumeQuota(actor) {
+    const limitRaw = String(this.env.PATCH_APPLY_RATE_LIMIT || "").trim();
+    const limit = Number(limitRaw || DEFAULT_PATCH_RATE_LIMIT);
+    const windowStart =
+      Math.floor(Date.now() / PATCH_RATE_WINDOW_MS) * PATCH_RATE_WINDOW_MS;
+    const key = `quota:${actor}:${windowStart}`;
+
+    return this.state.blockConcurrencyWhile(async () => {
+      const current = Number((await this.state.storage.get(key)) || 0);
+      if (Number.isFinite(limit) && limit > 0 && current >= limit) return false;
+      await this.state.storage.put(key, current + 1);
+      return true;
+    });
   }
 }

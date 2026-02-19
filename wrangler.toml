@@ -7,6 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 # Static assets from Vite build output.
 assets = { directory = "dist", binding = "ASSETS" }
 
+# Explicitly disable workers.dev + preview URLs for production.
+workers_dev = false
+preview_urls = false
+
 # Production routes for the public site.
 routes = [
   { pattern = "voicetowebsite.com/*", zone_name = "voicetowebsite.com" },
@@ -35,6 +39,7 @@ binding = "AI"
 ENVIRONMENT = "production"
 PUBLIC_GENERATE = "1"
 CF_WORKERS_BUILDS_AUTO_DEPLOY = "1"
+CF_ALLOW_LEGACY_DEPLOY_HOOKS = "1"
 GH_BASE_BRANCH = "main"
 GH_REPO = "3000Studios/voicetowebsite-copyright-mrjwswain"
 ADSENSE_PUBLISHER = "ca-pub-5800977493749262"

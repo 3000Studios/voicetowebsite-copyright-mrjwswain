@@ -38,6 +38,16 @@ body {
   overflow-y: auto;
 }
 
+/* Hide admin UI until the access-guard confirms the signed admin cookie. */
+html.admin-auth-pending .admin-shell {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-shell {
+  transition: opacity 240ms ease;
+}
+
 /* Global injected nav (nav.js) */
 .glass-nav {
   position: fixed;

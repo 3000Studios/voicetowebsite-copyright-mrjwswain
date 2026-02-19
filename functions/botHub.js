@@ -73,8 +73,8 @@ const brief = (env) => ({
   policy: {
     productionEnv: String(env.ENVIRONMENT || "production"),
     adminCookie:
-      "vtw_admin=1.<ts>.<sig> (signed by CONTROL_PASSWORD/ADMIN_COOKIE_SECRET)",
-    note: "Do not leak secrets to the client; use server-issued signed cookies or x-admin-token header.",
+      "vtw_admin=1.<ts>.<sig> (signed by ADMIN_COOKIE_SECRET; optional fallback to CONTROL_PASSWORD only if ALLOW_INSECURE_ADMIN_COOKIE_SECRET=1)",
+    note: "Do not leak secrets to the client; prefer server-issued signed cookies. Enable x-admin-token only if you explicitly set ALLOW_ADMIN_HEADER_TOKEN=1.",
   },
   coordination: {
     goal: "Keep multiple AI agents aligned (single brief + shared task log).",

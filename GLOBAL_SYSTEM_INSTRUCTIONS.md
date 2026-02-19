@@ -155,6 +155,9 @@ Admin pages:
 - `/admin/nexus` -> `admin/nexus.html`
 - `/admin/progress` -> `admin/progress.html`
 - `/admin/store-manager` -> `admin/store-manager.html`
+- `/admin/test-lab-1` -> `admin/test-lab-1.html`
+- `/admin/test-lab-2` -> `admin/test-lab-2.html`
+- `/admin/test-lab-3` -> `admin/test-lab-3.html`
 - `/admin/voice-commands` -> `admin/voice-commands.html`
 
 App Store pages:
@@ -183,6 +186,7 @@ Scripts available:
 - `scripts/performance-benchmark.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/ship.mjs`
+- `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
 - `scripts/test-checkout-flow.mjs`
 - `scripts/test-runner.mjs`
@@ -220,6 +224,8 @@ Core governance docs present:
 - `ADSENSE_SLOT_BOTTOM`
 - `ADSENSE_SLOT_MID`
 - `ADSENSE_SLOT_TOP`
+- `ALLOW_ADMIN_HEADER_TOKEN`
+- `ALLOW_INSECURE_ADMIN_COOKIE_SECRET`
 - `CF_ACCOUNT_API_VOICETOWEBSITE`
 - `CF_API_TOKEN`
 - `CF_API_TOKEN2`

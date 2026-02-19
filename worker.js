@@ -9,6 +9,7 @@ import {
 import { handleBotHubRequest } from "./functions/botHub.js";
 import { onRequestPost as handleChatRequest } from "./functions/chat.js";
 import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
+import { getCapabilityManifest } from "./functions/capabilities.js";
 import { onRequestPost as handleGodmodeInferRequest } from "./functions/godmode.js";
 import { handleImageSearchRequest } from "./functions/imageSearch.js";
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
@@ -655,7 +656,9 @@ export default {
     const cleanPath = url.pathname.replace(/\/$/, "");
     const assets = env.ASSETS || env.SITE_ASSETS;
 
-    if (!assets) {
+    // Allow API routes to function even if the static assets binding is misconfigured.
+    // This helps with emergency debugging and admin recovery.
+    if (!assets && !url.pathname.startsWith("/api/")) {
       return jsonResponse(500, {
         error: "Static assets binding is missing on this Worker route.",
       });
@@ -670,7 +673,11 @@ export default {
         const body = await request.clone().json();
         const { accessCode } = body;
 
-        const validAccessCode = String(env.ADMIN_ACCESS_CODE || "").trim();
+        // Access-code gate. Prefer a distinct ADMIN_ACCESS_CODE, but fall back to CONTROL_PASSWORD
+        // so a single configured value can unlock the admin UX flow.
+        const validAccessCode = String(
+          env.ADMIN_ACCESS_CODE || env.CONTROL_PASSWORD || ""
+        ).trim();
         if (!validAccessCode) {
           return createErrorResponse(
             503,
@@ -703,7 +710,7 @@ export default {
         if (!isAdminEnabled(env)) {
           return jsonResponse(503, {
             error:
-              "Admin is disabled. Set CONTROL_PASSWORD to enable admin login.",
+              "Admin is disabled. Set CONTROL_PASSWORD (recommended) or ADMIN_ACCESS_CODE to enable admin login.",
           });
         }
 
@@ -725,15 +732,21 @@ export default {
         }
 
         const validAccessCode = String(env.CONTROL_PASSWORD || "").trim();
+        const validAltCode = String(env.ADMIN_ACCESS_CODE || "").trim();
 
-        if (!validAccessCode) {
+        if (!validAccessCode && !validAltCode) {
           return jsonResponse(503, {
             error:
-              "Admin is disabled. Set CONTROL_PASSWORD to enable admin login.",
+              "Admin is disabled. Set CONTROL_PASSWORD (recommended) or ADMIN_ACCESS_CODE to enable admin login.",
           });
         }
 
-        if (!accessCode || String(accessCode).trim() !== validAccessCode) {
+        const provided = String(accessCode || "").trim();
+        const ok =
+          (validAccessCode && provided === validAccessCode) ||
+          (validAltCode && provided === validAltCode);
+
+        if (!ok) {
           return jsonResponse(401, { error: "Invalid access code." });
         }
         const cookieValue = await mintAdminCookieValue(env);
@@ -1204,12 +1217,36 @@ export default {
       });
     }
 
+    // Capability manifest (machine-readable). Used by admin tooling, Voice Command Center,
+    // and Custom GPT clients to self-calibrate against the canonical command surface.
+    if (url.pathname === "/api/capabilities" && request.method === "GET") {
+      const isAdmin = await isAdminRequest(request, env);
+      const provided = String(request.headers.get("x-orch-token") || "").trim();
+      const orchToken = String(
+        env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || ""
+      ).trim();
+      const orchOk = Boolean(provided && orchToken && provided === orchToken);
+
+      if (!isAdmin && !orchOk) {
+        return jsonResponse(401, { error: "Unauthorized" });
+      }
+
+      return jsonResponse(200, {
+        ok: true,
+        manifest: getCapabilityManifest(env),
+      });
+    }
+
     if (url.pathname === "/api/config/status" && request.method === "GET") {
       const hasAdmin = await hasValidAdminCookie(request, env);
       if (!hasAdmin) {
         return jsonResponse(401, { error: "Unauthorized" });
       }
+      const adminAccessCodeConfigured = Boolean(
+        String(env.ADMIN_ACCESS_CODE || env.CONTROL_PASSWORD || "").trim()
+      );
       return jsonResponse(200, {
+        admin_access_code_configured: adminAccessCodeConfigured,
         orch_token: !!(env.ORCH_TOKEN || env.X_ORCH_TOKEN),
         stripe_publishable: !!(env.STRIPE_PUBLISHABLE_KEY || env.STRIPE_PUBLIC),
         stripe_secret: !!env.STRIPE_SECRET_KEY,
@@ -1236,6 +1273,15 @@ export default {
           top: !!env.ADSENSE_SLOT_TOP,
           mid: !!env.ADSENSE_SLOT_MID,
           bottom: !!env.ADSENSE_SLOT_BOTTOM,
+        },
+        cloudflare_analytics: {
+          zone_id: !!(request.cf?.zoneId || env.CF_ZONE_ID),
+          api_token: !!(
+            env.CF_API_TOKEN ||
+            env.CF_API_TOKEN2 ||
+            env.CF_USER_TOKEN ||
+            env.CLOUDFLARE_API_TOKEN
+          ),
         },
         ts: new Date().toISOString(),
       });

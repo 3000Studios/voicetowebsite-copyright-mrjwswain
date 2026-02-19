@@ -35,6 +35,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -52,6 +53,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -69,6 +71,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -105,10 +108,42 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     expect(res.status).toBe(200);
   });
 
+  it("can login with ADMIN_ACCESS_CODE when CONTROL_PASSWORD is not set", async () => {
+    const env = {
+      ASSETS: mockAssets,
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
+      ADMIN_ACCESS_CODE: "5555",
+      NODE_ENV: "test",
+    };
+
+    const loginRes = await worker.fetch(
+      new Request("https://example.com/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: "5555" }),
+      }),
+      env,
+      {}
+    );
+    expect(loginRes.status).toBe(200);
+    const cookie = extractFirstCookie(loginRes.headers.get("Set-Cookie"));
+    expect(cookie.startsWith("vtw_admin=")).toBe(true);
+
+    const statusRes = await worker.fetch(
+      new Request("https://example.com/api/config/status", {
+        headers: { Cookie: cookie },
+      }),
+      env,
+      {}
+    );
+    expect(statusRes.status).toBe(200);
+  });
+
   it("blocks critical admin APIs without an admin cookie (support admin sessions)", async () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };
@@ -125,6 +160,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
       ADMIN_ACCESS_CODE: "code",
       NODE_ENV: "test",
     };

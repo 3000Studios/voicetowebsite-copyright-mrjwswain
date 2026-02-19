@@ -110,7 +110,7 @@ Implement smoke tests and promotion gate per Section P and V8. Update progress f
 
 - Store/Appstore contentization: IN_PROGRESS
 - AdSense + affiliate IDs live: IN_PROGRESS
-- Checkout unification (PayPal + Stripe + multi-item): TODO
+- Checkout unification (PayPal + Stripe + multi-item): IN_PROGRESS
 
 ### Admin Control Center
 

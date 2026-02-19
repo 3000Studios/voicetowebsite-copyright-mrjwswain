@@ -139,6 +139,17 @@
         overflow: hidden;
       }
 
+      .login-card {
+        transition:
+          transform 280ms ease,
+          opacity 280ms ease;
+      }
+
+      .login-card.success {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+      }
+
       .login-button:hover {
         transform: translateY(-1px);
         box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.5);
@@ -330,6 +341,7 @@
       const buttonText = document.getElementById("buttonText");
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
+      const loginCard = document.querySelector(".login-card");
 
       const bgVideo = document.querySelector(".video-bg video");
       if (bgVideo) {
@@ -370,8 +382,12 @@
           });
 
           if (response.ok) {
-            // Redirect to admin dashboard
-            window.location.href = "/admin/";
+            // Success transition and redirect to admin.
+            loginButton.disabled = true;
+            loginCard?.classList.add("success");
+            window.setTimeout(() => {
+              window.location.href = "/admin/";
+            }, 260);
           } else {
             const error = await response.json();
             throw new Error(error.error || "Login failed");
@@ -387,12 +403,6 @@
           loadingSpinner.style.display = "none";
         }
       });
-
-      // Check if access is validated
-      if (sessionStorage.getItem("adminAccessValidated") !== "true") {
-        window.location.href = "/admin/access.html";
-        return;
-      }
 
       // Check if already authenticated
       async function checkAuth() {

@@ -30,12 +30,23 @@ export const handleStripePurchase = async (product, amount, redirectUrl) => {
 
   try {
     const stripe = window.Stripe(STRIPE_PK);
+    const items = Array.isArray(product) ? product : null;
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         provider: "stripe",
-        id: product,
+        ...(items
+          ? { items }
+          : {
+              id: product,
+              name:
+                typeof product === "string" && product.trim()
+                  ? product.trim()
+                  : "Product",
+              price: Number(amount || 0),
+              currency: "USD",
+            }),
         successUrl: redirectUrl,
       }),
     });
@@ -138,14 +149,22 @@ export const handlePayPalPurchase = async (
           label: "paypal",
         },
         createOrder: async () => {
+          const items = Array.isArray(sku) ? sku : null;
           const res = await fetch("/api/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               provider: "paypal",
-              id: String(sku || "")
-                .trim()
-                .toLowerCase(),
+              ...(items
+                ? { items }
+                : {
+                    id: String(sku || "")
+                      .trim()
+                      .toLowerCase(),
+                    name: displayName || String(sku || ""),
+                    price: Number(amount || 0),
+                    currency: "USD",
+                  }),
             }),
           });
           const data = await res.json().catch(() => ({}));

@@ -236,7 +236,8 @@ const App: React.FC = () => {
           <div
             className="w-full h-full brightness-50"
             style={{
-              backgroundImage: "url(/vtw-wallpaper.png)",
+              backgroundImage:
+                "radial-gradient(1200px circle at 12% -10%, rgba(255,255,255,0.18), transparent 60%), radial-gradient(1100px circle at 90% 15%, rgba(34,211,238,0.14), transparent 62%), radial-gradient(800px circle at 30% 80%, rgba(251,191,36,0.10), transparent 65%), linear-gradient(180deg, rgba(8,12,24,0.78), rgba(8,12,24,0.95)), linear-gradient(120deg, rgba(10,20,40,0.97), rgba(7,10,22,0.99))",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
