@@ -1,18 +1,25 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import SiteOpener from "./SiteOpener";
 
 describe("SiteOpener", () => {
-  it("renders skip button when shown", () => {
+  it("renders when shown", () => {
     const onDone = vi.fn();
-    render(<SiteOpener show={true} onDone={onDone} reduceMotion={true} />);
-    expect(screen.getByRole("button", { name: /skip/i })).toBeInTheDocument();
+    const { container } = render(
+      <SiteOpener show={true} onDone={onDone} reduceMotion={true} />
+    );
+    expect(
+      container.querySelector('[data-testid="vtw-site-opener"]')
+    ).toBeTruthy();
   });
 
-  it("calls onDone when skip is clicked", async () => {
+  it("calls onDone automatically in reduceMotion mode", () => {
+    vi.useFakeTimers();
     const onDone = vi.fn();
     render(<SiteOpener show={true} onDone={onDone} reduceMotion={true} />);
-    screen.getByRole("button", { name: /skip/i }).click();
+    expect(onDone).toHaveBeenCalledTimes(0);
+    vi.advanceTimersByTime(500);
     expect(onDone).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
   });
 });

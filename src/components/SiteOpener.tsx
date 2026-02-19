@@ -16,6 +16,8 @@ export default function SiteOpener({
   reduceMotion = false,
 }: Props) {
   const doneRef = useRef(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const safetyTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!show) return;
@@ -24,15 +26,19 @@ export default function SiteOpener({
     // Hide nav/widget/footer while the opener is on-screen.
     document.documentElement.dataset.vtwPhase = "opener";
 
-    const ms = reduceMotion ? 500 : 3800;
-    const t = window.setTimeout(() => {
-      if (doneRef.current) return;
-      doneRef.current = true;
-      onDone();
-    }, ms);
+    if (reduceMotion) {
+      safetyTimerRef.current = window.setTimeout(() => {
+        if (doneRef.current) return;
+        doneRef.current = true;
+        onDone();
+      }, 500);
+    }
 
     return () => {
-      window.clearTimeout(t);
+      if (safetyTimerRef.current) {
+        window.clearTimeout(safetyTimerRef.current);
+        safetyTimerRef.current = null;
+      }
       // If opener unmounts, restore normal chrome.
       if (document.documentElement.dataset.vtwPhase === "opener") {
         delete document.documentElement.dataset.vtwPhase;
@@ -51,6 +57,7 @@ export default function SiteOpener({
       {show ? (
         <motion.div
           key="vtw-site-opener"
+          data-testid="vtw-site-opener"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -65,45 +72,30 @@ export default function SiteOpener({
                   backgroundImage: `url(${FALLBACK_IMG})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
-                  filter: "brightness(0.55)",
+                  filter: "brightness(0.9)",
                 }}
               />
             ) : (
               <video
+                ref={videoRef}
                 className="w-full h-full object-cover"
                 autoPlay
                 muted
-                loop
                 playsInline
                 preload="metadata"
                 poster={FALLBACK_IMG}
+                onLoadedMetadata={() => {
+                  if (videoRef.current) videoRef.current.playbackRate = 1;
+                }}
+                onEnded={finish}
+                onError={() => {
+                  if (doneRef.current) return;
+                  safetyTimerRef.current = window.setTimeout(finish, 800);
+                }}
               >
                 <source src={VIDEO_SRC} type="video/mp4" />
               </video>
             )}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/35 to-black/80" />
-          </div>
-
-          <div className="relative z-10 h-full w-full flex flex-col items-center justify-end pb-10 md:pb-16 px-6">
-            <div className="text-center">
-              <div className="font-orbitron text-[10px] tracking-[0.6em] text-white/70 uppercase">
-                VoiceToWebsite
-              </div>
-              <div className="mt-3 font-orbitron text-3xl md:text-5xl tracking-[0.18em] text-white">
-                Command Center
-              </div>
-              <div className="mt-4 text-white/60 max-w-xl mx-auto">
-                Speak it. Ship it. Securely.
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={finish}
-              className="mt-8 px-6 py-3 rounded-full border border-white/20 bg-white/10 hover:bg-white hover:text-black transition font-orbitron tracking-widest uppercase text-[10px]"
-            >
-              Skip
-            </button>
           </div>
         </motion.div>
       ) : null}
