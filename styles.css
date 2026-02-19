@@ -4461,3 +4461,24 @@ h1 {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+
+/* Voice-injected styles */
+body {
+   background-color: #000000;
+   margin: 0;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 100vh;
+
+}
+ h1 {
+   font-size: 10vw;
+   color: transparent;
+   background: linear-gradient(90deg, #D4AF37, #FFD700);
+   -webkit-background-clip: text;
+   background-clip: text;
+   text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+
+}
