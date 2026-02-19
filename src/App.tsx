@@ -225,6 +225,11 @@ const App: React.FC = () => {
           try {
             sessionStorage.setItem("vtw-opener-seen", "1");
           } catch (_) {}
+          try {
+            if (document.documentElement.dataset.vtwPhase === "opener") {
+              delete document.documentElement.dataset.vtwPhase;
+            }
+          } catch (_) {}
           setShowOpener(false);
         }}
       />

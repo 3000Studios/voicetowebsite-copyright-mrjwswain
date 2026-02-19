@@ -49,6 +49,11 @@ export default function SiteOpener({
   const finish = () => {
     if (doneRef.current) return;
     doneRef.current = true;
+
+    // Ensure chrome becomes visible immediately (even during fade-out).
+    if (document.documentElement.dataset.vtwPhase === "opener") {
+      delete document.documentElement.dataset.vtwPhase;
+    }
     onDone();
   };
 
