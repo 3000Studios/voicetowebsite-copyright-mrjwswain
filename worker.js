@@ -708,7 +708,7 @@ export default {
         if (!isAdminEnabled(env)) {
           return jsonResponse(503, {
             error:
-              "Admin is disabled. Set CONTROL_PASSWORD to enable admin login.",
+              "Admin is disabled. Set CONTROL_PASSWORD (recommended) or ADMIN_ACCESS_CODE to enable admin login.",
           });
         }
 
@@ -730,15 +730,21 @@ export default {
         }
 
         const validAccessCode = String(env.CONTROL_PASSWORD || "").trim();
+        const validAltCode = String(env.ADMIN_ACCESS_CODE || "").trim();
 
-        if (!validAccessCode) {
+        if (!validAccessCode && !validAltCode) {
           return jsonResponse(503, {
             error:
-              "Admin is disabled. Set CONTROL_PASSWORD to enable admin login.",
+              "Admin is disabled. Set CONTROL_PASSWORD (recommended) or ADMIN_ACCESS_CODE to enable admin login.",
           });
         }
 
-        if (!accessCode || String(accessCode).trim() !== validAccessCode) {
+        const provided = String(accessCode || "").trim();
+        const ok =
+          (validAccessCode && provided === validAccessCode) ||
+          (validAltCode && provided === validAltCode);
+
+        if (!ok) {
           return jsonResponse(401, { error: "Invalid access code." });
         }
         const cookieValue = await mintAdminCookieValue(env);

@@ -45,7 +45,11 @@ const sign = async (secret, message) => {
 export const getAdminSigningSecret = (env) =>
   String(env.ADMIN_COOKIE_SECRET || "").trim();
 
-export const isAdminEnabled = (env) => Boolean(env.CONTROL_PASSWORD);
+export const isAdminEnabled = (env) =>
+  Boolean(
+    String(env.CONTROL_PASSWORD || "").trim() ||
+    String(env.ADMIN_ACCESS_CODE || "").trim()
+  );
 
 export const adminCookieName = "vtw_admin";
 export const adminCookieTtlSeconds = 60 * 60 * 2; // 2 hours
