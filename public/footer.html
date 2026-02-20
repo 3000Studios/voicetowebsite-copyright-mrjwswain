@@ -68,16 +68,73 @@
             50% { opacity: 0.5; transform: scaleX(1.1); }
         }
 
-        /* Content Layout */
+        /* Content Layout - Horizontal Cards */
         .v2w-container {
             position: relative;
             z-index: 2;
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 120px 40px 60px;
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 60px;
+            padding: 60px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .v2w-cards-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 0 10px;
+        }
+
+        .v2w-card {
+            flex: 0 0 auto;
+            min-width: 280px;
+            max-width: 320px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .v2w-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-glow);
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.2);
+        }
+
+        .v2w-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .v2w-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .v2w-card li {
+            margin: 8px 0;
+        }
+
+        .v2w-card a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .v2w-card a:hover {
+            color: var(--accent-glow);
         }
 
         .v2w-brand-block {
@@ -255,19 +312,55 @@
             color: rgba(255,255,255,0.2);
         }
 
-        @media (max-width: 900px) {
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
             .v2w-container {
-                grid-template-columns: 1fr 1fr;
-                gap: 40px;
-            }
-            .v2w-newsletter {
-                flex-direction: column;
-                align-items: flex-start;
+                padding: 40px 15px 30px;
                 gap: 30px;
-                grid-column: span 2;
             }
-            .v2w-brand-block { grid-column: span 2; }
-            .v2w-bottom { grid-column: span 2; flex-direction: column; gap: 20px; text-align: center; }
+
+            .v2w-cards-row {
+                gap: 15px;
+                padding: 0 5px;
+            }
+
+            .v2w-card {
+                min-width: 250px;
+                max-width: 280px;
+                padding: 20px;
+            }
+
+            .v2w-card h3 {
+                font-size: 1.1rem;
+            }
+
+            .v2w-bottom {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                font-size: 0.6rem;
+            }
+
+            .v2w-coords {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .v2w-card {
+                min-width: 200px;
+                max-width: 220px;
+                padding: 15px;
+            }
+
+            .v2w-card h3 {
+                font-size: 1rem;
+            }
+
+            .v2w-card a {
+                font-size: 0.8rem;
+            }
         }
 
         /* Strata Grain Overlay */
@@ -298,8 +391,8 @@
         </div>
 
         <div class="v2w-container">
-            <!-- Brand Column -->
-            <div class="v2w-brand-block">
+            <!-- Brand Card -->
+            <div class="v2w-card">
                 <div class="v2w-logo">Voice<span>To</span>Website</div>
                 <p class="v2w-tagline">
                     Transforming the acoustic vibrations of human intent into high-fidelity digital architecture.
@@ -317,48 +410,49 @@
                 </div>
             </div>
 
-            <!-- Links Column 1 -->
-            <div>
-                <span class="v2w-nav-head">Platform</span>
-                <ul class="v2w-link-list">
-                    <li><a href="/features">Voice Engine</a></li>
-                    <li><a href="/how-it-works">Strata UI Kit</a></li>
-                    <li><a href="/api-documentation">API Documentation</a></li>
-                    <li><a href="/pricing">Pricing Strata</a></li>
-                </ul>
-            </div>
-
-            <!-- Links Column 2 -->
-            <div>
-                <span class="v2w-nav-head">Company</span>
-                <ul class="v2w-link-list">
-                    <li><a href="/about">Our Frequency</a></li>
-                    <li><a href="/blog">Research Lab</a></li>
-                    <li><a href="/status">Changelog</a></li>
-                    <li><a href="/contact">Careers</a></li>
-                </ul>
-            </div>
-
-            <!-- Links Column 3 -->
-            <div>
-                <span class="v2w-nav-head">Legal & Support</span>
-                <ul class="v2w-link-list">
-                    <li><a href="/privacy">Privacy Protocol</a></li>
-                    <li><a href="/terms">Terms of Resonance</a></li>
-                    <li><a href="/legal">Cookie Strata</a></li>
-                    <li><a href="/support">Contact Support</a></li>
-                </ul>
-            </div>
-
-            <!-- Newsletter Area -->
-            <div class="v2w-newsletter">
-                <div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 1.4rem; font-weight: 700;">Join the frequency.</h4>
-                    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Monthly updates on AI voice design and web strata.</p>
+            <!-- Cards Row -->
+            <div class="v2w-cards-row">
+                <!-- Platform Card -->
+                <div class="v2w-card">
+                    <h3>Platform</h3>
+                    <ul>
+                        <li><a href="/features">Voice Engine</a></li>
+                        <li><a href="/how-it-works">Strata UI Kit</a></li>
+                        <li><a href="/api-documentation">API Documentation</a></li>
+                        <li><a href="/pricing">Pricing Strata</a></li>
+                    </ul>
                 </div>
-                <div class="v2w-input-group">
-                    <input type="email" class="v2w-input" placeholder="Enter your node (email)..." id="vtw-newsletter-email">
-                    <button class="v2w-input-btn" id="vtw-newsletter-submit">TRANSMIT</button>
+
+                <!-- Company Card -->
+                <div class="v2w-card">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="/about">Our Frequency</a></li>
+                        <li><a href="/blog">Research Lab</a></li>
+                        <li><a href="/status">Changelog</a></li>
+                        <li><a href="/contact">Careers</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal & Support Card -->
+                <div class="v2w-card">
+                    <h3>Legal & Support</h3>
+                    <ul>
+                        <li><a href="/privacy">Privacy Protocol</a></li>
+                        <li><a href="/terms">Terms of Resonance</a></li>
+                        <li><a href="/legal">Cookie Strata</a></li>
+                        <li><a href="/support">Contact Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter Card -->
+                <div class="v2w-card">
+                    <h3>Join the frequency</h3>
+                    <p style="margin: 0 0 20px 0; color: var(--text-muted); font-size: 0.9rem;">Monthly updates on AI voice design and web strata.</p>
+                    <div class="v2w-input-group">
+                        <input type="email" class="v2w-input" placeholder="Enter your node (email)..." id="vtw-newsletter-email">
+                        <button class="v2w-input-btn" id="vtw-newsletter-submit">TRANSMIT</button>
+                    </div>
                 </div>
             </div>
 

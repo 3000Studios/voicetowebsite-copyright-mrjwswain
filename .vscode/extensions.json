@@ -31,13 +31,6 @@
     "usernamehw.errorlens",
 
     // ============================================
-    // HTML & CSS
-    // ============================================
-    "formulahendry.auto-close-tag",
-    "formulahendry.auto-rename-tag",
-    "bradlc.vscode-tailwindcss",
-
-    // ============================================
     // NPM & PACKAGE MANAGEMENT
     // ============================================
     "eg2.vscode-npm-script",
@@ -49,16 +42,10 @@
     "dsznajder.es7-react-js-snippets",
 
     // ============================================
-    // LIVE PREVIEW & TESTING
-    // ============================================
-    "ritwickdey.LiveServer",
-
-    // ============================================
-    // AI-POWERED CODING (Windsurf Compatible)
+    // AI-POWERED CODING
     // ============================================
     "GitHub.copilot",
     "Continue.continue",
-    "Codeium.codeium",
 
     // ============================================
     // CODE QUALITY & FORMATTING
@@ -69,10 +56,18 @@
     // ============================================
     // UTILITIES
     // ============================================
-    "wayou.vscode-todo-highlight",
     "Gruntfuggly.todo-tree",
     "PKief.material-icon-theme"
   ],
 
-  "unwantedRecommendations": ["vscodevim.vim", "ms-vscode.vscode-typescript-tslint-plugin"]
+  "unwantedRecommendations": [
+    "vscodevim.vim",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "ritwickdey.LiveServer",
+    "bradlc.vscode-tailwindcss",
+    "wayou.vscode-todo-highlight",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag",
+    "Codeium.codeium"
+  ]
 }

@@ -403,10 +403,12 @@ iframe {
 .crystal-links {
   list-style: none;
   display: flex;
-  gap: 1.5rem;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
   align-items: center;
   margin: 0;
   padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .crystal-nav-item {
@@ -420,11 +422,11 @@ iframe {
   gap: 0.15rem;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.95rem;
+  font-size: clamp(0.7rem, 1.2vw, 0.95rem);
   font-weight: 900;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  padding: 1.25rem 2.2rem;
+  padding: clamp(0.8rem, 1.5vw, 1.25rem) clamp(1rem, 2vw, 2.2rem);
   border: 2px solid rgba(255, 255, 255, 0.12);
   background: linear-gradient(
     145deg,

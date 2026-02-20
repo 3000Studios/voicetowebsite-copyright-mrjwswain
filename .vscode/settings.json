@@ -1,14 +1,41 @@
 {
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
   "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
   "eslint.format.enable": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
   },
   "cSpell.enabled": true,
   "cSpell.language": "en",
-  "cSpell.configFile": "cspell.json"
+  "cSpell.configFile": "cspell.json",
+  "explorer.compactFolders": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.suggestSelection": "recentlyUsed",
+  "files.associations": {
+    "*.css": "css",
+    "*.html": "html",
+    "*.js": "javascript",
+    "*.mjs": "javascript",
+    "*.cjs": "javascript"
+  },
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  },
+  "gitlens.codeLens.enabled": true,
+  "errorLens.enabledDiagnosticLevels": ["error", "warning"],
+  "todo-tree.general.tags": ["TODO", "FIXME", "BUG", "OPTIMIZE", "NOTE"],
+  "path-intellisense.extensionOnImport": true,
+  "npm.packageManager": "npm",
+  "vitest.enable": true,
+  "workbench.iconTheme": "material-icon-theme",
+  "editor.minimap.enabled": true,
+  "editor.stickyScroll.enabled": true
 }

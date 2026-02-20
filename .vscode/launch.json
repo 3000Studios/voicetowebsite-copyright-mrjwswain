@@ -11,10 +11,8 @@
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}",
       "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///./src/*": "${webRoot}/src/*"
-      },
-      "preLaunchTask": "🚀 Dev: Site (Vite)"
+      "preLaunchTask": "🚀 Dev: Site (Vite)",
+      "userDataDir": false
     },
     {
       "name": "🌐 Launch Edge (Dev Server)",
@@ -23,10 +21,8 @@
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}",
       "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///./src/*": "${webRoot}/src/*"
-      },
-      "preLaunchTask": "🚀 Dev: Site (Vite)"
+      "preLaunchTask": "🚀 Dev: Site (Vite)",
+      "userDataDir": false
     },
     {
       "name": "🌐 Attach to Chrome",
@@ -54,7 +50,8 @@
       "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
       "args": ["run", "${file}"],
       "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
+      "skipFiles": ["<node_internals>/**"],
+      "smartStep": true
     },
     {
       "name": "🟢 Debug: All Tests",

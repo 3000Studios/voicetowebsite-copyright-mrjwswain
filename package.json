@@ -14,6 +14,7 @@
     "governance:check": "node ./scripts/validate-governance.mjs",
     "ops:global-doc:update": "node ./scripts/update-global-system-doc.mjs",
     "ops:global-doc:check": "node ./scripts/update-global-system-doc.mjs --check",
+    "lint": "eslint .",
     "generate:config": "node ./scripts/generate-config.mjs",
     "generate:sitemap": "node ./scripts/generate-sitemap.mjs",
     "prebuild": "node ./scripts/sync-public-assets.mjs && npm run generate:config && npm run generate:sitemap",

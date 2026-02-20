@@ -403,7 +403,36 @@ h3,
   will-change: transform;
 }
 
-/* Headings: unique animations applied via nav.js (IntersectionObserver). */
+/* Footer - Always at Bottom */
+.vt-footer,
+.v2w-footer {
+  margin-top: auto;
+  position: relative;
+  z-index: 100;
+}
+
+/* Video Background - Pushed to Very Back */
+.video-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.video-bg video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+
+/* AdSense-Compliant Layout Structure */
 .vtw-headline {
   display: inline-block;
   transform-origin: 50% 60%;
