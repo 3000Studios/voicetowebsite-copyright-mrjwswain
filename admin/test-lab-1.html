@@ -16,17 +16,184 @@
     <div class="admin-shell">
       <header class="admin-header">
         <div>
-          <h1>Lab 1</h1>
-          <p class="muted">Private admin test page for future additions.</p>
+          <h1>Lab 1: Autonomous Agent Control</h1>
+          <p class="muted">Control center for agent autonomy, voice I/O, and remote access.</p>
         </div>
       </header>
       <main class="admin-grid">
         <section class="card wide metallic-card">
-          <h2>Placeholder</h2>
-          <p class="muted">Add experiments here.</p>
+          <h2>Mission</h2>
+          <p class="muted">
+            Make the assistant run tasks autonomously, listen/speak, and be reachable from a phone while keeping
+            security and permissions explicit.
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>Custom GPT (Cloud)</h2>
+          <p class="muted">
+            Highest quality path. Requires a paid ChatGPT plan to create GPTs. Use the Execute API schema + auto mode.
+          </p>
+          <div class="admin-actions">
+            <a class="ghost" href="https://chatgpt.com/gpts/editor" target="_blank" rel="noreferrer"
+              >Open GPT Builder</a
+            >
+            <a class="ghost" href="../CUSTOM_GPT_SETUP.md" target="_blank" rel="noreferrer">Custom GPT setup</a>
+            <a class="ghost" href="../CUSTOM_GPT_SYSTEM_PROMPT.mjs" target="_blank" rel="noreferrer">System prompt</a>
+          </div>
+          <ul class="muted" style="margin: 1rem 0 0 1.25rem">
+            <li>Action schema: `ops/contracts/openapi.execute.json`</li>
+            <li>Endpoint: `/api` (Execute API v2)</li>
+            <li>Auth header: `x-orch-token` with `ORCH_TOKEN`</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>Continue Agent</h2>
+          <p class="muted">Full autonomy is enabled in the workspace agent config. Use Continue in Agent mode.</p>
+          <div class="admin-actions">
+            <a class="ghost" href="../README_CONTINUE.md" target="_blank" rel="noreferrer">Continue setup</a>
+            <a class="ghost" href="../VSCODE_AUTONOMOUS_SETUP.md" target="_blank" rel="noreferrer"
+              >Autonomous VS Code</a
+            >
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Voice I/O (Push-to-Talk)</h2>
+          <p class="muted">Use the Voice Commands console for mic capture + speech output.</p>
+          <div class="admin-actions">
+            <a class="ghost" href="voice-commands.html">Open Voice Commands</a>
+          </div>
+          <ul class="muted" style="margin: 1rem 0 0 1.25rem">
+            <li>Push-to-talk is enabled via Start/Stop controls.</li>
+            <li>Speech output uses browser TTS.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>Desktop Control</h2>
+          <p class="muted">Local desktop automation (open apps, run scripts, click UI) is done via Windows tools.</p>
+          <div class="admin-actions">
+            <a class="ghost" href="../install-voice-commander.ps1" target="_blank" rel="noreferrer"
+              >Install voice commander</a
+            >
+            <a class="ghost" href="../UNIFIED_COMMAND_CENTER_SETUP.md" target="_blank" rel="noreferrer"
+              >Unified command center</a
+            >
+          </div>
+          <ul class="muted" style="margin: 1rem 0 0 1.25rem">
+            <li>Use PowerShell scripts for deterministic tasks.</li>
+            <li>Use UI automation tools only for specific, approved workflows.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>Remote Access (Free)</h2>
+          <p class="muted">
+            Best free path: secure VPN + remote desktop. Use these from your phone to control the desktop agent.
+          </p>
+          <div class="admin-actions">
+            <a class="ghost" href="../REMOTE_ACCESS_SETUP.md" target="_blank" rel="noreferrer">Remote access setup</a>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Quick Launch</h2>
+          <p class="muted">Fast access to your site, admin hub, and voice console.</p>
+          <div class="admin-actions">
+            <a class="ghost" href="https://voicetowebsite.com/" target="_blank" rel="noreferrer">Open Site</a>
+            <a class="ghost" href="https://voicetowebsite.com/admin/" target="_blank" rel="noreferrer">Open Admin</a>
+            <a class="ghost" href="voice-commands.html">Open Voice Commands</a>
+          </div>
+          <p class="muted small" style="margin-top: 0.75rem">Admin access is protected by your access code.</p>
+        </section>
+
+        <section class="card wide">
+          <h2>System Status</h2>
+          <p class="muted">Live checks for auth, API health, and agent wiring.</p>
+          <div class="admin-grid" style="margin-top: 1rem">
+            <div class="card">
+              <h3>Auth</h3>
+              <p class="muted" id="status-auth">Checking...</p>
+            </div>
+            <div class="card">
+              <h3>API Health</h3>
+              <p class="muted" id="status-health">Checking...</p>
+            </div>
+            <div class="card">
+              <h3>Capabilities</h3>
+              <p class="muted" id="status-capabilities">Checking...</p>
+            </div>
+            <div class="card">
+              <h3>Execute API</h3>
+              <p class="muted" id="status-execute">Checking...</p>
+            </div>
+          </div>
+          <div class="admin-actions" style="margin-top: 1rem">
+            <button class="ghost" id="status-refresh" type="button">Refresh Status</button>
+          </div>
         </section>
       </main>
     </div>
+    <script>
+      const elAuth = document.getElementById("status-auth");
+      const elHealth = document.getElementById("status-health");
+      const elCaps = document.getElementById("status-capabilities");
+      const elExec = document.getElementById("status-execute");
+      const btnRefresh = document.getElementById("status-refresh");
+
+      const setText = (el, text) => {
+        if (el) el.textContent = text;
+      };
+
+      const checkStatus = async () => {
+        setText(elAuth, "Checking...");
+        setText(elHealth, "Checking...");
+        setText(elCaps, "Checking...");
+        setText(elExec, "Checking...");
+
+        try {
+          const authRes = await fetch("/api/config/status", {
+            credentials: "include",
+            cache: "no-store",
+          });
+          setText(elAuth, authRes.ok ? "Unlocked" : "Locked");
+        } catch (err) {
+          setText(elAuth, `Error: ${err.message}`);
+        }
+
+        try {
+          const healthRes = await fetch("/api/health", { cache: "no-store" });
+          setText(elHealth, healthRes.ok ? "Healthy" : `Error ${healthRes.status}`);
+        } catch (err) {
+          setText(elHealth, `Error: ${err.message}`);
+        }
+
+        try {
+          const capsRes = await fetch("/api/capabilities", { cache: "no-store" });
+          if (!capsRes.ok) {
+            setText(elCaps, `Error ${capsRes.status}`);
+          } else {
+            const caps = await capsRes.json().catch(() => ({}));
+            const count = Array.isArray(caps?.manifest?.commands) ? caps.manifest.commands.length : 0;
+            setText(elCaps, count ? `OK (${count} commands)` : "OK");
+          }
+        } catch (err) {
+          setText(elCaps, `Error: ${err.message}`);
+        }
+
+        try {
+          const execRes = await fetch("/api/health", { cache: "no-store" });
+          setText(elExec, execRes.ok ? "Reachable (POST required)" : `Error ${execRes.status}`);
+        } catch (err) {
+          setText(elExec, `Error: ${err.message}`);
+        }
+      };
+
+      if (btnRefresh) btnRefresh.addEventListener("click", checkStatus);
+      checkStatus();
+    </script>
     <script type="module" src="../nav.js"></script>
   </body>
 </html>

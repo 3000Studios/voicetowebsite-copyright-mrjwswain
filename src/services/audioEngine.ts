@@ -2,6 +2,7 @@ class AudioEngine {
   private context: AudioContext | null = null;
   private isEnabled = false;
   private bgMusic: HTMLAudioElement | null = null;
+  private bgMusicWasAutoplayMuted = false;
   private currentVolume = 0.5;
   private musicSource: MediaElementAudioSourceNode | null = null;
   private musicGain: GainNode | null = null;
@@ -10,20 +11,30 @@ class AudioEngine {
   private analyserFreqData: Uint8Array<ArrayBuffer> | null = null;
 
   constructor() {
-    if (typeof window !== "undefined") {
-      this.context = new (
-        window.AudioContext || (window as any).webkitAudioContext
-      )();
-    }
+    // Delay AudioContext creation until `enable()` is called.
+    // Creating AudioContext eagerly can increase the chance browsers block/resume it
+    // until a user gesture, which makes "autoplay on load" feel broken.
   }
 
   public async enable() {
+    if (!this.context && typeof window !== "undefined") {
+      try {
+        this.context = new (
+          window.AudioContext || (window as any).webkitAudioContext
+        )();
+      } catch (_) {
+        this.context = null;
+      }
+    }
     if (this.context?.state === "suspended") {
       try {
         await this.context.resume();
       } catch (_) {}
     }
     this.isEnabled = true;
+
+    // If music started muted due to autoplay restrictions, try to unmute after enable() (gesture).
+    this.unmuteMusicIfNeeded();
   }
 
   private teardownMusicGraph() {
@@ -55,6 +66,8 @@ class AudioEngine {
     audio.crossOrigin = "anonymous";
     audio.loop = true;
     audio.preload = "auto";
+    audio.muted = false;
+    this.bgMusicWasAutoplayMuted = false;
 
     // Prefer routing music through Web Audio so we can drive reactive visuals.
     if (this.context) {
@@ -94,9 +107,28 @@ class AudioEngine {
       await this.bgMusic.play();
       return true;
     } catch (e) {
-      console.error("Audio playback blocked or invalid format", e);
-      return false;
+      // Autoplay with audio is commonly blocked without user gesture.
+      // As a best-effort fallback, try starting muted so the user still gets a seamless load,
+      // then unmute on the first gesture via `enable()`.
+      try {
+        audio.muted = true;
+        this.bgMusicWasAutoplayMuted = true;
+        await audio.play();
+        return true;
+      } catch (err) {
+        console.error("Audio playback blocked or invalid format", e, err);
+        return false;
+      }
     }
+  }
+
+  public unmuteMusicIfNeeded() {
+    if (!this.bgMusic) return;
+    if (!this.bgMusicWasAutoplayMuted) return;
+    try {
+      this.bgMusic.muted = false;
+      this.bgMusicWasAutoplayMuted = false;
+    } catch (_) {}
   }
 
   public stopMusic() {

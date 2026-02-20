@@ -62,21 +62,90 @@
             <span>Command Center</span>
           </div>
         </div>
-        <nav class="admin-subnav">
-          <a href="#console">Console</a>
-          <a href="bot-command-center.html">Boss Bot</a>
-          <a href="voice-commands.html">Voice</a>
-          <a href="store-manager.html">Store</a>
-          <a href="app-store-manager.html">Apps</a>
-          <a href="analytics.html">Data</a>
-          <a href="nexus.html">Nexus</a>
-          <a href="progress.html">Progress</a>
-        </nav>
         <div class="status-chip warn" id="session-state">Locked</div>
       </header>
 
       <!-- COMMAND CENTER INTERFACE -->
       <div class="command-interface" id="console">
+        <section class="card wide admin-hero-card" id="voice-first">
+          <div class="admin-hero-grid">
+            <div class="admin-hero-copy">
+              <p class="eyebrow">Voice-first control</p>
+              <h2>Speak or type a change. It updates instantly.</h2>
+              <p class="muted">
+                This admin is built for one job: you say it, it ships it. Use Voice Control for live commands, or
+                Command Center for structured planning + deploy.
+              </p>
+              <div class="button-row">
+                <a class="primary" href="voice-commands.html">Open Voice Control</a>
+                <a class="ghost" href="test-lab-1.html">Agent Control</a>
+                <a class="ghost" href="#admin-hub-card">All Admin Pages</a>
+              </div>
+            </div>
+            <div class="admin-hero-media">
+              <video src="/media/vtw-opener.mp4" autoplay muted loop playsinline></video>
+              <span class="media-caption">Say it. Ship it. Monitor it.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card wide">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Quick Start</p>
+              <h2>Three steps to live updates</h2>
+              <p class="muted">Simple flow: speak → preview → deploy.</p>
+            </div>
+          </div>
+          <div class="help-grid">
+            <div class="help-card">
+              <div class="hint-title">1) Start Voice</div>
+              <p class="muted">Open Voice Control and press Start.</p>
+            </div>
+            <div class="help-card">
+              <div class="hint-title">2) Say the change</div>
+              <p class="muted">Example: “Change headline to AI in Motion.”</p>
+            </div>
+            <div class="help-card">
+              <div class="hint-title">3) Ship it</div>
+              <p class="muted">Autonomous mode applies + deploys for you.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card wide">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Visual Map</p>
+              <h2>What does what</h2>
+              <p class="muted">Each card shows the tool and its primary job.</p>
+            </div>
+          </div>
+          <div class="media-strip">
+            <a class="media-card" href="voice-commands.html">
+              <video src="/media/vtw-animated-logo.mp4" autoplay muted loop playsinline></video>
+              <div class="media-card__body">
+                <strong>Voice Control</strong>
+                <span>Speak updates, run commands, ship changes.</span>
+              </div>
+            </a>
+            <a class="media-card" href="index.html#console">
+              <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+              <div class="media-card__body">
+                <strong>Command Center</strong>
+                <span>Plan, preview, apply, deploy with logs.</span>
+              </div>
+            </a>
+            <a class="media-card" href="test-lab-1.html">
+              <video src="/media/vtw-home-wallpaper.mp4" autoplay muted loop playsinline></video>
+              <div class="media-card__body">
+                <strong>Agent Control</strong>
+                <span>Autonomy, remote access, and system status.</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
         <!-- ADMIN HUB -->
         <section class="card wide" id="admin-hub-card">
           <div class="card-head">

@@ -31,6 +31,12 @@
       "zone": "public"
     },
     {
+      "id": "search",
+      "route": "/search",
+      "asset": "search.html",
+      "zone": "public"
+    },
+    {
       "id": "support",
       "route": "/support",
       "asset": "support.html",

@@ -207,6 +207,12 @@ const STYLE_PACK_LIBRARY = [
 ];
 
 const STYLE_PACK_IDS = new Set(STYLE_PACK_LIBRARY.map((pack) => pack.id));
+const DEFAULT_STYLE_PACKS = [
+  "subtle-motion",
+  "rich-links",
+  "bold-headings",
+  "ocean-gradient",
+];
 const normalizeStylePackIds = (value) => {
   if (!Array.isArray(value)) return [];
   const unique = [];
@@ -245,7 +251,7 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
 
   const baseCss = `
     :root{color-scheme:dark}
-    body{margin:0;background:#050507;color:#f8fafc;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:#050507;color:#f8fafc;font-family:'Manrope',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     .vtw-wrap{max-width:1100px;margin:0 auto;padding:28px 18px}
     header{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-bottom:22px}
     nav{display:flex;gap:12px;flex-wrap:wrap}
@@ -255,6 +261,35 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
     .vtw-page{padding:18px 0;border-top:1px solid rgba(255,255,255,.08)}
     .vtw-section{padding:12px 0}
     .vtw-section h3{margin:0 0 6px 0}
+    .vtw-hero{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:center;margin-bottom:24px;padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(15,23,42,.65))}
+    .vtw-hero-media{position:relative;border-radius:16px;overflow:hidden;min-height:180px}
+    .vtw-hero-media video,.vtw-hero-media img{width:100%;height:100%;object-fit:cover;display:block}
+    .vtw-hero-card{display:grid;gap:12px}
+    .vtw-hero-actions{display:flex;flex-wrap:wrap;gap:10px}
+    .vtw-hero-actions a{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);text-decoration:none;color:#fff}
+    .vtw-hero-actions a.primary{background:#38bdf8;color:#020617;border-color:transparent}
+    .vtw-float{animation:vtwFloat 5s ease-in-out infinite}
+    @keyframes vtwFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @media (prefers-reduced-motion:reduce){.vtw-float{animation:none}}
+  `;
+
+  const hero = `
+    <section class="vtw-hero">
+      <div class="vtw-hero-media">
+        <video autoplay muted loop playsinline poster="/vtw-wallpaper.png">
+          <source src="/media/vtw-home-wallpaper.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="vtw-hero-card vtw-float">
+        <div class="vtw-meta">Generated preview</div>
+        <h1 style="margin:0">${title}</h1>
+        <p>${description}</p>
+        <div class="vtw-hero-actions">
+          <a class="primary" href="#home">Explore</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+    </section>
   `;
 
   return `<!doctype html>
@@ -264,11 +299,15 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${title}</title>
     <meta name="description" content="${description}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
     <style>${baseCss}\n${css || ""}</style>
   </head>
   <body>
     <div class="vtw-wrap">
+      ${hero}
       <header>
         <div>
           <h1 style="margin:0">${title}</h1>
@@ -332,6 +371,10 @@ export async function handleGenerateRequest({ request, env }) {
     }
   } catch (err) {
     return json(400, { error: `Invalid request body: ${err.message}` });
+  }
+
+  if (!stylePackIds.length) {
+    stylePackIds = DEFAULT_STYLE_PACKS.slice();
   }
 
   const siteId = crypto.randomUUID();
@@ -522,21 +565,31 @@ export async function handlePublishRequest({ request, env }) {
     },
   ];
 
-  for (const asset of assets) {
-    const buf = new TextEncoder().encode(String(asset.body));
-    await env.R2.put(asset.key, buf, {
-      httpMetadata: { contentType: asset.contentType },
-    });
-    await env.D1.prepare(
-      "INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)"
-    )
-      .bind(siteId, asset.kind, asset.key, asset.contentType, buf.byteLength)
-      .run();
-  }
+  const encoder = new TextEncoder();
+  const uploadResults = await Promise.all(
+    assets.map(async (asset) => {
+      const buf = encoder.encode(String(asset.body));
+      await env.R2.put(asset.key, buf, {
+        httpMetadata: { contentType: asset.contentType },
+      });
+      return { asset, sizeBytes: buf.byteLength };
+    })
+  );
 
-  await env.D1.prepare("UPDATE sites SET status = ? WHERE id = ?")
-    .bind("published", siteId)
-    .run();
+  const statements = uploadResults.map(({ asset, sizeBytes }) =>
+    env.D1.prepare(
+      "INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)"
+    ).bind(siteId, asset.kind, asset.key, asset.contentType, sizeBytes)
+  );
+
+  statements.push(
+    env.D1.prepare("UPDATE sites SET status = ? WHERE id = ?").bind(
+      "published",
+      siteId
+    )
+  );
+
+  await env.D1.batch(statements);
 
   return json(200, { ok: true, siteId, r2Prefix: base });
 }

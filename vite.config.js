@@ -45,6 +45,7 @@ export default defineConfig({
         features: resolve(__dirname, "features.html"),
         pricing: resolve(__dirname, "pricing.html"),
         demo: resolve(__dirname, "demo.html"),
+        search: resolve(__dirname, "search.html"),
         support: resolve(__dirname, "support.html"),
         status: resolve(__dirname, "status.html"),
         trust: resolve(__dirname, "trust.html"),

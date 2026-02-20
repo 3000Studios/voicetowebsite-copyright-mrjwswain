@@ -7,7 +7,7 @@
   "settings": {
     "editor.linkedEditing": true,
     "php.linkedEditing.variables": true,
-    "todo-tree.tree.scanMode": "workspace only",
+    "todo-tree.tree.scanMode": "current file",
     "geminicodeassist.project": "studios-ai-agent-3k",
     "chat.mcp.assisted.nuget.enabled": true,
     "github.copilot.chat.codesearch.enabled": true,
