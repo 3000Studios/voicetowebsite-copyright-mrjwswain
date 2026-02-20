@@ -39,7 +39,9 @@ describe("App Accessibility - Use Cases", () => {
     expect(audioToggle).toBeInTheDocument();
 
     // Main CTA for voice capture exists
-    const tapToSpeak = screen.getByRole("button", { name: /tap to speak/i });
+    const tapToSpeak = screen.getByRole("button", {
+      name: /start voice command/i,
+    });
     expect(tapToSpeak).toBeInTheDocument();
 
     // Clicking it enters listening phase with a clear "Finish Command" control.
@@ -50,6 +52,13 @@ describe("App Accessibility - Use Cases", () => {
       ).toBeTruthy();
     });
     fireEvent.click(tapToSpeak);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("button", { name: /voice (off|on)/i })
+      ).not.toBeInTheDocument();
+    });
+
     const finish = await waitFor(() =>
       screen.getByRole("button", { name: /finish command/i })
     );

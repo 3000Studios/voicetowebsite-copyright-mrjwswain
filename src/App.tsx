@@ -220,6 +220,8 @@ const App: React.FC = () => {
     }
   };
 
+  const isVoiceToggleVisible = flowPhase === "idle";
+
   return (
     <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
       <SiteOpener
@@ -270,20 +272,22 @@ const App: React.FC = () => {
       </div>
 
       {/* Persistent audio control */}
-      <div className="fixed top-6 right-6 z-[160] flex items-center gap-3 bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full">
-        <button
-          type="button"
-          onClick={toggleAudio}
-          className="flex items-center gap-2"
-        >
-          <div
-            className={`w-2 h-2 rounded-full ${isAudioPlaying ? "bg-cyan-400 animate-pulse" : "bg-white/20"}`}
-          />
-          <span className="font-orbitron text-[10px] tracking-widest text-white/60 uppercase">
-            {isAudioPlaying ? "VOICE ON" : "VOICE OFF"}
-          </span>
-        </button>
-      </div>
+      {isVoiceToggleVisible && (
+        <div className="fixed top-6 right-6 z-[160] flex items-center gap-3 bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full">
+          <button
+            type="button"
+            onClick={toggleAudio}
+            className="flex items-center gap-2"
+          >
+            <div
+              className={`w-2 h-2 rounded-full ${isAudioPlaying ? "bg-cyan-400 animate-pulse" : "bg-white/20"}`}
+            />
+            <span className="font-orbitron text-[10px] tracking-widest text-white/60 uppercase">
+              {isAudioPlaying ? "VOICE ON" : "VOICE OFF"}
+            </span>
+          </button>
+        </div>
+      )}
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-32">
         {/* Header */}
@@ -338,6 +342,9 @@ const App: React.FC = () => {
                   </div>
 
                   <button
+                    type="button"
+                    title="Tap to speak your command"
+                    aria-label="Start voice command"
                     onClick={startMic}
                     className="group relative inline-flex items-center justify-center p-1 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl"
                   >

@@ -1536,9 +1536,6 @@
         injectWidget();
         injectFooter();
         wireWidget();
-        initFooterTimestamp();
-        initFooterLatency();
-        initFooterParallax();
         electrifyLinks();
         spectralizeCards();
         initTextFx();
@@ -1583,90 +1580,120 @@
       observer.observe(el);
     });
   };
+  /* --- Cybernetic Tectonic Footer --- */
   const injectFooter = () => {
     const existing = document.querySelector(".vt-footer");
     if (existing) return;
+
     const footer = document.createElement("footer");
     footer.className = "vt-footer";
-    const platformLinks = footerLinks.platform
-      .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
-      .join("");
-    const companyLinks = footerLinks.company
-      .map((link) => `<li><a href="${link.href}">${link.label}</a></li>`)
-      .join("");
-    const affiliateLinks = footerLinks.affiliates
-      .map(
-        (link) =>
-          `<li><a href="${link.href}" target="_blank" rel="noopener">${link.label}</a></li>`
-      )
-      .join("");
-    const themeButtons = THEMES.map(
-      (t) =>
-        `<button type="button" class="theme-btn" data-theme="${t.id}" data-vtw-theme-btn>${t.label}</button>`
-    ).join("");
-    footer.innerHTML = `      <div class="footer-container">        <div class="strata-cell">          <div class="etched-brand">VOICE<br>TO<br>WEBSITE</div>          <p class="vt-footer-tagline">            Erosion-resistant digital infrastructure for the vocal era.          </p>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Platform</h4>          <ul class="footer-links">            ${platformLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Company</h4>          <ul class="footer-links">            ${companyLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Earn</h4>          <ul class="footer-links">            ${affiliateLinks}          </ul>        </div>        <div class="strata-cell">          <h4 class="strata-heading">Trending Now</h4>          <a href="/lexicon-pro.html" class="hot-product-card">            <div>              <div class="hot-tag">FEATURED</div>              <div class="product-name">LEXICON PRO</div>              <p class="hot-product-desc">                Real-time site stratification from live audio feeds.              </p>            </div>            <div class="product-cta">ACQUIRE LICENSE</div>          </a>        </div>      </div>      <div class="status-bar">        <div class="live-indicator">          <div class="pulse-stack">            <div class="pulse" aria-hidden="true"></div>            <span>SYSTEMS NOMINAL</span>          </div>          <span>LATENCY: <span id="vt-footer-latency">—</span></span>          <span class="timestamp" id="vt-footer-timestamp"></span>        </div>        <div>          &copy; ${new Date().getFullYear()} VOICETOWEBSITE.COM
+    footer.innerHTML = `
+      <div class="noise-overlay"></div>
+      <div class="tectonic-visualizer">
+        <canvas id="tectonicCanvas"></canvas>
+      </div>
+      <div class="footer-main-content">
+        <h2 class="textured-headline" id="tiltText">FUTURE<br>CORE</h2>
+        <div class="footer-grid">
+          <div class="footer-col">
+            <h4>Navigation</h4>
+            <a href="/features" class="footer-link">Protocol 01</a>
+            <a href="/demo" class="footer-link">Neural Interface</a>
+            <a href="/templates" class="footer-link">Asset Forge</a>
+          </div>
+          <div class="footer-col">
+            <h4>Directives</h4>
+            <a href="/privacy" class="footer-link">Privacy Shard</a>
+            <a href="/terms" class="footer-link">Terms of Flow</a>
+            <a href="/support" class="footer-link">Quantum Support</a>
+          </div>
+          <div class="footer-col">
+            <h4>System Status</h4>
+            <p style="color: #444; font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 1px;">LATENCY: <span id="vt-footer-latency">14ms</span></p>
+            <p style="color: #444; font-size: 0.7rem; letter-spacing: 1px;">UPTIME: 99.998%</p>
+            <div class="social-cluster">
+              <a href="https://x.com/voicetowebsite" class="social-btn" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+              </a>
+              <a href="https://instagram.com/3000studios" class="social-btn" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 60px; color: #333; font-size: 0.6rem; letter-spacing: 4px; font-family: 'JetBrains Mono', monospace;">
+          © VOICETOWEBSITE - ${new Date().getFullYear()}
+        </div>
+      </div>
+    `;
 
-        </div>      </div>    `;
-
-    footer
-      .querySelector(".strata-cell")
-      ?.insertAdjacentHTML(
-        "beforeend",
-        `<div class="footer-theme"><div class="theme-label">Theme</div><div class="theme-switch" role="group" aria-label="Theme switcher">${themeButtons}</div></div>`
-      );
     document.body.appendChild(footer);
+    initTectonicVisualizer();
+    init3DHeader();
   };
-  const initFooterTimestamp = () => {
-    const stamp = document.getElementById("vt-footer-timestamp");
-    if (!stamp) return;
-    const updateTime = () => {
-      const now = new Date();
-      const timeString = now.toISOString().replace("T", " ").substring(0, 19);
-      stamp.textContent = `UTC: ${timeString}`;
-    };
-    updateTime();
-    window.setInterval(updateTime, 1000);
-  };
-  const initFooterLatency = () => {
-    const el = document.getElementById("vt-footer-latency");
-    if (!el) return;
 
-    const ping = async () => {
-      try {
-        const t0 = performance.now();
-        const res = await fetch("/api/health", { cache: "no-store" });
-        if (!res.ok) throw new Error("bad status");
-        const ms = Math.max(0, Math.round(performance.now() - t0));
-        el.textContent = `${ms}ms`;
-      } catch (_) {
-        el.textContent = "—";
+  const initTectonicVisualizer = () => {
+    const canvas = document.getElementById("tectonicCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let width,
+      height,
+      points = [];
+
+    const init = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = canvas.parentElement.offsetHeight;
+      points = [];
+      for (let i = 0; i < 40; i++) {
+        points.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+        });
       }
     };
 
-    ping();
-    window.setInterval(ping, 30000);
+    const draw = () => {
+      if (!document.getElementById("tectonicCanvas")) return; // Stop if removed
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = "rgba(0, 243, 255, 0.15)";
+      ctx.lineWidth = 1;
+
+      points.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        points.forEach((p2, j) => {
+          if (i === j) return;
+          let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 250) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        });
+      });
+      requestAnimationFrame(draw);
+    };
+
+    window.addEventListener("resize", init);
+    init();
+    draw();
   };
-  const initFooterParallax = () => {
-    const cells = document.querySelectorAll(".vt-footer .strata-cell");
-    if (!cells.length) return;
-    cells.forEach((cell) => {
-      cell.addEventListener(
-        "mousemove",
-        (e) => {
-          const rect = cell.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          cell.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(var(--accent-rgb), 0.08) 0%, rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.03) 100%)`;
-        },
-        { passive: true }
-      );
-      cell.addEventListener(
-        "mouseleave",
-        () => {
-          cell.style.background = "";
-        },
-        { passive: true }
-      );
+
+  const init3DHeader = () => {
+    const headline = document.getElementById("tiltText");
+    if (!headline) return;
+    document.addEventListener("mousemove", (e) => {
+      if (!document.getElementById("tiltText")) return;
+      let x = (window.innerWidth / 2 - e.pageX) / 25;
+      let y = (window.innerHeight / 2 - e.pageY) / 25;
+      headline.style.transform = `rotateY(${x}deg) rotateX(${y}deg) translateZ(100px)`;
     });
   };
   const electrifyLinks = () => {
