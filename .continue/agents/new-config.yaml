@@ -1,71 +1,91 @@
-# This is an example configuration file
-# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+# This is a Continue agent configuration file.
+# To learn more, see the config reference: https://docs.continue.dev/reference
 
-name: Example Config
-version: 1.0.0
+name: Workspace Autonomous Agent
+version: 1.1.0
 schema: v1
 
-# Define which models can be used
-# https://docs.continue.dev/customization/models
+# Models available to Continue
 models:
   - name: openai-gpt-5
     provider: openai
     model: gpt-5
     apiKey: ${{ secrets.OPENAI_API }}
+
   - name: gemini
     provider: google
     model: gemini
     apiKey: ${{ secrets.GEMINI_API_KEY }}
+
+  # Ollama local models (preferred for cost-free runs when available)
   - uses: ollama/qwen2.5-coder-7b
+    name: qwen2.5-coder-7b
     with:
       OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
-  # Recommended free / local models (will use local runtimes when available)
+
   - uses: ollama/vicuna-13b
     name: vicuna-13b
     with:
       OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
+
   - uses: ollama/llama-2-13b-chat
     name: llama2-13b-chat
     with:
       OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
+
+  # Optional hosted fallback models
   - uses: huggingface/gpt-j-6b
     name: gpt-j-6b
     with:
       HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_TOKEN }}
+
   - uses: huggingface/falcon-7b-instruct
     name: falcon-7b-instruct
     with:
       HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_TOKEN }}
+
+  # Optional local GGML model (llama.cpp runtime)
   - name: local-ggml-vicuna
     provider: local
     model: ggml-vicuna-13b
     runtime: llama.cpp
     path: ./models/ggml-vicuna-13b.bin
 
-# MCP Servers that Continue can access
-# https://docs.continue.dev/customization/mcp-tools
+# MCP servers
 mcpServers:
   - uses: anthropic/memory-mcp
 
-# Workspace agent configuration: safe defaults with optional full access
-# Review and adjust `allowedCommands` and `allowDeploy` before enabling in production.
+# Workspace agent configuration
 agent:
   id: workspace-agent
   name: Workspace Auto Agent
-  description: "Per-user enabled agent for automations: auto-fix, auto-heal, run scripts, and optional deploy. Review allowedCommands before running."
+  description: "Autonomous workspace agent for fix/test/build/deploy tasks. Review allowedCommands before enabling in production."
+
+  # Primary model (cloud-first for max quality)
   model: openai-gpt-5
+
+  # Autonomy controls
   continuous: true
-  # Increased iteration cap for long-running objectives
   maxIterations: 500
-  # Lower threshold to allow agent to attempt more uncertain actions
-  confidenceThreshold: 0.05
-  # Aggressive automation toggles
+  confidenceThreshold: 0.03
+  continueUntilObjectiveComplete: true
+  autoFindAndFix: true
+  autoCreateFiles: true
   autoFix: true
   autoHeal: true
   autoTest: true
-  autoCommit: true
-  autoDeploy: true
-  # Runtime permissions: these are powerful. I set sensible defaults below.
+
+  # Safety + operational policy (aligned with repo constraints)
+  # Ensure verify is run before deploys; keep allowedCommands explicit.
+  allowDeploy: true
+  deployCommand: npm run deploy
+  deploySecret: CLOUDFLARE_API_TOKEN
+
+  # If you truly want fully autonomous operation, keep confirmationMode to 'never'.
+  # For safer operation, change to 'low' or 'always'.
+  confirmationMode: never
+
+  # Permissions: powerful, only enable what you want the agent to do.
   permissions:
     filesystem: true
     run: true
@@ -73,18 +93,16 @@ agent:
     git: true
     allowFileCreate: true
     allowFileDelete: true
+
+  # Workspace scope
   workspaceRoots:
     - .
-  # Avoid loading secret-bearing env files automatically; prefer your OS env or a secrets store.
+
+  # Avoid auto-loading secret files; rely on OS env or secret store.
   envFiles: []
-  autoFindAndFix: true
-  autoCreateFiles: true
-  continueUntilObjectiveComplete: true
-  # Confirmation behaviour: 'never'|'low'|'always'. 'low' will auto-confirm low-risk ops.
-  confirmationMode: never
-  # Maximum concurrency for parallel tasks
+
+  # Concurrency and timeouts
   concurrency: 6
-  # Timeouts and retries for long-running model calls/commands
   timeouts:
     modelCallSeconds: 180
     commandSeconds: 900
@@ -92,8 +110,13 @@ agent:
     retries: 5
     backoffSeconds: 8
     maxBackoffSeconds: 90
-  # Limit what the agent may run in the workspace for safety.
+
+  # Explicit command allowlist (include verify + deploy pipeline)
   allowedCommands:
+    - chrome
+    - code
+    - pwsh
+    - powershell
     - npm run verify
     - npm run test
     - npm run build
@@ -104,31 +127,42 @@ agent:
     - npx wrangler deploy
     - npx wrangler tail
     - scripts/*.ps1
-  # Fallback model order: agent will try these in order if primary is unavailable
+    - scripts/open-youtube.ps1
+    - scripts/open-facebook.ps1
+    - scripts/open-snapchat.ps1
+    - scripts/open-voicetowebsite.ps1
+    - scripts/open-vtw-admin.ps1
+    - scripts/open-vtw-voice-commands.ps1
+    - autofix.ps1
+    - whatever.ps1
+
+  # Fallback model order
   fallbackModels:
     - gemini
-    - ollama/qwen2.5-coder-7b
     - anthropic/claude-4-sonnet
-  # Prefer local models (if running Ollama or local LLM runtimes)
-  preferLocalModels: true
-  # If you want the agent to also deploy automatically set allowDeploy: true
-  allowDeploy: true
-  # Command the agent will run to deploy; adjust the command to your workflow.
-  deployCommand: npm run deploy
-  # Secret to use for deployment (ensure this is set in .env.local or secret store)
-  deploySecret: CLOUDFLARE_API_TOKEN
-  # Secrets available to the agent (referenced from environment/.env or secret store)
+    - qwen2.5-coder-7b
+
+  # Prefer local models when present
+  preferLocalModels: false
+
+  # Autonomy helpers
+  autoCommit: true
+  autoDeploy: true
+
+  # Secrets that the agent may reference
   secrets:
     - OPENAI_API
     - GEMINI_API_KEY
     - OLLAMA
+    - HUGGINGFACE_TOKEN
+
   # Logging and telemetry
   logging:
     level: info
     persist: true
-  # Optional telemetry: set to false to minimize external calls
   telemetry: false
-  # Prefer human-friendly natural language responses and minimize raw code dumps
+
+  # Response preferences
   responsePreferences:
     naturalLanguage: true
     avoidCodeOnlyResponses: true

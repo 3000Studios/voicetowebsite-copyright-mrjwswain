@@ -1,5 +1,8 @@
 # Custom GPT Setup (Execute API v2)
 
+> Note: Creating Custom GPTs requires a paid ChatGPT plan (Plus/Pro/Business/Enterprise/Edu). Free
+> plans can use GPTs but cannot create or edit them.
+
 ## 1. Deploy Worker
 
 Run:

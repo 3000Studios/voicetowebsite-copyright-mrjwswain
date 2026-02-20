@@ -1,0 +1,35 @@
+{
+  "videos": [
+    {
+      "id": "hero-wallpaper",
+      "title": "Hero Wallpaper",
+      "url": "/media/vtw-home-wallpaper.mp4"
+    },
+    {
+      "id": "opener",
+      "title": "Opener",
+      "url": "/media/vtw-opener.mp4"
+    }
+  ],
+  "images": [
+    {
+      "id": "wallpaper",
+      "title": "Wallpaper",
+      "url": "/vtw-wallpaper.png"
+    }
+  ],
+  "audio": [
+    {
+      "id": "background",
+      "title": "Background Music",
+      "url": "/background-music.wav"
+    }
+  ],
+  "fonts": [
+    {
+      "id": "manrope",
+      "title": "Manrope",
+      "url": "https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap"
+    }
+  ]
+}

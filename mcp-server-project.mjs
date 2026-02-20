@@ -4,88 +4,25 @@
  * Provides project-aware context to Continue.dev for better code suggestions
  */
 
-import { StdIO } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import * as z from "zod/v4";
 import fs from "fs";
 import path from "path";
 
-class ProjectContextServer {
-  constructor() {
-    this.server = new StdIO({
-      name: "project-context",
-      version: "1.0.0",
-    });
+const projectRoot = process.cwd();
+const server = new McpServer({
+  name: "project-context",
+  version: "1.0.0",
+});
 
-    this.setupHandlers();
-    this.projectRoot = process.cwd();
-  }
-
-  setupHandlers() {
-    this.server.setRequestHandler(ListToolsRequestSchema, () => ({
-      tools: [
-        {
-          name: "get-project-summary",
-          description: "Get summary of project structure and recent changes",
-          inputSchema: { type: "object" },
-        },
-        {
-          name: "get-file-context",
-          description: "Get context about a specific file",
-          inputSchema: {
-            type: "object",
-            properties: {
-              filePath: {
-                type: "string",
-                description: "Path to file (relative to project root)",
-              },
-            },
-          },
-        },
-        {
-          name: "search-references",
-          description: "Search for references to a symbol",
-          inputSchema: {
-            type: "object",
-            properties: {
-              symbol: { type: "string", description: "Symbol name to search" },
-              limit: { type: "number", description: "Max results" },
-            },
-          },
-        },
-      ],
-    }));
-
-    this.server.setRequestHandler(CallToolRequestSchema, (request) =>
-      this.handleToolCall(request)
-    );
-  }
-
-  async handleToolCall(request) {
-    const { name, arguments: args } = request.params;
-
-    try {
-      switch (name) {
-        case "get-project-summary":
-          return await this.getProjectSummary();
-        case "get-file-context":
-          return await this.getFileContext(args);
-        case "search-references":
-          return await this.searchReferences(args);
-        default:
-          throw new Error(`Unknown tool: ${name}`);
-      }
-    } catch (err) {
-      return {
-        content: [{ type: "text", text: `Error: ${err.message}` }],
-        isError: true,
-      };
-    }
-  }
-
-  async getProjectSummary() {
+server.registerTool(
+  "get-project-summary",
+  {
+    description: "Get summary of project structure and recent changes",
+    inputSchema: z.object({}),
+  },
+  async () => {
     const summary = `
 VoiceToWebsite Project:
 - Type: Vite + React + Cloudflare Workers
@@ -109,14 +46,20 @@ Scripts:
 Status: All systems operational, unified command center integrated
     `;
 
-    return {
-      content: [{ type: "text", text: summary }],
-    };
+    return { content: [{ type: "text", text: summary }] };
   }
+);
 
-  async getFileContext(args) {
-    const { filePath } = args;
-    const fullPath = path.join(this.projectRoot, filePath);
+server.registerTool(
+  "get-file-context",
+  {
+    description: "Get context about a specific file",
+    inputSchema: z.object({
+      filePath: z.string().describe("Path to file (relative to project root)"),
+    }),
+  },
+  async ({ filePath }) => {
+    const fullPath = path.join(projectRoot, filePath);
 
     try {
       const stats = fs.statSync(fullPath);
@@ -132,27 +75,40 @@ Status: All systems operational, unified command center integrated
         ],
       };
     } catch (err) {
-      throw new Error(`Could not read file: ${err.message}`);
+      return {
+        content: [{ type: "text", text: `Error: ${err.message}` }],
+        isError: true,
+      };
     }
   }
+);
 
-  async searchReferences(args) {
-    const { symbol, limit = 10 } = args;
-    // Simplified: just return a placeholder
-    return {
-      content: [
-        {
-          type: "text",
-          text: `References to "${symbol}" (search not implemented in this stub - integrate with codebase indexer for full functionality)`,
-        },
-      ],
-    };
-  }
+server.registerTool(
+  "search-references",
+  {
+    description: "Search for references to a symbol",
+    inputSchema: z.object({
+      symbol: z.string().describe("Symbol name to search"),
+      limit: z.number().optional().describe("Max results"),
+    }),
+  },
+  async ({ symbol }) => ({
+    content: [
+      {
+        type: "text",
+        text: `References to "${symbol}" (search not implemented in this stub - integrate with codebase indexer for full functionality)`,
+      },
+    ],
+  })
+);
 
-  async run() {
-    await this.server.connect(process.stdin, process.stdout);
-  }
+async function main() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error("project-context MCP server running on stdio");
 }
 
-const server = new ProjectContextServer();
-server.run().catch(console.error);
+main().catch((error) => {
+  console.error("Server error:", error);
+  process.exit(1);
+});

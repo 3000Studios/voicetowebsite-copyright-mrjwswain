@@ -1,0 +1,64 @@
+{
+  "posts": [
+    {
+      "id": "voice-to-website-playbook",
+      "title": "The Voice-to-Website Playbook",
+      "excerpt": "How to go from a spoken idea to a live, monetized site in under an hour.",
+      "tags": ["voice", "automation", "playbook"],
+      "date": "2026-02-19",
+      "readTime": "6 min",
+      "hero": "/vtw-wallpaper.png",
+      "url": "/blog#voice-to-website-playbook"
+    },
+    {
+      "id": "adsense-ready-layouts",
+      "title": "AdSense-Ready Layouts That Convert",
+      "excerpt": "Structure, spacing, and content depth that help pass review while protecting UX.",
+      "tags": ["adsense", "monetization", "seo"],
+      "date": "2026-02-18",
+      "readTime": "5 min",
+      "hero": "/vtw-wallpaper.png",
+      "url": "/blog#adsense-ready-layouts"
+    },
+    {
+      "id": "ai-ops-for-sites",
+      "title": "AI Ops for Websites",
+      "excerpt": "How orchestrators, preview environments, and auto-heal keep sites stable at scale.",
+      "tags": ["ai", "ops", "reliability"],
+      "date": "2026-02-17",
+      "readTime": "7 min",
+      "hero": "/vtw-wallpaper.png",
+      "url": "/blog#ai-ops-for-sites"
+    },
+    {
+      "id": "content-cluster-strategy",
+      "title": "Content Cluster Strategy for Search",
+      "excerpt": "Build topical authority with structured clusters and internal linking.",
+      "tags": ["content", "seo", "growth"],
+      "date": "2026-02-16",
+      "readTime": "4 min",
+      "hero": "/vtw-wallpaper.png",
+      "url": "/blog#content-cluster-strategy"
+    },
+    {
+      "id": "from-preview-to-publish",
+      "title": "From Preview to Publish: The 5-Step Funnel",
+      "excerpt": "A repeatable funnel that turns previews into paying customers.",
+      "tags": ["funnel", "conversion", "playbook"],
+      "date": "2026-02-15",
+      "readTime": "6 min",
+      "hero": "/vtw-wallpaper.png",
+      "url": "/blog#from-preview-to-publish"
+    },
+    {
+      "id": "edge-stack-monetization",
+      "title": "Edge Stack Monetization",
+      "excerpt": "Why edge-hosted sites load faster, rank better, and monetize more reliably.",
+      "tags": ["edge", "performance", "monetization"],
+      "date": "2026-02-14",
+      "readTime": "5 min",
+      "hero": "/vtw-wallpaper.png",
+      "url": "/blog#edge-stack-monetization"
+    }
+  ]
+}
