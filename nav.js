@@ -1,5 +1,3 @@
-import siteConfig from "./src/site-config.json";
-
 (() => {
   const THEME_KEY = "vtw-theme";
   const THEMES = [
@@ -40,7 +38,7 @@ import siteConfig from "./src/site-config.json";
     },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
-  document.documentElement.dataset.navVersion = "2026-02-12-01";
+  document.documentElement.dataset.navVersion = "2026-02-19-01";
 
   const isShellDisabled = () => {
     try {
@@ -85,6 +83,28 @@ import siteConfig from "./src/site-config.json";
     { href: "/support", label: "Support", icon: "💬" },
     { href: "/admin", label: "Admin", icon: "⚙️" },
   ];
+
+  const navDataTags = {
+    Home: "01_INIT",
+    Features: "02_CORE",
+    Pricing: "03_SUBS",
+    License: "04_CRED",
+    Demo: "05_DEMO",
+    Store: "06_KITS",
+    Blog: "07_SIG",
+    Livestream: "08_STREAM",
+    Support: "09_HELP",
+  };
+
+  const formatDataTag = (label, idx) => {
+    if (navDataTags[label]) return navDataTags[label];
+    const prefix = String(idx + 1).padStart(2, "0");
+    const slug = label
+      .replace(/[^a-z0-9]/gi, "")
+      .slice(0, 4)
+      .toUpperCase();
+    return `${prefix}_${slug || "VTW"}`;
+  };
 
   const adminLinks = [
     { href: "/admin/", label: "Dashboard", icon: "📊" },
@@ -172,7 +192,7 @@ import siteConfig from "./src/site-config.json";
     try {
       stored = localStorage.getItem(THEME_KEY);
     } catch (_) {}
-    applyTheme(stored || siteConfig?.theme?.default || "midnight");
+    applyTheme(stored || "midnight");
   };
   const enforceAdminTheme = () => {
     try {
@@ -254,6 +274,18 @@ import siteConfig from "./src/site-config.json";
           gain2.gain.linearRampToValueAtTime(0, t + 0.3);
           osc2.start(t);
           osc2.stop(t + 0.3);
+        } else if (type === "zap") {
+          const zapOsc = ctx.createOscillator();
+          const zapGain = ctx.createGain();
+          zapOsc.type = "sawtooth";
+          zapOsc.frequency.setValueAtTime(400, t);
+          zapOsc.frequency.linearRampToValueAtTime(2000, t + 0.12);
+          zapGain.gain.setValueAtTime(0.22, t);
+          zapGain.gain.linearRampToValueAtTime(0, t + 0.4);
+          zapOsc.connect(zapGain);
+          zapGain.connect(ctx.destination);
+          zapOsc.start(t);
+          zapOsc.stop(t + 0.4);
         }
       } catch (_) {}
     },
@@ -305,18 +337,23 @@ import siteConfig from "./src/site-config.json";
 
   const buildPrimaryLinksHtml = () =>
     getPrimaryNavLinks()
-      .map(
-        (link, idx) =>
-          `<a href="${link.href}" data-name="${link.label}" data-vtw-scrollfx="label" style="--vtw-i:${idx}">${link.icon} ${link.label}</a>`
-      )
+      .map((link, idx) => {
+        const dataTag = formatDataTag(link.label, idx);
+        return `
+          <li class="crystal-nav-item" style="--vtw-i:${idx}">
+            <a class="crystal-nav-link" href="${link.href}" data-name="${link.label}" data-vtw-scrollfx="label">
+              <span class="crystal-data-tag">${dataTag}</span>
+              ${link.label}
+            </a>
+          </li>
+        `;
+      })
       .join("");
 
   const buildActionsHtml = () => {
-    let html = "";
     const admin = getAdminNavLink();
-    if (admin)
-      html += `<a class="nav-admin-link" href="${admin.href}" data-name="${admin.label}" data-vtw-scrollfx="label" style="--vtw-i:99">${admin.icon} ${admin.label}</a>`;
-    return html;
+    if (!admin) return "";
+    return `<a class="crystal-admin-link" href="${admin.href}" data-name="${admin.label}" data-vtw-scrollfx="label">${admin.label}</a>`;
   };
 
   const buildListHtml = () => {
@@ -394,7 +431,9 @@ import siteConfig from "./src/site-config.json";
   };
   const clearExistingNav = () => {
     document
-      .querySelectorAll(".glass-nav, .mobile-overlay, .site-header, .site-nav")
+      .querySelectorAll(
+        ".glass-nav, .crystal-nav, .crystal-nav-wrapper, .mobile-overlay, .site-header, .site-nav"
+      )
       .forEach((el) => el.remove());
     const skip = document.querySelector(".vtw-skip-link");
     if (skip) skip.remove();
@@ -443,44 +482,41 @@ import siteConfig from "./src/site-config.json";
     toggle.id = "mobileNavToggle";
     toggle.className = "mobile-toggle";
     toggle.setAttribute("aria-hidden", "true");
+    const navWrapper = document.createElement("div");
+    navWrapper.className = "crystal-nav-wrapper";
+    navWrapper.id = "vtwNavWrapper";
     const nav = document.createElement("nav");
-    nav.className = "glass-nav";
-    const brandMark = prefersReducedMotion()
-      ? `
-        <span class="brand-video-wrap" aria-hidden="true">
-          <img class="brand-fallback" src="/vtw-wallpaper.png" alt="" />
-        </span>
-      `
-      : `
-        <span class="brand-video-wrap" aria-hidden="true">
-          <video class="brand-video" autoplay muted loop playsinline preload="metadata">
-            <source src="/media/vtw-animated-logo.mp4" type="video/mp4" />
-          </video>
-        </span>
-      `;
-    nav.innerHTML = `
-      <div class="nav-video-mask" aria-hidden="true"></div>
-      <a class="brand" href="/" aria-label="VoiceToWebsite home">
-        ${brandMark}
-        <span class="brand-name" data-vtw-scrollfx="brand">VoiceToWebsite</span>
-      </a>
-      <div class="nav-links">
-        ${buildPrimaryLinksHtml()}
-      </div>
-      <div class="nav-actions">
-        ${buildActionsHtml()}
-      </div>
-      <label for="mobileNavToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">
-        <span class="nav-toggle-bars" aria-hidden="true"></span>
-        <span class="nav-toggle-waves" aria-hidden="true"><i></i><i></i><i></i></span>
-      </label>
+    nav.className = "crystal-nav";
+    const brandMark = `
+      <span class="crystal-brand-mark" aria-hidden="true"></span>
     `;
+    nav.innerHTML = `
+      <div class="crystal-glint" aria-hidden="true"></div>
+      <a class="crystal-brand" href="/" aria-label="VoiceToWebsite home">
+        ${brandMark}
+        <span class="crystal-brand-text" data-vtw-scrollfx="brand">
+          <span class="crystal-brand-code">V.T.W</span>
+          <span class="crystal-brand-name">VoiceToWebsite</span>
+        </span>
+      </a>
+      <ul class="crystal-links">
+        ${buildPrimaryLinksHtml()}
+      </ul>
+      <div class="crystal-actions">
+        ${buildActionsHtml()}
+        <a class="crystal-cta detonation-trigger" href="/demo#video" data-vtw-scrollfx="label">Get Started</a>
+        <label for="mobileNavToggle" class="crystal-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">
+          <span class="crystal-toggle-bars" aria-hidden="true"></span>
+        </label>
+      </div>
+    `;
+    navWrapper.appendChild(nav);
     const overlay = document.createElement("div");
     overlay.className = "mobile-overlay";
     overlay.id = "mobileOverlay";
     overlay.setAttribute("aria-hidden", "true");
     overlay.innerHTML = `      <ul>        ${buildListHtml()}      </ul>    `;
-    fragment.append(skip, toggle, nav, overlay);
+    fragment.append(skip, toggle, navWrapper, overlay);
     body.prepend(fragment);
     body.classList.add("nav-ready");
     const closeOnNavigate = () => {
@@ -489,7 +525,7 @@ import siteConfig from "./src/site-config.json";
     overlay.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", closeOnNavigate);
     });
-    const interactiveLinks = nav.querySelectorAll("a, .brand");
+    const interactiveLinks = nav.querySelectorAll("a, .crystal-brand");
     interactiveLinks.forEach((link) => {
       link.addEventListener("mouseenter", playHover);
       link.addEventListener("mousedown", playClick);
@@ -498,7 +534,7 @@ import siteConfig from "./src/site-config.json";
       link.addEventListener("mouseenter", playHover);
       link.addEventListener("click", playClick);
     });
-    const toggleButton = nav.querySelector(".nav-toggle");
+    const toggleButton = nav.querySelector(".crystal-toggle");
     toggleButton?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
@@ -518,6 +554,38 @@ import siteConfig from "./src/site-config.json";
     toggle.addEventListener("change", syncOverlayA11y);
     syncOverlayA11y();
 
+    const updateWrapperState = () => {
+      if (!navWrapper) return;
+      const compact = (window.scrollY || 0) > 60;
+      navWrapper.classList.toggle("is-compact", compact);
+    };
+
+    updateWrapperState();
+    window.addEventListener("scroll", updateWrapperState, { passive: true });
+
+    nav
+      .querySelectorAll(
+        ".detonation-trigger, .crystal-nav-link, .crystal-admin-link"
+      )
+      .forEach((trigger) => {
+        if (trigger.dataset.vtwShardInit) return;
+        trigger.dataset.vtwShardInit = "1";
+        trigger.addEventListener("click", (event) => {
+          if (event.currentTarget?.classList.contains("crystal-admin-link")) {
+            triggerBubbleBurst(
+              event.currentTarget,
+              event.clientX,
+              event.clientY
+            );
+          } else {
+            createShardExplosion(event.clientX, event.clientY);
+            if (event.currentTarget?.classList.contains("crystal-nav-link")) {
+              triggerBoltZap(event.currentTarget);
+            }
+          }
+        });
+      });
+
     window.addEventListener(
       "keydown",
       (event) => {
@@ -528,6 +596,97 @@ import siteConfig from "./src/site-config.json";
       },
       { passive: true }
     );
+  };
+
+  const triggerBoltZap = (target) => {
+    if (!target || !target.classList) return;
+    target.classList.remove("crystal-zap");
+    // Force reflow so animation can retrigger quickly.
+    void target.offsetWidth;
+    target.classList.add("crystal-zap");
+    window.setTimeout(() => target.classList.remove("crystal-zap"), 420);
+    try {
+      SoundEngine.play("zap");
+    } catch (_) {}
+  };
+
+  const triggerBubbleBurst = (target, clientX, clientY) => {
+    if (!target) return;
+    try {
+      SoundEngine.play("success");
+    } catch (_) {}
+
+    const rect = target.getBoundingClientRect();
+    const centerX = clientX || rect.left + rect.width / 2;
+    const centerY = clientY || rect.top + rect.height / 2;
+
+    target.classList.add("bubble-pop");
+    window.setTimeout(() => target.classList.remove("bubble-pop"), 600);
+
+    const sporeCount = 16;
+    for (let i = 0; i < sporeCount; i++) {
+      const spore = document.createElement("span");
+      spore.className = "bubble-spore";
+      const size = 5 + Math.random() * 12;
+      spore.style.width = `${size}px`;
+      spore.style.height = `${size}px`;
+      spore.style.left = `${centerX - size / 2}px`;
+      spore.style.top = `${centerY - size / 2}px`;
+      document.body.appendChild(spore);
+
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 40 + Math.random() * 50;
+      const dx = Math.cos(angle) * velocity;
+      const dy = Math.sin(angle) * velocity;
+      const duration = 450 + Math.random() * 250;
+
+      spore.animate(
+        [
+          { transform: "translate(0,0) scale(1)", opacity: 0.95 },
+          { transform: `translate(${dx}px, ${dy}px) scale(0.2)`, opacity: 0 },
+        ],
+        {
+          duration,
+          easing: "ease-out",
+          fill: "forwards",
+        }
+      ).onfinish = () => spore.remove();
+    }
+  };
+
+  const createShardExplosion = (clientX, clientY) => {
+    if (!clientX && !clientY) return;
+    const shardCount = 18;
+    for (let i = 0; i < shardCount; i++) {
+      const shard = document.createElement("span");
+      shard.className = "crystal-shard";
+      const size = 8 + Math.random() * 24;
+      shard.style.width = `${size}px`;
+      shard.style.height = `${size}px`;
+      shard.style.left = `${clientX - size / 2}px`;
+      shard.style.top = `${clientY - size / 2}px`;
+      document.body.appendChild(shard);
+
+      const dx = (Math.random() - 0.5) * 420;
+      const dy = (Math.random() - 0.5) * 420;
+      const rotate = (Math.random() - 0.5) * 720;
+      const duration = 600 + Math.random() * 500;
+
+      shard.animate(
+        [
+          { transform: "translate(0,0) scale(1) rotate(0deg)", opacity: 0.95 },
+          {
+            transform: `translate(${dx}px, ${dy}px) scale(0) rotate(${rotate}deg)`,
+            opacity: 0,
+          },
+        ],
+        {
+          duration,
+          easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          fill: "forwards",
+        }
+      ).onfinish = () => shard.remove();
+    }
   };
 
   const initTextFx = () => {
@@ -568,7 +727,7 @@ import siteConfig from "./src/site-config.json";
     try {
       if (prefersReducedMotion()) return;
 
-      const nav = document.querySelector(".glass-nav");
+      const nav = document.querySelector(".crystal-nav");
       const fxEls = Array.from(
         document.querySelectorAll("[data-vtw-scrollfx]")
       );

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;700;900&display=swap");
+
 :root {
   --bg-color: #0b1222;
   --bg-obsidian: var(--bg-color);
@@ -8,6 +10,15 @@
   --accent-warm: #fbbf24;
   --accent-cool: #22d3ee;
   --muted: rgba(233, 241, 255, 0.72);
+  --crystal-nav-bg: #030712;
+  --crystal-primary: #f0f9ff;
+  --crystal-accent: #38bdf8;
+  --crystal-deep: #1e3a8a;
+  --crystal-prism-1: rgba(56, 189, 248, 0.4);
+  --crystal-prism-2: rgba(168, 85, 247, 0.4);
+  --crystal-shard-speed: 0.8s;
+  --crystal-font-code: "Space Mono", monospace;
+  --crystal-font-sans: "Outfit", "Inter", sans-serif;
   --wallpaper-image:
     radial-gradient(
       1200px circle at 12% -10%,
@@ -269,198 +280,379 @@ iframe {
   }
 }
 
-/* Global injected nav (nav.js) */
-.glass-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 150;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.9rem 2rem;
-  background: rgba(4, 6, 10, 0.75);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  overflow: visible;
-  pointer-events: auto;
-}
-
-.glass-nav .nav-video-mask {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.2;
-  pointer-events: none;
-}
-
-.glass-nav .nav-video-mask video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(0.8);
-}
-
-.glass-nav .brand {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.75rem;
-}
-
-.glass-nav .brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
-}
-
-.glass-nav .brand-video-wrap {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.25);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.35),
-    0 0 18px rgba(56, 189, 248, 0.22);
-  flex: 0 0 auto;
-}
-
-.glass-nav .brand-video,
-.glass-nav .brand-fallback {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-.glass-nav .brand-video {
-  filter: saturate(1.1) contrast(1.05);
-}
-
-.glass-nav .brand {
-  text-decoration: none;
-  color: inherit;
-}
-
-.glass-nav .brand:focus-visible {
-  outline: 2px solid rgba(56, 189, 248, 0.8);
-  outline-offset: 6px;
-  border-radius: 14px;
-}
-
-.glass-nav .brand-name {
-  color: #fff;
-  white-space: nowrap;
-}
-
-.glass-nav .nav-links {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  gap: 1.4rem;
-  align-items: center;
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.glass-nav .nav-actions {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 0 0 auto;
-}
-
-.glass-nav .nav-links a {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.7);
-  white-space: nowrap;
-  transition:
-    color 0.2s ease,
-    text-shadow 0.2s ease;
-  pointer-events: auto;
-}
-
-.glass-nav .nav-admin-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.55rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.86);
-  text-decoration: none;
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.glass-nav .nav-admin-link:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
-}
-
-.glass-nav .nav-links a:hover,
-.glass-nav .nav-links a.electrify {
-  color: #fff;
-  text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
-}
-
+/* Mobile toggle checkbox (used by nav.js) */
 .mobile-toggle {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-.nav-toggle {
-  position: relative;
-  z-index: 2;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
+/* Fractured Crystal global nav */
+.crystal-nav-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 2rem;
+  z-index: 150;
+  transition: padding 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  pointer-events: none;
 }
 
-.nav-toggle span,
-.nav-toggle span::before,
-.nav-toggle span::after {
+.crystal-nav-wrapper.is-compact {
+  padding: 1rem 2rem;
+}
+
+.crystal-nav {
+  pointer-events: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  backdrop-filter: blur(12px) saturate(180%);
+  position: relative;
+  overflow: hidden;
+  font-family: var(--crystal-font-sans);
+}
+
+.crystal-glint {
   content: "";
   position: absolute;
-  width: 18px;
-  height: 2px;
-  background: #fff;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  transform: rotate(45deg);
+  pointer-events: none;
+  animation: crystal-glint 8s infinite linear;
+}
+
+@keyframes crystal-glint {
+  0% {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  100% {
+    transform: translate(50%, 50%) rotate(45deg);
+  }
+}
+
+.crystal-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  z-index: 2;
+  color: var(--crystal-primary);
+}
+
+.crystal-brand-mark {
+  width: 32px;
+  height: 32px;
+  background: var(--crystal-accent);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  box-shadow: 0 0 20px var(--crystal-prism-1);
+}
+
+.crystal-brand-text {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--crystal-font-code);
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+
+.crystal-brand-code {
+  font-size: 0.9rem;
+}
+
+.crystal-brand-name {
+  font-size: 0.6rem;
+  opacity: 0.7;
+}
+
+.crystal-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.crystal-nav-item {
+  position: relative;
+}
+
+.crystal-nav-link {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 1.25rem 2.2rem;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    145deg,
+    rgba(9, 12, 20, 0.88),
+    rgba(0, 0, 0, 0.65)
+  );
+  box-shadow:
+    inset 0 0 0 rgba(0, 247, 255, 0),
+    0 0 0 rgba(0, 247, 255, 0);
+  transform: skewX(-12deg);
+  overflow: hidden;
   transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    text-shadow 0.2s ease,
+    transform 0.25s ease;
 }
 
-.nav-toggle span::before {
-  transform: translateY(-6px);
+.crystal-nav-link:hover {
+  color: #fff;
+  border-color: #00f7ff;
+  box-shadow:
+    0 0 30px #00f7ff,
+    inset 0 0 12px rgba(0, 247, 255, 0.45);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  transform: skewX(-6deg) scale(1.01);
 }
 
-.nav-toggle span::after {
-  transform: translateY(6px);
+.crystal-nav-link::before {
+  content: "";
+  position: absolute;
+  top: -120%;
+  left: -120%;
+  width: 320%;
+  height: 320%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition:
+    top 0.5s ease,
+    left 0.5s ease;
+  pointer-events: none;
+}
+
+.crystal-nav-link:hover::before {
+  top: 130%;
+  left: 130%;
+}
+
+.crystal-data-tag {
+  display: block;
+  font-family: var(--crystal-font-code);
+  font-size: 0.55rem;
+  letter-spacing: 0.35em;
+  color: var(--crystal-accent);
+  opacity: 0;
+  transform: translate3d(0, 6px, 0);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+  margin-bottom: -0.2rem;
+}
+
+.crystal-nav-link:hover .crystal-data-tag {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.crystal-zap {
+  animation: crystal-zap-burst 0.4s steps(4) forwards;
+}
+
+@keyframes crystal-zap-burst {
+  0% {
+    background: #fff;
+    transform: skewX(-15deg) scale(1);
+    opacity: 1;
+  }
+  25% {
+    background: #00f7ff;
+    transform: skewX(10deg) scale(1.35);
+  }
+  50% {
+    background: #fff;
+    transform: skewX(-25deg) scale(1.85);
+    opacity: 0.9;
+  }
+  100% {
+    background: transparent;
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.crystal-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.crystal-admin-link {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--crystal-accent);
+  color: #050a15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--crystal-font-code);
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.8);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: admin-float 4s ease-in-out infinite;
+}
+
+.crystal-admin-link:hover {
+  transform: scale(1.35);
+  filter: brightness(1.15);
+}
+
+.bubble-pop {
+  animation: bubble-pop 0.6s both;
+}
+
+.bubble-spore {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 1);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+}
+
+@keyframes admin-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes bubble-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.crystal-cta {
+  background: #fff;
+  color: #000;
+  padding: 0.8rem 1.8rem;
+  border-radius: 2px;
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--crystal-font-sans);
+}
+
+.crystal-cta:hover {
+  transform: scale(1.05) skewX(-5deg);
+  background: var(--crystal-accent);
+  box-shadow: 0 0 30px var(--crystal-prism-1);
+}
+
+.crystal-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+
+.crystal-toggle-bars,
+.crystal-toggle-bars::before,
+.crystal-toggle-bars::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: currentColor;
+  margin: 6px 0;
+  transition: transform 0.3s ease;
+}
+
+#mobileNavToggle:checked ~ .crystal-nav-wrapper .crystal-toggle-bars {
+  transform: rotate(45deg);
+}
+
+#mobileNavToggle:checked ~ .crystal-nav-wrapper .crystal-toggle-bars::before {
+  transform: rotate(-90deg) translate(-6px, 0);
+}
+
+#mobileNavToggle:checked ~ .crystal-nav-wrapper .crystal-toggle-bars::after {
+  opacity: 0;
+}
+
+.crystal-shard {
+  position: fixed;
+  pointer-events: none;
+  background: white;
+  z-index: 9999;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  opacity: 0;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .crystal-nav {
+    padding: 0.9rem 1.25rem;
+  }
+
+  .crystal-links {
+    display: none;
+  }
+
+  .crystal-actions {
+    gap: 0.5rem;
+  }
+
+  .crystal-toggle {
+    display: block;
+  }
 }
 
 .mobile-overlay {
@@ -496,24 +688,6 @@ iframe {
 #mobileNavToggle:checked ~ .mobile-overlay {
   opacity: 1;
   pointer-events: auto;
-}
-
-@media (max-width: 900px) {
-  .glass-nav {
-    padding: 0.85rem 1.2rem;
-  }
-
-  .glass-nav .nav-links {
-    display: none;
-  }
-
-  .glass-nav .nav-actions {
-    display: none;
-  }
-
-  .nav-toggle {
-    display: inline-flex;
-  }
 }
 
 .mobile-overlay .mobile-section {

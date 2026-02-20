@@ -255,6 +255,49 @@ const escapeHtml = (value) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 
+const normalizeBlogPostId = (value) => {
+  const raw = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "");
+  return raw || "general";
+};
+
+const getClientIp = (request) =>
+  request.headers.get("CF-Connecting-IP") ||
+  request.headers.get("x-forwarded-for") ||
+  "unknown";
+
+const loadBlogComments = async (env, postId) => {
+  if (!env.KV) return [];
+  const key = `blog:comments:${postId}`;
+  const raw = await env.KV.get(key);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+};
+
+const saveBlogComments = async (env, postId, comments) => {
+  if (!env.KV) return;
+  const key = `blog:comments:${postId}`;
+  const trimmed = Array.isArray(comments) ? comments.slice(0, 200) : [];
+  await env.KV.put(key, JSON.stringify(trimmed));
+};
+
+const blogCommentRateLimit = async (env, ip) => {
+  if (!env.KV || !ip || ip === "unknown") return true;
+  const key = `blog:rate:${ip}`;
+  const raw = await env.KV.get(key);
+  const count = Number.parseInt(raw || "0", 10) || 0;
+  if (count >= 6) return false;
+  await env.KV.put(key, String(count + 1), { expirationTtl: 3600 });
+  return true;
+};
+
 const getPayPalPlanLinks = (env, origin) => {
   const fallback = (plan) =>
     `${origin}/store.html?plan=${encodeURIComponent(plan)}&pay=paypal`;
@@ -768,6 +811,54 @@ export default {
       return addSecurityHeaders(
         new Response(JSON.stringify({ ok: true }), { status: 200, headers })
       );
+    }
+
+    if (url.pathname === "/api/blog/comments") {
+      if (!env.KV) {
+        return jsonResponse(503, {
+          error: "Comments storage unavailable.",
+        });
+      }
+      if (request.method === "GET") {
+        const postId = normalizeBlogPostId(url.searchParams.get("post"));
+        const comments = await loadBlogComments(env, postId);
+        return jsonResponse(200, { ok: true, post: postId, comments });
+      }
+      if (request.method === "POST") {
+        try {
+          const body = await request.clone().json();
+          const postId = normalizeBlogPostId(body?.post);
+          const name = String(body?.name || "Anonymous")
+            .trim()
+            .slice(0, 60);
+          const message = String(body?.message || "")
+            .trim()
+            .slice(0, 800);
+          if (!message) {
+            return jsonResponse(400, { error: "Message is required." });
+          }
+          const ip = getClientIp(request);
+          const allowed = await blogCommentRateLimit(env, ip);
+          if (!allowed) {
+            return jsonResponse(429, {
+              error: "Rate limit reached. Try again later.",
+            });
+          }
+          const comments = await loadBlogComments(env, postId);
+          const entry = {
+            id: crypto.randomUUID(),
+            name,
+            message,
+            ts: new Date().toISOString(),
+          };
+          comments.unshift(entry);
+          await saveBlogComments(env, postId, comments);
+          return jsonResponse(200, { ok: true, comment: entry });
+        } catch (err) {
+          return jsonResponse(500, { error: err.message });
+        }
+      }
+      return jsonResponse(405, { error: "Method not allowed." });
     }
 
     // Voice-to-layout routes (edge / Workers AI + D1 + R2)
@@ -2183,8 +2274,10 @@ export default {
       const isAdminPage =
         url.pathname === "/admin" || url.pathname.startsWith("/admin/");
       const isSecretPage = url.pathname.startsWith("/the3000");
+      const isSearchPage =
+        url.pathname === "/search" || url.pathname === "/search.html";
       const robotsTag =
-        isAdminPage || isSecretPage
+        isAdminPage || isSecretPage || isSearchPage
           ? "noindex, nofollow"
           : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 

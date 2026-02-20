@@ -155,7 +155,14 @@
               <div class="preview-card">
                 <div class="preview-title" id="previewTitle">—</div>
                 <p class="muted" id="livePreviewStatus">No live preview generated yet.</p>
-                <a id="livePreviewLink" class="btn btn-ghost is-hidden" href="#" target="_blank" rel="noreferrer">
+                <a
+                  id="livePreviewLink"
+                  class="btn btn-ghost is-hidden"
+                  href="/demo"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-disabled="true"
+                >
                   Open live preview
                 </a>
                 <ul class="preview-list" id="previewList"></ul>
@@ -165,16 +172,8 @@
                 <div class="muted" id="previewNext">Add pricing, add testimonials, and publish.</div>
                 <iframe
                   id="livePreviewFrame"
-                  class="is-hidden"
+                  class="is-hidden demo-preview-frame"
                   title="Live generated preview"
-                  style="
-                    width: 100%;
-                    min-height: 280px;
-                    border: 1px solid rgba(255, 255, 255, 0.12);
-                    border-radius: 12px;
-                    background: rgba(0, 0, 0, 0.35);
-                    margin-top: 12px;
-                  "
                 ></iframe>
               </div>
             </div>

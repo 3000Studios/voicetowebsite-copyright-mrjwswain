@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
 import SiteOpener from "./components/SiteOpener";
 import WarpTunnel from "./components/WarpTunnel";
@@ -24,6 +24,22 @@ const App: React.FC = () => {
 
   const recognitionRef = useRef<any>(null);
 
+  const startThemeSong = useCallback(async (force = false) => {
+    if (!force && audioPrefRef.current === "off") return false;
+    await audioEngine.enable();
+    audioEngine.unmuteMusicIfNeeded();
+    const ok = await audioEngine.playMusic(INTRO_SONG);
+    audioPlayingRef.current = ok;
+    setIsAudioPlaying(ok);
+    if (ok) {
+      audioPrefRef.current = "on";
+      try {
+        localStorage.setItem("vtw-audio-pref", "on");
+      } catch (_) {}
+    }
+    return ok;
+  }, []);
+
   useEffect(() => {
     try {
       // Show opener once per tab session.
@@ -32,7 +48,7 @@ const App: React.FC = () => {
     } catch (_) {
       setShowOpener(true);
     }
-  }, []);
+  }, [startThemeSong]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -94,22 +110,13 @@ const App: React.FC = () => {
     audioPrefRef.current = loadPref();
 
     const tryStart = async () => {
-      if (audioPrefRef.current === "off") return;
-      await audioEngine.enable();
-      const ok = await audioEngine.playMusic(INTRO_SONG);
       if (cancelled) return;
-      audioPlayingRef.current = ok;
-      setIsAudioPlaying(ok);
+      await startThemeSong();
     };
 
     const onFirstGesture = async () => {
-      if (audioPrefRef.current === "off") return;
       if (audioPlayingRef.current) return;
-      await audioEngine.enable();
-      audioEngine.unmuteMusicIfNeeded();
-      const ok = await audioEngine.playMusic(INTRO_SONG);
-      audioPlayingRef.current = ok;
-      setIsAudioPlaying(ok);
+      await startThemeSong(true);
     };
 
     // Attempt immediately (may be blocked).
@@ -143,7 +150,7 @@ const App: React.FC = () => {
         localStorage.setItem("vtw-audio-pref", "off");
       } catch (_) {}
     } else {
-      const ok = await audioEngine.playMusic(INTRO_SONG);
+      const ok = await startThemeSong(true);
       audioPlayingRef.current = ok;
       setIsAudioPlaying(ok);
       audioPrefRef.current = ok ? "on" : null;
@@ -191,10 +198,7 @@ const App: React.FC = () => {
     setGenerateError("");
 
     // Play the song as requested
-    await audioEngine.enable();
-    const ok = await audioEngine.playMusic(INTRO_SONG);
-    audioPlayingRef.current = ok;
-    setIsAudioPlaying(ok);
+    await startThemeSong(true);
 
     try {
       const res = await fetch("/api/generate", {
@@ -221,6 +225,7 @@ const App: React.FC = () => {
       <SiteOpener
         show={showOpener}
         reduceMotion={Boolean(reduceMotion)}
+        onMediaStart={() => startThemeSong(true)}
         onDone={() => {
           try {
             sessionStorage.setItem("vtw-opener-seen", "1");
@@ -256,6 +261,7 @@ const App: React.FC = () => {
             playsInline
             preload="metadata"
             className="w-full h-full object-cover brightness-50"
+            onPlay={() => startThemeSong(true)}
           >
             <source src={HOME_VIDEO} type="video/mp4" />
           </video>
@@ -308,34 +314,6 @@ const App: React.FC = () => {
             Just your voice.
           </motion.p>
         </div>
-
-        {/* 1. Video on top */}
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-20 rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-white/5 p-2"
-        >
-          <div className="relative aspect-video rounded-2xl overflow-hidden group">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            >
-              <source
-                src="https://media.voicetowebsite.com/homenavigation.mp4"
-                type="video/mp4"
-              />
-            </video>
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="font-orbitron tracking-widest text-xs">
-                How it works
-              </span>
-            </div>
-          </div>
-        </motion.section>
 
         {/* 2. Example below video / Integrated with Flow */}
         <section className="relative z-20">
@@ -490,11 +468,14 @@ const App: React.FC = () => {
                       Neural Shield Active
                     </div>
                     {generatedPreviewUrl && (
-                      <iframe
-                        src={generatedPreviewUrl}
-                        className="w-full h-[500px] border-none grayscale-[0.2]"
-                        title="Website Preview"
-                      />
+                      <div className="vt-preview-scroll">
+                        <iframe
+                          src={generatedPreviewUrl}
+                          className="vt-preview-frame w-full border-none grayscale-[0.2]"
+                          title="Website Preview"
+                          scrolling="yes"
+                        />
+                      </div>
                     )}
                     <div className="absolute inset-0 z-40 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
                   </div>

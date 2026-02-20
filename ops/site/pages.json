@@ -10,6 +10,7 @@
     { "id": "features", "route": "/features", "asset": "features.html", "zone": "public" },
     { "id": "pricing", "route": "/pricing", "asset": "pricing.html", "zone": "commerce" },
     { "id": "blog", "route": "/blog", "asset": "blog.html", "zone": "public" },
+    { "id": "search", "route": "/search", "asset": "search.html", "zone": "public" },
     { "id": "support", "route": "/support", "asset": "support.html", "zone": "public" },
     { "id": "status", "route": "/status", "asset": "status.html", "zone": "public" },
     { "id": "contact", "route": "/contact", "asset": "contact.html", "zone": "public" },

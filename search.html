@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Search | VoiceToWebsite</title>
+    <meta name="description" content="Search the VoiceToWebsite site." />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="vt-page">
+    <div class="video-bg" aria-hidden="true">
+      <video src="/media/vtw-home-wallpaper.mp4" autoplay muted loop playsinline></video>
+    </div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+    <main class="page">
+      <section class="section">
+        <p class="eyebrow">Site Search</p>
+        <h1>Search VoiceToWebsite</h1>
+        <p class="subhead">Find pages, products, features, and resources.</p>
+        <form class="search-shell" id="siteSearchForm" role="search">
+          <input type="search" id="siteSearchInput" name="q" placeholder="Search the site" />
+          <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+        <div class="search-results" id="siteSearchResults"></div>
+      </section>
+    </main>
+    <script type="module" src="/search.js"></script>
+    <script type="module" src="/nav.js"></script>
+  </body>
+</html>
