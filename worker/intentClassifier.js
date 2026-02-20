@@ -20,20 +20,35 @@ const baseIntentFromPhrase = (phraseIntent) => {
   }
 };
 
+const intentMapCache = new WeakMap();
+
+function getPreparedIntentMap(intentMap) {
+  if (!intentMap) return [];
+  let prepared = intentMapCache.get(intentMap);
+  if (!prepared) {
+    // Phrase-based intent extraction (deterministic: stable order by key length desc, then key).
+    const keys = Object.keys(intentMap).sort(
+      (a, b) => b.length - a.length || a.localeCompare(b)
+    );
+    prepared = keys.filter(Boolean).map((key) => ({
+      key,
+      normalizedKey: normalize(key),
+      intents: Array.isArray(intentMap[key])
+        ? intentMap[key]
+        : [intentMap[key]],
+    }));
+    intentMapCache.set(intentMap, prepared);
+  }
+  return prepared;
+}
+
 export function classifyIntents(rawInput, entities, intentMap) {
   const t = normalize(rawInput);
   const intentBundle = [];
 
-  // Phrase-based intent extraction (deterministic: stable order by key length desc, then key).
-  const keys = Object.keys(intentMap || {}).sort(
-    (a, b) => b.length - a.length || a.localeCompare(b)
-  );
-  for (const key of keys) {
-    if (!key) continue;
-    if (!t.includes(normalize(key))) continue;
-    const intents = Array.isArray(intentMap[key])
-      ? intentMap[key]
-      : [intentMap[key]];
+  const prepared = getPreparedIntentMap(intentMap);
+  for (const { key, normalizedKey, intents } of prepared) {
+    if (!t.includes(normalizedKey)) continue;
     intents.forEach((i) => {
       const intent = baseIntentFromPhrase(String(i || ""));
       if (!intent) return;
