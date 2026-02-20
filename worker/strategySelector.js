@@ -4,6 +4,8 @@ const normalize = (s) =>
     .replace(/\s+/g, " ")
     .trim();
 
+const keysCache = new WeakMap();
+
 export function selectStrategy(
   rawInput,
   entities,
@@ -13,9 +15,16 @@ export function selectStrategy(
   const t = normalize(rawInput);
 
   // Phrase-first mapping for determinism.
-  const keys = Object.keys(monetizationMap || {}).sort(
-    (a, b) => b.length - a.length || a.localeCompare(b)
-  );
+  const useCache = monetizationMap && typeof monetizationMap === "object";
+  let keys = useCache ? keysCache.get(monetizationMap) : null;
+
+  if (!keys) {
+    keys = Object.keys(monetizationMap || {}).sort(
+      (a, b) => b.length - a.length || a.localeCompare(b)
+    );
+    if (useCache) keysCache.set(monetizationMap, keys);
+  }
+
   for (const key of keys) {
     if (t.includes(normalize(key))) {
       const strategy = String(monetizationMap[key] || "").trim();
