@@ -565,21 +565,31 @@ export async function handlePublishRequest({ request, env }) {
     },
   ];
 
-  for (const asset of assets) {
-    const buf = new TextEncoder().encode(String(asset.body));
-    await env.R2.put(asset.key, buf, {
-      httpMetadata: { contentType: asset.contentType },
-    });
-    await env.D1.prepare(
-      "INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)"
-    )
-      .bind(siteId, asset.kind, asset.key, asset.contentType, buf.byteLength)
-      .run();
-  }
+  const encoder = new TextEncoder();
+  const uploadResults = await Promise.all(
+    assets.map(async (asset) => {
+      const buf = encoder.encode(String(asset.body));
+      await env.R2.put(asset.key, buf, {
+        httpMetadata: { contentType: asset.contentType },
+      });
+      return { asset, sizeBytes: buf.byteLength };
+    })
+  );
 
-  await env.D1.prepare("UPDATE sites SET status = ? WHERE id = ?")
-    .bind("published", siteId)
-    .run();
+  const statements = uploadResults.map(({ asset, sizeBytes }) =>
+    env.D1.prepare(
+      "INSERT INTO site_assets (site_id, kind, r2_key, content_type, size_bytes) VALUES (?,?,?,?,?)"
+    ).bind(siteId, asset.kind, asset.key, asset.contentType, sizeBytes)
+  );
+
+  statements.push(
+    env.D1.prepare("UPDATE sites SET status = ? WHERE id = ?").bind(
+      "published",
+      siteId
+    )
+  );
+
+  await env.D1.batch(statements);
 
   return json(200, { ok: true, siteId, r2Prefix: base });
 }
