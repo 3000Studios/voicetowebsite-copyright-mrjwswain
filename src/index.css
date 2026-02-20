@@ -87,6 +87,11 @@ body {
   cursor: default;
 }
 
+/* AdSense-Compliant Layout Structure */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -104,6 +109,9 @@ body {
   background-attachment: fixed, fixed;
   color: var(--text-color);
   font-family: "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .vt-waveform {
@@ -135,7 +143,9 @@ iframe {
 }
 
 #root {
-  min-height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   position: relative;
   z-index: 10;
 }
@@ -293,32 +303,40 @@ iframe {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 2rem;
-  z-index: 150;
+  padding: 1rem;
+  z-index: 2500;
   transition: padding 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 7, 18, 0.95) 0%,
+    rgba(3, 7, 18, 0.8) 50%,
+    transparent 100%
+  );
+  backdrop-filter: blur(12px);
 }
 
 .crystal-nav-wrapper.is-compact {
-  padding: 1rem 2rem;
+  padding: 0.5rem 1rem;
 }
 
 .crystal-nav {
   pointer-events: auto;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  backdrop-filter: blur(12px) saturate(180%);
+  padding: 0.75rem 1.5rem;
+  background: rgba(3, 7, 18, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  backdrop-filter: blur(16px) saturate(180%);
   position: relative;
   overflow: hidden;
   font-family: var(--crystal-font-sans);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .crystal-glint {
@@ -572,6 +590,61 @@ iframe {
   }
 }
 
+.crystal-admin-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.crystal-admin-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(125, 211, 252, 0.3);
+  animation: admin-float 3s ease-in-out infinite;
+}
+
+.crystal-admin-bubble:hover {
+  transform: scale(1.1);
+  background: linear-gradient(
+    135deg,
+    rgba(125, 211, 252, 0.2),
+    rgba(125, 211, 252, 0.1)
+  );
+  border-color: var(--crystal-accent);
+  box-shadow: 0 0 30px rgba(125, 211, 252, 0.6);
+}
+
+@keyframes admin-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 .crystal-cta {
   background: #fff;
   color: #000;
@@ -635,6 +708,74 @@ iframe {
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   opacity: 0;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Admin Sub-Navigation Dropdown */
+.admin-subnav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.admin-subnav-dropdown .nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 220px;
+  background: rgba(3, 7, 18, 0.95);
+  border: 1px solid rgba(125, 211, 252, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  z-index: 2600;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.admin-subnav-dropdown.is-open .nav-dropdown-menu,
+.admin-subnav-dropdown:hover .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.admin-subnav-dropdown .nav-dropdown-menu a {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.admin-subnav-dropdown .nav-dropdown-menu a:hover {
+  color: #fff;
+  background: rgba(125, 211, 252, 0.1);
+  border-left-color: var(--crystal-accent);
+  padding-left: 2rem;
+}
+
+.admin-subnav-dropdown .nav-dropdown-trigger {
+  background: none;
+  border: 1px solid rgba(125, 211, 252, 0.4);
+  color: var(--crystal-accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-subnav-dropdown .nav-dropdown-trigger:hover {
+  background: rgba(125, 211, 252, 0.1);
+  border-color: var(--crystal-accent);
+  box-shadow: 0 0 15px rgba(125, 211, 252, 0.3);
 }
 
 @media (max-width: 1024px) {

@@ -5029,3 +5029,26 @@ h1 {
 
 /* Voice-injected styles */
 /* redeploy trigger 2026-02-17 */
+
+.monetization {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Voice-injected styles */
+body {
+  background-color: #000000;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+h1 {
+  font-size: 10vw;
+  color: transparent;
+  background: linear-gradient(90deg, #d4af37, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+}

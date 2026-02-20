@@ -104,6 +104,7 @@ Public pages:
 - `/cursor-demo` -> `cursor-demo.html`
 - `/cyber-blog` -> `cyber-blog.html`
 - `/demo` -> `demo.html`
+- `/disclosure` -> `disclosure.html`
 - `/features` -> `features.html`
 - `/focus-timer` -> `focus-timer.html`
 - `/gallery` -> `gallery.html`

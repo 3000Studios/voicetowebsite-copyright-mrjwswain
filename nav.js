@@ -71,17 +71,16 @@
       return false;
     }
   };
-  const navLinks = [
+  const primaryLinks = [
     { href: "/", label: "Home", icon: "🏠" },
     { href: "/features", label: "Features", icon: "⚡" },
     { href: "/pricing", label: "Pricing", icon: "💎" },
-    { href: "/license", label: "License", icon: "🔐" },
     { href: "/demo", label: "Demo", icon: "🚀" },
     { href: "/store", label: "Store", icon: "🛒" },
     { href: "/blog", label: "Blog", icon: "📝" },
     { href: "/livestream", label: "Live", icon: "🎥" },
     { href: "/support", label: "Support", icon: "💬" },
-    { href: "/admin", label: "Admin", icon: "⚙️" },
+    { href: "/admin", label: "Admin", icon: "⚙️", admin: true },
   ];
 
   const navDataTags = {
@@ -353,7 +352,7 @@
   const buildActionsHtml = () => {
     const admin = getAdminNavLink();
     if (!admin) return "";
-    return `<a class="crystal-admin-link" href="${admin.href}" data-name="${admin.label}" data-vtw-scrollfx="label">${admin.label}</a>`;
+    return `<a class="crystal-admin-link crystal-admin-bubble" href="${admin.href}" data-name="${admin.label}" data-vtw-scrollfx="label" title="Admin Portal">${admin.icon}</a>`;
   };
 
   const buildListHtml = () => {
