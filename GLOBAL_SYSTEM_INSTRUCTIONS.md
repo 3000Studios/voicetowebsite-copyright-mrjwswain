@@ -152,6 +152,7 @@ Admin pages:
 - `/admin/bot-command-center` -> `admin/bot-command-center.html`
 - `/admin/customer-chat` -> `admin/customer-chat.html`
 - `/admin` -> `admin/index.html`
+- `/admin/integrated-dashboard` -> `admin/integrated-dashboard.html`
 - `/admin/live-stream` -> `admin/live-stream.html`
 - `/admin/login` -> `admin/login.html`
 - `/admin/nexus` -> `admin/nexus.html`
@@ -161,6 +162,7 @@ Admin pages:
 - `/admin/test-lab-2` -> `admin/test-lab-2.html`
 - `/admin/test-lab-3` -> `admin/test-lab-3.html`
 - `/admin/voice-commands` -> `admin/voice-commands.html`
+- `/admin/wallpaper` -> `admin/wallpaper.html`
 
 App Store pages:
 
