@@ -1,14 +1,12 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
-import SiteOpener from "./components/SiteOpener";
 import WarpTunnel from "./components/WarpTunnel";
 import { HOME_VIDEO, INTRO_SONG } from "./constants";
 import { audioEngine } from "./services/audioEngine";
 
 const App: React.FC = () => {
   const reduceMotion = useReducedMotion();
-  const [showOpener, setShowOpener] = useState(false);
   const audioPrefRef = useRef<"on" | "off" | null>(null);
   const audioPlayingRef = useRef(false);
 
@@ -20,7 +18,6 @@ const App: React.FC = () => {
   const [generatedPreviewUrl, setGeneratedPreviewUrl] = useState("");
   const [generatedSiteId, setGeneratedSiteId] = useState("");
   const [generateError, setGenerateError] = useState("");
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const recognitionRef = useRef<any>(null);
 
@@ -30,7 +27,6 @@ const App: React.FC = () => {
     audioEngine.unmuteMusicIfNeeded();
     const ok = await audioEngine.playMusic(INTRO_SONG);
     audioPlayingRef.current = ok;
-    setIsAudioPlaying(ok);
     if (ok) {
       audioPrefRef.current = "on";
       try {
@@ -39,16 +35,6 @@ const App: React.FC = () => {
     }
     return ok;
   }, []);
-
-  useEffect(() => {
-    try {
-      // Show opener once per tab session.
-      const seen = sessionStorage.getItem("vtw-opener-seen") === "1";
-      setShowOpener(!seen);
-    } catch (_) {
-      setShowOpener(true);
-    }
-  }, [startThemeSong]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -139,27 +125,6 @@ const App: React.FC = () => {
     };
   }, []);
 
-  const toggleAudio = async () => {
-    await audioEngine.enable();
-    if (isAudioPlaying) {
-      audioEngine.stopMusic();
-      audioPlayingRef.current = false;
-      setIsAudioPlaying(false);
-      audioPrefRef.current = "off";
-      try {
-        localStorage.setItem("vtw-audio-pref", "off");
-      } catch (_) {}
-    } else {
-      const ok = await startThemeSong(true);
-      audioPlayingRef.current = ok;
-      setIsAudioPlaying(ok);
-      audioPrefRef.current = ok ? "on" : null;
-      try {
-        if (ok) localStorage.setItem("vtw-audio-pref", "on");
-      } catch (_) {}
-    }
-  };
-
   // Actions
   const startMic = () => {
     if (!recognitionRef.current) {
@@ -188,7 +153,6 @@ const App: React.FC = () => {
     setGenerateError("");
     audioEngine.stopMusic();
     audioPlayingRef.current = false;
-    setIsAudioPlaying(false);
   };
 
   const generateSite = async () => {
@@ -222,23 +186,6 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
-      <SiteOpener
-        show={showOpener}
-        reduceMotion={Boolean(reduceMotion)}
-        onMediaStart={() => startThemeSong(true)}
-        onDone={() => {
-          try {
-            sessionStorage.setItem("vtw-opener-seen", "1");
-          } catch (_) {}
-          try {
-            if (document.documentElement.dataset.vtwPhase === "opener") {
-              delete document.documentElement.dataset.vtwPhase;
-            }
-          } catch (_) {}
-          setShowOpener(false);
-        }}
-      />
-
       <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
 
       {/* Background atmosphere */}

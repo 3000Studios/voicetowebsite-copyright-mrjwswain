@@ -18,6 +18,287 @@
   --crystal-primary: #f0f9ff;
   --crystal-accent: #38bdf8;
   --crystal-deep: #1e3a8a;
+
+  /* Plasma Navigation Colors */
+  --plasma-cyan: #00f2ff;
+  --plasma-magenta: #ff00ea;
+  --plasma-bg: rgba(5, 5, 15, 0.85);
+  --plasma-glow: 0 0 15px rgba(0, 242, 255, 0.6);
+
+  /* Original CSS Variables */
+  --crystal-prism-1: rgba(56, 189, 248, 0.4);
+  --crystal-prism-2: rgba(168, 85, 247, 0.4);
+  --crystal-shard-speed: 0.8s;
+  --crystal-font-code: var(--font-mono);
+  --crystal-font-sans: var(--font-heading);
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --error-color: #f43f5e;
+  --success-color: #10b981;
+  --muted: rgba(233, 241, 255, 0.72);
+  --panel-bg: rgba(12, 18, 35, 0.82);
+
+  /* Enhanced Typography */
+  --font-family:
+    "Inter", "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
+  --font-heading:
+    "Outfit", "Space Grotesk", "Inter", system-ui, -apple-system, "Segoe UI",
+    Roboto, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-display: "Orbitron", sans-serif;
+
+  /* Enhanced Spacing & Sizing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+}
+
+/* Plasma Navigation Styles */
+.flash-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--plasma-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  perspective: 1000px;
+  padding: 0 2rem;
+}
+
+/* Canvas Background */
+.flash-nav #waveCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Plasma Ball Follower */
+.plasma-ball {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 242, 255, 0.2) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 5;
+  transition: transform 0.1s linear;
+}
+
+/* Brand Section */
+.plasma-nav-brand {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.page-title-wrapper {
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+}
+
+.page-title {
+  color: #fff;
+  font-size: 1.8rem;
+  letter-spacing: 0.4rem;
+  text-transform: uppercase;
+  margin: 0;
+  pointer-events: auto;
+  position: relative;
+  transition: all 0.5s ease;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  font-family: "Syncopate", sans-serif;
+  font-weight: 700;
+}
+
+.page-title-wrapper:hover {
+  transform: translateY(-15px) rotateX(-25deg);
+}
+
+.page-title-wrapper:hover .page-title {
+  animation: spinMove 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  color: var(--plasma-cyan);
+  text-shadow: var(--plasma-glow);
+}
+
+@keyframes spinMove {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+/* Navigation Links */
+.plasma-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.plasma-nav-item {
+  position: relative;
+}
+
+.plasma-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.plasma-nav-link:hover {
+  color: var(--plasma-cyan);
+  background: rgba(0, 242, 255, 0.1);
+  border: 1px solid rgba(0, 242, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 242, 255, 0.3);
+}
+
+.plasma-icon {
+  font-size: 1.1rem;
+}
+
+.plasma-label {
+  font-size: 0.8rem;
+}
+
+/* Data Stream Section */
+.data-stream {
+  position: relative;
+  z-index: 10;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--plasma-cyan);
+  opacity: 0.8;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-end;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--plasma-cyan);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Explosion Fragments */
+.fragment {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background: var(--plasma-cyan);
+  pointer-events: none;
+  z-index: 2000;
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--plasma-cyan);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .flash-nav {
+    padding: 0 1rem;
+    height: 60px;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+    letter-spacing: 0.2rem;
+  }
+
+  .plasma-nav-links {
+    gap: 1rem;
+  }
+
+  .plasma-nav-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .plasma-label {
+    display: none;
+  }
+
+  .data-stream {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .plasma-nav-links {
+    gap: 0.5rem;
+  }
+
+  .flash-nav {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 60px;
+    padding: 0.5rem;
+  }
+
+  .data-stream {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+  }
+}
+
+:root {
   --crystal-prism-1: rgba(56, 189, 248, 0.4);
   --crystal-prism-2: rgba(168, 85, 247, 0.4);
   --crystal-shard-speed: 0.8s;
@@ -419,7 +700,7 @@ h3,
   width: 100%;
   background: var(--tectonic-bg);
   overflow: hidden;
-  padding: 100px 5% 40px 5%;
+  padding: 40px 5% 40px 5%;
   font-family: "Syncopate", sans-serif;
   perspective: 2000px;
   border-top: 1px solid var(--plate-border);

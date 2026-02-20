@@ -71,7 +71,8 @@
       return false;
     }
   };
-  const primaryLinks = [
+  // Public pages (always visible)
+  const publicLinks = [
     { href: "/", label: "Home", icon: "🏠" },
     { href: "/features", label: "Features", icon: "⚡" },
     { href: "/pricing", label: "Pricing", icon: "💎" },
@@ -80,7 +81,11 @@
     { href: "/blog", label: "Blog", icon: "📝" },
     { href: "/livestream", label: "Live", icon: "🎥" },
     { href: "/support", label: "Support", icon: "💬" },
-    { href: "/admin", label: "Admin", icon: "⚙️", admin: true },
+  ];
+
+  const primaryLinks = [
+    ...publicLinks,
+    { href: "/admin/login", label: "Admin Login", icon: "🔐", admin: true },
   ];
 
   const navDataTags = {
@@ -106,21 +111,19 @@
   };
 
   const adminLinks = [
-    { href: "/admin/", label: "Dashboard", icon: "📊" },
-    { href: "/admin/store-manager.html", label: "Store Manager", icon: "🏪" },
+    { href: "/admin", label: "Dashboard", icon: "🎯" },
+    { href: "/admin/voice-commands", label: "Voice Control", icon: "🎤" },
+    { href: "/admin/store-manager", label: "Store Manager", icon: "🛒" },
+    { href: "/admin/app-store-manager", label: "App Store", icon: "📲" },
+    { href: "/admin/analytics", label: "Analytics", icon: "📈" },
+    { href: "/admin/customer-chat", label: "Customer Chat", icon: "💬" },
+    { href: "/admin/bot-command-center", label: "Boss Bot", icon: "🤖" },
+    { href: "/admin/nexus", label: "Nexus", icon: "🔮" },
+    { href: "/admin/live-stream", label: "Live Stream", icon: "🎬" },
     {
-      href: "/admin/app-store-manager.html",
-      label: "App Store Manager",
-      icon: "📲",
-    },
-    { href: "/admin/analytics.html", label: "Analytics", icon: "📈" },
-    { href: "/admin/nexus.html", label: "Nexus", icon: "🧬" },
-    { href: "/admin/live-stream.html", label: "Live Stream", icon: "🎬" },
-    { href: "/admin/voice-commands.html", label: "Voice Commands", icon: "🎤" },
-    {
-      href: "/admin/bot-command-center.html",
-      label: "Bot Command Center",
-      icon: "🤖",
+      href: "/admin/integrated-dashboard",
+      label: "Integrated Dashboard",
+      icon: "🌟",
     },
   ];
 
@@ -325,14 +328,22 @@
       return false;
     }
   };
-  const getNavLinks = () => navLinks;
+  const getNavLinks = () => {
+    if (hasAdminAccess()) {
+      // User is logged in - show all pages except login
+      return [...publicLinks, ...adminLinks];
+    } else {
+      // User not logged in - show only public pages + login
+      return primaryLinks;
+    }
+  };
   // Admin was getting clipped off on mid-sized viewports because the nav bar
   // had `overflow: hidden` and too many links in one row. Keep Admin pinned
   // in a right-side "actions" area so it's always reachable.
   const getPrimaryNavLinks = () =>
-    getNavLinks().filter((l) => l.label !== "Admin");
+    getNavLinks().filter((l) => l.label !== "Admin Login");
   const getAdminNavLink = () =>
-    getNavLinks().find((l) => l.label === "Admin") || null;
+    getNavLinks().find((l) => l.label === "Admin Login") || null;
 
   const buildPrimaryLinksHtml = () =>
     getPrimaryNavLinks()
@@ -472,129 +483,333 @@
     ensureVideoBg();
     const body = document.body;
     const fragment = document.createDocumentFragment();
+
+    // Skip link for accessibility
     const skip = document.createElement("a");
     skip.className = "vtw-skip-link";
     skip.href = "#main";
     skip.textContent = "Skip to content";
-    const toggle = document.createElement("input");
-    toggle.type = "checkbox";
-    toggle.id = "mobileNavToggle";
-    toggle.className = "mobile-toggle";
-    toggle.setAttribute("aria-hidden", "true");
+
+    // Create plasma navigation
     const navWrapper = document.createElement("div");
-    navWrapper.className = "crystal-nav-wrapper";
+    navWrapper.className = "flash-nav";
     navWrapper.id = "vtwNavWrapper";
+
     const nav = document.createElement("nav");
-    nav.className = "crystal-nav";
-    const brandMark = `
-      <span class="crystal-brand-mark" aria-hidden="true"></span>
-    `;
+    nav.className = "flash-nav";
+    nav.id = "nav";
+
+    // Build navigation HTML
+    const currentLinks = getNavLinks();
+    const navLinks = currentLinks
+      .map(
+        (link, idx) => `
+      <li class="plasma-nav-item" style="--vtw-i:${idx}">
+        <a class="plasma-nav-link" href="${link.href}" data-name="${link.label}">
+          <span class="plasma-icon">${link.icon}</span>
+          <span class="plasma-label">${link.label}</span>
+        </a>
+      </li>
+    `
+      )
+      .join("");
+
     nav.innerHTML = `
-      <div class="crystal-glint" aria-hidden="true"></div>
-      <a class="crystal-brand" href="/" aria-label="VoiceToWebsite home">
-        ${brandMark}
-        <span class="crystal-brand-text" data-vtw-scrollfx="brand">
-          <span class="crystal-brand-code">V.T.W</span>
-          <span class="crystal-brand-name">VoiceToWebsite</span>
-        </span>
-      </a>
-      <ul class="crystal-links">
-        ${buildPrimaryLinksHtml()}
+      <canvas id="waveCanvas"></canvas>
+      <div class="plasma-ball" id="ball"></div>
+
+      <div class="plasma-nav-brand">
+        <div class="page-title-wrapper" id="target">
+          <h1 class="page-title">VoiceToWebsite</h1>
+        </div>
+      </div>
+
+      <ul class="plasma-nav-links">
+        ${navLinks}
       </ul>
-      <div class="crystal-actions">
-        ${buildActionsHtml()}
-        <a class="crystal-cta detonation-trigger" href="/demo#video" data-vtw-scrollfx="label">Get Started</a>
-        <label for="mobileNavToggle" class="crystal-toggle" aria-label="Toggle navigation" aria-controls="mobileOverlay" role="button" tabindex="0">
-          <span class="crystal-toggle-bars" aria-hidden="true"></span>
-        </label>
+
+      <div class="data-stream">
+        <div class="status-indicator">
+          <div class="status-dot"></div>
+          <span>Status: Active</span>
+        </div>
+        <div class="signal-info">Signal: 104.2 MHz</div>
       </div>
     `;
+
     navWrapper.appendChild(nav);
-    const overlay = document.createElement("div");
-    overlay.className = "mobile-overlay";
-    overlay.id = "mobileOverlay";
-    overlay.setAttribute("aria-hidden", "true");
-    overlay.innerHTML = `      <ul>        ${buildListHtml()}      </ul>    `;
-    fragment.append(skip, toggle, navWrapper, overlay);
+    fragment.append(skip, navWrapper);
     body.prepend(fragment);
     body.classList.add("nav-ready");
-    const closeOnNavigate = () => {
-      toggle.checked = false;
-    };
-    overlay.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", closeOnNavigate);
-    });
-    const interactiveLinks = nav.querySelectorAll("a, .crystal-brand");
-    interactiveLinks.forEach((link) => {
+
+    // Initialize plasma effects
+    initPlasmaEffects();
+
+    // Add navigation interactions
+    const navLinksElements = nav.querySelectorAll(".plasma-nav-link");
+    navLinksElements.forEach((link) => {
       link.addEventListener("mouseenter", playHover);
       link.addEventListener("mousedown", playClick);
     });
-    overlay.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("mouseenter", playHover);
-      link.addEventListener("click", playClick);
-    });
-    const toggleButton = nav.querySelector(".crystal-toggle");
-    toggleButton?.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        toggle.checked = !toggle.checked;
+
+    // Update navigation when auth state changes
+    let lastAuthState = null;
+    let updateTimeout = null;
+
+    const updateNavigation = () => {
+      const currentState = hasAdminAccess();
+      if (currentState === lastAuthState) return; // No change needed
+
+      lastAuthState = currentState;
+
+      const navContainer = document.querySelector(".plasma-nav-links");
+      if (navContainer) {
+        const newLinks = getNavLinks();
+        const newHtml = newLinks
+          .map(
+            (link, idx) => `
+          <li class="plasma-nav-item" style="--vtw-i:${idx}">
+            <a class="plasma-nav-link" href="${link.href}" data-name="${link.label}">
+              <span class="plasma-icon">${link.icon}</span>
+              <span class="plasma-label">${link.label}</span>
+            </a>
+          </li>
+        `
+          )
+          .join("");
+
+        // Only update if HTML actually changed
+        if (navContainer.innerHTML !== newHtml) {
+          navContainer.innerHTML = newHtml;
+
+          // Re-attach event listeners
+          navContainer.querySelectorAll(".plasma-nav-link").forEach((link) => {
+            link.addEventListener("mouseenter", playHover);
+            link.addEventListener("mousedown", playClick);
+          });
+        }
+      }
+    };
+
+    // Debounced update function
+    const debouncedUpdate = () => {
+      if (updateTimeout) clearTimeout(updateTimeout);
+      updateTimeout = setTimeout(updateNavigation, 100);
+    };
+
+    // Listen for auth state changes
+    window.addEventListener("storage", (e) => {
+      if (e.key === "adminAccessValidated" || e.key.includes("vtw_admin")) {
+        debouncedUpdate();
       }
     });
 
-    const syncOverlayA11y = () => {
-      const open = Boolean(toggle.checked);
-      overlay.setAttribute("aria-hidden", open ? "false" : "true");
-      toggleButton?.setAttribute("aria-expanded", open ? "true" : "false");
-      document.documentElement.classList.toggle("vtw-mobile-nav-open", open);
+    // Periodic check for auth state changes (reduced frequency)
+    setInterval(debouncedUpdate, 5000);
+  };
+
+  const initPlasmaEffects = () => {
+    const canvas = document.getElementById("waveCanvas");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const ball = document.getElementById("ball");
+    const target = document.getElementById("target");
+
+    let width, height;
+    let mouse = { x: -1000, y: -1000, active: false };
+    let points = [];
+    const count = 60;
+    let animationId = null;
+    let audioCtx = null;
+
+    // Cleanup function
+    const cleanup = () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+      if (audioCtx) {
+        try {
+          audioCtx.close();
+        } catch (_) {}
+        audioCtx = null;
+      }
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", mouseMoveHandler);
+      if (target) {
+        target.removeEventListener("mouseenter", mouseEnterHandler);
+        target.removeEventListener("click", clickHandler);
+      }
+    };
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = 80;
+    }
+
+    const mouseMoveHandler = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      if (ball) {
+        ball.style.transform = `translate(${mouse.x - 60}px, ${e.clientY - 60}px)`;
+      }
+    };
+
+    // Audio Context for Synth Sounds
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (_) {
+      console.warn("AudioContext not supported");
+    }
+
+    function playSparkle() {
+      if (!audioCtx) return;
       try {
-        SoundEngine.play(open ? "success" : "click");
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(
+          800 + Math.random() * 1000,
+          audioCtx.currentTime
+        );
+        osc.frequency.exponentialRampToValueAtTime(
+          40,
+          audioCtx.currentTime + 0.3
+        );
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioCtx.currentTime + 0.3
+        );
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
       } catch (_) {}
+    }
+
+    function playDetonation() {
+      if (!audioCtx) return;
+      try {
+        const noise = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        noise.type = "sawtooth";
+        noise.frequency.setValueAtTime(150, audioCtx.currentTime);
+        noise.frequency.exponentialRampToValueAtTime(
+          10,
+          audioCtx.currentTime + 0.5
+        );
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioCtx.currentTime + 0.5
+        );
+        noise.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start();
+        noise.stop(audioCtx.currentTime + 0.5);
+      } catch (_) {}
+    }
+
+    // Animation Loop for Wave
+    let tick = 0;
+    function animate() {
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, width, height);
+      tick += 0.02;
+
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      for (let i = 0; i <= count; i++) {
+        const x = (width / count) * i;
+        const dist = Math.abs(x - mouse.x);
+        const influence = Math.max(0, 1 - dist / 200);
+        const amp = 10 + influence * 30;
+        const y = height / 2 + Math.sin(tick + i * 0.2) * amp;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      const gradient = ctx.createLinearGradient(0, 0, width, 0);
+      gradient.addColorStop(0, "transparent");
+      gradient.addColorStop(0.5, "#00f2ff");
+      gradient.addColorStop(1, "transparent");
+
+      ctx.strokeStyle = gradient;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#00f2ff";
+      ctx.stroke();
+
+      animationId = requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", mouseMoveHandler);
+    resize();
+    animate();
+
+    const mouseEnterHandler = () => {
+      playSparkle();
     };
-    toggle.addEventListener("change", syncOverlayA11y);
-    syncOverlayA11y();
 
-    const updateWrapperState = () => {
-      if (!navWrapper) return;
-      const compact = (window.scrollY || 0) > 60;
-      navWrapper.classList.toggle("is-compact", compact);
+    const clickHandler = (e) => {
+      playDetonation();
+      explode(e.clientX, e.clientY);
+      target.style.opacity = "0";
+      target.style.pointerEvents = "none";
+
+      setTimeout(() => {
+        target.style.opacity = "1";
+        target.style.pointerEvents = "auto";
+      }, 2000);
     };
 
-    updateWrapperState();
-    window.addEventListener("scroll", updateWrapperState, { passive: true });
+    if (target) {
+      target.addEventListener("mouseenter", mouseEnterHandler);
+      target.addEventListener("click", clickHandler);
+    }
 
-    nav
-      .querySelectorAll(
-        ".detonation-trigger, .crystal-nav-link, .crystal-admin-link"
-      )
-      .forEach((trigger) => {
-        if (trigger.dataset.vtwShardInit) return;
-        trigger.dataset.vtwShardInit = "1";
-        trigger.addEventListener("click", (event) => {
-          if (event.currentTarget?.classList.contains("crystal-admin-link")) {
-            triggerBubbleBurst(
-              event.currentTarget,
-              event.clientX,
-              event.clientY
-            );
+    // Store cleanup function for global access
+    window.cleanupPlasmaEffects = cleanup;
+
+    // Auto-cleanup on page unload
+    window.addEventListener("beforeunload", cleanup);
+
+    function explode(x, y) {
+      for (let i = 0; i < 40; i++) {
+        const frag = document.createElement("div");
+        frag.className = "fragment";
+        document.body.appendChild(frag);
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = 5 + Math.random() * 10;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+
+        let posX = x;
+        let posY = y;
+        let opacity = 1;
+
+        function moveFragment() {
+          posX += vx;
+          posY += vy;
+          opacity -= 0.02;
+          frag.style.transform = `translate(${posX}px, ${posY}px)`;
+          frag.style.opacity = opacity;
+
+          if (opacity > 0) {
+            requestAnimationFrame(moveFragment);
           } else {
-            createShardExplosion(event.clientX, event.clientY);
-            if (event.currentTarget?.classList.contains("crystal-nav-link")) {
-              triggerBoltZap(event.currentTarget);
-            }
+            frag.remove();
           }
-        });
-      });
-
-    window.addEventListener(
-      "keydown",
-      (event) => {
-        if (event.key !== "Escape") return;
-        if (!toggle.checked) return;
-        toggle.checked = false;
-        syncOverlayA11y();
-      },
-      { passive: true }
-    );
+        }
+        moveFragment();
+      }
+    }
   };
 
   const triggerBoltZap = (target) => {
@@ -1525,14 +1740,25 @@
     });
   };
   const init = () => {
+    console.log("[VTW Nav] Starting init...");
     initTheme();
     enforceAdminTheme();
 
     const adminPage = isAdminPage();
-    if (!isShellDisabled()) {
+    const shellDisabled = isShellDisabled();
+    console.log(
+      "[VTW Nav] adminPage:",
+      adminPage,
+      "shellDisabled:",
+      shellDisabled
+    );
+
+    if (!shellDisabled) {
+      console.log("[VTW Nav] Injecting nav...");
       injectNav();
       wireThemeSwitcher();
       if (!adminPage) {
+        console.log("[VTW Nav] Injecting footer and widget...");
         injectWidget();
         injectFooter();
         wireWidget();
@@ -1542,6 +1768,8 @@
         initScrollChromeFx();
         if (!prefersReducedMotion()) initScrollReveals();
       }
+    } else {
+      console.log("[VTW Nav] Shell is disabled, skipping injection");
     }
 
     if (!prefersReducedMotion()) injectBottomWaves();
@@ -1552,6 +1780,7 @@
 
     ensureAdminSubnavManagement();
     maybeInitAdminTerminalFix();
+    console.log("[VTW Nav] Init complete");
   };
   const maybeInitAdminTerminalFix = () => {
     try {
@@ -1593,22 +1822,26 @@
         <canvas id="tectonicCanvas"></canvas>
       </div>
       <div class="footer-main-content">
-        <h2 class="textured-headline" id="tiltText">FUTURE<br>CORE</h2>
+        <h2 class="textured-headline" id="tiltText">VOICE<br>WEBSITE</h2>
         <div class="footer-grid">
           <div class="footer-col">
             <h4>Navigation</h4>
-            <a href="/features" class="footer-link">Protocol 01</a>
-            <a href="/demo" class="footer-link">Neural Interface</a>
-            <a href="/templates" class="footer-link">Asset Forge</a>
+            <a href="/features" class="footer-link">Features</a>
+            <a href="/demo" class="footer-link">Demo</a>
+            <a href="/pricing" class="footer-link">Pricing</a>
+            <a href="/store" class="footer-link">Store</a>
           </div>
           <div class="footer-col">
-            <h4>Directives</h4>
-            <a href="/privacy" class="footer-link">Privacy Shard</a>
-            <a href="/terms" class="footer-link">Terms of Flow</a>
-            <a href="/support" class="footer-link">Quantum Support</a>
+            <h4>Company</h4>
+            <a href="/about" class="footer-link">About Us</a>
+            <a href="/privacy" class="footer-link">Privacy Policy</a>
+            <a href="/terms" class="footer-link">Terms of Service</a>
+            <a href="/contact" class="footer-link">Contact</a>
           </div>
           <div class="footer-col">
-            <h4>System Status</h4>
+            <h4>Support</h4>
+            <a href="/support" class="footer-link">Help Center</a>
+            <a href="/status" class="footer-link">System Status</a>
             <p style="color: #444; font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 1px;">LATENCY: <span id="vt-footer-latency">14ms</span></p>
             <p style="color: #444; font-size: 0.7rem; letter-spacing: 1px;">UPTIME: 99.998%</p>
             <div class="social-cluster">

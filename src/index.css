@@ -303,7 +303,7 @@ iframe {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   z-index: 2500;
   transition: padding 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   pointer-events: none;
@@ -317,7 +317,7 @@ iframe {
 }
 
 .crystal-nav-wrapper.is-compact {
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 1rem;
 }
 
 .crystal-nav {
@@ -328,7 +328,7 @@ iframe {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.375rem 1.5rem;
   background: rgba(3, 7, 18, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
@@ -426,7 +426,7 @@ iframe {
   font-weight: 900;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  padding: clamp(0.8rem, 1.5vw, 1.25rem) clamp(1rem, 2vw, 2.2rem);
+  padding: clamp(0.8rem, 1.5vw, 1.25rem) clamp(0.8rem, 1.5vw, 1.25rem);
   border: 2px solid rgba(255, 255, 255, 0.12);
   background: linear-gradient(
     145deg,
@@ -444,6 +444,9 @@ iframe {
     box-shadow 0.2s ease,
     text-shadow 0.2s ease,
     transform 0.25s ease;
+  white-space: nowrap;
+  width: auto;
+  min-width: fit-content;
 }
 
 .crystal-nav-link:hover {

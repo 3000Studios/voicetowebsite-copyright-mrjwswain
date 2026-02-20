@@ -34,10 +34,6 @@ describe("App Accessibility - Use Cases", () => {
   it("renders accessible voice flow controls", async () => {
     render(<App />);
 
-    // Audio toggle exists (name is dynamic; either VOICE OFF or VOICE ON)
-    const audioToggle = screen.getByRole("button", { name: /voice (off|on)/i });
-    expect(audioToggle).toBeInTheDocument();
-
     // Main CTA for voice capture exists
     const tapToSpeak = screen.getByRole("button", {
       name: /start voice command/i,
@@ -52,12 +48,6 @@ describe("App Accessibility - Use Cases", () => {
       ).toBeTruthy();
     });
     fireEvent.click(tapToSpeak);
-
-    await waitFor(() => {
-      expect(
-        screen.queryByRole("button", { name: /voice (off|on)/i })
-      ).not.toBeInTheDocument();
-    });
 
     const finish = await waitFor(() =>
       screen.getByRole("button", { name: /finish command/i })

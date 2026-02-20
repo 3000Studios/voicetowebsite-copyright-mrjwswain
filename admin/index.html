@@ -7,6 +7,7 @@
     <meta name="description" content="Autonomous Voice-to-Website Command Center." />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
+    <link rel="stylesheet" href="./particle-wallpaper.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap"
       rel="stylesheet"
@@ -43,6 +44,9 @@
     </style>
   </head>
   <body>
+    <div class="admin-particle-wallpaper">
+      <iframe src="./wallpaper.html"></iframe>
+    </div>
     <div class="video-bg" aria-hidden="true">
       <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
     </div>
@@ -77,9 +81,9 @@
                 Command Center for structured planning + deploy.
               </p>
               <div class="button-row">
-                <a class="primary" href="voice-commands.html">Open Voice Control</a>
+                <a class="primary" href="integrated-dashboard.html">Open Integrated Dashboard</a>
+                <a class="ghost" href="voice-commands.html">Voice Control Only</a>
                 <a class="ghost" href="test-lab-1.html">Agent Control</a>
-                <a class="ghost" href="#admin-hub-card">All Admin Pages</a>
               </div>
             </div>
             <div class="admin-hero-media">
@@ -161,6 +165,26 @@
           </div>
 
           <div class="admin-feature-grid" style="margin-top: 1.2rem">
+            <a
+              class="feature-card"
+              href="integrated-dashboard.html"
+              aria-label="Open Integrated Admin Dashboard"
+              style="
+                background: linear-gradient(135deg, rgba(0, 247, 255, 0.1), rgba(139, 92, 246, 0.1));
+                border: 2px solid rgba(0, 247, 255, 0.3);
+              "
+            >
+              <div
+                class="icon-square"
+                aria-hidden="true"
+                style="color: #00f7ff; border-color: #00f7ff; font-size: 1.5rem"
+              >
+                🎯
+              </div>
+              <h3>Integrated Dashboard</h3>
+              <p><strong>Complete admin hub with all tools in one place</strong></p>
+            </a>
+
             <a class="feature-card" href="bot-command-center.html" aria-label="Open Boss Bot">
               <div class="icon-square" aria-hidden="true" style="color: #00f2ff; border-color: #00f2ff">BB</div>
               <h3>Boss Bot</h3>

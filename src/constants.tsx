@@ -49,5 +49,4 @@ export const NAV_LINKS: NavigationLink[] = [
   },
 ];
 
-export const INTRO_VIDEO =
-  "https://cdn.pixabay.com/video/2024/02/10/199890-911494511_tiny.mp4";
+export const INTRO_VIDEO = "/media/vtw-opener.mp4";

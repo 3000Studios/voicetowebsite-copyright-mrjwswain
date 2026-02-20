@@ -8,10 +8,10 @@
     window.location.replace("/admin/access.html");
   };
 
-  const maybeRedirectToVoice = () => {
+  const maybeRedirectToDashboard = () => {
     const path = window.location.pathname;
     if (path === "/admin/" || path.endsWith("/admin/index.html")) {
-      window.location.replace("/admin/voice-commands.html");
+      window.location.replace("/admin/integrated-dashboard.html");
       return true;
     }
     return false;
@@ -31,6 +31,7 @@
     const subnav = document.createElement("nav");
     subnav.className = "admin-subnav-bar";
     subnav.innerHTML = `
+      <a class="admin-subnav-link" data-path="/admin/integrated-dashboard.html" href="/admin/integrated-dashboard.html">Mission</a>
       <a class="admin-subnav-link" data-path="/admin/voice-commands.html" href="/admin/voice-commands.html">Voice Control</a>
       <a class="admin-subnav-link" data-path="/admin/index.html" href="/admin/index.html">Command Center</a>
       <a class="admin-subnav-link" data-path="/admin/test-lab-1.html" href="/admin/test-lab-1.html">Agent Control</a>
@@ -53,6 +54,7 @@
       </div>
       <div class="admin-sidebar__section">
         <p class="admin-sidebar__label">Primary</p>
+        <a class="admin-sidebar__link" data-path="/admin/integrated-dashboard.html" href="/admin/integrated-dashboard.html">Mission Control</a>
         <a class="admin-sidebar__link" data-path="/admin/index.html" href="/admin/index.html">Command Center</a>
         <a class="admin-sidebar__link" data-path="/admin/voice-commands.html" href="/admin/voice-commands.html">Voice Control</a>
         <a class="admin-sidebar__link" data-path="/admin/test-lab-1.html" href="/admin/test-lab-1.html">Agent Control</a>
@@ -177,7 +179,7 @@
       try {
         document.documentElement.classList.remove("admin-auth-pending");
       } catch (_) {}
-      if (maybeRedirectToVoice()) return;
+      if (maybeRedirectToDashboard()) return;
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", buildSidebar, {
           once: true,

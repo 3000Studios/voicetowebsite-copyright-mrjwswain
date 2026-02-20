@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite.com | Monolithic Cobalt Oscillation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=JetBrains+Mono:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --cobalt-deep: #001a4d;
+        --cobalt-mid: #0047ab;
+        --cobalt-bright: #3385ff;
+        --obsidian: #020408;
+        --white: #ffffff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        background-color: var(--obsidian);
+        overflow: hidden;
+        font-family: "Inter", sans-serif;
+        color: var(--white);
+      }
+
+      #app-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: 1000px;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      #ui-overlay {
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .monolith-text {
+        font-size: 8vw;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        color: var(--cobalt-mid);
+        text-align: center;
+        transform: rotateX(20deg) rotateY(-5deg);
+        text-shadow:
+          0 1px 0 #003380,
+          0 2px 0 #002e73,
+          0 3px 0 #002966,
+          0 4px 0 #002459,
+          0 5px 0 #001f4d,
+          0 6px 1px rgba(0, 0, 0, 0.1),
+          0 0 5px rgba(0, 0, 0, 0.1),
+          0 1px 3px rgba(0, 0, 0, 0.3),
+          0 3px 5px rgba(0, 0, 0, 0.2),
+          0 5px 10px rgba(0, 0, 0, 0.25),
+          0 10px 10px rgba(0, 0, 0, 0.2),
+          0 20px 20px rgba(0, 0, 0, 0.15);
+        animation: float 6s ease-in-out infinite;
+        filter: drop-shadow(0 0 15px rgba(0, 71, 171, 0.4));
+        user-select: none;
+      }
+
+      .data-header {
+        position: absolute;
+        top: 40px;
+        left: 40px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5em;
+        color: var(--cobalt-bright);
+        z-index: 10;
+      }
+
+      .data-footer {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        text-align: right;
+        color: var(--cobalt-bright);
+        z-index: 10;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: rotateX(15deg) translateY(0px);
+        }
+        50% {
+          transform: rotateX(25deg) translateY(-20px);
+        }
+      }
+
+      #particle-canvas {
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      #background-canvas {
+        z-index: 0;
+        opacity: 0.4;
+      }
+
+      @media (max-width: 768px) {
+        .monolith-text {
+          font-size: 12vw;
+        }
+        .data-header,
+        .data-footer {
+          font-size: 8px;
+        }
+        .data-header {
+          top: 20px;
+          left: 20px;
+        }
+        .data-footer {
+          bottom: 20px;
+          right: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-container">
+      <div class="data-header">SYSTEM.OSCILLATION // ACTIVE</div>
+
+      <canvas id="background-canvas"></canvas>
+
+      <div id="ui-overlay">
+        <h1 class="monolith-text">VoiceToWebsite.com</h1>
+      </div>
+
+      <canvas id="particle-canvas"></canvas>
+
+      <div class="data-footer">
+        LATENCY: 0.04ms<br />
+        SIGNAL: OPTIMAL
+      </div>
+    </div>
+
+    <script src="./access-guard.js" type="module" defer></script>
+    <script>
+      const bgCanvas = document.getElementById("background-canvas");
+      const bgCtx = bgCanvas.getContext("2d");
+      const pCanvas = document.getElementById("particle-canvas");
+      const pCtx = pCanvas.getContext("2d");
+
+      let width, height;
+      let mouse = { x: -1000, y: -1000 };
+      const particles = [];
+      const particleCount = 280;
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        bgCanvas.width = width;
+        bgCanvas.height = height;
+        pCanvas.width = width;
+        pCanvas.height = height;
+      }
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+      window.addEventListener("touchstart", (e) => {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+      });
+
+      class Droplet {
+        constructor() {
+          this.reset();
+        }
+
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2 + 1.5;
+          this.baseX = this.x;
+          this.baseY = this.y;
+          this.vx = (Math.random() - 0.5) * 0.5;
+          this.vy = (Math.random() - 0.5) * 0.5;
+
+          const colorRoll = Math.random();
+          if (colorRoll > 0.7) this.color = "#ffffff";
+          else if (colorRoll > 0.3) this.color = "#3385ff";
+          else this.color = "#050505";
+
+          this.magnetStrength = 0.02 + Math.random() * 0.04;
+        }
+
+        update() {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const maxDist = 350;
+
+          if (dist < maxDist) {
+            const angle = Math.atan2(dy, dx);
+            const force = (maxDist - dist) / maxDist;
+            this.vx += Math.cos(angle) * force * 0.8;
+            this.vy += Math.sin(angle) * force * 0.8;
+          }
+
+          this.x += this.vx;
+          this.y += this.vy;
+
+          // Friction
+          this.vx *= 0.92;
+          this.vy *= 0.92;
+
+          // Border wrap
+          if (this.x < 0) this.x = width;
+          if (this.x > width) this.x = 0;
+          if (this.y < 0) this.y = height;
+          if (this.y > height) this.y = 0;
+        }
+
+        draw() {
+          pCtx.beginPath();
+          pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          pCtx.fillStyle = this.color;
+          pCtx.fill();
+
+          if (this.color !== "#050505") {
+            pCtx.shadowBlur = 10;
+            pCtx.shadowColor = this.color;
+          } else {
+            pCtx.shadowBlur = 0;
+          }
+        }
+      }
+
+      function initParticles() {
+        for (let i = 0; i < particleCount; i++) {
+          particles.push(new Droplet());
+        }
+      }
+
+      let tick = 0;
+      function drawBackground() {
+        bgCtx.clearRect(0, 0, width, height);
+
+        const lines = 12;
+        const segmentWidth = width / 60;
+
+        for (let j = 0; j < lines; j++) {
+          bgCtx.beginPath();
+          bgCtx.lineWidth = 1.5;
+          bgCtx.strokeStyle = `rgba(51, 133, 255, ${0.1 + (j / lines) * 0.2})`;
+
+          for (let i = 0; i <= 60; i++) {
+            const x = i * segmentWidth;
+            const frequency = 0.01;
+            const amplitude = 40 + j * 15;
+            const y = height / 2 + Math.sin(i * frequency + tick * 0.02 + j * 0.5) * amplitude;
+
+            if (i === 0) bgCtx.moveTo(x, y);
+            else bgCtx.lineTo(x, y);
+          }
+          bgCtx.stroke();
+        }
+      }
+
+      function animate() {
+        tick++;
+        drawBackground();
+
+        pCtx.clearRect(0, 0, width, height);
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      resize();
+      initParticles();
+      animate();
+    </script>
+  </body>
+</html>

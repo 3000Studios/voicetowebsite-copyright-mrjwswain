@@ -1,5 +1,3 @@
-const STORAGE_KEY = "vtw-billing-cycle";
-
 const setActive = (btn, active) => {
   if (!btn) return;
   btn.classList.toggle("is-active", active);
