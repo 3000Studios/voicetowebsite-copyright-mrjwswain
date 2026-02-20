@@ -403,18 +403,20 @@ export class BotHubDO {
   }
 
   async putIdempotentResult(route, idempotencyKey, payload) {
-    await this.state.storage.put(
-      this.getIdempotencyKey(route, idempotencyKey),
-      {
-        ts: Date.now(),
-        payload,
-      }
-    );
-
+    const now = Date.now();
+    const resultKey = this.getIdempotencyKey(route, idempotencyKey);
     const indexKey = this.getIdempotencyIndexKey(route);
-    const index = (await this.state.storage.get(indexKey)) || [];
+
+    const [_, index] = await Promise.all([
+      this.state.storage.put(resultKey, {
+        ts: now,
+        payload,
+      }),
+      this.state.storage.get(indexKey),
+    ]);
+
     const nextIndex = Array.isArray(index) ? index : [];
-    nextIndex.push({ idempotencyKey, ts: Date.now() });
+    nextIndex.push({ idempotencyKey, ts: now });
 
     // Prune: keep newest entries and also remove expired ones.
     const cutoff = Date.now() - IDEMPOTENCY_TTL_MS;
@@ -422,18 +424,23 @@ export class BotHubDO {
       .filter((e) => e && typeof e.ts === "number" && e.ts >= cutoff)
       .slice(-MAX_IDEMPOTENCY_CACHE_PER_ROUTE);
 
-    await this.state.storage.put(indexKey, pruned);
+    const finalPromises = [this.state.storage.put(indexKey, pruned)];
 
     // Opportunistic deletion of a few old entries to prevent unbounded storage.
     // We don't delete everything (could be expensive); just drop the oldest overflow entries.
     if (nextIndex.length > pruned.length) {
       const overflow = nextIndex.slice(0, nextIndex.length - pruned.length);
-      for (const entry of overflow) {
-        const key = entry?.idempotencyKey;
-        if (typeof key !== "string" || !key) continue;
-        await this.state.storage.delete(this.getIdempotencyKey(route, key));
+      const keysToDelete = overflow
+        .map((entry) => entry?.idempotencyKey)
+        .filter((key) => typeof key === "string" && key)
+        .map((key) => this.getIdempotencyKey(route, key));
+
+      if (keysToDelete.length > 0) {
+        finalPromises.push(this.state.storage.delete(keysToDelete));
       }
     }
+
+    await Promise.all(finalPromises);
   }
 
   async checkAndConsumeQuota(actor) {
