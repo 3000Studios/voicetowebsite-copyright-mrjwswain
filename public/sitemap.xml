@@ -26,6 +26,11 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
+    <loc>https://voicetowebsite.com/search</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://voicetowebsite.com/support</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>

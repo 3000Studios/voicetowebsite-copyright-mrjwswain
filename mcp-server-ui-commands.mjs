@@ -5,231 +5,148 @@
  * Entry points: Continue.dev chat, Custom GPT, Voice Commands
  */
 
-import { StdIO } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import * as z from "zod/v4";
 
-class UICommandServer {
-  constructor() {
-    this.server = new StdIO({
-      name: "ui-commands",
-      version: "1.0.0",
-    });
+const server = new McpServer({
+  name: "ui-commands",
+  version: "1.0.0",
+});
 
-    this.setupHandlers();
-    this.uiState = this.loadUIState();
-    this.commandHistory = [];
+const uiState = {
+  headline: "Hi Tiger",
+  subhead: "",
+  cta: "Start Now",
+  price: "",
+  theme: "ember",
+  testimonialsVisible: true,
+  modalsOpen: {},
+  metric1: "",
+  metric2: "",
+  metric3: "",
+};
+
+const commandHistory = [];
+
+function updateLocalState(command, args) {
+  switch (command) {
+    case "set-headline":
+      uiState.headline = args.value || uiState.headline;
+      break;
+    case "set-subhead":
+      uiState.subhead = args.value || uiState.subhead;
+      break;
+    case "set-cta":
+      uiState.cta = args.value || uiState.cta;
+      break;
+    case "set-price":
+      uiState.price = args.value || uiState.price;
+      break;
+    case "apply-theme":
+      uiState.theme = args.theme || uiState.theme;
+      break;
+    case "toggle-testimonials":
+      uiState.testimonialsVisible = !uiState.testimonialsVisible;
+      break;
+    case "show-modal":
+      uiState.modalsOpen[args.modalName] = true;
+      break;
+    case "hide-modal":
+      uiState.modalsOpen[args.modalName] = false;
+      break;
+    case "update-metric":
+      if (args.metricNum === 1) uiState.metric1 = args.value;
+      else if (args.metricNum === 2) uiState.metric2 = args.value;
+      else if (args.metricNum === 3) uiState.metric3 = args.value;
+      break;
   }
+}
 
-  setupHandlers() {
-    this.server.setRequestHandler(ListToolsRequestSchema, () => ({
-      tools: [
-        {
-          name: "execute-ui-command",
-          description: "Execute command to modify UI/UX in real-time",
-          inputSchema: {
-            type: "object",
-            properties: {
-              command: {
-                type: "string",
-                description:
-                  "UI command (set-headline, set-cta, apply-theme, show-modal, etc.)",
-              },
-              args: {
-                type: "object",
-                description: "Command arguments",
-              },
-              source: {
-                type: "string",
-                enum: ["chat", "voice", "gpt", "api"],
-                description: "Command source",
-              },
-            },
-            required: ["command"],
-          },
-        },
-        {
-          name: "get-ui-state",
-          description: "Get current UI state",
-          inputSchema: {
-            type: "object",
-            properties: {
-              property: {
-                type: "string",
-                description: "Property to query (headline, cta, theme, etc.)",
-              },
-            },
-          },
-        },
-        {
-          name: "list-ui-commands",
-          description: "List all available UI commands",
-          inputSchema: { type: "object" },
-        },
-        {
-          name: "get-command-history",
-          description: "Get recent command history",
-          inputSchema: {
-            type: "object",
-            properties: {
-              limit: {
-                type: "number",
-                description: "Number of commands to return",
-              },
-            },
-          },
-        },
-      ],
-    }));
+async function runCommand(command, args, source) {
+  const payload = {
+    action: command,
+    args,
+    source,
+    timestamp: new Date().toISOString(),
+  };
 
-    this.server.setRequestHandler(CallToolRequestSchema, (request) =>
-      this.handleToolCall(request)
-    );
-  }
+  const apiUrl = "https://voicetowebsite.com/api/ui-command";
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }).catch(() => ({ ok: false, error: "API unreachable" }));
 
-  loadUIState() {
-    return {
-      headline: "Hi Tiger",
-      subhead: "",
-      cta: "Start Now",
-      price: "",
-      theme: "ember",
-      testimonialsVisible: true,
-      modalsOpen: {},
-      metric1: "",
-      metric2: "",
-      metric3: "",
-    };
-  }
+  updateLocalState(command, args);
 
-  async handleToolCall(request) {
-    const { name, arguments: args } = request.params;
+  return {
+    success: response.ok !== false,
+    command,
+    args,
+    state: uiState,
+  };
+}
 
-    try {
-      switch (name) {
-        case "execute-ui-command":
-          return await this.executeUICommand(args);
-        case "get-ui-state":
-          return await this.getUIState(args);
-        case "list-ui-commands":
-          return await this.listUICommands();
-        case "get-command-history":
-          return await this.getCommandHistory(args);
-        default:
-          throw new Error(`Unknown command: ${name}`);
-      }
-    } catch (err) {
-      return {
-        content: [{ type: "text", text: `Error: ${err.message}` }],
-        isError: true,
-      };
-    }
-  }
-
-  async executeUICommand(args) {
-    const { command, args: cmdArgs = {}, source = "api" } = args;
-
-    // Log command
-    this.commandHistory.push({
+server.registerTool(
+  "execute-ui-command",
+  {
+    description: "Execute command to modify UI/UX in real-time",
+    inputSchema: z.object({
+      command: z
+        .string()
+        .describe(
+          "UI command (set-headline, set-cta, apply-theme, show-modal, etc.)"
+        ),
+      args: z.record(z.any()).optional().describe("Command arguments"),
+      source: z
+        .enum(["chat", "voice", "gpt", "api"])
+        .optional()
+        .describe("Command source"),
+    }),
+  },
+  async ({ command, args = {}, source = "api" }) => {
+    commandHistory.push({
       command,
-      args: cmdArgs,
+      args,
       source,
       timestamp: new Date().toISOString(),
     });
+    if (commandHistory.length > 50) commandHistory.shift();
 
-    // Trim history to last 50
-    if (this.commandHistory.length > 50) {
-      this.commandHistory.shift();
-    }
-
-    // Execute command
-    const result = await this.runCommand(command, cmdArgs, source);
-
+    const result = await runCommand(command, args, source);
     return {
       content: [
         {
           type: "text",
-          text: `✓ UI Command executed: ${command}\n\n${JSON.stringify(result, null, 2)}`,
+          text: `✓ UI Command executed: ${command}\n\n${JSON.stringify(
+            result,
+            null,
+            2
+          )}`,
         },
       ],
     };
   }
+);
 
-  async runCommand(command, args, source) {
-    // Build fetch request to the website's command API
-    const payload = {
-      action: command,
-      args,
-      source,
-      timestamp: new Date().toISOString(),
-    };
-
-    // Post to your API endpoint
-    const apiUrl = "https://voicetowebsite.com/api/ui-command";
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    }).catch(() => ({ ok: false, error: "API unreachable" }));
-
-    // Update local state optimistically
-    this.updateLocalState(command, args);
-
-    return {
-      success: response.ok !== false,
-      command,
-      args,
-      state: this.uiState,
-    };
-  }
-
-  updateLocalState(command, args) {
-    switch (command) {
-      case "set-headline":
-        this.uiState.headline = args.value || this.uiState.headline;
-        break;
-      case "set-subhead":
-        this.uiState.subhead = args.value || this.uiState.subhead;
-        break;
-      case "set-cta":
-        this.uiState.cta = args.value || this.uiState.cta;
-        break;
-      case "set-price":
-        this.uiState.price = args.value || this.uiState.price;
-        break;
-      case "apply-theme":
-        this.uiState.theme = args.theme || this.uiState.theme;
-        break;
-      case "toggle-testimonials":
-        this.uiState.testimonialsVisible = !this.uiState.testimonialsVisible;
-        break;
-      case "show-modal":
-        this.uiState.modalsOpen[args.modalName] = true;
-        break;
-      case "hide-modal":
-        this.uiState.modalsOpen[args.modalName] = false;
-        break;
-      case "update-metric":
-        if (args.metricNum === 1) this.uiState.metric1 = args.value;
-        else if (args.metricNum === 2) this.uiState.metric2 = args.value;
-        else if (args.metricNum === 3) this.uiState.metric3 = args.value;
-        break;
-    }
-  }
-
-  async getUIState(args) {
-    const { property } = args;
-
+server.registerTool(
+  "get-ui-state",
+  {
+    description: "Get current UI state",
+    inputSchema: z.object({
+      property: z
+        .string()
+        .optional()
+        .describe("Property to query (headline, cta, theme, etc.)"),
+    }),
+  },
+  async ({ property }) => {
     if (property) {
-      const value = this.uiState[property];
+      const value = uiState[property];
       return {
         content: [
-          {
-            type: "text",
-            text: `${property}: ${JSON.stringify(value)}`,
-          },
+          { type: "text", text: `${property}: ${JSON.stringify(value)}` },
         ],
       };
     }
@@ -238,13 +155,20 @@ class UICommandServer {
       content: [
         {
           type: "text",
-          text: `Current UI State:\n\n${JSON.stringify(this.uiState, null, 2)}`,
+          text: `Current UI State:\n\n${JSON.stringify(uiState, null, 2)}`,
         },
       ],
     };
   }
+);
 
-  async listUICommands() {
+server.registerTool(
+  "list-ui-commands",
+  {
+    description: "List all available UI commands",
+    inputSchema: z.object({}),
+  },
+  async () => {
     const commands = `
 Available UI Commands:
 
@@ -280,25 +204,39 @@ EXAMPLES:
     `;
     return { content: [{ type: "text", text: commands }] };
   }
+);
 
-  async getCommandHistory(args) {
-    const { limit = 10 } = args;
-    const recent = this.commandHistory.slice(-limit);
-
+server.registerTool(
+  "get-command-history",
+  {
+    description: "Get recent command history",
+    inputSchema: z.object({
+      limit: z.number().optional().describe("Number of commands to return"),
+    }),
+  },
+  async ({ limit = 10 }) => {
+    const recent = commandHistory.slice(-limit);
     return {
       content: [
         {
           type: "text",
-          text: `Recent Commands (last ${Math.min(limit, this.commandHistory.length)}):\n\n${JSON.stringify(recent, null, 2)}`,
+          text: `Recent Commands (last ${Math.min(
+            limit,
+            commandHistory.length
+          )}):\n\n${JSON.stringify(recent, null, 2)}`,
         },
       ],
     };
   }
+);
 
-  async run() {
-    await this.server.connect(process.stdin, process.stdout);
-  }
+async function main() {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error("ui-commands MCP server running on stdio");
 }
 
-const server = new UICommandServer();
-server.run().catch(console.error);
+main().catch((error) => {
+  console.error("Server error:", error);
+  process.exit(1);
+});

@@ -5,6 +5,7 @@ type Props = {
   show: boolean;
   onDone: () => void;
   reduceMotion?: boolean;
+  onMediaStart?: () => void;
 };
 
 const VIDEO_SRC = "/media/vtw-opener.mp4";
@@ -14,6 +15,7 @@ export default function SiteOpener({
   show,
   onDone,
   reduceMotion = false,
+  onMediaStart,
 }: Props) {
   const doneRef = useRef(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -45,6 +47,17 @@ export default function SiteOpener({
       }
     };
   }, [show, onDone, reduceMotion]);
+
+  useEffect(() => {
+    if (!show) return;
+    const videoEl = videoRef.current;
+    if (!videoEl || !onMediaStart) return;
+    const handlePlay = () => onMediaStart();
+    videoEl.addEventListener("play", handlePlay);
+    return () => {
+      videoEl.removeEventListener("play", handlePlay);
+    };
+  }, [show, onMediaStart]);
 
   const finish = () => {
     if (doneRef.current) return;

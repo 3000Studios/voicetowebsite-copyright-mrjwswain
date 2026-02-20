@@ -60,7 +60,12 @@
         z-index: 10;
       }
 
-      #app a {
+      #app a,
+      #app .link-button {
+        appearance: none;
+        border: none;
+        cursor: pointer;
+        font: inherit;
         text-decoration: none;
         color: #fff;
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -71,7 +76,8 @@
         backdrop-filter: blur(10px);
       }
 
-      #app a:hover {
+      #app a:hover,
+      #app .link-button:hover {
         background: rgba(255, 255, 255, 0.2);
         border-color: #fff;
       }
@@ -136,7 +142,7 @@
       <div class="hero">
         <h1>Luminous</h1>
         <h2>Ribbon Cursor</h2>
-        <a href="#" id="change-colors">Randomize Colors</a>
+        <button type="button" id="change-colors" class="link-button">Randomize Colors</button>
       </div>
     </div>
 
