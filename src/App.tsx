@@ -13,8 +13,8 @@ const App: React.FC = () => {
   // Core State
   const [tryPrompt, setTryPrompt] = useState("");
   const [flowPhase, setFlowPhase] = useState<
-    "idle" | "listening" | "confirm" | "generating" | "result"
-  >("idle");
+    "listening" | "confirm" | "generating" | "result"
+  >("listening");
   const [generatedPreviewUrl, setGeneratedPreviewUrl] = useState("");
   const [generatedSiteId, setGeneratedSiteId] = useState("");
   const [generateError, setGenerateError] = useState("");
@@ -59,9 +59,14 @@ const App: React.FC = () => {
       if (flowPhase === "listening") setFlowPhase("confirm");
     };
     recognition.onerror = () => {
-      setFlowPhase("idle");
+      setFlowPhase("listening");
     };
     recognitionRef.current = recognition;
+
+    // Start recognition automatically since we removed the manual button
+    try {
+      recognition.start();
+    } catch (_) {}
 
     return () => {
       try {
@@ -126,18 +131,6 @@ const App: React.FC = () => {
   }, []);
 
   // Actions
-  const startMic = () => {
-    if (!recognitionRef.current) {
-      alert("Speech recognition not supported in this browser.");
-      return;
-    }
-    setTryPrompt("");
-    setFlowPhase("listening");
-    try {
-      recognitionRef.current.start();
-    } catch (_) {}
-  };
-
   const stopMic = () => {
     try {
       recognitionRef.current.stop();
@@ -146,7 +139,7 @@ const App: React.FC = () => {
   };
 
   const resetFlow = () => {
-    setFlowPhase("idle");
+    setFlowPhase("listening");
     setTryPrompt("");
     setGeneratedPreviewUrl("");
     setGeneratedSiteId("");
@@ -249,194 +242,149 @@ const App: React.FC = () => {
 
         {/* 2. Example below video / Integrated with Flow */}
         <section className="relative z-20">
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-8 md:p-16 shadow-[0_0_100px_rgba(34,211,238,0.1)]">
-            <AnimatePresence mode="wait">
-              {flowPhase === "idle" && (
-                <motion.div
-                  key="idle"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-center"
+          <AnimatePresence mode="wait">
+            {flowPhase === "listening" && (
+              <motion.div
+                key="listening"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.1 }}
+                className="text-center py-10"
+              >
+                <div className="mb-12">
+                  <AudioWaveform
+                    active={true}
+                    mode="opener"
+                    className="mx-auto scale-150"
+                  />
+                </div>
+                <div className="text-2xl font-light text-white/80 min-h-[4rem] px-4">
+                  {tryPrompt || "Listening for your command..."}
+                </div>
+                <button
+                  onClick={stopMic}
+                  className="mt-12 px-10 py-4 rounded-full border border-white/20 bg-white/10 hover:bg-white hover:text-black transition-all font-orbitron tracking-widest uppercase text-xs"
                 >
-                  <div className="mb-10">
-                    <h2 className="font-orbitron text-2xl mb-4 font-bold">
-                      Example: Build a Portfolio
-                    </h2>
-                    <p className="text-white/40 italic">
-                      "Make a luxury portfolio for a photographer with a dark
-                      theme and gallery."
-                    </p>
-                  </div>
+                  Finish Command
+                </button>
+              </motion.div>
+            )}
 
+            {flowPhase === "confirm" && (
+              <motion.div
+                key="confirm"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center"
+              >
+                <div className="text-sm font-orbitron tracking-[0.4em] text-cyan-400 uppercase mb-8">
+                  System Check
+                </div>
+                <h3 className="text-3xl font-orbitron mb-4 font-black">
+                  Are you ready?
+                </h3>
+                <div className="bg-white/5 border border-white/10 p-6 rounded-2xl max-w-2xl mx-auto mb-10 text-xl font-light text-white/90 shadow-inner">
+                  "{tryPrompt}"
+                </div>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                   <button
-                    type="button"
-                    title="Tap to speak your command"
-                    aria-label="Start voice command"
-                    onClick={startMic}
-                    className="group relative inline-flex items-center justify-center p-1 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl"
+                    onClick={resetFlow}
+                    className="w-full md:w-auto px-10 py-5 rounded-full border border-white/10 hover:bg-white/5 transition-all font-orbitron text-xs tracking-widest uppercase"
                   >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-700"></span>
-                    <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
-                    <span className="relative flex flex-col items-center justify-center w-48 h-48 bg-black rounded-full text-white group-hover:text-cyan-400 transition-colors">
-                      <svg
-                        className="w-12 h-12 mb-2"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 005.93 6.93V17H7a1 1 0 100 2h6a1 1 0 100-2h-1.93v-2.07z" />
-                      </svg>
-                      <span className="font-orbitron tracking-widest text-sm uppercase">
-                        Tap to Speak
-                      </span>
-                    </span>
+                    Try Again
                   </button>
-                </motion.div>
-              )}
-
-              {flowPhase === "listening" && (
-                <motion.div
-                  key="listening"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.1 }}
-                  className="text-center py-10"
-                >
-                  <div className="mb-12">
-                    <AudioWaveform
-                      active={true}
-                      mode="opener"
-                      className="mx-auto scale-150"
-                    />
-                  </div>
-                  <div className="text-2xl font-light text-white/80 min-h-[4rem] px-4">
-                    {tryPrompt || "Listening for your command..."}
-                  </div>
                   <button
-                    onClick={stopMic}
-                    className="mt-12 px-10 py-4 rounded-full border border-white/20 bg-white/10 hover:bg-white hover:text-black transition-all font-orbitron tracking-widest uppercase text-xs"
+                    onClick={generateSite}
+                    className="w-full md:w-auto px-16 py-5 rounded-full bg-white text-black font-black font-orbitron text-sm tracking-[0.2em] shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:shadow-[0_0_60px_rgba(255,255,255,0.6)] transition-all uppercase"
                   >
-                    Finish Command
+                    MAKE IT
                   </button>
-                </motion.div>
-              )}
+                </div>
+                {generateError && (
+                  <div className="mt-6 text-red-400 font-orbitron text-xs uppercase tracking-widest">
+                    {generateError}
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-              {flowPhase === "confirm" && (
-                <motion.div
-                  key="confirm"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center"
-                >
-                  <div className="text-sm font-orbitron tracking-[0.4em] text-cyan-400 uppercase mb-8">
-                    System Check
+            {flowPhase === "generating" && (
+              <motion.div
+                key="generating"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20"
+              >
+                <div className="relative inline-block mb-10">
+                  <div className="absolute inset-0 animate-ping bg-cyan-500/20 rounded-full" />
+                  <div className="relative w-32 h-32 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+                </div>
+                <h3 className="text-3xl font-orbitron font-black tracking-widest uppercase animate-pulse">
+                  Forging Website...
+                </h3>
+                <p className="mt-4 text-white/40 font-orbitron text-xs tracking-[0.3em] uppercase">
+                  Audio Engine: Active
+                </p>
+              </motion.div>
+            )}
+
+            {flowPhase === "result" && (
+              <motion.div
+                key="result"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center"
+              >
+                <div className="text-sm font-orbitron tracking-[0.4em] text-green-400 uppercase mb-8">
+                  Success
+                </div>
+                <h3 className="text-3xl font-orbitron mb-10 font-black">
+                  Site Identity: {generatedSiteId}
+                </h3>
+
+                {/* Protected Preview Box */}
+                <div className="relative mb-12 rounded-3xl overflow-hidden border border-white/20 bg-black shadow-2xl group">
+                  <div
+                    className="absolute inset-0 z-20 pointer-events-auto bg-transparent select-none"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-6 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-orbitron tracking-widest text-white/60 uppercase pointer-events-none">
+                    Neural Shield Active
                   </div>
-                  <h3 className="text-3xl font-orbitron mb-4 font-black">
-                    Are you ready?
-                  </h3>
-                  <div className="bg-white/5 border border-white/10 p-6 rounded-2xl max-w-2xl mx-auto mb-10 text-xl font-light text-white/90 shadow-inner">
-                    "{tryPrompt}"
-                  </div>
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-                    <button
-                      onClick={resetFlow}
-                      className="w-full md:w-auto px-10 py-5 rounded-full border border-white/10 hover:bg-white/5 transition-all font-orbitron text-xs tracking-widest uppercase"
-                    >
-                      Try Again
-                    </button>
-                    <button
-                      onClick={generateSite}
-                      className="w-full md:w-auto px-16 py-5 rounded-full bg-white text-black font-black font-orbitron text-sm tracking-[0.2em] shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:shadow-[0_0_60px_rgba(255,255,255,0.6)] transition-all uppercase"
-                    >
-                      MAKE IT
-                    </button>
-                  </div>
-                  {generateError && (
-                    <div className="mt-6 text-red-400 font-orbitron text-xs uppercase tracking-widest">
-                      {generateError}
+                  {generatedPreviewUrl && (
+                    <div className="vt-preview-scroll">
+                      <iframe
+                        src={generatedPreviewUrl}
+                        className="vt-preview-frame w-full border-none grayscale-[0.2]"
+                        title="Website Preview"
+                        scrolling="yes"
+                      />
                     </div>
                   )}
-                </motion.div>
-              )}
+                  <div className="absolute inset-0 z-40 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
+                </div>
 
-              {flowPhase === "generating" && (
-                <motion.div
-                  key="generating"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center py-20"
-                >
-                  <div className="relative inline-block mb-10">
-                    <div className="absolute inset-0 animate-ping bg-cyan-500/20 rounded-full" />
-                    <div className="relative w-32 h-32 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
-                  </div>
-                  <h3 className="text-3xl font-orbitron font-black tracking-widest uppercase animate-pulse">
-                    Forging Website...
-                  </h3>
-                  <p className="mt-4 text-white/40 font-orbitron text-xs tracking-[0.3em] uppercase">
-                    Audio Engine: Active
-                  </p>
-                </motion.div>
-              )}
-
-              {flowPhase === "result" && (
-                <motion.div
-                  key="result"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center"
-                >
-                  <div className="text-sm font-orbitron tracking-[0.4em] text-green-400 uppercase mb-8">
-                    Success
-                  </div>
-                  <h3 className="text-3xl font-orbitron mb-10 font-black">
-                    Site Identity: {generatedSiteId}
-                  </h3>
-
-                  {/* Protected Preview Box */}
-                  <div className="relative mb-12 rounded-3xl overflow-hidden border border-white/20 bg-black shadow-2xl group">
-                    <div
-                      className="absolute inset-0 z-20 pointer-events-auto bg-transparent select-none"
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-6 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-orbitron tracking-widest text-white/60 uppercase pointer-events-none">
-                      Neural Shield Active
-                    </div>
-                    {generatedPreviewUrl && (
-                      <div className="vt-preview-scroll">
-                        <iframe
-                          src={generatedPreviewUrl}
-                          className="vt-preview-frame w-full border-none grayscale-[0.2]"
-                          title="Website Preview"
-                          scrolling="yes"
-                        />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 z-40 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
-                  </div>
-
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-                    <button
-                      onClick={resetFlow}
-                      className="w-full md:w-auto px-10 py-5 rounded-full border border-white/10 hover:bg-white/5 transition-all font-orbitron text-xs tracking-widest uppercase"
-                    >
-                      Build Another
-                    </button>
-                    <a
-                      href="/license.html"
-                      className="w-full md:w-auto px-16 py-5 rounded-full bg-cyan-500 text-black font-black font-orbitron text-sm tracking-[0.1em] shadow-[0_0_40px_rgba(34,211,238,0.4)] hover:shadow-[0_0_60px_rgba(34,211,238,0.6)] transition-all uppercase text-center"
-                    >
-                      Claim Ownership
-                    </a>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                  <button
+                    onClick={resetFlow}
+                    className="w-full md:w-auto px-10 py-5 rounded-full border border-white/10 hover:bg-white/5 transition-all font-orbitron text-xs tracking-widest uppercase"
+                  >
+                    Build Another
+                  </button>
+                  <a
+                    href="/license.html"
+                    className="w-full md:w-auto px-16 py-5 rounded-full bg-cyan-500 text-black font-black font-orbitron text-sm tracking-[0.1em] shadow-[0_0_40px_rgba(34,211,238,0.4)] hover:shadow-[0_0_60px_rgba(34,211,238,0.6)] transition-all uppercase text-center"
+                  >
+                    Claim Ownership
+                  </a>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
 
         {/* 3. Pricing / Licenses */}
-        <section className="mt-32 border-t border-white/10 pt-32">
+        <section className="mt-16 border-t border-white/10 pt-16">
           <div className="text-center mb-16">
             <h2 className="font-orbitron font-black text-3xl md:text-5xl uppercase mb-4">
               Ownership Tiers

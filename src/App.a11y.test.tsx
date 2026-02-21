@@ -34,21 +34,7 @@ describe("App Accessibility - Use Cases", () => {
   it("renders accessible voice flow controls", async () => {
     render(<App />);
 
-    // Main CTA for voice capture exists
-    const tapToSpeak = screen.getByRole("button", {
-      name: /start voice command/i,
-    });
-    expect(tapToSpeak).toBeInTheDocument();
-
-    // Clicking it enters listening phase with a clear "Finish Command" control.
-    await waitFor(() => {
-      expect(
-        (window as any).SpeechRecognition ||
-          (window as any).webkitSpeechRecognition
-      ).toBeTruthy();
-    });
-    fireEvent.click(tapToSpeak);
-
+    // App starts directly in listening phase with a "Finish Command" control
     const finish = await waitFor(() =>
       screen.getByRole("button", { name: /finish command/i })
     );
