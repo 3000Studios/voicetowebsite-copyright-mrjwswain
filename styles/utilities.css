@@ -1,0 +1,20 @@
+/**
+ * Utility helpers intended for one-off layout/spacing usage.
+ */
+
+/* Enhanced Typography */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: text-shine 3s linear infinite;
+}
+
+.mb-4 {
+  margin-bottom: 1rem !important;
+}
+.mb-6 {
+  margin-bottom: 1.5rem !important;
+}

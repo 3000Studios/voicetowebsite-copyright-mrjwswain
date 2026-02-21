@@ -1,0 +1,268 @@
+/**
+ * Base globals, theme roots, and document-level primitives.
+ */
+
+:root {
+  --crystal-prism-1: rgba(56, 189, 248, 0.4);
+  --crystal-prism-2: rgba(168, 85, 247, 0.4);
+  --crystal-shard-speed: 0.8s;
+  --crystal-font-code: var(--font-mono);
+  --crystal-font-sans: var(--font-heading);
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --error-color: #f43f5e;
+  --success-color: #10b981;
+  --muted: rgba(233, 241, 255, 0.72);
+  --panel-bg: rgba(12, 18, 35, 0.82);
+
+  /* Enhanced Typography */
+  --font-family:
+    "Inter", "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
+  --font-heading:
+    "Outfit", "Space Grotesk", "Inter", system-ui, -apple-system, "Segoe UI",
+    Roboto, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-display: "Orbitron", sans-serif;
+
+  /* Enhanced Spacing & Sizing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* Enhanced Visual Effects */
+  --card-gradient: linear-gradient(
+    150deg,
+    rgba(22, 30, 58, 0.92),
+    rgba(6, 10, 24, 0.98)
+  );
+  --glass-surface: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.6);
+
+  /* Enhanced Background */
+  --wallpaper-image:
+    radial-gradient(
+      1200px circle at 12% -10%,
+      rgba(255, 255, 255, 0.15),
+      transparent 60%
+    ),
+    radial-gradient(
+      1100px circle at 90% 15%,
+      rgba(34, 211, 238, 0.12),
+      transparent 62%
+    ),
+    radial-gradient(
+      800px circle at 30% 80%,
+      rgba(251, 191, 36, 0.08),
+      transparent 65%
+    ),
+    radial-gradient(
+      600px circle at 70% 40%,
+      rgba(125, 211, 252, 0.06),
+      transparent 70%
+    ),
+    linear-gradient(180deg, rgba(8, 12, 24, 0.8), rgba(8, 12, 24, 0.95)),
+    linear-gradient(120deg, rgba(10, 20, 40, 0.97), rgba(7, 10, 22, 0.99));
+
+  /* Enhanced Animations */
+  --transition-fast: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Enhanced Component Sizing */
+  --store-card-height: 560px;
+  --nav-height: 70px;
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+  --border-radius-2xl: 24px;
+  --border-radius-full: 9999px;
+
+  color-scheme: dark;
+
+  /* Enhanced Theme Extensions */
+  --metallic-bg: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+  --metallic-border: #f1f5f9;
+  --metallic-text: #0f172a;
+  --metallic-glow: rgba(226, 232, 240, 0.6);
+
+  /* Enhanced Gradients */
+  --gradient-primary: linear-gradient(
+    135deg,
+    #7dd3fc 0%,
+    #22d3ee 50%,
+    #06b6d4 100%
+  );
+  --gradient-secondary: linear-gradient(
+    135deg,
+    #fbbf24 0%,
+    #f59e0b 50%,
+    #d97706 100%
+  );
+  --gradient-success: linear-gradient(
+    135deg,
+    #10b981 0%,
+    #059669 50%,
+    #047857 100%
+  );
+  --gradient-error: linear-gradient(
+    135deg,
+    #ef4444 0%,
+    #dc2626 50%,
+    #b91c1c 100%
+  );
+  --gradient-dark: linear-gradient(
+    135deg,
+    #1e293b 0%,
+    #0f172a 50%,
+    #020617 100%
+  );
+}
+
+html {
+  scroll-padding-top: var(--vtw-nav-offset, var(--nav-height));
+}
+
+/* Smooth scrolling (respect reduced motion) */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Riser look + always-on shadow for non-plain text elements */
+:root {
+  --vtw-rise-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.55), 0 10px 28px rgba(0, 0, 0, 0.38),
+    0 0 18px rgba(var(--accent-rgb), 0.14);
+  --vtw-rise-shadow-soft:
+    0 1px 0 rgba(0, 0, 0, 0.45), 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Typography: subtle raised (riser) treatment everywhere, stronger on UI/heads. */
+:root {
+  --vtw-text-riser-soft:
+    0 1px 0 rgba(255, 255, 255, 0.08), 0 -1px 0 rgba(0, 0, 0, 0.28);
+  --vtw-text-shadow-ui:
+    0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 28px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(var(--accent-rgb), 0.22);
+  --vtw-text-shadow-head:
+    0 1px 0 rgba(255, 255, 255, 0.16), 0 18px 46px rgba(0, 0, 0, 0.7),
+    0 0 26px rgba(var(--accent-rgb), 0.32);
+}
+
+body {
+  text-shadow: var(--vtw-text-riser-soft);
+}
+
+/* Footer - Always at Bottom */
+/* --- FLASH FOOTER (Cybernetic/Tectonic Aesthetic) --- */
+:root {
+  --glitch-cyan: #00f3ff;
+  --glitch-magenta: #ff00c1;
+  --laser-core: #ffffff;
+  --tectonic-bg: #050505;
+  --plate-border: rgba(255, 255, 255, 0.1);
+  --footer-transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Theme variants (persisted via localStorage + data-theme) */
+:root[data-theme="midnight"] {
+  --bg-color: #0b1222;
+  --text-color: #f8fbff;
+  --accent-color: #7dd3fc;
+  --accent-rgb: 125, 211, 252;
+  --accent-glow: rgba(125, 211, 252, 0.45);
+  --muted: rgba(233, 241, 255, 0.72);
+  --panel-bg: rgba(12, 18, 35, 0.82);
+}
+
+:root[data-theme="metallic"] {
+  --bg-color: #0d111a;
+  --text-color: #e2e8f0;
+  --accent-color: #cbd5e1;
+  --accent-rgb: 203, 213, 225;
+  --accent-glow: rgba(203, 213, 225, 0.55);
+  --muted: rgba(226, 232, 240, 0.7);
+  --panel-bg: linear-gradient(
+    145deg,
+    rgba(226, 232, 240, 0.12),
+    rgba(30, 41, 59, 0.68)
+  );
+}
+
+:root[data-theme="volt"] {
+  --bg-color: #061019;
+  --text-color: #f8fbff;
+  --accent-color: #22d3ee;
+  --accent-rgb: 34, 211, 238;
+  --accent-glow: rgba(34, 211, 238, 0.45);
+  --muted: rgba(233, 241, 255, 0.72);
+  --panel-bg: rgba(6, 16, 32, 0.82);
+}
+
+:root[data-theme="ember"] {
+  --bg-color: #120b08;
+  --text-color: #fff7ed;
+  --accent-color: #fbbf24;
+  --accent-rgb: 251, 191, 36;
+  --accent-glow: rgba(251, 191, 36, 0.4);
+  --muted: rgba(255, 237, 213, 0.78);
+  --panel-bg: rgba(22, 12, 6, 0.84);
+}
+
+:root[data-theme="ocean"] {
+  --bg-color: #051322;
+  --text-color: #e6f1ff;
+  --accent-color: #60a5fa;
+  --accent-rgb: 96, 165, 250;
+  --accent-glow: rgba(96, 165, 250, 0.4);
+  --muted: rgba(226, 237, 255, 0.74);
+  --panel-bg: rgba(5, 18, 40, 0.84);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Accessibility */
+html {
+  scroll-padding-top: 96px;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(var(--accent-rgb), 0.85);
+  outline-offset: 3px;
+}

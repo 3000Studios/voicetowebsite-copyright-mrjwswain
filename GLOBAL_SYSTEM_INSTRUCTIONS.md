@@ -82,7 +82,7 @@
 ### Canonical Commands (from package.json)
 
 - `dev:all`: `node ./scripts/dev-all.mjs`
-- `verify`: `node ./scripts/verify.mjs && npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run type-check && npm run test && npm run build && npm run governance:check && npm run guard:ui && npm run check:links`
+- `verify`: `node ./scripts/verify.mjs && npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run check:css-governance && npm run type-check && npm run test && npm run build && npm run governance:check && npm run guard:ui && npm run check:links`
 - `deploy`: `npm run verify && npm run guard:release-tag && wrangler deploy --keep-vars`
 - `auto:ship`: `node ./scripts/auto-ship.mjs`
 - `sync`: `node ./scripts/sync.mjs`
@@ -176,6 +176,7 @@ Scripts available:
 - `scripts/auto-ship-runner.ps1`
 - `scripts/auto-ship.mjs`
 - `scripts/autopilot.mjs`
+- `scripts/check-css-governance.mjs`
 - `scripts/dev-all.mjs`
 - `scripts/generate-config.mjs`
 - `scripts/generate-sitemap.mjs`
