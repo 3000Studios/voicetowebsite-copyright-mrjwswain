@@ -1,7 +1,13 @@
+import { Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+
+const App = lazy(() => import("./App"));
 
 const root = document.getElementById("root");
 if (root) {
-  createRoot(root).render(<App />);
+  createRoot(root).render(
+    <Suspense fallback={null}>
+      <App />
+    </Suspense>
+  );
 }

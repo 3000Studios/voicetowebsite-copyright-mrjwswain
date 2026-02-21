@@ -48,6 +48,8 @@ ADSENSE_MODE = "auto"
 ADSENSE_ALLOW_ALL_PAGES = "1"
 ADSENSE_MAX_SLOTS = "3"
 PAYPAL_ENV = "live"
+CACHE_CONTROL_STATIC = "public, max-age=31536000, immutable"
+CACHE_CONTROL_HTML = "public, max-age=600"
 # NOTE: Do not commit secrets.
 # Set runtime variables/secrets in the Cloudflare Dashboard (Worker settings) or via `wrangler secret put`.
 # Examples (dashboard): ADMIN_EMAIL, PAYPAL_CLIENT_ID, ADSENSE_*.
