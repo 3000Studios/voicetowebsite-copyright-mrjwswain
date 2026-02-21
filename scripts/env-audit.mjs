@@ -49,6 +49,34 @@ const CRITICAL_GROUPS = [
 const stableSort = (values) =>
   [...new Set(values)].sort((a, b) => a.localeCompare(b));
 
+const readJson = (filePath) => {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return null;
+  }
+};
+
+const readText = (filePath) => {
+  try {
+    if (!fs.existsSync(filePath)) return "";
+    return fs.readFileSync(filePath, "utf8");
+  } catch {
+    return "";
+  }
+};
+
+const toComparableReport = (report) => ({
+  scannedFiles: report.scannedFiles,
+  usedKeys: report.usedKeys,
+  definedKeys: report.definedKeys,
+  missing: report.missing,
+  unused: report.unused,
+  criticalMissing: report.criticalMissing,
+  usageByKey: report.usageByKey,
+});
+
 const walk = (dir, out = []) => {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
@@ -163,8 +191,7 @@ const main = async () => {
     if (!found) criticalMissing.push(group[0]);
   }
 
-  const report = {
-    generatedAt: new Date().toISOString(),
+  const candidateReport = {
     scannedFiles: files.length,
     usedKeys,
     definedKeys,
@@ -177,6 +204,18 @@ const main = async () => {
         stableSort(Array.from(usageMap.get(key) || [])),
       ])
     ),
+  };
+  const previousReport = readJson(REPORT_PATH);
+  const sameAsPrevious =
+    previousReport &&
+    JSON.stringify(toComparableReport(previousReport)) ===
+      JSON.stringify(toComparableReport(candidateReport));
+  const report = {
+    generatedAt:
+      sameAsPrevious && typeof previousReport.generatedAt === "string"
+        ? previousReport.generatedAt
+        : new Date().toISOString(),
+    ...candidateReport,
   };
 
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
@@ -220,8 +259,15 @@ const main = async () => {
   }
   schemaLines.push("");
 
-  fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`);
-  fs.writeFileSync(SCHEMA_PATH, `${schemaLines.join("\n")}\n`);
+  const reportContent = `${JSON.stringify(report, null, 2)}\n`;
+  const schemaContent = `${schemaLines.join("\n")}\n`;
+
+  if (readText(REPORT_PATH) !== reportContent) {
+    fs.writeFileSync(REPORT_PATH, reportContent);
+  }
+  if (readText(SCHEMA_PATH) !== schemaContent) {
+    fs.writeFileSync(SCHEMA_PATH, schemaContent);
+  }
   try {
     execSync("npx prettier --write ENV_SCHEMA.md reports/env-audit.json", {
       cwd: ROOT,
