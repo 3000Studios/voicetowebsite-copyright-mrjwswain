@@ -1,23 +1,49 @@
 {
   "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "args": ["-NoLogo"]
+    }
+  },
+  "terminal.integrated.scrollback": 50000,
+  "terminal.integrated.enablePersistentSessions": true,
+  "terminal.integrated.persistentSessionReviveProcess": "onExitAndWindowClose",
+  "terminal.integrated.env.windows": {
+    "NODE_OPTIONS": "--max-old-space-size=32768",
+    "FORCE_COLOR": "1"
+  },
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "files.autoSave": "afterDelay",
-  "files.autoSaveDelay": 1000,
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "javascript.updateImportsOnFileMove.enabled": "always",
-  "eslint.format.enable": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
-  "cSpell.enabled": true,
-  "cSpell.language": "en",
-  "cSpell.configFile": "cspell.json",
-  "explorer.compactFolders": false,
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggestSelection": "recentlyUsedByPrefix",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.acceptSuggestionOnCommitCharacter": true,
+  "editor.tabCompletion": "on",
+  "editor.inlayHints.enabled": "on",
+  "editor.stickyScroll.enabled": true,
+  "editor.minimap.enabled": true,
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
-  "editor.suggestSelection": "recentlyUsed",
+  "editor.linkedEditing": true,
+  "editor.rulers": [100, 120],
+  "editor.renderWhitespace": "selection",
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 750,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
   "files.associations": {
     "*.css": "css",
     "*.html": "html",
@@ -25,10 +51,43 @@
     "*.mjs": "javascript",
     "*.cjs": "javascript"
   },
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.wrangler/**": true,
+    "**/Media/**": true,
+    "**/black-vault/**": true,
+    "**/test-results/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.wrangler": true,
+    "**/Media": true,
+    "**/black-vault": true,
+    "**/test-results": true,
+    "**/package-lock.json": true
+  },
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
     "typescript": "typescriptreact"
   },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.tsserver.maxTsServerMemory": 8192,
+  "typescript.suggest.autoImports": true,
+  "javascript.suggest.autoImports": true,
+  "eslint.format.enable": true,
+  "eslint.run": "onType",
+  "eslint.alwaysShowStatus": true,
+  "cSpell.enabled": true,
+  "cSpell.language": "en",
+  "cSpell.configFile": "cspell.json",
+  "explorer.compactFolders": false,
+  "git.autofetch": true,
+  "git.autofetchPeriod": 60,
+  "git.confirmSync": false,
   "gitlens.codeLens.enabled": true,
   "errorLens.enabledDiagnosticLevels": ["error", "warning"],
   "todo-tree.general.tags": ["TODO", "FIXME", "BUG", "OPTIMIZE", "NOTE"],
@@ -36,6 +95,7 @@
   "npm.packageManager": "npm",
   "vitest.enable": true,
   "workbench.iconTheme": "material-icon-theme",
-  "editor.minimap.enabled": true,
-  "editor.stickyScroll.enabled": true
+  "workbench.startupEditor": "none",
+  "window.restoreWindows": "all",
+  "debug.javascript.autoAttachFilter": "smart"
 }

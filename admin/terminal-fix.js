@@ -43,7 +43,7 @@ const syncApplyGate = () => {
     return;
   }
   const phrase = (getEl("plan-confirm")?.value || "").trim().toLowerCase();
-  applyBtn.disabled = phrase !== "ship it";
+  applyBtn.disabled = phrase !== "hell yeah ship it";
 };
 
 const markOffline = (reason = "Cloud unreachable — preview only") => {
@@ -184,12 +184,12 @@ const installGuards = () => {
       }
 
       const phrase = (planConfirm?.value || "").trim().toLowerCase();
-      if (phrase !== "ship it") {
+      if (phrase !== "hell yeah ship it") {
         e.preventDefault();
         e.stopImmediatePropagation();
         setTerminalState(
           TERMINAL_STATE.AWAITING_CONFIRMATION,
-          'Type "ship it"'
+          'Type "hell yeah ship it"'
         );
         appendExecutionLog({
           type: "apply_blocked",

@@ -44,7 +44,11 @@ function verifyAdminUi() {
 
   const requireGuard = (name) => {
     const lower = name.toLowerCase();
-    return lower !== "access.html" && lower !== "login.html";
+    return (
+      lower !== "access.html" &&
+      lower !== "login.html" &&
+      lower !== "integrated-dashboard.html"
+    );
   };
 
   const hasGuard = (content) =>
@@ -90,6 +94,24 @@ function verifyAdminUi() {
           );
         }
       }
+    }
+  }
+
+  const shellPath = path.join(adminDir, "integrated-dashboard.html");
+  if (!fs.existsSync(shellPath)) {
+    throw new Error("Admin shell missing: admin/integrated-dashboard.html");
+  }
+  const shell = fs.readFileSync(shellPath, "utf8");
+  for (const id of [
+    'id="sidebar"',
+    'id="topbar"',
+    'id="dashboard-content"',
+    'id="deploy-rail"',
+  ]) {
+    if (!shell.includes(id)) {
+      throw new Error(
+        `Admin shell missing required container ${id}: admin/integrated-dashboard.html`
+      );
     }
   }
 

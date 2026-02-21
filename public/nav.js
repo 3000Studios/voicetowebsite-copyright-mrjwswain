@@ -111,20 +111,16 @@
   };
 
   const adminLinks = [
-    { href: "/admin", label: "Dashboard", icon: "🎯" },
-    { href: "/admin/voice-commands", label: "Voice Control", icon: "🎤" },
-    { href: "/admin/store-manager", label: "Store Manager", icon: "🛒" },
-    { href: "/admin/app-store-manager", label: "App Store", icon: "📲" },
+    { href: "/admin/mission", label: "Mission", icon: "🎯" },
+    { href: "/admin/cc", label: "Command Center", icon: "🛠️" },
+    { href: "/admin/vcc", label: "Voice", icon: "🎤" },
+    { href: "/admin/monetization", label: "Monetization", icon: "💰" },
     { href: "/admin/analytics", label: "Analytics", icon: "📈" },
-    { href: "/admin/customer-chat", label: "Customer Chat", icon: "💬" },
-    { href: "/admin/bot-command-center", label: "Boss Bot", icon: "🤖" },
-    { href: "/admin/nexus", label: "Nexus", icon: "🔮" },
-    { href: "/admin/live-stream", label: "Live Stream", icon: "🎬" },
-    {
-      href: "/admin/integrated-dashboard",
-      label: "Integrated Dashboard",
-      icon: "🌟",
-    },
+    { href: "/admin/live", label: "Live", icon: "🎬" },
+    { href: "/admin/store", label: "Store", icon: "🛒" },
+    { href: "/admin/media", label: "Media", icon: "🖼️" },
+    { href: "/admin/audio", label: "Audio", icon: "🎵" },
+    { href: "/admin/settings", label: "Settings", icon: "⚙️" },
   ];
 
   const footerLinks = {
@@ -987,44 +983,6 @@
     } catch (_) {}
   };
 
-  const injectWidget = () => {
-    if (document.getElementById("vtw-widget")) return;
-    const wrap = document.createElement("div");
-    wrap.className = "vt-widget";
-    wrap.id = "vtw-widget";
-    wrap.innerHTML = `
-      <button class="vt-widget-fab" id="vtw-widget-toggle" type="button" aria-expanded="false" aria-controls="vtw-widget-panel" aria-label="Open chat and mic widget">
-        <span class="vt-widget-fab-dot" aria-hidden="true"></span>
-        <span class="vt-widget-fab-label">Ask / Build</span>
-      </button>
-      <section class="vt-widget-panel" id="vtw-widget-panel" aria-hidden="true">
-        <header class="vt-widget-head">
-          <div class="vt-widget-title">
-            <span class="vt-widget-title-mark" aria-hidden="true"></span>
-            <span>VoiceToWebsite</span>
-          </div>
-          <div class="vt-widget-tabs" role="tablist" aria-label="Widget mode">
-            <button class="vt-widget-tab is-active" type="button" role="tab" data-mode="ask" aria-selected="true">Ask</button>
-            <button class="vt-widget-tab" type="button" role="tab" data-mode="build" aria-selected="false">Build</button>
-          </div>
-          <button class="vt-widget-close" id="vtw-widget-close" type="button" aria-label="Close widget">×</button>
-        </header>
-        <div class="vt-widget-body">
-          <div class="vt-widget-log" id="vtw-widget-log" aria-live="polite"></div>
-          <div class="vt-widget-hints" id="vtw-widget-hints"></div>
-          <div class="vt-widget-input">
-            <label class="sr-only" for="vtw-widget-text">Message</label>
-            <textarea id="vtw-widget-text" rows="2" placeholder="Ask a question..."></textarea>
-            <button class="vt-widget-mic" id="vtw-widget-mic" type="button" aria-label="Voice input">Mic</button>
-            <button class="vt-widget-send" id="vtw-widget-send" type="button">Send</button>
-          </div>
-          <div class="vt-widget-status muted" id="vtw-widget-status" aria-live="polite"></div>
-        </div>
-      </section>
-    `;
-    document.body.appendChild(wrap);
-  };
-
   const hashString = (value) => {
     const str = String(value || "");
     let h = 2166136261;
@@ -1413,332 +1371,6 @@
     } catch (_) {}
   };
 
-  const wireWidget = () => {
-    const root = document.getElementById("vtw-widget");
-    if (!root || root.dataset.vtwWired) return;
-    root.dataset.vtwWired = "1";
-
-    const panel = document.getElementById("vtw-widget-panel");
-    const toggle = document.getElementById("vtw-widget-toggle");
-    const closeBtn = document.getElementById("vtw-widget-close");
-    const log = document.getElementById("vtw-widget-log");
-    const text = document.getElementById("vtw-widget-text");
-    const send = document.getElementById("vtw-widget-send");
-    const micBtn = document.getElementById("vtw-widget-mic");
-    const hints = document.getElementById("vtw-widget-hints");
-    const status = document.getElementById("vtw-widget-status");
-
-    const modes = {
-      ask: {
-        placeholder: "Ask a question...",
-        chips: [
-          "What is VoiceToWebsite?",
-          "How does Plan -> Apply work?",
-          "Show pricing",
-          "Open the demo",
-          "Where do ads appear?",
-        ],
-      },
-      build: {
-        placeholder: "Describe what you want to build...",
-        chips: [
-          "Build a creator portfolio site",
-          "Make a barber shop landing page with booking",
-          "Create an agency homepage with case studies",
-          "Design an ecommerce storefront with bundles",
-          "Generate a blog cluster for voice website builder",
-        ],
-      },
-    };
-
-    let mode = "ask";
-
-    const setExpanded = (expanded) => {
-      toggle?.setAttribute("aria-expanded", expanded ? "true" : "false");
-      panel?.setAttribute("aria-hidden", expanded ? "false" : "true");
-      root.classList.toggle("is-open", expanded);
-      if (expanded) text?.focus();
-    };
-
-    const renderHints = () => {
-      if (!hints) return;
-      hints.innerHTML = "";
-      modes[mode].chips.forEach((chip) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "vt-chip";
-        btn.textContent = chip;
-        btn.addEventListener("click", () => {
-          if (text) text.value = chip;
-          text?.focus();
-        });
-        hints.appendChild(btn);
-      });
-    };
-
-    const addMsg = (who, content) => {
-      if (!log) return;
-      const row = document.createElement("div");
-      row.className = `vt-widget-msg vt-widget-msg--${who}`;
-      row.innerHTML = `<div class="vt-widget-bubble">${content}</div>`;
-      log.appendChild(row);
-      log.scrollTop = log.scrollHeight;
-    };
-
-    const esc = (s) => String(s || "").replace(/</g, "&lt;");
-
-    let supportSessionId = "";
-    let supportSessionReady = false;
-    let supportPollTimer = 0;
-    const seenSupportMessageIds = new Set();
-    const seenSupportFingerprints = new Set();
-    const ensureSupportSession = async () => {
-      if (supportSessionReady) return true;
-      try {
-        const res = await fetch("/api/support/start", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        });
-        const data = await res.json().catch(() => ({}));
-        supportSessionReady = res.ok;
-        if (res.ok && data?.sessionId)
-          supportSessionId = String(data.sessionId || "");
-        return supportSessionReady;
-      } catch (_) {
-        supportSessionReady = false;
-        return false;
-      }
-    };
-
-    const mapSupportSender = (sender) => {
-      const s = String(sender || "").toLowerCase();
-      if (s === "customer") return "user";
-      if (s === "admin") return "bot";
-      if (s === "bot") return "bot";
-      return "bot";
-    };
-
-    const fingerprintSupportMessage = (sender, message) =>
-      `${String(sender || "").toLowerCase()}:${String(message || "")}`;
-
-    const appendSupportMessages = (messages) => {
-      (messages || []).forEach((m) => {
-        const id = String(m?.id || "");
-        const sender = String(m?.sender || "");
-        const message = String(m?.message || "");
-        const who = mapSupportSender(sender);
-        const fp = fingerprintSupportMessage(sender, message);
-
-        if (id && seenSupportMessageIds.has(id)) return;
-        if (fp && seenSupportFingerprints.has(fp)) {
-          if (id) seenSupportMessageIds.add(id);
-          return;
-        }
-
-        if (id) seenSupportMessageIds.add(id);
-        if (fp) seenSupportFingerprints.add(fp);
-        addMsg(who, esc(message));
-      });
-    };
-
-    const pollSupportMessages = async () => {
-      if (!supportSessionReady) return;
-      try {
-        const qp = supportSessionId
-          ? `?sessionId=${encodeURIComponent(supportSessionId)}`
-          : "";
-        const res = await fetch(`/api/support/messages${qp}`, {
-          method: "GET",
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) return;
-        appendSupportMessages(data?.messages || []);
-      } catch (_) {}
-    };
-
-    const startSupportPolling = () => {
-      if (supportPollTimer) return;
-      supportPollTimer = window.setInterval(pollSupportMessages, 2500);
-      pollSupportMessages();
-    };
-
-    const answerAsk = async (q) => {
-      const value = String(q || "").trim();
-      if (!value) return { reply: "", messageId: "", replyId: "" };
-      try {
-        await ensureSupportSession();
-        const res = await fetch("/api/support/message", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: value,
-            sessionId: supportSessionId || undefined,
-          }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data?.error || "Chat failed");
-        return {
-          reply: esc(String(data?.reply || "")),
-          messageId: String(data?.messageId || ""),
-          replyId: String(data?.replyId || ""),
-        };
-      } catch (_) {
-        const t = value.toLowerCase();
-        if (t.includes("pricing") || t.includes("price")) {
-          return `Pricing lives on <a href="/pricing">/pricing</a>. Want a fast win? Try <a href="/demo">the demo</a> first.`;
-        }
-        if (t.includes("demo") || t.includes("try")) {
-          return `Open the interactive demo: <a href="/demo">/demo</a>. You'll get an outline preview in seconds.`;
-        }
-        if (
-          t.includes("privacy") ||
-          t.includes("data") ||
-          t.includes("security")
-        ) {
-          return `For data handling + security posture, visit <a href="/trust">Trust Center</a> and <a href="/privacy">Privacy</a>.`;
-        }
-        return `Try: <a href="/demo">/demo</a> to build instantly, or <a href="/pricing">/pricing</a> to compare tiers.`;
-      }
-    };
-
-    const handleSend = async () => {
-      const value = (text?.value || "").trim();
-      if (!value) return;
-      addMsg("user", esc(value));
-      seenSupportFingerprints.add(fingerprintSupportMessage("customer", value));
-      if (text) text.value = "";
-
-      if (mode === "ask") {
-        if (status) status.textContent = "Thinking...";
-        const res = await answerAsk(value);
-        if (status) status.textContent = "";
-        const reply = typeof res === "string" ? res : res?.reply;
-        if (typeof res === "object" && res) {
-          if (res?.messageId) seenSupportMessageIds.add(res.messageId);
-          if (res?.replyId) seenSupportMessageIds.add(res.replyId);
-        }
-        if (reply) {
-          addMsg("bot", reply);
-          // Fingerprint uses unescaped text. This helps prevent double-render when polling.
-          try {
-            const tmp = document.createElement("div");
-            tmp.innerHTML = reply;
-            const plain = tmp.textContent || tmp.innerText || "";
-            seenSupportFingerprints.add(
-              fingerprintSupportMessage("bot", plain)
-            );
-          } catch (_) {}
-        } else {
-          addMsg(
-            "bot",
-            "I couldn't generate a reply right now. Try again in a moment."
-          );
-        }
-        startSupportPolling();
-        return;
-      }
-
-      try {
-        localStorage.setItem(
-          "vtw-demo-prefill",
-          JSON.stringify({ prompt: value, ts: Date.now() })
-        );
-      } catch (_) {}
-      addMsg("bot", `Opening <a href="/demo">/demo</a> with your prompt...`);
-      setTimeout(() => {
-        window.location.href = "/demo";
-      }, 350);
-    };
-
-    const setMode = (nextMode) => {
-      mode = nextMode === "build" ? "build" : "ask";
-      root.dataset.mode = mode;
-      root.querySelectorAll(".vt-widget-tab").forEach((tab) => {
-        const active = tab.dataset.mode === mode;
-        tab.classList.toggle("is-active", active);
-        tab.setAttribute("aria-selected", active ? "true" : "false");
-      });
-      if (text) text.placeholder = modes[mode].placeholder;
-      renderHints();
-      if (status) status.textContent = "";
-    };
-
-    toggle?.addEventListener("click", () =>
-      setExpanded(!root.classList.contains("is-open"))
-    );
-    closeBtn?.addEventListener("click", () => setExpanded(false));
-    send?.addEventListener("click", handleSend);
-
-    text?.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        handleSend();
-      }
-    });
-
-    root.addEventListener("click", (event) => {
-      const tab = event.target.closest(".vt-widget-tab");
-      if (!tab) return;
-      setMode(tab.dataset.mode);
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") setExpanded(false);
-    });
-
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      micBtn?.setAttribute("disabled", "true");
-      micBtn && (micBtn.title = "Voice input not supported in this browser.");
-    } else {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
-
-      let listening = false;
-      recognition.onresult = (event) => {
-        const transcript = Array.from(event.results)
-          .map((r) => r[0])
-          .map((r) => r.transcript)
-          .join("");
-        if (text) text.value = transcript;
-      };
-      recognition.onend = () => {
-        listening = false;
-        root.classList.remove("is-listening");
-        if (status) status.textContent = "Voice input stopped.";
-      };
-      recognition.onerror = () => {
-        listening = false;
-        root.classList.remove("is-listening");
-        if (status) status.textContent = "Voice input failed.";
-      };
-
-      micBtn?.addEventListener("click", () => {
-        if (!listening) {
-          listening = true;
-          root.classList.add("is-listening");
-          if (status) status.textContent = "Listening...";
-          recognition.start();
-          return;
-        }
-        recognition.stop();
-      });
-    }
-
-    setMode("ask");
-    addMsg(
-      "bot",
-      `Need help? Ask here - or switch to Build to jump into <a href="/demo">/demo</a>.`
-    );
-    renderHints();
-    ensureSupportSession().then((ok) => {
-      if (ok) startSupportPolling();
-    });
-  };
   const init = () => {
     console.log("[VTW Nav] Starting init...");
     initTheme();
@@ -1758,10 +1390,8 @@
       injectNav();
       wireThemeSwitcher();
       if (!adminPage) {
-        console.log("[VTW Nav] Injecting footer and widget...");
-        injectWidget();
+        console.log("[VTW Nav] Injecting footer...");
         injectFooter();
-        wireWidget();
         electrifyLinks();
         spectralizeCards();
         initTextFx();
@@ -2097,7 +1727,7 @@
       try {
         return Boolean(
           el.closest(
-            ".glass-nav, .mobile-overlay, footer, .vtw-widget, .admin-topbar, .admin-shell"
+            ".glass-nav, .mobile-overlay, footer, .admin-topbar, .admin-shell"
           )
         );
       } catch (_) {

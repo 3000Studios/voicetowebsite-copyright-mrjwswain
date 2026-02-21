@@ -67,9 +67,25 @@ id = "e61605d144ac4348a72b7e85afc6c185"
 name = "BOT_HUB"
 class_name = "BotHubDO"
 
+[[durable_objects.bindings]]
+name = "DEPLOY_CONTROLLER"
+class_name = "DeployControllerDO"
+
+[[durable_objects.bindings]]
+name = "LIVE_ROOM"
+class_name = "LiveRoomDO"
+
+[[durable_objects.bindings]]
+name = "AUDIT_LOG"
+class_name = "AuditLogDO"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["BotHubDO"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["DeployControllerDO", "LiveRoomDO", "AuditLogDO"]
 
 [[r2_buckets]]
 binding = "R2"

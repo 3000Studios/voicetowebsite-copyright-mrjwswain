@@ -281,7 +281,7 @@ describe("/api/execute", () => {
 
     expect(apply.status).toBe(200);
     expect(lastOrchestratorPayload?.mode).toBe("apply");
-    expect(lastOrchestratorPayload?.confirmation).toBe("ship it");
+    expect(lastOrchestratorPayload?.confirmation).toBe("hell yeah ship it");
 
     const applyBody = await apply.json();
     expect(applyBody.eventType).toBe("applied");

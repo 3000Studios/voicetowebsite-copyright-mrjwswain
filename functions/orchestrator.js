@@ -40,7 +40,7 @@ export async function onRequestPost(context) {
   ];
   const positiveWords = [
     "apply now",
-    "ship it",
+    "hell yeah ship it",
     "go ahead",
     "do it",
     "yes",
@@ -544,7 +544,10 @@ Rules:
         diff: diffLines.join("\n"),
       },
       safety: { level: safetyLevel, rationale: safetyRationale },
-      confirmation: { required: requiresConfirmation, phrase: "ship it" },
+      confirmation: {
+        required: requiresConfirmation,
+        phrase: "hell yeah ship it",
+      },
       rollback: { supported: true, mode: "rollback_last" },
       command,
     };

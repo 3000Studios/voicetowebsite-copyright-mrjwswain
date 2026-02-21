@@ -9,9 +9,8 @@
       "group": "build"
     },
     {
-      "label": "Repo: Lint",
+      "label": "Repo: Format Check",
       "type": "shell",
-
       "command": "npm run format:check",
       "problemMatcher": [],
       "group": "test"
@@ -33,7 +32,7 @@
     {
       "label": "Repo: Full Check",
       "dependsOrder": "sequence",
-      "dependsOn": ["Repo: Install", "Repo: Lint", "Repo: Build", "Repo: Test"],
+      "dependsOn": ["Repo: Install", "Repo: Format Check", "Repo: Build", "Repo: Test"],
       "problemMatcher": [],
       "group": {
         "kind": "test",
@@ -48,9 +47,27 @@
       "group": "build"
     },
     {
-      "label": "🛡️ Background: Self-Heal Loop",
+      "label": "Repo: Deploy",
       "type": "shell",
-      "command": "npm run self-heal",
+      "command": "npm run deploy",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Repo: Verify"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Repo: Auto Ship",
+      "type": "shell",
+      "command": "npm run auto:ship",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Repo: Verify"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Repo: Heal",
+      "type": "shell",
+      "command": "npm run heal",
       "isBackground": true,
       "problemMatcher": {
         "pattern": {
@@ -75,6 +92,38 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".*VITE.*",
+          "endsPattern": ".*ready in.*"
+        }
+      }
+    },
+    {
+      "label": "⚡ Dev: Worker",
+      "type": "shell",
+      "command": "npm run dev:worker",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Ready on.*",
+          "endsPattern": ".*Listening on.*"
+        }
+      }
+    },
+    {
+      "label": "🔥 Dev: All",
+      "type": "shell",
+      "command": "npm run dev:all",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*starting.*",
           "endsPattern": ".*ready in.*"
         }
       }

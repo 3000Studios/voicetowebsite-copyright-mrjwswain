@@ -16,7 +16,7 @@ const hasPlanSignal = () => {
 const maybeAutoApply = () => {
   if (!autoToggle?.checked) return;
   if (!hasPlanSignal()) return;
-  if (planConfirm) planConfirm.value = "ship it";
+  if (planConfirm) planConfirm.value = "hell yeah ship it";
   if (applyBtn) {
     applyBtn.disabled = false;
     applyBtn.click();

@@ -21,8 +21,12 @@ import {
   handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
 import { handleSupportChatRequest } from "./functions/supportChat.js";
+import { handleCommandCenterRequest } from "./functions/commandCenterApi.js";
 import catalog from "./products.json";
+import { AuditLogDO } from "./src/durable_objects/AuditLogDO.js";
 import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
+import { DeployControllerDO } from "./src/durable_objects/DeployControllerDO.js";
+import { LiveRoomDO } from "./src/durable_objects/LiveRoomDO.js";
 import { handleUICommand } from "./src/functions/uiCommand.js";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
@@ -881,6 +885,19 @@ export default {
         return addSecurityHeaders(
           new Response(JSON.stringify({ ok: true }), { status: 200, headers })
         );
+      }
+
+      const commandCenterResponse = await handleCommandCenterRequest({
+        request,
+        env,
+        url,
+        assets,
+      });
+      if (commandCenterResponse) {
+        return addSecurityHeaders(commandCenterResponse, {
+          cacheControl: "no-store",
+          pragmaNoCache: true,
+        });
       }
 
       if (url.pathname === "/api/blog/comments") {
@@ -2246,10 +2263,17 @@ export default {
         "/admin/access-guard.js",
       ]);
       const isAdminRoot =
-        url.pathname === "/admin" ||
-        url.pathname === "/admin/" ||
-        url.pathname === "/admin/index.html";
-      if (url.pathname.startsWith("/admin/") || isAdminRoot) {
+        url.pathname === "/admin" || url.pathname === "/admin/";
+      const isAdminPath = url.pathname.startsWith("/admin/") || isAdminRoot;
+      const isAdminStaticAsset =
+        /^\/admin\/.+\.(?:css|js|mjs|map|svg|png|jpg|jpeg|gif|webp|ico|woff2?)$/i.test(
+          url.pathname
+        ) && !url.pathname.endsWith(".html");
+      const isAdminHtmlPath =
+        /^\/admin\/.+\.html$/i.test(url.pathname) &&
+        !ADMIN_PUBLIC_PATHS.has(url.pathname);
+
+      if (isAdminPath) {
         const isPublic = ADMIN_PUBLIC_PATHS.has(url.pathname);
         if (!isPublic) {
           const authHeader = String(
@@ -2280,24 +2304,28 @@ export default {
         }
       }
 
-      if (url.pathname === "/admin" || url.pathname === "/admin/") {
-        return Response.redirect(
-          new URL("/admin/integrated-dashboard.html", url.origin),
-          302
+      const shouldServeAdminShell =
+        isAdminRoot ||
+        (isAdminPath &&
+          !ADMIN_PUBLIC_PATHS.has(url.pathname) &&
+          !isAdminStaticAsset) ||
+        isAdminHtmlPath;
+
+      if (shouldServeAdminShell) {
+        const shellUrl = new URL(
+          "/admin/integrated-dashboard.html",
+          url.origin
         );
+        const shellRes = await assets.fetch(new Request(shellUrl, request));
+        return addSecurityHeaders(shellRes, {
+          cacheControl: "no-store",
+          pragmaNoCache: true,
+        });
       }
 
-      if (url.pathname.startsWith("/admin/")) {
+      if (isAdminPath) {
         const adminRes = await assets.fetch(request);
-        if (adminRes.status !== 404) {
-          return addSecurityHeaders(adminRes, {
-            cacheControl: "no-store",
-            pragmaNoCache: true,
-          });
-        }
-        const adminUrl = new URL("/admin/index.html", url.origin);
-        const res = await assets.fetch(new Request(adminUrl, request));
-        return addSecurityHeaders(res, {
+        return addSecurityHeaders(adminRes, {
           cacheControl: "no-store",
           pragmaNoCache: true,
         });
@@ -2602,4 +2630,4 @@ export default {
   },
 };
 
-export { BotHubDO };
+export { AuditLogDO, BotHubDO, DeployControllerDO, LiveRoomDO };

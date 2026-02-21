@@ -45,6 +45,7 @@
     // AI-POWERED CODING
     // ============================================
     "GitHub.copilot",
+    "GitHub.copilot-chat",
     "Continue.continue",
 
     // ============================================
@@ -57,17 +58,11 @@
     // UTILITIES
     // ============================================
     "Gruntfuggly.todo-tree",
-    "PKief.material-icon-theme"
+    "PKief.material-icon-theme",
+    "ms-playwright.playwright",
+    "GitHub.vscode-github-actions",
+    "vitest.explorer"
   ],
 
-  "unwantedRecommendations": [
-    "vscodevim.vim",
-    "ms-vscode.vscode-typescript-tslint-plugin",
-    "ritwickdey.LiveServer",
-    "bradlc.vscode-tailwindcss",
-    "wayou.vscode-todo-highlight",
-    "formulahendry.auto-close-tag",
-    "formulahendry.auto-rename-tag",
-    "Codeium.codeium"
-  ]
+  "unwantedRecommendations": ["vscodevim.vim", "ms-vscode.vscode-typescript-tslint-plugin"]
 }

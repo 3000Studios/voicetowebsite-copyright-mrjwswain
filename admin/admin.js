@@ -34,7 +34,7 @@ const UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 2;
 const positiveWords = [
   "apply now",
-  "ship it",
+  "hell yeah ship it",
   "go ahead",
   "do it",
   "yes",
@@ -422,7 +422,7 @@ planBtn.addEventListener("click", async () => {
     if (data.plan?.actions) {
       applyActionsPreview(data.plan.actions);
     }
-    speak("Plan ready. Say apply now to ship it.");
+    speak("Plan ready. Say apply now and confirm hell yeah ship it.");
   } catch (err) {
     setResponse({ error: err.message });
     speak("Planning failed");
