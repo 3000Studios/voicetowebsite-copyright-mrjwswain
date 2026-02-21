@@ -36,6 +36,7 @@ export default defineConfig({
         adminLive: resolve(__dirname, "admin/live-stream.html"),
         adminStore: resolve(__dirname, "admin/store-manager.html"),
         adminAppStore: resolve(__dirname, "admin/app-store-manager.html"),
+        adminIntegrated: resolve(__dirname, "admin/integrated-dashboard.html"),
         store: resolve(__dirname, "store.html"),
         appstore: resolve(__dirname, "appstore.html"),
         appstoreNew: resolve(__dirname, "appstore-new.html"),

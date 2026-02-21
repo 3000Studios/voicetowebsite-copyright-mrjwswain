@@ -26,6 +26,20 @@ import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
 import { handleUICommand } from "./src/functions/uiCommand.js";
 
 const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self' https: data: blob:",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagmanager.com https://www.google-analytics.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' data: blob: https:",
+  "connect-src 'self' https:",
+  "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.youtube.com",
+  "worker-src 'self' blob:",
+].join("; ");
 
 const jsonResponse = (status, payload) =>
   addSecurityHeaders(
@@ -50,6 +64,9 @@ const addSecurityHeaders = (response, options = {}) => {
     "Permissions-Policy",
     "geolocation=(), microphone=(self), camera=(self)"
   );
+  headers.set("Content-Security-Policy", CONTENT_SECURITY_POLICY);
+  headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
   // Preserve status + statusText; clone body to avoid locking the original response stream.
   return new Response(response.body, {
     status: response.status,
@@ -2170,13 +2187,11 @@ export default {
       }
     }
 
-    if (url.pathname === "/admin") {
-      const adminUrl = new URL("/admin/index.html", url.origin);
-      const res = await assets.fetch(new Request(adminUrl, request));
-      return addSecurityHeaders(res, {
-        cacheControl: "no-store",
-        pragmaNoCache: true,
-      });
+    if (url.pathname === "/admin" || url.pathname === "/admin/") {
+      return Response.redirect(
+        new URL("/admin/integrated-dashboard.html", url.origin),
+        302
+      );
     }
 
     if (url.pathname.startsWith("/admin/")) {
