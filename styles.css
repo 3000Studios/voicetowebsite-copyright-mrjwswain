@@ -4,3 +4,14 @@
 @import "./styles/components.css";
 @import "./styles/animations.css";
 @import "./styles/utilities.css";
+
+
+/* Voice-injected styles */
+.hero-section {
+   text-align: center;
+
+}
+ .activate-button {
+   margin-top: 20px;
+
+}
