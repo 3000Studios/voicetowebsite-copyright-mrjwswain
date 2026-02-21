@@ -12,6 +12,14 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        const path = window.location.pathname;
+        if (path === "/admin" || path === "/admin/" || path.endsWith("/admin/index.html")) {
+          window.location.replace("/admin/integrated-dashboard.html");
+        }
+      })();
+    </script>
     <style>
       /* Admin Dashboard Specific Styles */
       .eyebrow {
