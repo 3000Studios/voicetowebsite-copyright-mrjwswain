@@ -3,462 +3,116 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>VoiceToWebsite | Admin Command Center</title>
-    <meta name="description" content="Autonomous Voice-to-Website Command Center." />
+    <title>VoiceToWebsite | Admin Dashboard</title>
+    <meta name="description" content="Integrated Admin Dashboard for VoiceToWebsite" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
     <link rel="stylesheet" href="./particle-wallpaper.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <style>
-      /* Inline overrides for the Neural Gate + Command Center hybrid */
-      .command-interface {
-        display: grid;
-        gap: 2rem;
-        margin-top: 2rem;
-        position: relative;
-        z-index: 100;
-        background: rgba(5, 7, 10, 0.85);
-        backdrop-filter: blur(20px);
-        padding: 2rem;
-        border-radius: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+      /* Admin Dashboard Specific Styles */
+      .eyebrow {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #3b82f6;
+        margin-bottom: 0.5rem;
       }
 
-      .status-bar {
+      .raised-text {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .glass-metal {
+        background: rgba(15, 23, 42, 0.8);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb, #1e40af);
+        transform: translateY(-1px);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: #e2e8f0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+      }
+
+      .btn-lg {
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+      }
+
+      .section-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 2rem;
       }
 
-      .mic-controls {
+      .activity-row {
         display: flex;
-        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.875rem;
+      }
+
+      .media-frame {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.3);
+        aspect-ratio: 16/9;
+      }
+
+      .media-frame video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     </style>
   </head>
   <body>
-    <div class="admin-particle-wallpaper">
-      <iframe src="./wallpaper.html"></iframe>
-    </div>
-    <div class="video-bg" aria-hidden="true">
-      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
-    </div>
-    <div class="noise-overlay" aria-hidden="true"></div>
-    <a class="vtw-skip-link" href="#auth-form">Skip to login</a>
-
-    <!-- LOCK SCREEN REMOVED -->
-
-    <!-- MAIN ADMIN SHELL -->
-    <div class="admin-shell admin-landing-shell">
-      <!-- NAVIGATION HEADER -->
-      <header class="admin-header">
-        <div class="brand">
-          <div class="brand-mark">J</div>
-          <div class="brand-text">
-            <strong>JULES</strong>
-            <span>Command Center</span>
-          </div>
-        </div>
-        <div class="status-chip warn" id="session-state">Locked</div>
-      </header>
-
-      <!-- COMMAND CENTER INTERFACE -->
-      <div class="command-interface" id="console">
-        <section class="card wide admin-hero-card" id="voice-first">
-          <div class="admin-hero-grid">
-            <div class="admin-hero-copy">
-              <p class="eyebrow">Voice-first control</p>
-              <h2>Speak or type a change. It updates instantly.</h2>
-              <p class="muted">
-                This admin is built for one job: you say it, it ships it. Use Voice Control for live commands, or
-                Command Center for structured planning + deploy.
-              </p>
-              <div class="button-row">
-                <a class="primary" href="integrated-dashboard.html">Open Integrated Dashboard</a>
-                <a class="ghost" href="voice-commands.html">Voice Control Only</a>
-                <a class="ghost" href="test-lab-1.html">Agent Control</a>
-              </div>
-            </div>
-            <div class="admin-hero-media">
-              <video src="/media/vtw-opener.mp4" autoplay muted loop playsinline></video>
-              <span class="media-caption">Say it. Ship it. Monitor it.</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="card wide">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Quick Start</p>
-              <h2>Three steps to live updates</h2>
-              <p class="muted">Simple flow: speak → preview → deploy.</p>
-            </div>
-          </div>
-          <div class="help-grid">
-            <div class="help-card">
-              <div class="hint-title">1) Start Voice</div>
-              <p class="muted">Open Voice Control and press Start.</p>
-            </div>
-            <div class="help-card">
-              <div class="hint-title">2) Say the change</div>
-              <p class="muted">Example: “Change headline to AI in Motion.”</p>
-            </div>
-            <div class="help-card">
-              <div class="hint-title">3) Ship it</div>
-              <p class="muted">Autonomous mode applies + deploys for you.</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="card wide">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">Visual Map</p>
-              <h2>What does what</h2>
-              <p class="muted">Each card shows the tool and its primary job.</p>
-            </div>
-          </div>
-          <div class="media-strip">
-            <a class="media-card" href="voice-commands.html">
-              <video src="/media/vtw-animated-logo.mp4" autoplay muted loop playsinline></video>
-              <div class="media-card__body">
-                <strong>Voice Control</strong>
-                <span>Speak updates, run commands, ship changes.</span>
-              </div>
-            </a>
-            <a class="media-card" href="index.html#console">
-              <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
-              <div class="media-card__body">
-                <strong>Command Center</strong>
-                <span>Plan, preview, apply, deploy with logs.</span>
-              </div>
-            </a>
-            <a class="media-card" href="test-lab-1.html">
-              <video src="/media/vtw-home-wallpaper.mp4" autoplay muted loop playsinline></video>
-              <div class="media-card__body">
-                <strong>Agent Control</strong>
-                <span>Autonomy, remote access, and system status.</span>
-              </div>
-            </a>
-          </div>
-        </section>
-
-        <!-- ADMIN HUB -->
-        <section class="card wide" id="admin-hub-card">
-          <div class="card-head">
-            <div>
-              <p class="eyebrow">Admin hub</p>
-              <h2>All Admin Pages</h2>
-              <p class="muted">One place to run ops: commands, products, apps, analytics, and live tools.</p>
-            </div>
-            <div class="status-strip">
-              <span class="status-chip" id="hub-auth">Locked</span>
-              <span class="status-chip" id="hub-config">Config: —</span>
-            </div>
-          </div>
-
-          <div class="admin-feature-grid" style="margin-top: 1.2rem">
-            <a
-              class="feature-card"
-              href="integrated-dashboard.html"
-              aria-label="Open Integrated Admin Dashboard"
-              style="
-                background: linear-gradient(135deg, rgba(0, 247, 255, 0.1), rgba(139, 92, 246, 0.1));
-                border: 2px solid rgba(0, 247, 255, 0.3);
-              "
-            >
-              <div
-                class="icon-square"
-                aria-hidden="true"
-                style="color: #00f7ff; border-color: #00f7ff; font-size: 1.5rem"
-              >
-                🎯
-              </div>
-              <h3>Integrated Dashboard</h3>
-              <p><strong>Complete admin hub with all tools in one place</strong></p>
-            </a>
-
-            <a class="feature-card" href="bot-command-center.html" aria-label="Open Boss Bot">
-              <div class="icon-square" aria-hidden="true" style="color: #00f2ff; border-color: #00f2ff">BB</div>
-              <h3>Boss Bot</h3>
-              <p>Orchestrate Jules, Sentinel, Bolt, and Palette.</p>
-            </a>
-
-            <a class="feature-card" href="voice-commands.html" aria-label="Open voice commands">
-              <div class="icon-square" aria-hidden="true">VC</div>
-              <h3>Voice Commands</h3>
-              <p>Run live prompts, capture transcripts, and ship changes.</p>
-            </a>
-
-            <a class="feature-card" href="customer-chat.html" aria-label="Open customer chat inbox">
-              <div class="icon-square" aria-hidden="true" style="color: #31f6b6; border-color: #31f6b6">CC</div>
-              <h3>Customer Chat</h3>
-              <p>Inbox, respond, and use voice for hands-free support.</p>
-            </a>
-
-            <a class="feature-card" href="store-manager.html" aria-label="Open store manager">
-              <div class="icon-square" aria-hidden="true">ST</div>
-              <h3>Store Manager</h3>
-              <p>Manage products, Stripe Buy Buttons, and payment links.</p>
-            </a>
-
-            <a class="feature-card" href="app-store-manager.html" aria-label="Open app store manager">
-              <div class="icon-square" aria-hidden="true">AP</div>
-              <h3>App Store Manager</h3>
-              <p>Curate apps, publish listings, and attach media.</p>
-            </a>
-
-            <a class="feature-card" href="analytics.html" aria-label="Open analytics dashboard">
-              <div class="icon-square" aria-hidden="true">AN</div>
-              <h3>Analytics</h3>
-              <p>Cloudflare traffic telemetry + sales endpoints.</p>
-            </a>
-
-            <a class="feature-card" href="nexus.html" aria-label="Open Nexus intelligence hub">
-              <div class="icon-square" aria-hidden="true" style="color: #f472b6; border-color: #f472b6">NX</div>
-              <h3>Nexus</h3>
-              <p>Review Claude artifacts and copy assets into ops pipelines.</p>
-            </a>
-
-            <a class="feature-card" href="live-stream.html" aria-label="Open live stream tools">
-              <div class="icon-square" aria-hidden="true">LS</div>
-              <h3>Live Stream</h3>
-              <p>Configure embeds, clips, and show overlays.</p>
-            </a>
-
-            <a class="feature-card" href="test-lab-1.html" aria-label="Open admin lab 1">
-              <div class="icon-square" aria-hidden="true">L1</div>
-              <h3>Lab 1</h3>
-              <p>Private test page (future additions).</p>
-            </a>
-
-            <a class="feature-card" href="test-lab-2.html" aria-label="Open admin lab 2">
-              <div class="icon-square" aria-hidden="true">L2</div>
-              <h3>Lab 2</h3>
-              <p>Private test page (future additions).</p>
-            </a>
-
-            <a class="feature-card" href="test-lab-3.html" aria-label="Open admin lab 3">
-              <div class="icon-square" aria-hidden="true">L3</div>
-              <h3>Lab 3</h3>
-              <p>Private test page (future additions).</p>
-            </a>
-
-            <a class="feature-card" href="/the3000.html" aria-label="Open The 3000 page">
-              <div class="icon-square" aria-hidden="true">3K</div>
-              <h3>The 3000</h3>
-              <p>Legacy 3000 page link.</p>
-            </a>
-          </div>
-        </section>
-
-        <!-- SNAPSHOT -->
-        <section class="card wide" id="admin-snapshot-card">
-          <div class="card-head">
-            <div>
-              <p class="eyebrow">At-a-glance</p>
-              <h2>Profit Readiness Snapshot</h2>
-              <p class="muted">No secrets shown. Only status + counts.</p>
-            </div>
-            <div class="status-strip">
-              <span class="status-chip" id="hub-snapshot-status">Waiting...</span>
-              <button class="ghost small" id="hub-refresh" type="button">Refresh</button>
-            </div>
-          </div>
-
-          <div class="analytics-kpis" style="margin-top: 1.2rem">
-            <div class="metric-card">
-              <div class="metric-label">Requests (12h)</div>
-              <div class="metric-value" id="hub-requests">—</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Uniques (12h)</div>
-              <div class="metric-value" id="hub-uniques">—</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Products</div>
-              <div class="metric-value" id="hub-products">—</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Missing Buy Buttons</div>
-              <div class="metric-value" id="hub-missing-buttons">—</div>
-            </div>
-          </div>
-
-          <div class="table-shell" style="margin-top: 1.2rem">
-            <div class="table-head">
-              <h3>Payments configuration</h3>
-            </div>
-            <table class="app-table">
-              <thead>
-                <tr>
-                  <th>Provider</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Stripe publishable</td>
-                  <td id="hub-stripe-pub">—</td>
-                </tr>
-                <tr>
-                  <td>Stripe secret</td>
-                  <td id="hub-stripe-secret">—</td>
-                </tr>
-                <tr>
-                  <td>PayPal client ID</td>
-                  <td id="hub-paypal">—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- STATUS & MIC -->
-        <div class="status-bar">
-          <div>
-            <span class="status-label">System Status</span>
-            <div class="status-value" id="status">Initializing...</div>
-          </div>
-          <div>
-            <span class="status-label">Orchestrator</span>
-            <div class="status-chip warn" id="orchestrator-state">Offline</div>
-          </div>
-          <div class="mic-controls">
-            <button class="primary" id="start">Start Voice</button>
-            <button class="secondary" id="stop">Stop</button>
-            <span class="status-chip" id="mic-state">Idle</span>
-          </div>
-        </div>
-
-        <!-- INPUT & CONTROLS -->
-        <div class="control-box">
-          <div class="control-main">
-            <label class="field-label" for="command">Command Input</label>
-            <textarea
-              id="command"
-              placeholder="Describe the change you want... (e.g. 'Change headline to Future of Web', 'Add a pricing section')"
-            ></textarea>
-
-            <div class="quick-commands" style="margin-top: 0.75rem">
-              <span class="quick-label">Target:</span>
-              <select
-                id="target-mode"
-                style="
-                  background: rgba(255, 255, 255, 0.06);
-                  border: 1px solid rgba(255, 255, 255, 0.12);
-                  padding: 0.6rem 0.9rem;
-                  border-radius: 999px;
-                  color: white;
-                "
-              >
-                <option value="sandbox" selected>Sandbox (Recommended)</option>
-                <option value="site">Live site (Danger)</option>
-              </select>
-              <span class="muted small">Sandbox edits `sandbox.html` only.</span>
-            </div>
-
-            <div class="quick-commands" id="quick-commands">
-              <span class="quick-label">Quick:</span>
-              <button class="chip" data-command="Deploy site">Deploy</button>
-              <button class="chip" data-command="Show analytics">Analytics</button>
-              <button class="chip" data-command="Theme to midnight">Midnight Theme</button>
-            </div>
-
-            <div
-              style="
-                margin: 1rem 0;
-                padding: 0.5rem;
-                background: rgba(255, 200, 0, 0.1);
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-              "
-            >
-              <input type="checkbox" id="autonomous-mode" style="width: 1.2rem; height: 1.2rem" checked />
-              <label for="autonomous-mode" style="font-weight: bold; cursor: pointer"
-                >Autonomous Mode (Auto-Plan & Auto-Deploy)</label
-              >
-            </div>
-
-            <div class="button-grid">
-              <button class="primary" id="plan">Plan Change</button>
-              <input
-                type="text"
-                id="plan-confirm"
-                placeholder='Type "ship it" to confirm'
-                style="
-                  background: rgba(255, 255, 255, 0.05);
-                  border: 1px solid rgba(255, 255, 255, 0.1);
-                  padding: 0.8rem;
-                  border-radius: 999px;
-                  color: white;
-                  text-align: center;
-                "
-              />
-              <button class="primary" id="apply" disabled>Apply & Deploy</button>
-              <button class="ghost" id="undo">Undo Last</button>
-            </div>
-          </div>
-
-          <!-- LOGS & RESPONSE -->
-          <div class="response-panel">
-            <div class="panel-head">
-              <span class="field-label">System Response</span>
-              <span class="status-chip" id="response-source">Waiting</span>
-            </div>
-            <pre id="response">Awaiting input...</pre>
-            <div id="plan-summary" class="muted small"></div>
-          </div>
-        </div>
-
-        <!-- PREVIEW SECTION -->
-        <div class="preview-shell">
-          <div class="preview-controls">
-            <h3 class="field-label">Live Preview</h3>
-            <div class="button-row">
-              <button class="ghost small" id="preview-speak">Read Summary</button>
-              <button class="ghost small" id="preview-reset">Reset Preview</button>
-              <span class="status-chip" id="preview-mode">Idle</span>
-            </div>
-          </div>
-          <div class="preview-stage solo">
-            <iframe id="preview-frame" src="/sandbox.html" title="Site Preview"></iframe>
-          </div>
-          <div class="preview-extras" id="preview-extras"></div>
-        </div>
-
-        <!-- ACTIVITY LOGS -->
-        <div class="activity-section">
-          <div class="panel-head">
-            <h3>Activity Log</h3>
-            <button class="ghost small" id="refresh-logs">Refresh</button>
-          </div>
-          <p class="muted" id="activity-status">Ready to load.</p>
-          <ul class="activity-list" id="activity-list"></ul>
-        </div>
-
-        <!-- TRANSCRIPTS -->
-        <div class="transcript-section">
-          <h3>Voice Transcripts</h3>
-          <p class="muted" id="transcript-status">No transcripts.</p>
-          <ul class="activity-list" id="transcript-list"></ul>
-        </div>
-      </div>
-    </div>
-
-    <script type="module" src="./admin.js"></script>
-    <script type="module" src="./auto-mode.js"></script>
-    <script type="module" src="./hub.js"></script>
-    <script type="module" src="../nav.js"></script>
+    <div id="root"></div>
     <script type="module" src="./access-guard.js"></script>
+    <script type="module" src="../src/admin-dashboard/main.tsx"></script>
   </body>
 </html>

@@ -1,58 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;700&family=Syncopate:wght@700&family=JetBrains+Mono:wght@300;500&display=swap");
-
-:root {
-  /* Enhanced Color Palette */
-  --bg-color: #0b1222;
-  --bg-obsidian: var(--bg-color);
-  --bg-surface: rgba(15, 23, 42, 0.8);
-  --bg-surface-elevated: rgba(30, 41, 59, 0.9);
-  --text-color: #f8fbff;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent-color: #7dd3fc;
-  --accent-rgb: 125, 211, 252;
-  --accent-glow: rgba(125, 211, 252, 0.45);
-  --accent-warm: #fbbf24;
-  --accent-cool: #22d3ee;
-  --crystal-nav-bg: #030712;
-  --crystal-primary: #f0f9ff;
-  --crystal-accent: #38bdf8;
-  --crystal-deep: #1e3a8a;
-
-  /* Plasma Navigation Colors */
-  --plasma-cyan: #00f2ff;
-  --plasma-magenta: #ff00ea;
-  --plasma-bg: rgba(5, 5, 15, 0.85);
-  --plasma-glow: 0 0 15px rgba(0, 242, 255, 0.6);
-
-  /* Original CSS Variables */
-  --crystal-prism-1: rgba(56, 189, 248, 0.4);
-  --crystal-prism-2: rgba(168, 85, 247, 0.4);
-  --crystal-shard-speed: 0.8s;
-  --crystal-font-code: var(--font-mono);
-  --crystal-font-sans: var(--font-heading);
-  --accent-success: #10b981;
-  --accent-warning: #f59e0b;
-  --accent-error: #ef4444;
-  --error-color: #f43f5e;
-  --success-color: #10b981;
-  --muted: rgba(233, 241, 255, 0.72);
-  --panel-bg: rgba(12, 18, 35, 0.82);
-
-  /* Enhanced Typography */
-  --font-family:
-    "Inter", "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto,
-    Arial, sans-serif;
-  --font-heading:
-    "Outfit", "Space Grotesk", "Inter", system-ui, -apple-system, "Segoe UI",
-    Roboto, Arial, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
-  --font-display: "Orbitron", sans-serif;
-
-  /* Enhanced Spacing & Sizing */
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-}
+@import "./src/design-system.css";
+@import "./src/layout-system.css";
 
 /* Plasma Navigation Styles */
 .flash-nav {
@@ -60,17 +7,18 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 80px;
-  z-index: 1000;
+  height: var(--nav-height);
+  z-index: var(--z-fixed);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--plasma-bg);
+  background: var(--bg-overlay);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color);
   overflow: hidden;
   perspective: 1000px;
-  padding: 0 2rem;
+  padding: 0 var(--space-8);
 }
 
 /* Canvas Background */
@@ -169,21 +117,21 @@
 .plasma-nav-link {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  gap: var(--space-2);
+  color: var(--text-secondary);
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-family-mono);
 }
 
 .plasma-nav-link:hover {
-  color: var(--plasma-cyan);
+  color: var(--color-primary);
   background: rgba(0, 242, 255, 0.1);
   border: 1px solid rgba(0, 242, 255, 0.3);
   transform: translateY(-2px);
@@ -220,8 +168,8 @@
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: clamp(4px, 0.5vw, 6px);
+  height: clamp(4px, 0.5vw, 6px);
   background: var(--plasma-cyan);
   border-radius: 50%;
   animation: pulse 2s infinite;
@@ -240,8 +188,8 @@
 /* Explosion Fragments */
 .fragment {
   position: fixed;
-  width: 4px;
-  height: 4px;
+  width: clamp(3px, 0.4vw, 4px);
+  height: clamp(3px, 0.4vw, 4px);
   background: var(--plasma-cyan);
   pointer-events: none;
   z-index: 2000;
@@ -797,7 +745,7 @@ h3,
 
 .footer-link {
   display: block;
-  color: #888;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.9rem;
   margin-bottom: 12px;
@@ -818,8 +766,8 @@ h3,
 }
 
 .social-btn {
-  width: 50px;
-  height: 50px;
+  width: clamp(40px, 4vw, 50px);
+  height: clamp(40px, 4vw, 50px);
   border: 1px solid var(--plate-border);
   display: flex;
   align-items: center;
@@ -843,7 +791,7 @@ h3,
 }
 
 .social-btn:hover {
-  border-color: #fff;
+  border-color: var(--border-color-hover);
   transform: translateY(-5px) rotate(10deg);
   box-shadow: 0 0 20px rgba(0, 243, 243, 0.4);
 }
@@ -853,8 +801,8 @@ h3,
 }
 
 .social-btn svg {
-  width: 20px;
-  height: 20px;
+  width: clamp(16px, 2vw, 20px);
+  height: clamp(16px, 2vw, 20px);
   fill: currentColor;
 }
 
@@ -1085,7 +1033,7 @@ h3,
   position: absolute;
   top: 100%;
   right: 0;
-  width: 200px;
+  width: clamp(180px, 20vw, 200px);
   background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
@@ -1095,6 +1043,7 @@ h3,
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.2s ease;
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
@@ -1115,7 +1064,7 @@ h3,
 .nav-dropdown-menu a {
   display: block;
   padding: 0.6rem 1.2rem;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 0.8rem;
   text-transform: none;
   letter-spacing: normal;
@@ -1688,8 +1637,8 @@ html {
 }
 
 .loading-dots span {
-  width: 8px;
-  height: 8px;
+  width: clamp(6px, 1vw, 8px);
+  height: clamp(6px, 1vw, 8px);
   border-radius: 50%;
   background: var(--accent-color);
   animation: loading-bounce 1.4s infinite ease-in-out both;
@@ -1886,8 +1835,8 @@ html {
   position: absolute;
   top: 0.8rem;
   right: 0.8rem;
-  width: 36px;
-  height: 36px;
+  width: clamp(32px, 3vw, 36px);
+  height: clamp(32px, 3vw, 36px);
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.3);
   background: rgba(15, 23, 42, 0.8);
@@ -2578,8 +2527,8 @@ html {
 .nav-toggle {
   position: relative;
   z-index: 2;
-  width: 42px;
-  height: 42px;
+  width: clamp(36px, 3vw, 42px);
+  height: clamp(36px, 3vw, 42px);
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.08);
@@ -3704,6 +3653,7 @@ h2 {
   border-radius: 22px;
   padding: 1.2rem;
   background: rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
@@ -4653,6 +4603,7 @@ button.ghost:hover {
   padding: 1.4rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
   min-height: 220px;
@@ -5201,6 +5152,7 @@ button.ghost:hover {
   background: rgba(0, 0, 0, 0.45);
   color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   transition: var(--transition-smooth);

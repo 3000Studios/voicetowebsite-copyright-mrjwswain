@@ -11,8 +11,9 @@
     {
       "label": "Repo: Lint",
       "type": "shell",
-      "command": "npm run lint",
-      "problemMatcher": ["$eslint-stylish"],
+
+      "command": "npm run format:check",
+      "problemMatcher": [],
       "group": "test"
     },
     {
@@ -37,6 +38,29 @@
       "group": {
         "kind": "test",
         "isDefault": true
+      }
+    },
+    {
+      "label": "Repo: Verify",
+      "type": "shell",
+      "command": "npm run verify",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "🛡️ Background: Self-Heal Loop",
+      "type": "shell",
+      "command": "npm run self-heal",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".*"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Self-heal loop starting.*",
+          "endsPattern": ".*cycle complete.*"
+        }
       }
     },
     {
