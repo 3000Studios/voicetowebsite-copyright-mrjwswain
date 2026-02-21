@@ -178,6 +178,7 @@ Scripts available:
 - `scripts/autopilot.mjs`
 - `scripts/check-css-governance.mjs`
 - `scripts/css-budget-validator.mjs`
+- `scripts/deploy-ai-agent-3k.ps1`
 - `scripts/dev-all.mjs`
 - `scripts/env-audit.mjs`
 - `scripts/generate-config.mjs`

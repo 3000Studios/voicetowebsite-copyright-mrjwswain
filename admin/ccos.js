@@ -8,6 +8,7 @@ const state = {
   lastVoicePlan: null,
   lastPreviews: [],
   analytics: null,
+  deployInProgress: false,
 };
 
 const byId = (id) => document.getElementById(id);
@@ -58,8 +59,11 @@ const refreshDeployLogs = async () => {
 const deployFromTopbar = async () => {
   const phrase = String(byId("deploy-confirm")?.value || "").trim();
   if (phrase !== CONFIRMATION_PHRASE) return;
+  if (state.deployInProgress) return; // Prevent concurrent deploys
+
   const button = byId("deploy-button");
   const statusEl = byId("deploy-rail-status");
+  state.deployInProgress = true;
   button.disabled = true;
   statusEl.textContent = "Running deploy pipeline...";
   try {
@@ -74,6 +78,7 @@ const deployFromTopbar = async () => {
   } catch (error) {
     statusEl.textContent = `Deploy failed: ${error.message}`;
   } finally {
+    state.deployInProgress = false;
     syncDeployPhraseGate();
   }
 };
@@ -82,7 +87,7 @@ const syncDeployPhraseGate = () => {
   const phrase = String(byId("deploy-confirm")?.value || "").trim();
   const matches = phrase === CONFIRMATION_PHRASE;
   const button = byId("deploy-button");
-  button.disabled = !matches;
+  button.disabled = !matches || state.deployInProgress;
 };
 
 const normalizeRoute = (path) => {
@@ -545,6 +550,13 @@ const ROUTES = {
 };
 
 const wireCommonNav = () => {
+  // Remove existing event listeners to prevent memory leaks
+  document.querySelectorAll("[data-route]").forEach((el) => {
+    const newEl = el.cloneNode(true);
+    el.parentNode.replaceChild(newEl, el);
+  });
+
+  // Add new event listeners
   document.querySelectorAll("[data-route]").forEach((el) => {
     el.addEventListener("click", () => navigate(el.getAttribute("data-route")));
   });
