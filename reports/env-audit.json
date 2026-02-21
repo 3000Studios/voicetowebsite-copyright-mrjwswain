@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-21T07:34:20.888Z",
+  "generatedAt": "2026-02-21T20:42:49.407Z",
   "scannedFiles": 313,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
@@ -36,6 +36,8 @@
     "CF_API_TOKEN2",
     "CF_AUTO_DEPLOY_ON_PUSH",
     "CF_DEPLOY_HOOK_URL",
+    "CF_FORCE_DEPLOY_HOOK",
+    "CF_FORCE_DEPLOY_WEBHOOK",
     "CF_PAGES_DEPLOY_HOOK",
     "CF_USER_TOKEN",
     "CF_WORKERS_BUILDS_AUTO_DEPLOY",
@@ -257,6 +259,8 @@
     "BASE_URL",
     "CF_A",
     "CF_AUTO_DEPLOY_ON_PUSH",
+    "CF_FORCE_DEPLOY_HOOK",
+    "CF_FORCE_DEPLOY_WEBHOOK",
     "CI",
     "CLOUDFLARE_WORKER_NAME",
     "CONFIRM_TOKEN_SECRET",
@@ -373,6 +377,8 @@
     "CF_API_TOKEN2": ["worker.js"],
     "CF_AUTO_DEPLOY_ON_PUSH": ["functions/orchestrator.js"],
     "CF_DEPLOY_HOOK_URL": ["functions/orchestrator.js"],
+    "CF_FORCE_DEPLOY_HOOK": ["functions/orchestrator.js"],
+    "CF_FORCE_DEPLOY_WEBHOOK": ["functions/orchestrator.js"],
     "CF_PAGES_DEPLOY_HOOK": ["functions/orchestrator.js"],
     "CF_USER_TOKEN": ["worker.js"],
     "CF_WORKERS_BUILDS_AUTO_DEPLOY": ["functions/orchestrator.js"],

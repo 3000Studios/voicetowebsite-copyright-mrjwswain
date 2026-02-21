@@ -990,6 +990,12 @@ Rules:
     }
   };
   const triggerDeployment = async (commitSha, intent) => {
+    const isEnabled = (value) =>
+      ["1", "true", "yes", "on"].includes(
+        String(value || "")
+          .trim()
+          .toLowerCase()
+      );
     const allowLegacyHooks =
       String(env.CF_ALLOW_LEGACY_DEPLOY_HOOKS || "").trim() === "1";
     const legacyHookUrl = allowLegacyHooks
@@ -997,12 +1003,20 @@ Rules:
       : "";
     const hookUrl =
       env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK || legacyHookUrl;
-    const autoDeployOnPush =
-      String(
-        env.CF_WORKERS_BUILDS_AUTO_DEPLOY || env.CF_AUTO_DEPLOY_ON_PUSH || ""
-      )
-        .trim()
-        .toLowerCase() === "1";
+    const autoDeployOnPush = isEnabled(
+      env.CF_WORKERS_BUILDS_AUTO_DEPLOY || env.CF_AUTO_DEPLOY_ON_PUSH || ""
+    );
+    const forceHook = isEnabled(
+      env.CF_FORCE_DEPLOY_HOOK || env.CF_FORCE_DEPLOY_WEBHOOK || ""
+    );
+    if (autoDeployOnPush && commitSha && !forceHook) {
+      return {
+        status: "queued",
+        deploymentId: commitSha,
+        message:
+          "Queued via Workers Builds auto-deploy on Git push (deploy hook bypassed).",
+      };
+    }
     if (!hookUrl) {
       if (autoDeployOnPush && commitSha) {
         return {
@@ -1032,6 +1046,13 @@ Rules:
           parsed?.id || parsed?.deploymentId || parsed?.deployment_id || "";
       } catch (_) {
         deploymentId = res.headers.get("cf-ray") || "";
+      }
+      if (!res.ok && autoDeployOnPush && commitSha) {
+        return {
+          status: "queued",
+          deploymentId: commitSha,
+          message: `Deploy hook failed (${res.status}); fallback queued via Workers Builds auto-deploy on push.`,
+        };
       }
       return {
         status: res.ok ? "triggered" : "failed",

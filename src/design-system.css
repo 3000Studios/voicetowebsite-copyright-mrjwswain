@@ -3,7 +3,7 @@
  * Single source of truth for all design tokens
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;600;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap");
 
 :root {
   /* === COLOR SYSTEM === */
@@ -39,13 +39,14 @@
   --border-color-hover: rgba(255, 255, 255, 0.2);
   --surface-glass: rgba(255, 255, 255, 0.05);
 
-  /* === TYPOGRAPHY SYSTEM === */
+  /* Font Families */
   --font-family-primary:
     "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-family-heading:
     "Outfit", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial,
     sans-serif;
   --font-family-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-family-accent: "Orbitron", "Outfit", sans-serif;
 
   /* Font Sizes - clamp() for responsive */
   --font-size-xs: clamp(0.75rem, 0.8rem, 0.875rem);
@@ -468,4 +469,88 @@
   .xl\:grid {
     display: grid;
   }
+}
+
+/* Enhanced Font Utilities */
+.font-inter {
+  font-family: var(--font-family-primary);
+}
+
+.font-outfit {
+  font-family: var(--font-family-heading);
+}
+
+.font-orbitron {
+  font-family: var(--font-family-accent);
+}
+
+.font-jetbrains {
+  font-family: var(--font-family-mono);
+}
+
+/* Background gradients */
+.bg-radial-atmosphere {
+  background-image:
+    radial-gradient(
+      1200px circle at 12% -10%,
+      rgba(255, 255, 255, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      1100px circle at 90% 15%,
+      rgba(34, 211, 238, 0.14),
+      transparent 62%
+    ),
+    radial-gradient(
+      800px circle at 30% 80%,
+      rgba(251, 191, 36, 0.1),
+      transparent 65%
+    ),
+    linear-gradient(180deg, rgba(8, 12, 24, 0.78), rgba(8, 12, 24, 0.95)),
+    linear-gradient(120deg, rgba(10, 20, 40, 0.97), rgba(7, 10, 22, 0.99));
+  background-size: cover;
+  background-position: center;
+}
+
+/* Particle positioning utilities */
+.particle-random {
+  position: absolute;
+}
+
+/* Enhanced particle animations */
+.particle-container {
+  position: absolute;
+  inset: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.bg-cover-center {
+  background-size: cover;
+  background-position: center;
+}
+
+/* Enhanced typography classes */
+.typography-heading {
+  font-family: var(--font-family-accent);
+  font-weight: var(--font-weight-black);
+  line-height: var(--line-height-tight);
+}
+
+.typography-body {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-relaxed);
+}
+
+.typography-mono {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-medium);
 }

@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-02-21T07:34:20.888Z
+Generated: 2026-02-21T20:42:49.407Z
 
 ## Summary
 
 - Scanned files: 313
-- Used keys: 131
+- Used keys: 133
 - Defined keys: 108
-- Missing keys: 49
+- Missing keys: 51
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -51,6 +51,8 @@ Generated: 2026-02-21T07:34:20.888Z
 | CF_API_TOKEN2                            | yes     | 1             | ok      |
 | CF_AUTO_DEPLOY_ON_PUSH                   | no      | 1             | missing |
 | CF_DEPLOY_HOOK_URL                       | yes     | 1             | ok      |
+| CF_FORCE_DEPLOY_HOOK                     | no      | 1             | missing |
+| CF_FORCE_DEPLOY_WEBHOOK                  | no      | 1             | missing |
 | CF_PAGES_DEPLOY_HOOK                     | yes     | 1             | ok      |
 | CF_USER_TOKEN                            | yes     | 1             | ok      |
 | CF_WORKERS_BUILDS_AUTO_DEPLOY            | yes     | 1             | ok      |

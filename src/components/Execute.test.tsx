@@ -322,6 +322,62 @@ describe("/api/execute", () => {
     expect(deployBody.eventType).toBe("deployed");
   });
 
+  it("auto falls back to deploy when apply returns no supported changes", async () => {
+    const modes: string[] = [];
+    mockedHandleOrchestrator.mockImplementation(
+      async ({ request }: { request: Request }) => {
+        const payload = await request.json();
+        modes.push(String(payload.mode || ""));
+        if (payload.mode === "apply") {
+          return new Response(
+            JSON.stringify({
+              error: "No supported changes were produced by the plan.",
+            }),
+            {
+              status: 400,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+        return new Response(
+          JSON.stringify({
+            mode: payload.mode,
+            deployment: { status: "queued", deploymentId: "abc123" },
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+    );
+
+    const response = await handleExecute({
+      request: makeRequest(
+        {
+          action: "auto",
+          idempotencyKey: "auto-001",
+          command:
+            'Update the homepage header to say exactly: "Boom shakalaka."',
+        },
+        { "x-orch-token": "test-orch-token" }
+      ),
+      env: { ORCH_TOKEN: "test-orch-token" },
+      ctx: {},
+    });
+
+    expect(response.status).toBe(200);
+    expect(modes).toEqual(["apply", "deploy"]);
+    const body = await response.json();
+    expect(body.eventType).toBe("applied");
+    expect(body.result.noChanges).toBe(true);
+    expect(body.result.steps).toEqual([
+      "planned",
+      "no_changes",
+      "deploy_triggered",
+    ]);
+  });
+
   it("allows deploy after apply with the same confirmToken when D1 is enabled", async () => {
     const env = { D1: new InMemoryD1(), ORCH_TOKEN: "test-orch-token" };
 

@@ -104,8 +104,12 @@ class AudioEngine {
         this.musicSource = source;
         this.analyser = analyser;
         this.musicGain = gain;
-        this.analyserTimeData = new Uint8Array(analyser.frequencyBinCount);
-        this.analyserFreqData = new Uint8Array(analyser.frequencyBinCount);
+        this.analyserTimeData = new Uint8Array(
+          analyser.frequencyBinCount
+        ) as Uint8Array<ArrayBuffer>;
+        this.analyserFreqData = new Uint8Array(
+          analyser.frequencyBinCount
+        ) as Uint8Array<ArrayBuffer>;
       } catch (err) {
         // Fallback to direct element playback if the graph cannot be constructed.
         audio.volume = this.currentVolume;

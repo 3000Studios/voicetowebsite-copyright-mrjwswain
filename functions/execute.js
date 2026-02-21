@@ -1105,6 +1105,60 @@ export async function onRequestPost(context) {
             applyResult?.error ||
             applyResult?.message ||
             "Auto-apply failed with unknown error.";
+          const normalizedError = String(errorMessage).toLowerCase();
+          const isNoOpPlan = normalizedError.includes(
+            "no supported changes were produced by the plan"
+          );
+          if (isNoOpPlan) {
+            logger.info(
+              "Auto apply produced no supported changes; triggering deploy fallback",
+              { command: payload.command }
+            );
+            const deployResponse = await runOrchestrator(context, {
+              mode: "deploy",
+              command: payload.command || "Deploy latest approved changes",
+              target: payload.target,
+              page: payload.page,
+              path: payload.path,
+              file: payload.file,
+            });
+            const deployResult = await decodeJsonResponse(deployResponse);
+            if (!deployResponse.ok) {
+              const deployError =
+                deployResult?.error ||
+                deployResult?.message ||
+                "Deploy fallback failed.";
+              logger.error("Auto deploy fallback failed", {
+                error: deployError,
+              });
+              throw new Error(deployError);
+            }
+            const result = {
+              ...deployResult,
+              autoMode: true,
+              noChanges: true,
+              steps: ["planned", "no_changes", "deploy_triggered"],
+              message:
+                "No content delta was produced by apply; deployment fallback was triggered for the latest commit.",
+            };
+            autoTimer.end({ steps: result.steps });
+            const eventPayload = makeEvent({
+              eventType: "applied",
+              actionPayload: actionRecord,
+              traceId,
+              eventId,
+              result,
+            });
+            await writeEventRecord(db, {
+              eventId,
+              action: payload.action,
+              idempotencyKey: payload.idempotencyKey,
+              traceId,
+              status: 200,
+              payload: eventPayload,
+            });
+            return toJsonResponse(200, eventPayload, env);
+          }
           logger.error("Auto mode failed", { error: errorMessage });
           throw new Error(errorMessage);
         }
