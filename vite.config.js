@@ -23,6 +23,8 @@ export default defineConfig({
   },
   build: {
     target: "esnext",
+    minify: "esbuild",
+    cssCodeSplit: true,
     sourcemap: false,
     rollupOptions: {
       input: {
@@ -74,6 +76,11 @@ export default defineConfig({
         privacy: resolve(__dirname, "privacy.html"),
         terms: resolve(__dirname, "terms.html"),
         lexiconPro: resolve(__dirname, "lexicon-pro.html"),
+      },
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+        },
       },
     },
   },
