@@ -5,6 +5,38 @@ const SHADOW_FILE_PREFIX = "cc:shadow:file:";
 const MONETIZATION_KEY = "cc:monetization:config:v1";
 const LIVE_STATE_KEY = "cc:live:state:v1";
 const PREVIEW_WATERMARK = "PREVIEW - SHADOW STATE";
+const PROTECTED_CORE_PATHS = new Set([
+  "worker.js",
+  "wrangler.toml",
+  "admin/integrated-dashboard.html",
+  "admin/ccos.js",
+  "admin/ccos.css",
+]);
+const COMMAND_CENTER_EXACT_API_PATHS = new Set([
+  "/api/fs/tree",
+  "/api/fs/read",
+  "/api/fs/write",
+  "/api/fs/delete",
+  "/api/fs/search",
+  "/api/preview/build",
+  "/api/repo/status",
+  "/api/repo/commit",
+  "/api/deploy/run",
+  "/api/deploy/logs",
+  "/api/deploy/meter",
+  "/api/analytics/metrics",
+  "/api/monetization/config",
+  "/api/voice/execute",
+  "/api/env/audit",
+  "/api/governance/check",
+  "/api/store",
+]);
+const COMMAND_CENTER_PREFIX_API_PATHS = [
+  "/api/store/",
+  "/api/media/",
+  "/api/audio/",
+  "/api/live/",
+];
 
 const MEMORY_SHADOW = new Map();
 
@@ -31,6 +63,20 @@ const parseJsonBody = async (request) => {
   }
 };
 
+export const isCommandCenterPath = (url) => {
+  if (
+    url.pathname.startsWith("/preview/") &&
+    url.searchParams.get("shadow") === "1"
+  ) {
+    return true;
+  }
+  if (!url.pathname.startsWith("/api/")) return false;
+  if (COMMAND_CENTER_EXACT_API_PATHS.has(url.pathname)) return true;
+  return COMMAND_CENTER_PREFIX_API_PATHS.some(
+    (prefix) => url.pathname === prefix || url.pathname.startsWith(prefix)
+  );
+};
+
 const safePath = (value) => {
   const normalized = String(value || "")
     .trim()
@@ -41,6 +87,25 @@ const safePath = (value) => {
   if (!/^[a-zA-Z0-9._/-]+$/.test(normalized)) return "";
   return normalized;
 };
+
+const getRequestActor = (request) => {
+  const actorHeader = String(request.headers.get("x-cc-actor") || "").trim();
+  if (actorHeader) return actorHeader.slice(0, 120);
+  const ip = String(request.headers.get("cf-connecting-ip") || "").trim();
+  if (ip) return `admin:${ip}`;
+  return "admin:unknown";
+};
+
+const getLiveRoomAdminToken = (env) =>
+  String(
+    env.LIVE_ROOM_ADMIN_TOKEN ||
+      env.ADMIN_BEARER_TOKEN ||
+      env.CONTROL_PASSWORD ||
+      ""
+  ).trim();
+
+const isProtectedCorePath = (filePath) =>
+  PROTECTED_CORE_PATHS.has(String(filePath || "").trim());
 
 const toRouteFromFilePath = (filePath) => {
   const p = safePath(filePath);
@@ -600,6 +665,14 @@ const handleFsWrite = async ({ env, request }) => {
   const filePath = safePath(body.path);
   const content = String(body.content || "");
   if (!filePath) return json(400, { ok: false, error: "Invalid path." });
+  if (isProtectedCorePath(filePath)) {
+    return json(403, {
+      ok: false,
+      error: "Protected core shell file cannot be edited from Command Center.",
+      path: filePath,
+    });
+  }
+  const actor = getRequestActor(request);
   const index = await listShadowIndex(env);
   const payload = {
     path: filePath,
@@ -618,6 +691,7 @@ const handleFsWrite = async ({ env, request }) => {
   await appendAuditLog({
     env,
     action: "fs.write",
+    actor,
     details: { path: filePath, bytes: payload.bytes },
   });
   return json(200, {
@@ -631,6 +705,14 @@ const handleFsDelete = async ({ env, request }) => {
   const body = await parseJsonBody(request);
   const filePath = safePath(body.path);
   if (!filePath) return json(400, { ok: false, error: "Invalid path." });
+  if (isProtectedCorePath(filePath)) {
+    return json(403, {
+      ok: false,
+      error: "Protected core shell file cannot be deleted from Command Center.",
+      path: filePath,
+    });
+  }
+  const actor = getRequestActor(request);
   const index = await listShadowIndex(env);
   const payload = {
     path: filePath,
@@ -649,6 +731,7 @@ const handleFsDelete = async ({ env, request }) => {
   await appendAuditLog({
     env,
     action: "fs.delete",
+    actor,
     details: { path: filePath },
   });
   return json(200, {
@@ -751,7 +834,25 @@ const handleRepoCommit = async ({ env, request }) => {
   }
   const body = await parseJsonBody(request);
   const message = String(body.message || "Command Center commit").trim();
+  const actor = getRequestActor(request);
   const index = await listShadowIndex(env);
+  const stagedPaths = Object.keys(index)
+    .map((path) => safePath(path))
+    .filter(Boolean);
+  const protectedPaths = stagedPaths.filter((path) =>
+    isProtectedCorePath(path)
+  );
+  const allowProtectedOverride =
+    body.allowProtected === true &&
+    String(body.confirmation || "") === CONFIRMATION_PHRASE;
+  if (protectedPaths.length && !allowProtectedOverride) {
+    return json(403, {
+      ok: false,
+      error:
+        "Protected core shell files are staged. Commit blocked unless explicit override is supplied.",
+      protectedPaths,
+    });
+  }
   const changed = [];
 
   for (const [filePath, meta] of Object.entries(index)) {
@@ -809,6 +910,7 @@ const handleRepoCommit = async ({ env, request }) => {
   await appendAuditLog({
     env,
     action: "repo.commit",
+    actor,
     details: { changedCount: changed.length, changed },
   });
   await clearShadowState(env);
@@ -821,13 +923,26 @@ const handleRepoCommit = async ({ env, request }) => {
 
 const handleDeployRun = async ({ env, request }) => {
   const body = await parseJsonBody(request);
-  const phrase = String(body.confirmation || "").trim();
+  const phrase = String(body.confirmation || "");
   if (phrase !== CONFIRMATION_PHRASE) {
-    return json(400, {
+    return json(403, {
       ok: false,
       error: `Confirmation phrase must be exactly "${CONFIRMATION_PHRASE}"`,
     });
   }
+  const actor = getRequestActor(request);
+  const planTier = String(
+    request.headers.get("x-cc-plan-tier") || env.DEPLOY_PLAN_TIER || "pro"
+  )
+    .trim()
+    .toLowerCase();
+  const billingStatus = String(
+    request.headers.get("x-cc-billing-status") ||
+      env.DEPLOY_BILLING_STATUS ||
+      "active"
+  )
+    .trim()
+    .toLowerCase();
   const audit = await getEnvAudit(env);
   if (audit.missing.length) {
     return json(400, {
@@ -849,7 +964,9 @@ const handleDeployRun = async ({ env, request }) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       confirmation: phrase,
-      actor: "admin",
+      actor,
+      planTier,
+      billingStatus,
       summary: body.summary || {},
     }),
   });
@@ -857,7 +974,8 @@ const handleDeployRun = async ({ env, request }) => {
   await appendAuditLog({
     env,
     action: "deploy.run",
-    details: { accepted: res.ok, payload },
+    actor,
+    details: { accepted: res.ok, planTier, billingStatus, payload },
   });
   return json(res.status, payload);
 };
@@ -872,6 +990,39 @@ const handleDeployLogs = async ({ env }) => {
   const id = env.DEPLOY_CONTROLLER.idFromName("global");
   const stub = env.DEPLOY_CONTROLLER.get(id);
   const res = await stub.fetch("https://deploy/logs");
+  const payload = await res.json().catch(() => ({}));
+  return json(res.status, payload);
+};
+
+const handleDeployMeter = async ({ env, request }) => {
+  if (!env.DEPLOY_CONTROLLER) {
+    return json(503, {
+      ok: false,
+      error: "DeployControllerDO binding missing.",
+    });
+  }
+  const actor = encodeURIComponent(getRequestActor(request));
+  const planTier = encodeURIComponent(
+    String(
+      request.headers.get("x-cc-plan-tier") || env.DEPLOY_PLAN_TIER || "pro"
+    )
+      .trim()
+      .toLowerCase()
+  );
+  const billingStatus = encodeURIComponent(
+    String(
+      request.headers.get("x-cc-billing-status") ||
+        env.DEPLOY_BILLING_STATUS ||
+        "active"
+    )
+      .trim()
+      .toLowerCase()
+  );
+  const id = env.DEPLOY_CONTROLLER.idFromName("global");
+  const stub = env.DEPLOY_CONTROLLER.get(id);
+  const res = await stub.fetch(
+    `https://deploy/meter?actor=${actor}&planTier=${planTier}&billingStatus=${billingStatus}`
+  );
   const payload = await res.json().catch(() => ({}));
   return json(res.status, payload);
 };
@@ -1203,9 +1354,13 @@ const handleLiveApi = async ({ env, request, url }) => {
   if (env.LIVE_ROOM) {
     const id = env.LIVE_ROOM.idFromName("global");
     const stub = env.LIVE_ROOM.get(id);
+    const token = getLiveRoomAdminToken(env);
     await stub.fetch("https://live/event", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ type: "live_state", payload: next }),
     });
   }
@@ -1260,7 +1415,12 @@ const renderPreviewHtml = ({ html, route, showZones }) => {
 };
 
 const handlePreviewRoute = async ({ env, assets, request, url }) => {
-  const raw = decodeURIComponent(url.pathname.replace(/^\/preview/, "") || "/");
+  let raw = "/";
+  try {
+    raw = decodeURIComponent(url.pathname.replace(/^\/preview/, "") || "/");
+  } catch (_) {
+    return text(400, "Invalid preview route encoding.");
+  }
   const route = raw.startsWith("/") ? raw : `/${raw}`;
   const filePath = toFilePathFromRoute(route);
   if (!filePath) return text(404, "Preview target not found.");
@@ -1326,6 +1486,8 @@ export const handleCommandCenterRequest = async ({
     return handleDeployRun({ env, request });
   if (url.pathname === "/api/deploy/logs" && request.method === "GET")
     return handleDeployLogs({ env });
+  if (url.pathname === "/api/deploy/meter" && request.method === "GET")
+    return handleDeployMeter({ env, request });
 
   if (url.pathname === "/api/analytics/metrics" && request.method === "GET")
     return handleAnalyticsMetrics({ env });

@@ -32,6 +32,9 @@ export class LiveRoomDO {
       return this.handleWebSocket(request, url);
     }
     if (url.pathname === "/event" && request.method === "POST") {
+      if (!this.hasValidToken(request, "admin", url)) {
+        return json(401, { ok: false, error: "Unauthorized" });
+      }
       const payload = await request
         .clone()
         .json()
@@ -53,11 +56,46 @@ export class LiveRoomDO {
     return json(404, { ok: false, error: "Not found." });
   }
 
+  getAdminToken() {
+    return String(
+      this.env.LIVE_ROOM_ADMIN_TOKEN ||
+        this.env.ADMIN_BEARER_TOKEN ||
+        this.env.CONTROL_PASSWORD ||
+        ""
+    ).trim();
+  }
+
+  getViewerToken() {
+    const explicitViewer = String(this.env.LIVE_ROOM_VIEWER_TOKEN || "").trim();
+    if (explicitViewer) return explicitViewer;
+    return this.getAdminToken();
+  }
+
+  extractToken(request, url) {
+    const headerToken = String(
+      request.headers.get("Authorization") || ""
+    ).replace(/^bearer\s+/i, "");
+    const queryToken = String(url.searchParams.get("token") || "");
+    const fallbackToken = String(request.headers.get("x-live-token") || "");
+    return (headerToken || queryToken || fallbackToken).trim();
+  }
+
+  hasValidToken(request, role, url) {
+    const token = this.extractToken(request, url);
+    const expected =
+      role === "admin" ? this.getAdminToken() : this.getViewerToken();
+    if (!expected) return false;
+    return token === expected;
+  }
+
   handleWebSocket(request, url) {
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
     const sessionId = crypto.randomUUID();
     const role = String(url.searchParams.get("role") || "viewer");
+    if (!this.hasValidToken(request, role, url)) {
+      return json(401, { ok: false, error: "Unauthorized" });
+    }
 
     server.accept();
     this.clients.set(sessionId, { socket: server, role, joinedAt: Date.now() });

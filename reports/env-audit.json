@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-02-21T07:21:05.911Z",
-  "scannedFiles": 312,
+  "generatedAt": "2026-02-21T07:31:40.182Z",
+  "scannedFiles": 313,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -49,7 +49,11 @@
     "D1",
     "DB",
     "DEMO_EMAIL_FROM",
+    "DEPLOY_BILLING_STATUS",
     "DEPLOY_CONTROLLER",
+    "DEPLOY_DAILY_LIMIT",
+    "DEPLOY_DAILY_LIMITS_JSON",
+    "DEPLOY_PLAN_TIER",
     "EMAIL_FROM",
     "ENVIRONMENT",
     "GEMINIAPIKEY2",
@@ -65,6 +69,8 @@
     "LEARN",
     "LICENSE_SECRET",
     "LIVE_ROOM",
+    "LIVE_ROOM_ADMIN_TOKEN",
+    "LIVE_ROOM_VIEWER_TOKEN",
     "LOG_LEVEL",
     "NEXT_PUBLIC_ADSENSE_PUBLISHER_ID",
     "NODE_ENV",
@@ -255,10 +261,16 @@
     "CLOUDFLARE_WORKER_NAME",
     "CONFIRM_TOKEN_SECRET",
     "DB",
+    "DEPLOY_BILLING_STATUS",
+    "DEPLOY_DAILY_LIMIT",
+    "DEPLOY_DAILY_LIMITS_JSON",
+    "DEPLOY_PLAN_TIER",
     "EMAIL_FROM",
     "GEMINIAPIKEY2",
     "GITHUB_BASE_BRANCH",
     "LEARN",
+    "LIVE_ROOM_ADMIN_TOKEN",
+    "LIVE_ROOM_VIEWER_TOKEN",
     "LOG_LEVEL",
     "NEXT_PUBLIC_ADSENSE_PUBLISHER_ID",
     "NODE_ENV",
@@ -318,7 +330,11 @@
   "criticalMissing": [],
   "usageByKey": {
     "ADMIN_ACCESS_CODE": ["functions/adminAuth.js", "worker.js"],
-    "ADMIN_BEARER_TOKEN": ["worker.js"],
+    "ADMIN_BEARER_TOKEN": [
+      "functions/commandCenterApi.js",
+      "src/durable_objects/LiveRoomDO.js",
+      "worker.js"
+    ],
     "ADMIN_COOKIE_SECRET": ["functions/adminAuth.js"],
     "ADMIN_ROLE": ["functions/orchestrator.js"],
     "ADSENSE_ALLOW_ALL_PAGES": ["worker.js"],
@@ -368,7 +384,9 @@
     "CONFIRM_TOKEN_SECRET": ["functions/execute.js"],
     "CONTROL_PASSWORD": [
       "functions/adminAuth.js",
+      "functions/commandCenterApi.js",
       "src/durable_objects/DeployControllerDO.js",
+      "src/durable_objects/LiveRoomDO.js",
       "worker.js"
     ],
     "D1": [
@@ -384,7 +402,11 @@
     ],
     "DB": ["functions/execute.js", "functions/orchestrator.js"],
     "DEMO_EMAIL_FROM": ["worker.js"],
+    "DEPLOY_BILLING_STATUS": ["functions/commandCenterApi.js", "worker.js"],
     "DEPLOY_CONTROLLER": ["functions/commandCenterApi.js"],
+    "DEPLOY_DAILY_LIMIT": ["src/durable_objects/DeployControllerDO.js"],
+    "DEPLOY_DAILY_LIMITS_JSON": ["src/durable_objects/DeployControllerDO.js"],
+    "DEPLOY_PLAN_TIER": ["functions/commandCenterApi.js", "worker.js"],
     "EMAIL_FROM": ["worker.js"],
     "ENVIRONMENT": ["functions/botHub.js"],
     "GEMINIAPIKEY2": [
@@ -426,6 +448,8 @@
     "LEARN": ["functions/orchestrator.js"],
     "LICENSE_SECRET": ["worker.js"],
     "LIVE_ROOM": ["functions/commandCenterApi.js"],
+    "LIVE_ROOM_ADMIN_TOKEN": ["functions/commandCenterApi.js", "src/durable_objects/LiveRoomDO.js"],
+    "LIVE_ROOM_VIEWER_TOKEN": ["src/durable_objects/LiveRoomDO.js"],
     "LOG_LEVEL": [
       "functions/chat.js",
       "functions/execute.js",

@@ -69,6 +69,23 @@ class AudioEngine {
     audio.muted = false;
     this.bgMusicWasAutoplayMuted = false;
 
+    // AGGRESSIVE AUTOPLAY: Set attributes to maximize autoplay success
+    try {
+      (audio as any).playsInline = true;
+      audio.setAttribute("playsinline", "");
+      audio.setAttribute("webkit-playsinline", "");
+    } catch (e) {
+      // Some browsers don't support these attributes
+    }
+
+    // Try to unmute immediately for better autoplay
+    try {
+      audio.muted = false;
+      audio.volume = this.currentVolume;
+    } catch (e) {
+      // Some browsers block volume changes before play
+    }
+
     // Prefer routing music through Web Audio so we can drive reactive visuals.
     if (this.context) {
       try {
@@ -87,12 +104,8 @@ class AudioEngine {
         this.musicSource = source;
         this.analyser = analyser;
         this.musicGain = gain;
-        this.analyserTimeData = new Uint8Array(
-          analyser.frequencyBinCount
-        ) as Uint8Array<ArrayBuffer>;
-        this.analyserFreqData = new Uint8Array(
-          analyser.frequencyBinCount
-        ) as Uint8Array<ArrayBuffer>;
+        this.analyserTimeData = new Uint8Array(analyser.frequencyBinCount);
+        this.analyserFreqData = new Uint8Array(analyser.frequencyBinCount);
       } catch (err) {
         // Fallback to direct element playback if the graph cannot be constructed.
         audio.volume = this.currentVolume;

@@ -21,7 +21,10 @@ import {
   handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
 import { handleSupportChatRequest } from "./functions/supportChat.js";
-import { handleCommandCenterRequest } from "./functions/commandCenterApi.js";
+import {
+  handleCommandCenterRequest,
+  isCommandCenterPath,
+} from "./functions/commandCenterApi.js";
 import catalog from "./products.json";
 import { AuditLogDO } from "./src/durable_objects/AuditLogDO.js";
 import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
@@ -85,6 +88,17 @@ const getCacheControlForPath = (pathname, env) => {
     String(env?.CACHE_CONTROL_STATIC || "").trim() ||
     "public, max-age=31536000, immutable"
   );
+};
+
+const getBearerToken = (request) =>
+  String(request.headers.get("Authorization") || "")
+    .replace(/^bearer\s+/i, "")
+    .trim();
+
+const hasValidConfiguredAdminBearer = (request, env) => {
+  const expectedBearer = String(env.ADMIN_BEARER_TOKEN || "").trim();
+  if (!expectedBearer) return false;
+  return getBearerToken(request) === expectedBearer;
 };
 
 const jsonResponse = (status, payload) =>
@@ -887,8 +901,42 @@ export default {
         );
       }
 
+      const isCommandCenterReq = isCommandCenterPath(url);
+      let commandCenterRequest = request;
+      if (isCommandCenterReq) {
+        const hasBearer = hasValidConfiguredAdminBearer(request, env);
+        const hasAdminSession = await isAdminRequest(request, env);
+        if (!hasBearer && !hasAdminSession) {
+          return addSecurityHeaders(
+            jsonResponse(401, { ok: false, error: "Unauthorized" }),
+            {
+              cacheControl: "no-store",
+              pragmaNoCache: true,
+            }
+          );
+        }
+        const actorIp = String(
+          request.headers.get("cf-connecting-ip") || ""
+        ).trim();
+        const actor = actorIp ? `admin:${actorIp}` : "admin:session";
+        const forwardedHeaders = new Headers(request.headers);
+        forwardedHeaders.set("x-cc-actor", actor);
+        if (env.DEPLOY_PLAN_TIER) {
+          forwardedHeaders.set("x-cc-plan-tier", String(env.DEPLOY_PLAN_TIER));
+        }
+        if (env.DEPLOY_BILLING_STATUS) {
+          forwardedHeaders.set(
+            "x-cc-billing-status",
+            String(env.DEPLOY_BILLING_STATUS)
+          );
+        }
+        commandCenterRequest = new Request(request, {
+          headers: forwardedHeaders,
+        });
+      }
+
       const commandCenterResponse = await handleCommandCenterRequest({
-        request,
+        request: commandCenterRequest,
         env,
         url,
         assets,
@@ -2276,17 +2324,12 @@ export default {
       if (isAdminPath) {
         const isPublic = ADMIN_PUBLIC_PATHS.has(url.pathname);
         if (!isPublic) {
-          const authHeader = String(
-            request.headers.get("Authorization") || ""
-          ).trim();
-          const providedBearer = authHeader.replace(/^bearer\s+/i, "").trim();
-          const expectedBearer = String(env.ADMIN_BEARER_TOKEN || "").trim();
-          const hasValidAuthHeader = expectedBearer
-            ? providedBearer === expectedBearer
-            : Boolean(providedBearer);
-          const hasAdmin = await hasValidAdminCookie(request, env);
-          const isAdmin = hasAdmin ? await isAdminRequest(request, env) : false;
-          if (!hasValidAuthHeader && (!hasAdmin || !isAdmin)) {
+          const hasValidAuthHeader = hasValidConfiguredAdminBearer(
+            request,
+            env
+          );
+          const isAdmin = await isAdminRequest(request, env);
+          if (!hasValidAuthHeader && !isAdmin) {
             if (request.method !== "GET") {
               return addSecurityHeaders(
                 new Response("Unauthorized", { status: 401 }),

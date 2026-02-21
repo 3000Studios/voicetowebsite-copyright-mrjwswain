@@ -1,5 +1,13 @@
 const CONFIRMATION_PHRASE = "hell yeah ship it";
 const LOG_LIMIT = 300;
+const DEPLOY_METER_KEY = "deployMeter";
+const DEFAULT_LIMITS = {
+  free: 1,
+  starter: 3,
+  pro: 10,
+  business: 25,
+  enterprise: 1000,
+};
 
 const json = (status, payload) =>
   new Response(JSON.stringify(payload), {
@@ -18,6 +26,7 @@ export class DeployControllerDO {
     this.logs = [];
     this.lastSuccess = null;
     this.lastRollbackRef = "";
+    this.deployMeter = { day: "", users: {} };
 
     this.state.blockConcurrencyWhile(async () => {
       this.lock = (await this.state.storage.get("lock")) || null;
@@ -25,6 +34,11 @@ export class DeployControllerDO {
       this.lastSuccess = (await this.state.storage.get("lastSuccess")) || null;
       this.lastRollbackRef =
         (await this.state.storage.get("lastRollbackRef")) || "";
+      this.deployMeter = (await this.state.storage.get(DEPLOY_METER_KEY)) || {
+        day: this.currentDay(),
+        users: {},
+      };
+      await this.ensureMeterDay();
     });
   }
 
@@ -59,6 +73,25 @@ export class DeployControllerDO {
       });
     }
 
+    if (url.pathname === "/meter" && request.method === "GET") {
+      const actor = String(url.searchParams.get("actor") || "admin").slice(
+        0,
+        120
+      );
+      const planTier = String(
+        url.searchParams.get("planTier") || "pro"
+      ).toLowerCase();
+      const billingStatus = String(
+        url.searchParams.get("billingStatus") || "active"
+      ).toLowerCase();
+      const metering = await this.getDeployAllowance({
+        actor,
+        planTier,
+        billingStatus,
+      });
+      return json(200, { ok: true, metering });
+    }
+
     return json(404, { ok: false, error: "Not found." });
   }
 
@@ -78,6 +111,124 @@ export class DeployControllerDO {
     return entry;
   }
 
+  currentDay() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  parsePlanLimits() {
+    const allLimitRaw = Number.parseInt(
+      String(this.env.DEPLOY_DAILY_LIMIT || "0"),
+      10
+    );
+    const allLimit =
+      Number.isFinite(allLimitRaw) && allLimitRaw > 0 ? allLimitRaw : null;
+
+    let overrides = {};
+    try {
+      overrides = JSON.parse(String(this.env.DEPLOY_DAILY_LIMITS_JSON || "{}"));
+    } catch (_) {
+      overrides = {};
+    }
+
+    const out = { ...DEFAULT_LIMITS };
+    for (const [key, value] of Object.entries(overrides || {})) {
+      const parsed = Number.parseInt(String(value || "0"), 10);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        out[String(key).toLowerCase()] = parsed;
+      }
+    }
+    if (allLimit != null) {
+      for (const key of Object.keys(out)) out[key] = allLimit;
+    }
+    return out;
+  }
+
+  normalizePlanTier(planTier) {
+    const tier = String(planTier || "")
+      .trim()
+      .toLowerCase();
+    if (!tier) return "pro";
+    if (tier === "team") return "business";
+    return tier;
+  }
+
+  normalizeBillingStatus(billingStatus) {
+    const raw = String(billingStatus || "")
+      .trim()
+      .toLowerCase();
+    if (!raw) return "active";
+    return raw;
+  }
+
+  async ensureMeterDay() {
+    const day = this.currentDay();
+    if (this.deployMeter?.day === day) return;
+    this.deployMeter = { day, users: {} };
+    await this.state.storage.put(DEPLOY_METER_KEY, this.deployMeter);
+  }
+
+  getDailyLimit(planTier) {
+    const limits = this.parsePlanLimits();
+    return Number(limits[planTier] || limits.pro || DEFAULT_LIMITS.pro);
+  }
+
+  async getDeployAllowance({ actor, planTier, billingStatus }) {
+    await this.ensureMeterDay();
+    const normalizedActor = String(actor || "admin").slice(0, 120);
+    const normalizedTier = this.normalizePlanTier(planTier);
+    const normalizedBilling = this.normalizeBillingStatus(billingStatus);
+    const row = this.deployMeter.users?.[normalizedActor] || { count: 0 };
+    const limit = this.getDailyLimit(normalizedTier);
+    const used = Number(row.count || 0);
+    const remaining = Math.max(0, limit - used);
+    const billingActive = normalizedBilling === "active";
+    return {
+      actor: normalizedActor,
+      planTier: normalizedTier,
+      billingStatus: normalizedBilling,
+      day: this.deployMeter.day,
+      used,
+      limit,
+      remaining: billingActive ? remaining : 0,
+      allowed: billingActive && remaining > 0,
+      reason: billingActive
+        ? remaining > 0
+          ? "ok"
+          : "daily_limit_exceeded"
+        : "billing_inactive",
+    };
+  }
+
+  async recordDeploy({ actor, planTier, billingStatus }) {
+    await this.ensureMeterDay();
+    const metering = await this.getDeployAllowance({
+      actor,
+      planTier,
+      billingStatus,
+    });
+    const nextUsed = metering.used + 1;
+    this.deployMeter.users[metering.actor] = {
+      count: nextUsed,
+      planTier: metering.planTier,
+      billingStatus: metering.billingStatus,
+      lastDeployAt: new Date().toISOString(),
+    };
+    await this.state.storage.put(DEPLOY_METER_KEY, this.deployMeter);
+    return {
+      ...metering,
+      used: nextUsed,
+      remaining: Math.max(0, metering.limit - nextUsed),
+      allowed:
+        metering.billingStatus === "active" && nextUsed <= metering.limit,
+      reason:
+        metering.billingStatus !== "active"
+          ? "billing_inactive"
+          : nextUsed <= metering.limit
+            ? "ok"
+            : "daily_limit_exceeded",
+    };
+  }
+
   async runDeploy(payload = {}) {
     if (this.lock) {
       return json(409, {
@@ -87,11 +238,26 @@ export class DeployControllerDO {
       });
     }
 
-    const phrase = String(payload.confirmation || "").trim();
+    const phrase = String(payload.confirmation || "");
     if (phrase !== CONFIRMATION_PHRASE) {
-      return json(400, {
+      return json(403, {
         ok: false,
         error: `Confirmation phrase must be exactly "${CONFIRMATION_PHRASE}"`,
+      });
+    }
+    const actor = String(payload.actor || "admin").slice(0, 120);
+    const planTier = this.normalizePlanTier(payload.planTier);
+    const billingStatus = this.normalizeBillingStatus(payload.billingStatus);
+    const meteringPrecheck = await this.getDeployAllowance({
+      actor,
+      planTier,
+      billingStatus,
+    });
+    if (!meteringPrecheck.allowed) {
+      return json(429, {
+        ok: false,
+        error: "Deploy blocked by metering policy.",
+        metering: meteringPrecheck,
       });
     }
 
@@ -99,16 +265,24 @@ export class DeployControllerDO {
     this.lock = {
       runId,
       startedAt: new Date().toISOString(),
-      actor: String(payload.actor || "admin"),
+      actor,
+      planTier,
     };
     await this.state.storage.put("lock", this.lock);
 
     let deployResponse = null;
+    let metering = meteringPrecheck;
     try {
       await this.appendLog("info", "Deploy pipeline started", { runId });
 
       await this.appendLog("info", "Step 1/6: Validate governance gates");
       await this.validateEnvGates();
+      metering = await this.recordDeploy({ actor, planTier, billingStatus });
+      await this.appendLog("info", "Deploy metering consumed", {
+        actor,
+        planTier,
+        remaining: metering.remaining,
+      });
 
       await this.appendLog("info", "Step 2/6: Verify project state");
       await this.appendLog(
@@ -141,6 +315,14 @@ export class DeployControllerDO {
       return json(200, {
         ok: true,
         runId,
+        metering: {
+          allowed: metering.allowed,
+          remaining: metering.remaining,
+          used: metering.used,
+          limit: metering.limit,
+          planTier: metering.planTier,
+          billingStatus: metering.billingStatus,
+        },
         logs: this.logs.slice(-50),
         deployResponse,
         lastSuccess: this.lastSuccess,
@@ -154,6 +336,14 @@ export class DeployControllerDO {
         ok: false,
         runId,
         error: error?.message || String(error),
+        metering: {
+          allowed: metering.allowed,
+          remaining: metering.remaining,
+          used: metering.used,
+          limit: metering.limit,
+          planTier: metering.planTier,
+          billingStatus: metering.billingStatus,
+        },
         logs: this.logs.slice(-50),
       });
     } finally {

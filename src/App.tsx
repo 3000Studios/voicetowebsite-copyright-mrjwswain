@@ -77,13 +77,11 @@ const App: React.FC = () => {
 
   // Audio Control
   useEffect(() => {
-    // Fixed volume for now; can be promoted to UI control later.
-    audioEngine.setVolume(0.6);
+    // Set optimal volume for immediate autoplay
+    audioEngine.setVolume(0.4);
   }, []);
 
-  // Best-effort autoplay. Browsers often block sound without a user gesture, so we:
-  // 1) try once immediately, and
-  // 2) retry on the first user interaction (pointer/key) unless the user turned audio off.
+  // AGGRESSIVE AUTOPLAY - Play music immediately on page load
   useEffect(() => {
     let cancelled = false;
 
@@ -102,18 +100,46 @@ const App: React.FC = () => {
 
     const tryStart = async () => {
       if (cancelled) return;
-      await startThemeSong();
+      // Force start the song immediately
+      await startThemeSong(true);
     };
 
     const onFirstGesture = async () => {
       if (audioPlayingRef.current) return;
+      // Force start on first user interaction if blocked
       await startThemeSong(true);
     };
 
-    // Attempt immediately (may be blocked).
-    tryStart().catch(() => {});
+    // Multiple attempts for immediate autoplay
+    const attemptAutoplay = async () => {
+      if (cancelled) return;
 
-    // Retry on first interaction.
+      // Try immediately
+      try {
+        await startThemeSong(true);
+      } catch (error) {
+        console.log("Autoplay blocked, will retry on user interaction");
+      }
+
+      // Try again after a short delay (some browsers allow delayed autoplay)
+      setTimeout(() => {
+        if (!cancelled && !audioPlayingRef.current) {
+          tryStart().catch(() => {});
+        }
+      }, 500);
+
+      // Try one more time after page load
+      setTimeout(() => {
+        if (!cancelled && !audioPlayingRef.current) {
+          tryStart().catch(() => {});
+        }
+      }, 1500);
+    };
+
+    // Start aggressive autoplay attempts
+    attemptAutoplay();
+
+    // Fallback: retry on first user interaction
     document.addEventListener("pointerdown", onFirstGesture, {
       capture: true,
       once: true,
@@ -123,10 +149,23 @@ const App: React.FC = () => {
       once: true,
     });
 
+    // Also try on page visibility change (tab switching)
+    const handleVisibilityChange = () => {
+      if (
+        !cancelled &&
+        !audioPlayingRef.current &&
+        document.visibilityState === "visible"
+      ) {
+        tryStart().catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       cancelled = true;
       document.removeEventListener("pointerdown", onFirstGesture, true);
       document.removeEventListener("keydown", onFirstGesture, true);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

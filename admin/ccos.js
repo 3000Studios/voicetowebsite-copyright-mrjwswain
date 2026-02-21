@@ -57,7 +57,7 @@ const refreshDeployLogs = async () => {
 };
 
 const deployFromTopbar = async () => {
-  const phrase = String(byId("deploy-confirm")?.value || "").trim();
+  const phrase = String(byId("deploy-confirm")?.value || "");
   if (phrase !== CONFIRMATION_PHRASE) return;
   if (state.deployInProgress) return; // Prevent concurrent deploys
 
@@ -84,7 +84,7 @@ const deployFromTopbar = async () => {
 };
 
 const syncDeployPhraseGate = () => {
-  const phrase = String(byId("deploy-confirm")?.value || "").trim();
+  const phrase = String(byId("deploy-confirm")?.value || "");
   const matches = phrase === CONFIRMATION_PHRASE;
   const button = byId("deploy-button");
   button.disabled = !matches || state.deployInProgress;
@@ -151,20 +151,23 @@ const loadAnalytics = async () => {
 };
 
 const renderMission = async () => {
-  const [governance, deployLogs, analytics] = await Promise.all([
+  const [governance, deployLogs, deployMeter, analytics] = await Promise.all([
     requestJson("/api/governance/check", { method: "GET" }).catch(() => null),
     requestJson("/api/deploy/logs", { method: "GET" }).catch(() => null),
+    requestJson("/api/deploy/meter", { method: "GET" }).catch(() => null),
     loadAnalytics(),
   ]);
   const envStatus = governance?.checks?.envAudit?.status || "fail";
   const envMissing = governance?.checks?.envAudit?.missing || [];
   const lock = deployLogs?.locked ? "Deploy In Progress" : "Idle";
   const auditPass = governance?.ok ? "PASS" : "FAIL";
+  const remaining = deployMeter?.metering?.remaining;
   return `
     <section class="ccos-kpi">
       <article class="ccos-card"><h4>Worker Health</h4><p><span class="ccos-pill ok">ONLINE</span></p></article>
       <article class="ccos-card"><h4>Governance</h4><p><span class="ccos-pill ${auditPass === "PASS" ? "ok" : "err"}">${auditPass}</span></p></article>
       <article class="ccos-card"><h4>Deploy State</h4><p>${escapeHtml(lock)}</p></article>
+      <article class="ccos-card"><h4>Deploy Remaining</h4><p>${remaining == null ? "n/a" : escapeHtml(remaining)}</p></article>
       <article class="ccos-card"><h4>Env Audit</h4><p><span class="ccos-pill ${envStatus === "pass" ? "ok" : "err"}">${escapeHtml(envStatus.toUpperCase())}</span></p></article>
     </section>
     <section class="ccos-grid">
@@ -534,19 +537,90 @@ const renderSettings = async () => {
 };
 
 const ROUTES = {
-  "/admin/mission": { title: "Mission Control", render: renderMission },
-  "/admin/cc": { title: "Command Center", render: renderCC },
-  "/admin/vcc": { title: "Voice Command Center", render: renderVCC },
+  "/admin/mission": {
+    title: "Mission Control",
+    render: renderMission,
+    navRoute: "/admin/mission",
+    moduleKey: "mission",
+  },
+  "/admin/dashboard": {
+    title: "Mission Control",
+    render: renderMission,
+    navRoute: "/admin/mission",
+    moduleKey: "mission",
+  },
+  "/admin/cc": {
+    title: "Command Center",
+    render: renderCC,
+    navRoute: "/admin/cc",
+    moduleKey: "cc",
+  },
+  "/admin/deploy": {
+    title: "Command Center",
+    render: renderCC,
+    navRoute: "/admin/cc",
+    moduleKey: "cc",
+  },
+  "/admin/vcc": {
+    title: "Voice Command Center",
+    render: renderVCC,
+    navRoute: "/admin/vcc",
+    moduleKey: "vcc",
+  },
+  "/admin/preview": {
+    title: "Voice Command Center",
+    render: renderVCC,
+    navRoute: "/admin/vcc",
+    moduleKey: "vcc",
+  },
   "/admin/monetization": {
     title: "Monetization Control",
     render: renderMonetization,
+    navRoute: "/admin/monetization",
+    moduleKey: "monetization",
   },
-  "/admin/analytics": { title: "Analytics", render: renderAnalytics },
-  "/admin/live": { title: "Live Stream Manager", render: renderLive },
-  "/admin/store": { title: "Store Manager", render: renderStore },
-  "/admin/media": { title: "Media Library", render: renderMedia },
-  "/admin/audio": { title: "Audio Library", render: renderAudio },
-  "/admin/settings": { title: "Settings", render: renderSettings },
+  "/admin/analytics": {
+    title: "Analytics",
+    render: renderAnalytics,
+    navRoute: "/admin/analytics",
+    moduleKey: "analytics",
+  },
+  "/admin/live": {
+    title: "Live Stream Manager",
+    render: renderLive,
+    navRoute: "/admin/live",
+    moduleKey: "live",
+  },
+  "/admin/store": {
+    title: "Store Manager",
+    render: renderStore,
+    navRoute: "/admin/store",
+    moduleKey: "store",
+  },
+  "/admin/media": {
+    title: "Media Library",
+    render: renderMedia,
+    navRoute: "/admin/media",
+    moduleKey: "media",
+  },
+  "/admin/audio": {
+    title: "Audio Library",
+    render: renderAudio,
+    navRoute: "/admin/audio",
+    moduleKey: "audio",
+  },
+  "/admin/settings": {
+    title: "Settings",
+    render: renderSettings,
+    navRoute: "/admin/settings",
+    moduleKey: "settings",
+  },
+  "/admin/governance": {
+    title: "Settings",
+    render: renderSettings,
+    navRoute: "/admin/settings",
+    moduleKey: "settings",
+  },
 };
 
 const wireCommonNav = () => {
@@ -777,13 +851,14 @@ const wireUploadForm = (kind) => {
 };
 
 const wireRouteHandlers = () => {
-  if (state.route === "/admin/cc") wireCCEvents();
-  if (state.route === "/admin/vcc") wireVCCEvents();
-  if (state.route === "/admin/monetization") wireMonetizationEvents();
-  if (state.route === "/admin/live") wireLiveEvents();
-  if (state.route === "/admin/store") wireStoreEvents();
-  if (state.route === "/admin/media") wireUploadForm("media");
-  if (state.route === "/admin/audio") wireUploadForm("audio");
+  const moduleKey = ROUTES[state.route]?.moduleKey || "";
+  if (moduleKey === "cc") wireCCEvents();
+  if (moduleKey === "vcc") wireVCCEvents();
+  if (moduleKey === "monetization") wireMonetizationEvents();
+  if (moduleKey === "live") wireLiveEvents();
+  if (moduleKey === "store") wireStoreEvents();
+  if (moduleKey === "media") wireUploadForm("media");
+  if (moduleKey === "audio") wireUploadForm("audio");
 };
 
 const loadRoute = async (routePath) => {
@@ -791,10 +866,11 @@ const loadRoute = async (routePath) => {
   state.route = route;
   const module = ROUTES[route];
   byId("ccos-title").textContent = module.title;
+  const activeRoute = module.navRoute || route;
   document.querySelectorAll(".ccos-nav-item").forEach((button) => {
     button.classList.toggle(
       "is-active",
-      button.getAttribute("data-route") === route
+      button.getAttribute("data-route") === activeRoute
     );
   });
   const container = byId("dashboard-content");

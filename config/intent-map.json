@@ -14,7 +14,7 @@
   "background video": ["update_background_video"],
   "midnight steel": ["update_theme_midnight_steel"],
   "midnight": ["update_theme_midnight"],
-  "ship it": ["deploy"],
+  "hell yeah ship it": ["deploy"],
   "deploy it": ["deploy"],
   "go live": ["deploy"],
   "rollback": ["rollback"],

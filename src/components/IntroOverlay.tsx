@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 import { INTRO_VIDEO } from "../constants";
 
 interface IntroOverlayProps {
@@ -120,9 +120,69 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
       </div>
 
       <div className="absolute bottom-10 md:bottom-20 w-full text-center z-10 px-4">
-        <h1 className="font-orbitron text-2xl md:text-4xl font-black gold-platinum-text opacity-80 tracking-[0.3em] md:tracking-[0.5em] uppercase">
-          VOICE TO WEBSITE
-        </h1>
+        <motion.h1
+          className="font-orbitron text-2xl md:text-5xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent tracking-[0.2em] md:tracking-[0.3em] uppercase"
+          initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+          animate={{
+            opacity: [0, 1, 1, 0.8, 1],
+            scale: [0.5, 1.1, 1, 1.05, 1],
+            rotate: [-10, 5, -2, 1, 0],
+            y: [0, -10, 0, -5, 0],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            repeatDelay: 3,
+            ease: "easeInOut",
+          }}
+          whileHover={{
+            scale: 1.15,
+            rotate: 2,
+            textShadow:
+              "0 0 30px rgba(34, 211, 238, 0.8), 0 0 60px rgba(59, 130, 246, 0.6)",
+          }}
+        >
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0.7, 1] }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            GET THE NEW APP
+          </motion.span>
+          <br />
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0.7, 1] }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-3xl md:text-6xl"
+          >
+            RIGHT NOW!
+          </motion.span>
+        </motion.h1>
+
+        <motion.div
+          className="mt-4 flex justify-center gap-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+        >
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                delay: i * 0.1,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+        </motion.div>
       </div>
     </motion.div>
   );

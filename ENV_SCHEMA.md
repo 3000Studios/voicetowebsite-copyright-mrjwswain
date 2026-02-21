@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-02-21T07:21:05.911Z
+Generated: 2026-02-21T07:31:40.182Z
 
 ## Summary
 
-- Scanned files: 312
-- Used keys: 125
+- Scanned files: 313
+- Used keys: 131
 - Defined keys: 108
-- Missing keys: 43
+- Missing keys: 49
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -15,7 +15,7 @@ Generated: 2026-02-21T07:21:05.911Z
 | Key                                      | Defined | Used In Files | Status  |
 | ---------------------------------------- | ------- | ------------- | ------- |
 | ADMIN_ACCESS_CODE                        | no      | 2             | missing |
-| ADMIN_BEARER_TOKEN                       | no      | 1             | missing |
+| ADMIN_BEARER_TOKEN                       | no      | 3             | missing |
 | ADMIN_COOKIE_SECRET                      | yes     | 1             | ok      |
 | ADMIN_EMAIL                              | yes     | 0             | unused  |
 | ADMIN_ROLE                               | yes     | 1             | ok      |
@@ -62,11 +62,15 @@ Generated: 2026-02-21T07:21:05.911Z
 | CLOUDINARY_API_KEY                       | yes     | 0             | unused  |
 | CLOUDINARY_API_SECRET                    | yes     | 0             | unused  |
 | CONFIRM_TOKEN_SECRET                     | no      | 1             | missing |
-| CONTROL_PASSWORD                         | yes     | 3             | ok      |
+| CONTROL_PASSWORD                         | yes     | 5             | ok      |
 | D1                                       | yes     | 9             | ok      |
 | DB                                       | no      | 2             | missing |
 | DEMO_EMAIL_FROM                          | yes     | 1             | ok      |
+| DEPLOY_BILLING_STATUS                    | no      | 2             | missing |
 | DEPLOY_CONTROLLER                        | yes     | 1             | ok      |
+| DEPLOY_DAILY_LIMIT                       | no      | 1             | missing |
+| DEPLOY_DAILY_LIMITS_JSON                 | no      | 1             | missing |
+| DEPLOY_PLAN_TIER                         | no      | 2             | missing |
 | EMAIL_FROM                               | no      | 1             | missing |
 | ENVIRONMENT                              | yes     | 1             | ok      |
 | GEMINI_API_KEY                           | yes     | 0             | unused  |
@@ -90,6 +94,8 @@ Generated: 2026-02-21T07:21:05.911Z
 | LEARN                                    | no      | 1             | missing |
 | LICENSE_SECRET                           | yes     | 1             | ok      |
 | LIVE_ROOM                                | yes     | 1             | ok      |
+| LIVE_ROOM_ADMIN_TOKEN                    | no      | 2             | missing |
+| LIVE_ROOM_VIEWER_TOKEN                   | no      | 1             | missing |
 | LOG_LEVEL                                | no      | 4             | missing |
 | NEXT_PUBLIC_ADSENSE_PUBLISHER_ID         | no      | 1             | missing |
 | NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME        | yes     | 0             | unused  |

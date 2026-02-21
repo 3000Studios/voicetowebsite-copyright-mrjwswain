@@ -88,7 +88,7 @@ const extractActions = (t) => {
     actions.add("update");
   if (hasAny(t, ["remove", "delete", "wipe", "drop"])) actions.add("remove");
   if (hasAny(t, ["optimize", "improve", "fix"])) actions.add("optimize");
-  if (hasAny(t, ["ship it", "deploy", "go live", "publish"]))
+  if (hasAny(t, ["hell yeah ship it", "deploy", "go live", "publish"]))
     actions.add("deploy");
   if (hasAny(t, ["rollback", "revert", "undo"])) actions.add("rollback");
   return [...actions];

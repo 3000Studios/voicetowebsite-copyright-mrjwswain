@@ -4353,7 +4353,7 @@ button.ghost:hover {
   outline: none;
 }
 
-/* Floating Ask/Build widget (nav.js) */
+/* Shared metallic heading accent */
 .vtw-metallic-heading {
   position: relative;
   display: inline-block;
