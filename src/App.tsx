@@ -4,6 +4,7 @@ import AudioWaveform from "./components/AudioWaveform";
 import WarpTunnel from "./components/WarpTunnel";
 import { HOME_VIDEO, INTRO_SONG } from "./constants";
 import { audioEngine } from "./services/audioEngine";
+import siteConfig from "./site-config.json";
 
 // Enhanced media types and components
 const EnhancedMediaSection = () => (
@@ -154,6 +155,11 @@ const AdvancedLayout = () => (
 
 const App: React.FC = () => {
   const reduceMotion = useReducedMotion();
+  const heroHeadline =
+    siteConfig?.copy?.headline?.trim() || "Speak It. Ship It.";
+  const heroSubhead =
+    siteConfig?.copy?.subhead?.trim() ||
+    "The world's first one-command website engine. No steps. No crap. Just your voice.";
   const audioPrefRef = useRef<"on" | "off" | null>(null);
   const audioPlayingRef = useRef(false);
 
@@ -447,11 +453,9 @@ const App: React.FC = () => {
           <motion.h1
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="vtw-metallic-heading font-outfit font-black text-5xl md:text-8xl lg:text-9xl tracking-tighter uppercase leading-none mb-8"
+            className="vtw-metallic-heading font-outfit font-black text-5xl md:text-8xl lg:text-9xl tracking-tighter leading-none mb-8"
           >
-            Speak It.
-            <br />
-            Ship It.
+            {heroHeadline}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -459,8 +463,7 @@ const App: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-white/60 text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed font-inter"
           >
-            The world's first one-command website engine. No steps. No crap.
-            Just your voice.
+            {heroSubhead}
           </motion.p>
         </div>
 
