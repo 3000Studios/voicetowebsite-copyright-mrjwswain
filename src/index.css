@@ -1,24 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;700;900&display=swap");
+@import "./design-system.css";
 
 :root {
-  --bg-color: #0b1222;
-  --bg-obsidian: var(--bg-color);
-  --text-color: #f8fbff;
-  --accent-color: #7dd3fc;
-  --accent-rgb: 125, 211, 252;
-  --accent-glow: rgba(125, 211, 252, 0.45);
-  --accent-warm: #fbbf24;
-  --accent-cool: #22d3ee;
-  --muted: rgba(233, 241, 255, 0.72);
-  --crystal-nav-bg: #030712;
-  --crystal-primary: #f0f9ff;
-  --crystal-accent: #38bdf8;
-  --crystal-deep: #1e3a8a;
-  --crystal-prism-1: rgba(56, 189, 248, 0.4);
-  --crystal-prism-2: rgba(168, 85, 247, 0.4);
-  --crystal-shard-speed: 0.8s;
-  --crystal-font-code: "Space Mono", monospace;
-  --crystal-font-sans: "Outfit", "Inter", sans-serif;
   --wallpaper-image:
     radial-gradient(
       1200px circle at 12% -10%,
@@ -37,8 +19,8 @@
     ),
     linear-gradient(180deg, rgba(8, 12, 24, 0.7), rgba(8, 12, 24, 0.92)),
     linear-gradient(120deg, rgba(10, 20, 40, 0.95), rgba(7, 10, 22, 0.98));
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   color-scheme: dark;
 }
 
