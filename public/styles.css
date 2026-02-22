@@ -6606,3 +6606,31 @@ h1 {
   margin-bottom: 1.5rem !important;
 }
 /* end import: styles/utilities.css */
+
+/* Voice-injected styles */
+.hero-section {
+  text-align: center;
+}
+.activate-button {
+  margin-top: 20px;
+}
+
+/* Voice-injected styles */
+.main-header {
+  color: #00aa00;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 0.15em solid;
+  animation: typing 3s steps(30, end);
+}
