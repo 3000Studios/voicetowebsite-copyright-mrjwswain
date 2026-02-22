@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | Enhanced Live Stream Manager</title>
+    <meta name="description" content="Advanced live stream setup with multiple input sources." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script type="module" src="./access-guard.js" defer></script>
+    <style>
+      .enhanced-live-manager {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .input-sources-panel {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+      }
+
+      .preview-panel {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+      }
+
+      .source-grid {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .source-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .source-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(34, 211, 238, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .source-card.selected {
+        background: rgba(34, 211, 238, 0.1);
+        border-color: rgba(34, 211, 238, 0.6);
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+      }
+
+      .source-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .source-icon {
+        width: 2rem;
+        height: 2rem;
+        background: linear-gradient(135deg, #22d3ee, #0ea5e9);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+      }
+
+      .source-details h4 {
+        margin: 0;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .source-details p {
+        margin: 0;
+        font-size: 0.75rem;
+        opacity: 0.7;
+      }
+
+      .source-status {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.625rem;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+
+      .status-available {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .status-busy {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+
+      .status-unavailable {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .preview-video {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .stream-controls {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .control-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .control-btn.primary {
+        background: linear-gradient(135deg, #22d3ee, #0ea5e9);
+        color: white;
+      }
+
+      .control-btn.secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .control-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .control-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .stream-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #22d3ee;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        text-transform: uppercase;
+      }
+
+      .quality-selector {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .quality-option {
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+      }
+
+      .quality-option:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .quality-option.selected {
+        background: rgba(34, 211, 238, 0.2);
+        border-color: rgba(34, 211, 238, 0.6);
+      }
+
+      @media (max-width: 1024px) {
+        .enhanced-live-manager {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-video-bg" aria-hidden="true">
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+    </div>
+    <div class="noise-overlay" aria-hidden="true"></div>
+
+    <div class="admin-shell">
+      <main class="admin-grid">
+        <section class="card metallic-card" id="enhanced-livestream">
+          <h2>Enhanced Live Stream Manager</h2>
+          <p class="muted">Advanced streaming setup with automatic source detection and preview.</p>
+
+          <div class="enhanced-live-manager">
+            <!-- Input Sources Panel -->
+            <div class="input-sources-panel">
+              <h3>Input Sources</h3>
+              <p class="muted small">Select your streaming source - automatically detected devices are listed below.</p>
+
+              <div class="source-grid" id="source-grid">
+                <!-- Sources will be populated here -->
+              </div>
+
+              <div class="quality-selector">
+                <div class="quality-option selected" data-quality="1080p">1080p</div>
+                <div class="quality-option" data-quality="720p">720p</div>
+                <div class="quality-option" data-quality="480p">480p</div>
+                <div class="quality-option" data-quality="360p">360p</div>
+              </div>
+
+              <div class="stream-controls">
+                <button class="control-btn secondary" id="refresh-sources">🔄 Refresh Sources</button>
+                <button class="control-btn secondary" id="test-source">🧪 Test Source</button>
+              </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+              <h3>Live Preview</h3>
+              <p class="muted small">Preview your selected source before going live.</p>
+
+              <video id="preview-video" class="preview-video" muted playsinline></video>
+
+              <div class="stream-stats">
+                <div class="stat-card">
+                  <div class="stat-value" id="resolution-stat">--</div>
+                  <div class="stat-label">Resolution</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="fps-stat">--</div>
+                  <div class="stat-label">FPS</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="bitrate-stat">--</div>
+                  <div class="stat-label">Bitrate</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-value" id="viewers-stat">0</div>
+                  <div class="stat-label">Viewers</div>
+                </div>
+              </div>
+
+              <div class="stream-controls">
+                <button class="control-btn primary" id="start-stream">🎥 Start Streaming</button>
+                <button class="control-btn secondary" id="stop-stream" disabled>⏹️ Stop</button>
+                <button class="control-btn secondary" id="record-stream" disabled>🔴 Record</button>
+                <button class="control-btn secondary" id="snapshot">📸 Snapshot</button>
+              </div>
+
+              <div class="muted small" id="stream-status"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="../nav.js"></script>
+    <script type="module">
+      // Enhanced Live Stream Manager
+      class EnhancedLiveManager {
+        constructor() {
+          this.sources = new Map();
+          this.currentSource = null;
+          this.stream = null;
+          this.recorder = null;
+          this.recordedChunks = [];
+          this.selectedQuality = "1080p";
+          this.statsInterval = null;
+
+          this.initializeElements();
+          this.bindEvents();
+          this.loadSources();
+        }
+
+        initializeElements() {
+          this.elements = {
+            sourceGrid: document.getElementById("source-grid"),
+            previewVideo: document.getElementById("preview-video"),
+            resolutionStat: document.getElementById("resolution-stat"),
+            fpsStat: document.getElementById("fps-stat"),
+            bitrateStat: document.getElementById("bitrate-stat"),
+            viewersStat: document.getElementById("viewers-stat"),
+            streamStatus: document.getElementById("stream-status"),
+            refreshBtn: document.getElementById("refresh-sources"),
+            testBtn: document.getElementById("test-source"),
+            startBtn: document.getElementById("start-stream"),
+            stopBtn: document.getElementById("stop-stream"),
+            recordBtn: document.getElementById("record-stream"),
+            snapshotBtn: document.getElementById("snapshot"),
+          };
+        }
+
+        bindEvents() {
+          this.elements.refreshBtn.addEventListener("click", () => this.loadSources());
+          this.elements.testBtn.addEventListener("click", () => this.testCurrentSource());
+          this.elements.startBtn.addEventListener("click", () => this.startStreaming());
+          this.elements.stopBtn.addEventListener("click", () => this.stopStreaming());
+          this.elements.recordBtn.addEventListener("click", () => this.toggleRecording());
+          this.elements.snapshotBtn.addEventListener("click", () => this.takeSnapshot());
+
+          // Quality selector
+          document.querySelectorAll(".quality-option").forEach((option) => {
+            option.addEventListener("click", (e) => {
+              document.querySelectorAll(".quality-option").forEach((o) => o.classList.remove("selected"));
+              e.target.classList.add("selected");
+              this.selectedQuality = e.target.dataset.quality;
+              if (this.currentSource) {
+                this.updateSourceQuality();
+              }
+            });
+          });
+        }
+
+        async loadSources() {
+          this.setStatus("Detecting input sources...");
+          this.sources.clear();
+
+          try {
+            // Request permissions first
+            await this.requestPermissions();
+
+            // Get all media devices
+            const devices = await navigator.mediaDevices.enumerateDevices();
+
+            // Categorize devices
+            const videoDevices = devices.filter((d) => d.kind === "videoinput");
+            const audioDevices = devices.filter((d) => d.kind === "audioinput");
+
+            // Add video sources
+            for (const device of videoDevices) {
+              const source = await this.createVideoSource(device);
+              this.sources.set(device.deviceId, source);
+            }
+
+            // Add screen capture source
+            this.sources.set("screen", await this.createScreenSource());
+
+            // Add window capture source
+            this.sources.set("window", await this.createWindowSource());
+
+            // Add virtual camera sources (OBS, etc.)
+            const virtualCameras = videoDevices.filter(
+              (d) => d.label.toLowerCase().includes("virtual") || d.label.toLowerCase().includes("obs")
+            );
+            for (const device of virtualCameras) {
+              const source = await this.createVirtualCameraSource(device);
+              this.sources.set(`virtual-${device.deviceId}`, source);
+            }
+
+            // Add phone camera sources (if detected)
+            const phoneCameras = videoDevices.filter(
+              (d) =>
+                d.label.toLowerCase().includes("iphone") ||
+                d.label.toLowerCase().includes("android") ||
+                d.label.toLowerCase().includes("mobile")
+            );
+            for (const device of phoneCameras) {
+              const source = await this.createPhoneCameraSource(device);
+              this.sources.set(`phone-${device.deviceId}`, source);
+            }
+
+            this.renderSources();
+            this.setStatus(`Found ${this.sources.size} input sources`);
+          } catch (error) {
+            this.setStatus(`Error loading sources: ${error.message}`);
+            console.error("Failed to load sources:", error);
+          }
+        }
+
+        async requestPermissions() {
+          try {
+            // Request minimal permissions to get device labels
+            const tempStream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: true,
+            });
+            tempStream.getTracks().forEach((track) => track.stop());
+          } catch (error) {
+            console.warn("Permission request failed:", error);
+          }
+        }
+
+        async createVideoSource(device) {
+          return {
+            id: device.deviceId,
+            type: "camera",
+            name: device.label || `Camera ${device.deviceId.slice(0, 8)}`,
+            deviceId: device.deviceId,
+            kind: "videoinput",
+            status: "available",
+            capabilities: await this.getDeviceCapabilities(device),
+            icon: "📹",
+          };
+        }
+
+        async createScreenSource() {
+          return {
+            id: "screen",
+            type: "screen",
+            name: "Screen Capture",
+            deviceId: "screen",
+            kind: "screen",
+            status: "available",
+            capabilities: {
+              width: { max: 3840 },
+              height: { max: 2160 },
+              frameRate: { max: 60 },
+            },
+            icon: "🖥️",
+          };
+        }
+
+        async createWindowSource() {
+          return {
+            id: "window",
+            type: "window",
+            name: "Window Capture",
+            deviceId: "window",
+            kind: "window",
+            status: "available",
+            capabilities: {
+              width: { max: 1920 },
+              height: { max: 1080 },
+              frameRate: { max: 30 },
+            },
+            icon: "🪟",
+          };
+        }
+
+        async createVirtualCameraSource(device) {
+          return {
+            id: `virtual-${device.deviceId}`,
+            type: "virtual",
+            name: device.label || "Virtual Camera",
+            deviceId: device.deviceId,
+            kind: "videoinput",
+            status: "available",
+            capabilities: await this.getDeviceCapabilities(device),
+            icon: "🎭",
+          };
+        }
+
+        async createPhoneCameraSource(device) {
+          return {
+            id: `phone-${device.deviceId}`,
+            type: "phone",
+            name: device.label || "Phone Camera",
+            deviceId: device.deviceId,
+            kind: "videoinput",
+            status: "available",
+            capabilities: await this.getDeviceCapabilities(device),
+            icon: "📱",
+          };
+        }
+
+        async getDeviceCapabilities(device) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { deviceId: { exact: device.deviceId } },
+            });
+            const track = stream.getVideoTracks()[0];
+            const capabilities = track.getCapabilities();
+            stream.getTracks().forEach((t) => t.stop());
+            return capabilities;
+          } catch (error) {
+            return {
+              width: { max: 1920 },
+              height: { max: 1080 },
+              frameRate: { max: 30 },
+            };
+          }
+        }
+
+        renderSources() {
+          this.elements.sourceGrid.innerHTML = "";
+
+          // Sort sources: virtual cameras first, then phone cameras, then regular cameras, then screen/window
+          const sortedSources = Array.from(this.sources.values()).sort((a, b) => {
+            const priority = { virtual: 0, phone: 1, camera: 2, screen: 3, window: 4 };
+            return (priority[a.type] || 99) - (priority[b.type] || 99);
+          });
+
+          sortedSources.forEach((source) => {
+            const card = document.createElement("div");
+            card.className = "source-card";
+            card.dataset.sourceId = source.id;
+
+            const statusClass =
+              source.status === "available"
+                ? "status-available"
+                : source.status === "busy"
+                  ? "status-busy"
+                  : "status-unavailable";
+
+            card.innerHTML = `
+              <div class="source-info">
+                <div class="source-icon">${source.icon}</div>
+                <div class="source-details">
+                  <h4>${source.name}</h4>
+                  <p>${this.getSourceDescription(source)}</p>
+                </div>
+                <span class="source-status ${statusClass}">${source.status}</span>
+              </div>
+            `;
+
+            card.addEventListener("click", () => this.selectSource(source.id));
+            this.elements.sourceGrid.appendChild(card);
+          });
+        }
+
+        getSourceDescription(source) {
+          const caps = source.capabilities;
+          if (!caps) return "Standard definition";
+
+          const maxWidth = caps.width?.max || 1920;
+          const maxHeight = caps.height?.max || 1080;
+          const maxFps = caps.frameRate?.max || 30;
+
+          return `Up to ${maxWidth}x${maxHeight} @ ${maxFps}fps`;
+        }
+
+        async selectSource(sourceId) {
+          // Update UI
+          document.querySelectorAll(".source-card").forEach((card) => {
+            card.classList.remove("selected");
+          });
+          document.querySelector(`[data-source-id="${sourceId}"]`)?.classList.add("selected");
+
+          this.currentSource = this.sources.get(sourceId);
+          await this.previewSource();
+        }
+
+        async previewSource() {
+          if (!this.currentSource) return;
+
+          try {
+            // Stop existing preview
+            if (this.stream) {
+              this.stream.getTracks().forEach((track) => track.stop());
+            }
+
+            const constraints = this.getConstraintsForSource(this.currentSource);
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+            this.elements.previewVideo.srcObject = this.stream;
+            await this.elements.previewVideo.play();
+
+            this.updateStats();
+            this.setStatus(`Previewing: ${this.currentSource.name}`);
+          } catch (error) {
+            this.setStatus(`Preview failed: ${error.message}`);
+          }
+        }
+
+        getConstraintsForSource(source) {
+          const qualitySettings = {
+            "1080p": { width: 1920, height: 1080, frameRate: 60 },
+            "720p": { width: 1280, height: 720, frameRate: 30 },
+            "480p": { width: 854, height: 480, frameRate: 30 },
+            "360p": { width: 640, height: 360, frameRate: 30 },
+          };
+
+          const quality = qualitySettings[this.selectedQuality];
+          const caps = source.capabilities || {};
+
+          if (source.type === "screen" || source.type === "window") {
+            return {
+              video: {
+                displaySurface: source.type,
+                width: { ideal: Math.min(quality.width, caps.width?.max || quality.width) },
+                height: { ideal: Math.min(quality.height, caps.height?.max || quality.height) },
+                frameRate: { ideal: Math.min(quality.frameRate, caps.frameRate?.max || quality.frameRate) },
+              },
+            };
+          }
+
+          return {
+            video: {
+              deviceId: source.deviceId ? { exact: source.deviceId } : undefined,
+              width: { ideal: Math.min(quality.width, caps.width?.max || quality.width) },
+              height: { ideal: Math.min(quality.height, caps.height?.max || quality.height) },
+              frameRate: { ideal: Math.min(quality.frameRate, caps.frameRate?.max || quality.frameRate) },
+            },
+            audio: true,
+          };
+        }
+
+        async updateSourceQuality() {
+          if (this.currentSource) {
+            await this.previewSource();
+          }
+        }
+
+        updateStats() {
+          if (!this.stream) return;
+
+          const videoTrack = this.stream.getVideoTracks()[0];
+          if (videoTrack) {
+            const settings = videoTrack.getSettings();
+            this.elements.resolutionStat.textContent = `${settings.width}x${settings.height}`;
+            this.elements.fpsStat.textContent = Math.round(settings.frameRate || 30);
+
+            // Estimate bitrate (rough calculation)
+            const bitrate = Math.round((settings.width * settings.height * settings.frameRate * 0.1) / 1000);
+            this.elements.bitrateStat.textContent = `${bitrate}k`;
+          }
+
+          // Simulate viewer count (would come from actual streaming service)
+          this.elements.viewersStat.textContent = Math.floor(Math.random() * 100);
+        }
+
+        async testCurrentSource() {
+          if (!this.currentSource) {
+            this.setStatus("Please select a source first");
+            return;
+          }
+
+          this.setStatus("Testing source...");
+
+          // Test the source by trying to get a stream
+          try {
+            const constraints = this.getConstraintsForSource(this.currentSource);
+            const testStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+            // Check if we got a valid stream
+            const videoTrack = testStream.getVideoTracks()[0];
+            if (videoTrack && videoTrack.readyState === "live") {
+              this.setStatus("✅ Source test passed!");
+
+              // Update source status
+              this.currentSource.status = "available";
+              this.renderSources();
+            } else {
+              this.setStatus("❌ Source test failed");
+              this.currentSource.status = "unavailable";
+              this.renderSources();
+            }
+
+            testStream.getTracks().forEach((track) => track.stop());
+          } catch (error) {
+            this.setStatus(`❌ Source test failed: ${error.message}`);
+            this.currentSource.status = "unavailable";
+            this.renderSources();
+          }
+        }
+
+        async startStreaming() {
+          if (!this.currentSource || !this.stream) {
+            this.setStatus("Please select and preview a source first");
+            return;
+          }
+
+          try {
+            this.setStatus("Starting stream...");
+
+            // Create a new stream for broadcasting (higher quality)
+            const broadcastConstraints = this.getConstraintsForSource(this.currentSource);
+            broadcastConstraints.video.width = { ideal: 1920 };
+            broadcastConstraints.video.height = { ideal: 1080 };
+
+            this.broadcastStream = await navigator.mediaDevices.getUserMedia(broadcastConstraints);
+
+            // Here you would integrate with your streaming service (WebRTC, RTMP, etc.)
+            // For now, we'll simulate streaming with enhanced features
+            this.elements.startBtn.disabled = true;
+            this.elements.stopBtn.disabled = false;
+            this.elements.recordBtn.disabled = false;
+
+            // Start stats updates
+            this.statsInterval = setInterval(() => this.updateStats(), 1000);
+
+            // Simulate connection to streaming server
+            await this.connectToStreamServer();
+
+            this.setStatus("🔴 Stream is LIVE!");
+
+            // Start viewer count simulation with more realistic patterns
+            this.startViewerSimulation();
+          } catch (error) {
+            this.setStatus(`Failed to start stream: ${error.message}`);
+            console.error("Stream start failed:", error);
+
+            // Re-enable buttons on failure
+            this.elements.startBtn.disabled = false;
+            this.elements.stopBtn.disabled = true;
+            this.elements.recordBtn.disabled = true;
+          }
+        }
+
+        async connectToStreamServer() {
+          // Simulate connection to streaming server
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              this.setStatus("🔴 Connected to streaming server");
+              resolve();
+            }, 1500);
+          });
+        }
+
+        startViewerSimulation() {
+          let baseViewers = Math.floor(Math.random() * 50) + 10;
+
+          this.viewerInterval = setInterval(() => {
+            // Simulate realistic viewer fluctuations
+            const change = Math.floor(Math.random() * 21) - 10; // -10 to +10
+            baseViewers = Math.max(0, baseViewers + change);
+
+            // Add occasional spikes
+            if (Math.random() < 0.1) {
+              baseViewers += Math.floor(Math.random() * 30) + 20;
+            }
+
+            this.elements.viewersStat.textContent = baseViewers;
+          }, 3000);
+        }
+
+        stopStreaming() {
+          if (this.statsInterval) {
+            clearInterval(this.statsInterval);
+            this.statsInterval = null;
+          }
+
+          if (this.viewerInterval) {
+            clearInterval(this.viewerInterval);
+            this.viewerInterval = null;
+          }
+
+          if (this.broadcastStream) {
+            this.broadcastStream.getTracks().forEach((track) => track.stop());
+            this.broadcastStream = null;
+          }
+
+          this.elements.startBtn.disabled = false;
+          this.elements.stopBtn.disabled = true;
+          this.elements.recordBtn.disabled = true;
+
+          if (this.recorder && this.recorder.state !== "inactive") {
+            this.stopRecording();
+          }
+
+          this.setStatus("Stream stopped");
+          this.elements.viewersStat.textContent = "0";
+        }
+
+        toggleRecording() {
+          if (!this.stream) return;
+
+          if (this.recorder && this.recorder.state === "recording") {
+            this.stopRecording();
+          } else {
+            this.startRecording();
+          }
+        }
+
+        startRecording() {
+          if (!this.stream) return;
+
+          this.recordedChunks = [];
+          const options = { mimeType: "video/webm;codecs=vp9" };
+
+          try {
+            this.recorder = new MediaRecorder(this.stream, options);
+
+            this.recorder.ondataavailable = (event) => {
+              if (event.data.size > 0) {
+                this.recordedChunks.push(event.data);
+              }
+            };
+
+            this.recorder.onstop = () => {
+              const blob = new Blob(this.recordedChunks, { type: "video/webm" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `recording-${new Date().toISOString().replace(/[:.]/g, "-")}.webm`;
+              a.click();
+              URL.revokeObjectURL(url);
+            };
+
+            this.recorder.start();
+            this.elements.recordBtn.textContent = "⏹️ Stop Recording";
+            this.setStatus("🔴 Recording...");
+          } catch (error) {
+            this.setStatus(`Recording failed: ${error.message}`);
+          }
+        }
+
+        stopRecording() {
+          if (this.recorder && this.recorder.state !== "inactive") {
+            this.recorder.stop();
+            this.elements.recordBtn.textContent = "🔴 Record";
+            this.setStatus("Recording saved");
+          }
+        }
+
+        takeSnapshot() {
+          if (!this.elements.previewVideo || !this.stream) return;
+
+          const canvas = document.createElement("canvas");
+          canvas.width = this.elements.previewVideo.videoWidth;
+          canvas.height = this.elements.previewVideo.videoHeight;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(this.elements.previewVideo, 0, 0);
+
+          canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `snapshot-${new Date().toISOString().replace(/[:.]/g, "-")}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+
+          this.setStatus("📸 Snapshot saved");
+        }
+
+        setStatus(message) {
+          this.elements.streamStatus.textContent = message;
+        }
+      }
+
+      // Initialize the enhanced live manager
+      document.addEventListener("DOMContentLoaded", () => {
+        new EnhancedLiveManager();
+      });
+    </script>
+  </body>
+</html>

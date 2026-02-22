@@ -127,8 +127,10 @@ const generateOutline = ({ siteType, prompt }) => {
 };
 
 const toAbsoluteUrl = (value) => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
   try {
-    return new URL(String(value || ""), window.location.origin).toString();
+    return new URL(raw, window.location.origin).toString();
   } catch {
     return "";
   }
@@ -204,7 +206,9 @@ const generateLivePreview = async (state, els) => {
       throw new Error(String(data?.error || "Generation failed."));
     }
     state.generatedSiteId = String(data.siteId || "");
-    state.generatedPreviewUrl = toAbsoluteUrl(data.previewUrl || "");
+    state.generatedPreviewUrl = toAbsoluteUrl(
+      data.previewUrl || `/preview/${state.generatedSiteId}`
+    );
     state.generatedLayout = data.layout || null;
     saveState(state);
 
@@ -482,7 +486,10 @@ const wireSave = (state, els) => {
         data?.siteId || state.generatedSiteId || ""
       );
       state.generatedPreviewUrl = toAbsoluteUrl(
-        data?.previewUrl || state.generatedPreviewUrl || ""
+        data?.previewUrl ||
+          (state.generatedSiteId ? `/preview/${state.generatedSiteId}` : "") ||
+          state.generatedPreviewUrl ||
+          ""
       );
       state.generatedLayout = data?.layout || state.generatedLayout || null;
       saveState(state);

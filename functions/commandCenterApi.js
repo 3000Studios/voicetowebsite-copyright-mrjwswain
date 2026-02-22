@@ -107,12 +107,74 @@ const getLiveRoomAdminToken = (env) =>
 const isProtectedCorePath = (filePath) =>
   PROTECTED_CORE_PATHS.has(String(filePath || "").trim());
 
+const normalizePreviewRoute = (value) => {
+  let route = String(value || "").trim();
+  if (!route) return "";
+  try {
+    if (/^https?:\/\//i.test(route)) {
+      route = new URL(route).pathname || "/";
+    }
+  } catch (_) {
+    return "";
+  }
+  route = route.replace(/^\/preview/, "");
+  if (!route.startsWith("/")) route = `/${route}`;
+  route = route.replace(/[?#].*$/, "");
+  if (!route || route === "/index" || route === "/index.html") return "/";
+  if (route.endsWith(".html")) route = route.slice(0, -5);
+  if (!/^\/[a-zA-Z0-9/_-]*$/.test(route)) return "";
+  return route || "/";
+};
+
 const toRouteFromFilePath = (filePath) => {
   const p = safePath(filePath);
   if (!p) return "/";
-  if (p === "index.html") return "/";
-  if (p.endsWith(".html")) return `/${p.slice(0, -5)}`;
-  return `/${p}`;
+  const lower = p.toLowerCase();
+
+  // Admin files always go to mission
+  if (lower.startsWith("admin/")) return "/admin/mission";
+
+  // Root index.html is the home page
+  if (lower === "index.html") return "/";
+
+  // HTML files in root become routes
+  if (lower.endsWith(".html") && !lower.includes("/")) {
+    const name = p.slice(0, -5); // Remove .html
+    return name === "index" ? "/" : `/${name}`;
+  }
+
+  // HTML files in subdirectories become nested routes
+  if (lower.endsWith(".html")) {
+    const pathWithoutExt = p.slice(0, -5);
+    const route = pathWithoutExt.replace(/\\/g, "/"); // Normalize path separators
+    return route.startsWith("/") ? route : `/${route}`;
+  }
+
+  // Special known directories
+  if (
+    /\b(store|pricing|blog|contact|features|templates|gallery)\b/.test(lower)
+  ) {
+    const match = lower.match(
+      /\b(store|pricing|blog|contact|features|templates|gallery)\b/
+    );
+    return normalizePreviewRoute(`/${match?.[0] || ""}`);
+  }
+
+  // For any other files, try to infer route from path structure
+  if (lower.includes("/")) {
+    const parts = lower.split("/");
+    // Skip common asset directories
+    if (
+      parts[0].match(/^(css|js|images|assets|public|static|src|components)$/)
+    ) {
+      return "/"; // Asset changes affect the whole site
+    }
+    // Use the directory as a route
+    return `/${parts[0]}`;
+  }
+
+  // Default fallback for root-level files
+  return "/";
 };
 
 const toFilePathFromRoute = (route) => {
@@ -784,23 +846,51 @@ const handleFsSearch = async ({ env, assets, request, url }) => {
 const handlePreviewBuild = async ({ request }) => {
   const body = await parseJsonBody(request);
   const routes = new Set();
+  const addRoute = (candidate) => {
+    const normalized = normalizePreviewRoute(candidate);
+    if (!normalized) return;
+    routes.add(normalized);
+  };
+
+  // Process explicit routes first
   for (const route of body.routes || []) {
-    if (typeof route === "string" && route.trim()) {
-      routes.add(route.trim());
-    }
+    if (typeof route !== "string" || !route.trim()) continue;
+    addRoute(route);
   }
+
+  // Process files and convert to routes
   for (const file of body.files || []) {
     const normalized = safePath(file);
     if (!normalized) continue;
-    routes.add(toRouteFromFilePath(normalized));
+    const route = toRouteFromFilePath(normalized);
+    addRoute(route);
   }
+
+  // If no routes were determined, default to home page
   if (!routes.size) routes.add("/");
+
+  // Prioritize home page if index.html was likely modified
+  const routeArray = Array.from(routes);
+  const hasIndexModification = body.files?.some((file) =>
+    String(file).toLowerCase().includes("index.html")
+  );
+
+  // If index.html was modified and home page isn't first, prioritize it
+  if (hasIndexModification && routeArray.length > 1 && routeArray[0] !== "/") {
+    const homeIndex = routeArray.indexOf("/");
+    if (homeIndex > 0) {
+      // Move home page to front for preview priority
+      routeArray.splice(homeIndex, 1);
+      routeArray.unshift("/");
+    }
+  }
+
   const ts = Date.now();
   const zoneFlag = body.showMonetizationZones ? "&zones=1" : "";
   return json(200, {
     ok: true,
-    previewRoutes: Array.from(routes),
-    previews: Array.from(routes).map((route) => ({
+    previewRoutes: routeArray,
+    previews: routeArray.map((route) => ({
       route,
       url: `/preview${route}?shadow=1${zoneFlag}&ts=${ts}`,
     })),

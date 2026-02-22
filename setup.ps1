@@ -54,7 +54,7 @@ if ($InstallVSCodeExtensions) {
   }
 
   $extensions = @(
-    "cloudflare.wrangler",
+    "cloudflare.cloudflare-workers-bindings-extension",
     "ms-vscode.vscode-typescript-next",
     "esbenp.prettier-vscode",
     "christian-kohler.path-intellisense",

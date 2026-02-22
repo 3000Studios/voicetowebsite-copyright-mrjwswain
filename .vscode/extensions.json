@@ -1,68 +1,59 @@
 {
   "recommendations": [
-    // ============================================
-    // ESSENTIAL - Core Development Tools
-    // ============================================
+    // Core Development
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "EditorConfig.EditorConfig",
 
-    // ============================================
-    // CLOUDFLARE WORKERS
-    // ============================================
-    "cloudflare.wrangler",
+    // Cloudflare Workers
+    "cloudflare.cloudflare-workers-bindings-extension",
 
-    // ============================================
-    // TYPESCRIPT & JAVASCRIPT
-    // ============================================
+    // TypeScript & JavaScript
     "ms-vscode.vscode-typescript-next",
 
-    // ============================================
-    // GIT & VERSION CONTROL
-    // ============================================
+    // Git Integration (single)
     "eamodio.gitlens",
-    "mhutchie.git-graph",
 
-    // ============================================
-    // PRODUCTIVITY & INTELLISENSE
-    // ============================================
+    // Productivity
     "christian-kohler.path-intellisense",
     "streetsidesoftware.code-spell-checker",
     "usernamehw.errorlens",
 
-    // ============================================
-    // NPM & PACKAGE MANAGEMENT
-    // ============================================
-    "eg2.vscode-npm-script",
-    "christian-kohler.npm-intellisense",
-
-    // ============================================
-    // REACT & MODERN WEB
-    // ============================================
+    // React
     "dsznajder.es7-react-js-snippets",
 
-    // ============================================
-    // AI-POWERED CODING
-    // ============================================
-    "GitHub.copilot",
-    "GitHub.copilot-chat",
+    // AI (single primary)
     "Continue.continue",
 
-    // ============================================
-    // CODE QUALITY & FORMATTING
-    // ============================================
+    // Utilities / Theme
+    "PKief.material-icon-theme",
+    "ms-vscode.powershell",
+    "GitHub.vscode-github-actions"
+  ],
+
+  "unwantedRecommendations": [
+    // Duplicates / non-essential / performance risk
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+    "mhutchie.git-graph",
+    "eg2.vscode-npm-script",
+    "christian-kohler.npm-intellisense",
     "aaron-bond.better-comments",
     "oderwat.indent-rainbow",
 
-    // ============================================
-    // UTILITIES
-    // ============================================
     "Gruntfuggly.todo-tree",
-    "PKief.material-icon-theme",
-    "ms-playwright.playwright",
-    "GitHub.vscode-github-actions",
-    "vitest.explorer"
-  ],
 
-  "unwantedRecommendations": ["vscodevim.vim", "ms-vscode.vscode-typescript-tslint-plugin"]
+    "ms-playwright.playwright",
+
+    "ZixuanChen.vitest-explorer",
+    // Already blocked legacy/unwanted set
+    "vscodevim.vim",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "bradlc.vscode-tailwindcss",
+    "ritwickdey.LiveServer",
+    "wayou.vscode-todo-highlight",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag",
+    "Codeium.codeium"
+  ]
 }

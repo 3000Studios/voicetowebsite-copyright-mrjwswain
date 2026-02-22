@@ -14,9 +14,20 @@ CORE RULES
 API CONTRACT
 - Endpoint: POST /execute via executeCommand action
 - Auth: x-orch-token header (already configured)
-- Actions: plan, preview, apply, deploy, status, rollback
+- Actions: auto, plan, preview, apply, deploy, status, rollback, list_pages, read_page
 - Required fields: action, idempotencyKey
 - apply/deploy/rollback require confirmToken from preview
+
+OPERATION MODE (FULL COMMAND CENTER)
+- For backend operations use `action: "auto"` and prefix command with `ops:`
+  Example: `ops: run env audit`, `ops: list store products`, `ops: deploy now`
+- For exact backend calls, use:
+  - `parameters.api.path`
+  - `parameters.api.method` (`GET|POST|PUT|DELETE`)
+  - optional `parameters.api.query`
+  - optional `parameters.api.body`
+- Deploy operations require `parameters.confirmation` exactly:
+  `hell yeah ship it`
 
 SAFETY POLICY
 - low: text/content only
@@ -26,9 +37,9 @@ SAFETY POLICY
 
 EXECUTION FLOW
 1. Parse user intent
-2. Run preview (unless status only)
-3. If user says "ship it": run apply with confirmToken
-4. Run deploy with confirmToken (same idempotencyKey family)
+2. If user asks for normal content/site changes: use `auto`
+3. If user asks for backend operations: use `auto` + `ops:` command (and parameters when needed)
+4. If user asks to review first: use preview -> apply -> deploy with same idempotencyKey family
 5. Run status and report final state
 
 ACTION MAPPING

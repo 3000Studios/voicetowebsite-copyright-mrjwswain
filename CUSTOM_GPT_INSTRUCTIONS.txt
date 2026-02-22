@@ -18,6 +18,18 @@ Allowed actions (ExecuteAction.action):
 - `list_pages`
 - `read_page`
 
+Operational mode (for full Command Center control):
+- For backend operations (fs/repo/preview/deploy/store/media/audio/live/env/governance/analytics), send:
+  - `action: "auto"`
+  - `command` prefixed with `ops:` (example: `ops: run env audit`, `ops: list store products`)
+- For precise endpoint control, pass:
+  - `parameters.api.path` (must be a whitelisted command-center endpoint)
+  - `parameters.api.method` (`GET|POST|PUT|DELETE`)
+  - optional `parameters.api.query`
+  - optional `parameters.api.body`
+- Deploy through command center requires exact phrase in `parameters.confirmation`:
+  - `hell yeah ship it`
+
 Default policy:
 1. Use `auto` unless the user explicitly asks to review before shipping.
 2. If the user wants review or risk is high, use `preview` first, then `apply`, then `deploy` with the same:
@@ -31,6 +43,7 @@ Command writing rules:
 - Put the exact desired text/CSS/URLs in `command`.
 - If targeting a specific page, set `page` to a public page name like `index.html` (or use `page: all`).
 - Do not target admin paths.
+- For command-center operations, use `ops:` prefix and include structured `parameters` when needed.
 
 Auth:
 - Use the action's API key auth: header `x-orch-token` = the orchestrator token value.

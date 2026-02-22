@@ -7,9 +7,13 @@ import {
   setAdminCookieHeaders,
 } from "./functions/adminAuth.js";
 import { handleBotHubRequest } from "./functions/botHub.js";
-import { onRequestPost as handleChatRequest } from "./functions/chat.js";
-import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
 import { getCapabilityManifest } from "./functions/capabilities.js";
+import { onRequestPost as handleChatRequest } from "./functions/chat.js";
+import {
+  handleCommandCenterRequest,
+  isCommandCenterPath,
+} from "./functions/commandCenterApi.js";
+import { onRequestPost as handleExecuteRequest } from "./functions/execute.js";
 import { onRequestPost as handleGodmodeInferRequest } from "./functions/godmode.js";
 import { handleImageSearchRequest } from "./functions/imageSearch.js";
 import { onRequestPost as handleOrchestrator } from "./functions/orchestrator.js";
@@ -21,10 +25,6 @@ import {
   handleStylePacksRequest,
 } from "./functions/siteGenerator.js";
 import { handleSupportChatRequest } from "./functions/supportChat.js";
-import {
-  handleCommandCenterRequest,
-  isCommandCenterPath,
-} from "./functions/commandCenterApi.js";
 import catalog from "./products.json";
 import { AuditLogDO } from "./src/durable_objects/AuditLogDO.js";
 import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
@@ -1391,7 +1391,7 @@ export default {
         }
       }
 
-      // Cloudflare zone analytics proxy (real data only)
+      // Enhanced Cloudflare analytics endpoints
       if (
         url.pathname === "/api/analytics/overview" &&
         request.method === "GET"
@@ -1438,6 +1438,181 @@ export default {
             });
           }
           return jsonResponse(200, { result: data.result });
+        } catch (err) {
+          return jsonResponse(500, { error: err.message });
+        }
+      }
+
+      // Enhanced analytics with detailed visitor metrics
+      if (
+        url.pathname === "/api/analytics/detailed" &&
+        request.method === "GET"
+      ) {
+        const hasAdmin = await hasValidAdminCookie(request, env);
+        if (!hasAdmin) {
+          return jsonResponse(401, { error: "Unauthorized" });
+        }
+        const isAdmin = await isAdminRequest(request, env);
+        if (!isAdmin) {
+          return jsonResponse(401, {
+            error: "Unauthorized. Admin access required.",
+          });
+        }
+
+        const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
+        const apiToken =
+          env.CF_API_TOKEN ||
+          env.CF_API_TOKEN2 ||
+          env.CF_USER_TOKEN ||
+          env.CLOUDFLARE_API_TOKEN ||
+          env.CF_ACCOUNT_API_VOICETOWEBSITE ||
+          env.CF_Account_API_VoicetoWebsite;
+        if (!apiToken || !zoneId) {
+          return jsonResponse(501, {
+            error: "Cloudflare API token or zone ID missing.",
+          });
+        }
+
+        try {
+          const since = url.searchParams.get("since") || "-86400"; // default last 24 hours
+          const until = url.searchParams.get("until") || "";
+
+          // Fetch multiple analytics endpoints for comprehensive data
+          const [dashboardRes, coloRes, httpRes] = await Promise.all([
+            fetch(
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}&until=${until}&continuous=true`,
+              {
+                headers: {
+                  Authorization: `Bearer ${apiToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            ),
+            fetch(
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/colos?since=${since}&until=${until}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${apiToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            ),
+            fetch(
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/http?since=${since}&until=${until}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${apiToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            ),
+          ]);
+
+          const [dashboardData, coloData, httpData] = await Promise.all([
+            dashboardRes.json(),
+            coloRes.json(),
+            httpRes.json(),
+          ]);
+
+          // Validate responses
+          if (
+            !dashboardData.success ||
+            !coloData.success ||
+            !httpData.success
+          ) {
+            throw new Error("One or more analytics endpoints failed");
+          }
+
+          return jsonResponse(200, {
+            result: {
+              dashboard: dashboardData.result,
+              colocation: coloData.result,
+              http: httpData.result,
+              metadata: {
+                since,
+                until: until || "now",
+                zoneId,
+                fetchedAt: new Date().toISOString(),
+              },
+            },
+          });
+        } catch (err) {
+          return jsonResponse(500, { error: err.message });
+        }
+      }
+
+      // Real-time metrics endpoint
+      if (
+        url.pathname === "/api/analytics/realtime" &&
+        request.method === "GET"
+      ) {
+        const hasAdmin = await hasValidAdminCookie(request, env);
+        if (!hasAdmin) {
+          return jsonResponse(401, { error: "Unauthorized" });
+        }
+        const isAdmin = await isAdminRequest(request, env);
+        if (!isAdmin) {
+          return jsonResponse(401, {
+            error: "Unauthorized. Admin access required.",
+          });
+        }
+
+        const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
+        const apiToken =
+          env.CF_API_TOKEN ||
+          env.CF_API_TOKEN2 ||
+          env.CF_USER_TOKEN ||
+          env.CLOUDFLARE_API_TOKEN ||
+          env.CF_ACCOUNT_API_VOICETOWEBSITE ||
+          env.CF_Account_API_VoicetoWebsite;
+        if (!apiToken || !zoneId) {
+          return jsonResponse(501, {
+            error: "Cloudflare API token or zone ID missing.",
+          });
+        }
+
+        try {
+          // Get last hour data for real-time feel
+          const since = "-3600";
+          const [dashboardRes, httpRes] = await Promise.all([
+            fetch(
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${apiToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            ),
+            fetch(
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/http?since=${since}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${apiToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            ),
+          ]);
+
+          const [dashboardData, httpData] = await Promise.all([
+            dashboardRes.json(),
+            httpRes.json(),
+          ]);
+
+          if (!dashboardData.success || !httpData.success) {
+            throw new Error("Real-time analytics fetch failed");
+          }
+
+          return jsonResponse(200, {
+            result: {
+              dashboard: dashboardData.result,
+              http: httpData.result,
+              realtime: true,
+              window: "last hour",
+              fetchedAt: new Date().toISOString(),
+            },
+          });
         } catch (err) {
           return jsonResponse(500, { error: err.message });
         }

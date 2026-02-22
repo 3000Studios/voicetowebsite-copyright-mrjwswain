@@ -166,13 +166,18 @@ const App: React.FC = () => {
   // Core State
   const [tryPrompt, setTryPrompt] = useState("");
   const [flowPhase, setFlowPhase] = useState<
-    "listening" | "confirm" | "generating" | "result"
-  >("listening");
+    "ready" | "listening" | "confirm" | "generating" | "result"
+  >("ready");
   const [generatedPreviewUrl, setGeneratedPreviewUrl] = useState("");
   const [generatedSiteId, setGeneratedSiteId] = useState("");
   const [generateError, setGenerateError] = useState("");
 
   const recognitionRef = useRef<any>(null);
+  const flowPhaseRef = useRef(flowPhase);
+
+  useEffect(() => {
+    flowPhaseRef.current = flowPhase;
+  }, [flowPhase]);
 
   const startThemeSong = useCallback(async (force = false) => {
     if (!force && audioPrefRef.current === "off") return false;
@@ -189,7 +194,7 @@ const App: React.FC = () => {
     return ok;
   }, []);
 
-  // Initialize Speech Recognition
+  // Initialize speech recognition once; start only when user explicitly taps CTA.
   useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
@@ -209,24 +214,21 @@ const App: React.FC = () => {
       setTryPrompt(transcript);
     };
     recognition.onend = () => {
-      if (flowPhase === "listening") setFlowPhase("confirm");
+      if (flowPhaseRef.current === "listening") setFlowPhase("confirm");
     };
     recognition.onerror = () => {
-      setFlowPhase("listening");
+      if (flowPhaseRef.current === "listening") {
+        setFlowPhase("ready");
+      }
     };
     recognitionRef.current = recognition;
-
-    // Start recognition automatically since we removed the manual button
-    try {
-      recognition.start();
-    } catch (_) {}
 
     return () => {
       try {
         recognition.stop();
       } catch (_) {}
     };
-  }, [flowPhase]);
+  }, []);
 
   // Audio Control
   useEffect(() => {
@@ -323,6 +325,27 @@ const App: React.FC = () => {
   }, []);
 
   // Actions
+  const startListening = () => {
+    const recognition = recognitionRef.current;
+    if (!recognition) {
+      setGenerateError(
+        "Voice capture is not available in this browser. Use Chrome or Edge."
+      );
+      return;
+    }
+    setGenerateError("");
+    setTryPrompt("");
+    setFlowPhase("listening");
+    try {
+      recognition.start();
+    } catch (_) {
+      setFlowPhase("ready");
+      setGenerateError(
+        "Microphone could not start. Check browser permissions."
+      );
+    }
+  };
+
   const stopMic = () => {
     try {
       recognitionRef.current.stop();
@@ -331,7 +354,7 @@ const App: React.FC = () => {
   };
 
   const resetFlow = () => {
-    setFlowPhase("listening");
+    setFlowPhase("ready");
     setTryPrompt("");
     setGeneratedPreviewUrl("");
     setGeneratedSiteId("");
@@ -359,8 +382,21 @@ const App: React.FC = () => {
       if (!res.ok)
         throw new Error(data?.error || `Generate failed (HTTP ${res.status})`);
 
-      setGeneratedSiteId(String(data?.siteId || ""));
-      setGeneratedPreviewUrl(String(data?.previewUrl || ""));
+      const siteId = String(data?.siteId || "");
+      const previewPath =
+        String(data?.previewUrl || "").trim() ||
+        (siteId ? `/preview/${siteId}` : "");
+      let previewUrl = "";
+      try {
+        previewUrl = previewPath
+          ? new URL(previewPath, window.location.origin).toString()
+          : "";
+      } catch (_) {
+        previewUrl = previewPath;
+      }
+
+      setGeneratedSiteId(siteId);
+      setGeneratedPreviewUrl(previewUrl);
       setFlowPhase("result");
     } catch (err: any) {
       setGenerateError(err?.message || "Generate failed.");
@@ -470,6 +506,38 @@ const App: React.FC = () => {
         {/* Enhanced Flow Section */}
         <section className="relative z-20 mb-32">
           <AnimatePresence mode="wait">
+            {flowPhase === "ready" && (
+              <motion.div
+                key="ready"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="text-center py-16"
+              >
+                <div className="mb-10">
+                  <AudioWaveform
+                    active={false}
+                    mode="opener"
+                    className="mx-auto scale-125"
+                  />
+                </div>
+                <button
+                  onClick={startListening}
+                  className="px-16 py-6 rounded-full bg-white text-black font-black font-outfit text-lg tracking-[0.18em] shadow-[0_0_40px_rgba(255,255,255,0.35)] hover:shadow-[0_0_55px_rgba(255,255,255,0.55)] transition-all uppercase"
+                >
+                  Tap to Create a Website
+                </button>
+                <p className="mt-6 text-white/60 font-inter">
+                  Microphone activates only after you tap the button.
+                </p>
+                {generateError && (
+                  <div className="mt-6 text-red-400 font-outfit text-sm uppercase tracking-widest">
+                    {generateError}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
             {flowPhase === "listening" && (
               <motion.div
                 key="listening"

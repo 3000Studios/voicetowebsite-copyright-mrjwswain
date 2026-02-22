@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-02-21T20:42:49.407Z",
-  "scannedFiles": 313,
+  "generatedAt": "2026-02-22T13:27:54.582Z",
+  "scannedFiles": 316,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -408,11 +408,11 @@
     ],
     "DB": ["functions/execute.js", "functions/orchestrator.js"],
     "DEMO_EMAIL_FROM": ["worker.js"],
-    "DEPLOY_BILLING_STATUS": ["functions/commandCenterApi.js", "worker.js"],
+    "DEPLOY_BILLING_STATUS": ["functions/commandCenterApi.js", "functions/execute.js", "worker.js"],
     "DEPLOY_CONTROLLER": ["functions/commandCenterApi.js"],
     "DEPLOY_DAILY_LIMIT": ["src/durable_objects/DeployControllerDO.js"],
     "DEPLOY_DAILY_LIMITS_JSON": ["src/durable_objects/DeployControllerDO.js"],
-    "DEPLOY_PLAN_TIER": ["functions/commandCenterApi.js", "worker.js"],
+    "DEPLOY_PLAN_TIER": ["functions/commandCenterApi.js", "functions/execute.js", "worker.js"],
     "EMAIL_FROM": ["worker.js"],
     "ENVIRONMENT": ["functions/botHub.js"],
     "GEMINIAPIKEY2": [

@@ -35,6 +35,28 @@ export const getCapabilityManifest = (env) => {
         "read_page",
       ],
       confirmationPhrase,
+      operationMode: {
+        enabled: true,
+        trigger:
+          "Use command prefix `ops:` for backend operations (fs/repo/preview/deploy/store/media/audio/live/env/governance/analytics).",
+        explicitApi:
+          "Use parameters.api = { path, method, query?, body? } to call whitelisted command-center endpoints through /api/execute.",
+      },
+      commandCenterEndpoints: [
+        "/api/fs/*",
+        "/api/repo/*",
+        "/api/preview/*",
+        "/api/deploy/*",
+        "/api/analytics/metrics",
+        "/api/monetization/config",
+        "/api/store/*",
+        "/api/media/*",
+        "/api/audio/*",
+        "/api/live/*",
+        "/api/voice/execute",
+        "/api/env/audit",
+        "/api/governance/check",
+      ],
     },
     orchestrator: {
       endpoint: "/api/orchestrator",

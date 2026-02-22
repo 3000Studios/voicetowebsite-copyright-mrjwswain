@@ -1,10 +1,10 @@
 # ENV Schema
 
-Generated: 2026-02-21T20:42:49.407Z
+Generated: 2026-02-22T13:27:54.582Z
 
 ## Summary
 
-- Scanned files: 313
+- Scanned files: 316
 - Used keys: 133
 - Defined keys: 108
 - Missing keys: 51
@@ -68,11 +68,11 @@ Generated: 2026-02-21T20:42:49.407Z
 | D1                                       | yes     | 9             | ok      |
 | DB                                       | no      | 2             | missing |
 | DEMO_EMAIL_FROM                          | yes     | 1             | ok      |
-| DEPLOY_BILLING_STATUS                    | no      | 2             | missing |
+| DEPLOY_BILLING_STATUS                    | no      | 3             | missing |
 | DEPLOY_CONTROLLER                        | yes     | 1             | ok      |
 | DEPLOY_DAILY_LIMIT                       | no      | 1             | missing |
 | DEPLOY_DAILY_LIMITS_JSON                 | no      | 1             | missing |
-| DEPLOY_PLAN_TIER                         | no      | 2             | missing |
+| DEPLOY_PLAN_TIER                         | no      | 3             | missing |
 | EMAIL_FROM                               | no      | 1             | missing |
 | ENVIRONMENT                              | yes     | 1             | ok      |
 | GEMINI_API_KEY                           | yes     | 0             | unused  |

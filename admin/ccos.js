@@ -7,6 +7,7 @@ const state = {
   lastRepoStatus: null,
   lastVoicePlan: null,
   lastPreviews: [],
+  lastVoiceExecution: null,
   analytics: null,
   deployInProgress: false,
 };
@@ -37,6 +38,97 @@ const requestJson = async (url, init = {}) => {
     throw new Error(payload?.error || `Request failed (${res.status})`);
   }
   return payload;
+};
+
+const formatNumber = (value) => {
+  const num = Number(value || 0);
+  if (!Number.isFinite(num)) return "0";
+  return num.toLocaleString();
+};
+
+const formatBytes = (value) => {
+  const num = Number(value || 0);
+  if (!Number.isFinite(num) || num <= 0) return "0 B";
+  if (num < 1024) return `${num} B`;
+  if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} KB`;
+  if (num < 1024 * 1024 * 1024) return `${(num / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(num / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+};
+
+const makeIdempotencyKey = (prefix = "op") => {
+  const stamp = new Date()
+    .toISOString()
+    .replace(/[-:.TZ]/g, "")
+    .slice(0, 14);
+  return `${prefix}-${stamp}-${crypto.randomUUID().slice(0, 8)}`;
+};
+
+const withCacheBust = (url) => {
+  const value = String(url || "").trim();
+  if (!value) return "";
+  return value.includes("?")
+    ? `${value}&ts=${Date.now()}`
+    : `${value}?ts=${Date.now()}`;
+};
+
+const normalizePreviewRoute = (value) => {
+  let route = String(value || "").trim();
+  if (!route) return "";
+  try {
+    if (/^https?:\/\//i.test(route)) {
+      route = new URL(route).pathname || "/";
+    }
+  } catch (_) {
+    return "";
+  }
+  route = route.replace(/^\/preview/, "");
+  if (!route.startsWith("/")) route = `/${route}`;
+  route = route.replace(/[?#].*$/, "");
+  if (!route || route === "/index" || route === "/index.html") return "/";
+  if (route.endsWith(".html")) route = route.slice(0, -5);
+  if (!/^\/[a-zA-Z0-9/_-]*$/.test(route)) return "";
+  return route || "/";
+};
+
+const uniqueStrings = (values = []) => {
+  const out = [];
+  const seen = new Set();
+  for (const value of values) {
+    const text = String(value || "").trim();
+    if (!text || seen.has(text)) continue;
+    seen.add(text);
+    out.push(text);
+  }
+  return out;
+};
+
+const buildPreviewBundle = async ({
+  routes = [],
+  files = [],
+  showMonetizationZones = true,
+} = {}) => {
+  const normalizedRoutes = uniqueStrings(
+    routes.map((route) => normalizePreviewRoute(route)).filter(Boolean)
+  );
+  const normalizedFiles = uniqueStrings(files);
+  const payload = await requestJson("/api/preview/build", {
+    method: "POST",
+    body: JSON.stringify({
+      routes: normalizedRoutes,
+      files: normalizedFiles,
+      showMonetizationZones,
+    }),
+  });
+  return payload;
+};
+
+const populatePreviewFrame = (frame, bundle) => {
+  state.lastPreviews = bundle?.previews || [];
+  const first = state.lastPreviews[0];
+  if (first && frame) {
+    frame.src = withCacheBust(first.url);
+  }
+  return first || null;
 };
 
 const refreshDeployLogs = async () => {
@@ -150,6 +242,23 @@ const loadAnalytics = async () => {
   }
 };
 
+const loadCloudflareAnalytics = async () => {
+  const [overview, detailed, realtime] = await Promise.all([
+    requestJson("/api/analytics/overview", { method: "GET" }).catch(
+      (error) => ({ error: error.message })
+    ),
+    requestJson("/api/analytics/detailed?since=-86400", {
+      method: "GET",
+    }).catch((error) => ({ error: error.message })),
+    requestJson("/api/analytics/realtime", { method: "GET" }).catch(
+      (error) => ({
+        error: error.message,
+      })
+    ),
+  ]);
+  return { overview, detailed, realtime };
+};
+
 const renderMission = async () => {
   const [governance, deployLogs, deployMeter, analytics] = await Promise.all([
     requestJson("/api/governance/check", { method: "GET" }).catch(() => null),
@@ -259,15 +368,23 @@ const renderVCC = async () => {
   const analytics = await loadAnalytics();
   const plan = state.lastVoicePlan;
   const routes = plan?.executionPlan?.previewRoutes || [];
+  const execution = state.lastVoiceExecution;
   return `
     <section class="ccos-grid">
       <article class="ccos-card ccos-col-6">
         <h3>Voice Command Center</h3>
-        <textarea id="vcc-command" class="ccos-textarea" rows="4" placeholder="Describe the change you want to execute..."></textarea>
+        <textarea id="vcc-command" class="ccos-textarea" rows="4" placeholder="Describe the change you want to execute... (Use 'ops:' prefix for backend operations)"></textarea>
         <div style="margin-top:.5rem">
           <button type="button" class="ccos-button" id="vcc-mic">Voice Input</button>
           <button type="button" class="ccos-button" id="vcc-run">Compile Plan</button>
+          <button type="button" class="ccos-button" id="vcc-build-preview">Build Preview</button>
+          <button type="button" class="ccos-button" id="vcc-auto">Execute Auto</button>
         </div>
+        <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+          <input id="vcc-deploy-confirm" class="ccos-input" style="max-width:280px" placeholder="hell yeah ship it" />
+          <button type="button" class="ccos-button" id="vcc-deploy">Deploy Live</button>
+        </div>
+        <div id="vcc-status" style="margin-top:.5rem"></div>
         <h4>Execution Plan JSON</h4>
         <pre id="vcc-plan-json">${escapeHtml(JSON.stringify(plan || {}, null, 2) || "{}")}</pre>
       </article>
@@ -285,6 +402,12 @@ const renderVCC = async () => {
         <h3>Route Previews</h3>
         <div id="vcc-preview-tabs">${routes.map((route) => `<button type="button" class="ccos-button vcc-preview-open" data-route="${escapeHtml(route)}">${escapeHtml(route)}</button>`).join(" ") || "Compile a command to generate previews."}</div>
         <iframe title="Voice Preview" id="vcc-preview-frame" class="ccos-preview-frame"></iframe>
+      </article>
+      <article class="ccos-card ccos-col-12">
+        <h3>Execution Result</h3>
+        <pre id="vcc-exec-json">${escapeHtml(
+          JSON.stringify(execution || {}, null, 2) || "{}"
+        )}</pre>
       </article>
     </section>
     ${renderContextPanels(analytics, plan?.whatChanged || [])}
@@ -331,22 +454,88 @@ const renderMonetization = async () => {
 };
 
 const renderAnalytics = async () => {
-  const metrics = await loadAnalytics();
+  const [metrics, cf] = await Promise.all([
+    loadAnalytics(),
+    loadCloudflareAnalytics(),
+  ]);
+  const overview = cf?.overview?.result || {};
+  const overviewTotals = overview?.totals || {};
+  const detailed = cf?.detailed?.result || {};
+  const detailedMeta = detailed?.metadata || {};
+  const realtime = cf?.realtime?.result || {};
+  const realtimeTotals = realtime?.dashboard?.totals || {};
+  const colos = detailed?.colocation || [];
+  const coloRows = Array.isArray(colos) ? colos.slice(0, 8) : [];
+  const cfErrors = [
+    cf?.overview?.error,
+    cf?.detailed?.error,
+    cf?.realtime?.error,
+  ]
+    .filter(Boolean)
+    .join(" | ");
   return `
     <section class="ccos-grid">
       <article class="ccos-card ccos-col-12">
-        <h3>Analytics Overview</h3>
+        <h3>Cloudflare Analytics Overview</h3>
         <table class="ccos-data">
-          <tr><th>Traffic Sessions (24h)</th><td>${escapeHtml(metrics?.traffic?.sessions24h ?? 0)}</td></tr>
-          <tr><th>Unique Users (24h)</th><td>${escapeHtml(metrics?.traffic?.uniqueUsers24h ?? 0)}</td></tr>
+          <tr><th>Requests</th><td>${escapeHtml(formatNumber(overviewTotals?.requests?.all))}</td></tr>
+          <tr><th>Unique Visitors</th><td>${escapeHtml(formatNumber(overviewTotals?.uniques?.all))}</td></tr>
+          <tr><th>Page Views</th><td>${escapeHtml(formatNumber(overviewTotals?.pageviews?.all))}</td></tr>
+          <tr><th>Bandwidth</th><td>${escapeHtml(formatBytes(overviewTotals?.bandwidth?.all))}</td></tr>
+          <tr><th>Threats</th><td>${escapeHtml(formatNumber(overviewTotals?.threats?.all))}</td></tr>
+          <tr><th>Window</th><td>${escapeHtml(String(detailedMeta.since || "-86400"))} → ${escapeHtml(String(detailedMeta.until || "now"))}</td></tr>
+        </table>
+        <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
+          <button type="button" class="ccos-button" id="analytics-refresh">Refresh Cloudflare Data</button>
+          <button type="button" class="ccos-button" id="analytics-refresh-realtime">Refresh Realtime</button>
+        </div>
+        <div id="analytics-status" style="margin-top:.5rem">${
+          cfErrors
+            ? `<span class="ccos-pill err">${escapeHtml(cfErrors)}</span>`
+            : '<span class="ccos-pill ok">Cloudflare analytics live</span>'
+        }</div>
+      </article>
+      <article class="ccos-card ccos-col-6">
+        <h3>Realtime (Last Hour)</h3>
+        <table class="ccos-data">
+          <tr><th>Requests</th><td>${escapeHtml(formatNumber(realtimeTotals?.requests?.all))}</td></tr>
+          <tr><th>Unique Visitors</th><td>${escapeHtml(formatNumber(realtimeTotals?.uniques?.all))}</td></tr>
+          <tr><th>Bandwidth</th><td>${escapeHtml(formatBytes(realtimeTotals?.bandwidth?.all))}</td></tr>
+          <tr><th>Threats</th><td>${escapeHtml(formatNumber(realtimeTotals?.threats?.all))}</td></tr>
+        </table>
+      </article>
+      <article class="ccos-card ccos-col-6">
+        <h3>Top Colos (Detailed)</h3>
+        <table class="ccos-data">
+          <thead><tr><th>Colo</th><th>Requests</th><th>Bandwidth</th></tr></thead>
+          <tbody>${
+            coloRows.length
+              ? coloRows
+                  .map(
+                    (row) =>
+                      `<tr><td>${escapeHtml(row?.colo || row?.coloName || "n/a")}</td><td>${escapeHtml(formatNumber(row?.sum?.requests || row?.requests || 0))}</td><td>${escapeHtml(formatBytes(row?.sum?.bytes || row?.bandwidth || 0))}</td></tr>`
+                  )
+                  .join("")
+              : "<tr><td colspan='3'>No colocation data available.</td></tr>"
+          }</tbody>
+        </table>
+      </article>
+      <article class="ccos-card ccos-col-12">
+        <h3>Command Center Metrics</h3>
+        <table class="ccos-data">
+          <tr><th>Store Product Count</th><td>${escapeHtml(metrics?.store?.productCount ?? 0)}</td></tr>
           <tr><th>Conversions</th><td>${escapeHtml(metrics?.conversions?.orders ?? 0)}</td></tr>
           <tr><th>Revenue</th><td>$${escapeHtml(Number(metrics?.conversions?.revenue || 0).toFixed(2))}</td></tr>
-          <tr><th>Store Product Count</th><td>${escapeHtml(metrics?.store?.productCount ?? 0)}</td></tr>
-          <tr><th>Livestream Viewer Count</th><td>${escapeHtml(metrics?.livestream?.viewerCount ?? 0)}</td></tr>
+          <tr><th>Audit Events</th><td>${escapeHtml(metrics?.governance?.auditEvents ?? 0)}</td></tr>
         </table>
       </article>
     </section>
-    ${renderContextPanels(metrics, ["Analytics refreshed"])}
+    ${renderContextPanels(metrics, [
+      cfErrors
+        ? "Cloudflare analytics returned errors"
+        : "Cloudflare analytics refreshed",
+      "Command Center metrics refreshed",
+    ])}
   `;
 };
 
@@ -638,6 +827,13 @@ const wireCommonNav = () => {
 
 const wireCCEvents = () => {
   const statusEl = byId("cc-action-status");
+  const previewFrame = byId("cc-preview-frame");
+
+  const buildAndRenderPreview = async ({ routes = [], files = [] } = {}) => {
+    const payload = await buildPreviewBundle({ routes, files });
+    const first = populatePreviewFrame(previewFrame, payload);
+    return { payload, first };
+  };
 
   document.querySelectorAll(".cc-file-open").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -663,8 +859,13 @@ const wireCCEvents = () => {
       method: "POST",
       body: JSON.stringify({ path, content }),
     });
-    statusEl.textContent =
-      payload.whatChanged?.join(" | ") || "Saved to shadow.";
+    const preview = await buildAndRenderPreview({ files: [path] }).catch(
+      () => null
+    );
+    const baseStatus = payload.whatChanged?.join(" | ") || "Saved to shadow.";
+    statusEl.textContent = preview?.first
+      ? `${baseStatus} Preview: ${preview.first.route}`
+      : baseStatus;
   });
 
   byId("cc-file-delete")?.addEventListener("click", async () => {
@@ -673,20 +874,27 @@ const wireCCEvents = () => {
       method: "POST",
       body: JSON.stringify({ path }),
     });
-    statusEl.textContent = payload.whatChanged?.join(" | ") || "Delete staged.";
+    const preview = await buildAndRenderPreview({ files: [path] }).catch(
+      () => null
+    );
+    const baseStatus = payload.whatChanged?.join(" | ") || "Delete staged.";
+    statusEl.textContent = preview?.first
+      ? `${baseStatus} Preview: ${preview.first.route}`
+      : baseStatus;
   });
 
   byId("cc-build-preview")?.addEventListener("click", async () => {
     const path = String(byId("cc-file-path")?.value || "").trim();
-    const payload = await requestJson("/api/preview/build", {
-      method: "POST",
-      body: JSON.stringify({ files: [path], showMonetizationZones: true }),
+    const stagedPaths = (state.lastRepoStatus?.staged?.files || [])
+      .map((entry) => entry?.path)
+      .filter(Boolean);
+    const { first } = await buildAndRenderPreview({
+      files: path ? [path] : stagedPaths,
+      routes: path ? [] : ["/"],
     });
-    const first = payload.previews?.[0];
-    if (first) {
-      byId("cc-preview-frame").src = `${first.url}&ts=${Date.now()}`;
-      statusEl.textContent = `Previewing ${first.route}`;
-    }
+    statusEl.textContent = first
+      ? `Previewing ${first.route}`
+      : "No preview route resolved.";
   });
 
   byId("cc-run-verify")?.addEventListener("click", async () => {
@@ -708,60 +916,297 @@ const wireVCCEvents = () => {
   const micButton = byId("vcc-mic");
   const commandInput = byId("vcc-command");
   const runButton = byId("vcc-run");
+  const buildPreviewButton = byId("vcc-build-preview");
+  const autoButton = byId("vcc-auto");
+  const deployButton = byId("vcc-deploy");
+  const deployPhraseInput = byId("vcc-deploy-confirm");
   const previewFrame = byId("vcc-preview-frame");
   const planPre = byId("vcc-plan-json");
+  const execPre = byId("vcc-exec-json");
+  const statusEl = byId("vcc-status");
+  const impactTable = byId("vcc-impact-table");
+
+  if (commandInput && state.lastVoicePlan?.command) {
+    commandInput.value = state.lastVoicePlan.command;
+  }
+
+  const setStatus = (message, isError = false) => {
+    if (!statusEl) return;
+    statusEl.textContent = String(message || "");
+    statusEl.className = isError ? "ccos-pill err" : "ccos-pill ok";
+  };
+
+  const updatePlanJson = (payload) => {
+    if (planPre) {
+      planPre.textContent = JSON.stringify(payload || {}, null, 2);
+    }
+  };
+
+  const updateExecJson = (payload) => {
+    if (execPre) {
+      execPre.textContent = JSON.stringify(payload || {}, null, 2);
+    }
+  };
+
+  const updateImpactTable = (payload) => {
+    if (!impactTable) return;
+    const plan = payload?.executionPlan || {};
+    impactTable.innerHTML = `
+      <tr><th>Targets (routes)</th><td>${escapeHtml((plan?.targets?.routes || []).join(", ") || "n/a")}</td></tr>
+      <tr><th>Targets (files)</th><td>${escapeHtml((plan?.targets?.files || []).join(", ") || "n/a")}</td></tr>
+      <tr><th>Monetization Impact</th><td>${escapeHtml(JSON.stringify(payload?.monetizationImpact || {}))}</td></tr>
+      <tr><th>Analytics Impact</th><td>${escapeHtml(JSON.stringify(payload?.analyticsImpact || {}))}</td></tr>
+      <tr><th>Validation Checklist</th><td>${escapeHtml((plan?.validations || []).join(", ") || "n/a")}</td></tr>
+    `;
+  };
+
+  const collectPreviewInputs = (payload) => {
+    const executionPlan = payload?.executionPlan || {};
+    const result = payload?.result || {};
+    const routeCandidates = [
+      ...(executionPlan.previewRoutes || []),
+      ...(result.previewRoutes || []),
+      ...(result.impactedRoutes || []),
+      ...(result.preview?.previewRoutes || []),
+      result.route,
+    ];
+    const fileCandidates = [
+      ...(executionPlan?.targets?.files || []),
+      ...(result?.targets?.files || []),
+      ...(result?.changed || []).map((entry) => entry?.path),
+    ];
+
+    // Check if index.html was modified - if so, prioritize home page
+    const hasIndexModification = fileCandidates.some((file) =>
+      String(file).toLowerCase().includes("index.html")
+    );
+
+    const routes = uniqueStrings(
+      routeCandidates
+        .map((route) => normalizePreviewRoute(route))
+        .filter(Boolean)
+    );
+    const files = uniqueStrings(fileCandidates);
+
+    // If index.html was modified and home page isn't already prioritized, add it first
+    if (hasIndexModification && routes.length > 0 && routes[0] !== "/") {
+      routes.unshift("/");
+    }
+
+    return {
+      routes: routes.length ? routes : ["/"],
+      files,
+    };
+  };
+
+  const buildAndRenderPreview = async (payload) => {
+    const inputs = collectPreviewInputs(payload || {});
+    const previews = await buildPreviewBundle({
+      routes: inputs.routes,
+      files: inputs.files,
+      showMonetizationZones: true,
+    });
+    const first = populatePreviewFrame(previewFrame, previews);
+    updatePreviewTabs(previews.previewRoutes || inputs.routes);
+    return { previews, first };
+  };
+
+  const attachPreviewButtons = () => {
+    document.querySelectorAll(".vcc-preview-open").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const route = String(button.getAttribute("data-route") || "");
+        if (!route) return;
+        try {
+          const previews = await buildPreviewBundle({
+            routes: [route],
+            showMonetizationZones: true,
+          });
+          const first = populatePreviewFrame(previewFrame, previews);
+          if (first) setStatus(`Preview loaded for ${first.route}`);
+        } catch (error) {
+          setStatus(`Preview failed: ${error.message}`, true);
+        }
+      });
+    });
+  };
+
+  const updatePreviewTabs = (routes = []) => {
+    const tabs = byId("vcc-preview-tabs");
+    if (!tabs) return;
+    if (!routes.length) {
+      tabs.textContent = "Compile a command to generate previews.";
+      return;
+    }
+    tabs.innerHTML = routes
+      .map(
+        (route) =>
+          `<button type="button" class="ccos-button vcc-preview-open" data-route="${escapeHtml(route)}">${escapeHtml(route)}</button>`
+      )
+      .join(" ");
+    attachPreviewButtons();
+  };
 
   runButton?.addEventListener("click", async () => {
     const command = String(commandInput?.value || "").trim();
-    if (!command) return;
-    const payload = await requestJson("/api/voice/execute", {
-      method: "POST",
-      body: JSON.stringify({ command }),
-    });
-    state.lastVoicePlan = payload;
-    planPre.textContent = JSON.stringify(payload, null, 2);
-    const previews = await requestJson("/api/preview/build", {
-      method: "POST",
-      body: JSON.stringify({
-        routes: payload.executionPlan?.previewRoutes || [],
-      }),
-    });
-    state.lastPreviews = previews.previews || [];
-    if (state.lastPreviews[0]) {
-      previewFrame.src = `${state.lastPreviews[0].url}&ts=${Date.now()}`;
-    }
-  });
-
-  micButton?.addEventListener("click", () => {
-    const Recognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!Recognition) {
-      micButton.textContent = "Voice Unavailable";
+    if (!command) {
+      setStatus("Enter a voice command first.", true);
       return;
     }
-    const recognition = new Recognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onresult = (event) => {
-      const text = event.results?.[0]?.[0]?.transcript || "";
-      commandInput.value = text;
-    };
-    recognition.start();
+    try {
+      const payload = await requestJson("/api/voice/execute", {
+        method: "POST",
+        body: JSON.stringify({ command }),
+      });
+      state.lastVoicePlan = payload;
+      updatePlanJson(payload);
+      updateImpactTable(payload);
+      const preview = await buildAndRenderPreview(payload).catch(() => null);
+      setStatus(
+        preview?.first
+          ? `Execution plan compiled. Preview loaded for ${preview.first.route}.`
+          : "Execution plan compiled."
+      );
+    } catch (error) {
+      setStatus(`Compile failed: ${error.message}`, true);
+    }
   });
 
-  document.querySelectorAll(".vcc-preview-open").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const route = String(button.getAttribute("data-route") || "");
-      if (!route) return;
-      const previews = await requestJson("/api/preview/build", {
-        method: "POST",
-        body: JSON.stringify({ routes: [route], showMonetizationZones: true }),
-      });
-      const first = previews.previews?.[0];
-      if (first) previewFrame.src = `${first.url}&ts=${Date.now()}`;
-    });
+  buildPreviewButton?.addEventListener("click", async () => {
+    if (!state.lastVoicePlan && !state.lastVoiceExecution) {
+      setStatus("Compile plan first to build previews.", true);
+      return;
+    }
+    try {
+      const preview = await buildAndRenderPreview(
+        state.lastVoicePlan || state.lastVoiceExecution
+      );
+      setStatus(
+        `Built ${(preview.previews?.previews || []).length} preview route(s).`
+      );
+    } catch (error) {
+      setStatus(`Preview build failed: ${error.message}`, true);
+    }
   });
+
+  autoButton?.addEventListener("click", async () => {
+    const command = String(commandInput?.value || "").trim();
+    if (!command) {
+      setStatus("Enter a command before Execute Auto.", true);
+      return;
+    }
+    autoButton.disabled = true;
+    try {
+      const payload = await requestJson("/api/execute", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "auto",
+          idempotencyKey: makeIdempotencyKey("vcc-auto"),
+          command,
+          target: "site",
+          actor: "admin-vcc",
+        }),
+      });
+      state.lastVoiceExecution = payload;
+      updateExecJson(payload);
+      const eventType = payload?.eventType || "applied";
+      const preview = await buildAndRenderPreview(
+        state.lastVoicePlan || payload
+      ).catch(() => null);
+      setStatus(
+        preview?.first
+          ? `Auto execution complete (${eventType}). Preview loaded for ${preview.first.route}.`
+          : `Auto execution complete (${eventType}).`
+      );
+      await refreshDeployLogs();
+    } catch (error) {
+      setStatus(`Auto execution failed: ${error.message}`, true);
+    } finally {
+      autoButton.disabled = false;
+    }
+  });
+
+  deployButton?.addEventListener("click", async () => {
+    const phrase = String(deployPhraseInput?.value || "").trim();
+    if (phrase !== CONFIRMATION_PHRASE) {
+      setStatus(`Phrase must be exactly "${CONFIRMATION_PHRASE}".`, true);
+      return;
+    }
+    deployButton.disabled = true;
+    try {
+      const payload = await requestJson("/api/deploy/run", {
+        method: "POST",
+        body: JSON.stringify({
+          confirmation: phrase,
+          summary: {
+            route: state.route,
+            source: "voice-command-center",
+            plan:
+              state.lastVoicePlan?.executionPlan ||
+              state.lastVoiceExecution?.result ||
+              {},
+          },
+        }),
+      });
+      state.lastVoiceExecution = payload;
+      updateExecJson(payload);
+      setStatus("Deployment triggered.");
+      await refreshDeployLogs();
+    } catch (error) {
+      setStatus(`Deploy failed: ${error.message}`, true);
+    } finally {
+      deployButton.disabled = false;
+    }
+  });
+
+  let recognition = null;
+  let isListening = false;
+  micButton?.addEventListener("click", () => {
+    if (!recognition) {
+      const Recognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Recognition) {
+        micButton.textContent = "Voice Unavailable";
+        setStatus("Speech recognition is not supported in this browser.", true);
+        return;
+      }
+      recognition = new Recognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onresult = (event) => {
+        const text = event.results?.[0]?.[0]?.transcript || "";
+        if (commandInput) commandInput.value = text;
+      };
+      recognition.onend = () => {
+        isListening = false;
+        micButton.textContent = "Voice Input";
+        setStatus("Voice capture stopped.");
+      };
+      recognition.onerror = (event) => {
+        isListening = false;
+        micButton.textContent = "Voice Input";
+        const reason =
+          event?.error === "not-allowed"
+            ? "Microphone permission denied."
+            : "Voice capture failed.";
+        setStatus(reason, true);
+      };
+    }
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+    try {
+      recognition.start();
+      isListening = true;
+      micButton.textContent = "Stop Voice";
+      setStatus("Listening...");
+    } catch (error) {
+      setStatus(`Mic start failed: ${error.message}`, true);
+    }
+  });
+
+  attachPreviewButtons();
 };
 
 const wireMonetizationEvents = () => {
@@ -850,11 +1295,41 @@ const wireUploadForm = (kind) => {
   });
 };
 
+const wireAnalyticsEvents = () => {
+  const statusEl = byId("analytics-status");
+  byId("analytics-refresh")?.addEventListener("click", async () => {
+    try {
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="ccos-pill">Refreshing…</span>';
+      }
+      await loadRoute("/admin/analytics");
+    } catch (error) {
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="ccos-pill err">${escapeHtml(error.message)}</span>`;
+      }
+    }
+  });
+  byId("analytics-refresh-realtime")?.addEventListener("click", async () => {
+    try {
+      if (statusEl) {
+        statusEl.innerHTML =
+          '<span class="ccos-pill">Refreshing realtime…</span>';
+      }
+      await loadRoute("/admin/analytics");
+    } catch (error) {
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="ccos-pill err">${escapeHtml(error.message)}</span>`;
+      }
+    }
+  });
+};
+
 const wireRouteHandlers = () => {
   const moduleKey = ROUTES[state.route]?.moduleKey || "";
   if (moduleKey === "cc") wireCCEvents();
   if (moduleKey === "vcc") wireVCCEvents();
   if (moduleKey === "monetization") wireMonetizationEvents();
+  if (moduleKey === "analytics") wireAnalyticsEvents();
   if (moduleKey === "live") wireLiveEvents();
   if (moduleKey === "store") wireStoreEvents();
   if (moduleKey === "media") wireUploadForm("media");

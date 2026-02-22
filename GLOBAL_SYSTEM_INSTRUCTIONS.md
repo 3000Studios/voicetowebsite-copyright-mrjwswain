@@ -147,12 +147,14 @@ Public pages:
 Admin pages:
 
 - `/admin/access` -> `admin/access.html`
+- `/admin/analytics-enhanced` -> `admin/analytics-enhanced.html`
 - `/admin/analytics` -> `admin/analytics.html`
 - `/admin/app-store-manager` -> `admin/app-store-manager.html`
 - `/admin/bot-command-center` -> `admin/bot-command-center.html`
 - `/admin/customer-chat` -> `admin/customer-chat.html`
 - `/admin` -> `admin/index.html`
 - `/admin/integrated-dashboard` -> `admin/integrated-dashboard.html`
+- `/admin/live-stream-enhanced` -> `admin/live-stream-enhanced.html`
 - `/admin/live-stream` -> `admin/live-stream.html`
 - `/admin/login` -> `admin/login.html`
 - `/admin/nexus` -> `admin/nexus.html`

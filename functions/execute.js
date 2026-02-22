@@ -10,6 +10,11 @@ import {
   initializeLogger,
   loggingMiddleware,
 } from "./logger.js";
+import {
+  CONFIRMATION_PHRASE,
+  handleCommandCenterRequest,
+  isCommandCenterPath,
+} from "./commandCenterApi.js";
 import { onRequestPost as handleOrchestrator } from "./orchestrator.js";
 import { createRateLimitMiddleware } from "./rate-limiter.js";
 import {
@@ -33,6 +38,9 @@ const VALID_ACTIONS = new Set([
   "read_page",
 ]);
 const VALID_SAFETY_LEVELS = new Set(["low", "medium", "high"]);
+const JSON_BODY_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+const CC_ROUTABLE_ACTIONS = new Set(["plan", "preview", "apply", "auto"]);
+const ALLOWED_CC_METHODS = new Set(["GET", "POST", "PUT", "DELETE"]);
 
 // Public page targeting: allow any safe `slug(.html)` or "all".
 // We intentionally block paths/directories so callers can't target `admin/*` or traverse.
@@ -673,6 +681,633 @@ const runOrchestrator = async (context, payload) => {
   });
 };
 
+const asObject = (value) =>
+  value && typeof value === "object" && !Array.isArray(value) ? value : {};
+
+const normalizeText = (value) =>
+  String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const extractPathCandidate = (payload, command) => {
+  const params = asObject(payload.raw?.parameters);
+  const direct = String(
+    params.path || params.file || payload.path || payload.file || ""
+  ).trim();
+  if (direct) return direct;
+  const match = String(command || "").match(
+    /(?:file|path)\s+([a-zA-Z0-9._/-]+)/i
+  );
+  return match ? String(match[1] || "").trim() : "";
+};
+
+const extractSearchQuery = (payload, command) => {
+  const params = asObject(payload.raw?.parameters);
+  const direct = String(params.q || params.query || "").trim();
+  if (direct) return direct;
+  const quoted = String(command || "").match(/["']([^"']{2,})["']/);
+  if (quoted?.[1]) return String(quoted[1]).trim();
+  const forMatch = String(command || "").match(/\bfor\s+(.+)$/i);
+  return forMatch?.[1] ? String(forMatch[1]).trim() : "";
+};
+
+const extractStoreId = (payload, command) => {
+  const params = asObject(payload.raw?.parameters);
+  const direct = String(params.id || params.productId || "").trim();
+  if (direct) return direct;
+  const match = String(command || "").match(
+    /\bproduct\s+([a-z0-9][a-z0-9_-]{2,})\b/i
+  );
+  return match ? String(match[1] || "").trim() : "";
+};
+
+const toBooleanOrUndefined = (value) => {
+  if (typeof value === "boolean") return value;
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (!normalized) return undefined;
+  if (["1", "true", "yes", "on", "enable", "enabled"].includes(normalized))
+    return true;
+  if (["0", "false", "no", "off", "disable", "disabled"].includes(normalized))
+    return false;
+  return undefined;
+};
+
+const extractInteger = (value) => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.round(value);
+  }
+  const normalized = String(value || "").trim();
+  if (!normalized) return undefined;
+  const parsed = Number.parseInt(normalized, 10);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const looksLikeContentEdit = (command) => {
+  const lower = String(command || "").toLowerCase();
+  const editVerb =
+    /\b(update|change|set|edit|replace|make|insert|add|rewrite)\b/.test(lower);
+  const contentTarget =
+    /\b(headline|subhead|title|description|copy|text|cta|button|hero|theme|font|color|page|section|image|video|background)\b/.test(
+      lower
+    );
+  return editVerb && contentTarget;
+};
+
+const parseExplicitApiOperation = (payload) => {
+  const params = asObject(payload.raw?.parameters);
+  const api = asObject(params.api);
+  const path = String(api.path || api.endpoint || "").trim();
+  if (!path) return null;
+  const method = String(api.method || "GET")
+    .trim()
+    .toUpperCase();
+  if (!ALLOWED_CC_METHODS.has(method)) {
+    return {
+      invalid: true,
+      reason:
+        "Explicit API method must be one of GET, POST, PUT, DELETE for command center operations.",
+      method,
+    };
+  }
+  const body = api.body;
+  const url = new URL(`https://execute.local${path}`);
+  const query = {
+    ...Object.fromEntries(url.searchParams.entries()),
+    ...asObject(api.query),
+  };
+  if (!isCommandCenterPath(url)) {
+    return {
+      invalid: true,
+      reason: "Explicit API path is not within the Command Center surface.",
+      path,
+    };
+  }
+  return {
+    source: "explicit-api",
+    endpoint: url.pathname,
+    method,
+    query,
+    body,
+    description: `Execute ${method} ${url.pathname}`,
+    deployRequired: url.pathname === "/api/deploy/run",
+  };
+};
+
+const parseCommandCenterOperation = (payload) => {
+  if (!CC_ROUTABLE_ACTIONS.has(payload.action)) return null;
+  const explicit = parseExplicitApiOperation(payload);
+  if (explicit) return explicit;
+
+  const raw = normalizeText(payload.command);
+  if (!raw) return null;
+
+  const opsPrefix = raw.match(/^(ops|operation|admin ops)\s*:\s*/i);
+  const command = opsPrefix ? raw.slice(opsPrefix[0].length).trim() : raw;
+  const lower = command.toLowerCase();
+
+  // Avoid hijacking normal site-edit commands unless operation mode is explicit.
+  if (!opsPrefix && looksLikeContentEdit(lower)) return null;
+
+  const params = asObject(payload.raw?.parameters);
+  const deploySummary = asObject(params.summary);
+
+  if (/\b(deploy|deployment)\s+logs?\b|\btail\s+deploy\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/deploy/logs",
+      method: "GET",
+      description: "Fetch deploy logs",
+      deployRequired: false,
+    };
+  }
+
+  if (/\bdeploy\s+(meter|quota)\b|\bremaining deploys?\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/deploy/meter",
+      method: "GET",
+      description: "Fetch deploy quota and metering",
+      deployRequired: false,
+    };
+  }
+
+  if (/\benv(ironment)?\s+audit\b|\bcheck\s+env\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/env/audit",
+      method: "GET",
+      description: "Run environment audit",
+      deployRequired: false,
+    };
+  }
+
+  if (/\bgovernance\s+check\b|\bvalidation checklist\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/governance/check",
+      method: "GET",
+      description: "Run governance checks",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(show|run|get)\s+analytics\b|\banalytics metrics\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/analytics/metrics",
+      method: "GET",
+      description: "Fetch analytics metrics",
+      deployRequired: false,
+    };
+  }
+
+  if (/\brepo\s+status\b|\bstaged changes\b|\bshadow status\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/repo/status",
+      method: "GET",
+      description: "Fetch staged shadow repo status",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(file tree|repo tree|list files?)\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/fs/tree",
+      method: "GET",
+      description: "List repository file tree",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(search|find|grep)\b.*\b(files?|repo|code)\b/i.test(lower)) {
+    const query = extractSearchQuery(payload, command);
+    if (!query) {
+      return {
+        invalid: true,
+        reason:
+          "Search operation requires parameters.query (or quoted query text).",
+      };
+    }
+    return {
+      source: "nl",
+      endpoint: "/api/fs/search",
+      method: "GET",
+      query: { q: query },
+      description: `Search files for "${query}"`,
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(read|open|show|view)\s+file\b/i.test(lower)) {
+    const path = extractPathCandidate(payload, command);
+    if (!path) {
+      return {
+        invalid: true,
+        reason:
+          "Read file operation requires parameters.path or a file/path in the command.",
+      };
+    }
+    return {
+      source: "nl",
+      endpoint: "/api/fs/read",
+      method: "GET",
+      query: { path },
+      description: `Read file ${path}`,
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(write|update|edit|create)\s+file\b/i.test(lower)) {
+    const path = extractPathCandidate(payload, command);
+    const content = String(params.content ?? params.text ?? params.value ?? "");
+    if (!path) {
+      return {
+        invalid: true,
+        reason:
+          "Write file operation requires parameters.path or a file/path in the command.",
+      };
+    }
+    if (!content) {
+      return {
+        invalid: true,
+        reason: "Write file operation requires parameters.content.",
+      };
+    }
+    return {
+      source: "nl",
+      endpoint: "/api/fs/write",
+      method: "POST",
+      body: { path, content },
+      description: `Write file ${path}`,
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(delete|remove)\s+file\b/i.test(lower)) {
+    const path = extractPathCandidate(payload, command);
+    if (!path) {
+      return {
+        invalid: true,
+        reason:
+          "Delete file operation requires parameters.path or a file/path in the command.",
+      };
+    }
+    return {
+      source: "nl",
+      endpoint: "/api/fs/delete",
+      method: "POST",
+      body: { path },
+      description: `Delete file ${path}`,
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(build|generate)\s+preview\b|\bpreview routes?\b/i.test(lower)) {
+    const routes = Array.isArray(params.routes)
+      ? params.routes.filter((v) => typeof v === "string" && v.trim())
+      : [];
+    const files = Array.isArray(params.files)
+      ? params.files.filter((v) => typeof v === "string" && v.trim())
+      : [];
+    const showMonetizationZones = Boolean(params.showMonetizationZones);
+    return {
+      source: "nl",
+      endpoint: "/api/preview/build",
+      method: "POST",
+      body: { routes, files, showMonetizationZones },
+      description: "Build preview routes from shadow state",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(commit|save)\s+(staged|shadow|repo|changes?)\b/i.test(lower)) {
+    const message = String(
+      params.message || `Command Center commit: ${command}`
+    )
+      .trim()
+      .slice(0, 240);
+    return {
+      source: "nl",
+      endpoint: "/api/repo/commit",
+      method: "POST",
+      body: { message },
+      description: "Commit staged shadow changes to repository",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(list|show|get)\s+(store\s+)?products?\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/store/products",
+      method: "GET",
+      description: "List store products",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(create|add)\s+product\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/store/products",
+      method: "POST",
+      body: asObject(params.product),
+      description: "Create store product",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(update|edit)\s+product\b/i.test(lower)) {
+    const id = extractStoreId(payload, command);
+    if (!id) {
+      return {
+        invalid: true,
+        reason:
+          "Update product operation requires parameters.id (or a product id in the command).",
+      };
+    }
+    return {
+      source: "nl",
+      endpoint: `/api/store/${id}`,
+      method: "PUT",
+      body: asObject(params.product),
+      description: `Update store product ${id}`,
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(delete|remove)\s+product\b/i.test(lower)) {
+    const id = extractStoreId(payload, command);
+    if (!id) {
+      return {
+        invalid: true,
+        reason:
+          "Delete product operation requires parameters.id (or a product id in the command).",
+      };
+    }
+    return {
+      source: "nl",
+      endpoint: `/api/store/${id}`,
+      method: "DELETE",
+      description: `Delete store product ${id}`,
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(list|show|get)\s+media\b|\bmedia assets?\b/i.test(lower)) {
+    return {
+      source: "nl",
+      endpoint: "/api/media/list",
+      method: "GET",
+      description: "List media assets",
+      deployRequired: false,
+    };
+  }
+
+  if (
+    /\b(list|show|get)\s+audio\b|\baudio assets?\b|\bsoundboard\b/i.test(lower)
+  ) {
+    return {
+      source: "nl",
+      endpoint: "/api/audio/list",
+      method: "GET",
+      description: "List audio assets",
+      deployRequired: false,
+    };
+  }
+
+  if (
+    /\b(live|stream)\s+(state|status)\b|\bshow\s+live\b/i.test(lower) &&
+    !/\b(set|update|enable|disable)\b/i.test(lower)
+  ) {
+    return {
+      source: "nl",
+      endpoint: "/api/live/state",
+      method: "GET",
+      description: "Fetch live stream state",
+      deployRequired: false,
+    };
+  }
+
+  if (
+    /\b(set|update|enable|disable)\b.*\b(live|stream|superchat|actions|bitrate)\b/i.test(
+      lower
+    )
+  ) {
+    const stateBody = {
+      streamState: String(params.streamState || "").trim() || undefined,
+      websocketState: String(params.websocketState || "").trim() || undefined,
+      superchatEnabled: toBooleanOrUndefined(params.superchatEnabled),
+      actionsEnabled: toBooleanOrUndefined(params.actionsEnabled),
+      bitrateKbps: extractInteger(params.bitrateKbps),
+    };
+    if (/\benable superchat\b/i.test(lower)) stateBody.superchatEnabled = true;
+    if (/\bdisable superchat\b/i.test(lower))
+      stateBody.superchatEnabled = false;
+    if (/\benable actions\b/i.test(lower)) stateBody.actionsEnabled = true;
+    if (/\bdisable actions\b/i.test(lower)) stateBody.actionsEnabled = false;
+    return {
+      source: "nl",
+      endpoint: "/api/live/state",
+      method: "POST",
+      body: stateBody,
+      description: "Update live stream state",
+      deployRequired: false,
+    };
+  }
+
+  if (/\b(monetization|monetisation)\b/.test(lower)) {
+    const isWrite = /\b(set|update|enable|disable|change)\b/i.test(lower);
+    if (!isWrite) {
+      return {
+        source: "nl",
+        endpoint: "/api/monetization/config",
+        method: "GET",
+        description: "Fetch monetization config",
+        deployRequired: false,
+      };
+    }
+    const nextConfig = asObject(params.config);
+    const adDensityCap = extractInteger(params.adDensityCap);
+    if (adDensityCap !== undefined) nextConfig.adDensityCap = adDensityCap;
+    return {
+      source: "nl",
+      endpoint: "/api/monetization/config",
+      method: "POST",
+      body: nextConfig,
+      description: "Update monetization config",
+      deployRequired: false,
+    };
+  }
+
+  if (/\bvoice\b.*\b(command|execute|plan)\b/i.test(lower)) {
+    const voiceCommand = String(params.voiceCommand || params.command || "")
+      .trim()
+      .slice(0, 1000);
+    if (!voiceCommand) {
+      return {
+        invalid: true,
+        reason: "Voice execution requires parameters.voiceCommand.",
+      };
+    }
+    return {
+      source: "nl",
+      endpoint: "/api/voice/execute",
+      method: "POST",
+      body: { command: voiceCommand },
+      description: "Generate voice execution plan",
+      deployRequired: false,
+    };
+  }
+
+  if (
+    /\b(deploy|ship|publish|push live|go live)\b/i.test(lower) &&
+    !/\blogs?\b|\bmeter\b|\bquota\b/i.test(lower)
+  ) {
+    const confirmation = String(
+      params.confirmation || payload.raw?.confirmation || ""
+    ).trim();
+    return {
+      source: "nl",
+      endpoint: "/api/deploy/run",
+      method: "POST",
+      body: {
+        confirmation,
+        summary: deploySummary,
+      },
+      description: "Run deployment pipeline",
+      deployRequired: true,
+      note: `Deployment requires confirmation phrase "${CONFIRMATION_PHRASE}" exactly.`,
+    };
+  }
+
+  return null;
+};
+
+const callCommandCenter = async (context, payload, operation) => {
+  if (!operation || operation.invalid) {
+    const reason =
+      operation?.reason || "Invalid command center operation request.";
+    throw new Error(reason);
+  }
+
+  const method = String(operation.method || "GET")
+    .trim()
+    .toUpperCase();
+  if (!ALLOWED_CC_METHODS.has(method)) {
+    throw new Error(
+      "Operation method is not allowed. Use GET, POST, PUT, or DELETE."
+    );
+  }
+  const requestUrl = new URL(context.request.url);
+  requestUrl.pathname = String(operation.endpoint || "").trim();
+  requestUrl.search = "";
+
+  for (const [k, v] of Object.entries(asObject(operation.query))) {
+    if (v === undefined || v === null) continue;
+    requestUrl.searchParams.set(k, String(v));
+  }
+
+  if (!isCommandCenterPath(requestUrl)) {
+    throw new Error("Operation endpoint is outside command center scope.");
+  }
+
+  const headers = new Headers();
+  const actor = String(payload.actor || "bot")
+    .trim()
+    .slice(0, 120);
+  headers.set("x-cc-actor", `execute:${actor || "bot"}`);
+  if (context.env?.DEPLOY_PLAN_TIER) {
+    headers.set("x-cc-plan-tier", String(context.env.DEPLOY_PLAN_TIER));
+  }
+  if (context.env?.DEPLOY_BILLING_STATUS) {
+    headers.set(
+      "x-cc-billing-status",
+      String(context.env.DEPLOY_BILLING_STATUS)
+    );
+  }
+  if (JSON_BODY_METHODS.has(method)) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  const init = { method, headers };
+  if (JSON_BODY_METHODS.has(method)) {
+    init.body = JSON.stringify(operation.body || {});
+  }
+
+  const internalRequest = new Request(requestUrl.toString(), init);
+  const ccResponse = await handleCommandCenterRequest({
+    request: internalRequest,
+    env: context.env,
+    url: requestUrl,
+    assets: context.env?.ASSETS || context.env?.SITE_ASSETS || null,
+  });
+
+  if (!ccResponse) {
+    throw new Error("Command Center endpoint did not resolve.");
+  }
+
+  const ccPayload = await decodeJsonResponse(ccResponse);
+  if (!ccResponse.ok) {
+    throw new Error(
+      ccPayload?.error ||
+        ccPayload?.message ||
+        `Operation failed (${ccResponse.status}).`
+    );
+  }
+
+  return {
+    operation: {
+      source: operation.source || "nl",
+      endpoint: requestUrl.pathname,
+      method,
+      query: asObject(operation.query),
+      deployRequired: Boolean(operation.deployRequired),
+    },
+    ...ccPayload,
+  };
+};
+
+const buildCommandCenterPlan = (operation) => ({
+  ok: true,
+  mode: "plan",
+  operation: {
+    source: operation.source || "nl",
+    endpoint: operation.endpoint,
+    method: operation.method,
+    query: asObject(operation.query),
+    body: asObject(operation.body),
+    deployRequired: Boolean(operation.deployRequired),
+  },
+  executionPlan: {
+    intent: "command_center_operation",
+    targets: {
+      endpoint: operation.endpoint,
+      method: operation.method,
+    },
+    operations: [operation.method || "GET"],
+    validations: [
+      "env-audit",
+      "governance-check",
+      "preview-integrity",
+      "shell-integrity",
+    ],
+    previewRoutes: [],
+    deployRequired: Boolean(operation.deployRequired),
+  },
+  whatChanged: [
+    operation.description ||
+      `Planned operation ${operation.method} ${operation.endpoint}`,
+  ],
+  note:
+    operation.note ||
+    "Operation planned only. Use apply/auto to execute against backend state.",
+});
+
 const mapActionToEventType = (action) => {
   switch (action) {
     case "plan":
@@ -962,8 +1597,40 @@ export async function onRequestPost(context) {
 
     const actionRecord = makeActionRecord(payload);
     const eventId = crypto.randomUUID();
+    const commandCenterOperation = parseCommandCenterOperation(payload);
+    if (commandCenterOperation) {
+      logger.info("Command Center operation resolved from execute command", {
+        action: payload.action,
+        endpoint: commandCenterOperation.endpoint,
+        method: commandCenterOperation.method,
+        source: commandCenterOperation.source,
+        invalid: Boolean(commandCenterOperation.invalid),
+      });
+    }
 
     try {
+      if (commandCenterOperation?.invalid) {
+        const message =
+          commandCenterOperation.reason ||
+          "Invalid command center operation request.";
+        const eventPayload = makeEvent({
+          eventType: "error",
+          actionPayload: actionRecord,
+          traceId,
+          eventId,
+          error: { message },
+        });
+        await writeEventRecord(db, {
+          eventId,
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+          traceId,
+          status: 400,
+          payload: eventPayload,
+        });
+        return toJsonResponse(400, eventPayload, env);
+      }
+
       if (payload.action === "status") {
         const statusTimer = logger.startTimer("status-fetch");
         const statusData = await fetchStatus(db);
@@ -1085,6 +1752,46 @@ export async function onRequestPost(context) {
       }
 
       if (payload.action === "auto") {
+        if (commandCenterOperation) {
+          const autoTimer = logger.startTimer("auto-command-center-operation");
+          const commandCenterResult = await callCommandCenter(
+            context,
+            payload,
+            commandCenterOperation
+          );
+          const operationSteps =
+            commandCenterOperation.endpoint === "/api/deploy/run"
+              ? ["planned", "deploy_triggered"]
+              : commandCenterOperation.method === "GET"
+                ? ["planned", "queried"]
+                : ["planned", "applied"];
+          const result = {
+            ...commandCenterResult,
+            autoMode: true,
+            steps: operationSteps,
+            message:
+              commandCenterOperation.description ||
+              "Command Center operation executed through auto mode.",
+          };
+          autoTimer.end({ steps: result.steps });
+          const eventPayload = makeEvent({
+            eventType: "applied",
+            actionPayload: actionRecord,
+            traceId,
+            eventId,
+            result,
+          });
+          await writeEventRecord(db, {
+            eventId,
+            action: payload.action,
+            idempotencyKey: payload.idempotencyKey,
+            traceId,
+            status: 200,
+            payload: eventPayload,
+          });
+          return toJsonResponse(200, eventPayload, env);
+        }
+
         logger.info("Executing auto mode", { command: payload.command });
         const autoTimer = logger.startTimer("auto-execution");
 
@@ -1092,7 +1799,7 @@ export async function onRequestPost(context) {
           mode: "apply",
           command: payload.command,
           target: payload.target,
-          confirmation: "hell yeah ship it",
+          confirmation: CONFIRMATION_PHRASE,
           page: payload.page,
           path: payload.path,
           file: payload.file,
@@ -1217,6 +1924,51 @@ export async function onRequestPost(context) {
         }
       }
 
+      if (
+        commandCenterOperation &&
+        (payload.action === "plan" ||
+          payload.action === "preview" ||
+          payload.action === "apply")
+      ) {
+        let result =
+          payload.action === "plan" || payload.action === "preview"
+            ? buildCommandCenterPlan(commandCenterOperation)
+            : await callCommandCenter(context, payload, commandCenterOperation);
+
+        if (payload.action === "preview") {
+          const confirm = await createConfirmToken(env, db, {
+            action: "execute",
+            idempotencyKey: payload.idempotencyKey,
+            traceId,
+          });
+          result = {
+            ...result,
+            ...confirm,
+            confirmInstructions:
+              "Use this confirmToken with the same idempotencyKey for apply, and optionally deploy right after apply.",
+          };
+        }
+
+        const eventPayload = makeEvent({
+          eventType: mapActionToEventType(payload.action),
+          actionPayload: actionRecord,
+          traceId,
+          eventId,
+          result,
+        });
+
+        await writeEventRecord(db, {
+          eventId,
+          action: payload.action,
+          idempotencyKey: payload.idempotencyKey,
+          traceId,
+          status: 200,
+          payload: eventPayload,
+        });
+
+        return toJsonResponse(200, eventPayload, env);
+      }
+
       let orchestratorPayload = null;
       if (payload.action === "plan" || payload.action === "preview") {
         orchestratorPayload = {
@@ -1232,7 +1984,7 @@ export async function onRequestPost(context) {
           mode: "apply",
           command: payload.command,
           target: payload.target,
-          confirmation: "hell yeah ship it",
+          confirmation: CONFIRMATION_PHRASE,
           page: payload.page,
           path: payload.path,
           file: payload.file,

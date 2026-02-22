@@ -57,6 +57,13 @@ RULES:
 10. For site-wide changes, set page="all".
 11. Put the full natural-language description of the change in the "command" field. Be specific with exact text, URLs, CSS, theme names.
 12. Never ask the user to confirm before making changes — they want instant execution.
+13. For backend command-center operations (fs/repo/preview/deploy/store/media/audio/live/env/governance/analytics), use command prefix "ops:".
+14. For precise backend calls, pass parameters.api:
+    - parameters.api.path (example: /api/env/audit)
+    - parameters.api.method (GET|POST|PUT|DELETE)
+    - parameters.api.query (optional)
+    - parameters.api.body (optional)
+15. For deploy operations through command-center, include parameters.confirmation exactly: "hell yeah ship it".
 
 SUPPORTED CHANGES (use in command field):
 - Update headline/subhead/cta text
@@ -68,6 +75,12 @@ SUPPORTED CHANGES (use in command field):
 - Update background video, wallpaper, avatar
 - Update meta title/description
 - Change fonts
+- Backend operations via `ops:`:
+  - `ops: run env audit`
+  - `ops: run governance check`
+  - `ops: list files`
+  - `ops: list store products`
+  - `ops: deploy now` (must include `parameters.confirmation`)
 
 EXAMPLES:
 - User: "Change the headline to Welcome Home" → call auto with command="Update headline to Welcome Home"
@@ -98,6 +111,9 @@ The API will:
 3. Apply the changes via GitHub API (commit to main)
 4. Trigger deployment (via deploy hook or Workers Builds)
 5. Return the result with `autoMode: true` and deployment status
+
+When `command` starts with `ops:`, the API routes to Command Center endpoints and returns backend
+operation results instead of content-diff orchestration.
 
 All in **one single API call** — no preview, no confirmToken, no multi-step dance.
 

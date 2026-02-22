@@ -3,7 +3,7 @@
   "info": {
     "title": "VoiceToWebsite Execute API",
     "version": "2.0.0",
-    "description": "Production orchestration API for VoiceToWebsite. Single endpoint for all site changes. PREFERRED WORKFLOW: Use 'auto' action for instant changes (plans + applies + deploys in one call, no confirmation needed). Use 'list_pages' and 'read_page' to inspect the site. Use 'status' to check deployment health. Only use preview/apply/deploy flow for changes that need manual review."
+    "description": "Production orchestration API for VoiceToWebsite. Single endpoint for all site changes and command-center operations. PREFERRED WORKFLOW: Use 'auto' action for instant execution. For backend operations (fs/repo/preview/deploy/store/media/audio/live/env/governance/analytics), prefix command with 'ops:' or send parameters.api { path, method, query?, body? }. Use 'list_pages' and 'read_page' to inspect the site. Use 'status' to check deployment health. Only use preview/apply/deploy flow for changes that need manual review."
   },
   "servers": [
     {
@@ -43,7 +43,7 @@
         "operationId": "executeCommand",
         "tags": ["Orchestration"],
         "summary": "Execute any site change or query in a single call",
-        "description": "Single endpoint for all site operations. Use 'auto' for instant changes (plans+applies+deploys in one call). Use 'list_pages'/'read_page' to inspect site, 'status' for health, 'rollback' to undo. Supported: text updates, themes, pages, sections, videos, products, CSS, backgrounds, meta updates.",
+        "description": "Single endpoint for all site operations. Use 'auto' for instant execution. For command-center backend operations, use command prefix 'ops:' or parameters.api. Use 'list_pages'/'read_page' to inspect site, 'status' for health, 'rollback' to undo. Supported: content updates + fs/repo/preview/deploy/store/media/audio/live/env/governance/analytics operations.",
         "security": [
           {
             "OrchestratorToken": []
@@ -155,6 +155,49 @@
                     "idempotencyKey": "status-20260211-01",
                     "target": "site",
                     "actor": "custom-gpt"
+                  }
+                },
+                "ops_env_audit": {
+                  "summary": "Run command-center environment audit",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "ops-env-audit-20260211-01",
+                    "command": "ops: run env audit",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "ops_explicit_api": {
+                  "summary": "Explicit command-center API call",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "ops-store-list-20260211-01",
+                    "command": "ops: list store products",
+                    "target": "site",
+                    "actor": "custom-gpt",
+                    "parameters": {
+                      "api": {
+                        "path": "/api/store/products",
+                        "method": "GET"
+                      }
+                    }
+                  }
+                },
+                "ops_deploy": {
+                  "summary": "Command-center deploy (requires exact confirmation phrase)",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "ops-deploy-20260211-01",
+                    "command": "ops: deploy now",
+                    "target": "site",
+                    "actor": "custom-gpt",
+                    "parameters": {
+                      "confirmation": "hell yeah ship it",
+                      "summary": {
+                        "source": "custom-gpt",
+                        "note": "production deploy request"
+                      }
+                    }
                   }
                 },
                 "rollback": {
@@ -285,7 +328,7 @@
           },
           "command": {
             "type": "string",
-            "description": "Natural-language description of the change. Required for auto/plan/preview/apply. Be specific: include the exact text, URL, theme name, CSS, or page target. Examples: 'Update headline to Welcome Home', 'Change theme to midnight', 'Add page About Us with headline Our Story', 'Inject CSS: body { background: #000; }'."
+            "description": "Natural-language description of the change. Required for auto/plan/preview/apply. Use 'ops:' prefix for command-center backend operations. Be specific: include exact text, URL, theme name, CSS, or operation intent."
           },
           "target": {
             "type": "string",
@@ -331,7 +374,7 @@
           "parameters": {
             "type": "object",
             "additionalProperties": true,
-            "description": "Optional extension parameters."
+            "description": "Optional extension parameters. For backend ops you can pass parameters.api = { path, method, query?, body? }. Deploy ops should pass parameters.confirmation exactly 'hell yeah ship it'."
           }
         },
         "required": ["action", "idempotencyKey"],

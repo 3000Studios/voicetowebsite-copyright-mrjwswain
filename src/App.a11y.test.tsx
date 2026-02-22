@@ -34,13 +34,19 @@ describe("App Accessibility - Use Cases", () => {
   it("renders accessible voice flow controls", async () => {
     render(<App />);
 
-    // App starts directly in listening phase with a "Finish Command" control
+    // Mic starts only after explicit user intent.
+    const tapToCreate = await waitFor(() =>
+      screen.getByRole("button", { name: /tap to create a website/i })
+    );
+    expect(tapToCreate).toBeInTheDocument();
+
+    fireEvent.click(tapToCreate);
     const finish = await waitFor(() =>
       screen.getByRole("button", { name: /finish command/i })
     );
     expect(finish).toBeInTheDocument();
 
-    // Stop listening transitions to confirm phase (button exists and is clickable).
+    // Stop listening transitions to confirm phase.
     fireEvent.click(finish);
     await waitFor(() => {
       expect(

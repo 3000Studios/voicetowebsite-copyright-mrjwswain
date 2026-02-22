@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | Enhanced Analytics</title>
+    <meta name="description" content="Comprehensive analytics from Cloudflare with detailed visitor metrics." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="/admin/access-guard.js" type="module" defer></script>
+    <style>
+      .analytics-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .tab-button {
+        padding: 0.75rem 1.5rem;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 2px solid transparent;
+        font-weight: 500;
+      }
+
+      .tab-button:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .tab-button.active {
+        color: #22d3ee;
+        border-bottom-color: #22d3ee;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .metric-card-enhanced {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
+
+      .metric-card-enhanced:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+      }
+
+      .metric-value-enhanced {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #22d3ee;
+        margin-bottom: 0.5rem;
+      }
+
+      .metric-label-enhanced {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .geo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+
+      .geo-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      .http-methods {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .method-stat {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        text-align: center;
+        flex: 1;
+      }
+
+      .refresh-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-video-bg" aria-hidden="true">
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+    </div>
+
+    <div class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <h1>Enhanced Analytics</h1>
+          <p>Comprehensive visitor metrics from Cloudflare Analytics API.</p>
+        </div>
+
+        <div class="admin-actions">
+          <span class="pill">Real-time data</span>
+        </div>
+      </header>
+
+      <main class="admin-grid">
+        <section class="card wide metallic-card">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Analytics Dashboard</p>
+              <h2>Cloudflare Visitor Analytics</h2>
+              <p class="muted">Complete visitor insights including geography, HTTP metrics, and real-time data.</p>
+            </div>
+            <div class="status-strip">
+              <span class="status-chip" id="analytics-status">Loading…</span>
+            </div>
+          </div>
+
+          <div class="refresh-controls">
+            <button class="secondary" id="refresh-analytics">🔄 Refresh Now</button>
+            <button class="secondary" id="load-detailed">📊 Load Detailed Data</button>
+          </div>
+
+          <div class="analytics-tabs">
+            <button class="tab-button active" data-tab="overview">Overview</button>
+            <button class="tab-button" data-tab="geography">Geography</button>
+            <button class="tab-button" data-tab="http">HTTP Analytics</button>
+            <button class="tab-button" data-tab="realtime">Real-time</button>
+            <button class="tab-button" data-tab="sales">Sales</button>
+          </div>
+
+          <!-- Overview Tab -->
+          <div class="tab-content active" id="overview-tab">
+            <div class="analytics-kpis">
+              <div class="metric-card">
+                <div class="metric-label">Requests</div>
+                <div class="metric-value" id="metric-requests">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Bandwidth</div>
+                <div class="metric-value" id="metric-bandwidth">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Threats</div>
+                <div class="metric-value" id="metric-threats">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Uniques</div>
+                <div class="metric-value" id="metric-uniques">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Cached</div>
+                <div class="metric-value" id="metric-cached">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">HTTPS</div>
+                <div class="metric-value" id="metric-encrypted">—</div>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <div class="table-head">
+                <h3>Last 12h (enhanced timeseries)</h3>
+              </div>
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Window</th>
+                    <th>Requests</th>
+                    <th>Bandwidth</th>
+                    <th>Threats</th>
+                    <th>Uniques</th>
+                    <th>Cached</th>
+                  </tr>
+                </thead>
+                <tbody id="analytics-timeseries">
+                  <tr>
+                    <td colspan="6" class="muted">Loading…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Geography Tab -->
+          <div class="tab-content" id="geography-tab">
+            <div class="analytics-kpis">
+              <div class="metric-card">
+                <div class="metric-label">Data Centers</div>
+                <div class="metric-value" id="metric-colos">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Top Region</div>
+                <div class="metric-value" id="metric-top-region">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Countries</div>
+                <div class="metric-value" id="metric-countries">—</div>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <div class="table-head">
+                <h3>Cloudflare Data Centers (Colocations)</h3>
+              </div>
+              <div class="geo-grid" id="colo-grid">
+                <div class="muted">Loading geographic data…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HTTP Analytics Tab -->
+          <div class="tab-content" id="http-tab">
+            <div class="analytics-kpis">
+              <div class="metric-card">
+                <div class="metric-label">Avg Response</div>
+                <div class="metric-value" id="metric-avg-response">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">2xx Status</div>
+                <div class="metric-value" id="metric-2xx">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">4xx Errors</div>
+                <div class="metric-value" id="metric-4xx">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">5xx Errors</div>
+                <div class="metric-value" id="metric-5xx">—</div>
+              </div>
+            </div>
+
+            <div class="http-methods" id="http-methods">
+              <div class="method-stat">
+                <div>GET</div>
+                <div class="metric-value" id="get-count">—</div>
+              </div>
+              <div class="method-stat">
+                <div>POST</div>
+                <div class="metric-value" id="post-count">—</div>
+              </div>
+              <div class="method-stat">
+                <div>PUT</div>
+                <div class="metric-value" id="put-count">—</div>
+              </div>
+              <div class="method-stat">
+                <div>DELETE</div>
+                <div class="metric-value" id="delete-count">—</div>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <div class="table-head">
+                <h3>HTTP Status Code Distribution</h3>
+              </div>
+              <div id="status-codes">
+                <div class="muted">Loading HTTP analytics…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-time Tab -->
+          <div class="tab-content" id="realtime-tab">
+            <div class="analytics-kpis">
+              <div class="metric-card">
+                <div class="metric-label">Requests (1h)</div>
+                <div class="metric-value" id="realtime-requests">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Visitors (1h)</div>
+                <div class="metric-value" id="realtime-uniques">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Bandwidth (1h)</div>
+                <div class="metric-value" id="realtime-bandwidth">—</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Threats (1h)</div>
+                <div class="metric-value" id="realtime-threats">—</div>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <div class="table-head">
+                <h3>Real-time Activity (Last Hour)</h3>
+              </div>
+              <div id="realtime-activity">
+                <div class="muted">Loading real-time data…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sales Tab -->
+          <div class="tab-content" id="sales-tab">
+            <div class="table-shell" id="sales-shell">
+              <div class="muted">Loading sales data...</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="../nav.js"></script>
+    <script type="module">
+      const requestsEl = document.getElementById("metric-requests");
+      const bandwidthEl = document.getElementById("metric-bandwidth");
+      const threatsEl = document.getElementById("metric-threats");
+      const uniquesEl = document.getElementById("metric-uniques");
+      const cachedEl = document.getElementById("metric-cached");
+      const encryptedEl = document.getElementById("metric-encrypted");
+      const timeseriesEl = document.getElementById("analytics-timeseries");
+      const analyticsStatus = document.getElementById("analytics-status");
+
+      // Enhanced metrics
+      const colosEl = document.getElementById("metric-colos");
+      const avgResponseEl = document.getElementById("metric-avg-response");
+      const http2xxEl = document.getElementById("metric-2xx");
+      const http4xxEl = document.getElementById("metric-4xx");
+      const http5xxEl = document.getElementById("metric-5xx");
+
+      // Real-time metrics
+      const realtimeRequestsEl = document.getElementById("realtime-requests");
+      const realtimeUniquesEl = document.getElementById("realtime-uniques");
+      const realtimeBandwidthEl = document.getElementById("realtime-bandwidth");
+      const realtimeThreatsEl = document.getElementById("realtime-threats");
+
+      const fmtNumber = (n) => (typeof n === "number" ? n.toLocaleString() : "—");
+      const fmtBandwidth = (bytes) => {
+        if (typeof bytes !== "number") return "—";
+        const gb = bytes / (1024 * 1024 * 1024);
+        return gb >= 1 ? `${gb.toFixed(2)} GB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      };
+
+      const renderAnalytics = (result) => {
+        const totals = result?.totals || {};
+        const requests = totals.requests?.all;
+        const bandwidth = totals.bandwidth?.all;
+        const threats = totals.threats?.all;
+        const uniques = totals.uniques?.all;
+        const cached = totals.cached?.all;
+        const encrypted = totals.encrypted?.all;
+
+        requestsEl.textContent = fmtNumber(requests);
+        bandwidthEl.textContent = fmtBandwidth(bandwidth);
+        threatsEl.textContent = fmtNumber(threats);
+        uniquesEl.textContent = fmtNumber(uniques);
+        cachedEl.textContent = fmtNumber(cached);
+        encryptedEl.textContent = fmtNumber(encrypted);
+
+        const ts = result?.timeseries ?? [];
+        timeseriesEl.innerHTML = "";
+
+        ts.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.until || row.since || "window"}</td>
+            <td>${fmtNumber(row.requests?.all)}</td>
+            <td>${fmtBandwidth(row.bandwidth?.all)}</td>
+            <td>${fmtNumber(row.threats?.all)}</td>
+            <td>${fmtNumber(row.uniques?.all)}</td>
+            <td>${fmtNumber(row.cached?.all)}</td>
+          `;
+          timeseriesEl.appendChild(tr);
+        });
+
+        if (!ts.length) {
+          timeseriesEl.innerHTML = '<tr><td colspan="6" class="muted">No analytics timeseries returned.</td></tr>';
+        }
+      };
+
+      const renderDetailedAnalytics = (data) => {
+        // Render colocation data
+        const coloData = data?.colocation || {};
+        const coloTimeseries = coloData.timeseries || [];
+
+        if (coloTimeseries.length > 0) {
+          const uniqueColos = new Set(coloTimeseries.map((row) => row.colo)).size;
+          colosEl.textContent = uniqueColos;
+
+          const coloGrid = document.getElementById("colo-grid");
+          coloGrid.innerHTML = "";
+
+          // Group and sort by requests
+          const coloMap = new Map();
+          coloTimeseries.forEach((row) => {
+            const current = coloMap.get(row.colo) || { requests: 0, name: row.colo };
+            current.requests += row.requests?.all || 0;
+            coloMap.set(row.colo, current);
+          });
+
+          Array.from(coloMap.entries())
+            .sort((a, b) => b[1].requests - a[1].requests)
+            .slice(0, 12)
+            .forEach(([colo, data]) => {
+              const div = document.createElement("div");
+              div.className = "geo-card";
+              div.innerHTML = `
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🌐</div>
+                <div style="font-weight: 500; margin-bottom: 0.25rem;">${colo}</div>
+                <div style="color: #22d3ee; font-size: 0.875rem;">${fmtNumber(data.requests)} req</div>
+              `;
+              coloGrid.appendChild(div);
+            });
+        }
+
+        // Render HTTP analytics
+        const httpData = data?.http || {};
+        const httpTimeseries = httpData.timeseries || [];
+
+        if (httpTimeseries.length > 0) {
+          const avgResponse =
+            httpTimeseries.reduce((sum, row) => sum + (row.avg_response_time || 0), 0) / httpTimeseries.length;
+          avgResponseEl.textContent = `${Math.round(avgResponse)}ms`;
+
+          // Count status codes
+          const statusCounts = { "2xx": 0, "3xx": 0, "4xx": 0, "5xx": 0 };
+          httpTimeseries.forEach((row) => {
+            Object.keys(row.http_status || {}).forEach((status) => {
+              const code = parseInt(status);
+              if (code >= 200 && code < 300) statusCounts["2xx"] += row.http_status[status];
+              else if (code >= 300 && code < 400) statusCounts["3xx"] += row.http_status[status];
+              else if (code >= 400 && code < 500) statusCounts["4xx"] += row.http_status[status];
+              else if (code >= 500) statusCounts["5xx"] += row.http_status[status];
+            });
+          });
+
+          http2xxEl.textContent = fmtNumber(statusCounts["2xx"]);
+          http4xxEl.textContent = fmtNumber(statusCounts["4xx"]);
+          http5xxEl.textContent = fmtNumber(statusCounts["5xx"]);
+
+          // HTTP methods
+          const methodCounts = { GET: 0, POST: 0, PUT: 0, DELETE: 0 };
+          httpTimeseries.forEach((row) => {
+            Object.keys(row.http_method || {}).forEach((method) => {
+              if (methodCounts.hasOwnProperty(method)) {
+                methodCounts[method] += row.http_method[method];
+              }
+            });
+          });
+
+          document.getElementById("get-count").textContent = fmtNumber(methodCounts.GET);
+          document.getElementById("post-count").textContent = fmtNumber(methodCounts.POST);
+          document.getElementById("put-count").textContent = fmtNumber(methodCounts.PUT);
+          document.getElementById("delete-count").textContent = fmtNumber(methodCounts.DELETE);
+
+          // Status codes
+          const statusCodesEl = document.getElementById("status-codes");
+          statusCodesEl.innerHTML = "";
+          const latest = httpTimeseries[httpTimeseries.length - 1];
+          Object.entries(latest.http_status || {}).forEach(([status, count]) => {
+            const div = document.createElement("div");
+            div.style.cssText =
+              "display: flex; justify-content: space-between; padding: 0.5rem; background: rgba(255,255,255,0.03); margin-bottom: 0.5rem; border-radius: 0.25rem;";
+            div.innerHTML = `
+              <span>${status}</span>
+              <span style="color: #22d3ee; font-weight: 600;">${fmtNumber(count)}</span>
+            `;
+            statusCodesEl.appendChild(div);
+          });
+        }
+      };
+
+      const renderRealtime = (data) => {
+        const dashboard = data?.dashboard || {};
+        const totals = dashboard.totals || {};
+
+        realtimeRequestsEl.textContent = fmtNumber(totals.requests?.all);
+        realtimeUniquesEl.textContent = fmtNumber(totals.uniques?.all);
+        realtimeBandwidthEl.textContent = fmtBandwidth(totals.bandwidth?.all);
+        realtimeThreatsEl.textContent = fmtNumber(totals.threats?.all);
+
+        const ts = dashboard.timeseries || [];
+        const activityEl = document.getElementById("realtime-activity");
+        activityEl.innerHTML = "";
+
+        if (ts.length > 0) {
+          ts.slice(-6)
+            .reverse()
+            .forEach((row) => {
+              const div = document.createElement("div");
+              div.style.cssText =
+                "display: flex; justify-content: space-between; padding: 0.5rem; background: rgba(255,255,255,0.03); margin-bottom: 0.5rem; border-radius: 0.25rem;";
+              div.innerHTML = `
+              <span>${new Date(row.until || row.since).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+              <span style="color: #22d3ee;">${fmtNumber(row.requests?.all)} req</span>
+            `;
+              activityEl.appendChild(div);
+            });
+        } else {
+          activityEl.innerHTML = '<div class="muted">No real-time activity data available.</div>';
+        }
+      };
+
+      const loadAnalytics = async () => {
+        analyticsStatus.textContent = "Loading…";
+
+        // 1. Cloudflare Analytics
+        try {
+          const res = await fetch("/api/analytics/overview", { cache: "no-store" });
+          const data = await res.json();
+          if (!res.ok || data?.error) {
+            throw new Error(data?.error || "Analytics unavailable");
+          }
+
+          renderAnalytics(data.result || {});
+          analyticsStatus.textContent = "Live";
+          analyticsStatus.classList.add("ok");
+        } catch (err) {
+          analyticsStatus.textContent = err.message;
+          analyticsStatus.classList.add("alert");
+        }
+
+        // 2. Sales Analytics
+        const salesStatus = document.getElementById("sales-status");
+        if (salesStatus) salesStatus.textContent = "Loading...";
+
+        try {
+          const res = await fetch("/api/sales/stats", { cache: "no-store" });
+          const data = await res.json();
+
+          const shell = document.getElementById("sales-shell");
+          if (shell) {
+            if (data.recent_orders && data.recent_orders.length > 0) {
+              let html = `
+                      <div class="analytics-kpis">
+                        <div class="metric-card">
+                          <div class="metric-label">Total Revenue</div>
+                          <div class="metric-value">$${Number(data.total_revenue_usd || 0).toFixed(2)}</div>
+                        </div>
+                        <div class="metric-card">
+                          <div class="metric-label">Orders</div>
+                          <div class="metric-value">${data.total_orders || 0}</div>
+                        </div>
+                      </div>
+                      <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Revenue</th>
+                                <th>Product</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+              data.recent_orders.forEach((o) => {
+                html += `<tr>
+                            <td class="small muted">${o.id}</td>
+                            <td>$${Number(o.amount_usd || 0).toFixed(2)}</td>
+                            <td>${o.product_id}</td>
+                            <td class="small">${new Date(o.ts).toLocaleString()}</td>
+                        </tr>`;
+              });
+              html += `</tbody></table>`;
+
+              shell.innerHTML = html;
+              if (salesStatus) {
+                salesStatus.textContent = "Live";
+                salesStatus.classList.add("ok");
+              }
+            } else {
+              shell.innerHTML = `<div class="muted">No sales recorded yet.</div>`;
+              if (salesStatus) salesStatus.textContent = "No Data";
+            }
+          }
+        } catch (err) {
+          if (salesStatus) {
+            salesStatus.textContent = "Error";
+            salesStatus.classList.add("alert");
+          }
+          const shell = document.getElementById("sales-shell");
+          if (shell) shell.innerHTML = `<div class="muted alert">Failed to load sales: ${err.message}</div>`;
+        }
+      };
+
+      const loadDetailedAnalytics = async () => {
+        try {
+          const res = await fetch("/api/analytics/detailed?since=-86400", { cache: "no-store" });
+          const data = await res.json();
+
+          if (!res.ok || data?.error) {
+            throw new Error(data?.error || "Detailed analytics unavailable");
+          }
+
+          renderDetailedAnalytics(data.result);
+        } catch (err) {
+          console.error("Failed to load detailed analytics:", err);
+        }
+      };
+
+      const loadRealtimeData = async () => {
+        try {
+          const res = await fetch("/api/analytics/realtime", { cache: "no-store" });
+          const data = await res.json();
+
+          if (!res.ok || data?.error) {
+            throw new Error(data?.error || "Real-time analytics unavailable");
+          }
+
+          renderRealtime(data.result);
+        } catch (err) {
+          console.error("Failed to load real-time data:", err);
+        }
+      };
+
+      // Tab switching
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        button.addEventListener("click", (e) => {
+          const tabName = e.target.dataset.tab;
+
+          // Update tab buttons
+          document.querySelectorAll(".tab-button").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          e.target.classList.add("active");
+
+          // Update tab content
+          document.querySelectorAll(".tab-content").forEach((content) => {
+            content.classList.remove("active");
+          });
+          document.getElementById(`${tabName}-tab`).classList.add("active");
+
+          // Load specific data
+          if (tabName === "geography" || tabName === "http") {
+            loadDetailedAnalytics();
+          } else if (tabName === "realtime") {
+            loadRealtimeData();
+          }
+        });
+      });
+
+      // Event listeners
+      document.getElementById("refresh-analytics").addEventListener("click", loadAnalytics);
+      document.getElementById("load-detailed").addEventListener("click", loadDetailedAnalytics);
+
+      // Initialize
+      loadAnalytics();
+      setInterval(loadAnalytics, 60000);
+    </script>
+  </body>
+</html>
