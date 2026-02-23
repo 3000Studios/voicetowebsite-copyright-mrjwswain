@@ -73,3 +73,20 @@
   }
 
 }
+
+
+/* Voice-injected styles */
+.headline {
+   animation: flame 2s infinite;
+
+}
+ @keyframes flame {
+   /* flame animation styles */
+}
+ .splash {
+   animation: splash 1s;
+
+}
+ @keyframes splash {
+   /* splash animation styles */
+}
