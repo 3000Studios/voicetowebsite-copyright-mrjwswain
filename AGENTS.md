@@ -36,9 +36,8 @@ Set only what you need for the task.
 
 - Cloudflare deploy:
   - `CLOUDFLARE_API_TOKEN` (required to deploy from a hosted agent environment)
-  - `VOICETOWEBSITE_WORKERS_BUILD_TOKEN` (required in Cloudflare Worker Builds API token settings
-    for auto-deploy)
-  - `CF_WORKERS_BUILDS_AUTO_DEPLOY=1` (runtime flag when using push-triggered Workers Builds)
+  - unified mode defaults: `CF_WORKERS_BUILDS_AUTO_DEPLOY=0`, `CF_ALLOW_LEGACY_DEPLOY_HOOKS=0`
+  - set `ALLOW_REMOTE_DEPLOY_TRIGGER=1` only if you intentionally want remote/API-triggered deploys
 - Admin auth:
   - `CONTROL_PASSWORD` (enables `/api/admin/login`)
 

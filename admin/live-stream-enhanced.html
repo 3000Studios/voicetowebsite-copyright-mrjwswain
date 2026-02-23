@@ -221,7 +221,7 @@
   </head>
   <body>
     <div class="admin-video-bg" aria-hidden="true">
-      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline webkit-playsinline></video>
     </div>
     <div class="noise-overlay" aria-hidden="true"></div>
 
@@ -259,7 +259,7 @@
               <h3>Live Preview</h3>
               <p class="muted small">Preview your selected source before going live.</p>
 
-              <video id="preview-video" class="preview-video" muted playsinline></video>
+              <video id="preview-video" class="preview-video" muted playsinline webkit-playsinline></video>
 
               <div class="stream-stats">
                 <div class="stat-card">
@@ -700,7 +700,7 @@
 
             this.broadcastStream = await navigator.mediaDevices.getUserMedia(broadcastConstraints);
 
-            // Here you would integrate with your streaming service (WebRTC, RTMP, etc.)
+            // Here you would integrate with your streaming service (WebRTC, RTMP protocol, etc.)
             // For now, we'll simulate streaming with enhanced features
             this.elements.startBtn.disabled = true;
             this.elements.stopBtn.disabled = false;

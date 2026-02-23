@@ -990,6 +990,17 @@ Rules:
     }
   };
   const triggerDeployment = async (commitSha, intent) => {
+    const remoteDeployEnabled =
+      String(env.ALLOW_REMOTE_DEPLOY_TRIGGER || "").trim() === "1";
+    if (!remoteDeployEnabled) {
+      return {
+        status: "manual_required",
+        deploymentId: "",
+        message:
+          "Unified deploy mode is active. Run `npm run deploy` from the primary workspace.",
+      };
+    }
+
     const isEnabled = (value) =>
       ["1", "true", "yes", "on"].includes(
         String(value || "")

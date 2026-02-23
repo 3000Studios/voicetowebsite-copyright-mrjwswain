@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 type Props = {
   show: boolean;
@@ -84,15 +84,7 @@ export default function SiteOpener({
         >
           <div className="absolute inset-0">
             {reduceMotion ? (
-              <div
-                className="w-full h-full"
-                style={{
-                  backgroundImage: `url(${FALLBACK_IMG})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  filter: "brightness(0.9)",
-                }}
-              />
+              <div className="w-full h-full site-opener-fallback" />
             ) : (
               <video
                 ref={videoRef}
