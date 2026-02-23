@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Marketing - VoiceToWebsite App</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .email-form {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .email-preview {
+        background: rgba(239, 68, 68, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+      .btn {
+        background: linear-gradient(45deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: transform 0.2s;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .input-field {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        margin: 0.5rem 0;
+      }
+      .input-field::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .template-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .template-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .template-card:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>📧 Email Marketing</h1>
+        <p>Create professional email campaigns</p>
+      </header>
+
+      <main>
+        <section class="email-form">
+          <h2>Create Email Campaign</h2>
+
+          <div class="template-grid">
+            <div class="template-card" data-template="newsletter">
+              <h4>📰 Newsletter</h4>
+              <p>Weekly updates and news</p>
+            </div>
+            <div class="template-card" data-template="promotion">
+              <h4>🎉 Promotion</h4>
+              <p>Special offers and deals</p>
+            </div>
+            <div class="template-card" data-template="welcome">
+              <h4>👋 Welcome</h4>
+              <p>New subscriber onboarding</p>
+            </div>
+            <div class="template-card" data-template="announcement">
+              <h4>📢 Announcement</h4>
+              <p>Important updates</p>
+            </div>
+          </div>
+
+          <form id="emailForm">
+            <div>
+              <label for="subject">Subject Line:</label>
+              <input
+                type="text"
+                id="subject"
+                class="input-field"
+                placeholder="Enter compelling subject line"
+                required
+              />
+            </div>
+
+            <div>
+              <label for="fromName">From Name:</label>
+              <input type="text" id="fromName" class="input-field" placeholder="Your Name" required />
+            </div>
+
+            <div>
+              <label for="fromEmail">From Email:</label>
+              <input type="email" id="fromEmail" class="input-field" placeholder="your@email.com" required />
+            </div>
+
+            <div>
+              <label for="preview">Preview Text:</label>
+              <input type="text" id="preview" class="input-field" placeholder="Brief preview shown in inbox" />
+            </div>
+
+            <div>
+              <label for="content">Email Content:</label>
+              <textarea
+                id="content"
+                class="input-field"
+                placeholder="Write your email content..."
+                rows="8"
+                required
+              ></textarea>
+            </div>
+
+            <div>
+              <label for="cta">Call to Action:</label>
+              <input type="text" id="cta" class="input-field" placeholder="Click here to learn more" />
+            </div>
+
+            <div>
+              <label for="ctaUrl">CTA URL:</label>
+              <input type="url" id="ctaUrl" class="input-field" placeholder="https://example.com" />
+            </div>
+
+            <button type="submit" class="btn">Create Campaign</button>
+          </form>
+        </section>
+
+        <section id="preview" class="email-preview" style="display: none">
+          <h3>Email Preview</h3>
+          <div id="emailPreview"></div>
+          <button id="sendTestBtn" class="btn">Send Test Email</button>
+          <button id="scheduleBtn" class="btn">Schedule Campaign</button>
+          <button id="editBtn" class="btn">Edit Email</button>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const templates = {
+        newsletter: {
+          subject: "Your Weekly Newsletter",
+          content: `Hi [Name],
+
+Welcome to this week's newsletter! Here's what's new:
+
+📰 Latest Updates
+• Feature announcement
+• Industry insights
+• Community highlights
+
+🎯 This Week's Focus
+[Main content area]
+
+💡 Quick Tips
+• Tip 1
+• Tip 2
+• Tip 3
+
+Thanks for reading!
+Best regards,
+[Your Name]`,
+        },
+        promotion: {
+          subject: "🎉 Special Offer Inside!",
+          content: `Hi [Name],
+
+We have an exciting promotion just for you!
+
+🎁 Limited Time Offer
+[Promotion details]
+
+✨ Benefits
+• Benefit 1
+• Benefit 2
+• Benefit 3
+
+⏰ Hurry! This offer ends [Date].
+
+Shop now: [Link]
+
+Cheers,
+[Your Name]`,
+        },
+        welcome: {
+          subject: "Welcome to Our Community!",
+          content: `Hi [Name],
+
+Welcome! We're so glad you're here.
+
+👋 Getting Started
+• Step 1: Complete your profile
+• Step 2: Explore features
+• Step 3: Join the community
+
+🎯 What to Expect
+• Regular updates
+• Exclusive content
+• Special offers
+
+📞 Need Help?
+Reply to this email anytime.
+
+Welcome aboard!
+[Your Name]`,
+        },
+        announcement: {
+          subject: "📢 Important Announcement",
+          content: `Hi [Name],
+
+We have an important update to share.
+
+📢 Announcement
+[Main announcement]
+
+🔍 What This Means
+• Impact 1
+• Impact 2
+• Impact 3
+
+📅 Timeline
+• Phase 1: [Date]
+• Phase 2: [Date]
+• Phase 3: [Date]
+
+Questions? Just reply to this email.
+
+Best,
+[Your Name]`,
+        },
+      };
+
+      // Template selection
+      document.querySelectorAll(".template-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const template = templates[card.dataset.template];
+          document.getElementById("subject").value = template.subject;
+          document.getElementById("content").value = template.content;
+        });
+      });
+
+      // Form submission
+      document.getElementById("emailForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = {
+          subject: document.getElementById("subject").value,
+          fromName: document.getElementById("fromName").value,
+          fromEmail: document.getElementById("fromEmail").value,
+          preview: document.getElementById("preview").value,
+          content: document.getElementById("content").value,
+          cta: document.getElementById("cta").value,
+          ctaUrl: document.getElementById("ctaUrl").value,
+        };
+
+        showEmailPreview(formData);
+      });
+
+      function showEmailPreview(data) {
+        const preview = `
+                <div style="background: white; color: black; padding: 2rem; border-radius: 8px;">
+                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 1rem; margin-bottom: 1rem;">
+                        <strong>From:</strong> ${data.fromName} &lt;${data.fromEmail}&gt;<br>
+                        <strong>Subject:</strong> ${data.subject}<br>
+                        ${data.preview ? `<strong>Preview:</strong> ${data.preview}` : ""}
+                    </div>
+                    <div style="white-space: pre-wrap;">${data.content}</div>
+                    ${
+                      data.cta
+                        ? `
+                        <div style="margin-top: 2rem; text-align: center;">
+                            <a href="${data.ctaUrl || "#"}" style="background: #007bff; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 4px; display: inline-block;">
+                                ${data.cta}
+                            </a>
+                        </div>
+                    `
+                        : ""
+                    }
+                </div>
+            `;
+
+        document.getElementById("emailPreview").innerHTML = preview;
+        document.getElementById("preview").style.display = "block";
+      }
+
+      // Button actions
+      document.getElementById("sendTestBtn").addEventListener("click", () => {
+        alert("Test email sent! (Demo mode)");
+      });
+
+      document.getElementById("scheduleBtn").addEventListener("click", () => {
+        alert("Campaign scheduled! (Demo mode)");
+      });
+
+      document.getElementById("editBtn").addEventListener("click", () => {
+        document.getElementById("preview").style.display = "none";
+      });
+    </script>
+  </body>
+</html>

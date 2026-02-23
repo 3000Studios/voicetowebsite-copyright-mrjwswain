@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Timer | VoiceToWebsite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+      }
+      body {
+        background:
+          radial-gradient(circle at 20% 20%, rgba(0, 242, 255, 0.12), transparent 30%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+      .shell {
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+        text-align: center;
+      }
+      .timer {
+        font-size: clamp(3rem, 8vw, 5rem);
+        font-weight: 900;
+        margin: 20px 0 8px;
+      }
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .inputs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+      input {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 12px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div
+        style="
+          display: inline-flex;
+          gap: 8px;
+          padding: 10px 14px;
+          border-radius: 999px;
+          background: rgba(0, 242, 255, 0.14);
+          border: 1px solid rgba(0, 242, 255, 0.35);
+          color: var(--accent);
+          font-weight: 800;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        "
+      >
+        Pomodoro
+      </div>
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">Focus / break cycles</h1>
+      <p style="color: var(--muted)">Run pomodoros and push status into VoiceToWebsite pages.</p>
+
+      <div class="timer" id="display">25:00</div>
+      <div class="controls">
+        <button class="btn btn-primary" id="start" type="button">Start</button>
+        <button class="btn btn-ghost" id="pause" type="button">Pause</button>
+        <button class="btn btn-ghost" id="reset" type="button">Reset</button>
+      </div>
+
+      <div class="inputs">
+        <div>
+          <label for="focus">Focus minutes</label>
+          <input id="focus" type="number" value="25" />
+        </div>
+        <div>
+          <label for="break">Break minutes</label>
+          <input id="break" type="number" value="5" />
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const display = document.getElementById("display");
+      const start = document.getElementById("start");
+      const pause = document.getElementById("pause");
+      const reset = document.getElementById("reset");
+      const focus = document.getElementById("focus");
+      const brk = document.getElementById("break");
+
+      let mode = "focus";
+      let remaining = Number(focus.value) * 60;
+      let timer = null;
+
+      const render = () => {
+        const m = String(Math.floor(remaining / 60)).padStart(2, "0");
+        const s = String(remaining % 60).padStart(2, "0");
+        display.textContent = `${m}:${s}`;
+      };
+
+      const tick = () => {
+        if (remaining <= 0) {
+          mode = mode === "focus" ? "break" : "focus";
+          remaining = Number((mode === "focus" ? focus : brk).value) * 60;
+        } else {
+          remaining -= 1;
+        }
+        render();
+      };
+
+      start.addEventListener("click", () => {
+        if (timer) clearInterval(timer);
+        timer = setInterval(tick, 1000);
+      });
+
+      pause.addEventListener("click", () => {
+        if (timer) clearInterval(timer);
+        timer = null;
+      });
+
+      reset.addEventListener("click", () => {
+        mode = "focus";
+        remaining = Number(focus.value) * 60;
+        render();
+      });
+
+      render();
+    </script>
+  </body>
+</html>

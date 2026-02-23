@@ -36,6 +36,86 @@
   ],
   "apps": [
     {
+      "id": "ai-content-generator",
+      "type": "app",
+      "title": "AI Content Generator",
+      "label": "Content",
+      "desc": "Generate high-quality content for blogs, social media, emails, and landing pages with AI assistance.",
+      "price": 39.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/ai-content-generator.html"
+    },
+    {
+      "id": "seo-optimizer",
+      "type": "app",
+      "title": "SEO Optimizer",
+      "label": "Marketing",
+      "desc": "Analyze and optimize your website for search engines with comprehensive SEO tools and recommendations.",
+      "price": 49.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/seo-optimizer.html"
+    },
+    {
+      "id": "social-media-manager",
+      "type": "app",
+      "title": "Social Media Manager",
+      "label": "Social",
+      "desc": "Create and schedule posts across multiple platforms with AI-powered content suggestions.",
+      "price": 34.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/social-media-manager.html"
+    },
+    {
+      "id": "email-marketing",
+      "type": "app",
+      "title": "Email Marketing",
+      "label": "Email",
+      "desc": "Design and send professional email campaigns with templates and analytics tracking.",
+      "price": 44.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/email-marketing.html"
+    },
+    {
+      "id": "analytics-dashboard",
+      "type": "app",
+      "title": "Analytics Dashboard",
+      "label": "Analytics",
+      "desc": "Real-time website performance metrics with interactive charts and detailed insights.",
+      "price": 54.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/analytics-dashboard.html"
+    },
+    {
+      "id": "task-manager",
+      "type": "app",
+      "title": "Task Manager",
+      "label": "Productivity",
+      "desc": "Organize and track your tasks efficiently with priority levels and due dates.",
+      "price": 24.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/task-manager.html"
+    },
+    {
+      "id": "invoice-generator",
+      "type": "app",
+      "title": "Invoice Generator",
+      "label": "Business",
+      "desc": "Create professional invoices with automatic calculations and PDF export functionality.",
+      "price": 29.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/invoice-generator.html"
+    },
+    {
+      "id": "calendar-scheduler",
+      "type": "app",
+      "title": "Calendar Scheduler",
+      "label": "Productivity",
+      "desc": "Manage your events and appointments with an interactive calendar and reminders.",
+      "price": 27.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/calendar-scheduler.html"
+    },
+    {
       "id": "project-planning-hub",
       "type": "app",
       "title": "Project Planning Hub",
@@ -75,6 +155,366 @@
       "price": 4.99,
       "currency": "USD",
       "previewUrl": "/rush-percussion.html"
+    },
+    {
+      "id": "contact-form-builder",
+      "type": "app",
+      "title": "Contact Form Builder",
+      "label": "Forms",
+      "desc": "Create custom contact forms with drag-and-drop builder and email integration.",
+      "price": 22.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/contact-form-builder.html"
+    },
+    {
+      "id": "image-editor",
+      "type": "app",
+      "title": "Image Editor",
+      "label": "Design",
+      "desc": "Professional image editing tool with filters, effects, and export options.",
+      "price": 37.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/image-editor.html"
+    },
+    {
+      "id": "password-manager",
+      "type": "app",
+      "title": "Password Manager",
+      "label": "Security",
+      "desc": "Secure password storage with encryption and generator functionality.",
+      "price": 19.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/password-manager.html"
+    },
+    {
+      "id": "note-taking-app",
+      "type": "app",
+      "title": "Note Taking App",
+      "label": "Productivity",
+      "desc": "Rich text note-taking with organization, search, and sync capabilities.",
+      "price": 17.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/note-taking-app.html"
+    },
+    {
+      "id": "expense-tracker",
+      "type": "app",
+      "title": "Expense Tracker",
+      "label": "Finance",
+      "desc": "Track personal and business expenses with categories and reporting.",
+      "price": 26.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/expense-tracker.html"
+    },
+    {
+      "id": "time-tracker",
+      "type": "app",
+      "title": "Time Tracker",
+      "label": "Productivity",
+      "desc": "Track work hours and productivity with detailed reports and analytics.",
+      "price": 23.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/time-tracker.html"
+    },
+    {
+      "id": "weather-dashboard",
+      "type": "app",
+      "title": "Weather Dashboard",
+      "label": "Utility",
+      "desc": "Real-time weather information with forecasts and interactive maps.",
+      "price": 14.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/weather-dashboard.html"
+    },
+    {
+      "id": "recipe-manager",
+      "type": "app",
+      "title": "Recipe Manager",
+      "label": "Lifestyle",
+      "desc": "Organize recipes with meal planning and shopping list generation.",
+      "price": 18.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/recipe-manager.html"
+    },
+    {
+      "id": "fitness-tracker",
+      "type": "app",
+      "title": "Fitness Tracker",
+      "label": "Health",
+      "desc": "Track workouts, nutrition, and fitness goals with progress analytics.",
+      "price": 31.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/fitness-tracker.html"
+    },
+    {
+      "id": "budget-planner",
+      "type": "app",
+      "title": "Budget Planner",
+      "label": "Finance",
+      "desc": "Personal budget planning with expense categories and savings goals.",
+      "price": 21.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/budget-planner.html"
+    },
+    {
+      "id": "habit-tracker",
+      "type": "app",
+      "title": "Habit Tracker",
+      "label": "Lifestyle",
+      "desc": "Build and track daily habits with streaks and motivational features.",
+      "price": 15.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/habit-tracker.html"
+    },
+    {
+      "id": "mind-mapper",
+      "type": "app",
+      "title": "Mind Mapper",
+      "label": "Productivity",
+      "desc": "Visual mind mapping tool for brainstorming and idea organization.",
+      "price": 33.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/mind-mapper.html"
+    },
+    {
+      "id": "pomodoro-timer",
+      "type": "app",
+      "title": "Pomodoro Timer",
+      "label": "Productivity",
+      "desc": "Focus timer with task management and productivity analytics.",
+      "price": 12.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/pomodoro-timer.html"
+    },
+    {
+      "id": "file-converter",
+      "type": "app",
+      "title": "File Converter",
+      "label": "Utility",
+      "desc": "Convert between different file formats with batch processing support.",
+      "price": 28.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/file-converter.html"
+    },
+    {
+      "id": "qr-code-generator",
+      "type": "app",
+      "title": "QR Code Generator",
+      "label": "Utility",
+      "desc": "Create custom QR codes for URLs, text, and other content types.",
+      "price": 9.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/qr-code-generator.html"
+    },
+    {
+      "id": "color-palette",
+      "type": "app",
+      "title": "Color Palette",
+      "label": "Design",
+      "desc": "Generate and manage color palettes for design projects.",
+      "price": 16.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/color-palette.html"
+    },
+    {
+      "id": "font-finder",
+      "type": "app",
+      "title": "Font Finder",
+      "label": "Design",
+      "desc": "Browse and preview fonts for your design projects.",
+      "price": 13.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/font-finder.html"
+    },
+    {
+      "id": "logo-maker",
+      "type": "app",
+      "title": "Logo Maker",
+      "label": "Design",
+      "desc": "Create professional logos with templates and customization tools.",
+      "price": 42.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/logo-maker.html"
+    },
+    {
+      "id": "video-editor",
+      "type": "app",
+      "title": "Video Editor",
+      "label": "Media",
+      "desc": "Edit videos with transitions, effects, and audio mixing.",
+      "price": 58.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/video-editor.html"
+    },
+    {
+      "id": "audio-mixer",
+      "type": "app",
+      "title": "Audio Mixer",
+      "label": "Audio",
+      "desc": "Mix and edit audio tracks with effects and export options.",
+      "price": 45.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/audio-mixer.html"
+    },
+    {
+      "id": "pdf-tools",
+      "type": "app",
+      "title": "PDF Tools",
+      "label": "Utility",
+      "desc": "Merge, split, and edit PDF documents with comprehensive tools.",
+      "price": 25.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/pdf-tools.html"
+    },
+    {
+      "id": "screenshot-capture",
+      "type": "app",
+      "title": "Screenshot Capture",
+      "label": "Utility",
+      "desc": "Capture and annotate screenshots with editing tools.",
+      "price": 11.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/screenshot-capture.html"
+    },
+    {
+      "id": "text-analyzer",
+      "type": "app",
+      "title": "Text Analyzer",
+      "label": "Writing",
+      "desc": "Analyze text for readability, sentiment, and keyword density.",
+      "price": 20.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/text-analyzer.html"
+    },
+    {
+      "id": "presentation-builder",
+      "type": "app",
+      "title": "Presentation Builder",
+      "label": "Productivity",
+      "desc": "Create stunning presentations with templates and animations.",
+      "price": 38.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/presentation-builder.html"
+    },
+    {
+      "id": "database-manager",
+      "type": "app",
+      "title": "Database Manager",
+      "label": "Development",
+      "desc": "Manage databases with visual interface and SQL tools.",
+      "price": 52.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/database-manager.html"
+    },
+    {
+      "id": "api-tester",
+      "type": "app",
+      "title": "API Tester",
+      "label": "Development",
+      "desc": "Test and debug APIs with request builder and response analysis.",
+      "price": 35.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/api-tester.html"
+    },
+    {
+      "id": "code-editor",
+      "type": "app",
+      "title": "Code Editor",
+      "label": "Development",
+      "desc": "Advanced code editor with syntax highlighting and collaboration.",
+      "price": 48.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/code-editor.html"
+    },
+    {
+      "id": "website-builder",
+      "type": "app",
+      "title": "Website Builder",
+      "label": "Builder",
+      "desc": "Drag-and-drop website builder with templates and hosting.",
+      "price": 67.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/website-builder.html"
+    },
+    {
+      "id": "crm-system",
+      "type": "app",
+      "title": "CRM System",
+      "label": "Business",
+      "desc": "Customer relationship management with sales tracking and analytics.",
+      "price": 89.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/crm-system.html"
+    },
+    {
+      "id": "inventory-manager",
+      "type": "app",
+      "title": "Inventory Manager",
+      "label": "Business",
+      "desc": "Track inventory levels, orders, and suppliers with alerts.",
+      "price": 56.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/inventory-manager.html"
+    },
+    {
+      "id": "learning-platform",
+      "type": "app",
+      "title": "Learning Platform",
+      "label": "Education",
+      "desc": "Create and manage online courses with quizzes and certificates.",
+      "price": 78.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/learning-platform.html"
+    },
+    {
+      "id": "survey-builder",
+      "type": "app",
+      "title": "Survey Builder",
+      "label": "Research",
+      "desc": "Create surveys and analyze responses with detailed reports.",
+      "price": 32.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/survey-builder.html"
+    },
+    {
+      "id": "chatbot-builder",
+      "type": "app",
+      "title": "Chatbot Builder",
+      "label": "AI",
+      "desc": "Build custom chatbots with AI integration and analytics.",
+      "price": 72.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/chatbot-builder.html"
+    },
+    {
+      "id": "backup-manager",
+      "type": "app",
+      "title": "Backup Manager",
+      "label": "Utility",
+      "desc": "Automated backup system with scheduling and encryption.",
+      "price": 41.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/backup-manager.html"
+    },
+    {
+      "id": "security-scanner",
+      "type": "app",
+      "title": "Security Scanner",
+      "label": "Security",
+      "desc": "Scan websites and applications for security vulnerabilities.",
+      "price": 85.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/security-scanner.html"
+    },
+    {
+      "id": "translation-tool",
+      "type": "app",
+      "title": "Translation Tool",
+      "label": "Utility",
+      "desc": "Translate text between multiple languages with AI assistance.",
+      "price": 30.0,
+      "currency": "USD",
+      "previewUrl": "/src/apps/translation-tool.html"
     }
   ],
   "subscriptions": []

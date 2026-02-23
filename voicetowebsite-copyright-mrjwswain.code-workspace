@@ -7,11 +7,12 @@
   "settings": {
     "editor.linkedEditing": true,
     "php.linkedEditing.variables": true,
-    "todo-tree.tree.scanMode": "current file",
-    "geminicodeassist.project": "studios-ai-agent-3k",
-    "chat.mcp.assisted.nuget.enabled": true,
-    "github.copilot.chat.codesearch.enabled": true,
-    "github.copilot.chat.alternateGeminiModelFPrompt.enabled": true,
-    "codeium.enableSearch": true,
+    "github.copilot.chat.codesearch.enabled": false,
+    "github.copilot.chat.alternateGeminiModelFPrompt.enabled": false,
+    "github.copilot.enable": false,
+    "codeium.enableSearch": false,
+    "codeium.enableConfig": {
+      "*": false,
+    },
   },
 }

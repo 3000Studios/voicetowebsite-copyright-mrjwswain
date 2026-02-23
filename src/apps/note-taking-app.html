@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note Taking | VoiceToWebsite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #04060a;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #e9f1f7;
+        --muted: #9bb1c2;
+      }
+      body {
+        background:
+          linear-gradient(135deg, rgba(0, 242, 255, 0.12), transparent 45%),
+          linear-gradient(225deg, rgba(255, 0, 189, 0.08), transparent 40%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 0.9fr;
+        gap: 22px;
+        margin-top: 18px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        display: grid;
+        gap: 12px;
+      }
+      .section-title {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      textarea,
+      input {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 12px;
+        resize: none;
+      }
+      textarea {
+        min-height: 220px;
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .note {
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .note h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+      .note p {
+        margin: 0;
+        color: var(--muted);
+        white-space: pre-wrap;
+      }
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <div
+          style="
+            display: inline-flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0, 242, 255, 0.14);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          "
+        >
+          Notes
+        </div>
+        <span style="color: var(--muted); font-weight: 600">Capture ideas and sync into VoiceToWebsite pages.</span>
+      </div>
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">Fast note capture with tagging</h1>
+      <p style="color: var(--muted)">Draft ideas, auto-tag them, and copy into your live experiences.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="section-title">Create note</div>
+          <input id="title" type="text" placeholder="Title" />
+          <textarea id="body" placeholder="Write your thoughts..."></textarea>
+          <input id="tags" type="text" placeholder="Tags (comma separated)" />
+          <div style="display: flex; gap: 10px; flex-wrap: wrap">
+            <button class="btn btn-primary" id="save" type="button">Save note</button>
+            <button class="btn btn-ghost" id="clear" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div class="card" style="gap: 14px">
+          <div class="section-title">Notebook</div>
+          <div id="list" style="display: grid; gap: 12px"></div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const notes = [];
+      const title = document.getElementById("title");
+      const body = document.getElementById("body");
+      const tags = document.getElementById("tags");
+      const list = document.getElementById("list");
+      const save = document.getElementById("save");
+      const clear = document.getElementById("clear");
+
+      const render = () => {
+        list.innerHTML = "";
+        notes.forEach((note, idx) => {
+          const div = document.createElement("div");
+          div.className = "note";
+          div.innerHTML = \`
+            <h3>\${note.title || "Untitled"}</h3>
+            <p>\${note.body || ""}</p>
+            <div class="meta">
+              <span>\${note.tags}</span>
+              <button class="btn btn-ghost" data-delete="\${idx}" style="padding:8px 12px;">Delete</button>
+            </div>
+          \`;
+          list.appendChild(div);
+        });
+      };
+
+      save.addEventListener("click", () => {
+        if (!title.value && !body.value) return;
+        notes.unshift({
+          title: title.value.trim(),
+          body: body.value.trim(),
+          tags: tags.value.trim() || "untagged",
+        });
+        title.value = body.value = tags.value = "";
+        render();
+      });
+
+      clear.addEventListener("click", () => {
+        title.value = body.value = tags.value = "";
+      });
+
+      list.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-delete]");
+        if (!btn) return;
+        const idx = Number(btn.dataset.delete);
+        notes.splice(idx, 1);
+        render();
+      });
+
+      render();
+    </script>
+  </body>
+</html>

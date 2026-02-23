@@ -234,13 +234,17 @@
         }
 
         try {
-          const response = await fetch("/api/apps/purchase", {
+          const response = await fetch("/api/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              appId: currentApp.id,
-              email: email,
               provider: selectedProvider,
+              id: currentApp.id,
+              name: currentApp.title,
+              price: currentApp.price,
+              currency: "USD",
+              successUrl: window.location.origin + "/appstore.html?purchase=success",
+              cancelUrl: window.location.origin + "/appstore.html?purchase=cancelled",
             }),
           });
 
@@ -251,8 +255,9 @@
             localStorage.setItem(`license_${currentApp.id}`, result.licenseKey);
 
             if (selectedProvider === "paypal") {
-              // Validate redirect URL before redirecting
-              if (result.redirectUrl && result.redirectUrl.startsWith("https://www.paypal.com/")) {
+              // Validate redirect URL with proper regex matching
+              const paypalRegex = /^https:\/\/www\.paypal\.com\/(cgi-bin\/webscr\?|checkout\/)/;
+              if (result.redirectUrl && paypalRegex.test(result.redirectUrl)) {
                 window.location.href = result.redirectUrl;
               } else {
                 alert("Invalid PayPal redirect URL. Please try again.");

@@ -1,9 +1,18 @@
 import { NavigationLink } from "./types";
+import { validateAudioFile } from "./utils/audioValidation";
 
 export const BACKGROUND_TUNNEL =
   "https://pub-6293369f8afa4d849c26002fd232f5ac.r2.dev/looping%20tunnel.mp4";
-// Keep music same-origin to avoid CORS/autoplay inconsistencies and third-party dependency.
-export const INTRO_SONG = "/background-music.wav";
+
+// Audio file with validation fallback
+export const INTRO_SONG = "/audio/go-to-voice-to-website.mp3";
+export const FALLBACK_INTRO_SONG = "/background-music.wav";
+
+export const getValidatedAudioPath = async (): Promise<string> => {
+  const isValid = await validateAudioFile(INTRO_SONG);
+  return isValid ? INTRO_SONG : FALLBACK_INTRO_SONG;
+};
+
 export const HOME_VIDEO = "/media/vtw-home-wallpaper.mp4";
 
 export const NAV_LINKS: NavigationLink[] = [

@@ -433,168 +433,8 @@
         </div>
       </section>
 
-      <div class="app-grid">
-        <!-- New App: Web Forge -->
-        <div class="app-card premium-brand premium-border-glow glass-morphism">
-          <div>
-            <div class="status-pill live">New Arrival</div>
-            <h3>AI Web Forge Pro</h3>
-            <p>Autonomous Web Engineering. Neural UI Generation. One-click Deployment.</p>
-            <div class="app-video-container">
-              <video
-                src="https://cdn.coverr.co/videos/coverr-typing-on-computer-keyboard-4638/1080p.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                class="app-preview-video"
-              ></video>
-            </div>
-          </div>
-          <div class="card-actions">
-            <button
-              class="primary-btn purchase-btn"
-              data-product="AI Web Forge Pro"
-              data-sku="ai-web-forge-pro"
-              data-label="AI Web Forge Pro"
-              data-price="49.99"
-              data-url="/webforge.html"
-            >
-              BUY NOW
-            </button>
-            <span class="monetization">PRO / $49.99</span>
-          </div>
-        </div>
-
-        <!-- New App: AI Drive -->
-        <div class="app-card glass-morphism">
-          <div>
-            <div class="status-pill live">New Arrival</div>
-            <h3>AI Drive</h3>
-            <p>Cloud Storage Optimization & AI File Sorting.</p>
-            <div class="app-video-container">
-              <video
-                src="https://cdn.coverr.co/videos/coverr-servers-in-data-center-5056/1080p.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                class="app-preview-video"
-              ></video>
-            </div>
-          </div>
-          <div class="card-actions">
-            <button
-              class="primary-btn purchase-btn"
-              data-product="AI Drive"
-              data-sku="ai-drive"
-              data-label="AI Drive"
-              data-price="4.99"
-              data-url="https://ai.studio/apps/drive/11xPCcjccnVrX457JqYDpPEwk7RtnuAG6"
-            >
-              BUY NOW
-            </button>
-            <span class="monetization">TOOL / $4.99</span>
-          </div>
-        </div>
-
-        <!-- New App: Google Prompts -->
-        <div class="app-card glass-morphism">
-          <div>
-            <div class="status-pill live">New Arrival</div>
-            <h3>Google AI Prompts</h3>
-            <p>Premium System Prompts to unlock Gemini Potential.</p>
-            <div class="app-video-container">
-              <video
-                src="https://cdn.coverr.co/videos/coverr-ai-brain-9856/1080p.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                class="app-preview-video"
-              ></video>
-            </div>
-          </div>
-          <div class="card-actions">
-            <button
-              class="primary-btn purchase-btn"
-              data-product="Google AI Prompts"
-              data-sku="google-ai-prompts"
-              data-label="Google AI Prompts"
-              data-price="2.99"
-              data-url="https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221lVLQZYUW0jwnR0ffUYTTQAsaRgu93umS%22%5D,%22action%22:%22open%22,%22userId%22:%22118217312494368426718%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing"
-            >
-              BUY NOW
-            </button>
-            <span class="monetization">PACK / $2.99</span>
-          </div>
-        </div>
-
-        <div class="app-card premium-brand premium-border-glow glass-morphism">
-          <div>
-            <div class="status-pill live">System Active</div>
-            <h3>VoiceToWebsite</h3>
-            <p>High-fidelity neural interface that converts natural language into production-ready web deployments.</p>
-            <div class="app-video-container">
-              <video
-                src="https://cdn.coverr.co/videos/coverr-voice-assistant-8764/1080p.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                class="app-preview-video"
-              ></video>
-            </div>
-          </div>
-          <div class="card-actions">
-            <a class="primary-btn" href="index.html">LAUNCH APP</a>
-            <span class="monetization">PRO / $19</span>
-          </div>
-        </div>
-
-        <div class="app-card glass-morphism">
-          <div>
-            <div class="status-pill live">System Active</div>
-            <h3>Revenue Bot</h3>
-            <p>Conductive monetization layer that automates lead capture and affiliate conversion cycles.</p>
-            <div class="app-video-container">
-              <video
-                src="https://cdn.coverr.co/videos/coverr-money-growing-8765/1080p.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                class="app-preview-video"
-              ></video>
-            </div>
-          </div>
-          <div class="card-actions">
-            <button class="primary-btn" type="button" disabled>ACTIVATE</button>
-            <span class="monetization">FREE</span>
-          </div>
-        </div>
-
-        <div class="app-card glass-morphism">
-          <div>
-            <div class="status-pill live">Tool V1.0</div>
-            <h3>Color Synth</h3>
-            <p>Harmonic neural palette generator. Create production-ready color schemes instantly.</p>
-            <div class="app-video-container">
-              <video
-                src="https://cdn.coverr.co/videos/coverr-color-palette-8766/1080p.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                class="app-preview-video"
-              ></video>
-            </div>
-          </div>
-          <div class="card-actions">
-            <a class="primary-btn" href="color-synth.html">OPEN TOOL</a>
-            <span class="monetization">FREE</span>
-          </div>
-        </div>
+      <div class="app-grid" id="appGrid">
+        <!-- Apps will be dynamically loaded here -->
 
         <div class="app-card glass-morphism">
           <div>
@@ -731,6 +571,57 @@
     </main>
 
     <script>
+      // Load apps from products API
+      async function loadApps() {
+        try {
+          const response = await fetch("/api/products");
+          const data = await response.json();
+          const appGrid = document.getElementById("appGrid");
+
+          // Render all apps
+          data.apps.forEach((app) => {
+            const appCard = document.createElement("div");
+            appCard.className = "app-card glass-morphism";
+            appCard.innerHTML = `
+              <div>
+                ${app.price < 20 ? '<div class="status-pill live">Hot Deal</div>' : ""}
+                <h3>${app.title}</h3>
+                <p>${app.desc}</p>
+                <div class="app-video-container">
+                  <video
+                    src="https://cdn.coverr.co/videos/coverr-abstract-geometric-shapes-8157/1080p.mp4"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    class="app-preview-video"
+                  ></video>
+                </div>
+              </div>
+              <div class="card-actions">
+                <button
+                  class="primary-btn purchase-btn"
+                  data-product="${app.title}"
+                  data-sku="${app.id}"
+                  data-label="${app.title}"
+                  data-price="${app.price}"
+                  data-url="${app.previewUrl || "#"}"
+                >
+                  BUY NOW - $${app.price}
+                </button>
+                <span class="monetization">${app.label.toUpperCase()} / $${app.price}</span>
+              </div>
+            `;
+            appGrid.appendChild(appCard);
+          });
+        } catch (error) {
+          console.error("Failed to load apps:", error);
+        }
+      }
+
+      // Load apps when page loads
+      document.addEventListener("DOMContentLoaded", loadApps);
+
       document.addEventListener("mousemove", (e) => {
         const x = e.clientX / window.innerWidth;
         const y = e.clientY / window.innerHeight;

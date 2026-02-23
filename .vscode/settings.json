@@ -9,6 +9,7 @@
   "terminal.integrated.scrollback": 50000,
   "terminal.integrated.enablePersistentSessions": true,
   "terminal.integrated.persistentSessionReviveProcess": "onExitAndWindowClose",
+  "terminal.integrated.gpuAcceleration": "on",
   "terminal.integrated.env.windows": {
     "NODE_OPTIONS": "--max-old-space-size=32768",
     "FORCE_COLOR": "1"
@@ -22,6 +23,8 @@
     "source.organizeImports": "explicit"
   },
   "editor.inlineSuggest.enabled": true,
+  "editor.smoothScrolling": true,
+  "editor.cursorSmoothCaretAnimation": "on",
   "editor.suggestSelection": "recentlyUsedByPrefix",
   "editor.quickSuggestions": {
     "other": true,
@@ -58,7 +61,10 @@
     "**/.wrangler/**": true,
     "**/Media/**": true,
     "**/black-vault/**": true,
-    "**/test-results/**": true
+    "**/test-results/**": true,
+    "**/.turbo/**": true,
+    "**/.cache/**": true,
+    "**/coverage/**": true
   },
   "search.exclude": {
     "**/node_modules": true,
@@ -67,7 +73,8 @@
     "**/Media": true,
     "**/black-vault": true,
     "**/test-results": true,
-    "**/package-lock.json": true
+    "**/package-lock.json": true,
+    "**/coverage": true
   },
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
@@ -75,7 +82,12 @@
   },
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "typescript.tsserver.maxTsServerMemory": 8192,
+  "typescript.tsserver.maxTsServerMemory": 16384,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents"
+  },
   "typescript.suggest.autoImports": true,
   "javascript.suggest.autoImports": true,
   "eslint.format.enable": true,
@@ -90,10 +102,8 @@
   "git.confirmSync": false,
   "gitlens.codeLens.enabled": true,
   "errorLens.enabledDiagnosticLevels": ["error", "warning"],
-  "todo-tree.general.tags": ["TODO", "FIXME", "BUG", "OPTIMIZE", "NOTE"],
   "path-intellisense.extensionOnImport": true,
   "npm.packageManager": "npm",
-  "vitest.enable": true,
   "workbench.iconTheme": "material-icon-theme",
   "workbench.startupEditor": "none",
   "window.restoreWindows": "all",

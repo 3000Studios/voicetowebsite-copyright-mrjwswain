@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Generator - VoiceToWebsite App</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .invoice-form {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .invoice-preview {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 2rem;
+      }
+      .btn {
+        background: linear-gradient(45deg, #10b981, #059669);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .input-field {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        margin: 0.5rem 0;
+      }
+      .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+      }
+      .invoice-table th,
+      .invoice-table td {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.75rem;
+        text-align: left;
+      }
+      .invoice-table th {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .total-row {
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>🧾 Invoice Generator</h1>
+        <p>Create professional invoices in minutes</p>
+      </header>
+
+      <section class="invoice-form">
+        <h2>Create Invoice</h2>
+        <form id="invoiceForm">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
+            <div>
+              <h3>Your Information</h3>
+              <input type="text" id="yourName" class="input-field" placeholder="Your Name" required />
+              <input type="text" id="yourCompany" class="input-field" placeholder="Your Company" />
+              <input type="text" id="yourAddress" class="input-field" placeholder="Your Address" />
+              <input type="email" id="yourEmail" class="input-field" placeholder="Your Email" />
+            </div>
+            <div>
+              <h3>Client Information</h3>
+              <input type="text" id="clientName" class="input-field" placeholder="Client Name" required />
+              <input type="text" id="clientCompany" class="input-field" placeholder="Client Company" />
+              <input type="text" id="clientAddress" class="input-field" placeholder="Client Address" />
+              <input type="email" id="clientEmail" class="input-field" placeholder="Client Email" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem">
+            <input type="text" id="invoiceNumber" class="input-field" placeholder="Invoice Number" required />
+            <input type="date" id="invoiceDate" class="input-field" required />
+            <input type="date" id="dueDate" class="input-field" required />
+          </div>
+
+          <h3>Line Items</h3>
+          <div id="itemsContainer">
+            <div
+              class="line-item"
+              style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem"
+            >
+              <input type="text" placeholder="Description" class="input-field item-desc" />
+              <input type="number" placeholder="Quantity" class="input-field item-qty" min="1" value="1" />
+              <input type="number" placeholder="Price" class="input-field item-price" min="0" step="0.01" />
+              <input type="number" placeholder="Total" class="input-field item-total" readonly />
+              <button type="button" class="btn" onclick="removeItem(this)">×</button>
+            </div>
+          </div>
+          <button type="button" class="btn" onclick="addItem()">Add Item</button>
+
+          <div style="margin-top: 2rem">
+            <label for="notes">Notes:</label>
+            <textarea
+              id="notes"
+              class="input-field"
+              placeholder="Additional notes or payment terms"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn">Generate Invoice</button>
+        </form>
+      </section>
+
+      <section id="invoicePreview" class="invoice-preview" style="display: none">
+        <h3>Invoice Preview</h3>
+        <div id="invoiceContent"></div>
+        <button class="btn" onclick="downloadInvoice()">Download PDF</button>
+        <button class="btn" onclick="emailInvoice()">Email Invoice</button>
+        <button class="btn" onclick="editInvoice()">Edit Invoice</button>
+      </section>
+    </div>
+
+    <script>
+      function addItem() {
+        const container = document.getElementById("itemsContainer");
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "line-item";
+        itemDiv.style.display = "grid";
+        itemDiv.style.gridTemplateColumns = "2fr 1fr 1fr 1fr auto";
+        itemDiv.style.gap = "0.5rem";
+        itemDiv.style.marginBottom = "0.5rem";
+        itemDiv.innerHTML = `
+                <input type="text" placeholder="Description" class="input-field item-desc">
+                <input type="number" placeholder="Quantity" class="input-field item-qty" min="1" value="1">
+                <input type="number" placeholder="Price" class="input-field item-price" min="0" step="0.01">
+                <input type="number" placeholder="Total" class="input-field item-total" readonly>
+                <button type="button" class="btn" onclick="removeItem(this)">×</button>
+            `;
+        container.appendChild(itemDiv);
+        attachItemListeners(itemDiv);
+      }
+
+      function removeItem(button) {
+        button.parentElement.remove();
+        calculateTotals();
+      }
+
+      function attachItemListeners(itemDiv) {
+        const qty = itemDiv.querySelector(".item-qty");
+        const price = itemDiv.querySelector(".item-price");
+        const total = itemDiv.querySelector(".item-total");
+
+        [qty, price].forEach((input) => {
+          input.addEventListener("input", () => {
+            const qtyVal = parseFloat(qty.value) || 0;
+            const priceVal = parseFloat(price.value) || 0;
+            total.value = (qtyVal * priceVal).toFixed(2);
+            calculateTotals();
+          });
+        });
+      }
+
+      function calculateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll(".line-item").forEach((item) => {
+          const total = parseFloat(item.querySelector(".item-total").value) || 0;
+          subtotal += total;
+        });
+
+        const tax = subtotal * 0.1; // 10% tax
+        const total = subtotal + tax;
+
+        document.getElementById("subtotal").textContent = subtotal.toFixed(2);
+        document.getElementById("tax").textContent = tax.toFixed(2);
+        document.getElementById("total").textContent = total.toFixed(2);
+      }
+
+      document.getElementById("invoiceForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        generateInvoice();
+      });
+
+      function generateInvoice() {
+        const formData = {
+          yourName: document.getElementById("yourName").value,
+          yourCompany: document.getElementById("yourCompany").value,
+          yourAddress: document.getElementById("yourAddress").value,
+          yourEmail: document.getElementById("yourEmail").value,
+          clientName: document.getElementById("clientName").value,
+          clientCompany: document.getElementById("clientCompany").value,
+          clientAddress: document.getElementById("clientAddress").value,
+          clientEmail: document.getElementById("clientEmail").value,
+          invoiceNumber: document.getElementById("invoiceNumber").value,
+          invoiceDate: document.getElementById("invoiceDate").value,
+          dueDate: document.getElementById("dueDate").value,
+          notes: document.getElementById("notes").value,
+        };
+
+        const items = [];
+        document.querySelectorAll(".line-item").forEach((item) => {
+          const desc = item.querySelector(".item-desc").value;
+          const qty = item.querySelector(".item-qty").value;
+          const price = item.querySelector(".item-price").value;
+          const total = item.querySelector(".item-total").value;
+
+          if (desc && qty && price) {
+            items.push({ desc, qty, price, total });
+          }
+        });
+
+        calculateTotals();
+
+        const invoiceHTML = `
+                <div style="background: white; color: black; padding: 2rem; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                        <div>
+                            <h2>${formData.yourCompany || formData.yourName}</h2>
+                            <p>${formData.yourAddress}</p>
+                            <p>${formData.yourEmail}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h2>INVOICE</h2>
+                            <p><strong>#${formData.invoiceNumber}</strong></p>
+                            <p>Date: ${formData.invoiceDate}</p>
+                            <p>Due: ${formData.dueDate}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h3>Bill To:</h3>
+                        <p>${formData.clientName}</p>
+                        <p>${formData.clientCompany}</p>
+                        <p>${formData.clientAddress}</p>
+                        <p>${formData.clientEmail}</p>
+                    </div>
+                    
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items
+                              .map(
+                                (item) => `
+                                <tr>
+                                    <td>${item.desc}</td>
+                                    <td>${item.qty}</td>
+                                    <td>$${item.price}</td>
+                                    <td>$${item.total}</td>
+                                </tr>
+                            `
+                              )
+                              .join("")}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3">Subtotal</td>
+                                <td>$${document.getElementById("subtotal").textContent}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Tax (10%)</td>
+                                <td>$${document.getElementById("tax").textContent}</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="3">Total</td>
+                                <td>$${document.getElementById("total").textContent}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    ${
+                      formData.notes
+                        ? `
+                        <div style="margin-top: 2rem;">
+                            <h3>Notes:</h3>
+                            <p>${formData.notes}</p>
+                        </div>
+                    `
+                        : ""
+                    }
+                </div>
+            `;
+
+        document.getElementById("invoiceContent").innerHTML = invoiceHTML;
+        document.getElementById("invoicePreview").style.display = "block";
+      }
+
+      function downloadInvoice() {
+        alert("Invoice downloaded! (Demo mode)");
+      }
+
+      function emailInvoice() {
+        alert("Invoice emailed! (Demo mode)");
+      }
+
+      function editInvoice() {
+        document.getElementById("invoicePreview").style.display = "none";
+      }
+
+      // Initialize
+      document.querySelectorAll(".line-item").forEach(attachItemListeners);
+      calculateTotals();
+    </script>
+  </body>
+</html>

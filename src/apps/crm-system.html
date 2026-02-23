@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRM System - VoiceToWebsite App Store</title>
+    <script src="/nav.js"></script>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+        --success: #00ff88;
+        --warning: #ffaa00;
+        --error: #ff4444;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 15% 15%, rgba(0, 242, 255, 0.12), transparent 32%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+
+      .shell {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+
+      .badge {
+        display: inline-flex;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(0, 242, 255, 0.14);
+        border: 1px solid rgba(0, 242, 255, 0.35);
+        color: var(--accent);
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.2s;
+        font-size: 0.9rem;
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 20px;
+        min-height: 600px;
+      }
+
+      .sidebar {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+      }
+
+      .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .nav-item {
+        padding: 12px 16px;
+        margin: 2px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-item.active {
+        background: rgba(0, 242, 255, 0.1);
+        border: 1px solid rgba(0, 242, 255, 0.3);
+      }
+
+      .nav-icon {
+        font-size: 1.1rem;
+      }
+
+      .main-content {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+      }
+
+      .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .content-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--accent);
+        margin-bottom: 8px;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .data-table th {
+        background: rgba(0, 242, 255, 0.05);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.8rem;
+        color: var(--accent);
+      }
+
+      .data-table tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-active {
+        background: rgba(0, 255, 136, 0.2);
+        color: var(--success);
+      }
+
+      .status-pending {
+        background: rgba(255, 170, 0, 0.2);
+        color: var(--warning);
+      }
+
+      .status-lost {
+        background: rgba(255, 68, 68, 0.2);
+        color: var(--error);
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        color: var(--text);
+        font-family: inherit;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .section-title {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+
+      @media (max-width: 768px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          order: -1;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div class="header">
+        <div class="badge">CRM</div>
+        <span style="color: var(--muted); font-weight: 600"
+          >Customer relationship management with sales tracking and analytics.</span
+        >
+      </div>
+
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">CRM System</h1>
+      <p style="color: var(--muted)">Manage customer relationships with comprehensive sales tracking and analytics.</p>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" id="addCustomerBtn">➕ Add Customer</button>
+        <button class="btn btn-ghost" id="exportBtn">📊 Export Data</button>
+        <button class="btn btn-ghost" id="reportsBtn">📈 Reports</button>
+        <button class="btn btn-ghost" id="settingsBtn">⚙️ Settings</button>
+      </div>
+
+      <div class="workspace">
+        <div class="sidebar">
+          <h3 style="margin-bottom: 16px; font-size: 1rem">Navigation</h3>
+          <ul class="nav-menu">
+            <li class="nav-item active" data-view="dashboard">
+              <span class="nav-icon">📊</span>
+              <span>Dashboard</span>
+            </li>
+            <li class="nav-item" data-view="customers">
+              <span class="nav-icon">👥</span>
+              <span>Customers</span>
+            </li>
+            <li class="nav-item" data-view="leads">
+              <span class="nav-icon">🎯</span>
+              <span>Leads</span>
+            </li>
+            <li class="nav-item" data-view="deals">
+              <span class="nav-icon">💼</span>
+              <span>Deals</span>
+            </li>
+            <li class="nav-item" data-view="tasks">
+              <span class="nav-icon">✅</span>
+              <span>Tasks</span>
+            </li>
+            <li class="nav-item" data-view="analytics">
+              <span class="nav-icon">📈</span>
+              <span>Analytics</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="main-content">
+          <div class="content-header">
+            <div class="content-title">Dashboard Overview</div>
+            <button class="btn btn-ghost btn-small">🔄 Refresh</button>
+          </div>
+
+          <div id="dashboardView">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">1,234</div>
+                <div class="stat-label">Total Customers</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">89</div>
+                <div class="stat-label">Active Deals</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">$45,678</div>
+                <div class="stat-label">Revenue MTD</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">23%</div>
+                <div class="stat-label">Conversion Rate</div>
+              </div>
+            </div>
+
+            <div class="section-title">Recent Activity</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Status</th>
+                  <th>Value</th>
+                  <th>Last Contact</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Acme Corporation</td>
+                  <td><span class="status-badge status-active">Active</span></td>
+                  <td>$12,500</td>
+                  <td>2 hours ago</td>
+                  <td><button class="btn btn-ghost btn-small">View</button></td>
+                </tr>
+                <tr>
+                  <td>Tech Innovations LLC</td>
+                  <td><span class="status-badge status-pending">Pending</span></td>
+                  <td>$8,200</td>
+                  <td>1 day ago</td>
+                  <td><button class="btn btn-ghost btn-small">View</button></td>
+                </tr>
+                <tr>
+                  <td>Global Solutions Inc</td>
+                  <td><span class="status-badge status-active">Active</span></td>
+                  <td>$15,750</td>
+                  <td>3 days ago</td>
+                  <td><button class="btn btn-ghost btn-small">View</button></td>
+                </tr>
+                <tr>
+                  <td>StartUp Ventures</td>
+                  <td><span class="status-badge status-lost">Lost</span></td>
+                  <td>$3,400</td>
+                  <td>1 week ago</td>
+                  <td><button class="btn btn-ghost btn-small">View</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="customersView" style="display: none">
+            <div class="content-header">
+              <div class="content-title">Customer Management</div>
+              <button class="btn btn-primary btn-small">➕ Add Customer</button>
+            </div>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Company</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>John Smith</td>
+                  <td>john@acme.com</td>
+                  <td>+1-555-0123</td>
+                  <td>Acme Corporation</td>
+                  <td><span class="status-badge status-active">Active</span></td>
+                  <td><button class="btn btn-ghost btn-small">Edit</button></td>
+                </tr>
+                <tr>
+                  <td>Sarah Johnson</td>
+                  <td>sarah@techinnov.com</td>
+                  <td>+1-555-0456</td>
+                  <td>Tech Innovations LLC</td>
+                  <td><span class="status-badge status-pending">Pending</span></td>
+                  <td><button class="btn btn-ghost btn-small">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="leadsView" style="display: none">
+            <div class="content-header">
+              <div class="content-title">Lead Management</div>
+              <button class="btn btn-primary btn-small">➕ Add Lead</button>
+            </div>
+
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Source</th>
+                  <th>Score</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Michael Brown</td>
+                  <td>Website</td>
+                  <td>85</td>
+                  <td><span class="status-badge status-active">Qualified</span></td>
+                  <td>Sales Team A</td>
+                  <td><button class="btn btn-ghost btn-small">Convert</button></td>
+                </tr>
+                <tr>
+                  <td>Emily Davis</td>
+                  <td>Referral</td>
+                  <td>72</td>
+                  <td><span class="status-badge status-pending">Contacted</span></td>
+                  <td>Sales Team B</td>
+                  <td><button class="btn btn-ghost btn-small">Follow Up</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Navigation
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        item.addEventListener("click", function () {
+          const view = this.dataset.view;
+
+          // Update active state
+          document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("active"));
+          this.classList.add("active");
+
+          // Hide all views
+          document.querySelectorAll('[id$="View"]').forEach((v) => (v.style.display = "none"));
+
+          // Show selected view
+          const selectedView = document.getElementById(view + "View");
+          if (selectedView) {
+            selectedView.style.display = "block";
+          }
+
+          // Update title
+          const titles = {
+            dashboard: "Dashboard Overview",
+            customers: "Customer Management",
+            leads: "Lead Management",
+            deals: "Deal Pipeline",
+            tasks: "Task Management",
+            analytics: "Analytics & Reports",
+          };
+
+          document.querySelector(".content-title").textContent = titles[view] || "Dashboard";
+        });
+      });
+
+      // Add Customer Modal
+      document.getElementById("addCustomerBtn").addEventListener("click", function () {
+        const modal = document.createElement("div");
+        modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+
+        modal.innerHTML = `
+                <div style="background: var(--panel); border: 1px solid var(--border); border-radius: 22px; padding: 32px; max-width: 500px; width: 90%;">
+                    <h2 style="margin-bottom: 20px; color: var(--accent);">Add New Customer</h2>
+                    
+                    <div class="form-group">
+                        <div class="form-label">Name</div>
+                        <input type="text" placeholder="Enter customer name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">Email</div>
+                        <input type="email" placeholder="Enter email address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">Phone</div>
+                        <input type="tel" placeholder="Enter phone number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">Company</div>
+                        <input type="text" placeholder="Enter company name">
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 24px;">
+                        <button class="btn btn-primary" onclick="this.closest('div').parentElement.remove()">Save Customer</button>
+                        <button class="btn btn-ghost" onclick="this.closest('div').parentElement.remove()">Cancel</button>
+                    </div>
+                </div>
+            `;
+
+        document.body.appendChild(modal);
+
+        modal.addEventListener("click", function (e) {
+          if (e.target === modal) {
+            modal.remove();
+          }
+        });
+      });
+
+      // Export Data
+      document.getElementById("exportBtn").addEventListener("click", function () {
+        const data = {
+          customers: [
+            { name: "John Smith", email: "john@acme.com", status: "Active" },
+            { name: "Sarah Johnson", email: "sarah@techinnov.com", status: "Pending" },
+          ],
+          exportDate: new Date().toISOString(),
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "crm-data.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // Reports
+      document.getElementById("reportsBtn").addEventListener("click", function () {
+        alert("Reports dashboard would open here with detailed analytics and charts.");
+      });
+
+      // Settings
+      document.getElementById("settingsBtn").addEventListener("click", function () {
+        alert("CRM settings dialog would open here for configuration options.");
+      });
+    </script>
+  </body>
+</html>

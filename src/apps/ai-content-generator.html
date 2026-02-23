@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Content Generator - VoiceToWebsite App</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .content-form {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .generated-content {
+        background: rgba(0, 242, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(0, 242, 255, 0.3);
+      }
+      .btn {
+        background: linear-gradient(45deg, #00f2ff, #7000ff);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: transform 0.2s;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .input-field {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        margin: 0.5rem 0;
+      }
+      .input-field::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>🤖 AI Content Generator</h1>
+        <p>Generate high-quality content for your website, blog, or marketing campaigns</p>
+      </header>
+
+      <main>
+        <section class="content-form">
+          <h2>Create Your Content</h2>
+          <form id="contentForm">
+            <div>
+              <label for="contentType">Content Type:</label>
+              <select id="contentType" class="input-field">
+                <option value="blog">Blog Post</option>
+                <option value="product">Product Description</option>
+                <option value="social">Social Media Post</option>
+                <option value="email">Email Campaign</option>
+                <option value="landing">Landing Page Copy</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="topic">Topic/Subject:</label>
+              <input
+                type="text"
+                id="topic"
+                class="input-field"
+                placeholder="e.g., Sustainable Technology, Digital Marketing, etc."
+                required
+              />
+            </div>
+
+            <div>
+              <label for="tone">Tone:</label>
+              <select id="tone" class="input-field">
+                <option value="professional">Professional</option>
+                <option value="casual">Casual</option>
+                <option value="enthusiastic">Enthusiastic</option>
+                <option value="formal">Formal</option>
+                <option value="friendly">Friendly</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="length">Content Length:</label>
+              <select id="length" class="input-field">
+                <option value="short">Short (100-200 words)</option>
+                <option value="medium">Medium (300-500 words)</option>
+                <option value="long">Long (600-1000 words)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="keywords">Keywords (comma-separated):</label>
+              <input
+                type="text"
+                id="keywords"
+                class="input-field"
+                placeholder="e.g., AI, technology, innovation, future"
+              />
+            </div>
+
+            <button type="submit" class="btn">Generate Content</button>
+          </form>
+        </section>
+
+        <section id="result" class="generated-content" style="display: none">
+          <h3>Generated Content</h3>
+          <div id="generatedText"></div>
+          <button id="copyBtn" class="btn">Copy to Clipboard</button>
+          <button id="regenerateBtn" class="btn">Regenerate</button>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      document.getElementById("contentForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = {
+          type: document.getElementById("contentType").value,
+          topic: document.getElementById("topic").value,
+          tone: document.getElementById("tone").value,
+          length: document.getElementById("length").value,
+          keywords: document.getElementById("keywords").value,
+        };
+
+        // Simulate AI content generation
+        const generatedContent = generateContent(formData);
+
+        document.getElementById("generatedText").innerHTML = `
+                <h4>${formData.type.charAt(0).toUpperCase() + formData.type.slice(1)}: ${formData.topic}</h4>
+                <p><em>Tone: ${formData.tone} | Length: ${formData.length}</em></p>
+                <div style="margin-top: 1rem; line-height: 1.6;">
+                    ${generatedContent}
+                </div>
+            `;
+
+        document.getElementById("result").style.display = "block";
+      });
+
+      document.getElementById("copyBtn").addEventListener("click", () => {
+        const text = document.getElementById("generatedText").innerText;
+        navigator.clipboard.writeText(text);
+        alert("Content copied to clipboard!");
+      });
+
+      document.getElementById("regenerateBtn").addEventListener("click", () => {
+        document.getElementById("contentForm").dispatchEvent(new Event("submit"));
+      });
+
+      function generateContent(data) {
+        const templates = {
+          blog: `# ${data.topic}: The Future is Now
+
+In today's rapidly evolving digital landscape, ${data.topic} stands at the forefront of innovation. This comprehensive guide explores how ${data.keywords ? data.keywords.split(",")[0] : "technology"} is reshaping industries and creating new opportunities.
+
+## Understanding the Impact
+
+The integration of ${data.topic} into our daily lives has transformed the way we work, communicate, and solve problems. From enhanced productivity to breakthrough discoveries, the possibilities are endless.
+
+## Key Benefits
+
+- Improved efficiency and automation
+- Enhanced user experiences
+- Cost-effective solutions
+- Scalable implementations
+
+## Looking Ahead
+
+As we move forward, ${data.topic} will continue to play a pivotal role in shaping our future. Organizations that embrace these technologies will gain a competitive edge in the market.
+
+*This content was generated with AI assistance for ${data.tone} ${data.length}-form communication.*`,
+
+          product: `Introducing Our Revolutionary ${data.topic} Solution
+
+Experience the power of cutting-edge ${data.topic} technology designed to transform your business operations. Our innovative solution delivers unparalleled performance and reliability.
+
+## Key Features
+
+✅ Advanced ${data.keywords ? data.keywords.split(",")[0] : "automation"} capabilities
+✅ User-friendly interface
+✅ Real-time analytics and insights
+✅ Seamless integration with existing systems
+✅ 24/7 support and maintenance
+
+## Why Choose Us?
+
+Our ${data.topic} solution stands out from the competition with its robust architecture, scalable design, and proven track record of success across multiple industries.
+
+## Get Started Today
+
+Transform your business with our ${data.topic} solution. Contact us for a personalized demo and see the difference for yourself.
+
+*Professional product description optimized for conversion*`,
+
+          social: `🚀 Exciting News About ${data.topic}!
+
+We're thrilled to share the latest developments in ${data.topic} that are revolutionizing the industry! 🌟
+
+Key highlights:
+• Cutting-edge ${data.keywords ? data.keywords.split(",")[0] : "innovation"}
+• Game-changing results
+• Industry-leading performance
+• User-tested and approved
+
+Join the conversation and be part of the future! 💬
+
+#${data.topic.replace(/\s+/g, "").replace(/[^a-zA-Z0-9]/g, "")} #Innovation #Technology #Future
+
+*Engaging social media content with ${data.tone} tone*`,
+
+          email: `Subject: Transform Your Business with ${data.topic}
+
+Dear Valued Customer,
+
+We're excited to introduce our latest ${data.topic} solution that's designed to elevate your business to new heights.
+
+## What's New?
+
+Our enhanced ${data.topic} platform now includes:
+- Advanced ${data.keywords ? data.keywords.split(",")[0] : "features"}
+- Improved performance metrics
+- Enhanced user experience
+- Comprehensive analytics
+
+## Limited Time Offer
+
+Get started today with our special launch pricing and receive exclusive bonuses.
+
+## Next Steps
+
+1. Schedule a personalized demo
+2. Discuss your specific requirements
+3. Receive a customized proposal
+4. Begin your transformation journey
+
+Reply to this email to get started!
+
+Best regards,
+The ${data.topic} Team
+
+*Professional email campaign with ${data.tone} tone*`,
+
+          landing: `# Unlock the Power of ${data.topic}
+
+## Experience the Future Today
+
+Transform your operations with our state-of-the-art ${data.topic} solution. Join thousands of satisfied customers who have already made the switch.
+
+### 🎯 Why Choose Our Solution?
+
+- **Proven Results**: 95% customer satisfaction rate
+- **Cutting-Edge Technology**: Latest ${data.keywords ? data.keywords.split(",")[0] : "innovations"}
+- **Expert Support**: 24/7 assistance from our dedicated team
+- **Risk-Free Trial**: 30-day money-back guarantee
+
+### ✨ What You Get
+
+✅ Complete ${data.topic} implementation
+✅ Personalized training sessions
+✅ Ongoing maintenance and updates
+✅ Priority customer support
+
+### 🚀 Get Started in 3 Simple Steps
+
+1. **Sign Up**: Create your account in minutes
+2. **Configure**: Customize settings to your needs
+3. **Launch**: Go live with expert guidance
+
+### 💬 What Our Customers Say
+
+*"This ${data.topic} solution transformed our business completely!"* - Happy Customer
+
+### 🎁 Limited-Time Bonus
+
+Order now and receive:
+- Free setup (Value: $500)
+- Extra training session (Value: $300)
+- Priority support for 6 months (Value: $600)
+
+## Ready to Transform?
+
+[Get Started Now] [Schedule Demo] [View Pricing]
+
+*High-converting landing page copy with ${data.tone} tone*`,
+        };
+
+        return templates[data.type] || templates.blog;
+      }
+    </script>
+  </body>
+</html>

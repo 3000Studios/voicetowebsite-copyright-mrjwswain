@@ -38,7 +38,17 @@
     },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
-  document.documentElement.dataset.navVersion = "2026-02-19-01";
+  document.documentElement.dataset.navVersion = "2026-02-23-01";
+
+  const ensureLatexFonts = () => {
+    if (document.getElementById("vtw-latex-fonts")) return;
+    const link = document.createElement("link");
+    link.id = "vtw-latex-fonts";
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&family=Syne:wght@800&display=swap";
+    document.head.appendChild(link);
+  };
 
   const isShellDisabled = () => {
     try {
@@ -438,7 +448,7 @@
   const clearExistingNav = () => {
     document
       .querySelectorAll(
-        ".glass-nav, .crystal-nav, .crystal-nav-wrapper, .mobile-overlay, .site-header, .site-nav"
+        ".glass-nav, .crystal-nav, .crystal-nav-wrapper, .mobile-overlay, .site-header, .site-nav, .latex-header, #vtwLatexHeader, .vt-footer, .bubble-footer"
       )
       .forEach((el) => el.remove());
     const skip = document.querySelector(".vtw-skip-link");
@@ -473,12 +483,136 @@
     `;
     document.body.prepend(wrap);
   };
+  const buildLatexHeader = () => {
+    const header = document.createElement("header");
+    header.id = "vtwLatexHeader";
+    header.className = "latex-header smash-effect";
+    header.setAttribute("aria-label", "VoiceToWebsite global hero header");
+    header.innerHTML = `
+      <div class="latex-hero-text">
+        <h1 class="latex-hero-title">VoiceToWebsite</h1>
+        <span class="latex-hero-subtitle">Auditory Elasticity</span>
+        <p class="latex-hero-tagline">Bioluminescent Latex Tension · Granular Quartz Displacement · Tactile Carbonized Cartography · Luminous Anodized Interlace</p>
+      </div>
+
+      <div class="latex-wave-container" aria-hidden="true">
+        <svg class="latex-synth-waves" viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <path id="vtw-latex-wave-1" class="latex-wave-path" d=""></path>
+          <path id="vtw-latex-wave-2" class="latex-wave-path" d=""></path>
+          <path id="vtw-latex-wave-3" class="latex-wave-path" d=""></path>
+        </svg>
+      </div>
+
+      <div class="latex-scroll-indicator">Drag Down to Stretch</div>
+      <div class="latex-reflection" aria-hidden="true"></div>
+    `;
+    return header;
+  };
+
+  const latexWaveConfig = [
+    { color: "#00f2ff", amp: 60, freq: 0.02, speed: 0.05 },
+    { color: "#bc13fe", amp: 40, freq: 0.015, speed: 0.03 },
+    { color: "#ff00bd", amp: 80, freq: 0.01, speed: 0.02 },
+  ];
+  let latexWaveState = { raf: 0, phase: 0, paths: [] };
+  const startLatexWaves = (header) => {
+    if (!header) return;
+    if (prefersReducedMotion()) return;
+    const paths = [
+      header.querySelector("#vtw-latex-wave-1"),
+      header.querySelector("#vtw-latex-wave-2"),
+      header.querySelector("#vtw-latex-wave-3"),
+    ].filter(Boolean);
+    if (!paths.length) return;
+    latexWaveState.paths = paths;
+    const createPath = (amplitude, frequency, phase, offset) => {
+      let path = `M 0 ${160 + offset}`;
+      for (let x = 0; x <= 1440; x += 12) {
+        const y = 160 + Math.sin(x * frequency + phase) * amplitude;
+        path += ` L ${x} ${y}`;
+      }
+      return path;
+    };
+    const loop = () => {
+      latexWaveState.phase += 0.05;
+      const liftFactor = 1 - (Number(header.dataset.latexLift) || 0);
+      paths.forEach((path, i) => {
+        const cfg = latexWaveConfig[i];
+        const dynamicAmp =
+          cfg.amp *
+          liftFactor *
+          (1 + Math.sin(latexWaveState.phase * 0.5) * 0.2);
+        const d = createPath(
+          dynamicAmp,
+          cfg.freq,
+          latexWaveState.phase * cfg.speed * 10,
+          i * 10
+        );
+        path.setAttribute("d", d);
+        path.setAttribute("stroke", cfg.color);
+        path.style.opacity = `${0.35 + liftFactor * 0.65}`;
+      });
+      latexWaveState.raf = window.requestAnimationFrame(loop);
+    };
+    if (latexWaveState.raf) window.cancelAnimationFrame(latexWaveState.raf);
+    latexWaveState.phase = 0;
+    latexWaveState.raf = window.requestAnimationFrame(loop);
+  };
+
+  const setupLatexScroll = (header, navWrapper) => {
+    if (!header) {
+      if (navWrapper) navWrapper.classList.add("is-visible");
+      return;
+    }
+    if (prefersReducedMotion()) {
+      if (navWrapper) navWrapper.classList.add("is-visible");
+      header.classList.remove("smash-effect");
+      return;
+    }
+    const title = header.querySelector(".latex-hero-title");
+    const subtitle = header.querySelector(".latex-hero-subtitle");
+    const indicator = header.querySelector(".latex-scroll-indicator");
+    const onScroll = () => {
+      const threshold = window.innerHeight * 0.65;
+      const progress = Math.min(window.scrollY / threshold, 1);
+      header.style.transform = `translateY(-${progress * 100}%)`;
+      header.dataset.latexLift = progress.toFixed(3);
+      if (title) {
+        title.style.transform = `scale(${1 + progress * 0.35}) translateY(${
+          progress * -50
+        }px)`;
+        title.style.filter = `blur(${progress * 16}px) brightness(${
+          1 + progress * 1.5
+        })`;
+        title.style.opacity = `${1 - progress}`;
+      }
+      if (subtitle) {
+        subtitle.style.opacity = `${Math.max(0, 1 - progress * 1.2)}`;
+      }
+      if (indicator) {
+        indicator.style.opacity = `${Math.max(0, 1 - progress * 1.5)}`;
+      }
+      if (navWrapper) {
+        const showNav = progress > 0.45;
+        navWrapper.classList.toggle("is-visible", showNav);
+        navWrapper.style.setProperty("--vtw-scroll-p", String(progress));
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    window.requestAnimationFrame(onScroll);
+    window.setTimeout(() => header.classList.remove("smash-effect"), 1200);
+  };
   const injectNav = () => {
     clearExistingNav();
+    ensureLatexFonts();
     ensureMainAnchor();
     ensureVideoBg();
     const body = document.body;
     const fragment = document.createDocumentFragment();
+
+    const latexHeader = buildLatexHeader();
+    if (latexHeader) fragment.appendChild(latexHeader);
 
     // Skip link for accessibility
     const skip = document.createElement("a");
@@ -488,11 +622,11 @@
 
     // Create plasma navigation
     const navWrapper = document.createElement("div");
-    navWrapper.className = "flash-nav";
+    navWrapper.className = "flash-nav nav-reveal";
     navWrapper.id = "vtwNavWrapper";
 
     const nav = document.createElement("nav");
-    nav.className = "flash-nav";
+    nav.className = "flash-nav nav-reveal";
     nav.id = "nav";
 
     // Build navigation HTML
@@ -537,6 +671,9 @@
     fragment.append(skip, navWrapper);
     body.prepend(fragment);
     body.classList.add("nav-ready");
+
+    setupLatexScroll(latexHeader, navWrapper);
+    startLatexWaves(latexHeader);
 
     // Initialize plasma effects
     initPlasmaEffects();
@@ -1439,125 +1576,73 @@
       observer.observe(el);
     });
   };
-  /* --- Cybernetic Tectonic Footer --- */
+  /* --- Bubble Footer (global) --- */
   const injectFooter = () => {
-    const existing = document.querySelector(".vt-footer");
-    if (existing) return;
-
+    if (document.querySelector(".bubble-footer")) return;
     const footer = document.createElement("footer");
-    footer.className = "vt-footer";
+    footer.className = "bubble-footer";
+    footer.id = "vtwBubbleFooter";
     footer.innerHTML = `
-      <div class="noise-overlay"></div>
-      <div class="tectonic-visualizer">
-        <canvas id="tectonicCanvas"></canvas>
-      </div>
-      <div class="footer-main-content">
-        <h2 class="textured-headline" id="tiltText">VOICE<br>WEBSITE</h2>
-        <div class="footer-grid">
-          <div class="footer-col">
-            <h4>Navigation</h4>
-            <a href="/features" class="footer-link">Features</a>
-            <a href="/demo" class="footer-link">Demo</a>
-            <a href="/pricing" class="footer-link">Pricing</a>
-            <a href="/store" class="footer-link">Store</a>
-          </div>
-          <div class="footer-col">
-            <h4>Company</h4>
-            <a href="/about" class="footer-link">About Us</a>
-            <a href="/privacy" class="footer-link">Privacy Policy</a>
-            <a href="/terms" class="footer-link">Terms of Service</a>
-            <a href="/contact" class="footer-link">Contact</a>
-          </div>
-          <div class="footer-col">
-            <h4>Support</h4>
-            <a href="/support" class="footer-link">Help Center</a>
-            <a href="/status" class="footer-link">System Status</a>
-            <p style="color: #444; font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 1px;">LATENCY: <span id="vt-footer-latency">14ms</span></p>
-            <p style="color: #444; font-size: 0.7rem; letter-spacing: 1px;">UPTIME: 99.998%</p>
-            <div class="social-cluster">
-              <a href="https://x.com/voicetowebsite" class="social-btn" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-              </a>
-              <a href="https://instagram.com/3000studios" class="social-btn" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
-            </div>
-          </div>
+      <div class="bubble-footer__glass">
+        <div class="bubble-brand" aria-label="VoiceToWebsite">VoiceToWebsite</div>
+        <div class="bubble-social" aria-label="Social links">
+          <a class="bubble-icon" href="https://x.com/voicetowebsite" target="_blank" rel="noopener" aria-label="X (Twitter)">
+            <span aria-hidden="true">✕</span>
+          </a>
+          <a class="bubble-icon" href="https://instagram.com/3000studios" target="_blank" rel="noopener" aria-label="Instagram">
+            <span aria-hidden="true">◎</span>
+          </a>
+          <a class="bubble-icon" href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube">
+            <span aria-hidden="true">▶</span>
+          </a>
         </div>
-        <div style="margin-top: 60px; color: #333; font-size: 0.6rem; letter-spacing: 4px; font-family: 'JetBrains Mono', monospace;">
-          © VOICETOWEBSITE - ${new Date().getFullYear()}
+        <div class="bubble-dancer" aria-hidden="true">
+          <svg viewBox="0 0 50 100" focusable="false">
+            <circle cx="25" cy="20" r="8" />
+            <path d="M25 28 V60 M10 40 H40 M25 60 L10 90 M25 60 L40 90" />
+          </svg>
         </div>
       </div>
+      <div class="bubble-haze" aria-hidden="true"></div>
     `;
-
     document.body.appendChild(footer);
-    initTectonicVisualizer();
-    init3DHeader();
+    initBubbleFooterInteractions(footer);
   };
 
-  const initTectonicVisualizer = () => {
-    const canvas = document.getElementById("tectonicCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let width,
-      height,
-      points = [];
-
-    const init = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = canvas.parentElement.offsetHeight;
-      points = [];
-      for (let i = 0; i < 40; i++) {
-        points.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-        });
-      }
+  const initBubbleFooterInteractions = (footer) => {
+    if (!footer) return;
+    if (prefersReducedMotion()) {
+      footer.classList.add("is-active", "is-ignited");
+      return;
+    }
+    const glass = footer.querySelector(".bubble-footer__glass");
+    const tilt = (e) => {
+      const rect = glass.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+      const y = ((e.clientY - rect.top) / rect.height - 0.5) * 6;
+      glass.style.setProperty("--tilt-x", `${x.toFixed(2)}deg`);
+      glass.style.setProperty("--tilt-y", `${-y.toFixed(2)}deg`);
     };
-
-    const draw = () => {
-      if (!document.getElementById("tectonicCanvas")) return; // Stop if removed
-      ctx.clearRect(0, 0, width, height);
-      ctx.strokeStyle = "rgba(0, 243, 255, 0.15)";
-      ctx.lineWidth = 1;
-
-      points.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        points.forEach((p2, j) => {
-          if (i === j) return;
-          let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (dist < 250) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        });
-      });
-      requestAnimationFrame(draw);
-    };
-
-    window.addEventListener("resize", init);
-    init();
-    draw();
-  };
-
-  const init3DHeader = () => {
-    const headline = document.getElementById("tiltText");
-    if (!headline) return;
-    document.addEventListener("mousemove", (e) => {
-      if (!document.getElementById("tiltText")) return;
-      let x = (window.innerWidth / 2 - e.pageX) / 25;
-      let y = (window.innerHeight / 2 - e.pageY) / 25;
-      headline.style.transform = `rotateY(${x}deg) rotateX(${y}deg) translateZ(100px)`;
+    glass.addEventListener("mousemove", tilt);
+    glass.addEventListener("mouseleave", () => {
+      glass.style.removeProperty("--tilt-x");
+      glass.style.removeProperty("--tilt-y");
     });
+
+    const onScroll = () => {
+      const scrollPos = window.scrollY + window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const progress = Math.min(
+        Math.max((scrollPos - (docHeight - 600)) / 420, 0),
+        1
+      );
+      footer.style.setProperty("--footer-progress", progress.toFixed(3));
+      footer.classList.toggle("is-active", progress > 0.05);
+      footer.classList.toggle("is-ignited", scrollPos >= docHeight - 8);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    requestAnimationFrame(onScroll);
   };
   const electrifyLinks = () => {
     const links = () => document.querySelectorAll(".nav-links a");

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backup Manager | VoiceToWebsite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+      }
+      body {
+        background:
+          radial-gradient(circle at 20% 20%, rgba(0, 242, 255, 0.12), transparent 30%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+      .shell {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        display: grid;
+        gap: 12px;
+      }
+      .section-title {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      input {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 12px;
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .list {
+        display: grid;
+        gap: 10px;
+      }
+      .item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <div
+          style="
+            display: inline-flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0, 242, 255, 0.14);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          "
+        >
+          Backups
+        </div>
+        <span style="color: var(--muted); font-weight: 600">Trigger and list backups for VoiceToWebsite content.</span>
+      </div>
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">One-click backups</h1>
+      <p style="color: var(--muted)">Set destination, run backup, and copy the restore command.</p>
+
+      <div class="card">
+        <div class="section-title">Destination</div>
+        <input id="dest" type="text" value="cloud://voicetowebsite/backups" />
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button class="btn btn-primary" id="run" type="button">Run backup</button>
+          <button class="btn btn-ghost" id="restore" type="button">Copy restore cmd</button>
+        </div>
+        <div class="list" id="list"></div>
+      </div>
+    </main>
+
+    <script>
+      const dest = document.getElementById("dest");
+      const run = document.getElementById("run");
+      const restore = document.getElementById("restore");
+      const list = document.getElementById("list");
+
+      const entries = [];
+
+      const render = () => {
+        list.innerHTML = "";
+        entries.forEach((e) => {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.textContent = e;
+          list.appendChild(div);
+        });
+      };
+
+      run.addEventListener("click", () => {
+        const stamp = new Date().toISOString();
+        entries.unshift(`Backup ${stamp} → ${dest.value}`);
+        render();
+      });
+
+      restore.addEventListener("click", () => {
+        navigator.clipboard.writeText("restore --target latest --dest " + dest.value);
+      });
+
+      render();
+    </script>
+  </body>
+</html>
