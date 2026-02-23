@@ -1,7 +1,7 @@
 {
   "copy": {
     "eyebrow": "Home",
-    "headline": "Hey Paige, hurry up.",
+    "headline": "Hello and welcome.",
     "subhead": "Turn voice into a complete, responsive, SEO-ready website with pages, copy, templates, and one-click publish — then keep improving with admin-safe sandbox edits.",
     "cta": "on index.html with the following improvements: 1) Add a subtle pulsing animation effect to draw attention. 2) Add a microphone icon inside the button (inline SVG, no external dependency). 3) When clicked, change the button text to \"Listening...\" and visually indicate active state (e.g., glowing ring or color change). 4) Allow the button to toggle: when clicked again while active, stop the microphone and change text to \"Start Speaking\" (or revert to original label). 5) Ensure proper JavaScript logic handles start/stop states cleanly without auto-activation on load. Do not modify unrelated content.",
     "price": "",

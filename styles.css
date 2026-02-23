@@ -32,3 +32,44 @@
   border-right: 0.15em solid;
   animation: typing 3s steps(30, end);
 }
+
+
+/* Voice-injected styles */
+.hero-header {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  perspective:1000px
+}
+.puppy-img {
+  width:200px;
+  border-radius:20px;
+  margin-bottom:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,.4)
+}
+.flash-gold {
+  font-size:3rem;
+  font-weight:bold;
+  color:gold;
+  animation:flash 1s infinite alternate,spin3d 3s linear infinite;
+  text-shadow:2px 2px 0 #b8860b,4px 4px 10px rgba(0,0,0,.6);
+  transform-style:preserve-3d
+}
+@keyframes flash {
+  from {
+    opacity:1
+  }
+  to {
+    opacity:.4
+  }
+
+}
+@keyframes spin3d {
+  from {
+    transform:rotateY(0)
+  }
+  to {
+    transform:rotateY(360deg)
+  }
+
+}
