@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
+import MonolithNav from "./components/MonolithNav";
 import WarpTunnel from "./components/WarpTunnel";
 import { HOME_VIDEO, INTRO_SONG } from "./constants";
 import { audioEngine } from "./services/audioEngine";
@@ -440,6 +441,7 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
+      <MonolithNav />
       <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
 
       {/* Enhanced Background atmosphere with multiple media types */}
