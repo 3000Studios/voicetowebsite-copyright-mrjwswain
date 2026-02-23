@@ -7,15 +7,18 @@ Run from project root in PowerShell:
 $extensions = @(
   'dbaeumer.vscode-eslint',
   'esbenp.prettier-vscode',
+  'EditorConfig.EditorConfig',
+  'cloudflare.cloudflare-workers-bindings-extension',
+  'ms-vscode.vscode-typescript-next',
   'eamodio.gitlens',
   'christian-kohler.path-intellisense',
-  'eg2.vscode-npm-script',
   'streetsidesoftware.code-spell-checker',
-  'EditorConfig.EditorConfig',
-  'ms-vscode.vscode-typescript-next',
-  'formulahendry.auto-close-tag',
-  'formulahendry.auto-rename-tag',
-  'ritwickdey.LiveServer'
+  'usernamehw.errorlens',
+  'dsznajder.es7-react-js-snippets',
+  'Continue.continue',
+  'PKief.material-icon-theme',
+  'ms-vscode.powershell',
+  'GitHub.vscode-github-actions'
 )
 
 if (-not (Get-Command code -ErrorAction SilentlyContinue)) {

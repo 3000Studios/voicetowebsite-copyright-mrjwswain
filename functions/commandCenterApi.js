@@ -1020,6 +1020,17 @@ const handleDeployRun = async ({ env, request }) => {
       error: `Confirmation phrase must be exactly "${CONFIRMATION_PHRASE}"`,
     });
   }
+  const remoteDeployEnabled =
+    String(env.ALLOW_REMOTE_DEPLOY_TRIGGER || "").trim() === "1";
+  if (!remoteDeployEnabled) {
+    return json(409, {
+      ok: false,
+      mode: "local_only",
+      requiredCommand: "npm run deploy",
+      error:
+        "Unified deploy mode is active. Remote/API deploy is disabled. Run `npm run deploy` from the primary workspace.",
+    });
+  }
   const actor = getRequestActor(request);
   const planTier = String(
     request.headers.get("x-cc-plan-tier") || env.DEPLOY_PLAN_TIER || "pro"

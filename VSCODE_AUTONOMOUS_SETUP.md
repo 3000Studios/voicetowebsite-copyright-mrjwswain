@@ -8,7 +8,7 @@ All VS Code settings, extensions, and integrations are optimized for full autono
 
 ## What's Installed & Configured
 
-### ✅ Extensions Installed (24 total)
+### ✅ Extensions Installed (14 total)
 
 **Core Development:**
 
@@ -17,46 +17,34 @@ All VS Code settings, extensions, and integrations are optimized for full autono
 - EditorConfig (EditorConfig.EditorConfig)
 - TypeScript Next (ms-vscode.vscode-typescript-next)
 
-**AI & Code Completion:**
+**Cloudflare Workers:**
 
-- GitHub Copilot + Copilot Chat
-- Codeium (alternative AI completion)
-- Continue.dev (AI command integration)
+- Cloudflare Workers Bindings (cloudflare.cloudflare-workers-bindings-extension)
 
 **Git & Version Control:**
 
 - GitLens (eamodio.gitlens)
-- Git Graph (mhutchie.git-graph)
+- GitHub Actions (GitHub.vscode-github-actions)
 
-**Productivity:**
+**Productivity & UI:**
 
 - Path Intellisense (christian-kohler.path-intellisense)
 - Code Spell Checker (streetsidesoftware.code-spell-checker)
 - Error Lens (usernamehw.errorlens)
-- NPM Script Explorer (eg2.vscode-npm-script)
-- NPM Intellisense (christian-kohler.npm-intellisense)
-
-**HTML/CSS/Frontend:**
-
-- Auto Close Tag (formulahendry.auto-close-tag)
-- Auto Rename Tag (formulahendry.auto-rename-tag)
-- Tailwind CSS (bradlc.vscode-tailwindcss)
+- Continue.dev (Continue.continue)
+- Material Icon Theme (PKief.material-icon-theme)
+- PowerShell (ms-vscode.powershell)
 
 **React & Modern JS:**
 
 - ES7+ React/Redux/GraphQL Snippets (dsznajder.es7-react-js-snippets)
 
-**Code Aesthetics:**
+**Legacy Extensions Removed:**
 
-- Better Comments (aaron-bond.better-comments)
-- Indent Rainbow (oderwat.indent-rainbow)
-- Material Icon Theme (PKief.material-icon-theme)
-
-**Dev Tools:**
-
+- Auto Close Tag (formulahendry.auto-close-tag)
+- Auto Rename Tag (formulahendry.auto-rename-tag)
 - Live Server (ritwickdey.LiveServer)
-- Todo Highlight (wayou.vscode-todo-highlight)
-- Todo Tree (Gruntfuggly.todo-tree)
+- NPM Script Explorer (eg2.vscode-npm-script)
 
 ---
 
@@ -93,9 +81,7 @@ All VS Code settings, extensions, and integrations are optimized for full autono
 
 ### 🤖 AI Auto-Complete
 
-- GitHub Copilot enabled (all file types)
-- Copilot Chat enabled
-- Codeium code lens enabled
+- Continue.dev enabled (all file types)
 - Inline suggestions on all files
 - Accept suggestions with Tab or Enter
 
@@ -164,7 +150,7 @@ All VS Code settings, extensions, and integrations are optimized for full autono
 ```
 1. Start typing
 ↓
-2. Copilot/Codeium suggests completions
+2. Continue suggests completions
 ↓
 3. Press Tab/Enter to accept
 ↓
@@ -304,18 +290,6 @@ Ctrl+Shift+X → Extensions
 - Event listeners attached
 - Command history tracking
 
-### GitHub Copilot Integration
-
-- Enabled for all file types
-- Chat enabled
-- Code completions aggressive
-- Inline suggestions visible
-
-### Codeium Integration
-
-- Code lens enabled
-- Alternative AI completion ready
-
 ---
 
 ## Performance Optimizations
@@ -323,7 +297,7 @@ Ctrl+Shift+X → Extensions
 - File watcher excludes: node_modules, dist, .wrangler, Media, black-vault
 - Search excludes: same folders + lock files
 - minimap maxColumn: 120 (limited width)
-- Extension ignore: only 2 (vim, tslint)
+- Deprecated extensions blocked in workspace recommendations
 - Hot exit: preserves state
 - Persistent sessions: reduces startup overhead
 
@@ -343,7 +317,7 @@ Linting auto-fix enabled ✅ Auto-save configured ✅ Git operations automated �
 2. **Open a file** and make changes - should auto-save and format
 3. **Open Command Palette** - type "npm run dev" to start dev server
 4. **Try voice commands** - on voicetowebsite.com with 🎤 button
-5. **Test Copilot** - start typing to see suggestions
+5. **Test Continue** - start typing to see suggestions
 6. **Check git status** - auto-commit should be working
 
 ---

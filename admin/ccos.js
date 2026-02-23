@@ -446,7 +446,7 @@ const renderMonetization = async () => {
       </article>
       <article class="ccos-card ccos-col-6">
         <h3>Monetization Zones Preview</h3>
-        <iframe id="monetization-preview" title="Monetization preview" class="ccos-preview-frame" src="/preview/?shadow=1&zones=1&ts=${Date.now()}"></iframe>
+        <iframe id="monetization-preview" title="Monetization preview" class="ccos-preview-frame" src="/preview/index?shadow=1&zones=1&ts=${Date.now()}"></iframe>
       </article>
     </section>
     ${renderContextPanels(analytics, ["Monetization controls loaded"])}
@@ -1226,7 +1226,7 @@ const wireMonetizationEvents = () => {
     });
     status.textContent = `Saved. Density cap: ${payload.config.adDensityCap}`;
     byId("monetization-preview").src =
-      `/preview/?shadow=1&zones=1&ts=${Date.now()}`;
+      `/preview/index?shadow=1&zones=1&ts=${Date.now()}`;
   });
 };
 

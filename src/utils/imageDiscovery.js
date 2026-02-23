@@ -56,9 +56,11 @@ export class ImageDiscoverySystem {
    */
   async searchImage(query) {
     // Try Unsplash first
-    if (this.env.UNSPLASH_ACCESS_KEY) {
+    if (this.env.UNSPLASH_ACCESS_KEY || this.env.unsplash_access_key) {
       try {
-        const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&count=1&client_id=${this.env.UNSPLASH_ACCESS_KEY}`;
+        const key =
+          this.env.UNSPLASH_ACCESS_KEY || this.env.unsplash_access_key;
+        const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&count=1&client_id=${key}`;
         const response = await fetch(url);
         const data = await response.json();
 

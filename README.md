@@ -51,10 +51,10 @@ store).
   `wrangler deploy --keep-vars`).
 - Set required Worker vars/secrets in Cloudflare (examples in `ENV.example` and `wrangler.toml`
   comments).
-- Optional remote auto-deploy on Git push:
-  - enable `CF_WORKERS_BUILDS_AUTO_DEPLOY=1` in Worker runtime vars
-  - set Worker Build API token to `VOICETOWEBSITE_WORKERS_BUILD_TOKEN`
-  - set Build variable `CLOUDFLARE_ACCOUNT_ID`
+- Unified deploy mode defaults:
+  - `CF_WORKERS_BUILDS_AUTO_DEPLOY=0`
+  - `CF_ALLOW_LEGACY_DEPLOY_HOOKS=0`
+  - remote/API deploy is disabled unless `ALLOW_REMOTE_DEPLOY_TRIGGER=1`
 - Local ship helper (verify → commit → optional push): `npm run ship -- -m "your message" --push`
 
 ## Makeover workflow

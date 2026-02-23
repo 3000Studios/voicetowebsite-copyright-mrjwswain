@@ -825,3 +825,11 @@ iframe {
   font-size: 0.75rem;
   margin-top: 1rem;
 }
+
+/* SiteOpener fallback background styles */
+.site-opener-fallback {
+  background-image: url("/vtw-wallpaper.png");
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9);
+}

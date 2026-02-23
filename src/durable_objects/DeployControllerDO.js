@@ -374,6 +374,21 @@ export class DeployControllerDO {
   }
 
   async triggerCloudflareDeploy() {
+    const remoteDeployEnabled =
+      String(this.env.ALLOW_REMOTE_DEPLOY_TRIGGER || "").trim() === "1";
+    if (!remoteDeployEnabled) {
+      await this.appendLog(
+        "warn",
+        "Unified deploy mode is active; remote deploy triggers are disabled."
+      );
+      return {
+        mode: "local_only",
+        status: "manual_required",
+        message:
+          "Run `npm run deploy` from the primary workspace to publish this revision.",
+      };
+    }
+
     const accountId = String(
       this.env.CLOUDFLARE_ACCOUNT_ID || this.env.CF_ACCOUNT_ID || ""
     ).trim();

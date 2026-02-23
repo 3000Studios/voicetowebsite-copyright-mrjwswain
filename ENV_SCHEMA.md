@@ -1,12 +1,12 @@
 # ENV Schema
 
-Generated: 2026-02-22T13:27:54.582Z
+Generated: 2026-02-23T01:17:57.107Z
 
 ## Summary
 
 - Scanned files: 316
-- Used keys: 133
-- Defined keys: 108
+- Used keys: 134
+- Defined keys: 109
 - Missing keys: 51
 - Critical missing keys: 0
 
@@ -31,6 +31,7 @@ Generated: 2026-02-22T13:27:54.582Z
 | AI                                       | yes     | 5             | ok      |
 | ALLOW_ADMIN_HEADER_TOKEN                 | yes     | 1             | ok      |
 | ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 1             | ok      |
+| ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 3             | ok      |
 | API_BASE_URL                             | no      | 2             | missing |
 | ASSETS                                   | no      | 2             | missing |
 | AUDIT_LOG                                | yes     | 1             | ok      |

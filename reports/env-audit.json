@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-22T13:27:54.582Z",
+  "generatedAt": "2026-02-23T01:17:57.107Z",
   "scannedFiles": 316,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
@@ -18,6 +18,7 @@
     "AI",
     "ALLOW_ADMIN_HEADER_TOKEN",
     "ALLOW_INSECURE_ADMIN_COOKIE_SECRET",
+    "ALLOW_REMOTE_DEPLOY_TRIGGER",
     "API_BASE_URL",
     "ASSETS",
     "AUDIT_LOG",
@@ -152,6 +153,7 @@
     "AI",
     "ALLOW_ADMIN_HEADER_TOKEN",
     "ALLOW_INSECURE_ADMIN_COOKIE_SECRET",
+    "ALLOW_REMOTE_DEPLOY_TRIGGER",
     "AUDIT_LOG",
     "BOT_HUB",
     "CACHE_CONTROL_HTML",
@@ -359,6 +361,11 @@
     ],
     "ALLOW_ADMIN_HEADER_TOKEN": ["functions/adminAuth.js"],
     "ALLOW_INSECURE_ADMIN_COOKIE_SECRET": ["functions/adminAuth.js"],
+    "ALLOW_REMOTE_DEPLOY_TRIGGER": [
+      "functions/commandCenterApi.js",
+      "functions/orchestrator.js",
+      "src/durable_objects/DeployControllerDO.js"
+    ],
     "API_BASE_URL": ["stripe-connect-dashboard.html", "stripe-connect-storefront.html"],
     "ASSETS": ["src/functions/deterministicRouting.js", "worker.js"],
     "AUDIT_LOG": ["functions/commandCenterApi.js"],
