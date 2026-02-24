@@ -1647,7 +1647,7 @@
     enforceAdminTheme();
 
     const adminPage = isAdminPage();
-    const shellDisabled = isShellDisabled();
+    const shellDisabled = true; // Navigation disabled
     console.log(
       "[VTW Nav] adminPage:",
       adminPage,

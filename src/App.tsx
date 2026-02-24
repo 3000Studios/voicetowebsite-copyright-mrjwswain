@@ -1,10 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
-import BioluminescentHeader from "./components/BioluminescentHeader";
-import BubbleFooter from "./components/BubbleFooter";
 import ErrorBoundary from "./components/ErrorBoundary";
-import MonolithNav from "./components/MonolithNav";
 import SiteLogo from "./components/SiteLogo";
 import WarpTunnel from "./components/WarpTunnel";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
@@ -456,12 +453,6 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
         <ErrorBoundary fallback={null}>
-          <MonolithNav />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
-          <BioluminescentHeader />
-        </ErrorBoundary>
-        <ErrorBoundary fallback={null}>
           <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
         </ErrorBoundary>
 
@@ -882,8 +873,6 @@ const App: React.FC = () => {
 
           <div className="h-48" />
         </main>
-
-        <BubbleFooter />
       </div>
     </ErrorBoundary>
   );
