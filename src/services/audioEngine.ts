@@ -9,14 +9,14 @@ class AudioEngine {
   private analyser: AnalyserNode | null = null;
   private analyserTimeData: Uint8Array<ArrayBuffer> | null = null;
   private analyserFreqData: Uint8Array<ArrayBuffer> | null = null;
+  private audioDisabled = true; // Audio disabled flag
 
   constructor() {
-    // Delay AudioContext creation until `enable()` is called.
-    // Creating AudioContext eagerly can increase the chance browsers block/resume it
-    // until a user gesture, which makes "autoplay on load" feel broken.
+    // Audio disabled - no initialization needed
   }
 
   public async enable() {
+    if (this.audioDisabled) return; // Audio disabled
     if (!this.context && typeof window !== "undefined") {
       try {
         this.context = new (

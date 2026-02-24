@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import { resolve } from "path";
 import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
@@ -76,6 +76,72 @@ export default defineConfig({
         privacy: resolve(__dirname, "privacy.html"),
         terms: resolve(__dirname, "terms.html"),
         lexiconPro: resolve(__dirname, "lexicon-pro.html"),
+        // App preview pages
+        aiContentGenerator: resolve(
+          __dirname,
+          "src/apps/ai-content-generator.html"
+        ),
+        seoOptimizer: resolve(__dirname, "src/apps/seo-optimizer.html"),
+        socialMediaManager: resolve(
+          __dirname,
+          "src/apps/social-media-manager.html"
+        ),
+        emailMarketing: resolve(__dirname, "src/apps/email-marketing.html"),
+        analyticsDashboard: resolve(
+          __dirname,
+          "src/apps/analytics-dashboard.html"
+        ),
+        taskManager: resolve(__dirname, "src/apps/task-manager.html"),
+        invoiceGenerator: resolve(__dirname, "src/apps/invoice-generator.html"),
+        calendarScheduler: resolve(
+          __dirname,
+          "src/apps/calendar-scheduler.html"
+        ),
+        contactFormBuilder: resolve(
+          __dirname,
+          "src/apps/contact-form-builder.html"
+        ),
+        imageEditor: resolve(__dirname, "src/apps/image-editor.html"),
+        passwordManager: resolve(__dirname, "src/apps/password-manager.html"),
+        noteTakingApp: resolve(__dirname, "src/apps/note-taking-app.html"),
+        expenseTracker: resolve(__dirname, "src/apps/expense-tracker.html"),
+        timeTracker: resolve(__dirname, "src/apps/time-tracker.html"),
+        weatherDashboard: resolve(__dirname, "src/apps/weather-dashboard.html"),
+        recipeManager: resolve(__dirname, "src/apps/recipe-manager.html"),
+        fitnessTracker: resolve(__dirname, "src/apps/fitness-tracker.html"),
+        budgetPlanner: resolve(__dirname, "src/apps/budget-planner.html"),
+        habitTracker: resolve(__dirname, "src/apps/habit-tracker.html"),
+        mindMapper: resolve(__dirname, "src/apps/mind-mapper.html"),
+        pomodoroTimer: resolve(__dirname, "src/apps/pomodoro-timer.html"),
+        fileConverter: resolve(__dirname, "src/apps/file-converter.html"),
+        qrCodeGenerator: resolve(__dirname, "src/apps/qr-code-generator.html"),
+        colorPalette: resolve(__dirname, "src/apps/color-palette.html"),
+        fontFinder: resolve(__dirname, "src/apps/font-finder.html"),
+        logoMaker: resolve(__dirname, "src/apps/logo-maker.html"),
+        videoEditor: resolve(__dirname, "src/apps/video-editor.html"),
+        audioMixer: resolve(__dirname, "src/apps/audio-mixer.html"),
+        pdfTools: resolve(__dirname, "src/apps/pdf-tools.html"),
+        screenshotCapture: resolve(
+          __dirname,
+          "src/apps/screenshot-capture.html"
+        ),
+        textAnalyzer: resolve(__dirname, "src/apps/text-analyzer.html"),
+        presentationBuilder: resolve(
+          __dirname,
+          "src/apps/presentation-builder.html"
+        ),
+        databaseManager: resolve(__dirname, "src/apps/database-manager.html"),
+        apiTester: resolve(__dirname, "src/apps/api-tester.html"),
+        codeEditor: resolve(__dirname, "src/apps/code-editor.html"),
+        websiteBuilder: resolve(__dirname, "src/apps/website-builder.html"),
+        crmSystem: resolve(__dirname, "src/apps/crm-system.html"),
+        inventoryManager: resolve(__dirname, "src/apps/inventory-manager.html"),
+        learningPlatform: resolve(__dirname, "src/apps/learning-platform.html"),
+        surveyBuilder: resolve(__dirname, "src/apps/survey-builder.html"),
+        chatbotBuilder: resolve(__dirname, "src/apps/chatbot-builder.html"),
+        backupManager: resolve(__dirname, "src/apps/backup-manager.html"),
+        securityScanner: resolve(__dirname, "src/apps/security-scanner.html"),
+        translationTool: resolve(__dirname, "src/apps/translation-tool.html"),
       },
       output: {
         manualChunks: {

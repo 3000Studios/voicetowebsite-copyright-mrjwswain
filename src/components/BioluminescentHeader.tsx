@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { SHARED_NAV_ITEMS } from "../constants/navigation";
+import VitreousLogo from "./VitreousLogo";
 
 interface BioluminescentHeaderProps {
   className?: string;
@@ -21,9 +22,9 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
 
   // Wave configuration
   const waveConfig = [
-    { color: "#00f2ff", amp: 60, freq: 0.02, speed: 0.05 },
-    { color: "#bc13fe", amp: 40, freq: 0.015, speed: 0.03 },
-    { color: "#ff00bd", amp: 80, freq: 0.01, speed: 0.02 },
+    { color: "#0ea5e9", amp: 60, freq: 0.02, speed: 0.05 },
+    { color: "#38bdf8", amp: 50, freq: 0.016, speed: 0.035 },
+    { color: "#1d4ed8", amp: 80, freq: 0.012, speed: 0.022 },
   ];
 
   const createWavePath = useCallback(
@@ -51,10 +52,10 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
       // Check if component is still mounted
       if (!isMountedRef.current) return;
 
-      phaseRef.current += 0.05;
+      phaseRef.current += 0.03; // Slower, smoother animation
 
-      // Adjust amplitude based on scroll (lifting off)
-      const liftFactor = Math.max(0, 1 - scrollY / 400);
+      // Always animate waves regardless of scroll for infinite loop
+      const liftFactor = Math.max(0.1, 1 - scrollY / 400); // Minimum visibility
 
       wavePathsRef.current.forEach((path, i) => {
         // Add null checks to prevent race conditions
@@ -82,12 +83,11 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
         }
       });
 
-      // Only request next frame if component is still mounted
-      if (isMountedRef.current) {
-        animationFrameRef.current = requestAnimationFrame(animate);
-      }
+      // Always request next frame for infinite loop
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
 
+    // Start animation immediately
     animate();
 
     return () => {
@@ -142,11 +142,11 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
           position: relative;
           width: 100%;
           height: 80vh;
-          background: #0a0a0a;
+          background: transparent;
           overflow: hidden;
           pointer-events: auto;
           transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
-          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.1);
           z-index: 1;
         }
 
@@ -157,7 +157,7 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
           left: -50%;
           width: 200%;
           height: 200%;
-          background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+          background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
           pointer-events: none;
         }
 
@@ -233,9 +233,9 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
           opacity: 0;
           transform: translateY(20px);
           transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-          background: rgba(5, 5, 5, 0.95);
+          background: rgba(255, 255, 255, 0.1);
           backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
           pointer-events: auto;
         }
 
@@ -244,13 +244,9 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
           transform: translateY(0);
         }
 
-        .nav-reveal .logo {
-          font-size: 1.2rem;
-          letter-spacing: -1px;
-          font-weight: 800;
-          text-transform: uppercase;
-          font-family: 'Syne', sans-serif;
-          color: #ffffff;
+        .nav-reveal .logo img {
+          height: 48px;
+          width: auto;
         }
 
         .nav-links {
@@ -337,7 +333,9 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
         className={`nav-reveal ${isNavVisible ? "visible" : ""}`}
         ref={navRef}
       >
-        <div className="logo">VoiceToWebsite.com</div>
+        <div className="logo">
+          <VitreousLogo size={42} alt="VoiceToWebsite" />
+        </div>
         <div className="nav-links" role="navigation">
           {navItems.map((item) => (
             <a
@@ -357,8 +355,7 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
         ref={headerRef}
       >
         <div className="hero-text">
-          <h1 ref={titleRef}>VOICE</h1>
-          <span>Transform Your Ideas Into Reality</span>
+          <VitreousLogo size={200} />
         </div>
 
         <div className="wave-container">
@@ -375,7 +372,7 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
                     wavePathsRef.current[index] = el;
                   }
                 }}
-                className="wave-path"
+                className={`wave-path wave-path-${index}`}
                 d=""
               />
             ))}

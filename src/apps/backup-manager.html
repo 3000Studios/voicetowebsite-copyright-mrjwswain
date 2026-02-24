@@ -80,6 +80,37 @@
         display: grid;
         gap: 10px;
       }
+      .header-flex {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .badge {
+        display: inline-flex;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(0, 242, 255, 0.14);
+        border: 1px solid rgba(0, 242, 255, 0.35);
+        color: var(--accent);
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .header-title {
+        margin: 12px 0 6px;
+        font-size: 2rem;
+        font-weight: 900;
+      }
+      .header-description {
+        color: var(--muted);
+      }
+      .button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
       .item {
         border: 1px solid var(--border);
         border-radius: 12px;
@@ -90,32 +121,23 @@
   </head>
   <body>
     <main class="shell">
-      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
-        <div
-          style="
-            display: inline-flex;
-            gap: 8px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: rgba(0, 242, 255, 0.14);
-            border: 1px solid rgba(0, 242, 255, 0.35);
-            color: var(--accent);
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-          "
-        >
-          Backups
-        </div>
+      <div class="header-flex">
+        <div class="badge">Backups</div>
         <span style="color: var(--muted); font-weight: 600">Trigger and list backups for VoiceToWebsite content.</span>
       </div>
-      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">One-click backups</h1>
-      <p style="color: var(--muted)">Set destination, run backup, and copy the restore command.</p>
+      <h1 class="header-title">One-click backups</h1>
+      <p class="header-description">Set destination, run backup, and copy the restore command.</p>
 
       <div class="card">
         <div class="section-title">Destination</div>
-        <input id="dest" type="text" value="cloud://voicetowebsite/backups" />
-        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <label for="dest">Backup Destination:</label>
+        <input
+          id="dest"
+          type="text"
+          value="cloud://voicetowebsite/backups"
+          placeholder="Enter backup destination path"
+        />
+        <div class="button-group">
           <button class="btn btn-primary" id="run" type="button">Run backup</button>
           <button class="btn btn-ghost" id="restore" type="button">Copy restore cmd</button>
         </div>

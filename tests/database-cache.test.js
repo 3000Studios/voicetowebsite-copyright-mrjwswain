@@ -101,7 +101,7 @@ describe("StatementCache", () => {
     expect(cache.get(query)).toBe(statement);
   });
 
-  it("should respect TTL and expire old entries", (done) => {
+  it("should respect TTL and expire old entries", async () => {
     const cache = new StatementCache(10, 50); // 50ms TTL
     const query = "SELECT * FROM users";
     const statement = { query };
@@ -109,10 +109,8 @@ describe("StatementCache", () => {
     cache.set(query, [], statement);
     expect(cache.get(query)).toBe(statement);
 
-    setTimeout(() => {
-      expect(cache.get(query)).toBeNull();
-      done();
-    }, 100);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(cache.get(query)).toBeNull();
   });
 
   it("should evict oldest entries when cache is full", () => {

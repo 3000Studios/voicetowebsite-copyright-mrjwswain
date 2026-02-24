@@ -2,8 +2,10 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
 import BioluminescentHeader from "./components/BioluminescentHeader";
+import BubbleFooter from "./components/BubbleFooter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import MonolithNav from "./components/MonolithNav";
+import SiteLogo from "./components/SiteLogo";
 import WarpTunnel from "./components/WarpTunnel";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
 import { SHARED_NAV_ITEMS } from "./constants/navigation";
@@ -20,6 +22,29 @@ type PricingTier = {
 };
 
 const NAV_MENU_ITEMS = SHARED_NAV_ITEMS;
+
+const PARTICLE_LAYOUT = [
+  { left: "15%", top: "20%", delay: "0.1s", opacity: 0.3 },
+  { left: "85%", top: "10%", delay: "1.2s", opacity: 0.6 },
+  { left: "45%", top: "85%", delay: "2.3s", opacity: 0.4 },
+  { left: "25%", top: "55%", delay: "0.8s", opacity: 0.5 },
+  { left: "75%", top: "35%", delay: "3.1s", opacity: 0.2 },
+  { left: "55%", top: "15%", delay: "1.7s", opacity: 0.7 },
+  { left: "35%", top: "75%", delay: "2.9s", opacity: 0.3 },
+  { left: "65%", top: "65%", delay: "0.5s", opacity: 0.6 },
+  { left: "5%", top: "45%", delay: "2.1s", opacity: 0.4 },
+  { left: "95%", top: "25%", delay: "1.4s", opacity: 0.5 },
+  { left: "40%", top: "40%", delay: "3.4s", opacity: 0.2 },
+  { left: "60%", top: "80%", delay: "0.3s", opacity: 0.8 },
+  { left: "20%", top: "90%", delay: "2.6s", opacity: 0.3 },
+  { left: "80%", top: "5%", delay: "1.9s", opacity: 0.6 },
+  { left: "50%", top: "50%", delay: "0.7s", opacity: 0.4 },
+  { left: "30%", top: "30%", delay: "3.2s", opacity: 0.5 },
+  { left: "70%", top: "70%", delay: "1.1s", opacity: 0.3 },
+  { left: "10%", top: "60%", delay: "2.4s", opacity: 0.7 },
+  { left: "90%", top: "40%", delay: "0.9s", opacity: 0.4 },
+  { left: "48%", top: "12%", delay: "2.8s", opacity: 0.6 },
+];
 
 const PRICING_TIERS: PricingTier[] = [
   {
@@ -61,29 +86,6 @@ const PRICING_TIERS: PricingTier[] = [
       "SLA Guarantee",
     ],
   },
-];
-
-const FOOTER_LINKS = [
-  { href: "/store", label: "Product" },
-  { href: "/features", label: "Features" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/gallery", label: "Examples" },
-  { href: "/api-documentation", label: "API" },
-  { href: "/about", label: "Company" },
-  { href: "/about", label: "About" },
-  { href: "/blog", label: "Blog" },
-  { href: "/contact", label: "Careers" },
-  { href: "/contact", label: "Contact" },
-  { href: "/support", label: "Resources" },
-  { href: "/api-documentation", label: "Documentation" },
-  { href: "/how-it-works", label: "Tutorials" },
-  { href: "/partners", label: "Community" },
-  { href: "/support", label: "Support" },
-  { href: "/legal", label: "Legal" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Terms" },
-  { href: "/license", label: "License" },
-  { href: "/trust", label: "Security" },
 ];
 
 const EnhancedTypography = () => (
@@ -128,10 +130,11 @@ const EnhancedTypography = () => (
 const App: React.FC = () => {
   const reduceMotion = useReducedMotion();
   const heroHeadline =
-    siteConfig?.copy?.headline?.trim() || "Speak It. Ship It.";
+    siteConfig?.copy?.headline?.trim() ||
+    "Launch production-ready sites with one spoken command.";
   const heroSubhead =
     siteConfig?.copy?.subhead?.trim() ||
-    "The world's first one-command website engine. No steps. No crap. Just your voice.";
+    "Voice-to-website automation that builds, tests, and deploys in minutes—no handoffs, no guesswork.";
   const audioPlayingRef = useRef(false);
   const musicManuallyStoppedRef = useRef(false);
 
@@ -483,10 +486,16 @@ const App: React.FC = () => {
 
           {/* Enhanced particle effects */}
           <div className="absolute inset-0">
-            {[...Array(20)].map((_, i) => (
+            {PARTICLE_LAYOUT.map((p, i) => (
               <div
                 key={i}
-                className={`absolute w-1 h-1 bg-white rounded-full animate-pulse particle-random particle-${i}`}
+                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                style={{
+                  left: p.left,
+                  top: p.top,
+                  opacity: p.opacity,
+                  animationDelay: p.delay,
+                }}
               />
             ))}
           </div>
@@ -496,12 +505,9 @@ const App: React.FC = () => {
         <nav
           className={`fixed top-0 left-0 right-0 z-40 transition-opacity duration-300 ${isNavFaded ? "opacity-70" : "opacity-100"}`}
         >
-          <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between backdrop-blur-md bg-black/35 border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between backdrop-blur-md bg-black/45 border-b border-white/15 rounded-b-3xl shadow-lg shadow-black/20">
             <a href="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-lg" />
-              <span className="font-bold text-xl font-outfit tracking-wide">
-                VoiceToWebsite
-              </span>
+              <SiteLogo size={42} className="text-white" inline />
             </a>
             <div ref={navMenuRef} className="relative">
               <button
@@ -509,7 +515,7 @@ const App: React.FC = () => {
                 onClick={() => setIsNavMenuOpen((prev) => !prev)}
                 aria-expanded={isNavMenuOpen ? "true" : "false"}
                 aria-label="Toggle navigation menu"
-                className="px-4 py-2 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 transition-all font-outfit text-xs tracking-[0.22em] uppercase"
+                className="px-4 py-2 rounded-full border border-white/15 bg-white/10 hover:bg-white/15 transition-all font-outfit text-[11px] tracking-[0.16em] uppercase"
               >
                 Menu
               </button>
@@ -564,7 +570,7 @@ const App: React.FC = () => {
             <motion.h1
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="vtw-metallic-heading font-outfit font-black text-5xl md:text-8xl lg:text-9xl tracking-tighter leading-none mb-8"
+              className="vtw-metallic-heading font-outfit font-black text-5xl md:text-8xl lg:text-9xl tracking-tight leading-none mb-8"
             >
               {heroHeadline}
             </motion.h1>
@@ -598,11 +604,12 @@ const App: React.FC = () => {
                   </div>
                   <button
                     onClick={startListening}
-                    className="px-16 py-6 rounded-full bg-white text-black font-black font-outfit text-lg tracking-[0.18em] shadow-[0_0_40px_rgba(255,255,255,0.35)] hover:shadow-[0_0_55px_rgba(255,255,255,0.55)] transition-all uppercase"
+                    aria-label="Tap to create a website"
+                    className="px-14 py-5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black font-outfit text-base tracking-[0.12em] shadow-[0_12px_35px_rgba(56,189,248,0.25)] hover:shadow-[0_16px_45px_rgba(56,189,248,0.35)] transition-all uppercase"
                   >
-                    Tap to Create a Website
+                    Start a build
                   </button>
-                  <p className="mt-6 text-white/60 font-inter">
+                  <p className="mt-6 text-white/65 font-inter">
                     Microphone activates only after you tap the button.
                   </p>
                   {generateError && (
@@ -873,79 +880,10 @@ const App: React.FC = () => {
             </div>
           </section>
 
-          {/* Consolidated Graphic Footer */}
-          <footer className="mt-40 border-t border-emerald-300/25 bg-gradient-to-b from-emerald-500/10 via-black/40 to-black/70 rounded-t-[2rem] px-6 py-16">
-            <div className="max-w-6xl mx-auto text-center">
-              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-emerald-300/40 bg-emerald-300/10 mb-8">
-                <div className="w-3 h-3 rounded-full bg-emerald-300 shadow-[0_0_14px_rgba(110,231,183,0.8)]" />
-                <span className="font-outfit text-xs tracking-[0.22em] uppercase text-emerald-200">
-                  VoiceToWebsite
-                </span>
-              </div>
-
-              <h2 className="font-outfit font-black text-4xl md:text-7xl leading-[0.95] text-white mb-6">
-                Voice
-                <br />
-                Website
-              </h2>
-              <p className="text-emerald-100/80 max-w-3xl mx-auto mb-10 font-inter">
-                One footer only. All key links stay here.
-              </p>
-
-              <div className="flex flex-nowrap md:flex-wrap md:justify-center gap-2.5 mb-10 overflow-x-auto px-2 -mx-2 pb-2">
-                {FOOTER_LINKS.map((link) => (
-                  <a
-                    key={`${link.label}-${link.href}`}
-                    href={link.href}
-                    className="px-3 py-2 rounded-full border border-white/20 bg-white/5 text-xs md:text-sm text-white/80 hover:text-white hover:bg-emerald-400/20 hover:border-emerald-300/50 transition-all"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-
-              <div className="social-cluster justify-center">
-                <a
-                  href="https://x.com/voicetowebsite"
-                  className="social-btn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="X"
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M18.901 1.153h3.68l-8.036 9.186L24 22.847h-7.406l-5.8-7.584-6.637 7.584H.478l8.593-9.82L0 1.154h7.594l5.243 6.932z" />
-                  </svg>
-                </a>
-                <a
-                  href="https://instagram.com/3000studios"
-                  className="social-btn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5a4.25 4.25 0 0 0-4.25-4.25zm8.9 1.2a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.youtube.com/"
-                  className="social-btn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="YouTube"
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M23.5 7.3a2.99 2.99 0 0 0-2.1-2.12C19.53 4.67 12 4.67 12 4.67s-7.53 0-9.4.51A2.99 2.99 0 0 0 .5 7.3 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 4.7 2.99 2.99 0 0 0 2.1 2.12c1.87.51 9.4.51 9.4.51s7.53 0 9.4-.51a2.99 2.99 0 0 0 2.1-2.12A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-4.7zM9.6 15.2V8.8L15.8 12z" />
-                  </svg>
-                </a>
-              </div>
-
-              <p className="mt-10 text-white/45 text-sm">
-                2026 VoiceToWebsite. All rights reserved.
-              </p>
-            </div>
-          </footer>
+          <div className="h-48" />
         </main>
+
+        <BubbleFooter />
       </div>
     </ErrorBoundary>
   );

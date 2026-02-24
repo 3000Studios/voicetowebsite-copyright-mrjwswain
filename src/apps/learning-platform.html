@@ -97,6 +97,35 @@
         padding: 12px;
         background: rgba(255, 255, 255, 0.02);
       }
+      .header-flex {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .badge {
+        display: inline-flex;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(0, 242, 255, 0.14);
+        border: 1px solid rgba(0, 242, 255, 0.35);
+        color: var(--accent);
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .header-title {
+        margin: 12px 0 6px;
+        font-size: 2rem;
+        font-weight: 900;
+      }
+      .header-description {
+        color: var(--muted);
+      }
+      .curriculum-card {
+        gap: 14px;
+      }
       @media (max-width: 960px) {
         .grid {
           grid-template-columns: 1fr;
@@ -106,27 +135,12 @@
   </head>
   <body>
     <main class="shell">
-      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
-        <div
-          style="
-            display: inline-flex;
-            gap: 8px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: rgba(0, 242, 255, 0.14);
-            border: 1px solid rgba(0, 242, 255, 0.35);
-            color: var(--accent);
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-          "
-        >
-          Learning
-        </div>
+      <div class="header-flex">
+        <div class="badge">Learning</div>
         <span style="color: var(--muted); font-weight: 600">Course builder for VoiceToWebsite previews.</span>
       </div>
-      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">Publish lessons fast</h1>
-      <p style="color: var(--muted)">Add lessons, durations, and export into your live experience.</p>
+      <h1 class="header-title">Publish lessons fast</h1>
+      <p class="header-description">Add lessons, durations, and export into your live experience.</p>
 
       <div class="grid">
         <div class="card">
@@ -137,7 +151,7 @@
           <button class="btn btn-primary" id="add" type="button">Add lesson</button>
         </div>
 
-        <div class="card" style="gap: 14px">
+        <div class="card curriculum-card">
           <div class="section-title">Curriculum</div>
           <div class="list" id="list"></div>
           <button class="btn btn-ghost" id="copy" type="button">Copy outline</button>

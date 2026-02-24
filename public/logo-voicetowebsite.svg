@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 360" role="img" aria-labelledby="title desc">
+  <title id="title">VoiceToWebsite logo</title>
+  <desc id="desc">Wordmark VoiceToWebsite with flowing wave underline and chat bubble cursor.</desc>
+  <defs>
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0b88d9"/>
+      <stop offset="45%" stop-color="#11b4f5"/>
+      <stop offset="75%" stop-color="#12d2f8"/>
+      <stop offset="100%" stop-color="#0d84c6"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0d4477"/>
+      <stop offset="55%" stop-color="#0bb7f7"/>
+      <stop offset="100%" stop-color="#12d2f8"/>
+    </linearGradient>
+    <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="980" height="360" fill="none"/>
+
+  <path d="M55 230c70-55 135-80 205-48 62 29 128 127 210 100 60-20 86-136 160-152 55-12 129 55 185 42 35-8 66-42 100-92"
+        fill="none" stroke="url(#waveGrad)" stroke-width="26" stroke-linecap="round" filter="url(#glow)" opacity="0.88"/>
+
+  <text x="90" y="205" font-family="Inter, 'Segoe UI', sans-serif" font-size="92" font-weight="800" letter-spacing="-1.5" fill="#0c1a33">VoiceTo</text>
+  <text x="390" y="205" font-family="Inter, 'Segoe UI', sans-serif" font-size="92" font-weight="800" letter-spacing="-1.5" fill="url(#textGrad)">Website</text>
+  <text x="840" y="205" font-family="Inter, 'Segoe UI', sans-serif" font-size="28" font-weight="700" fill="#0c1a33">.com</text>
+
+  <g transform="translate(815 115)">
+    <rect x="0" y="0" rx="18" ry="18" width="120" height="115" fill="url(#textGrad)" />
+    <path d="M20 28h80v38H53l-10 16-10-16H20z" fill="#fff"/>
+  </g>
+</svg>

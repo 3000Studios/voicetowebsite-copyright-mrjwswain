@@ -21,20 +21,20 @@
 
   const WAVE_COLOR_PRESETS = [
     {
-      id: "cobalt-ocean",
-      layers: ["#142c54", "#1e3a8a", "#38bdf8", "#fdf7ef"],
+      id: "blue-surge",
+      layers: ["#0b1f33", "#0ea5e9", "#38bdf8", "#dbeafe"],
+    },
+    {
+      id: "azure-rush",
+      layers: ["#0f172a", "#1d4ed8", "#3b82f6", "#93c5fd"],
     },
     {
       id: "ion-sky",
       layers: ["#0b233d", "#0ea5e9", "#7dd3fc", "#bae6fd"],
     },
     {
-      id: "sunrise",
-      layers: ["#1d1f2a", "#2563eb", "#3b82f6", "#f8fafc"],
-    },
-    {
-      id: "ivory-wave",
-      layers: ["#111827", "#1d4ed8", "#60a5fa", "#fff7e6"],
+      id: "cobalt-ocean",
+      layers: ["#142c54", "#1e3a8a", "#38bdf8", "#fdf7ef"],
     },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
@@ -85,12 +85,40 @@
   const publicLinks = [
     { href: "/", label: "Home", icon: "🏠" },
     { href: "/features", label: "Features", icon: "⚡" },
-    { href: "/pricing", label: "Pricing", icon: "💎" },
+    { href: "/how-it-works", label: "How It Works", icon: "🔧" },
     { href: "/demo", label: "Demo", icon: "🚀" },
-    { href: "/store", label: "Store", icon: "🛒" },
+    { href: "/pricing", label: "Pricing", icon: "💎" },
+    { href: "/store", label: "Store", icon: "�" },
+    { href: "/appstore", label: "App Store", icon: "�" },
     { href: "/blog", label: "Blog", icon: "📝" },
     { href: "/livestream", label: "Live", icon: "🎥" },
     { href: "/support", label: "Support", icon: "💬" },
+    { href: "/contact", label: "Contact", icon: "📧" },
+    { href: "/about", label: "About", icon: "🗿" },
+    { href: "/status", label: "Status", icon: "📡" },
+    { href: "/search", label: "Search", icon: "🔍" },
+    { href: "/gallery", label: "Gallery", icon: "🖼️" },
+    { href: "/templates", label: "Templates", icon: "📋" },
+    { href: "/partners", label: "Partners", icon: "🤝" },
+    { href: "/trust", label: "Trust Center", icon: "🛡️" },
+    { href: "/referrals", label: "Referrals", icon: "🎁" },
+    { href: "/projects", label: "Projects", icon: "📂" },
+    { href: "/the3000", label: "The3000", icon: "🎨" },
+    { href: "/studio3000", label: "Studio3000", icon: "🎬" },
+    { href: "/webforge", label: "Webforge", icon: "🔨" },
+    { href: "/cursor-demo", label: "Cursor Demo", icon: "👆" },
+    { href: "/sandbox", label: "Sandbox", icon: "🧪" },
+    { href: "/license", label: "License", icon: "🔐" },
+    { href: "/privacy", label: "Privacy", icon: "🔒" },
+    { href: "/terms", label: "Terms", icon: "📜" },
+    { href: "/legal", label: "Legal", icon: "⚖️" },
+    { href: "/copyrights", label: "Copyrights", icon: "©️" },
+    { href: "/api-documentation", label: "API Docs", icon: "📚" },
+    { href: "/neural-engine", label: "Neural Engine", icon: "🧠" },
+    { href: "/strata-design-system", label: "Design System", icon: "🎨" },
+    { href: "/lexicon-pro", label: "Lexicon Pro", icon: "📖" },
+    { href: "/voice-to-json", label: "Voice to JSON", icon: "🎤" },
+    { href: "/geological-studies", label: "Geological Studies", icon: "🏔️" },
   ];
 
   const primaryLinks = [
@@ -101,13 +129,40 @@
   const navDataTags = {
     Home: "01_INIT",
     Features: "02_CORE",
-    Pricing: "03_SUBS",
-    License: "04_CRED",
-    Demo: "05_DEMO",
+    "How It Works": "03_WORKS",
+    Demo: "04_DEMO",
+    Pricing: "05_SUBS",
     Store: "06_KITS",
-    Blog: "07_SIG",
-    Livestream: "08_STREAM",
-    Support: "09_HELP",
+    "App Store": "07_APPS",
+    Blog: "08_SIG",
+    Livestream: "09_STREAM",
+    Support: "10_HELP",
+    Contact: "11_CONT",
+    About: "12_ABOUT",
+    Status: "13_STAT",
+    Search: "14_SRCH",
+    Gallery: "15_GAL",
+    Templates: "16_TEMP",
+    Partners: "17_PART",
+    "Trust Center": "18_TRUST",
+    Referrals: "19_REF",
+    Projects: "20_PROJ",
+    The3000: "21_3K",
+    Studio3000: "22_3KS",
+    Webforge: "23_FORGE",
+    "Cursor Demo": "24_CUR",
+    Sandbox: "25_SAN",
+    License: "26_LIC",
+    Privacy: "27_PRIV",
+    Terms: "28_TERM",
+    Legal: "29_LEG",
+    Copyrights: "30_COPY",
+    "API Docs": "31_API",
+    "Neural Engine": "32_NEUR",
+    "Design System": "33_DESG",
+    "Lexicon Pro": "34_LEX",
+    "Voice to JSON": "35_JSON",
+    "Geological Studies": "36_GEO",
   };
 
   const formatDataTag = (label, idx) => {
@@ -367,9 +422,8 @@
       .join("");
 
   const buildActionsHtml = () => {
-    const admin = getAdminNavLink();
-    if (!admin) return "";
-    return `<a class="crystal-admin-link crystal-admin-bubble" href="${admin.href}" data-name="${admin.label}" data-vtw-scrollfx="label" title="Admin Portal">${admin.icon}</a>`;
+    // Admin bubble removed - all links will be in hamburger menu
+    return "";
   };
 
   const buildListHtml = () => {
@@ -491,8 +545,6 @@
     header.innerHTML = `
       <div class="latex-hero-text">
         <h1 class="latex-hero-title">VoiceToWebsite</h1>
-        <span class="latex-hero-subtitle">Auditory Elasticity</span>
-        <p class="latex-hero-tagline">Bioluminescent Latex Tension · Granular Quartz Displacement · Tactile Carbonized Cartography · Luminous Anodized Interlace</p>
       </div>
 
       <div class="latex-wave-container" aria-hidden="true">
@@ -654,6 +706,13 @@
         </div>
       </div>
 
+      <!-- Hamburger Menu Toggle -->
+      <button class="hamburger-toggle" id="mobileNavToggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
       <ul class="plasma-nav-links">
         ${navLinks}
       </ul>
@@ -669,6 +728,26 @@
 
     navWrapper.appendChild(nav);
     fragment.append(skip, navWrapper);
+
+    // Create mobile overlay for hamburger menu
+    const mobileOverlay = document.createElement("div");
+    mobileOverlay.className = "mobile-overlay";
+    mobileOverlay.id = "mobileOverlay";
+    mobileOverlay.innerHTML = `
+      <div class="mobile-overlay-content">
+        <div class="mobile-overlay-header">
+          <h2 class="mobile-overlay-title">Navigation</h2>
+          <button class="mobile-overlay-close" id="mobileOverlayClose" type="button" aria-label="Close menu">
+            <span class="close-icon">×</span>
+          </button>
+        </div>
+        <ul class="mobile-nav-list">
+          ${buildListHtml()}
+        </ul>
+      </div>
+    `;
+    fragment.appendChild(mobileOverlay);
+
     body.prepend(fragment);
     body.classList.add("nav-ready");
 
@@ -683,6 +762,60 @@
     navLinksElements.forEach((link) => {
       link.addEventListener("mouseenter", playHover);
       link.addEventListener("mousedown", playClick);
+    });
+
+    // Hamburger menu functionality
+    const hamburgerToggle = document.getElementById("mobileNavToggle");
+    const mobileOverlayElement = document.getElementById("mobileOverlay");
+    const mobileOverlayClose = document.getElementById("mobileOverlayClose");
+
+    const openMobileMenu = () => {
+      mobileOverlayElement.classList.add("is-open");
+      hamburgerToggle.classList.add("is-active");
+      hamburgerToggle.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+    };
+
+    const closeMobileMenu = () => {
+      mobileOverlayElement.classList.remove("is-open");
+      hamburgerToggle.classList.remove("is-active");
+      hamburgerToggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    };
+
+    if (hamburgerToggle) {
+      hamburgerToggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (mobileOverlayElement.classList.contains("is-open")) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+    }
+
+    if (mobileOverlayClose) {
+      mobileOverlayClose.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeMobileMenu();
+      });
+    }
+
+    // Close menu when clicking outside
+    mobileOverlayElement.addEventListener("click", (e) => {
+      if (e.target === mobileOverlayElement) {
+        closeMobileMenu();
+      }
+    });
+
+    // Close menu on escape key
+    window.addEventListener("keydown", (e) => {
+      if (
+        e.key === "Escape" &&
+        mobileOverlayElement.classList.contains("is-open")
+      ) {
+        closeMobileMenu();
+      }
     });
 
     // Update navigation when auth state changes

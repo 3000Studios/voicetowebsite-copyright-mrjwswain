@@ -98,6 +98,7 @@ Public pages:
 - `/appstore-new` -> `appstore-new.html`
 - `/appstore` -> `appstore.html`
 - `/blog` -> `blog.html`
+- `/chromewebdata_2026-02-23_22-31-10.report` -> `chromewebdata_2026-02-23_22-31-10.report.html`
 - `/color-synth` -> `color-synth.html`
 - `/contact` -> `contact.html`
 - `/copyrights` -> `copyrights.html`
@@ -175,10 +176,13 @@ App Store pages:
 
 Scripts available:
 
+- `scripts/advanced-heal.mjs`
+- `scripts/auto-dev-push.ps1`
 - `scripts/auto-ship-runner.ps1`
 - `scripts/auto-ship.mjs`
 - `scripts/autopilot.mjs`
 - `scripts/check-css-governance.mjs`
+- `scripts/continuous-integration.mjs`
 - `scripts/css-budget-validator.mjs`
 - `scripts/dev-all.mjs`
 - `scripts/env-audit.mjs`
@@ -201,6 +205,7 @@ Scripts available:
 - `scripts/open-vtw-voice-commands.ps1`
 - `scripts/open-youtube.ps1`
 - `scripts/performance-benchmark.mjs`
+- `scripts/pre-commit-enhanced.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/release.mjs`
 - `scripts/restore.mjs`
@@ -224,7 +229,6 @@ _None found_
 
 Core governance docs present:
 
-- `AGENTS.md`
 - `DEPLOYMENT.md`
 - `SYSTEM_OPERATIONS.md`
 - `EXECUTION.md`

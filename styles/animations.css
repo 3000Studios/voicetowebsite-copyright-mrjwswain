@@ -21,6 +21,42 @@
   }
 }
 
+@keyframes infinite-wave {
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(-10px) translateY(-5px);
+  }
+  50% {
+    transform: translateX(5px) translateY(-10px);
+  }
+  75% {
+    transform: translateX(-5px) translateY(5px);
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes wave-flow {
+  0% {
+    d: path("M0,160 Q360,120 720,160 T1440,160");
+  }
+  25% {
+    d: path("M0,140 Q360,180 720,140 T1440,140");
+  }
+  50% {
+    d: path("M0,180 Q360,140 720,180 T1440,180");
+  }
+  75% {
+    d: path("M0,140 Q360,180 720,140 T1440,140");
+  }
+  100% {
+    d: path("M0,160 Q360,120 720,160 T1440,160");
+  }
+}
+
 @keyframes vtw-h-scan {
   0% {
     letter-spacing: 0.02em;
