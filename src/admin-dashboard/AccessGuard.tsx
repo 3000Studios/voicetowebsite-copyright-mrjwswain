@@ -7,9 +7,11 @@ const AccessGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/health");
-        const data = await res.json();
-        setIsAuthenticated(data.status === "ok");
+        const res = await fetch("/api/config/status", {
+          cache: "no-store",
+          credentials: "include",
+        });
+        setIsAuthenticated(res.ok);
       } catch (_) {
         setIsAuthenticated(false);
       } finally {
@@ -42,7 +44,7 @@ const AccessGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             Please authenticate to access the admin dashboard.
           </p>
           <div className="text-center">
-            <a href="/admin/login.html" className="btn-primary">
+            <a href="/admin/login" className="btn-primary">
               Go to Login
             </a>
           </div>

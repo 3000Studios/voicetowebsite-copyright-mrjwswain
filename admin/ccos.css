@@ -66,6 +66,14 @@ body.ccos-body {
   gap: 0.5rem;
 }
 
+.ccos-nav-group-label {
+  margin: 1rem 0 0.45rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ccos-muted);
+}
+
 .ccos-nav-item {
   border: 1px solid var(--ccos-border);
   background: var(--ccos-panel);
@@ -74,6 +82,16 @@ body.ccos-body {
   padding: 0.65rem 0.75rem;
   border-radius: 0.65rem;
   cursor: pointer;
+}
+
+.ccos-nav-link {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ccos-nav-pages {
+  margin-bottom: 0.5rem;
 }
 
 .ccos-nav-item:hover,

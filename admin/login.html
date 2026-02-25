@@ -346,6 +346,13 @@
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
       const loginCard = document.querySelector(".login-card");
+      const markAdminSession = () => {
+        try {
+          sessionStorage.setItem("adminAccessValidated", "true");
+          sessionStorage.setItem("yt-admin-unlocked", "true");
+          sessionStorage.setItem("yt-admin-unlocked-ts", String(Date.now()));
+        } catch (_) {}
+      };
 
       const bgVideo = document.querySelector(".video-bg video");
       if (bgVideo) {
@@ -386,6 +393,7 @@
           });
 
           if (response.ok) {
+            markAdminSession();
             // Success transition and redirect to admin.
             loginButton.disabled = true;
             loginCard?.classList.add("success");

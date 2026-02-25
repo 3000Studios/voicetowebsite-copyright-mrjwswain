@@ -67,6 +67,34 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     expect(res.headers.get("Content-Type") || "").toContain("text/html");
   });
 
+  it("serves /admin/login and /admin/access aliases without admin cookie", async () => {
+    const env = {
+      ASSETS: mockAssets,
+      CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
+      ADMIN_ACCESS_CODE: "code",
+      NODE_ENV: "test",
+    };
+
+    const loginRes = await worker.fetch(
+      new Request("https://example.com/admin/login"),
+      env,
+      {}
+    );
+    expect(loginRes.status).toBe(200);
+    const loginBody = await loginRes.text();
+    expect(loginBody).toContain("asset:/admin/login.html");
+
+    const accessRes = await worker.fetch(
+      new Request("https://example.com/admin/access"),
+      env,
+      {}
+    );
+    expect(accessRes.status).toBe(200);
+    const accessBody = await accessRes.text();
+    expect(accessBody).toContain("asset:/admin/access.html");
+  });
+
   it("can login and then access guarded /admin/* routes with the signed admin cookie", async () => {
     const env = {
       ASSETS: mockAssets,
@@ -106,6 +134,51 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
       {}
     );
     expect(res.status).toBe(200);
+  });
+
+  it("serves legacy admin pages for authenticated users and keeps module routes on shell", async () => {
+    const env = {
+      ASSETS: mockAssets,
+      CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
+      ADMIN_ACCESS_CODE: "code",
+      NODE_ENV: "test",
+    };
+
+    const loginRes = await worker.fetch(
+      new Request("https://example.com/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: "pw" }),
+      }),
+      env,
+      {}
+    );
+    expect(loginRes.status).toBe(200);
+    const cookie = extractFirstCookie(loginRes.headers.get("Set-Cookie"));
+    expect(cookie.startsWith("vtw_admin=")).toBe(true);
+
+    const legacyRes = await worker.fetch(
+      new Request("https://example.com/admin/customer-chat", {
+        headers: { Cookie: cookie },
+      }),
+      env,
+      {}
+    );
+    expect(legacyRes.status).toBe(200);
+    const legacyBody = await legacyRes.text();
+    expect(legacyBody).toContain("asset:/admin/customer-chat.html");
+
+    const moduleRes = await worker.fetch(
+      new Request("https://example.com/admin/mission", {
+        headers: { Cookie: cookie },
+      }),
+      env,
+      {}
+    );
+    expect(moduleRes.status).toBe(200);
+    const moduleBody = await moduleRes.text();
+    expect(moduleBody).toContain("asset:/admin/integrated-dashboard.html");
   });
 
   it("can login with ADMIN_ACCESS_CODE when CONTROL_PASSWORD is not set", async () => {

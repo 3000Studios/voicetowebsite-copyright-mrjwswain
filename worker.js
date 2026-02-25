@@ -2485,6 +2485,35 @@ export default {
         "/admin/admin.css",
         "/admin/access-guard.js",
       ]);
+      const ADMIN_PUBLIC_ROUTE_ALIASES = new Map([
+        ["/admin/access", "/admin/access.html"],
+        ["/admin/login", "/admin/login.html"],
+      ]);
+      const ADMIN_SHELL_PATHS = new Set([
+        "/admin",
+        "/admin/index.html",
+        "/admin/integrated-dashboard",
+        "/admin/integrated-dashboard.html",
+        "/admin/mission",
+        "/admin/dashboard",
+        "/admin/cc",
+        "/admin/deploy",
+        "/admin/vcc",
+        "/admin/preview",
+        "/admin/monetization",
+        "/admin/analytics",
+        "/admin/live",
+        "/admin/store",
+        "/admin/media",
+        "/admin/audio",
+        "/admin/settings",
+        "/admin/governance",
+      ]);
+      const normalizedAdminPath = cleanPath || "/";
+      const adminPublicAliasPath =
+        request.method === "GET"
+          ? ADMIN_PUBLIC_ROUTE_ALIASES.get(normalizedAdminPath) || null
+          : null;
       const isAdminRoot =
         url.pathname === "/admin" || url.pathname === "/admin/";
       const isAdminPath = url.pathname.startsWith("/admin/") || isAdminRoot;
@@ -2492,12 +2521,10 @@ export default {
         /^\/admin\/.+\.(?:css|js|mjs|map|svg|png|jpg|jpeg|gif|webp|ico|woff2?)$/i.test(
           url.pathname
         ) && !url.pathname.endsWith(".html");
-      const isAdminHtmlPath =
-        /^\/admin\/.+\.html$/i.test(url.pathname) &&
-        !ADMIN_PUBLIC_PATHS.has(url.pathname);
 
       if (isAdminPath) {
-        const isPublic = ADMIN_PUBLIC_PATHS.has(url.pathname);
+        const isPublic =
+          ADMIN_PUBLIC_PATHS.has(url.pathname) || Boolean(adminPublicAliasPath);
         if (!isPublic) {
           const hasValidAuthHeader = hasValidConfiguredAdminBearer(
             request,
@@ -2522,12 +2549,19 @@ export default {
         }
       }
 
-      const shouldServeAdminShell =
-        isAdminRoot ||
-        (isAdminPath &&
-          !ADMIN_PUBLIC_PATHS.has(url.pathname) &&
-          !isAdminStaticAsset) ||
-        isAdminHtmlPath;
+      const shouldServeAdminShell = ADMIN_SHELL_PATHS.has(normalizedAdminPath);
+
+      if (adminPublicAliasPath) {
+        const aliasRequest = new Request(
+          new URL(adminPublicAliasPath, url.origin),
+          request
+        );
+        const aliasRes = await assets.fetch(aliasRequest);
+        return addSecurityHeaders(aliasRes, {
+          cacheControl: "no-store",
+          pragmaNoCache: true,
+        });
+      }
 
       if (shouldServeAdminShell) {
         const shellUrl = new URL(
@@ -2539,6 +2573,17 @@ export default {
           cacheControl: "no-store",
           pragmaNoCache: true,
         });
+      }
+
+      if (isAdminPath && !isAdminStaticAsset && !url.pathname.includes(".")) {
+        const htmlUrl = new URL(`${normalizedAdminPath}.html`, url.origin);
+        const htmlRes = await assets.fetch(new Request(htmlUrl, request));
+        if (htmlRes.status !== 404) {
+          return addSecurityHeaders(htmlRes, {
+            cacheControl: "no-store",
+            pragmaNoCache: true,
+          });
+        }
       }
 
       if (isAdminPath) {

@@ -88,9 +88,11 @@
     { href: "/how-it-works", label: "How It Works", icon: "🔧" },
     { href: "/demo", label: "Demo", icon: "🚀" },
     { href: "/pricing", label: "Pricing", icon: "💎" },
-    { href: "/store", label: "Store", icon: "�" },
-    { href: "/appstore", label: "App Store", icon: "�" },
+    { href: "/store", label: "Store", icon: "🛒" },
+    { href: "/appstore", label: "App Store", icon: "📱" },
+    { href: "/appstore-new", label: "App Store New", icon: "🆕" },
     { href: "/blog", label: "Blog", icon: "📝" },
+    { href: "/cyber-blog", label: "Cyber Blog", icon: "🛰️" },
     { href: "/livestream", label: "Live", icon: "🎥" },
     { href: "/support", label: "Support", icon: "💬" },
     { href: "/contact", label: "Contact", icon: "📧" },
@@ -99,15 +101,35 @@
     { href: "/search", label: "Search", icon: "🔍" },
     { href: "/gallery", label: "Gallery", icon: "🖼️" },
     { href: "/templates", label: "Templates", icon: "📋" },
+    { href: "/seo-template", label: "SEO Template", icon: "🧭" },
     { href: "/partners", label: "Partners", icon: "🤝" },
     { href: "/trust", label: "Trust Center", icon: "🛡️" },
     { href: "/referrals", label: "Referrals", icon: "🎁" },
     { href: "/projects", label: "Projects", icon: "📂" },
+    {
+      href: "/project-planning-hub",
+      label: "Project Planning Hub",
+      icon: "🧠",
+    },
     { href: "/the3000", label: "The3000", icon: "🎨" },
+    { href: "/the3000-gallery", label: "The3000 Gallery", icon: "🖌️" },
     { href: "/studio3000", label: "Studio3000", icon: "🎬" },
     { href: "/webforge", label: "Webforge", icon: "🔨" },
     { href: "/cursor-demo", label: "Cursor Demo", icon: "👆" },
     { href: "/sandbox", label: "Sandbox", icon: "🧪" },
+    { href: "/color-synth", label: "Color Synth", icon: "🎛️" },
+    { href: "/focus-timer", label: "Focus Timer", icon: "⏱️" },
+    { href: "/memory-matrix", label: "Memory Matrix", icon: "🧩" },
+    { href: "/neon-snake", label: "Neon Snake", icon: "🐍" },
+    { href: "/zen-particles", label: "Zen Particles", icon: "🫧" },
+    { href: "/rush-percussion", label: "Rush Percussion", icon: "🥁" },
+    { href: "/stripe-connect-dashboard", label: "Stripe Dashboard", icon: "💳" },
+    {
+      href: "/stripe-connect-storefront",
+      label: "Stripe Storefront",
+      icon: "🏪",
+    },
+    { href: "/disclosure", label: "Disclosure", icon: "📣" },
     { href: "/license", label: "License", icon: "🔐" },
     { href: "/privacy", label: "Privacy", icon: "🔒" },
     { href: "/terms", label: "Terms", icon: "📜" },
@@ -178,14 +200,25 @@
   const adminLinks = [
     { href: "/admin/mission", label: "Mission", icon: "🎯" },
     { href: "/admin/cc", label: "Command Center", icon: "🛠️" },
-    { href: "/admin/vcc", label: "Voice", icon: "🎤" },
+    { href: "/admin/vcc", label: "Voice Command Center", icon: "🎤" },
     { href: "/admin/monetization", label: "Monetization", icon: "💰" },
-    { href: "/admin/analytics", label: "Analytics", icon: "📈" },
-    { href: "/admin/live", label: "Live", icon: "🎬" },
-    { href: "/admin/store", label: "Store", icon: "🛒" },
-    { href: "/admin/media", label: "Media", icon: "🖼️" },
-    { href: "/admin/audio", label: "Audio", icon: "🎵" },
+    { href: "/admin/analytics", label: "Analytics Core", icon: "📈" },
+    { href: "/admin/live", label: "Live Manager", icon: "🎬" },
+    { href: "/admin/store", label: "Store Manager", icon: "🛒" },
+    { href: "/admin/media", label: "Media Library", icon: "🖼️" },
+    { href: "/admin/audio", label: "Audio Library", icon: "🎵" },
     { href: "/admin/settings", label: "Settings", icon: "⚙️" },
+    { href: "/admin/voice-commands", label: "Legacy Voice", icon: "🗣️" },
+    { href: "/admin/analytics-enhanced", label: "Legacy Analytics", icon: "📊" },
+    { href: "/admin/live-stream-enhanced", label: "Legacy Live", icon: "📺" },
+    { href: "/admin/app-store-manager", label: "App Store Manager", icon: "📦" },
+    { href: "/admin/customer-chat", label: "Customer Chat", icon: "💬" },
+    { href: "/admin/bot-command-center", label: "Bot Command", icon: "🤖" },
+    { href: "/admin/progress", label: "Progress", icon: "📈" },
+    { href: "/admin/nexus", label: "Nexus", icon: "🧭" },
+    { href: "/admin/test-lab-1", label: "Test Lab 1", icon: "🧪" },
+    { href: "/admin/test-lab-2", label: "Test Lab 2", icon: "🧫" },
+    { href: "/admin/test-lab-3", label: "Test Lab 3", icon: "⚗️" },
   ];
 
   const footerLinks = {
@@ -379,12 +412,17 @@
   };
   const hasAdminAccess = () => {
     try {
-      // Session unlock (client-side UX guard) must be present.
+      // Signed admin cookie is authoritative.
+      if (hasAdminCookie()) {
+        sessionStorage.setItem("adminAccessValidated", "true");
+        sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, String(Date.now()));
+        return true;
+      }
+      // Fallback unlock state is allowed for short-lived local UX continuity.
       const unlocked =
         sessionStorage.getItem("adminAccessValidated") === "true";
       if (!unlocked) return false;
-      // And the user must have an authenticated admin cookie OR a fresh unlock timer.
-      return hasAdminCookie() || isAdminSessionFresh();
+      return isAdminSessionFresh();
     } catch (_) {
       return false;
     }
@@ -1647,7 +1685,7 @@
     enforceAdminTheme();
 
     const adminPage = isAdminPage();
-    const shellDisabled = true; // Navigation disabled
+    const shellDisabled = isShellDisabled() || adminPage;
     console.log(
       "[VTW Nav] adminPage:",
       adminPage,
