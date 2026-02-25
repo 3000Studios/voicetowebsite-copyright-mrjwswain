@@ -27,8 +27,8 @@ Upgrade VoiceToWebsite into a “showpiece” UI/UX while keeping it fast, acces
 
 ## Pages to audit
 
-From `JULES.system.json`: `/`, `/features`, `/demo`, `/pricing`, `/appstore`, `/live`, `/support`,
-`/admin`.
+From `JULES.system.json`: `/`, `/features`, `/demo`, `/pricing`, `/appstore`, `/livestream`,
+`/support`, `/admin`.
 
 ## Acceptance checklist (ship gate)
 

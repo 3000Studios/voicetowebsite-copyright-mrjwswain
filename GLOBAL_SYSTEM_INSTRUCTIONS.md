@@ -177,6 +177,7 @@ App Store pages:
 Scripts available:
 
 - `scripts/advanced-heal.mjs`
+- `scripts/AGENTS.md`
 - `scripts/auto-dev-push.ps1`
 - `scripts/auto-ship-runner.ps1`
 - `scripts/auto-ship.mjs`
@@ -204,7 +205,6 @@ Scripts available:
 - `scripts/open-vtw-admin.ps1`
 - `scripts/open-vtw-voice-commands.ps1`
 - `scripts/open-youtube.ps1`
-- `scripts/performance-benchmark.mjs`
 - `scripts/pre-commit-enhanced.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/release.mjs`
@@ -212,8 +212,6 @@ Scripts available:
 - `scripts/ship.mjs`
 - `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
-- `scripts/test-checkout-flow.mjs`
-- `scripts/test-runner.mjs`
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
 - `scripts/validate-governance.mjs`
@@ -229,6 +227,7 @@ _None found_
 
 Core governance docs present:
 
+- `AGENTS.md`
 - `DEPLOYMENT.md`
 - `SYSTEM_OPERATIONS.md`
 - `EXECUTION.md`
