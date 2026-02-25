@@ -69,6 +69,23 @@ const AdminDashboard: React.FC = () => {
   const [bots, setBots] = useState<BotStatus | null>(null);
   const [logs, setLogs] = useState<AdminLog[] | null>(null);
   const [orders, setOrders] = useState<Order[] | null>(null);
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (_) {
+      // Best-effort logout; always clear local auth hints.
+    } finally {
+      try {
+        sessionStorage.removeItem("adminAccessValidated");
+        sessionStorage.removeItem("yt-admin-unlocked");
+        sessionStorage.removeItem("yt-admin-unlocked-ts");
+      } catch (_) {}
+      window.location.href = "/admin/login";
+    }
+  };
 
   const authStatus = useMemo(() => {
     if (!health) return "Checking…";
@@ -571,7 +588,9 @@ const AdminDashboard: React.FC = () => {
             <a href="/" className="btn-ghost btn-sm">
               View Site
             </a>
-            <button className="btn-ghost btn-sm">Logout</button>
+            <button type="button" className="btn-ghost btn-sm" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         </div>
       </header>

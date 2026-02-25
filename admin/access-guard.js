@@ -17,6 +17,87 @@
     return false;
   };
 
+  const normalizeAdminPath = (input) => {
+    let path = String(input || "").trim();
+    if (!path) return "/";
+    if (!path.startsWith("/")) path = `/${path}`;
+    path = path.replace(/\/+$/, "");
+    if (path.endsWith(".html")) path = path.slice(0, -5);
+    if (path === "/admin/index") return "/admin";
+    return path || "/";
+  };
+
+  const adminPageLinks = [
+    { href: "/admin/integrated-dashboard", label: "Mission Control" },
+    { href: "/admin/mission", label: "Mission Route" },
+    { href: "/admin/cc", label: "Command Center" },
+    { href: "/admin/vcc", label: "Voice Command Center" },
+    { href: "/admin/monetization", label: "Monetization" },
+    { href: "/admin/analytics", label: "Analytics" },
+    { href: "/admin/live", label: "Live Manager" },
+    { href: "/admin/store", label: "Store Manager" },
+    { href: "/admin/media", label: "Media Library" },
+    { href: "/admin/audio", label: "Audio Library" },
+    { href: "/admin/settings", label: "Settings" },
+    { href: "/admin/voice-commands", label: "Legacy Voice Commands" },
+    { href: "/admin/analytics-enhanced", label: "Legacy Analytics Enhanced" },
+    { href: "/admin/live-stream", label: "Legacy Live Stream" },
+    { href: "/admin/live-stream-enhanced", label: "Legacy Live Enhanced" },
+    { href: "/admin/customer-chat", label: "Customer Chat" },
+    { href: "/admin/bot-command-center", label: "Bot Command Center" },
+    { href: "/admin/store-manager", label: "Legacy Store Manager" },
+    { href: "/admin/app-store-manager", label: "Legacy App Store" },
+    { href: "/admin/progress", label: "Progress" },
+    { href: "/admin/nexus", label: "Nexus" },
+    { href: "/admin/test-lab-1", label: "Test Lab 1" },
+    { href: "/admin/test-lab-2", label: "Test Lab 2" },
+    { href: "/admin/test-lab-3", label: "Test Lab 3" },
+  ];
+
+  const sidebarGroups = [
+    {
+      label: "Core Modules",
+      links: [
+        { href: "/admin/integrated-dashboard", label: "Mission Control" },
+        { href: "/admin/cc", label: "Command Center" },
+        { href: "/admin/vcc", label: "Voice Command Center" },
+        { href: "/admin/monetization", label: "Monetization" },
+        { href: "/admin/settings", label: "Settings" },
+      ],
+    },
+    {
+      label: "Operations",
+      links: [
+        { href: "/admin/analytics", label: "Analytics" },
+        { href: "/admin/live", label: "Live Manager" },
+        { href: "/admin/customer-chat", label: "Customer Chat" },
+        { href: "/admin/bot-command-center", label: "Bot Command Center" },
+      ],
+    },
+    {
+      label: "Commerce + Media",
+      links: [
+        { href: "/admin/store", label: "Store Manager" },
+        { href: "/admin/app-store-manager", label: "App Store Manager" },
+        { href: "/admin/media", label: "Media Library" },
+        { href: "/admin/audio", label: "Audio Library" },
+      ],
+    },
+    {
+      label: "Legacy + Labs",
+      links: [
+        { href: "/admin/voice-commands", label: "Legacy Voice Commands" },
+        { href: "/admin/analytics-enhanced", label: "Legacy Analytics" },
+        { href: "/admin/live-stream-enhanced", label: "Legacy Live Enhanced" },
+        { href: "/admin/progress", label: "Progress" },
+        { href: "/admin/nexus", label: "Nexus" },
+        { href: "/admin/test-lab-1", label: "Test Lab 1" },
+        { href: "/admin/test-lab-2", label: "Test Lab 2" },
+        { href: "/admin/test-lab-3", label: "Test Lab 3" },
+      ],
+    },
+  ];
+
   const buildSidebar = () => {
     const shell = document.querySelector(".admin-shell");
     if (!shell || shell.querySelector(".admin-sidebar")) return;
@@ -30,20 +111,31 @@
 
     const subnav = document.createElement("nav");
     subnav.className = "admin-subnav-bar";
-    subnav.innerHTML = `
-      <a class="admin-subnav-link" data-path="/admin/integrated-dashboard.html" href="/admin/integrated-dashboard.html">Mission</a>
-      <a class="admin-subnav-link" data-path="/admin/voice-commands.html" href="/admin/voice-commands.html">Voice Control</a>
-      <a class="admin-subnav-link" data-path="/admin/index.html" href="/admin/index.html">Command Center</a>
-      <a class="admin-subnav-link" data-path="/admin/test-lab-1.html" href="/admin/test-lab-1.html">Agent Control</a>
-      <a class="admin-subnav-link" data-path="/admin/analytics.html" href="/admin/analytics.html">Analytics</a>
-      <a class="admin-subnav-link" data-path="/admin/store-manager.html" href="/admin/store-manager.html">Store</a>
-      <a class="admin-subnav-link" data-path="/admin/app-store-manager.html" href="/admin/app-store-manager.html">Apps</a>
-      <a class="admin-subnav-link" data-path="/admin/customer-chat.html" href="/admin/customer-chat.html">Chat</a>
-    `;
+    subnav.innerHTML = adminPageLinks
+      .map(
+        (link) =>
+          `<a class="admin-subnav-link" data-path="${link.href}" href="${link.href}">${link.label}</a>`
+      )
+      .join("");
     main.prepend(subnav);
 
     const sidebar = document.createElement("aside");
     sidebar.className = "admin-sidebar";
+    const sectionsHtml = sidebarGroups
+      .map(
+        (group) => `
+      <div class="admin-sidebar__section">
+        <p class="admin-sidebar__label">${group.label}</p>
+        ${group.links
+          .map(
+            (link) =>
+              `<a class="admin-sidebar__link" data-path="${link.href}" href="${link.href}">${link.label}</a>`
+          )
+          .join("")}
+      </div>
+    `
+      )
+      .join("");
     sidebar.innerHTML = `
       <div class="admin-sidebar__brand">
         <div class="admin-sidebar__mark">J</div>
@@ -52,36 +144,7 @@
           <span>Voice Control</span>
         </div>
       </div>
-      <div class="admin-sidebar__section">
-        <p class="admin-sidebar__label">Primary</p>
-        <a class="admin-sidebar__link" data-path="/admin/integrated-dashboard.html" href="/admin/integrated-dashboard.html">Mission Control</a>
-        <a class="admin-sidebar__link" data-path="/admin/index.html" href="/admin/index.html">Command Center</a>
-        <a class="admin-sidebar__link" data-path="/admin/voice-commands.html" href="/admin/voice-commands.html">Voice Control</a>
-        <a class="admin-sidebar__link" data-path="/admin/test-lab-1.html" href="/admin/test-lab-1.html">Agent Control</a>
-      </div>
-      <div class="admin-sidebar__section">
-        <p class="admin-sidebar__label">Operations</p>
-        <a class="admin-sidebar__link" data-path="/admin/bot-command-center.html" href="/admin/bot-command-center.html">Boss Bot</a>
-        <a class="admin-sidebar__link" data-path="/admin/customer-chat.html" href="/admin/customer-chat.html">Customer Chat</a>
-        <a class="admin-sidebar__link" data-path="/admin/live-stream.html" href="/admin/live-stream.html">Live Stream</a>
-      </div>
-      <div class="admin-sidebar__section">
-        <p class="admin-sidebar__label">Commerce</p>
-        <a class="admin-sidebar__link" data-path="/admin/store-manager.html" href="/admin/store-manager.html">Store Manager</a>
-        <a class="admin-sidebar__link" data-path="/admin/app-store-manager.html" href="/admin/app-store-manager.html">App Store</a>
-      </div>
-      <div class="admin-sidebar__section">
-        <p class="admin-sidebar__label">Data</p>
-        <a class="admin-sidebar__link" data-path="/admin/analytics.html" href="/admin/analytics.html">Analytics</a>
-        <a class="admin-sidebar__link" data-path="/admin/progress.html" href="/admin/progress.html">Progress</a>
-        <a class="admin-sidebar__link" data-path="/admin/nexus.html" href="/admin/nexus.html">Nexus</a>
-      </div>
-      <div class="admin-sidebar__section">
-        <p class="admin-sidebar__label">Labs</p>
-        <a class="admin-sidebar__link" data-path="/admin/test-lab-1.html" href="/admin/test-lab-1.html">Lab 1</a>
-        <a class="admin-sidebar__link" data-path="/admin/test-lab-2.html" href="/admin/test-lab-2.html">Lab 2</a>
-        <a class="admin-sidebar__link" data-path="/admin/test-lab-3.html" href="/admin/test-lab-3.html">Lab 3</a>
-      </div>
+      ${sectionsHtml}
       <div class="admin-sidebar__section">
         <p class="admin-sidebar__label">Quick</p>
         <a class="admin-sidebar__link" href="/">Open Site</a>
@@ -111,20 +174,15 @@
     shell.appendChild(sidebar);
     shell.appendChild(main);
 
-    const currentPath = window.location.pathname;
-    shell.querySelectorAll(".admin-sidebar__link").forEach((link) => {
+    const currentPath = normalizeAdminPath(window.location.pathname);
+    shell
+      .querySelectorAll(".admin-sidebar__link, .admin-subnav-link")
+      .forEach((link) => {
       const path = link.getAttribute("data-path");
-      if (path && currentPath.endsWith(path)) {
+      if (path && normalizeAdminPath(path) === currentPath) {
         link.classList.add("is-active");
       }
-    });
-
-    shell.querySelectorAll(".admin-subnav-link").forEach((link) => {
-      const path = link.getAttribute("data-path");
-      if (path && currentPath.endsWith(path)) {
-        link.classList.add("is-active");
-      }
-    });
+      });
 
     const setText = (id, value) => {
       const el = document.getElementById(id);

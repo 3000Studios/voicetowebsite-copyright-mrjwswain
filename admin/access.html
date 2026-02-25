@@ -328,6 +328,13 @@
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
       const accessCard = document.querySelector(".access-card");
+      const markAdminSession = () => {
+        try {
+          sessionStorage.setItem("adminAccessValidated", "true");
+          sessionStorage.setItem("yt-admin-unlocked", "true");
+          sessionStorage.setItem("yt-admin-unlocked-ts", String(Date.now()));
+        } catch (_) {}
+      };
 
       accessForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -356,6 +363,7 @@
             throw new Error(result.error || "Access denied");
           }
 
+          markAdminSession();
           // Success transition and redirect to admin.
           accessButton.disabled = true;
           accessCard?.classList.add("success");
