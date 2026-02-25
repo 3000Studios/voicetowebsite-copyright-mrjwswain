@@ -283,6 +283,7 @@
         </section>
       </section>
     </main>
+    <script defer src="/tracking.js"></script>
     <script src="https://js.stripe.com/v3"></script>
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <script>
@@ -308,11 +309,22 @@
         enterprise: (window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_ENTERPRISE) || "",
         lifetime: (window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_LIFETIME) || "",
       };
+      const track = (eventName, properties = {}, value) => {
+        try {
+          if (typeof window.vtwTrackEvent === "function") {
+            window.vtwTrackEvent(eventName, properties, value);
+          }
+        } catch (_) {}
+      };
       const handleStripe = async (btn) => {
         const product = btn.dataset.product;
+        const label = btn.dataset.label || product;
+        const amount = Number(btn.dataset.amount || 0) / 100;
+        track("store_checkout_clicked", { provider: "stripe", product, label }, amount);
         try {
           const link = (STRIPE_LINKS[String(product || "").toLowerCase()] || "").trim();
           if (link) {
+            track("store_checkout_redirected", { provider: "stripe", product, link }, amount);
             window.location.href = link;
             return;
           }
@@ -326,6 +338,7 @@
           if (!data.sessionId) throw new Error(data.error || "No session");
           await stripe.redirectToCheckout({ sessionId: data.sessionId });
         } catch (err) {
+          track("store_checkout_failed", { provider: "stripe", product, reason: err.message || "unknown" }, amount);
           alert("Stripe checkout failed. " + err.message);
           console.warn(err);
         }
@@ -334,9 +347,12 @@
         const product = btn.dataset.product;
         const label = btn.dataset.label || product;
         const amount = btn.dataset.amount;
+        const amountUsd = Number(amount || 0) / 100;
+        track("store_checkout_clicked", { provider: "paypal", product, label }, amountUsd);
 
         const link = (PAYPAL_LINKS[String(product || "").toLowerCase()] || "").trim();
         if (link) {
+          track("store_checkout_redirected", { provider: "paypal", product, link }, amountUsd);
           window.location.href = link;
           return;
         }
@@ -424,17 +440,20 @@
                 const cap = await res.json().catch(() => ({}));
                 if (!res.ok || !cap?.ok) throw new Error(String(cap?.error || "PayPal capture failed."));
 
+              track("checkout_completed", { provider: "paypal", product, label }, amountUsd);
                 if (statusEl) statusEl.textContent = "Payment successful!";
                 setTimeout(() => {
                   close();
                   window.location.href = `/store.html?checkout=success&product=${encodeURIComponent(product || "")}`;
                 }, 1000);
               } catch (err) {
+              track("store_checkout_failed", { provider: "paypal", product, reason: err.message || "capture_failed" }, amountUsd);
                 console.warn(err);
                 alert("PayPal capture failed.");
               }
             },
             onError: (err) => {
+            track("store_checkout_failed", { provider: "paypal", product, reason: err.message || "paypal_error" }, amountUsd);
               console.warn(err);
               alert("PayPal checkout failed.");
             },

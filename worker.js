@@ -693,6 +693,42 @@ const ensureOrdersTable = async (env) => {
   }
 };
 
+const normalizeAnalyticsEventName = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_:-]/g, "_")
+    .slice(0, 64);
+
+const stringifyAnalyticsProperties = (value) => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "{}";
+  try {
+    return JSON.stringify(value);
+  } catch (_) {
+    return "{}";
+  }
+};
+
+const ensureAnalyticsEventsTable = async (env) => {
+  if (!env.D1) return;
+  await env.D1.prepare(
+    `CREATE TABLE IF NOT EXISTS analytics_events (
+       id TEXT PRIMARY KEY,
+       event_name TEXT NOT NULL,
+       page TEXT,
+       referrer TEXT,
+       ip TEXT,
+       user_agent TEXT,
+       value REAL,
+       properties_json TEXT,
+       ts DATETIME DEFAULT CURRENT_TIMESTAMP
+     );`
+  ).run();
+  await env.D1.prepare(
+    "CREATE INDEX IF NOT EXISTS idx_analytics_events_name_ts ON analytics_events(event_name, ts DESC);"
+  ).run();
+};
+
 const base64UrlEncode = (input) => {
   const bytes =
     input instanceof Uint8Array
@@ -1386,6 +1422,110 @@ export default {
             "SELECT id, ts, command, actions, files, commit_sha, intent_json, deployment_id, deployment_status, deployment_message FROM commands ORDER BY ts DESC LIMIT 20"
           ).all();
           return jsonResponse(200, { logs: data.results || [] });
+        } catch (err) {
+          return jsonResponse(500, { error: err.message });
+        }
+      }
+
+      if (
+        url.pathname === "/api/analytics/event" &&
+        request.method === "POST"
+      ) {
+        try {
+          const body = await request.clone().json().catch(() => ({}));
+          const eventName = normalizeAnalyticsEventName(
+            body?.eventName || body?.name
+          );
+          if (!eventName) {
+            return jsonResponse(400, {
+              error: "eventName is required.",
+            });
+          }
+
+          const page = String(
+            body?.page || request.headers.get("x-page-path") || ""
+          )
+            .trim()
+            .slice(0, 256);
+          const referrer = String(
+            body?.referrer || request.headers.get("referer") || ""
+          )
+            .trim()
+            .slice(0, 512);
+          const ua = String(request.headers.get("user-agent") || "")
+            .trim()
+            .slice(0, 512);
+          const ip = String(getClientIp(request) || "").trim().slice(0, 128);
+          const valueNum = Number(body?.value);
+          const value = Number.isFinite(valueNum) ? valueNum : null;
+          const propertiesJson = stringifyAnalyticsProperties(body?.properties);
+
+          if (env.D1) {
+            await ensureAnalyticsEventsTable(env);
+            await env.D1.prepare(
+              `INSERT INTO analytics_events
+                 (id, event_name, page, referrer, ip, user_agent, value, properties_json)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+            )
+              .bind(
+                crypto.randomUUID(),
+                eventName,
+                page || null,
+                referrer || null,
+                ip || null,
+                ua || null,
+                value,
+                propertiesJson
+              )
+              .run();
+          }
+
+          return jsonResponse(200, {
+            ok: true,
+            event: eventName,
+          });
+        } catch (err) {
+          return jsonResponse(500, { error: err.message });
+        }
+      }
+
+      if (
+        url.pathname === "/api/analytics/conversions" &&
+        request.method === "GET"
+      ) {
+        const hasAdmin = await hasValidAdminCookie(request, env);
+        if (!hasAdmin) {
+          return jsonResponse(401, { error: "Unauthorized" });
+        }
+        const isAdmin = await isAdminRequest(request, env);
+        if (!isAdmin) {
+          return jsonResponse(401, {
+            error: "Unauthorized. Admin access required.",
+          });
+        }
+        if (!env.D1) {
+          return jsonResponse(200, {
+            ok: true,
+            window: "30d",
+            events: [],
+          });
+        }
+        try {
+          await ensureAnalyticsEventsTable(env);
+          const data = await env.D1.prepare(
+            `SELECT event_name,
+                    COUNT(*) AS count,
+                    ROUND(COALESCE(SUM(value), 0), 2) AS total_value
+             FROM analytics_events
+             WHERE ts >= datetime('now', '-30 days')
+             GROUP BY event_name
+             ORDER BY count DESC`
+          ).all();
+          return jsonResponse(200, {
+            ok: true,
+            window: "30d",
+            events: data.results || [],
+          });
         } catch (err) {
           return jsonResponse(500, { error: err.message });
         }
