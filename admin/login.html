@@ -346,6 +346,26 @@
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
       const loginCard = document.querySelector(".login-card");
+      const ADMIN_UNLOCK_STATE_KEY = "adminAccessValidated";
+      const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+      const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
+
+      const markAdminSession = () => {
+        try {
+          const now = String(Date.now());
+          sessionStorage.setItem(ADMIN_UNLOCK_STATE_KEY, "true");
+          sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, now);
+          localStorage.setItem(ADMIN_AUTH_REFRESH_KEY, now);
+        } catch (_) {}
+      };
+
+      const clearAdminSession = () => {
+        try {
+          sessionStorage.removeItem(ADMIN_UNLOCK_STATE_KEY);
+          sessionStorage.removeItem(ADMIN_UNLOCK_TS_KEY);
+          localStorage.setItem(ADMIN_AUTH_REFRESH_KEY, String(Date.now()));
+        } catch (_) {}
+      };
 
       const bgVideo = document.querySelector(".video-bg video");
       if (bgVideo) {
@@ -387,6 +407,7 @@
 
           if (response.ok) {
             // Success transition and redirect to admin.
+            markAdminSession();
             loginButton.disabled = true;
             loginCard?.classList.add("success");
             window.setTimeout(() => {
@@ -397,6 +418,7 @@
             throw new Error(error.error || "Login failed");
           }
         } catch (error) {
+          clearAdminSession();
           console.error("Login error:", error);
           errorMessage.style.display = "block";
           errorMessage.textContent = error.message || "Login failed. Please check your credentials.";
@@ -416,6 +438,7 @@
           });
 
           if (response.ok) {
+            markAdminSession();
             // Already authenticated, redirect to admin
             window.location.href = "/admin/";
           }

@@ -67,6 +67,32 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     expect(res.headers.get("Content-Type") || "").toContain("text/html");
   });
 
+  it("normalizes clean public admin auth routes", async () => {
+    const env = {
+      ASSETS: mockAssets,
+      CONTROL_PASSWORD: "pw",
+      ADMIN_COOKIE_SECRET: "test-admin-cookie-secret",
+      ADMIN_ACCESS_CODE: "code",
+      NODE_ENV: "test",
+    };
+
+    const loginRes = await worker.fetch(
+      new Request("https://example.com/admin/login"),
+      env,
+      {}
+    );
+    expect(loginRes.status).toBe(302);
+    expect(loginRes.headers.get("Location")).toContain("/admin/login.html");
+
+    const accessRes = await worker.fetch(
+      new Request("https://example.com/admin/access"),
+      env,
+      {}
+    );
+    expect(accessRes.status).toBe(302);
+    expect(accessRes.headers.get("Location")).toContain("/admin/access.html");
+  });
+
   it("can login and then access guarded /admin/* routes with the signed admin cookie", async () => {
     const env = {
       ASSETS: mockAssets,

@@ -2485,6 +2485,14 @@ export default {
         "/admin/admin.css",
         "/admin/access-guard.js",
       ]);
+      const ADMIN_PUBLIC_ROUTE_ALIASES = new Map([
+        ["/admin/access", "/admin/access.html"],
+        ["/admin/login", "/admin/login.html"],
+      ]);
+      const adminAliasTarget = ADMIN_PUBLIC_ROUTE_ALIASES.get(cleanPath);
+      if (adminAliasTarget && url.pathname !== adminAliasTarget) {
+        return Response.redirect(new URL(adminAliasTarget, url.origin), 302);
+      }
       const isAdminRoot =
         url.pathname === "/admin" || url.pathname === "/admin/";
       const isAdminPath = url.pathname.startsWith("/admin/") || isAdminRoot;

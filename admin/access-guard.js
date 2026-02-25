@@ -17,6 +17,31 @@
     return false;
   };
 
+  const ADMIN_UNLOCK_STATE_KEY = "adminAccessValidated";
+  const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+  const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
+  const ADMIN_MODULE_LINKS = [
+    { href: "/admin/mission", label: "Mission" },
+    { href: "/admin/cc", label: "Command Center" },
+    { href: "/admin/vcc", label: "Voice Command Center" },
+    { href: "/admin/monetization", label: "Monetization" },
+    { href: "/admin/analytics", label: "Analytics" },
+    { href: "/admin/live", label: "Live" },
+    { href: "/admin/store", label: "Store" },
+    { href: "/admin/media", label: "Media" },
+    { href: "/admin/audio", label: "Audio" },
+    { href: "/admin/settings", label: "Settings" },
+  ];
+
+  const markAdminSession = () => {
+    try {
+      const now = String(Date.now());
+      sessionStorage.setItem(ADMIN_UNLOCK_STATE_KEY, "true");
+      sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, now);
+      localStorage.setItem(ADMIN_AUTH_REFRESH_KEY, now);
+    } catch (_) {}
+  };
+
   const buildSidebar = () => {
     const shell = document.querySelector(".admin-shell");
     if (!shell || shell.querySelector(".admin-sidebar")) return;
@@ -30,16 +55,10 @@
 
     const subnav = document.createElement("nav");
     subnav.className = "admin-subnav-bar";
-    subnav.innerHTML = `
-      <a class="admin-subnav-link" data-path="/admin/integrated-dashboard.html" href="/admin/integrated-dashboard.html">Mission</a>
-      <a class="admin-subnav-link" data-path="/admin/voice-commands.html" href="/admin/voice-commands.html">Voice Control</a>
-      <a class="admin-subnav-link" data-path="/admin/index.html" href="/admin/index.html">Command Center</a>
-      <a class="admin-subnav-link" data-path="/admin/test-lab-1.html" href="/admin/test-lab-1.html">Agent Control</a>
-      <a class="admin-subnav-link" data-path="/admin/analytics.html" href="/admin/analytics.html">Analytics</a>
-      <a class="admin-subnav-link" data-path="/admin/store-manager.html" href="/admin/store-manager.html">Store</a>
-      <a class="admin-subnav-link" data-path="/admin/app-store-manager.html" href="/admin/app-store-manager.html">Apps</a>
-      <a class="admin-subnav-link" data-path="/admin/customer-chat.html" href="/admin/customer-chat.html">Chat</a>
-    `;
+    subnav.innerHTML = ADMIN_MODULE_LINKS.map(
+      (link) =>
+        `<a class="admin-subnav-link" data-path="${link.href}" href="${link.href}">${link.label}</a>`
+    ).join("");
     main.prepend(subnav);
 
     const sidebar = document.createElement("aside");
@@ -176,6 +195,7 @@
   fetch("/api/config/status", { credentials: "include", cache: "no-store" })
     .then((res) => {
       if (!res.ok) throw new Error("unauthorized");
+      markAdminSession();
       try {
         document.documentElement.classList.remove("admin-auth-pending");
       } catch (_) {}

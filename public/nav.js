@@ -88,10 +88,10 @@
     { href: "/how-it-works", label: "How It Works", icon: "🔧" },
     { href: "/demo", label: "Demo", icon: "🚀" },
     { href: "/pricing", label: "Pricing", icon: "💎" },
-    { href: "/store", label: "Store", icon: "�" },
-    { href: "/appstore", label: "App Store", icon: "�" },
+    { href: "/store", label: "Store", icon: "🛒" },
+    { href: "/appstore", label: "App Store", icon: "📱" },
     { href: "/blog", label: "Blog", icon: "📝" },
-    { href: "/livestream", label: "Live", icon: "🎥" },
+    { href: "/livestream", label: "Livestream", icon: "🎥" },
     { href: "/support", label: "Support", icon: "💬" },
     { href: "/contact", label: "Contact", icon: "📧" },
     { href: "/about", label: "About", icon: "🗿" },
@@ -123,7 +123,12 @@
 
   const primaryLinks = [
     ...publicLinks,
-    { href: "/admin/login", label: "Admin Login", icon: "🔐", admin: true },
+    {
+      href: "/admin/login.html",
+      label: "Admin Login",
+      icon: "🔐",
+      admin: true,
+    },
   ];
 
   const navDataTags = {
@@ -356,18 +361,30 @@
 
   const playHover = () => SoundEngine.play("hover");
   const playClick = () => SoundEngine.play("click");
-  const ADMIN_UNLOCK_KEY = "yt-admin-unlocked";
   const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+  const ADMIN_UNLOCK_STATE_KEY = "adminAccessValidated";
+  const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
   const ADMIN_SESSION_TTL_MS = 1000 * 60 * 60 * 2;
-  const hasAdminCookie = () => {
+  let serverAdminAuthenticated = false;
+
+  const touchAdminSession = () => {
     try {
-      return document.cookie
-        .split(";")
-        .some((part) => part.trim().startsWith("vtw_admin=1"));
+      sessionStorage.setItem(ADMIN_UNLOCK_STATE_KEY, "true");
+      sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, String(Date.now()));
     } catch (_) {
-      return false;
+      // ignore
     }
   };
+
+  const clearAdminSession = () => {
+    try {
+      sessionStorage.removeItem(ADMIN_UNLOCK_STATE_KEY);
+      sessionStorage.removeItem(ADMIN_UNLOCK_TS_KEY);
+    } catch (_) {
+      // ignore
+    }
+  };
+
   const isAdminSessionFresh = () => {
     try {
       const ts = Number(sessionStorage.getItem(ADMIN_UNLOCK_TS_KEY) || 0);
@@ -377,18 +394,38 @@
       return false;
     }
   };
-  const hasAdminAccess = () => {
+
+  const hasSessionUnlock = () => {
     try {
-      // Session unlock (client-side UX guard) must be present.
-      const unlocked =
-        sessionStorage.getItem("adminAccessValidated") === "true";
+      const unlocked = sessionStorage.getItem(ADMIN_UNLOCK_STATE_KEY) === "true";
       if (!unlocked) return false;
-      // And the user must have an authenticated admin cookie OR a fresh unlock timer.
-      return hasAdminCookie() || isAdminSessionFresh();
+      return isAdminSessionFresh();
     } catch (_) {
       return false;
     }
   };
+
+  const hasAdminAccess = () => serverAdminAuthenticated || hasSessionUnlock();
+
+  const refreshAdminAccessState = async () => {
+    try {
+      const response = await fetch("/api/config/status", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      const authenticated = response.ok;
+      serverAdminAuthenticated = authenticated;
+      if (authenticated) {
+        touchAdminSession();
+      } else {
+        clearAdminSession();
+      }
+      return authenticated;
+    } catch (_) {
+      return hasSessionUnlock();
+    }
+  };
+
   const getNavLinks = () => {
     if (hasAdminAccess()) {
       // User is logged in - show all pages except login
@@ -855,6 +892,14 @@
           });
         }
       }
+
+      const mobileNavList = document.querySelector(".mobile-nav-list");
+      if (mobileNavList) {
+        const nextMobileHtml = buildListHtml();
+        if (mobileNavList.innerHTML !== nextMobileHtml) {
+          mobileNavList.innerHTML = nextMobileHtml;
+        }
+      }
     };
 
     // Debounced update function
@@ -863,15 +908,32 @@
       updateTimeout = setTimeout(updateNavigation, 100);
     };
 
+    const refreshAndUpdateNavigation = () => {
+      refreshAdminAccessState().finally(() => {
+        debouncedUpdate();
+      });
+    };
+
     // Listen for auth state changes
     window.addEventListener("storage", (e) => {
-      if (e.key === "adminAccessValidated" || e.key.includes("vtw_admin")) {
-        debouncedUpdate();
+      if (
+        e.key === ADMIN_UNLOCK_STATE_KEY ||
+        e.key === ADMIN_AUTH_REFRESH_KEY ||
+        e.key?.includes("vtw_admin")
+      ) {
+        refreshAndUpdateNavigation();
       }
     });
 
-    // Periodic check for auth state changes (reduced frequency)
-    setInterval(debouncedUpdate, 5000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        refreshAndUpdateNavigation();
+      }
+    });
+
+    // Initial + periodic auth refresh keeps nav in sync after login/logout.
+    refreshAndUpdateNavigation();
+    setInterval(refreshAndUpdateNavigation, 15000);
   };
 
   const initPlasmaEffects = () => {
@@ -1647,7 +1709,7 @@
     enforceAdminTheme();
 
     const adminPage = isAdminPage();
-    const shellDisabled = true; // Navigation disabled
+    const shellDisabled = isShellDisabled() || adminPage;
     console.log(
       "[VTW Nav] adminPage:",
       adminPage,
