@@ -516,7 +516,7 @@ const App: React.FC = () => {
                     initial={{ opacity: 0, y: -10, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                    className="absolute right-0 mt-3 w-56 rounded-2xl border border-emerald-400/30 bg-black/85 backdrop-blur-xl p-2"
+                    className="absolute right-0 mt-3 w-56 max-h-[72vh] overflow-y-auto rounded-2xl border border-emerald-400/30 bg-black/85 backdrop-blur-xl p-2"
                   >
                     {NAV_MENU_ITEMS.map((item) => (
                       <a
