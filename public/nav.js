@@ -38,7 +38,7 @@
     },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
-  document.documentElement.dataset.navVersion = "2026-02-23-01";
+  document.documentElement.dataset.navVersion = "2026-02-25-02";
 
   const ensureLatexFonts = () => {
     if (document.getElementById("vtw-latex-fonts")) return;
@@ -424,6 +424,28 @@
     } catch (_) {
       return hasSessionUnlock();
     }
+  };
+
+  const trackRevenueEvent = (eventName, properties = {}, value) => {
+    try {
+      if (typeof window.vtwTrackEvent === "function") {
+        window.vtwTrackEvent(eventName, properties, value);
+        return;
+      }
+      fetch("/api/analytics/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        keepalive: true,
+        body: JSON.stringify({
+          eventName,
+          properties,
+          value,
+          page: location.pathname,
+          ts: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch (_) {}
   };
 
   const getNavLinks = () => {
@@ -1724,6 +1746,7 @@
       if (!adminPage) {
         console.log("[VTW Nav] Injecting footer...");
         injectFooter();
+        injectRevenueRail();
         electrifyLinks();
         spectralizeCards();
         initTextFx();
@@ -1802,6 +1825,67 @@
     `;
     document.body.appendChild(footer);
     initBubbleFooterInteractions(footer);
+  };
+
+  const injectRevenueRail = () => {
+    try {
+      if (document.getElementById("vtw-revenue-rail")) return;
+      const path = String(location.pathname || "").toLowerCase();
+      const excluded = [
+        "/store",
+        "/store.html",
+        "/pricing",
+        "/pricing.html",
+        "/license",
+        "/license.html",
+      ];
+      if (excluded.includes(path) || path.startsWith("/admin")) return;
+
+      const rail = document.createElement("aside");
+      rail.id = "vtw-revenue-rail";
+      rail.setAttribute("aria-label", "Revenue quick actions");
+      rail.style.cssText = [
+        "position:fixed",
+        "right:1rem",
+        "bottom:1rem",
+        "z-index:1100",
+        "max-width:320px",
+        "width:min(92vw,320px)",
+        "padding:14px",
+        "border-radius:16px",
+        "border:1px solid rgba(16,185,129,0.45)",
+        "background:linear-gradient(160deg,rgba(6,11,22,0.92),rgba(4,10,18,0.84))",
+        "box-shadow:0 20px 50px rgba(0,0,0,0.45)",
+        "backdrop-filter:blur(10px)",
+      ].join(";");
+
+      rail.innerHTML = `
+        <div style="font-family:Inter,system-ui,sans-serif;color:#e2e8f0;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(148,163,184,0.8);">Revenue Sprint</div>
+          <strong style="font-size:15px;line-height:1.35;font-weight:700;">Turn visitors into buyers faster.</strong>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <a data-vtw-revenue-action="store" href="/store.html?utm_source=quick_rail&utm_medium=site_shell&utm_campaign=revenue_max" style="display:inline-flex;justify-content:center;align-items:center;padding:10px 12px;border-radius:999px;text-decoration:none;background:linear-gradient(135deg,#10b981,#06b6d4);color:#031018;font-weight:700;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;">Open Store</a>
+            <a data-vtw-revenue-action="referrals" href="/referrals?utm_source=quick_rail&utm_medium=site_shell&utm_campaign=revenue_max" style="display:inline-flex;justify-content:center;align-items:center;padding:10px 12px;border-radius:999px;text-decoration:none;border:1px solid rgba(148,163,184,0.4);color:#e2e8f0;font-weight:600;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;">Referrals</a>
+          </div>
+          <button type="button" data-vtw-revenue-dismiss style="margin-top:2px;border:none;background:transparent;color:rgba(148,163,184,0.9);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">Dismiss</button>
+        </div>
+      `;
+
+      rail.querySelector("[data-vtw-revenue-dismiss]")?.addEventListener("click", () => {
+        rail.remove();
+        trackRevenueEvent("revenue_rail_dismissed", { path });
+      });
+
+      rail.querySelectorAll("[data-vtw-revenue-action]").forEach((link) => {
+        link.addEventListener("click", () => {
+          const action = link.getAttribute("data-vtw-revenue-action") || "unknown";
+          trackRevenueEvent("revenue_rail_clicked", { action, path });
+        });
+      });
+
+      document.body.appendChild(rail);
+      trackRevenueEvent("revenue_rail_shown", { path });
+    } catch (_) {}
   };
 
   const initBubbleFooterInteractions = (footer) => {
