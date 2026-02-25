@@ -12,6 +12,7 @@ export const SHARED_NAV_ITEMS: NavigationItem[] = [
   { href: "/store", label: "Store" },
   { href: "/appstore", label: "App Store" },
   { href: "/appstore-new", label: "App Store New" },
+  { href: "/admin/login", label: "Admin Login" },
   { href: "/blog", label: "Blog" },
   { href: "/cyber-blog", label: "Cyber Blog" },
   { href: "/livestream", label: "Live" },
@@ -54,5 +55,4 @@ export const SHARED_NAV_ITEMS: NavigationItem[] = [
   { href: "/lexicon-pro", label: "Lexicon Pro" },
   { href: "/voice-to-json", label: "Voice to JSON" },
   { href: "/geological-studies", label: "Geological Studies" },
-  { href: "/admin/login", label: "Admin Login" },
 ];
