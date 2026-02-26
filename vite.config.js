@@ -18,6 +18,7 @@ export default defineConfig({
       "/api/bot-hub": "http://127.0.0.1:8787",
       "/api/health": "http://127.0.0.1:8787",
       "/api/config": "http://127.0.0.1:8787",
+      "/api/admin": "http://127.0.0.1:8787",
       "/api/paypal": "http://127.0.0.1:8787",
     },
   },
@@ -146,6 +147,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ["react", "react-dom"],
+          "framer-motion": ["framer-motion"],
         },
       },
     },

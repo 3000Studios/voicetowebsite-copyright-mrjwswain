@@ -328,6 +328,26 @@
       const loadingSpinner = document.getElementById("loadingSpinner");
       const errorMessage = document.getElementById("errorMessage");
       const accessCard = document.querySelector(".access-card");
+      const ADMIN_UNLOCK_STATE_KEY = "adminAccessValidated";
+      const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+      const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
+
+      const markAdminSession = () => {
+        try {
+          const now = String(Date.now());
+          sessionStorage.setItem(ADMIN_UNLOCK_STATE_KEY, "true");
+          sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, now);
+          localStorage.setItem(ADMIN_AUTH_REFRESH_KEY, now);
+        } catch (_) {}
+      };
+
+      const clearAdminSession = () => {
+        try {
+          sessionStorage.removeItem(ADMIN_UNLOCK_STATE_KEY);
+          sessionStorage.removeItem(ADMIN_UNLOCK_TS_KEY);
+          localStorage.setItem(ADMIN_AUTH_REFRESH_KEY, String(Date.now()));
+        } catch (_) {}
+      };
 
       accessForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -357,12 +377,14 @@
           }
 
           // Success transition and redirect to admin.
+          markAdminSession();
           accessButton.disabled = true;
           accessCard?.classList.add("success");
           window.setTimeout(() => {
             window.location.href = "/admin/";
           }, 260);
         } catch (error) {
+          clearAdminSession();
           console.error("Access error:", error);
           errorMessage.style.display = "block";
           errorMessage.textContent = error.message || "Access denied. Please check your access code.";
@@ -377,7 +399,10 @@
       // If already authenticated, go straight to admin.
       fetch("/api/config/status", { credentials: "include" })
         .then((res) => {
-          if (res.ok) window.location.href = "/admin/";
+          if (res.ok) {
+            markAdminSession();
+            window.location.href = "/admin/";
+          }
         })
         .catch(() => {});
     </script>

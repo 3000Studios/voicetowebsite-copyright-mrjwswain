@@ -71,6 +71,10 @@ Do not commit secrets to git.
 - Runtime vars/secrets must be configured in the Cloudflare Dashboard (Worker settings) or via:
   - `wrangler secret put <NAME>`
 
+**Minimum for deploy:** Wrangler auth (login or API token). The `ASSETS` binding is set by
+`wrangler.toml` (no manual var). For admin login set `CONTROL_PASSWORD` (or `ADMIN_ACCESS_CODE`).
+For PayPal/Stripe and other features, set the vars listed in `ENV_SCHEMA.md` and Dashboard.
+
 At minimum, to deploy from a new machine you typically need Wrangler authentication (login or API
 token).
 
