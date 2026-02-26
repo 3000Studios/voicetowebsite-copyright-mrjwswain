@@ -38,7 +38,7 @@
     },
   ];
   // Force cache-bust/version stamp so new nav bundle propagates
-  document.documentElement.dataset.navVersion = "2026-02-23-01";
+  document.documentElement.dataset.navVersion = "2026-02-25-02";
 
   const ensureLatexFonts = () => {
     if (document.getElementById("vtw-latex-fonts")) return;
@@ -88,10 +88,10 @@
     { href: "/how-it-works", label: "How It Works", icon: "🔧" },
     { href: "/demo", label: "Demo", icon: "🚀" },
     { href: "/pricing", label: "Pricing", icon: "💎" },
-    { href: "/store", label: "Store", icon: "�" },
-    { href: "/appstore", label: "App Store", icon: "�" },
+    { href: "/store", label: "Store", icon: "🛒" },
+    { href: "/appstore", label: "App Store", icon: "📱" },
     { href: "/blog", label: "Blog", icon: "📝" },
-    { href: "/livestream", label: "Live", icon: "🎥" },
+    { href: "/livestream", label: "Livestream", icon: "🎥" },
     { href: "/support", label: "Support", icon: "💬" },
     { href: "/contact", label: "Contact", icon: "📧" },
     { href: "/about", label: "About", icon: "🗿" },
@@ -123,7 +123,12 @@
 
   const primaryLinks = [
     ...publicLinks,
-    { href: "/admin/login", label: "Admin Login", icon: "🔐", admin: true },
+    {
+      href: "/admin/login.html",
+      label: "Admin Login",
+      icon: "🔐",
+      admin: true,
+    },
   ];
 
   const navDataTags = {
@@ -356,18 +361,30 @@
 
   const playHover = () => SoundEngine.play("hover");
   const playClick = () => SoundEngine.play("click");
-  const ADMIN_UNLOCK_KEY = "yt-admin-unlocked";
   const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+  const ADMIN_UNLOCK_STATE_KEY = "adminAccessValidated";
+  const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
   const ADMIN_SESSION_TTL_MS = 1000 * 60 * 60 * 2;
-  const hasAdminCookie = () => {
+  let serverAdminAuthenticated = false;
+
+  const touchAdminSession = () => {
     try {
-      return document.cookie
-        .split(";")
-        .some((part) => part.trim().startsWith("vtw_admin=1"));
+      sessionStorage.setItem(ADMIN_UNLOCK_STATE_KEY, "true");
+      sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, String(Date.now()));
     } catch (_) {
-      return false;
+      // ignore
     }
   };
+
+  const clearAdminSession = () => {
+    try {
+      sessionStorage.removeItem(ADMIN_UNLOCK_STATE_KEY);
+      sessionStorage.removeItem(ADMIN_UNLOCK_TS_KEY);
+    } catch (_) {
+      // ignore
+    }
+  };
+
   const isAdminSessionFresh = () => {
     try {
       const ts = Number(sessionStorage.getItem(ADMIN_UNLOCK_TS_KEY) || 0);
@@ -377,18 +394,60 @@
       return false;
     }
   };
-  const hasAdminAccess = () => {
+
+  const hasSessionUnlock = () => {
     try {
-      // Session unlock (client-side UX guard) must be present.
-      const unlocked =
-        sessionStorage.getItem("adminAccessValidated") === "true";
+      const unlocked = sessionStorage.getItem(ADMIN_UNLOCK_STATE_KEY) === "true";
       if (!unlocked) return false;
-      // And the user must have an authenticated admin cookie OR a fresh unlock timer.
-      return hasAdminCookie() || isAdminSessionFresh();
+      return isAdminSessionFresh();
     } catch (_) {
       return false;
     }
   };
+
+  const hasAdminAccess = () => serverAdminAuthenticated || hasSessionUnlock();
+
+  const refreshAdminAccessState = async () => {
+    try {
+      const response = await fetch("/api/config/status", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      const authenticated = response.ok;
+      serverAdminAuthenticated = authenticated;
+      if (authenticated) {
+        touchAdminSession();
+      } else {
+        clearAdminSession();
+      }
+      return authenticated;
+    } catch (_) {
+      return hasSessionUnlock();
+    }
+  };
+
+  const trackRevenueEvent = (eventName, properties = {}, value) => {
+    try {
+      if (typeof window.vtwTrackEvent === "function") {
+        window.vtwTrackEvent(eventName, properties, value);
+        return;
+      }
+      fetch("/api/analytics/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        keepalive: true,
+        body: JSON.stringify({
+          eventName,
+          properties,
+          value,
+          page: location.pathname,
+          ts: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch (_) {}
+  };
+
   const getNavLinks = () => {
     if (hasAdminAccess()) {
       // User is logged in - show all pages except login
@@ -855,6 +914,14 @@
           });
         }
       }
+
+      const mobileNavList = document.querySelector(".mobile-nav-list");
+      if (mobileNavList) {
+        const nextMobileHtml = buildListHtml();
+        if (mobileNavList.innerHTML !== nextMobileHtml) {
+          mobileNavList.innerHTML = nextMobileHtml;
+        }
+      }
     };
 
     // Debounced update function
@@ -863,15 +930,32 @@
       updateTimeout = setTimeout(updateNavigation, 100);
     };
 
+    const refreshAndUpdateNavigation = () => {
+      refreshAdminAccessState().finally(() => {
+        debouncedUpdate();
+      });
+    };
+
     // Listen for auth state changes
     window.addEventListener("storage", (e) => {
-      if (e.key === "adminAccessValidated" || e.key.includes("vtw_admin")) {
-        debouncedUpdate();
+      if (
+        e.key === ADMIN_UNLOCK_STATE_KEY ||
+        e.key === ADMIN_AUTH_REFRESH_KEY ||
+        e.key?.includes("vtw_admin")
+      ) {
+        refreshAndUpdateNavigation();
       }
     });
 
-    // Periodic check for auth state changes (reduced frequency)
-    setInterval(debouncedUpdate, 5000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        refreshAndUpdateNavigation();
+      }
+    });
+
+    // Initial + periodic auth refresh keeps nav in sync after login/logout.
+    refreshAndUpdateNavigation();
+    setInterval(refreshAndUpdateNavigation, 15000);
   };
 
   const initPlasmaEffects = () => {
@@ -1647,7 +1731,7 @@
     enforceAdminTheme();
 
     const adminPage = isAdminPage();
-    const shellDisabled = true; // Navigation disabled
+    const shellDisabled = isShellDisabled() || adminPage;
     console.log(
       "[VTW Nav] adminPage:",
       adminPage,
@@ -1662,6 +1746,7 @@
       if (!adminPage) {
         console.log("[VTW Nav] Injecting footer...");
         injectFooter();
+        injectRevenueRail();
         electrifyLinks();
         spectralizeCards();
         initTextFx();
@@ -1740,6 +1825,67 @@
     `;
     document.body.appendChild(footer);
     initBubbleFooterInteractions(footer);
+  };
+
+  const injectRevenueRail = () => {
+    try {
+      if (document.getElementById("vtw-revenue-rail")) return;
+      const path = String(location.pathname || "").toLowerCase();
+      const excluded = [
+        "/store",
+        "/store.html",
+        "/pricing",
+        "/pricing.html",
+        "/license",
+        "/license.html",
+      ];
+      if (excluded.includes(path) || path.startsWith("/admin")) return;
+
+      const rail = document.createElement("aside");
+      rail.id = "vtw-revenue-rail";
+      rail.setAttribute("aria-label", "Revenue quick actions");
+      rail.style.cssText = [
+        "position:fixed",
+        "right:1rem",
+        "bottom:1rem",
+        "z-index:1100",
+        "max-width:320px",
+        "width:min(92vw,320px)",
+        "padding:14px",
+        "border-radius:16px",
+        "border:1px solid rgba(16,185,129,0.45)",
+        "background:linear-gradient(160deg,rgba(6,11,22,0.92),rgba(4,10,18,0.84))",
+        "box-shadow:0 20px 50px rgba(0,0,0,0.45)",
+        "backdrop-filter:blur(10px)",
+      ].join(";");
+
+      rail.innerHTML = `
+        <div style="font-family:Inter,system-ui,sans-serif;color:#e2e8f0;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(148,163,184,0.8);">Revenue Sprint</div>
+          <strong style="font-size:15px;line-height:1.35;font-weight:700;">Turn visitors into buyers faster.</strong>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <a data-vtw-revenue-action="store" href="/store.html?utm_source=quick_rail&utm_medium=site_shell&utm_campaign=revenue_max" style="display:inline-flex;justify-content:center;align-items:center;padding:10px 12px;border-radius:999px;text-decoration:none;background:linear-gradient(135deg,#10b981,#06b6d4);color:#031018;font-weight:700;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;">Open Store</a>
+            <a data-vtw-revenue-action="referrals" href="/referrals?utm_source=quick_rail&utm_medium=site_shell&utm_campaign=revenue_max" style="display:inline-flex;justify-content:center;align-items:center;padding:10px 12px;border-radius:999px;text-decoration:none;border:1px solid rgba(148,163,184,0.4);color:#e2e8f0;font-weight:600;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;">Referrals</a>
+          </div>
+          <button type="button" data-vtw-revenue-dismiss style="margin-top:2px;border:none;background:transparent;color:rgba(148,163,184,0.9);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">Dismiss</button>
+        </div>
+      `;
+
+      rail.querySelector("[data-vtw-revenue-dismiss]")?.addEventListener("click", () => {
+        rail.remove();
+        trackRevenueEvent("revenue_rail_dismissed", { path });
+      });
+
+      rail.querySelectorAll("[data-vtw-revenue-action]").forEach((link) => {
+        link.addEventListener("click", () => {
+          const action = link.getAttribute("data-vtw-revenue-action") || "unknown";
+          trackRevenueEvent("revenue_rail_clicked", { action, path });
+        });
+      });
+
+      document.body.appendChild(rail);
+      trackRevenueEvent("revenue_rail_shown", { path });
+    } catch (_) {}
   };
 
   const initBubbleFooterInteractions = (footer) => {
