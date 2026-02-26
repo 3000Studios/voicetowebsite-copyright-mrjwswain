@@ -38,7 +38,6 @@ binding = "AI"
 [vars]
 ENVIRONMENT = "production"
 PUBLIC_GENERATE = "1"
-CF_WORKERS_BUILDS_AUTO_DEPLOY = "0"
 CF_ALLOW_LEGACY_DEPLOY_HOOKS = "0"
 GH_BASE_BRANCH = "main"
 GH_REPO = "3000Studios/voicetowebsite-copyright-mrjwswain"

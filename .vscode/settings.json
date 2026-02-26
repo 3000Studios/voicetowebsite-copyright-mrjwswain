@@ -102,6 +102,7 @@
   "git.autofetch": true,
   "git.postCommitCommand": "push",
   "git.showPushSuccessNotification": false,
+  "cursor.git.autoCommit": true,
   "git.confirmEmptyCommits": false,
   "git.confirmForcePush": false,
   "git.confirmNoVerifyCommit": false,
