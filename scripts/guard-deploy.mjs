@@ -1,6 +1,67 @@
 #!/usr/bin/env node
 /**
- * Guard-deploy: no-op. GitHub Actions now owns deploy on push to main.
- * Kept for backward compatibility if any script still invokes guard:deploy.
+ * Guard-deploy: Enforces manual-only production deploy.
+ * Fails if any GitHub workflow runs wrangler deploy or uses cloudflare/wrangler-action.
+ * Production deploy is performed locally via `npm run deploy` (after verify).
  */
-console.log("guard-deploy: OK (deploy via GitHub Actions)");
+import fs from "node:fs";
+import path from "node:path";
+
+const ROOT = process.cwd();
+const WF_DIR = path.join(ROOT, ".github", "workflows");
+
+const forbiddenPatterns = [
+  /cloudflare\/wrangler-action@/i,
+  /wrangler-action@/i,
+  /^\s*name:\s*deploy to cloudflare\s*$/im,
+  /^\s*command:\s*deploy\s*$/im,
+  /\bwrangler\s+deploy\b/i,
+];
+
+const listWorkflowFiles = () => {
+  try {
+    return fs
+      .readdirSync(WF_DIR)
+      .filter((f) => f.endsWith(".yml") || f.endsWith(".yaml"))
+      .map((f) => path.join(WF_DIR, f));
+  } catch {
+    return [];
+  }
+};
+
+const main = () => {
+  const files = listWorkflowFiles();
+  const violations = [];
+
+  for (const file of files) {
+    const base = path.basename(file).toLowerCase();
+    const text = fs.readFileSync(file, "utf8");
+
+    if (base === "deploy.yml" || base === "deploy.yaml") {
+      violations.push(
+        `${path.relative(ROOT, file)}: deploy workflow file name is not allowed`
+      );
+    }
+
+    for (const re of forbiddenPatterns) {
+      if (re.test(text)) {
+        violations.push(
+          `${path.relative(ROOT, file)}: forbidden deploy pattern matched (${re})`
+        );
+      }
+    }
+  }
+
+  if (violations.length) {
+    console.error("guard-deploy: FAIL");
+    for (const v of violations) console.error(`- ${v}`);
+    console.error(
+      "This repo is locked to manual production deploy via `npm run verify` then `npm run deploy`."
+    );
+    process.exit(1);
+  }
+
+  console.log("guard-deploy: OK");
+};
+
+main();

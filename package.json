@@ -33,7 +33,7 @@
     "check:links": "node ./link-checker.js",
     "smash:check": "node ./check_smash.cjs",
     "smash:apply": "node ./apply_smash.cjs",
-    "verify": "node ./scripts/verify.mjs && npm run env:audit && npm run ops:global-doc:check && npm run format:check && npm run check:css-governance && npm run check:css-budget && npm run type-check && npm run test && npm run build && npm run governance:check && npm run guard:ui && npm run check:links",
+    "verify": "node ./scripts/verify.mjs && npm run env:audit && npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run check:css-governance && npm run check:css-budget && npm run type-check && npm run test && npm run build && npm run governance:check && npm run guard:ui && npm run check:links",
     "format": "prettier --write --ignore-unknown .",
     "format:check": "prettier --check --ignore-unknown .",
     "heal": "node ./scripts/heal.mjs",

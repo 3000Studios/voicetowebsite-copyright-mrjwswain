@@ -10,18 +10,19 @@ Cloudflare-managed and emulated locally by `wrangler dev --local`.
 
 ### Quick reference
 
-| Task                | Command                                |
-| ------------------- | -------------------------------------- |
-| Install deps        | `npm ci` (or `npm install` for non-CI) |
-| Lint                | `npm run lint`                         |
-| Type-check          | `npm run type-check`                   |
-| Tests               | `npm test`                             |
-| Build               | `npm run build`                        |
-| Dev (frontend only) | `npm run dev`                          |
-| Dev (worker only)   | `npm run dev:worker`                   |
-| Dev (both)          | `npm run dev:all`                      |
-| Format              | `npm run format`                       |
-| Full verify         | `npm run verify`                       |
+| Task                                    | Command                                |
+| --------------------------------------- | -------------------------------------- |
+| Install deps                            | `npm ci` (or `npm install` for non-CI) |
+| Lint                                    | `npm run lint`                         |
+| Type-check                              | `npm run type-check`                   |
+| Tests                                   | `npm test`                             |
+| Build                                   | `npm run build`                        |
+| Dev (frontend only)                     | `npm run dev`                          |
+| Dev (worker only)                       | `npm run dev:worker`                   |
+| Dev (both)                              | `npm run dev:all`                      |
+| Format                                  | `npm run format`                       |
+| Full verify                             | `npm run verify`                       |
+| Ship (lint, verify, push, deploy, logs) | `npm run ship`                         |
 
 See `README.md` for full documentation.
 
@@ -44,3 +45,9 @@ See `README.md` for full documentation.
   `vite.config.js`).
 - **Husky hooks** run `npm run verify` on pre-commit, which includes type-check, tests, build, link
   check, and more. This can be slow; be aware when committing.
+
+### Operator constraints
+
+- **GitHub billing:** The operator has GitHub billing issues. Do not rely on or propose solutions
+  that require GitHub Actions to run (e.g. CI deploy, workflows that must succeed). Prefer
+  local/manual deploy and flows that do not depend on GitHub not blocking.

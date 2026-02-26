@@ -82,7 +82,7 @@
 ### Canonical Commands (from package.json)
 
 - `dev:all`: `node ./scripts/dev-all.mjs`
-- `verify`: `node ./scripts/verify.mjs && npm run env:audit && npm run ops:global-doc:check && npm run format:check && npm run check:css-governance && npm run check:css-budget && npm run type-check && npm run test && npm run build && npm run governance:check && npm run guard:ui && npm run check:links`
+- `verify`: `node ./scripts/verify.mjs && npm run env:audit && npm run guard:deploy && npm run ops:global-doc:check && npm run format:check && npm run check:css-governance && npm run check:css-budget && npm run type-check && npm run test && npm run build && npm run governance:check && npm run guard:ui && npm run check:links`
 - `deploy`: `wrangler deploy --keep-vars`
 - `auto:ship`: `node ./scripts/auto-ship.mjs`
 - `sync`: `node ./scripts/sync.mjs`
@@ -210,6 +210,7 @@ Scripts available:
 - `scripts/pre-commit-enhanced.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/release.mjs`
+- `scripts/remote-deploy.mjs`
 - `scripts/restore.mjs`
 - `scripts/ship.mjs`
 - `scripts/sync-public-assets.mjs`

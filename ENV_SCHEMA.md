@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-02-24T04:19:59.392Z
+Generated: 2026-02-26T11:19:05.496Z
 
 ## Summary
 
-- Scanned files: 376
-- Used keys: 134
+- Scanned files: 381
+- Used keys: 136
 - Defined keys: 109
-- Missing keys: 51
+- Missing keys: 53
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -31,7 +31,7 @@ Generated: 2026-02-24T04:19:59.392Z
 | AI                                       | yes     | 5             | ok      |
 | ALLOW_ADMIN_HEADER_TOKEN                 | yes     | 1             | ok      |
 | ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 1             | ok      |
-| ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 3             | ok      |
+| ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 4             | ok      |
 | API_BASE_URL                             | no      | 2             | missing |
 | ASSETS                                   | no      | 2             | missing |
 | AUDIT_LOG                                | yes     | 1             | ok      |
@@ -46,21 +46,22 @@ Generated: 2026-02-24T04:19:59.392Z
 | CACHE_CONTROL_STATIC                     | yes     | 0             | unused  |
 | CF_A                                     | no      | 1             | missing |
 | CF_ACCOUNT_API_VOICETOWEBSITE            | yes     | 1             | ok      |
-| CF_ACCOUNT_ID                            | yes     | 1             | ok      |
+| CF_ACCOUNT_ID                            | yes     | 2             | ok      |
 | CF_ALLOW_LEGACY_DEPLOY_HOOKS             | yes     | 1             | ok      |
-| CF_API_TOKEN                             | yes     | 1             | ok      |
+| CF_API_TOKEN                             | yes     | 2             | ok      |
 | CF_API_TOKEN2                            | yes     | 1             | ok      |
 | CF_AUTO_DEPLOY_ON_PUSH                   | no      | 1             | missing |
-| CF_DEPLOY_HOOK_URL                       | yes     | 1             | ok      |
+| CF_DEPLOY_HOOK_URL                       | yes     | 2             | ok      |
 | CF_FORCE_DEPLOY_HOOK                     | no      | 1             | missing |
 | CF_FORCE_DEPLOY_WEBHOOK                  | no      | 1             | missing |
-| CF_PAGES_DEPLOY_HOOK                     | yes     | 1             | ok      |
+| CF_PAGES_DEPLOY_HOOK                     | yes     | 2             | ok      |
+| CF_TOKEN                                 | no      | 1             | missing |
 | CF_USER_TOKEN                            | yes     | 1             | ok      |
 | CF_WORKERS_BUILDS_AUTO_DEPLOY            | yes     | 1             | ok      |
 | CF_ZONE_ID                               | yes     | 1             | ok      |
 | CI                                       | no      | 1             | missing |
-| CLOUDFLARE_ACCOUNT_ID                    | yes     | 1             | ok      |
-| CLOUDFLARE_API_TOKEN                     | yes     | 2             | ok      |
+| CLOUDFLARE_ACCOUNT_ID                    | yes     | 2             | ok      |
+| CLOUDFLARE_API_TOKEN                     | yes     | 3             | ok      |
 | CLOUDFLARE_WORKER_NAME                   | no      | 1             | missing |
 | CLOUDINARY_API_KEY                       | yes     | 0             | unused  |
 | CLOUDINARY_API_SECRET                    | yes     | 0             | unused  |
@@ -137,6 +138,7 @@ Generated: 2026-02-24T04:19:59.392Z
 | PUBLIC_GENERATE                          | yes     | 1             | ok      |
 | R2                                       | yes     | 2             | ok      |
 | R2_BUCKET                                | no      | 1             | missing |
+| REPO_DIR                                 | no      | 1             | missing |
 | RESEND_API_KEY                           | yes     | 1             | ok      |
 | SENDGRID_API_KEY                         | yes     | 1             | ok      |
 | SHIP_MESSAGE                             | no      | 1             | missing |

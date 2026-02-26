@@ -1,25 +1,44 @@
-name: Deploy to Cloudflare Worker
+name: CI
 
 on:
   push:
     branches:
-      - main
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - run: npm install
-      - run: npm run build
+      - name: Validate lockfile
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "package-lock.json is required for CI"
+            exit 1
+          fi
 
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify
+        run: npm run verify

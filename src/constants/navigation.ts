@@ -40,5 +40,4 @@ export const SHARED_NAV_ITEMS: NavigationItem[] = [
   { href: "/lexicon-pro", label: "Lexicon Pro" },
   { href: "/voice-to-json", label: "Voice to JSON" },
   { href: "/geological-studies", label: "Geological Studies" },
-  { href: "/admin/login.html", label: "Admin Login" },
 ];

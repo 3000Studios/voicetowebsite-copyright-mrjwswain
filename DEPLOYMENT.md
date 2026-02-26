@@ -1,8 +1,10 @@
 # Deployment (Authoritative)
 
-This repo deploys the live site to Cloudflare **Workers**. **Push to `main`** triggers the GitHub
-Action **Deploy to Cloudflare Worker**, which runs `npm install`, `npm run build`, and `wrangler`
-deploy (requires `CF_API_TOKEN` and `CF_ACCOUNT_ID` in repo secrets).
+This repo deploys the live site to Cloudflare **Workers**. Production deploy is **manual only**: CI
+runs `npm run verify` on push/PR but **does not** run `wrangler deploy`. You deploy from your
+machine after verify passes. `scripts/guard-deploy.mjs` fails verify if any workflow runs
+`wrangler deploy` or uses `cloudflare/wrangler-action`, so broken builds cannot reach production via
+CI.
 
 ## Commands (One-Liners)
 
@@ -10,18 +12,21 @@ deploy (requires `CF_API_TOKEN` and `CF_ACCOUNT_ID` in repo secrets).
   - `npm run verify`
 - Local dev:
   - `npm run dev:all`
-- Deploy production (local; optional—GitHub deploys on push to main):
+- **Ship (full pipeline: lint, verify, push, deploy, logs):**
+  - `npm run ship`
+- Deploy only (e.g. after verify or when ship is not needed):
   - `npm run deploy`
 - Emergency rollback (resets to previous commit and force-pushes main):
   - `npm run rollback`
-- Auto everything (watch -> verify -> commit -> push; GitHub Action deploys):
+- Auto everything (watch -> verify -> commit -> push -> deploy locally):
   - `npm run auto:ship`
 
 ## What `npm run verify` Does
 
 `npm run verify` runs, in order:
 
-1. `node ./scripts/verify.mjs`, `npm run env:audit`, `npm run ops:global-doc:check`
+1. `node ./scripts/verify.mjs`, `npm run env:audit`, `npm run guard:deploy`,
+   `npm run ops:global-doc:check`
 2. `npm run format:check`
 3. `npm run type-check`
 4. `npm run test`
@@ -43,8 +48,8 @@ npm run deploy
 
 Notes:
 
-- `npm run deploy` runs `wrangler deploy --keep-vars` only (no verify). Use after a local build when
-  you need to deploy from your machine; normally GitHub Actions deploys on push to main.
+- `npm run deploy` runs `wrangler deploy --keep-vars` only (no verify). Always run `npm run verify`
+  first, then `npm run deploy`. CI does not deploy; guard-deploy blocks adding deploy workflows.
 - The Worker refuses traffic if `ENVIRONMENT` is set to anything other than `production` or
   `development` (e.g. blocks staging-from-production config).
 - `--keep-vars` prevents Wrangler from wiping runtime vars/secrets set in the Cloudflare Dashboard.
@@ -81,6 +86,13 @@ Do not commit secrets to git.
 **Minimum for deploy:** Wrangler auth (login or API token). The `ASSETS` binding is set by
 `wrangler.toml` (no manual var). For admin login set `CONTROL_PASSWORD` (or `ADMIN_ACCESS_CODE`).
 For PayPal/Stripe and other features, set the vars listed in `ENV_SCHEMA.md` and Dashboard.
+
+**Custom GPT → deploy live:** VoiceToWebsite Commander:
+[https://chatgpt.com/g/g-698a3140739c819196fda7f3badb2754-voicetowebsite-commander](https://chatgpt.com/g/g-698a3140739c819196fda7f3badb2754-voicetowebsite-commander).
+To have it push changes and trigger an immediate deploy without GitHub Actions, set
+`ALLOW_REMOTE_DEPLOY_TRIGGER=1` and `CF_DEPLOY_HOOK_URL` to a URL that runs
+`scripts/remote-deploy.mjs` (pull, build, wrangler deploy). The GPT then POSTs to
+`/api/admin/trigger-deploy` with admin auth after pushing to main. See `docs/CUSTOM_GPT_DEPLOY.md`.
 
 At minimum, to deploy from a new machine you typically need Wrangler authentication (login or API
 token).

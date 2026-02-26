@@ -1,0 +1,4 @@
+# Copy to .dev.vars and adjust. Do not commit .dev.vars if it contains secrets.
+# Used by: wrangler dev (overrides [vars] from wrangler.toml)
+
+ENVIRONMENT=development

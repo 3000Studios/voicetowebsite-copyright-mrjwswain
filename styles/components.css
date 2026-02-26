@@ -5019,3 +5019,8 @@ button.ghost:hover {
     transition: none;
   }
 }
+
+/* Global: hide site header site-wide */
+.site-header {
+  display: none !important;
+}

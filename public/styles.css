@@ -7005,3 +7005,8 @@ button.ghost:hover {
 @keyframes splash {
   /* splash animation styles */
 }
+
+/* Global: hide site header site-wide */
+.site-header {
+  display: none !important;
+}

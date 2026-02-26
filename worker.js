@@ -937,6 +937,73 @@ export default {
         );
       }
 
+      if (
+        url.pathname === "/api/admin/trigger-deploy" &&
+        request.method === "POST"
+      ) {
+        const hasBearer = hasValidConfiguredAdminBearer(request, env);
+        const isAdmin = await isAdminRequest(request, env);
+        const orchToken = String(
+          env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || ""
+        ).trim();
+        const orchHeader = String(
+          request.headers.get("x-orch-token") || ""
+        ).trim();
+        const hasOrch = Boolean(
+          orchToken && orchHeader && orchToken === orchHeader
+        );
+        if (!hasBearer && !isAdmin && !hasOrch) {
+          return addSecurityHeaders(
+            jsonResponse(401, { ok: false, error: "Unauthorized" }),
+            { cacheControl: "no-store", pragmaNoCache: true }
+          );
+        }
+        const remoteOk =
+          String(env.ALLOW_REMOTE_DEPLOY_TRIGGER || "").trim() === "1";
+        const hookUrl =
+          (remoteOk && (env.CF_DEPLOY_HOOK_URL || env.CF_PAGES_DEPLOY_HOOK)) ||
+          "";
+        if (!hookUrl) {
+          return addSecurityHeaders(
+            jsonResponse(503, {
+              ok: false,
+              error:
+                "Deploy hook not configured. Set ALLOW_REMOTE_DEPLOY_TRIGGER=1 and CF_DEPLOY_HOOK_URL to your deploy runner URL.",
+            }),
+            { cacheControl: "no-store", pragmaNoCache: true }
+          );
+        }
+        try {
+          const res = await fetch(hookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              commit: "latest",
+              intent: { source: "custom_gpt", ts: new Date().toISOString() },
+            }),
+          });
+          const text = await res.text();
+          let payload = { ok: res.ok, status: res.status };
+          try {
+            payload.body = text ? JSON.parse(text) : {};
+          } catch (_) {
+            payload.body = { message: text.slice(0, 500) };
+          }
+          return addSecurityHeaders(jsonResponse(res.ok ? 200 : 502, payload), {
+            cacheControl: "no-store",
+            pragmaNoCache: true,
+          });
+        } catch (err) {
+          return addSecurityHeaders(
+            jsonResponse(502, {
+              ok: false,
+              error: err.message || "Deploy hook request failed",
+            }),
+            { cacheControl: "no-store", pragmaNoCache: true }
+          );
+        }
+      }
+
       const isCommandCenterReq = isCommandCenterPath(url);
       let commandCenterRequest = request;
       if (isCommandCenterReq) {
@@ -2631,7 +2698,21 @@ export default {
         ["/admin/access", "/admin/access.html"],
         ["/admin/login", "/admin/login.html"],
       ]);
-      const adminAliasTarget = ADMIN_PUBLIC_ROUTE_ALIASES.get(cleanPath);
+      const ADMIN_MODULE_ALIASES = new Map([
+        ["/admin/mission", "/admin/integrated-dashboard.html"],
+        ["/admin/cc", "/admin/index.html"],
+        ["/admin/vcc", "/admin/voice-commands.html"],
+        ["/admin/monetization", "/admin/store-manager.html"],
+        ["/admin/analytics", "/admin/analytics.html"],
+        ["/admin/live", "/admin/live-stream.html"],
+        ["/admin/store", "/admin/store-manager.html"],
+        ["/admin/media", "/admin/nexus.html"],
+        ["/admin/audio", "/admin/voice-commands.html"],
+        ["/admin/settings", "/admin/integrated-dashboard.html"],
+      ]);
+      const adminAliasTarget =
+        ADMIN_PUBLIC_ROUTE_ALIASES.get(cleanPath) ||
+        ADMIN_MODULE_ALIASES.get(cleanPath);
       if (adminAliasTarget && url.pathname !== adminAliasTarget) {
         return Response.redirect(new URL(adminAliasTarget, url.origin), 302);
       }

@@ -1,0 +1,438 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "VoiceToWebsite Execute API",
+    "version": "2.0.0",
+    "description": "Production orchestration API for VoiceToWebsite. Single endpoint for all site changes. PREFERRED WORKFLOW: Use 'auto' action for instant changes (plans + applies + deploys in one call, no confirmation needed). Use 'list_pages' and 'read_page' to inspect the site. Use 'status' to check deployment health. Only use preview/apply/deploy flow for changes that need manual review."
+  },
+  "servers": [
+    {
+      "url": "https://voicetowebsite.com/api",
+      "description": "Production API base URL"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Orchestration",
+      "description": "All site operations: auto (instant changes), plan, preview, apply, deploy, status, rollback, list_pages, read_page, triggerDeploy."
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "tags": ["Orchestration"],
+        "summary": "Health check (no auth)",
+        "description": "Lightweight unauthenticated health check for connectivity debugging. Returns whether the Worker is online and which bindings are available.",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HealthResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execute": {
+      "post": {
+        "operationId": "executeCommand",
+        "tags": ["Orchestration"],
+        "summary": "Execute any site change or query in a single call",
+        "description": "Single endpoint for all site operations. Use 'auto' for instant changes (plans+applies+deploys in one call). Use 'list_pages'/'read_page' to inspect site, 'status' for health, 'rollback' to undo. Supported: text updates, themes, pages, sections, videos, products, CSS, backgrounds, meta updates.",
+        "security": [{ "OrchestratorToken": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExecuteAction" },
+              "examples": {
+                "auto_headline": {
+                  "summary": "PREFERRED: Instantly change homepage headline (no confirmation needed)",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "auto-headline-20260211-01",
+                    "command": "Update homepage hero headline to Build Faster on the Edge",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "auto_theme": {
+                  "summary": "PREFERRED: Instantly change site theme",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "auto-theme-20260211-01",
+                    "command": "Change theme to ocean",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "auto_css": {
+                  "summary": "PREFERRED: Instantly inject custom CSS",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "auto-css-20260211-01",
+                    "command": "Add custom CSS: .hero-headline { font-size: 4rem; color: gold; }",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "auto_add_page": {
+                  "summary": "PREFERRED: Instantly add a new page",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "auto-page-20260211-01",
+                    "command": "Add page Partners with headline Our Partners and body We work with the best.",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "auto_all_pages": {
+                  "summary": "PREFERRED: Apply change to ALL pages at once",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "auto-allpages-20260211-01",
+                    "command": "Update subhead to Powered by AI on all pages",
+                    "target": "site",
+                    "page": "all",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "auto_video": {
+                  "summary": "PREFERRED: Insert a video section",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "auto-video-20260211-01",
+                    "command": "Insert video https://example.com/demo.mp4 with title Product Demo",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "auto_store_page": {
+                  "summary": "PREFERRED: Change specific page",
+                  "value": {
+                    "action": "auto",
+                    "idempotencyKey": "auto-store-20260211-01",
+                    "command": "Update headline to Premium Apps on store page",
+                    "target": "site",
+                    "page": "store.html",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "list_pages": {
+                  "summary": "List all site pages",
+                  "value": {
+                    "action": "list_pages",
+                    "idempotencyKey": "list-20260211-01",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "read_page": {
+                  "summary": "Read current content of a page",
+                  "value": {
+                    "action": "read_page",
+                    "idempotencyKey": "read-home-20260211-01",
+                    "target": "site",
+                    "page": "index.html",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "status": {
+                  "summary": "Check deployment status and recent changes",
+                  "value": {
+                    "action": "status",
+                    "idempotencyKey": "status-20260211-01",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "rollback": {
+                  "summary": "Undo the last production change",
+                  "value": {
+                    "action": "rollback",
+                    "idempotencyKey": "rollback-20260211-01",
+                    "command": "Rollback last production change",
+                    "confirmToken": "vtwcfm.<payload>.<signature>",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                },
+                "preview": {
+                  "summary": "Preview changes (only if user wants to review before applying)",
+                  "value": {
+                    "action": "preview",
+                    "idempotencyKey": "preview-home-20260211-01",
+                    "command": "Update homepage hero headline to Build Faster on the Edge",
+                    "target": "site",
+                    "actor": "custom-gpt"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Action accepted and executed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExecuteEvent" }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid x-orch-token/admin cookie)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (confirmToken missing/invalid/expired)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Execution error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExecuteEvent" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/trigger-deploy": {
+      "post": {
+        "operationId": "triggerDeploy",
+        "tags": ["Orchestration"],
+        "summary": "Trigger remote code deployment via deploy hook",
+        "description": "Triggers the configured deploy runner (CF_DEPLOY_HOOK_URL) to pull, build, and deploy the latest code. Use after pushing changes to main. Auth: x-orch-token (same as execute) or Bearer.",
+        "security": [{ "OrchestratorToken": [] }],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commit": {
+                    "type": "string",
+                    "description": "Optional commit hash (default: latest)."
+                  },
+                  "intent": {
+                    "type": "object",
+                    "properties": {
+                      "source": { "type": "string", "enum": ["custom_gpt"] },
+                      "ts": { "type": "string", "format": "date-time" }
+                    },
+                    "description": "Optional context about the trigger source."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deploy triggered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "status": { "type": "integer" },
+                    "body": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized (missing or invalid x-orch-token)." },
+          "502": { "description": "Deploy hook request failed." },
+          "503": {
+            "description": "Deploy hook not configured (ALLOW_REMOTE_DEPLOY_TRIGGER or CF_DEPLOY_HOOK_URL)."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OrchestratorToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-orch-token",
+        "description": "Custom header token for orchestration calls. Set to ORCH_TOKEN (or X_ORCH_TOKEN) from Worker env. Same token works for /execute and /admin/trigger-deploy."
+      }
+    },
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "status": { "type": "string" },
+          "orchestrator": { "type": "string" },
+          "d1": { "type": "boolean" },
+          "assets": { "type": "boolean" },
+          "ts": { "type": "string" }
+        }
+      },
+      "ExecuteAction": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Action request for POST /execute. PREFERRED: Use action='auto' for instant changes. It plans, applies, and deploys in one call with no confirmation token needed.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "plan",
+              "preview",
+              "apply",
+              "deploy",
+              "status",
+              "rollback",
+              "list_pages",
+              "read_page"
+            ],
+            "description": "Operation to perform. Use 'auto' for instant one-call changes (PREFERRED). Use 'list_pages' to see all pages. Use 'read_page' to inspect a page. Use 'status' to check health. Use 'rollback' to undo. Only use preview/apply/deploy if the user explicitly wants to review before shipping."
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 3,
+            "description": "Unique key for deduplication. Use format: action-target-YYYYMMDD-NN (e.g. auto-headline-20260211-01). Generate a new key for each distinct request."
+          },
+          "command": {
+            "type": "string",
+            "description": "Natural-language description of the change. Required for auto/plan/preview/apply. Be specific: include the exact text, URL, theme name, CSS, or page target. Examples: 'Update headline to Welcome Home', 'Change theme to midnight', 'Add page About Us with headline Our Story', 'Inject CSS: body { background: #000; }'."
+          },
+          "target": {
+            "type": "string",
+            "enum": ["site"],
+            "default": "site",
+            "description": "Always 'site' for production changes."
+          },
+          "safetyLevel": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "default": "medium",
+            "description": "Risk level. Not required for auto mode."
+          },
+          "confirmToken": {
+            "type": "string",
+            "description": "Single-use token from preview. Only needed for apply/deploy/rollback (NOT needed for auto)."
+          },
+          "actor": {
+            "oneOf": [{ "type": "string" }, { "type": "object", "additionalProperties": true }],
+            "description": "Caller identity. Use 'custom-gpt'."
+          },
+          "page": {
+            "type": "string",
+            "pattern": "^(all|[a-z0-9-]+(?:\\.html)?)$",
+            "description": "Target public page (example: index.html, partners.html) or 'all' for every page. Admin paths like 'admin/index.html' are blocked."
+          },
+          "path": { "type": "string", "description": "Alias for page field." },
+          "file": {
+            "type": "string",
+            "description": "File target. Use for CSS files like 'styles.css' or specific HTML pages."
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Optional extension parameters."
+          }
+        },
+        "required": ["action", "idempotencyKey"],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": { "enum": ["auto", "plan", "preview", "apply"] }
+              },
+              "required": ["action"]
+            },
+            "then": { "required": ["command"] }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": { "enum": ["apply", "deploy", "rollback"] }
+              },
+              "required": ["action"]
+            },
+            "then": { "required": ["confirmToken"] }
+          }
+        ]
+      },
+      "ExecuteEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Canonical event envelope returned by /execute.",
+        "properties": {
+          "eventId": { "type": "string", "description": "Unique event identifier." },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event creation time in ISO format."
+          },
+          "traceId": {
+            "type": "string",
+            "description": "Trace identifier for request correlation."
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "previewed",
+              "confirmed",
+              "applied",
+              "deployed",
+              "rolled_back",
+              "error"
+            ],
+            "description": "Lifecycle event type."
+          },
+          "action": { "$ref": "#/components/schemas/ExecuteAction" },
+          "result": {
+            "type": ["object", "array", "string", "number", "boolean", "null"],
+            "description": "Action result payload. For auto mode, includes autoMode:true, steps array, and deployment status. For preview, includes confirmToken/confirmBy."
+          },
+          "error": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": { "message": { "type": "string" } },
+            "description": "Error details for failed actions."
+          }
+        },
+        "required": ["eventId", "timestamp", "traceId", "eventType", "action"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "error": { "type": "string" },
+          "traceId": { "type": "string" }
+        },
+        "required": ["error"]
+      }
+    }
+  }
+}
