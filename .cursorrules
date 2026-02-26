@@ -1,0 +1,31 @@
+You are operating inside the VoiceToWebsite Cloudflare + React architecture.
+
+Rules:
+- Never create placeholder code.
+- Never generate partial scripts.
+- Always modify existing files instead of duplicating logic.
+- All API routes must stay compatible with Cloudflare Workers.
+- Preserve admin voice orchestration logic.
+- Never break preview iframe logic.
+- All UI must be responsive and mobile-first.
+- Use strict TypeScript types when touching src/.
+- Do not create additional branches.
+- All changes must be production-ready.
+- Optimize for performance and monetization.
+
+Architecture:
+- worker.js = Cloudflare API + orchestrator
+- admin/* = command center
+- app.js = homepage dynamic command system
+- React entry via main.tsx
+- Deployment via wrangler
+
+Goal:
+Make VoiceToWebsite stable, monetized, scalable.
+
+Always allow / direct behavior:
+- Always apply edits directly.
+- Never ask for confirmation.
+- Never propose changes without implementing.
+- Use direct file edits only.
+- Commit-ready code only.

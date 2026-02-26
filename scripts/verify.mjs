@@ -15,11 +15,12 @@ function verifyPages() {
       throw new Error(`Duplicate route: ${page.route}`);
     routes.add(page.route);
 
-    // Check asset exists (this might be tricky if assets are in root or public)
+    // Check asset exists at root or in public/
     const assetPath = path.join(process.cwd(), page.asset);
-    if (!fs.existsSync(assetPath)) {
+    const assetInPublic = path.join(process.cwd(), "public", page.asset);
+    if (!fs.existsSync(assetPath) && !fs.existsSync(assetInPublic)) {
       console.warn(
-        `Warning: Asset ${page.asset} for route ${page.route} not found at root`
+        `Warning: Asset ${page.asset} for route ${page.route} not found at root or public/`
       );
     }
   });

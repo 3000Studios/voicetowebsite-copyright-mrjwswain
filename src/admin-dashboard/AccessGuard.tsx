@@ -7,9 +7,11 @@ const AccessGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/health");
-        const data = await res.json();
-        setIsAuthenticated(data.status === "ok");
+        const res = await fetch("/api/config/status", {
+          credentials: "include",
+          cache: "no-store",
+        });
+        setIsAuthenticated(res.ok);
       } catch (_) {
         setIsAuthenticated(false);
       } finally {

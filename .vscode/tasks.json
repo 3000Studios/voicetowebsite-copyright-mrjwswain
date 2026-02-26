@@ -2,6 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "auto-commit",
+      "type": "shell",
+      "command": "git add . && git commit -m \"auto-update\" || echo \"no changes\" && git push",
+      "problemMatcher": []
+    },
+    {
       "label": "Repo: Install",
       "type": "shell",
       "command": "npm install",

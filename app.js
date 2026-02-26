@@ -23,7 +23,7 @@ const controlPassword =
 // ============================================
 // This handler processes commands from: voice, chat, custom GPT, and API
 const commandHandler = {
-  apiEndpoint: "https://voicetowebsite.com/api/ui-command",
+  apiEndpoint: "/api/ui-command",
   isProcessing: false,
 
   async execute(action, args = {}, source = "app") {

@@ -7,6 +7,7 @@ import WarpTunnel from "./components/WarpTunnel";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
 import { SHARED_NAV_ITEMS } from "./constants/navigation";
 import { audioEngine } from "./services/audioEngine";
+import { trackRevenueEvent } from "./utils/revenueTracking";
 import siteConfig from "./site-config.json";
 
 type PricingTier = {
@@ -449,6 +450,26 @@ const App: React.FC = () => {
     startThemeSong(true).catch(() => {});
   };
 
+  const routeToStore = useCallback(
+    (source: string, params: Record<string, string> = {}) => {
+      trackRevenueEvent("store_cta_clicked", {
+        source,
+        ...params,
+      });
+      const search = new URLSearchParams({
+        utm_source: source,
+        utm_medium: "website",
+        utm_campaign: "revenue_max",
+      });
+      Object.entries(params).forEach(([key, value]) => {
+        if (!value) return;
+        search.set(key, value);
+      });
+      window.location.href = `/store.html?${search.toString()}`;
+    },
+    []
+  );
+
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
@@ -516,7 +537,7 @@ const App: React.FC = () => {
                     initial={{ opacity: 0, y: -10, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                    className="absolute right-0 mt-3 w-56 rounded-2xl border border-emerald-400/30 bg-black/85 backdrop-blur-xl p-2"
+                    className="absolute right-0 mt-3 w-56 max-h-[72vh] overflow-y-auto rounded-2xl border border-emerald-400/30 bg-black/85 backdrop-blur-xl p-2"
                   >
                     {NAV_MENU_ITEMS.map((item) => (
                       <a
@@ -593,13 +614,22 @@ const App: React.FC = () => {
                       className="mx-auto scale-125"
                     />
                   </div>
-                  <button
-                    onClick={startListening}
-                    aria-label="Tap to create a website"
-                    className="px-14 py-5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black font-outfit text-base tracking-[0.12em] shadow-[0_12px_35px_rgba(56,189,248,0.25)] hover:shadow-[0_16px_45px_rgba(56,189,248,0.35)] transition-all uppercase"
-                  >
-                    Start a build
-                  </button>
+                  <div className="mt-2 flex flex-col md:flex-row items-center justify-center gap-4">
+                    <button
+                      onClick={startListening}
+                      aria-label="Tap to create a website"
+                      className="px-14 py-5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black font-outfit text-base tracking-[0.12em] shadow-[0_12px_35px_rgba(56,189,248,0.25)] hover:shadow-[0_16px_45px_rgba(56,189,248,0.35)] transition-all uppercase"
+                    >
+                      Start a build
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => routeToStore("home_primary_buy_now")}
+                      className="px-12 py-5 rounded-full border border-emerald-300/60 bg-emerald-400/15 text-emerald-100 font-black font-outfit text-sm tracking-[0.16em] shadow-[0_10px_30px_rgba(16,185,129,0.25)] hover:bg-emerald-400/25 transition-all uppercase"
+                    >
+                      Buy & Launch
+                    </button>
+                  </div>
                   <p className="mt-6 text-white/65 font-inter">
                     Microphone activates only after you tap the button.
                   </p>
@@ -837,12 +867,17 @@ const App: React.FC = () => {
                         ))}
                       </ul>
 
-                      <a
-                        href="/license.html"
+                      <button
+                        type="button"
+                        onClick={() =>
+                          routeToStore("home_pricing_tier", {
+                            plan: activeTier.name.toLowerCase(),
+                          })
+                        }
                         className={`block w-full text-center py-6 rounded-full font-outfit text-sm tracking-widest uppercase transition-all font-semibold ${activeTier.highlight ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_30px_rgba(34,211,238,0.4)] hover:shadow-[0_0_50px_rgba(34,211,238,0.6)]" : "border border-white/20 hover:bg-white/5"}`}
                       >
                         Select Tier
-                      </a>
+                      </button>
                     </motion.article>
                   </AnimatePresence>
                 </div>

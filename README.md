@@ -25,6 +25,18 @@ store).
 - PayPal server-side checkout uses `PAYPAL_CLIENT_ID(_PROD)` + `PAYPAL_CLIENT_SECRET(_PROD)` and
   optional `PAYPAL_ENV=sandbox|live`.
 
+## Agent operations docs
+
+- Root agent contract: `AGENTS.md`
+- Shared agent protocol: `AGENT_HANDSHAKE.txt`
+- Skills index: `skills/README.md`
+- Directory-scoped agent docs:
+  - `admin/AGENTS.md`
+  - `src/AGENTS.md`
+  - `functions/AGENTS.md`
+  - `scripts/AGENTS.md`
+  - `tests/AGENTS.md`
+
 ## Edge AI + R2
 
 - Workers AI binding: `wrangler.toml` `[ai] binding = "AI"`

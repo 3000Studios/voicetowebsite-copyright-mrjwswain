@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { trackRevenueEvent } from "../utils/revenueTracking";
 
 interface CheckoutProps {
   items: Array<{
@@ -29,12 +30,22 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
     () => items.reduce((sum, item) => sum + item.price, 0),
     [items]
   );
+  const itemIds = useMemo(() => items.map((item) => item.id), [items]);
   const paypalClientId = (import.meta as any).env?.VITE_PAYPAL_CLIENT_ID as
     | string
     | undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    trackRevenueEvent(
+      "checkout_submitted",
+      {
+        provider: "stripe",
+        items: itemIds,
+        total,
+      },
+      total
+    );
     setProcessing(true);
 
     // Simulate payment processing
@@ -42,6 +53,15 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
 
     setProcessing(false);
     setSuccess(true);
+    trackRevenueEvent(
+      "checkout_completed",
+      {
+        provider: "stripe",
+        items: itemIds,
+        total,
+      },
+      total
+    );
 
     // Reset after 3 seconds
     setTimeout(() => {
@@ -72,6 +92,27 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
   };
 
   useEffect(() => {
+    trackRevenueEvent(
+      "checkout_modal_opened",
+      {
+        items: itemIds,
+        total,
+      },
+      total
+    );
+    return () => {
+      trackRevenueEvent(
+        "checkout_modal_closed",
+        {
+          items: itemIds,
+          total,
+        },
+        total
+      );
+    };
+  }, [itemIds, total]);
+
+  useEffect(() => {
     if (paymentMethod !== "paypal") return;
     if (!paypalHostRef.current) return;
 
@@ -93,6 +134,15 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
         const button = paypalAny.Buttons({
           style: { layout: "vertical", shape: "rect", label: "paypal" },
           createOrder: async () => {
+            trackRevenueEvent(
+              "checkout_submitted",
+              {
+                provider: "paypal",
+                items: itemIds,
+                total,
+              },
+              total
+            );
             const res = await fetch("/api/checkout", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -125,18 +175,47 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
 
               setProcessing(false);
               setSuccess(true);
+              trackRevenueEvent(
+                "checkout_completed",
+                {
+                  provider: "paypal",
+                  items: itemIds,
+                  total,
+                },
+                total
+              );
               setTimeout(() => {
                 setSuccess(false);
                 onClose();
               }, 1800);
             } catch (err) {
               console.error(err);
+              trackRevenueEvent(
+                "checkout_failed",
+                {
+                  provider: "paypal",
+                  reason: "capture_failed",
+                  items: itemIds,
+                  total,
+                },
+                total
+              );
               alert("Capture failed.");
               setProcessing(false);
             }
           },
           onError: (err: any) => {
             console.error("PayPal error", err);
+            trackRevenueEvent(
+              "checkout_failed",
+              {
+                provider: "paypal",
+                reason: "paypal_sdk_error",
+                items: itemIds,
+                total,
+              },
+              total
+            );
             setProcessing(false);
           },
         });
@@ -153,7 +232,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
     return () => {
       cancelled = true;
     };
-  }, [items, onClose, paymentMethod, total, paypalClientId]);
+  }, [itemIds, items, onClose, paymentMethod, total, paypalClientId]);
 
   return (
     <div className="checkout-modal">
@@ -415,7 +494,17 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
       >
         <button
           className="checkout-close"
-          onClick={onClose}
+          onClick={() => {
+            trackRevenueEvent(
+              "checkout_close_clicked",
+              {
+                items: itemIds,
+                total,
+              },
+              total
+            );
+            onClose();
+          }}
           aria-label="Close checkout"
         >
           ×
@@ -460,7 +549,18 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
               <button
                 type="button"
                 className={`payment-method-btn ${paymentMethod === "stripe" ? "active" : ""}`}
-                onClick={() => setPaymentMethod("stripe")}
+                onClick={() => {
+                  setPaymentMethod("stripe");
+                  trackRevenueEvent(
+                    "payment_method_selected",
+                    {
+                      method: "stripe",
+                      items: itemIds,
+                      total,
+                    },
+                    total
+                  );
+                }}
                 aria-pressed={paymentMethod === "stripe"}
               >
                 <div className="payment-icon">💳</div>
@@ -469,7 +569,18 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
               <button
                 type="button"
                 className={`payment-method-btn ${paymentMethod === "paypal" ? "active" : ""}`}
-                onClick={() => setPaymentMethod("paypal")}
+                onClick={() => {
+                  setPaymentMethod("paypal");
+                  trackRevenueEvent(
+                    "payment_method_selected",
+                    {
+                      method: "paypal",
+                      items: itemIds,
+                      total,
+                    },
+                    total
+                  );
+                }}
                 aria-pressed={paymentMethod === "paypal"}
               >
                 <div className="payment-icon">🅿️</div>

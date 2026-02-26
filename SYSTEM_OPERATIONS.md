@@ -47,7 +47,7 @@ Source of truth: `DEPLOYMENT.md`.
 
 ## Bot Roles (Multi-Agent System)
 
-Source of truth: `AGENT_HANDSHAKE.txt` and `.Jules/*`.
+Source of truth: `AGENT_HANDSHAKE.txt`, `AGENTS.md`, and `skills/README.md`.
 
 - Commander (you):
   - Sets priorities, approves destructive actions, owns product direction.
@@ -63,7 +63,7 @@ Source of truth: `AGENT_HANDSHAKE.txt` and `.Jules/*`.
 - Shared sources of truth:
   - `PROJECT_NOTES.md`
   - `products.json`
-  - `AGENTS.md`, `DEPLOYMENT.md`, `SYSTEM_OPERATIONS.md`
+  - `AGENTS.md`, `DEPLOYMENT.md`, `SYSTEM_OPERATIONS.md`, `skills/README.md`
 - Shared workflow:
   1. Preflight (below)
   2. Small change set

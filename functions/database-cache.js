@@ -280,23 +280,20 @@ export function createCachedDatabase(db, options = {}) {
 }
 
 /**
- * Database performance monitoring middleware
+ * Database performance monitoring middleware.
+ * Returns a cached DB wrapper; no interval is set (caller may log stats as needed)
+ * to avoid leaking intervals when createDatabaseMonitor is invoked per request.
  */
 export function createDatabaseMonitor(db, logger) {
   const cachedDb = createCachedDatabase(db);
-
-  // Log performance metrics periodically (every minute)
-  cachedDb.monitoringInterval = setInterval(() => {
+  if (logger && typeof logger.debug === "function") {
     try {
       const stats = cachedDb.getPerformanceStats();
       logger.debug("Database performance metrics", stats);
-    } catch (error) {
-      logger.warn("Failed to log database performance metrics", {
-        error: error.message,
-      });
+    } catch (_) {
+      // ignore
     }
-  }, 60000);
-
+  }
   return cachedDb;
 }
 
