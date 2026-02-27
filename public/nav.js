@@ -397,7 +397,8 @@
 
   const hasSessionUnlock = () => {
     try {
-      const unlocked = sessionStorage.getItem(ADMIN_UNLOCK_STATE_KEY) === "true";
+      const unlocked =
+        sessionStorage.getItem(ADMIN_UNLOCK_STATE_KEY) === "true";
       if (!unlocked) return false;
       return isAdminSessionFresh();
     } catch (_) {
@@ -1871,14 +1872,17 @@
         </div>
       `;
 
-      rail.querySelector("[data-vtw-revenue-dismiss]")?.addEventListener("click", () => {
-        rail.remove();
-        trackRevenueEvent("revenue_rail_dismissed", { path });
-      });
+      rail
+        .querySelector("[data-vtw-revenue-dismiss]")
+        ?.addEventListener("click", () => {
+          rail.remove();
+          trackRevenueEvent("revenue_rail_dismissed", { path });
+        });
 
       rail.querySelectorAll("[data-vtw-revenue-action]").forEach((link) => {
         link.addEventListener("click", () => {
-          const action = link.getAttribute("data-vtw-revenue-action") || "unknown";
+          const action =
+            link.getAttribute("data-vtw-revenue-action") || "unknown";
           trackRevenueEvent("revenue_rail_clicked", { action, path });
         });
       });
