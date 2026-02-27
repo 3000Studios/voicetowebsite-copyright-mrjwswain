@@ -4,7 +4,10 @@ import { handleCommandCenterRequest } from "../functions/commandCenterApi.js";
 const makeMockD1 = () => ({
   prepare(sql) {
     const q = String(sql || "");
-    return {
+    const statement = {
+      bind() {
+        return statement;
+      },
       async run() {
         return { success: true };
       },
@@ -68,6 +71,7 @@ const makeMockD1 = () => ({
         return { results: [] };
       },
     };
+    return statement;
   },
 });
 
