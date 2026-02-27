@@ -98,4 +98,29 @@ describe("command center analytics metrics", () => {
     expect(Array.isArray(body.perRoute)).toBe(true);
     expect(body.perRoute[0].route).toBe("/");
   });
+
+  it("builds a deterministic voice execution plan", async () => {
+    const request = new Request("https://example.com/api/voice/execute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        command: "Update homepage pricing and ship",
+      }),
+    });
+    const response = await handleCommandCenterRequest({
+      request,
+      env: { D1: makeMockD1() },
+      url: new URL(request.url),
+      assets: { fetch: async () => new Response("ok") },
+    });
+
+    expect(response).toBeTruthy();
+    const body = await response.json();
+    expect(body.ok).toBe(true);
+    expect(body.executionPlan.intent).toBe("update");
+    expect(Array.isArray(body.executionPlan.previewRoutes)).toBe(true);
+    expect(body.executionPlan.previewRoutes.includes("/")).toBe(true);
+    expect(Array.isArray(body.executionPlan.validations)).toBe(true);
+    expect(body.analyticsImpact.events).toContain("preview_built");
+  });
 });
