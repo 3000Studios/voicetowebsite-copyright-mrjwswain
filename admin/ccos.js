@@ -369,6 +369,12 @@ const renderVCC = async () => {
   const plan = state.lastVoicePlan;
   const routes = plan?.executionPlan?.previewRoutes || [];
   const execution = state.lastVoiceExecution;
+  const conversions = analytics?.conversions || {};
+  const store = analytics?.store || {};
+  const scientific = analytics?.scientific || {};
+  const runRateDaily = Number(conversions?.runRateDaily || 0);
+  const runRateMonthly = Number(conversions?.runRateMonthly || 0);
+  const runRateYearly = Number(conversions?.runRateYearly || 0);
   return `
     <section class="ccos-grid">
       <article class="ccos-card ccos-col-6">
@@ -397,6 +403,31 @@ const renderVCC = async () => {
           <tr><th>Analytics Impact</th><td>${escapeHtml(JSON.stringify(plan?.analyticsImpact || {}))}</td></tr>
           <tr><th>Validation Checklist</th><td>${escapeHtml((plan?.executionPlan?.validations || []).join(", ") || "n/a")}</td></tr>
         </table>
+      </article>
+      <article class="ccos-card ccos-col-12">
+        <h3>Profit Center Metrics</h3>
+        <table class="ccos-data">
+          <tr><th>Daily Revenue Estimate</th><td>$${escapeHtml(runRateDaily.toFixed(2))}</td></tr>
+          <tr><th>Monthly Revenue Estimate</th><td>$${escapeHtml(runRateMonthly.toFixed(2))}</td></tr>
+          <tr><th>Yearly Revenue Estimate</th><td>$${escapeHtml(runRateYearly.toFixed(2))}</td></tr>
+          <tr><th>Store Conversion Rate</th><td>${escapeHtml(Number(store?.conversionRate || 0).toFixed(2))}%</td></tr>
+          <tr><th>Average Order Value</th><td>$${escapeHtml(Number(store?.aov || 0).toFixed(2))}</td></tr>
+          <tr><th>Effective RPM</th><td>$${escapeHtml(Number(store?.rpm || 0).toFixed(2))}</td></tr>
+          <tr><th>Confidence Score</th><td>${escapeHtml(Number(scientific?.confidenceScore || 0).toFixed(1))}/100</td></tr>
+        </table>
+      </article>
+      <article class="ccos-card ccos-col-12">
+        <h3>Scientific Method</h3>
+        <pre>${escapeHtml(
+          [
+            scientific?.method || "Method unavailable.",
+            "",
+            `conversion: ${scientific?.formulas?.conversionRate || "orders_24h / sessions_24h * 100"}`,
+            `AOV: ${scientific?.formulas?.averageOrderValue || "revenue / orders"}`,
+            `RPM: ${scientific?.formulas?.effectiveRpm || "revenue_24h / (sessions_24h / 1000)"}`,
+            `daily projection: ${scientific?.formulas?.projectedDailyRevenue || "0.55*revenue_24h + 0.45*(revenue_7d/7)"}`,
+          ].join("\n")
+        )}</pre>
       </article>
       <article class="ccos-card ccos-col-12">
         <h3>Route Previews</h3>
