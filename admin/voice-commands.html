@@ -911,6 +911,11 @@
             <strong id="metricLeads">—</strong>
             <small class="muted">Not connected</small>
           </div>
+          <div class="profit-metric">
+            <span>Confidence Score</span>
+            <strong id="metricConfidence">—</strong>
+            <small class="muted">Not connected</small>
+          </div>
         </div>
         <div class="profit-actions">
           <button class="highlight" data-command="Generate monetization offer now">⚡ Generate New Offer</button>
@@ -941,6 +946,10 @@
         <div class="plan-output" id="aiSuggestions" style="min-height: 90px">
           <small>AI Suggestions</small>
           • Add a lead magnet • Launch a pricing tier • Increase CTA density
+        </div>
+        <div class="plan-output" id="scientificMethod" style="min-height: 100px">
+          <small>Scientific Method</small>
+          Awaiting live metrics formula metadata.
         </div>
       </section>
 
@@ -1108,6 +1117,15 @@
       const aiSuggestionsBox = document.getElementById("aiSuggestions");
       const historyList = document.getElementById("commandHistory");
       const form = document.getElementById("moneyCommandForm");
+      const previewFrame = document.getElementById("vcc-preview-frame");
+      const metricDaily = document.getElementById("metricDaily");
+      const metricMonthly = document.getElementById("metricMonthly");
+      const metricMRR = document.getElementById("metricMRR");
+      const metricAffiliate = document.getElementById("metricAffiliate");
+      const metricRPM = document.getElementById("metricRPM");
+      const metricLeads = document.getElementById("metricLeads");
+      const metricConfidence = document.getElementById("metricConfidence");
+      const scientificMethod = document.getElementById("scientificMethod");
       const defaultSuggestions = [
         "Add a lead magnet",
         "Launch a pricing tier",
@@ -1117,11 +1135,124 @@
         "Build comparison funnel",
       ];
 
+      if (previewFrame) {
+        previewFrame.src = `/preview/index?shadow=1&ts=${Date.now()}`;
+      }
+
       const updateSuggestions = (extra = []) => {
         const merged = [...extra, ...defaultSuggestions];
         aiSuggestionsBox.innerHTML = `<small>AI Suggestions</small>• ${merged.slice(0, 5).join("<br>• ")}`;
       };
       updateSuggestions();
+
+      const formatMoney = (value) => {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return "—";
+        return `$${n.toFixed(2)}`;
+      };
+
+      const formatPercent = (value) => {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return "—";
+        return `${n.toFixed(2)}%`;
+      };
+
+      const setMetric = (el, value, note) => {
+        if (!el) return;
+        el.textContent = value;
+        const noteEl = el.parentElement?.querySelector("small");
+        if (noteEl && note) noteEl.textContent = note;
+      };
+
+      const renderScientificMethod = (metrics) => {
+        if (!scientificMethod) return;
+        const scientific = metrics?.scientific || {};
+        const formulas = scientific?.formulas || {};
+        const methodText =
+          scientific?.method ||
+          "Method metadata unavailable. Ensure /api/analytics/metrics is connected.";
+        scientificMethod.innerHTML = `
+          <small>Scientific Method</small>
+          ${methodText}
+          <br /><br />
+          conversion: ${formulas.conversionRate || "orders_24h / sessions_24h * 100"}
+          <br />
+          AOV: ${formulas.averageOrderValue || "revenue / orders"}
+          <br />
+          RPM: ${formulas.effectiveRpm || "revenue_24h / (sessions_24h / 1000)"}
+        `;
+      };
+
+      const loadProfitMetrics = async () => {
+        try {
+          const res = await fetch("/api/analytics/metrics", {
+            cache: "no-store",
+          });
+          const metrics = await res.json().catch(() => ({}));
+          if (!res.ok || !metrics?.ok) {
+            throw new Error(metrics?.error || "Metrics endpoint unavailable");
+          }
+
+          const conversions = metrics?.conversions || {};
+          const store = metrics?.store || {};
+          const scientific = metrics?.scientific || {};
+          const daily =
+            Number(conversions?.runRateDaily || 0) ||
+            Number(conversions?.revenue24h || 0);
+          const monthly =
+            Number(conversions?.runRateMonthly || 0) || daily * 30.4375;
+          const yearly =
+            Number(conversions?.runRateYearly || 0) || monthly * 12;
+
+          setMetric(
+            metricDaily,
+            formatMoney(daily),
+            "Weighted short-term projection"
+          );
+          setMetric(
+            metricMonthly,
+            formatMoney(monthly),
+            "Weighted monthly run rate"
+          );
+          setMetric(
+            metricMRR,
+            formatMoney(Number(conversions?.revenue || 0)),
+            "Current observed recurring proxy"
+          );
+          setMetric(
+            metricAffiliate,
+            String(metrics?.experiments?.[0]?.runs ?? "—"),
+            "Experiment count proxy"
+          );
+          setMetric(metricRPM, formatMoney(store?.rpm), "Revenue per 1000 sessions");
+          setMetric(
+            metricLeads,
+            formatPercent(store?.conversionRate),
+            "Orders/sessions conversion"
+          );
+          setMetric(
+            metricConfidence,
+            `${Number(scientific?.confidenceScore || 0).toFixed(1)}/100`,
+            "Sample-size + volatility adjusted"
+          );
+
+          revenueEstimate.innerHTML = `<small>Estimated Revenue (AI)</small>Daily ${formatMoney(
+            daily
+          )} • Monthly ${formatMoney(monthly)} • Yearly ${formatMoney(yearly)}`;
+          renderScientificMethod(metrics);
+        } catch (error) {
+          setMetric(metricDaily, "—", "Metrics unavailable");
+          setMetric(metricMonthly, "—", "Metrics unavailable");
+          setMetric(metricMRR, "—", "Metrics unavailable");
+          setMetric(metricAffiliate, "—", "Metrics unavailable");
+          setMetric(metricRPM, "—", "Metrics unavailable");
+          setMetric(metricLeads, "—", "Metrics unavailable");
+          setMetric(metricConfidence, "—", "Metrics unavailable");
+          if (scientificMethod) {
+            scientificMethod.innerHTML = `<small>Scientific Method</small>${error.message}`;
+          }
+        }
+      };
 
       const setPipelineStage = (stage, { error = false } = {}) => {
         const index = pipelineStages.indexOf(stage);
@@ -1326,6 +1457,7 @@
           }
           endPipeline(true);
           logCommand(command);
+          loadProfitMetrics().catch(() => {});
         } catch (error) {
           responseBox.innerHTML = `<small>Command Output</small>❌ Network Error: ${error.message}`;
           console.error("Command execution error:", error);
@@ -1376,6 +1508,7 @@
             null,
             2
           )}`;
+          loadProfitMetrics().catch(() => {});
         } catch (err) {
           responseBox.innerHTML = `<small>Command Output</small>❌ Ship failed: ${err.message}`;
         }
@@ -1485,6 +1618,8 @@
 
       pollBots();
       setInterval(pollBots, 6000);
+      loadProfitMetrics();
+      setInterval(loadProfitMetrics, 60000);
     </script>
     <script type="module" src="ccos.js"></script>
   </body>

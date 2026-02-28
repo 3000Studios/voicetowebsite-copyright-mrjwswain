@@ -19,6 +19,19 @@ type PricingTier = {
   features: string[];
 };
 
+type AdSlotKey = "ADSENSE_SLOT_TOP" | "ADSENSE_SLOT_MID" | "ADSENSE_SLOT_BOTTOM";
+
+type ContentGuide = {
+  title: string;
+  summary: string;
+  bullets: string[];
+};
+
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
 const NAV_MENU_ITEMS = SHARED_NAV_ITEMS;
 
 const PARTICLE_LAYOUT = [
@@ -85,6 +98,133 @@ const PRICING_TIERS: PricingTier[] = [
     ],
   },
 ];
+
+const AD_COMPLIANCE_LINKS = [
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+  { label: "Support", href: "/support" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Trust Center", href: "/trust" },
+  { label: "Status", href: "/status" },
+];
+
+const CONTENT_GUIDES: ContentGuide[] = [
+  {
+    title: "Voice-to-page architecture",
+    summary:
+      "Every build request maps user intent to pages, sections, metadata, and conversion targets while preserving responsive structure.",
+    bullets: [
+      "Intent parsing chooses page and section strategy.",
+      "Preview-first publishing protects production quality.",
+      "All generated layouts default to mobile-first blocks.",
+    ],
+  },
+  {
+    title: "AdSense readiness workflow",
+    summary:
+      "We keep a clear separation between editorial content and ads, mark all ad zones, and keep navigational trust pages easy to discover.",
+    bullets: [
+      "Ad blocks are labeled and contextual.",
+      "Content density stays higher than ad density.",
+      "Policy pages and contact surfaces remain visible.",
+    ],
+  },
+  {
+    title: "Monetization quality controls",
+    summary:
+      "Revenue actions are evaluated alongside user experience signals so performance gains do not degrade readability or trust.",
+    bullets: [
+      "Measured CTA placement and low-friction funnels.",
+      "Traffic source + intent alignment checks.",
+      "Analytics-backed iteration with audit trails.",
+    ],
+  },
+];
+
+const FAQ_ITEMS: FaqItem[] = [
+  {
+    question: "How do I activate live AdSense units?",
+    answer:
+      "Set ADSENSE_PUBLISHER and ADSENSE_SLOT values in environment config. Until then, placeholders render so layout remains policy-safe.",
+  },
+  {
+    question: "Can I control ad density?",
+    answer:
+      "Yes. The admin monetization controls enforce density caps and keep placements within a predictable, reviewable structure.",
+  },
+  {
+    question: "How is dashboard revenue calculated?",
+    answer:
+      "Dashboard metrics are computed from observed orders, sessions, and trailing windows with explicit formulas for AOV, conversion, RPM, and run-rate projections.",
+  },
+];
+
+const readRuntimeEnvValue = (key: string): string => {
+  if (typeof window === "undefined") return "";
+  const env = (window as Window & { __ENV?: Record<string, unknown> }).__ENV;
+  const value = env?.[key];
+  return typeof value === "string" ? value.trim() : "";
+};
+
+const AdSensePlacement: React.FC<{
+  slotKey: AdSlotKey;
+  title: string;
+  description: string;
+}> = ({ slotKey, title, description }) => {
+  const publisher = readRuntimeEnvValue("ADSENSE_PUBLISHER");
+  const slot =
+    readRuntimeEnvValue(slotKey) || readRuntimeEnvValue("ADSENSE_SLOT");
+  const showLiveUnit = Boolean(publisher && slot);
+
+  useEffect(() => {
+    if (!showLiveUnit) return;
+    if (typeof window === "undefined") return;
+    try {
+      (
+        (window as Window & { adsbygoogle?: Record<string, unknown>[] })
+          .adsbygoogle || []
+      ).push({});
+    } catch (_) {
+      // Google ad scripts can throw before hydration/network readiness.
+    }
+  }, [showLiveUnit, publisher, slot]);
+
+  return (
+    <aside className="mb-10 rounded-3xl border border-emerald-400/35 bg-emerald-500/5 p-5 md:p-6">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="font-outfit text-[0.65rem] tracking-[0.28em] text-emerald-200/85 uppercase">
+          Advertisement
+        </p>
+        <span className="rounded-full border border-white/15 px-3 py-1 text-[0.62rem] tracking-[0.2em] text-white/60 uppercase">
+          {showLiveUnit ? "Live Slot" : "Placeholder"}
+        </span>
+      </div>
+      <h3 className="font-outfit text-lg text-white">{title}</h3>
+      <p className="mt-2 font-inter text-sm leading-relaxed text-white/65">
+        {description}
+      </p>
+      <div className="mt-4 min-h-[130px] rounded-2xl border border-dashed border-white/20 bg-black/35 px-3 py-4">
+        {showLiveUnit ? (
+          <ins
+            className="adsbygoogle"
+            style={{ display: "block" }}
+            data-ad-client={publisher}
+            data-ad-slot={slot}
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          />
+        ) : (
+          <p className="font-inter text-sm text-white/55">
+            Configure <code>ADSENSE_PUBLISHER</code> and slot variables to
+            render live ads. This placeholder preserves layout and content
+            spacing for review.
+          </p>
+        )}
+      </div>
+    </aside>
+  );
+};
 
 const EnhancedTypography = () => (
   <section className="mt-20 space-y-12">
@@ -596,6 +736,87 @@ const App: React.FC = () => {
             </motion.p>
           </div>
 
+          <AdSensePlacement
+            slotKey="ADSENSE_SLOT_TOP"
+            title="Top-of-page monetization zone"
+            description="Editorial content appears before and after this block to keep user intent, readability, and ad density aligned."
+          />
+
+          <section className="mb-20 grid gap-6 lg:grid-cols-[1.35fr_1fr]">
+            <article className="rounded-3xl border border-white/15 bg-black/45 p-6 md:p-8">
+              <p className="font-outfit text-[0.7rem] tracking-[0.24em] text-cyan-300/80 uppercase">
+                Publisher-grade foundation
+              </p>
+              <h2 className="mt-3 font-outfit text-3xl md:text-4xl font-black">
+                Content-rich pages designed for ad and trust compliance.
+              </h2>
+              <p className="mt-4 font-inter text-white/70 leading-relaxed">
+                VoiceToWebsite generates and refines structured, useful content
+                so each page can pass quality review with clear navigation,
+                policy visibility, and meaningful editorial depth. The system
+                prioritizes user intent first, then monetization placement.
+              </p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
+                    Quality signal
+                  </p>
+                  <p className="mt-2 font-inter text-sm text-white/80">
+                    High information density with policy-safe CTA placement.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
+                    Governance signal
+                  </p>
+                  <p className="mt-2 font-inter text-sm text-white/80">
+                    Preview-first updates and auditable command execution.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
+                    Revenue signal
+                  </p>
+                  <p className="mt-2 font-inter text-sm text-white/80">
+                    Monetization surfaces are measurable and configurable.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
+                    UX signal
+                  </p>
+                  <p className="mt-2 font-inter text-sm text-white/80">
+                    Mobile-first layout, readable typography, predictable
+                    navigation.
+                  </p>
+                </div>
+              </div>
+            </article>
+            <aside className="rounded-3xl border border-white/15 bg-black/55 p-6 md:p-8">
+              <p className="font-outfit text-[0.7rem] tracking-[0.24em] text-emerald-300/80 uppercase">
+                Compliance links
+              </p>
+              <h3 className="mt-3 font-outfit text-2xl font-black">
+                Trust and policy surfaces
+              </h3>
+              <p className="mt-3 font-inter text-sm text-white/70 leading-relaxed">
+                These pages stay one click away to support ad network review and
+                user transparency.
+              </p>
+              <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {AD_COMPLIANCE_LINKS.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-outfit text-xs tracking-[0.14em] text-white/70 uppercase hover:text-white hover:border-emerald-300/45 transition-colors"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </aside>
+          </section>
+
           {/* Enhanced Flow Section */}
           <section className="relative z-20 mb-32">
             <AnimatePresence mode="wait">
@@ -790,6 +1011,52 @@ const App: React.FC = () => {
             </AnimatePresence>
           </section>
 
+          <section className="mb-24 space-y-6">
+            <div className="text-center">
+              <p className="font-outfit text-[0.72rem] tracking-[0.26em] text-cyan-300/85 uppercase">
+                Content engine
+              </p>
+              <h2 className="mt-3 font-outfit text-4xl md:text-6xl font-black">
+                Built for readers, crawlers, and monetization reviewers.
+              </h2>
+              <p className="mt-4 max-w-3xl mx-auto font-inter text-white/70">
+                Each page module is written to be useful by itself, connected to
+                related pages, and measurable through analytics events that map
+                to conversion goals.
+              </p>
+            </div>
+            <div className="grid gap-5 lg:grid-cols-3">
+              {CONTENT_GUIDES.map((guide) => (
+                <article
+                  key={guide.title}
+                  className="rounded-3xl border border-white/12 bg-white/[0.03] p-6"
+                >
+                  <h3 className="font-outfit text-xl font-bold">{guide.title}</h3>
+                  <p className="mt-3 font-inter text-sm leading-relaxed text-white/70">
+                    {guide.summary}
+                  </p>
+                  <ul className="mt-4 space-y-2">
+                    {guide.bullets.map((bullet) => (
+                      <li
+                        key={bullet}
+                        className="flex items-start gap-2 font-inter text-sm text-white/75"
+                      >
+                        <span className="mt-1 h-2 w-2 rounded-full bg-cyan-300/80" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <AdSensePlacement
+            slotKey="ADSENSE_SLOT_MID"
+            title="Mid-content monetization zone"
+            description="Placed between substantial editorial sections to preserve policy-friendly content-to-ad balance."
+          />
+
           {/* Enhanced Typography Section */}
           <EnhancedTypography />
 
@@ -906,7 +1173,47 @@ const App: React.FC = () => {
             </div>
           </section>
 
-          <div className="h-48" />
+          <AdSensePlacement
+            slotKey="ADSENSE_SLOT_BOTTOM"
+            title="Post-pricing monetization zone"
+            description="A lower-page ad area for users who reviewed pricing and continue exploring long-form content."
+          />
+
+          <section className="mt-16 rounded-3xl border border-white/15 bg-black/45 p-6 md:p-8">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="font-outfit text-[0.72rem] tracking-[0.26em] text-emerald-300/85 uppercase">
+                  FAQ
+                </p>
+                <h2 className="mt-2 font-outfit text-3xl md:text-4xl font-black">
+                  Ad-ready operations, answered clearly.
+                </h2>
+              </div>
+              <a
+                href="/api-documentation"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2 font-outfit text-xs tracking-[0.16em] uppercase text-white/80 hover:text-white hover:border-cyan-300/60 transition-colors"
+              >
+                API Documentation
+              </a>
+            </div>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {FAQ_ITEMS.map((item) => (
+                <article
+                  key={item.question}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                >
+                  <h3 className="font-outfit text-base font-semibold">
+                    {item.question}
+                  </h3>
+                  <p className="mt-2 font-inter text-sm leading-relaxed text-white/70">
+                    {item.answer}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <div className="h-24" />
         </main>
       </div>
     </ErrorBoundary>
