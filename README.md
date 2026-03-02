@@ -17,7 +17,9 @@ store).
 ## Environment
 
 - Copy `ENV.example` → `.env` (or set env vars in your deploy platform)
-- Cloudflare settings live in `wrangler.toml`
+- Cloudflare settings live in `wrangler.toml`. Keep `compatibility_date` current; after changing
+  bindings run `npm run types` to regenerate `worker-configuration.d.ts` (see
+  [Workers best practices](https://developers.cloudflare.com/workers/best-practices/workers-best-practices/)).
 - If you want `/api/analytics/overview` to return real Cloudflare data, set `CF_ZONE_ID` +
   `CF_API_TOKEN` (see `ENV.example`).
 - Admin login uses `CONTROL_PASSWORD` and server-issued signed cookies. Optional hardening: set
@@ -59,8 +61,10 @@ store).
 
 ## Deploy
 
-- Manual production deploy: `npm run deploy` (runs `npm run verify` first, then
-  `wrangler deploy --keep-vars`).
+- Manual production deploy: `npm run deploy` (runs `wrangler deploy --keep-vars`; run
+  `npm run verify` first if you want full checks).
+- Regenerate Worker binding types after editing `wrangler.toml`: `npm run types`. Check they’re up
+  to date: `npm run types:check`.
 - Set required Worker vars/secrets in Cloudflare (examples in `ENV.example` and `wrangler.toml`
   comments).
 - Unified deploy mode defaults:

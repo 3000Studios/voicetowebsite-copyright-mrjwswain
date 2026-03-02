@@ -1,5 +1,7 @@
+# VoiceToWebsite Worker — see https://developers.cloudflare.com/workers/best-practices/workers-best-practices/
+# Keep compatibility_date current; re-run `npm run types` after changing bindings.
 name = "voicetowebsite"
-compatibility_date = "2026-01-27"
+compatibility_date = "2026-03-02"
 main = "worker.js"
 
 compatibility_flags = ["nodejs_compat"]
@@ -30,7 +32,8 @@ invocation_logs = true
 [observability.traces]
 enabled = true
 persist = true
-head_sampling_rate = 1
+# 0.01 = 1% of requests (cost-friendly); use 1 for full traces when debugging
+head_sampling_rate = 0.01
 
 [ai]
 binding = "AI"

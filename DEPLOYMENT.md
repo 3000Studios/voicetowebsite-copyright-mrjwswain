@@ -48,7 +48,9 @@ Notes:
 - The Worker refuses traffic if `ENVIRONMENT` is set to anything other than `production` or
   `development` (e.g. blocks staging-from-production config).
 - `--keep-vars` prevents Wrangler from wiping runtime vars/secrets set in the Cloudflare Dashboard.
-- `wrangler.toml` deploys `worker.js` with static assets from `dist/` via the `ASSETS` binding.
+- `wrangler.toml` deploys `worker.js` with static assets from `dist/` via the `ASSETS` binding. Keep
+  `compatibility_date` current; after changing bindings run `npm run types` to regenerate
+  `worker-configuration.d.ts`.
 - Production routes are `voicetowebsite.com/*` and `www.voicetowebsite.com/*`.
 
 ## Auto-Ship (Hands-Free Local Operator)

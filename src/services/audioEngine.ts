@@ -170,13 +170,17 @@ class AudioEngine {
 
   public getMusicTimeDomainData() {
     if (!this.analyser || !this.analyserTimeData) return null;
-    this.analyser.getByteTimeDomainData(this.analyserTimeData);
+    this.analyser.getByteTimeDomainData(
+      this.analyserTimeData as Uint8Array<ArrayBuffer>
+    ); // cast for TS AnalyserNode typings
     return this.analyserTimeData;
   }
 
   public getMusicFrequencyData() {
     if (!this.analyser || !this.analyserFreqData) return null;
-    this.analyser.getByteFrequencyData(this.analyserFreqData);
+    this.analyser.getByteFrequencyData(
+      this.analyserFreqData as Uint8Array<ArrayBuffer>
+    ); // cast for TS AnalyserNode typings
     return this.analyserFreqData;
   }
 
