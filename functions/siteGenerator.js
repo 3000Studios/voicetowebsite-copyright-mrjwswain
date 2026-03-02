@@ -6,15 +6,49 @@ const json = (status, payload, headers = {}) =>
     headers: { "Content-Type": "application/json", ...headers },
   });
 
+const sanitizeContent = (content) => {
+  if (typeof content !== "string") return content;
+
+  // Remove dangerous HTML tags and attributes
+  return (
+    content
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "")
+      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, "")
+      .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, "")
+      .replace(/<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi, "")
+      .replace(/<input\b[^>]*>/gi, "")
+      .replace(/<textarea\b[^>]*>/gi, "")
+      .replace(/<button\b[^>]*>/gi, "")
+      // Remove dangerous event handlers
+      .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
+      .replace(/on\w+\s*=\s*[^>\s]*/gi, "")
+      // Remove javascript: URLs
+      .replace(/javascript:\s*[^\s"']*/gi, "")
+      // Remove data: URLs that could execute scripts
+      .replace(/data:\s*(?:text\/html|application\/javascript)[^;]*/gi, "")
+      // Limit dangerous CSS
+      .replace(/expression\s*\(/gi, "")
+      .replace(/javascript\s*:/gi, "")
+      .replace(/behavior\s*:\s*url\(/gi, "")
+  );
+};
+
 const extractJsonObject = (text) => {
   const raw = String(text || "").trim();
   if (!raw) throw new Error("AI response was empty.");
-  if (raw.startsWith("{") && raw.endsWith("}")) return JSON.parse(raw);
-  const fenced = raw.match(/```json\s*([\s\S]*?)\s*```/i);
+
+  // Sanitize the raw text before parsing
+  const sanitized = sanitizeContent(raw);
+
+  if (sanitized.startsWith("{") && sanitized.endsWith("}"))
+    return JSON.parse(sanitized);
+  const fenced = sanitized.match(/```json\s*([\s\S]*?)\s*```/i);
   if (fenced) return JSON.parse(fenced[1]);
-  const first = raw.indexOf("{");
-  const last = raw.lastIndexOf("}");
-  if (first >= 0 && last > first) return JSON.parse(raw.slice(first, last + 1));
+  const first = sanitized.indexOf("{");
+  const last = sanitized.lastIndexOf("}");
+  if (first >= 0 && last > first)
+    return JSON.parse(sanitized.slice(first, last + 1));
   throw new Error("Failed to parse JSON response.");
 };
 

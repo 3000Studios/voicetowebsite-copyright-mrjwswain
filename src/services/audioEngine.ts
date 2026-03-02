@@ -7,8 +7,8 @@ class AudioEngine {
   private musicSource: MediaElementAudioSourceNode | null = null;
   private musicGain: GainNode | null = null;
   private analyser: AnalyserNode | null = null;
-  private analyserTimeData: Uint8Array<ArrayBuffer> | null = null;
-  private analyserFreqData: Uint8Array<ArrayBuffer> | null = null;
+  private analyserTimeData: Uint8Array | null = null;
+  private analyserFreqData: Uint8Array | null = null;
   private audioDisabled = true; // Audio disabled flag
 
   constructor() {
@@ -104,12 +104,8 @@ class AudioEngine {
         this.musicSource = source;
         this.analyser = analyser;
         this.musicGain = gain;
-        this.analyserTimeData = new Uint8Array(
-          analyser.frequencyBinCount
-        ) as Uint8Array<ArrayBuffer>;
-        this.analyserFreqData = new Uint8Array(
-          analyser.frequencyBinCount
-        ) as Uint8Array<ArrayBuffer>;
+        this.analyserTimeData = new Uint8Array(analyser.frequencyBinCount);
+        this.analyserFreqData = new Uint8Array(analyser.frequencyBinCount);
       } catch (err) {
         // Fallback to direct element playback if the graph cannot be constructed.
         audio.volume = this.currentVolume;

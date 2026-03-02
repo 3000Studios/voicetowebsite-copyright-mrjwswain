@@ -723,8 +723,7 @@
     const body = document.body;
     const fragment = document.createDocumentFragment();
 
-    const latexHeader = buildLatexHeader();
-    if (latexHeader) fragment.appendChild(latexHeader);
+    // Latex hero header (VoiceToWebsite + waves) removed so it does not block page content.
 
     // Skip link for accessibility
     const skip = document.createElement("a");
@@ -811,8 +810,7 @@
     body.prepend(fragment);
     body.classList.add("nav-ready");
 
-    setupLatexScroll(latexHeader, navWrapper);
-    startLatexWaves(latexHeader);
+    setupLatexScroll(null, navWrapper);
 
     // Initialize plasma effects
     initPlasmaEffects();

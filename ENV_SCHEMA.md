@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-02-24T04:19:59.392Z
+Generated: 2026-03-02T12:11:48.777Z
 
 ## Summary
 
-- Scanned files: 376
-- Used keys: 134
-- Defined keys: 109
-- Missing keys: 51
+- Scanned files: 374
+- Used keys: 133
+- Defined keys: 86
+- Missing keys: 57
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -30,7 +30,7 @@ Generated: 2026-02-24T04:19:59.392Z
 | ADSENSE_SLOT_TOP                         | yes     | 3             | ok      |
 | AI                                       | yes     | 5             | ok      |
 | ALLOW_ADMIN_HEADER_TOKEN                 | yes     | 1             | ok      |
-| ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 1             | ok      |
+| ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 0             | unused  |
 | ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 3             | ok      |
 | API_BASE_URL                             | no      | 2             | missing |
 | ASSETS                                   | no      | 2             | missing |
@@ -46,7 +46,7 @@ Generated: 2026-02-24T04:19:59.392Z
 | CACHE_CONTROL_STATIC                     | yes     | 0             | unused  |
 | CF_A                                     | no      | 1             | missing |
 | CF_ACCOUNT_API_VOICETOWEBSITE            | yes     | 1             | ok      |
-| CF_ACCOUNT_ID                            | yes     | 1             | ok      |
+| CF_ACCOUNT_ID                            | no      | 1             | ok      |
 | CF_ALLOW_LEGACY_DEPLOY_HOOKS             | yes     | 1             | ok      |
 | CF_API_TOKEN                             | yes     | 1             | ok      |
 | CF_API_TOKEN2                            | yes     | 1             | ok      |
@@ -62,8 +62,6 @@ Generated: 2026-02-24T04:19:59.392Z
 | CLOUDFLARE_ACCOUNT_ID                    | yes     | 1             | ok      |
 | CLOUDFLARE_API_TOKEN                     | yes     | 2             | ok      |
 | CLOUDFLARE_WORKER_NAME                   | no      | 1             | missing |
-| CLOUDINARY_API_KEY                       | yes     | 0             | unused  |
-| CLOUDINARY_API_SECRET                    | yes     | 0             | unused  |
 | CONFIRM_TOKEN_SECRET                     | no      | 1             | missing |
 | CONTROL_PASSWORD                         | yes     | 5             | ok      |
 | D1                                       | yes     | 9             | ok      |
@@ -76,23 +74,15 @@ Generated: 2026-02-24T04:19:59.392Z
 | DEPLOY_PLAN_TIER                         | no      | 3             | missing |
 | EMAIL_FROM                               | no      | 1             | missing |
 | ENVIRONMENT                              | yes     | 1             | ok      |
-| GEMINI_API_KEY                           | yes     | 0             | unused  |
-| GEMINI_API_KEY2                          | yes     | 0             | unused  |
 | GEMINIAPIKEY2                            | no      | 5             | missing |
 | GH_BASE_BRANCH                           | yes     | 2             | ok      |
 | GH_BOT_TOKEN                             | yes     | 2             | ok      |
-| GH_PAT                                   | yes     | 0             | unused  |
 | GH_REPO                                  | yes     | 3             | ok      |
 | GH_TOKEN                                 | yes     | 3             | ok      |
 | GITHUB_BASE_BRANCH                       | no      | 2             | missing |
 | GITHUB_PAT                               | no      | 3             | ok      |
 | GITHUB_REPO                              | no      | 3             | ok      |
 | GITHUB_TOKEN                             | no      | 3             | ok      |
-| GITLENS                                  | yes     | 0             | unused  |
-| GLOBAL_API                               | yes     | 0             | unused  |
-| GLOBAL_API_KEY                           | yes     | 0             | unused  |
-| JULES_API_KEY                            | yes     | 0             | unused  |
-| JWT_SECRET                               | yes     | 0             | unused  |
 | KV                                       | yes     | 2             | ok      |
 | LEARN                                    | no      | 1             | missing |
 | LICENSE_SECRET                           | yes     | 1             | ok      |
@@ -101,11 +91,9 @@ Generated: 2026-02-24T04:19:59.392Z
 | LIVE_ROOM_VIEWER_TOKEN                   | no      | 1             | missing |
 | LOG_LEVEL                                | no      | 4             | missing |
 | NEXT_PUBLIC_ADSENSE_PUBLISHER_ID         | no      | 1             | missing |
-| NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME        | yes     | 0             | unused  |
 | NODE_ENV                                 | no      | 5             | missing |
-| OLLAMA                                   | yes     | 0             | unused  |
 | OPENAI_API                               | yes     | 1             | ok      |
-| OPENAI_API_KEY                           | yes     | 1             | ok      |
+| OPENAI_API_KEY                           | no      | 1             | missing |
 | OPENAI_API_KEY3                          | yes     | 1             | ok      |
 | OPENAI_MODEL                             | yes     | 1             | ok      |
 | ORCH_MAX_ALL_PAGES_FILES                 | no      | 1             | missing |
@@ -127,12 +115,11 @@ Generated: 2026-02-24T04:19:59.392Z
 | PAYPAL_PAYMENT_LINK_PROJECT_PLANNING_HUB | yes     | 0             | unused  |
 | PAYPAL_PAYMENT_LINK_STARTER              | yes     | 1             | ok      |
 | PAYPAL_PAYMENT_LINK_WEB_FORGE            | yes     | 0             | unused  |
-| PAYPAL_WEBHOOK                           | yes     | 0             | unused  |
 | PAYPAL_WEBHOOK_ID                        | no      | 1             | missing |
 | PAYPAL_WEBHOOK_ID_PROD                   | no      | 1             | missing |
 | PERSONAL_ACCESS_TOKEN                    | no      | 2             | ok      |
 | PERSONAL_ACCESS_TOKEN_API                | yes     | 2             | ok      |
-| PEXELS_API_KEY                           | yes     | 1             | ok      |
+| PEXELS_API_KEY                           | no      | 1             | missing |
 | PORT                                     | no      | 1             | missing |
 | PUBLIC_GENERATE                          | yes     | 1             | ok      |
 | R2                                       | yes     | 2             | ok      |
@@ -161,20 +148,17 @@ Generated: 2026-02-24T04:19:59.392Z
 | STRIPE_PUBLISHABLE_KEY                   | yes     | 2             | ok      |
 | STRIPE_SECRET                            | no      | 1             | missing |
 | STRIPE_SECRET_KEY                        | yes     | 2             | ok      |
-| STRIPE_WEBHOOK_SECRET                    | yes     | 1             | ok      |
+| STRIPE_WEBHOOK_SECRET                    | no      | 1             | missing |
 | SYSTEM_FREEZE                            | no      | 1             | missing |
 | UNSPLASH_ACCESS_KEY                      | no      | 1             | missing |
-| UNSPLASH_SECRET_KEY                      | yes     | 0             | unused  |
-| VITE_GEMINI_API_KEY                      | yes     | 0             | unused  |
 | VITE_GEMINI_MODEL                        | yes     | 3             | ok      |
 | VITE_GEMINIAPIKEY2                       | yes     | 4             | ok      |
-| VITE_GOOGLE_API_KEY                      | yes     | 0             | unused  |
 | VITE_PAYPAL_CLIENT_ID                    | yes     | 2             | ok      |
-| VITE_STRIPE_PUBLISHABLE_KEY              | yes     | 2             | ok      |
-| VOICETOWEBSITE_HOOK                      | yes     | 1             | ok      |
+| VITE_STRIPE_PUBLISHABLE_KEY              | no      | 2             | missing |
+| VOICETOWEBSITE_HOOK                      | no      | 1             | missing |
 | VOICETOWEBSITE_WORKERS_BUILD_TOKEN       | yes     | 0             | unused  |
 | VTW_CACHE                                | no      | 2             | missing |
 | VTW_KV                                   | no      | 1             | missing |
 | VTW_VAULT                                | no      | 1             | missing |
 | WORKER_NAME                              | no      | 1             | missing |
-| X_ORCH_TOKEN                             | yes     | 2             | ok      |
+| X_ORCH_TOKEN                             | no      | 2             | missing |

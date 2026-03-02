@@ -32,7 +32,8 @@ import { DeployControllerDO } from "./src/durable_objects/DeployControllerDO.js"
 import { LiveRoomDO } from "./src/durable_objects/LiveRoomDO.js";
 import { handleUICommand } from "./src/functions/uiCommand.js";
 
-const ADSENSE_CLIENT_ID = "ca-pub-5800977493749262";
+const getAdSenseClientId = (env) =>
+  String(env.ADSENSE_PUBLISHER || "").trim() || "ca-pub-demo";
 const SECURITY_HEADERS = {
   "Content-Security-Policy": `
     default-src 'self';
@@ -59,10 +60,9 @@ const SECURITY_HEADERS = {
 const buildCsp = (nonce) => {
   const base = SECURITY_HEADERS["Content-Security-Policy"];
   if (!nonce) return base;
-  return base.replace(
-    "script-src ",
-    `script-src 'nonce-${String(nonce).replace(/'/g, "")}' `
-  );
+  // Properly escape nonce for CSP - remove any quotes and ensure it's safe
+  const safeNonce = String(nonce).replace(/['"]/g, "");
+  return base.replace("script-src ", `script-src 'nonce-${safeNonce}' `);
 };
 
 const getCacheControlForPath = (pathname, env) => {

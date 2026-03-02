@@ -56,30 +56,20 @@ export const adminCookieTtlSeconds = 60 * 60 * 2; // 2 hours
 
 export const mintAdminCookieValue = async (env) => {
   const secret = getAdminSigningSecret(env);
-  const allowInsecureFallback =
-    String(env.ALLOW_INSECURE_ADMIN_COOKIE_SECRET || "").trim() === "1";
-  const fallbackSecret = String(env.CONTROL_PASSWORD || "").trim();
-  const effectiveSecret =
-    secret || (allowInsecureFallback ? fallbackSecret : "");
-  if (!effectiveSecret) {
+  if (!secret) {
     throw new Error(
-      "Missing ADMIN_COOKIE_SECRET. Set ADMIN_COOKIE_SECRET (recommended) or set ALLOW_INSECURE_ADMIN_COOKIE_SECRET=1 to fall back to CONTROL_PASSWORD."
+      "Missing ADMIN_COOKIE_SECRET. Set ADMIN_COOKIE_SECRET to enable admin authentication."
     );
   }
   const ts = Date.now();
   const msg = `1.${ts}`;
-  const sig = await sign(effectiveSecret, msg);
+  const sig = await sign(secret, msg);
   return `${msg}.${sig}`;
 };
 
 export const verifyAdminCookieValue = async (env, value) => {
   const secret = getAdminSigningSecret(env);
-  const allowInsecureFallback =
-    String(env.ALLOW_INSECURE_ADMIN_COOKIE_SECRET || "").trim() === "1";
-  const fallbackSecret = String(env.CONTROL_PASSWORD || "").trim();
-  const effectiveSecret =
-    secret || (allowInsecureFallback ? fallbackSecret : "");
-  if (!effectiveSecret) return false;
+  if (!secret) return false;
   const parts = String(value || "").split(".");
   if (parts.length !== 3) return false;
   const [v, tsRaw, sig] = parts;
@@ -89,7 +79,7 @@ export const verifyAdminCookieValue = async (env, value) => {
   const ageSeconds = (Date.now() - ts) / 1000;
   if (ageSeconds < 0 || ageSeconds > adminCookieTtlSeconds) return false;
   const msg = `1.${ts}`;
-  const expected = await sign(effectiveSecret, msg);
+  const expected = await sign(secret, msg);
   return timingSafeEqual(sig, expected);
 };
 

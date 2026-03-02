@@ -519,8 +519,52 @@ const App: React.FC = () => {
     setIsMusicPlaying(false);
   };
 
+  const validatePrompt = (
+    prompt: string
+  ): { valid: boolean; error?: string } => {
+    if (!prompt || !prompt.trim()) {
+      return { valid: false, error: "Prompt cannot be empty" };
+    }
+
+    const trimmed = prompt.trim();
+    if (trimmed.length < 3) {
+      return {
+        valid: false,
+        error: "Prompt must be at least 3 characters long",
+      };
+    }
+
+    if (trimmed.length > 5000) {
+      return {
+        valid: false,
+        error: "Prompt is too long (max 5000 characters)",
+      };
+    }
+
+    // Basic injection protection - disallow HTML tags and scripts
+    const dangerousPatterns = [
+      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+      /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+      /javascript:/gi,
+      /on\w+\s*=/gi,
+      /data:text\/html/gi,
+    ];
+
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(trimmed)) {
+        return { valid: false, error: "Prompt contains invalid content" };
+      }
+    }
+
+    return { valid: true };
+  };
+
   const generateSite = async () => {
-    if (!tryPrompt.trim()) return;
+    const validation = validatePrompt(tryPrompt);
+    if (!validation.valid) {
+      setGenerateError(validation.error || "Invalid input");
+      return;
+    }
 
     setFlowPhase("generating");
     setGenerateError("");
@@ -532,7 +576,7 @@ const App: React.FC = () => {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: tryPrompt, tone: "default" }),
+        body: JSON.stringify({ prompt: tryPrompt.trim(), tone: "default" }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok)

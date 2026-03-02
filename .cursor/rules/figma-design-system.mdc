@@ -1,0 +1,68 @@
+---
+description: Rules for implementing Figma designs using the Figma MCP server. Covers component organization, styling with design tokens, asset handling, and the required Figma-to-code workflow for VoiceToWebsite.
+globs: ["src/components/**", "src/**/*.tsx"]
+alwaysApply: false
+---
+
+# Figma MCP Integration Rules
+
+These rules define how to translate Figma inputs into code for VoiceToWebsite and must be followed for every Figma-driven change.
+
+## General Component Rules
+
+- IMPORTANT: Always use components from `src/components/` when possible (e.g. SiteLogo, ErrorBoundary, AudioWaveform).
+- Place new UI components in `src/components/`. Feature-specific components may live next to the feature (e.g. `src/webforge/components/`).
+- Follow PascalCase for component names (e.g. `SiteLogo`, `AudioWaveform`).
+- Components must export as default: `export default ComponentName`.
+
+## Styling Rules
+
+- Use CSS with design tokens for styling. Tailwind is loaded via CDN for some utilities but is not the primary approach; prefer project tokens and layout classes.
+- Design tokens are defined in `src/design-system.css` and layout patterns in `src/layout-system.css`.
+- IMPORTANT: Never hardcode colors — always use tokens from `src/design-system.css` (e.g. `var(--color-primary)`, `var(--bg-surface)`, `var(--text-muted)`).
+- Spacing values must use the `--space-*` scale from design-system.css (`--space-1` through `--space-32`).
+- Typography follows the scale in `src/design-system.css`: `--font-size-xs` through `--font-size-5xl`, `--font-family-primary`, `--font-family-heading`, `--font-weight-*`, `--line-height-*`.
+- Use layout classes from `src/layout-system.css` where applicable: `.vt-container`, `.vt-section`, `.vt-grid`, `.vt-flex`, `.vt-page`, etc.
+
+## Figma MCP Integration — Required Flow (do not skip)
+
+1. Run **get_design_context** first to fetch the structured representation for the exact node(s).
+2. If the response is too large or truncated, run **get_metadata** to get the high-level node map, then re-fetch only the required node(s) with **get_design_context**.
+3. Run **get_screenshot** for a visual reference of the node variant being implemented.
+4. Only after you have both **get_design_context** and **get_screenshot**, download any assets needed and start implementation.
+5. Translate the output (often React + Tailwind from Figma) into this project's conventions: CSS variables from `src/design-system.css`, layout classes from `src/layout-system.css`, and existing components from `src/components/`.
+6. Validate against Figma for 1:1 look and behavior before marking complete.
+
+## Implementation Rules
+
+- Treat the Figma MCP output (React + Tailwind) as a representation of design and behavior, not as final code style.
+- Replace Tailwind utility classes with CSS using `var(--*)` tokens and, where appropriate, layout classes (e.g. `.vt-container`, `.vt-section`, `.vt-grid`).
+- Reuse existing components from `src/components/` instead of duplicating functionality.
+- Use the project's color system (`--color-primary`, `--bg-*`, `--text-*`), typography scale (`--font-size-*`, `--font-family-*`), and spacing tokens (`--space-*`) consistently.
+- Respect existing routing, state management, and data-fetch patterns (see `src/App.tsx`, `AGENTS.md`).
+- Strive for 1:1 visual parity with the Figma design.
+- Validate the final UI against the Figma screenshot for both look and behavior.
+
+## Asset Handling Rules
+
+- The Figma MCP server provides an assets endpoint which can serve image and SVG assets.
+- IMPORTANT: If the Figma MCP server returns a localhost source for an image or SVG, use that source directly.
+- IMPORTANT: DO NOT import or add new icon packages — all assets should come from the Figma payload or existing `public/` assets.
+- IMPORTANT: DO NOT use or create placeholders if a localhost source is provided.
+- Store downloaded assets in `public/assets/` (or the path used by the build; see `vite.config.js` and `public/` for static assets).
+
+## Design Token Reference (quick)
+
+- **Colors:** `--color-primary`, `--color-secondary`, `--color-accent`, `--bg-primary`, `--bg-surface`, `--text-primary`, `--text-muted`, `--border-color`.
+- **Spacing:** `--space-1` (4px) through `--space-32` (128px).
+- **Typography:** `--font-family-primary`, `--font-family-heading`, `--font-size-xs` … `--font-size-5xl`, `--font-weight-*`, `--line-height-tight|normal|relaxed`.
+- **Layout:** `--container-sm` … `--container-2xl`, `--nav-height`, `--z-sticky`, `--z-fixed`, etc.
+- **Shadows/glow:** `--shadow-glow-primary`, `--shadow-base`, etc.
+- **Transitions:** `--transition-fast`, `--transition-base`, `--transition-slow`.
+
+## Project-Specific Conventions
+
+- React + Vite; TypeScript for `src/` components. Use `.tsx` for components.
+- Shared nav and constants: `src/constants/navigation.ts`, `SHARED_NAV_ITEMS`; align with `public/nav.js` and static shell behavior (see `AGENTS.md`).
+- Accessibility: use semantic HTML and `aria-*` where relevant; interactive elements must be keyboard-usable.
+- Run `npm run type-check` and `npm run build` after adding or changing components.
