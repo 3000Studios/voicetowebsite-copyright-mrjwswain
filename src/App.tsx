@@ -19,7 +19,10 @@ type PricingTier = {
   features: string[];
 };
 
-type AdSlotKey = "ADSENSE_SLOT_TOP" | "ADSENSE_SLOT_MID" | "ADSENSE_SLOT_BOTTOM";
+type AdSlotKey =
+  | "ADSENSE_SLOT_TOP"
+  | "ADSENSE_SLOT_MID"
+  | "ADSENSE_SLOT_BOTTOM";
 
 type ContentGuide = {
   title: string;
@@ -1031,7 +1034,9 @@ const App: React.FC = () => {
                   key={guide.title}
                   className="rounded-3xl border border-white/12 bg-white/[0.03] p-6"
                 >
-                  <h3 className="font-outfit text-xl font-bold">{guide.title}</h3>
+                  <h3 className="font-outfit text-xl font-bold">
+                    {guide.title}
+                  </h3>
                   <p className="mt-3 font-inter text-sm leading-relaxed text-white/70">
                     {guide.summary}
                   </p>

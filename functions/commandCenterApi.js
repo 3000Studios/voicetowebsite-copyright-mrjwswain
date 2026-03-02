@@ -1147,7 +1147,9 @@ const clamp = (value, min, max) =>
 
 const average = (values = []) => {
   if (!values.length) return 0;
-  return values.reduce((sum, value) => sum + Number(value || 0), 0) / values.length;
+  return (
+    values.reduce((sum, value) => sum + Number(value || 0), 0) / values.length
+  );
 };
 
 const stdDev = (values = []) => {
@@ -1301,7 +1303,11 @@ const handleAnalyticsMetrics = async ({ env }) => {
   );
 
   const avgSessionSeconds = Math.round(
-    clamp(70 + safeDivide(executeEvents24h, Math.max(1, sessions24h)) * 180, 45, 720)
+    clamp(
+      70 + safeDivide(executeEvents24h, Math.max(1, sessions24h)) * 180,
+      45,
+      720
+    )
   );
   const bounceRateProxy = roundTo(
     clamp(safeDivide(uniqueUsers24h, Math.max(1, sessions24h)) * 100, 0, 100),
@@ -1412,8 +1418,7 @@ const handleAnalyticsMetrics = async ({ env }) => {
         conversionRate: "orders_24h / sessions_24h * 100",
         averageOrderValue: "total_revenue / total_orders",
         effectiveRpm: "revenue_24h / (sessions_24h / 1000)",
-        projectedDailyRevenue:
-          "0.55 * revenue_24h + 0.45 * (revenue_7d / 7)",
+        projectedDailyRevenue: "0.55 * revenue_24h + 0.45 * (revenue_7d / 7)",
         confidenceScore:
           "clamp(24 + log1p(sample_size)*10 - min(38, coeff_variation*32), 5, 97)",
       },

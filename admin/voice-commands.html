@@ -1169,8 +1169,7 @@
         const scientific = metrics?.scientific || {};
         const formulas = scientific?.formulas || {};
         const methodText =
-          scientific?.method ||
-          "Method metadata unavailable. Ensure /api/analytics/metrics is connected.";
+          scientific?.method || "Method metadata unavailable. Ensure /api/analytics/metrics is connected.";
         scientificMethod.innerHTML = `
           <small>Scientific Method</small>
           ${methodText}
@@ -1196,40 +1195,16 @@
           const conversions = metrics?.conversions || {};
           const store = metrics?.store || {};
           const scientific = metrics?.scientific || {};
-          const daily =
-            Number(conversions?.runRateDaily || 0) ||
-            Number(conversions?.revenue24h || 0);
-          const monthly =
-            Number(conversions?.runRateMonthly || 0) || daily * 30.4375;
-          const yearly =
-            Number(conversions?.runRateYearly || 0) || monthly * 12;
+          const daily = Number(conversions?.runRateDaily || 0) || Number(conversions?.revenue24h || 0);
+          const monthly = Number(conversions?.runRateMonthly || 0) || daily * 30.4375;
+          const yearly = Number(conversions?.runRateYearly || 0) || monthly * 12;
 
-          setMetric(
-            metricDaily,
-            formatMoney(daily),
-            "Weighted short-term projection"
-          );
-          setMetric(
-            metricMonthly,
-            formatMoney(monthly),
-            "Weighted monthly run rate"
-          );
-          setMetric(
-            metricMRR,
-            formatMoney(Number(conversions?.revenue || 0)),
-            "Current observed recurring proxy"
-          );
-          setMetric(
-            metricAffiliate,
-            String(metrics?.experiments?.[0]?.runs ?? "—"),
-            "Experiment count proxy"
-          );
+          setMetric(metricDaily, formatMoney(daily), "Weighted short-term projection");
+          setMetric(metricMonthly, formatMoney(monthly), "Weighted monthly run rate");
+          setMetric(metricMRR, formatMoney(Number(conversions?.revenue || 0)), "Current observed recurring proxy");
+          setMetric(metricAffiliate, String(metrics?.experiments?.[0]?.runs ?? "—"), "Experiment count proxy");
           setMetric(metricRPM, formatMoney(store?.rpm), "Revenue per 1000 sessions");
-          setMetric(
-            metricLeads,
-            formatPercent(store?.conversionRate),
-            "Orders/sessions conversion"
-          );
+          setMetric(metricLeads, formatPercent(store?.conversionRate), "Orders/sessions conversion");
           setMetric(
             metricConfidence,
             `${Number(scientific?.confidenceScore || 0).toFixed(1)}/100`,

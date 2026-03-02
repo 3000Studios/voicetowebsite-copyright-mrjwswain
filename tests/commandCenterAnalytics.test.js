@@ -13,9 +13,15 @@ const makeMockD1 = () => ({
       },
       async first() {
         if (q.includes("FROM cc_store_products")) return { count: 3 };
-        if (q.includes("FROM orders") && q.includes("datetime('now','-24 hours')"))
+        if (
+          q.includes("FROM orders") &&
+          q.includes("datetime('now','-24 hours')")
+        )
           return { count: 4, total: 280 };
-        if (q.includes("FROM orders") && q.includes("datetime('now','-7 days')"))
+        if (
+          q.includes("FROM orders") &&
+          q.includes("datetime('now','-7 days')")
+        )
           return { count: 15, total: 910 };
         if (
           q.includes("FROM orders") &&
@@ -23,8 +29,12 @@ const makeMockD1 = () => ({
           !q.includes("datetime('now'")
         )
           return { count: 20, total: 1260 };
-        if (q.includes("FROM sessions")) return { sessions: 1000, uniques: 730 };
-        if (q.includes("FROM execute_events") && q.includes("COUNT(*) AS count"))
+        if (q.includes("FROM sessions"))
+          return { sessions: 1000, uniques: 730 };
+        if (
+          q.includes("FROM execute_events") &&
+          q.includes("COUNT(*) AS count")
+        )
           return { count: 36 };
         if (q.includes("FROM cc_media_assets")) return { count: 12 };
         if (q.includes("FROM cc_audio_assets")) return { count: 7 };
@@ -54,7 +64,10 @@ const makeMockD1 = () => ({
               {
                 status: 200,
                 response_json: JSON.stringify({
-                  action: { command: "run split test for pricing", page: "/pricing" },
+                  action: {
+                    command: "run split test for pricing",
+                    page: "/pricing",
+                  },
                   result: { previewRoutes: ["/pricing", "/"] },
                 }),
               },

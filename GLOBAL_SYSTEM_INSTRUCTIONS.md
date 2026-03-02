@@ -183,7 +183,6 @@ Scripts available:
 - `scripts/auto-ship.mjs`
 - `scripts/autopilot.mjs`
 - `scripts/check-css-governance.mjs`
-- `scripts/confirm-prod.mjs`
 - `scripts/continuous-integration.mjs`
 - `scripts/css-budget-validator.mjs`
 - `scripts/dev-all.mjs`
@@ -206,7 +205,6 @@ Scripts available:
 - `scripts/open-vtw-admin.ps1`
 - `scripts/open-vtw-voice-commands.ps1`
 - `scripts/open-youtube.ps1`
-- `scripts/performance-benchmark.mjs`
 - `scripts/pre-commit-enhanced.mjs`
 - `scripts/pre-push.mjs`
 - `scripts/release.mjs`
@@ -214,8 +212,6 @@ Scripts available:
 - `scripts/ship.mjs`
 - `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
-- `scripts/test-checkout-flow.mjs`
-- `scripts/test-runner.mjs`
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
 - `scripts/validate-governance.mjs`
