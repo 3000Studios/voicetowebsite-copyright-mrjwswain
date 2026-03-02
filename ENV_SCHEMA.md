@@ -1,10 +1,10 @@
 # ENV Schema
 
-Generated: 2026-03-02T12:11:48.777Z
+Generated: 2026-03-02T12:46:23.237Z
 
 ## Summary
 
-- Scanned files: 374
+- Scanned files: 376
 - Used keys: 133
 - Defined keys: 86
 - Missing keys: 57
@@ -28,7 +28,7 @@ Generated: 2026-03-02T12:11:48.777Z
 | ADSENSE_SLOT_BOTTOM                      | yes     | 3             | ok      |
 | ADSENSE_SLOT_MID                         | yes     | 3             | ok      |
 | ADSENSE_SLOT_TOP                         | yes     | 3             | ok      |
-| AI                                       | yes     | 5             | ok      |
+| AI                                       | yes     | 6             | ok      |
 | ALLOW_ADMIN_HEADER_TOKEN                 | yes     | 1             | ok      |
 | ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 0             | unused  |
 | ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 3             | ok      |

@@ -5,19 +5,22 @@ Use this list to confirm the site is ready for Google AdSense review and approva
 ## Links and navigation
 
 - **Link checker:** All 117 HTML files checked; no broken internal links.
-- **Homepage:** Compliance links visible (About, Contact, Support, Privacy, Terms, Trust Center, Status).
-- **Shared nav (nav.js):** Privacy, Terms, Contact, About, Legal, and other policy links in the menu.
-- **Policy pages:** Privacy and Terms include a site header with direct links to each other and Contact/Legal.
+- **Homepage:** Compliance links visible (About, Contact, Support, Privacy, Terms, Trust Center,
+  Status).
+- **Shared nav (nav.js):** Privacy, Terms, Contact, About, Legal, and other policy links in the
+  menu.
+- **Policy pages:** Privacy and Terms include a site header with direct links to each other and
+  Contact/Legal.
 
 ## Required pages for AdSense
 
-| Page        | URL                    | Status |
-|------------|------------------------|--------|
-| Privacy    | /privacy.html          | ✅ Live; includes AdSense disclosure, cookies, contact link |
-| Terms      | /terms.html            | ✅ Live; links to Legal and Privacy |
-| Contact    | /contact.html          | ✅ Live; form + owner/support/legal emails |
-| About      | /about                 | ✅ Live; substantive content |
-| Legal      | /legal.html            | ✅ Live; ownership, acceptable use, liability |
+| Page    | URL           | Status                                                      |
+| ------- | ------------- | ----------------------------------------------------------- |
+| Privacy | /privacy.html | ✅ Live; includes AdSense disclosure, cookies, contact link |
+| Terms   | /terms.html   | ✅ Live; links to Legal and Privacy                         |
+| Contact | /contact.html | ✅ Live; form + owner/support/legal emails                  |
+| About   | /about        | ✅ Live; substantive content                                |
+| Legal   | /legal.html   | ✅ Live; ownership, acceptable use, liability               |
 
 ## Privacy policy (AdSense requirements)
 
@@ -38,14 +41,19 @@ Use this list to confirm the site is ready for Google AdSense review and approva
 
 - **URL:** https://voicetowebsite.com/admin/
 - **Status:** Loads and shows Command Center OS (Worker Health, Governance, Deploy State).
-- **Note:** AdSense reviews the **public** site only. Admin is for you; “Governance: FAIL” / “Env Audit: FAIL” in the dashboard are internal checks and do not affect AdSense approval.
+- **Note:** AdSense reviews the **public** site only. Admin is for you; “Governance: FAIL” / “Env
+  Audit: FAIL” in the dashboard are internal checks and do not affect AdSense approval.
 
 ## Before submitting to AdSense
 
-1. Deploy the latest changes (including Privacy/Terms header and cross-links): `npm run build` then `npm run deploy`.
-2. Open the site in an incognito window and click through: Home → Privacy, Terms, Contact, About. Confirm all load and navigation is clear.
-3. In AdSense, use the exact URLs for Privacy and Contact when asked (e.g. `https://voicetowebsite.com/privacy.html`, `https://voicetowebsite.com/contact.html`).
+1. Deploy the latest changes (including Privacy/Terms header and cross-links): `npm run build` then
+   `npm run deploy`.
+2. Open the site in an incognito window and click through: Home → Privacy, Terms, Contact, About.
+   Confirm all load and navigation is clear.
+3. In AdSense, use the exact URLs for Privacy and Contact when asked (e.g.
+   `https://voicetowebsite.com/privacy.html`, `https://voicetowebsite.com/contact.html`).
 
 ---
 
-*Generated for AdSense review preparation. Update “Last updated” in privacy.html when you change the policy.*
+_Generated for AdSense review preparation. Update “Last updated” in privacy.html when you change the
+policy._
