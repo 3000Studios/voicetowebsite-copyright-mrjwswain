@@ -7,8 +7,8 @@ import WarpTunnel from "./components/WarpTunnel";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
 import { SHARED_NAV_ITEMS } from "./constants/navigation";
 import { audioEngine } from "./services/audioEngine";
-import { trackRevenueEvent } from "./utils/revenueTracking";
 import siteConfig from "./site-config.json";
+import { trackRevenueEvent } from "./utils/revenueTracking";
 
 type PricingTier = {
   name: string;
@@ -653,9 +653,9 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Simplified Navigation */}
+        {/* Simplified Navigation - in-flow so it does not cover page content */}
         <nav
-          className={`fixed top-0 left-0 right-0 z-40 transition-opacity duration-300 ${isNavFaded ? "opacity-70" : "opacity-100"}`}
+          className={`relative z-40 transition-opacity duration-300 ${isNavFaded ? "opacity-70" : "opacity-100"}`}
         >
           <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between backdrop-blur-md bg-black/45 border-b border-white/15 rounded-b-3xl shadow-lg shadow-black/20">
             <a href="/" className="flex items-center gap-3">
@@ -709,7 +709,7 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-32">
+        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-32">
           {/* Enhanced Header with better typography */}
           <div className="text-center mb-20">
             <motion.div
