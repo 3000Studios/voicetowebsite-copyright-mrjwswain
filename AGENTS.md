@@ -2,6 +2,57 @@
 
 ## Cursor Cloud specific instructions
 
+### Deployment Lock Policy (Do Not Deviate)
+
+Follow this workflow for this repo unless the user explicitly says otherwise.
+
+**Source of truth**
+
+- Cloudflare Workers + Wrangler is the deployment path.
+- Deploy using project scripts (`npm run deploy`) and existing Cloudflare config.
+- Do not introduce a different deploy method, platform, or branch strategy.
+
+**Branch and release model**
+
+- Use `main` only.
+- Keep local and remote `main` in sync.
+- Do not create side branches unless the user explicitly requests it.
+
+**Required flow after any code change**
+
+1. Run `npm run verify`.
+2. If verify fails: fix issues immediately in the same session, then re-run `npm run verify` until
+   green.
+3. When green: run `npm run ship` (or equivalent verify+commit flow).
+4. Push with `npm run ship:push` (or equivalent).
+5. Deploy with `npm run deploy` (or rely on CI deploy-on-push if configured and healthy).
+6. Confirm deploy/build success and report result.
+
+**Hard rules**
+
+- Never commit or deploy a red/broken state.
+- Never skip verify before ship/deploy.
+- Never change deploy pipeline/config unless required to fix a failure, and then explain exactly
+  what changed.
+- Keep Custom GPT execute flow, auth, schema, and command center integration working.
+- Keep checkout/pay links, previews, UI/UX requests, and AdSense readiness functional.
+- If anything breaks (verify/test/build/deploy), auto-fix it in-session and continue to green.
+
+**Expected behavior**
+
+- Default behavior is: verify → ship → push → deploy.
+- Stick to the current working deployment path and lock it in.
+- Only change this policy when the user explicitly instructs to.
+
+**Environment for verify/ship/deploy**
+
+- Use **Node 20** (see `.nvmrc`). Run `nvm use 20` before verify/ship/deploy; other Node versions
+  can cause `types:check` or other steps to fail.
+- If verify fails on formatting only, run `npm run format` then re-run verify. Use the project
+  `npm run format` script rather than raw `npx prettier` to avoid environment-specific issues.
+
+---
+
 ### Overview
 
 VoiceToWebsite is an AI-powered voice-to-website builder. The frontend is React + Vite; the backend

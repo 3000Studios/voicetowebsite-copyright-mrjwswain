@@ -1,8 +1,8 @@
 # Deployment (Authoritative)
 
 This repo deploys the live site to Cloudflare **Workers**. **Push to `main`** triggers the GitHub
-Action **Deploy to Cloudflare Worker**, which runs `npm install`, `npm run build`, and `wrangler`
-deploy (requires `CF_API_TOKEN` and `CF_ACCOUNT_ID` in repo secrets).
+Action **Deploy to Cloudflare Worker**, which runs `npm ci`, `npm run verify`, and Wrangler deploy
+(requires `CF_API_TOKEN` and `CF_ACCOUNT_ID` in repo secrets).
 
 **Secrets / env at a glance**
 
@@ -59,6 +59,10 @@ Notes:
   `$env:CLOUDFLARE_ACCOUNT_ID = "your-account-id"`). If you see "Authentication failed (status: 400)
   [code: 9106]", the token may be expired or invalid; create a new token in the Cloudflare
   dashboard.
+- Validate auth before deploying:
+  - `npx wrangler whoami`
+  - If it fails, run `npx wrangler login` or set a valid `CLOUDFLARE_API_TOKEN` with Workers deploy
+    permissions for this account.
 - The Worker refuses traffic if `ENVIRONMENT` is set to anything other than `production` or
   `development` (e.g. blocks staging-from-production config).
 - `--keep-vars` prevents Wrangler from wiping runtime vars/secrets set in the Cloudflare Dashboard.
@@ -123,58 +127,21 @@ If you omit `.dev.vars`, local dev will use production flags from `wrangler.toml
 - **Ambiguity removed:** Production monetization is **env-driven**. Config-driven behavior is not
   used at runtime.
 
-## When you push to main, what triggers production?
+## Main Branch Release Flow (Locked)
 
-**Answer: nothing automatic.** Production deploy is **manual** unless you change configuration.
-
-| Mechanism                          | Used?        | Notes                                                                                                                                                                                                                                                                                                                                                     |
-| ---------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **wrangler deploy manually**       | **Yes**      | You run `npm run deploy` (or `wrangler deploy --keep-vars`) from your machine. Push to `main` does not run this.                                                                                                                                                                                                                                          |
-| **GitHub Action**                  | **No**       | `scripts/guard-deploy.mjs` fails verify if a workflow runs `wrangler deploy`. No CI deploy.                                                                                                                                                                                                                                                               |
-| **Cloudflare auto-build from Git** | **No**       | `CF_WORKERS_BUILDS_AUTO_DEPLOY=0` in `wrangler.toml`. Workers Builds is not configured to deploy on push.                                                                                                                                                                                                                                                 |
-| **Deploy hook**                    | **Optional** | `CF_DEPLOY_HOOK_URL` / `CF_PAGES_DEPLOY_HOOK` are used by the **orchestrator** when a user runs a “deploy” command from the app; the Worker calls the hook. So “deploy” in-product can trigger an external deploy (e.g. Cloudflare Pages or a custom endpoint). That is **not** “push to main → deploy”; it is “user clicked deploy → Worker calls hook”. |
-
-So: **push to main does not trigger production.** You must run `wrangler deploy` (or use the in-app
-deploy flow that hits the hook). The env vars `CF_WORKERS_BUILDS_AUTO_DEPLOY`, `CF_DEPLOY_HOOK_URL`,
-`CF_PAGES_DEPLOY_HOOK`, `GH_BASE_BRANCH`, `GH_REPO` support the **orchestrator’s deploy flow** (e.g.
-calling a hook, or reporting “queued” when auto-deploy is enabled elsewhere); they do not by
-themselves make “push → production” happen.
-
-## Deployment method (current)
-
-Deployment is **manual from your machine**:
-
-- **No** Cloudflare Git auto-deploy (repo not connected to Workers “Deploy from Git”).
-- **No** GitHub Actions deploy (guard-deploy blocks adding deploy workflows).
-- **Canonical path:** `npm run verify` then `npm run deploy` (which runs
-  `wrangler deploy --keep-vars`).
-
-So today: **wrangler deploy manually** after push. To add “push → verify → deploy → rollback if
-fail” you would either:
-
-1. **Keep manual:** run `npm run verify && npm run deploy` locally after each push, with rollback
-   via `git revert` + redeploy, or
-2. **Enable remote deploy:** connect the repo to Cloudflare (Git integration or API) and configure
-   auto-deploy on push to `main`, with a post-deploy verify/rollback step, or
-3. **Unblock CI deploy:** remove or relax guard-deploy and add a GitHub Action that runs verify and
-   then `wrangler deploy` (with secrets in GitHub), plus optional rollback on failure.
-
-Once you choose one of these, we can wire the exact steps (e.g. “Push → Auto Verify → Auto Deploy →
-Auto Rollback if fail”).
-
-## Remote Auto-Deploy (Disabled by Default)
-
-To keep deployments unified to a single revision source, remote deploy triggers are disabled by
-default. Canonical production path is local:
+Use this order unless explicitly overridden:
 
 1. `npm run verify`
-2. `npm run deploy`
+2. `npm run ship`
+3. `npm run ship:push`
+4. `npm run deploy` (or rely on CI deploy-on-push to `main`)
+5. Confirm deploy/build success and report
 
-Notes:
+Hard rules:
 
-- Remote/API deploy routes are blocked unless `ALLOW_REMOTE_DEPLOY_TRIGGER=1`.
-- Keep `CF_WORKERS_BUILDS_AUTO_DEPLOY=0` and `CF_ALLOW_LEGACY_DEPLOY_HOOKS=0` for unified deploy
-  behavior.
+- Never commit or deploy on red.
+- Never skip verify.
+- Keep Cloudflare Workers + Wrangler as the deploy path.
 
 ## Rollback
 

@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
+# Use Node from .nvmrc so verify (and types:check) run on Node 20
+if [ -f .nvmrc ] && [ -n "$NVM_DIR" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
+  nvm use 2>/dev/null || true
+fi
 node ./scripts/update-global-system-doc.mjs
 git add GLOBAL_SYSTEM_INSTRUCTIONS.md
 npm run lint-staged

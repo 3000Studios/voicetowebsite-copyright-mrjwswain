@@ -1,6 +1,23 @@
 import fs from "fs";
 import path from "path";
 
+// Enforce Node 20 (repo .nvmrc) so verify/ship/deploy don't run on wrong Node
+const nvmrcPath = path.join(process.cwd(), ".nvmrc");
+if (fs.existsSync(nvmrcPath)) {
+  const raw = String(fs.readFileSync(nvmrcPath, "utf8")).trim();
+  const expected = raw.split(".")[0].replace(/^v/, "");
+  const current = process.version.slice(1).split(".")[0];
+  if (expected && current !== expected) {
+    console.error(
+      `Node version mismatch: repo expects Node ${expected} (.nvmrc) but current is ${process.version}.`
+    );
+    console.error(
+      `Run 'nvm use 20' (or equivalent) in this terminal, then retry the commit.`
+    );
+    process.exit(1);
+  }
+}
+
 const OPS_SITE = "ops/site";
 
 function verifyPages() {

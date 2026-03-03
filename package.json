@@ -5,6 +5,9 @@
   "description": "Voice-to-Website: Autonomous Web Engineering & Monetization Engine",
   "author": "3000 Studios",
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "vite",
     "dev:worker": "wrangler dev",
