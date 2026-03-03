@@ -114,13 +114,13 @@ export const setAdminCookieHeaders = (
     "Set-Cookie",
     `${adminCookieName}=${cookieValue}; Path=/; Max-Age=${adminCookieTtlSeconds}; ${
       secure ? "Secure; " : ""
-    }HttpOnly; SameSite=Lax`
+    }HttpOnly; SameSite=Strict`
   );
 };
 
 export const clearAdminCookieHeaders = (headers, { secure = true } = {}) => {
   headers.append(
     "Set-Cookie",
-    `${adminCookieName}=; Path=/; Max-Age=0; ${secure ? "Secure; " : ""}HttpOnly; SameSite=Lax`
+    `${adminCookieName}=; Path=/; Max-Age=0; ${secure ? "Secure; " : ""}HttpOnly; SameSite=Strict`
   );
 };

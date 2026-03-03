@@ -65,6 +65,11 @@ database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
 binding = "KV"
 id = "e61605d144ac4348a72b7e85afc6c185"
 
+# Same KV as above; required by /api/ui-command (Custom GPT, voice commands, MCP).
+[[kv_namespaces]]
+binding = "VTW_CACHE"
+id = "e61605d144ac4348a72b7e85afc6c185"
+
 [[durable_objects.bindings]]
 name = "BOT_HUB"
 class_name = "BotHubDO"

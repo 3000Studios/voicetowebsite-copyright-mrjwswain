@@ -12,6 +12,7 @@
     { "label": "Support", "route": "/support" },
     { "label": "Privacy", "route": "/privacy" },
     { "label": "Terms", "route": "/terms" },
-    { "label": "Legal", "route": "/legal" }
+    { "label": "Legal", "route": "/legal" },
+    { "label": "Admin Login", "route": "/admin/login.html" }
   ]
 }

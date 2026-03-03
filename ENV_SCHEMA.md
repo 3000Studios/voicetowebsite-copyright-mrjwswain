@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-03-02T12:46:23.237Z
+Generated: 2026-03-02T20:00:49.864Z
 
 ## Summary
 
-- Scanned files: 376
+- Scanned files: 381
 - Used keys: 133
-- Defined keys: 86
-- Missing keys: 57
+- Defined keys: 87
+- Missing keys: 56
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -157,7 +157,7 @@ Generated: 2026-03-02T12:46:23.237Z
 | VITE_STRIPE_PUBLISHABLE_KEY              | no      | 2             | missing |
 | VOICETOWEBSITE_HOOK                      | no      | 1             | missing |
 | VOICETOWEBSITE_WORKERS_BUILD_TOKEN       | yes     | 0             | unused  |
-| VTW_CACHE                                | no      | 2             | missing |
+| VTW_CACHE                                | yes     | 2             | ok      |
 | VTW_KV                                   | no      | 1             | missing |
 | VTW_VAULT                                | no      | 1             | missing |
 | WORKER_NAME                              | no      | 1             | missing |

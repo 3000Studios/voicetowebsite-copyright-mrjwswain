@@ -139,3 +139,50 @@ From your Custom GPT chat:
 | `apply`      | Apply a previewed change                  | Yes            | Yes                 |
 | `deploy`     | Deploy latest changes                     | No             | Yes                 |
 | `rollback`   | Undo last production change               | No             | Yes                 |
+
+## 8. "Error talking to App" / "Site command system not responding"
+
+If your Custom GPT reports a **server error** or **live edit endpoint not responding**, the cause is
+usually one of these.
+
+### A. Missing or wrong auth (most common)
+
+The Execute API requires the **`x-orch-token`** header. If it’s missing or wrong, the Worker returns
+**401**, which many clients show as a generic "server error".
+
+**Fix:**
+
+1. **Set the secret on the Worker** (one-time):
+
+   ```bash
+   npx wrangler secret put ORCH_TOKEN
+   ```
+
+   When prompted, paste a long random string (e.g. from a password generator). Remember this value.
+
+2. **Configure the Custom GPT Action**:
+   - **Authentication**: API Key
+   - **Header name**: `x-orch-token` (exactly)
+   - **Value**: the same string you set as `ORCH_TOKEN`
+
+3. If your GPT uses a **JIT plugin** or **Actions** that call `executeCommand`, ensure that
+   integration also sends the `x-orch-token` header with the same value.
+
+### B. Check the real error in Cloudflare
+
+To see the actual status and error:
+
+1. **Workers & Pages** → your Worker → **Logs** (or **Observability**).
+2. Trigger the Custom GPT again and look for the request to `/api/execute`.
+3. Note the **status code** (401 = auth; 500 = internal error) and any error message in the response
+   body or logs.
+
+### C. Redeploy after config changes
+
+If you added the `VTW_CACHE` KV binding or changed secrets, run:
+
+```bash
+npm run deploy
+```
+
+Then try the Custom GPT again.

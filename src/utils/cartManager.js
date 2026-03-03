@@ -249,76 +249,159 @@ export class CheckoutModal {
   }
 
   /**
-   * Build modal HTML
+   * Build modal HTML safely
    */
   buildHTML() {
     const items = cart.items;
     const total = cart.getTotal();
 
-    return `
-      <div class="vtw-checkout-overlay">
-        <div class="vtw-checkout-panel">
-          <div class="vtw-checkout-header">
-            <h2>Checkout</h2>
-            <button class="vtw-checkout-close" aria-label="Close">✕</button>
-          </div>
+    // Create safe HTML structure
+    const overlay = document.createElement("div");
+    overlay.className = "vtw-checkout-overlay";
 
-          <div class="vtw-checkout-items">
-            ${items
-              .map(
-                (item, idx) => `
-              <div class="vtw-checkout-item" data-item-id="${item.id}" data-index="${idx}">
-                <div class="vtw-item-info">
-                  <div class="vtw-item-title">${item.title}</div>
-                  <div class="vtw-item-description">${item.description}</div>
-                </div>
-                <div class="vtw-item-qty">
-                  <input type="number" class="vtw-qty-input" value="${item.quantity}" min="1" max="100">
-                </div>
-                <div class="vtw-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
-                <button class="vtw-item-remove" aria-label="Remove">✕</button>
-              </div>
-            `
-              )
-              .join("")}
-          </div>
+    const panel = document.createElement("div");
+    panel.className = "vtw-checkout-panel";
 
-          <div class="vtw-checkout-divider"></div>
+    // Header
+    const header = document.createElement("div");
+    header.className = "vtw-checkout-header";
 
-          <div class="vtw-checkout-total">
-            <span>Total</span>
-            <span class="vtw-total-amount">$${total.toFixed(2)}</span>
-          </div>
+    const title = document.createElement("h2");
+    title.textContent = "Checkout";
+    header.appendChild(title);
 
-          <div class="vtw-payment-methods">
-            ${
-              this.options.providers.includes("stripe")
-                ? `
-              <button class="vtw-payment-btn vtw-stripe-btn" data-provider="stripe">
-                <span class="vtw-payment-icon">💳</span>
-                <span>Pay with Card</span>
-              </button>
-            `
-                : ""
-            }
-            ${
-              this.options.providers.includes("paypal")
-                ? `
-              <button class="vtw-payment-btn vtw-paypal-btn" data-provider="paypal">
-                <span class="vtw-payment-icon">🅿️</span>
-                <span>PayPal</span>
-              </button>
-            `
-                : ""
-            }
-          </div>
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "vtw-checkout-close";
+    closeBtn.setAttribute("aria-label", "Close");
+    closeBtn.textContent = "✕";
+    header.appendChild(closeBtn);
 
-          <button class="vtw-checkout-continue" disabled>
-            Continue
-          </button>
-        </div>
-      </div>
-    `;
+    panel.appendChild(header);
+
+    // Items container
+    const itemsContainer = document.createElement("div");
+    itemsContainer.className = "vtw-checkout-items";
+
+    items.forEach((item, idx) => {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "vtw-checkout-item";
+      itemDiv.setAttribute("data-item-id", String(item.id));
+      itemDiv.setAttribute("data-index", String(idx));
+
+      const itemInfo = document.createElement("div");
+      itemInfo.className = "vtw-item-info";
+
+      const itemTitle = document.createElement("div");
+      itemTitle.className = "vtw-item-title";
+      itemTitle.textContent = item.title;
+      itemInfo.appendChild(itemTitle);
+
+      const itemDesc = document.createElement("div");
+      itemDesc.className = "vtw-item-description";
+      itemDesc.textContent = item.description;
+      itemInfo.appendChild(itemDesc);
+
+      itemDiv.appendChild(itemInfo);
+
+      const qtyDiv = document.createElement("div");
+      qtyDiv.className = "vtw-item-qty";
+
+      const qtyInput = document.createElement("input");
+      qtyInput.type = "number";
+      qtyInput.className = "vtw-qty-input";
+      qtyInput.value = String(item.quantity);
+      qtyInput.min = "1";
+      qtyInput.max = "100";
+      qtyDiv.appendChild(qtyInput);
+
+      itemDiv.appendChild(qtyDiv);
+
+      const priceDiv = document.createElement("div");
+      priceDiv.className = "vtw-item-price";
+      priceDiv.textContent = `$${(item.price * item.quantity).toFixed(2)}`;
+      itemDiv.appendChild(priceDiv);
+
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "vtw-item-remove";
+      removeBtn.setAttribute("aria-label", "Remove");
+      removeBtn.textContent = "✕";
+      itemDiv.appendChild(removeBtn);
+
+      itemsContainer.appendChild(itemDiv);
+    });
+
+    panel.appendChild(itemsContainer);
+
+    // Divider
+    const divider = document.createElement("div");
+    divider.className = "vtw-checkout-divider";
+    panel.appendChild(divider);
+
+    // Total
+    const totalDiv = document.createElement("div");
+    totalDiv.className = "vtw-checkout-total";
+
+    const totalLabel = document.createElement("span");
+    totalLabel.textContent = "Total";
+    totalDiv.appendChild(totalLabel);
+
+    const totalAmount = document.createElement("span");
+    totalAmount.className = "vtw-total-amount";
+    totalAmount.textContent = `$${total.toFixed(2)}`;
+    totalDiv.appendChild(totalAmount);
+
+    panel.appendChild(totalDiv);
+
+    // Payment methods
+    const paymentMethods = document.createElement("div");
+    paymentMethods.className = "vtw-payment-methods";
+
+    if (this.options.providers.includes("stripe")) {
+      const stripeBtn = document.createElement("button");
+      stripeBtn.className = "vtw-payment-btn vtw-stripe-btn";
+      stripeBtn.setAttribute("data-provider", "stripe");
+
+      const stripeIcon = document.createElement("span");
+      stripeIcon.className = "vtw-payment-icon";
+      stripeIcon.textContent = "💳";
+      stripeBtn.appendChild(stripeIcon);
+
+      const stripeText = document.createElement("span");
+      stripeText.textContent = "Pay with Card";
+      stripeBtn.appendChild(stripeText);
+
+      paymentMethods.appendChild(stripeBtn);
+    }
+
+    if (this.options.providers.includes("paypal")) {
+      const paypalBtn = document.createElement("button");
+      paypalBtn.className = "vtw-payment-btn vtw-paypal-btn";
+      paypalBtn.setAttribute("data-provider", "paypal");
+
+      const paypalIcon = document.createElement("span");
+      paypalIcon.className = "vtw-payment-icon";
+      paypalIcon.textContent = "🅿️";
+      paypalBtn.appendChild(paypalIcon);
+
+      const paypalText = document.createElement("span");
+      paypalText.textContent = "PayPal";
+      paypalBtn.appendChild(paypalText);
+
+      paymentMethods.appendChild(paypalBtn);
+    }
+
+    panel.appendChild(paymentMethods);
+
+    // Continue button
+    const continueBtn = document.createElement("button");
+    continueBtn.className = "vtw-checkout-continue";
+    continueBtn.disabled = true;
+    continueBtn.textContent = "Continue";
+    panel.appendChild(continueBtn);
+
+    overlay.appendChild(panel);
+
+    return overlay;
   }
 
   /**
@@ -410,25 +493,57 @@ export class CheckoutModal {
       return;
     }
 
-    // Update items list
+    // Update items list safely
     const itemsContainer = this.modal.querySelector(".vtw-checkout-items");
-    itemsContainer.innerHTML = items
-      .map(
-        (item, idx) => `
-      <div class="vtw-checkout-item" data-item-id="${item.id}" data-index="${idx}">
-        <div class="vtw-item-info">
-          <div class="vtw-item-title">${item.title}</div>
-          <div class="vtw-item-description">${item.description}</div>
-        </div>
-        <div class="vtw-item-qty">
-          <input type="number" class="vtw-qty-input" value="${item.quantity}" min="1" max="100">
-        </div>
-        <div class="vtw-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
-        <button class="vtw-item-remove" aria-label="Remove">✕</button>
-      </div>
-    `
-      )
-      .join("");
+    itemsContainer.innerHTML = ""; // Clear existing content
+
+    items.forEach((item, idx) => {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "vtw-checkout-item";
+      itemDiv.setAttribute("data-item-id", String(item.id));
+      itemDiv.setAttribute("data-index", String(idx));
+
+      const itemInfo = document.createElement("div");
+      itemInfo.className = "vtw-item-info";
+
+      const itemTitle = document.createElement("div");
+      itemTitle.className = "vtw-item-title";
+      itemTitle.textContent = item.title;
+      itemInfo.appendChild(itemTitle);
+
+      const itemDesc = document.createElement("div");
+      itemDesc.className = "vtw-item-description";
+      itemDesc.textContent = item.description;
+      itemInfo.appendChild(itemDesc);
+
+      itemDiv.appendChild(itemInfo);
+
+      const qtyDiv = document.createElement("div");
+      qtyDiv.className = "vtw-item-qty";
+
+      const qtyInput = document.createElement("input");
+      qtyInput.type = "number";
+      qtyInput.className = "vtw-qty-input";
+      qtyInput.value = String(item.quantity);
+      qtyInput.min = "1";
+      qtyInput.max = "100";
+      qtyDiv.appendChild(qtyInput);
+
+      itemDiv.appendChild(qtyDiv);
+
+      const priceDiv = document.createElement("div");
+      priceDiv.className = "vtw-item-price";
+      priceDiv.textContent = `$${(item.price * item.quantity).toFixed(2)}`;
+      itemDiv.appendChild(priceDiv);
+
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "vtw-item-remove";
+      removeBtn.setAttribute("aria-label", "Remove");
+      removeBtn.textContent = "✕";
+      itemDiv.appendChild(removeBtn);
+
+      itemsContainer.appendChild(itemDiv);
+    });
 
     // Update total
     const total = cart.getTotal();
@@ -497,15 +612,34 @@ export function initializeCartUI() {
   function updateDisplay() {
     const count = cart.getItemCount();
     const total = cart.getTotal();
-    container.innerHTML = `
-      <button class="vtw-cart-button">
-        <span class="vtw-cart-icon">🛒</span>
-        <span class="vtw-cart-badge">${count}</span>
-      </button>
-      <div class="vtw-cart-tooltip">
-        ${count} items • $${total.toFixed(2)}
-      </div>
-    `;
+
+    // Clear container safely
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+
+    // Create cart button
+    const cartButton = document.createElement("button");
+    cartButton.className = "vtw-cart-button";
+
+    const cartIcon = document.createElement("span");
+    cartIcon.className = "vtw-cart-icon";
+    cartIcon.textContent = "🛒";
+    cartButton.appendChild(cartIcon);
+
+    const cartBadge = document.createElement("span");
+    cartBadge.className = "vtw-cart-badge";
+    cartBadge.textContent = String(count);
+    cartButton.appendChild(cartBadge);
+
+    container.appendChild(cartButton);
+
+    // Create tooltip
+    const tooltip = document.createElement("div");
+    tooltip.className = "vtw-cart-tooltip";
+    tooltip.textContent = `${count} items • $${total.toFixed(2)}`;
+
+    container.appendChild(tooltip);
 
     container
       .querySelector(".vtw-cart-button")

@@ -26,7 +26,10 @@ const postEvent = (payload: Record<string, unknown>) => {
     body,
     credentials: "same-origin",
     keepalive: true,
-  }).catch(() => {});
+  }).catch((error) => {
+    // Log error for debugging but don't throw to avoid breaking app functionality
+    console.warn("Failed to track revenue event:", error);
+  });
 };
 
 export const trackRevenueEvent = (

@@ -758,6 +758,33 @@ const renderAudio = async () => {
   `;
 };
 
+const renderKraken = async () => {
+  return `
+    <section class="ccos-grid">
+      <article class="ccos-card ccos-col-6">
+        <h3>The Kraken</h3>
+        <p>Personal admin for the BTC/USD volatility scalper bot (Kraken spot, Railway-hosted).</p>
+        <table class="ccos-data">
+          <tr><th>Bot</th><td>Python 3.11+ scalper (1m candles, market exits)</td></tr>
+          <tr><th>Deploy</th><td>Railway (worker process). Keys: Railway env vars + local .env only.</td></tr>
+          <tr><th>Docs</th><td>Repo: <code>the-kraken-bot/STRATEGY_MATH_AUDIT.md</code> — edge, fees, break-even, recommended TP (1.4–1.8%).</td></tr>
+        </table>
+        <p><strong>Status</strong>: Run the bot on Railway or locally; this page does not execute trades. Link to your Railway project dashboard below when deployed.</p>
+        <p><a href="https://railway.app/dashboard" target="_blank" rel="noopener">Railway Dashboard</a> (set project env: KRAKEN_API_KEY, KRAKEN_API_SECRET)</p>
+      </article>
+      <article class="ccos-card ccos-col-6">
+        <h3>Keys and config</h3>
+        <p>KRAKEN_API_KEY and KRAKEN_API_SECRET belong in:</p>
+        <ul>
+          <li>Railway project variables (production)</li>
+          <li>Local <code>.env</code> (development). Never commit.</li>
+        </ul>
+        <p>Do not put Kraken keys in Cloudflare Workers or Pages; the bot runs only on Railway.</p>
+      </article>
+    </section>
+  `;
+};
+
 const renderSettings = async () => {
   const [envAudit, governance, analytics] = await Promise.all([
     requestJson("/api/env/audit", { method: "GET" }).catch(() => ({
@@ -872,6 +899,18 @@ const ROUTES = {
     render: renderSettings,
     navRoute: "/admin/settings",
     moduleKey: "settings",
+  },
+  "/admin/the-kraken": {
+    title: "The Kraken",
+    render: renderKraken,
+    navRoute: "/admin/the-kraken",
+    moduleKey: "kraken",
+  },
+  "/admin/kraken": {
+    title: "The Kraken",
+    render: renderKraken,
+    navRoute: "/admin/the-kraken",
+    moduleKey: "kraken",
   },
 };
 

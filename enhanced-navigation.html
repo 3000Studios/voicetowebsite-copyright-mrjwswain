@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite Enhanced Navigation</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;700;900&family=Outfit:wght@400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-blue: #22d3ee;
+        --secondary-blue: #06b6d4;
+        --light-blue: #7dd3fc;
+        --accent-yellow: #fbbf24;
+        --success-green: #10b981;
+        --error-red: #ef4444;
+        --bg-dark: #0a1428;
+        --bg-deep: #070a16;
+        --panel-bg: rgba(12, 18, 35, 0.82);
+        --glass-surface: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.14);
+        --text-primary: #ffffff;
+        --text-muted: rgba(233, 241, 255, 0.72);
+        --primary-gradient: linear-gradient(135deg, #7dd3fc 0%, #22d3ee 50%, #06b6d4 100%);
+        --secondary-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        --error-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+        --oscillation-speed: 4s;
+        --nav-height: 80px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-deep) 100%);
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* --- Enhanced Live Wallpaper Background --- */
+      .live-wallpaper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        opacity: 0.3;
+      }
+
+      .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: var(--primary-blue);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--primary-blue);
+        animation: float 20s infinite ease-in-out;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) translateX(0) scale(1);
+          opacity: 0.3;
+        }
+        25% {
+          transform: translateY(-20px) translateX(10px) scale(1.1);
+          opacity: 0.6;
+        }
+        50% {
+          transform: translateY(-10px) translateX(-5px) scale(0.9);
+          opacity: 0.8;
+        }
+        75% {
+          transform: translateY(-30px) translateX(15px) scale(1.05);
+          opacity: 0.4;
+        }
+      }
+
+      .wave-overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(circle at 30% 40%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 70% 60%, rgba(125, 211, 252, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 20% 80%, rgba(251, 191, 36, 0.06) 0%, transparent 50%);
+        animation: waveMove 15s ease-in-out infinite;
+      }
+
+      @keyframes waveMove {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        50% {
+          transform: translate(-20px, -10px) scale(1.1);
+        }
+      }
+
+      /* --- Navigation Container --- */
+      .nav-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+        position: relative;
+        z-index: 1000;
+      }
+
+      /* --- Enhanced Header --- */
+      .main-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 2rem;
+        background: rgba(12, 18, 35, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        position: sticky;
+        top: 1rem;
+        z-index: 100;
+        transition: all 0.3s ease;
+      }
+
+      .main-header:hover {
+        background: rgba(12, 18, 35, 0.98);
+        box-shadow: 0 30px 60px rgba(34, 211, 238, 0.3);
+      }
+
+      .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+      }
+
+      .logo-area:hover {
+        transform: scale(1.05);
+      }
+
+      .logo-icon {
+        width: 45px;
+        height: 45px;
+        background: var(--primary-gradient);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+      }
+
+      .logo-icon::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ffffff, transparent);
+        animation: scanline 3s linear infinite;
+      }
+
+      @keyframes scanline {
+        0% {
+          top: -10%;
+          opacity: 0;
+        }
+        50% {
+          top: 50%;
+          opacity: 1;
+        }
+        100% {
+          top: 110%;
+          opacity: 0;
+        }
+      }
+
+      .logo-text {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 900;
+        font-size: 1.5rem;
+        letter-spacing: -1px;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+      }
+
+      /* --- Mobile Hamburger Menu --- */
+      .mobile-menu-toggle {
+        display: none;
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+        padding: 0.75rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mobile-menu-toggle::before {
+        content: "☰";
+        font-size: 1.5rem;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+
+      .mobile-menu-toggle.active::before {
+        content: "✕";
+        transform: rotate(180deg);
+      }
+
+      .mobile-menu-toggle:hover {
+        background: var(--primary-gradient);
+        transform: scale(1.05);
+      }
+
+      /* --- Navigation Links --- */
+      .core-nav {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .nav-item {
+        position: relative;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        background: var(--glass-surface);
+        border: 1px solid transparent;
+        overflow: hidden;
+      }
+
+      .nav-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: left 0.5s ease;
+        z-index: -1;
+      }
+
+      .nav-item:hover {
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.3);
+      }
+
+      .nav-item:hover::before {
+        left: 0;
+      }
+
+      .nav-item:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      /* --- Enhanced Dropdown Engine --- */
+      .has-mega {
+        position: relative;
+      }
+
+      .mega-menu {
+        position: absolute;
+        top: 120%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        width: 800px;
+        background: rgba(12, 18, 35, 0.98);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 24px;
+        padding: 2.5rem;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        box-shadow: 0 50px 120px rgba(0, 0, 0, 0.7);
+      }
+
+      .has-mega:hover .mega-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .mega-col-title {
+        font-family: "Orbitron", sans-serif;
+        color: var(--primary-blue);
+        font-size: 0.75rem;
+        margin-bottom: 1.5rem;
+        letter-spacing: 3px;
+        opacity: 0.8;
+        text-transform: uppercase;
+      }
+
+      .mega-link-grid {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .mega-link {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-decoration: none;
+        padding: 1.25rem;
+        border-radius: 16px;
+        background: var(--glass-surface);
+        border: 1px solid transparent;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mega-link::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: left 0.4s ease;
+        z-index: -1;
+      }
+
+      .mega-link:hover {
+        background: rgba(34, 211, 238, 0.1);
+        border-color: rgba(34, 211, 238, 0.3);
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.4);
+      }
+
+      .mega-link:hover::before {
+        left: 0;
+      }
+
+      .mega-link-info span {
+        display: block;
+        font-family: "Outfit", sans-serif;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .mega-link-info small {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 0.25rem;
+      }
+
+      /* --- Admin Access Panel --- */
+      .admin-trigger {
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        color: var(--accent-yellow);
+        padding: 0.875rem 1.75rem;
+        border-radius: 16px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .admin-trigger::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--secondary-gradient);
+        transition: left 0.4s ease;
+        z-index: -1;
+      }
+
+      .admin-trigger:hover {
+        background: var(--secondary-gradient);
+        color: var(--text-primary);
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(251, 191, 36, 0.5);
+      }
+
+      .admin-trigger:hover::before {
+        left: 0;
+      }
+
+      /* --- Mobile Navigation --- */
+      .mobile-nav {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 85%;
+        max-width: 400px;
+        height: 100vh;
+        background: rgba(12, 18, 35, 0.98);
+        backdrop-filter: blur(30px);
+        z-index: 2000;
+        transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        overflow-y: auto;
+        padding: 2rem;
+      }
+
+      .mobile-nav.active {
+        left: 0;
+      }
+
+      .mobile-nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .mobile-nav-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .mobile-nav-section {
+        margin-bottom: 2rem;
+      }
+
+      .mobile-nav-title {
+        font-family: "Orbitron", sans-serif;
+        color: var(--primary-blue);
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .mobile-nav-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .mobile-nav-item a {
+        display: block;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 1rem;
+        border-radius: 12px;
+        background: var(--glass-surface);
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+      }
+
+      .mobile-nav-item a:hover {
+        background: rgba(34, 211, 238, 0.1);
+        color: var(--text-primary);
+        transform: translateX(5px);
+      }
+
+      /* --- Sound Effects --- */
+      .sound-indicator {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 40px;
+        height: 40px;
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 500;
+      }
+
+      .sound-indicator:hover {
+        background: var(--primary-gradient);
+        transform: scale(1.1);
+      }
+
+      .sound-indicator.muted {
+        opacity: 0.5;
+      }
+
+      .sound-wave {
+        width: 20px;
+        height: 20px;
+        position: relative;
+      }
+
+      .sound-wave::before,
+      .sound-wave::after {
+        content: "";
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: var(--primary-blue);
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .sound-wave::before {
+        animation: ping 1s ease-out infinite;
+      }
+
+      .sound-wave::after {
+        animation: ping 1s ease-out infinite 0.5s;
+      }
+
+      @keyframes ping {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(2);
+          opacity: 0;
+        }
+      }
+
+      /* --- Responsive Design --- */
+      @media (max-width: 1100px) {
+        .core-nav {
+          display: none;
+        }
+        .mobile-menu-toggle {
+          display: block;
+        }
+        .mega-menu {
+          width: 90vw;
+          max-width: 350px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-header {
+          padding: 1rem 1.5rem;
+        }
+        .logo-text {
+          font-size: 1.2rem;
+        }
+        .nav-item {
+          font-size: 0.75rem;
+          padding: 0.6rem 1rem;
+        }
+      }
+
+      /* --- Loading States --- */
+      .loading-pulse {
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      /* --- Accessibility --- */
+      @media (prefers-reduced-motion: reduce) {
+        .particle,
+        .wave-overlay,
+        .sound-wave::before,
+        .sound-wave::after {
+          animation: none;
+        }
+        .main-header {
+          backdrop-filter: none;
+        }
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Enhanced Live Wallpaper Background -->
+    <div class="live-wallpaper">
+      <!-- Floating Particles -->
+      <div class="particle" style="top: 10%; left: 15%; animation-delay: 0s"></div>
+      <div class="particle" style="top: 20%; left: 80%; animation-delay: 2s"></div>
+      <div class="particle" style="top: 60%; left: 25%; animation-delay: 4s"></div>
+      <div class="particle" style="top: 80%; left: 70%; animation-delay: 1s"></div>
+      <div class="particle" style="top: 40%; left: 90%; animation-delay: 3s"></div>
+
+      <!-- Wave Overlay -->
+      <div class="wave-overlay"></div>
+    </div>
+
+    <div class="nav-wrapper">
+      <!-- Main Public Navigation -->
+      <header class="main-header">
+        <a href="/" class="logo-area">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+              <path d="M12 1v22M5 8v8M19 8v8M2 12h20" stroke-linecap="round" />
+            </svg>
+          </div>
+          <span class="logo-text">VOICE TO WEBSITE</span>
+        </a>
+
+        <nav class="core-nav">
+          <a href="/" class="nav-item">Home</a>
+
+          <div class="has-mega">
+            <a href="/features" class="nav-item">Features</a>
+            <div class="mega-menu">
+              <div>
+                <h4 class="mega-col-title">Core Products</h4>
+                <div class="mega-link-grid">
+                  <a href="/the3000" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>The3000</span>
+                      <small>Advanced Audio Interface</small>
+                    </div>
+                  </a>
+                  <a href="/webforge" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Webforge</span>
+                      <small>Real-time Site Assembly</small>
+                    </div>
+                  </a>
+                  <a href="/neural-engine" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Neural Engine</span>
+                      <small>Voice-to-JSON Pipeline</small>
+                    </div>
+                  </a>
+                </div>
+              </div>
+              <div>
+                <h4 class="mega-col-title">Ecosystem</h4>
+                <div class="mega-link-grid">
+                  <a href="/store" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Plugin Store</span>
+                      <small>Custom Voice Modules</small>
+                    </div>
+                  </a>
+                  <a href="/templates" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Templates</span>
+                      <small>Pre-built High Fidelity UI</small>
+                    </div>
+                  </a>
+                  <a href="/appstore" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>App Store</span>
+                      <small>Native Integrations</small>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="/pricing" class="nav-item">Pricing</a>
+          <a href="/blog" class="nav-item">Blog</a>
+          <a href="/contact" class="nav-item">Contact</a>
+          <a href="/about" class="nav-item">About</a>
+
+          <div class="has-mega">
+            <a href="/support.html" class="nav-item">Resources</a>
+            <div class="mega-menu" style="width: 450px">
+              <div>
+                <h4 class="mega-col-title">Support & Docs</h4>
+                <div class="mega-link-grid">
+                  <a href="/api-documentation" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>API Documentation</span>
+                      <small>Developer Resources</small>
+                    </div>
+                  </a>
+                  <a href="/support" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Help Center</span>
+                      <small>24/7 Support</small>
+                    </div>
+                  </a>
+                  <a href="/status" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>System Status</span>
+                      <small>Real-time Monitoring</small>
+                    </div>
+                  </a>
+                  <a href="/trust" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Trust Center</span>
+                      <small>Security & Privacy</small>
+                    </div>
+                  </a>
+                </div>
+              </div>
+              <div>
+                <h4 class="mega-col-title">Legal</h4>
+                <div class="mega-link-grid">
+                  <a href="/privacy" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Privacy Policy</span>
+                      <small>Data Protection</small>
+                    </div>
+                  </a>
+                  <a href="/terms" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>Terms of Service</span>
+                      <small>Usage Guidelines</small>
+                    </div>
+                  </a>
+                  <a href="/license" class="mega-link">
+                    <div class="mega-link-info">
+                      <span>License</span>
+                      <small>Open Source</small>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Access (Only You) -->
+          <button class="admin-trigger" onclick="window.location.href = '/admin/login.html'">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"
+              />
+            </svg>
+            SECURE ACCESS
+          </button>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu">
+          <span class="sr-only">Toggle navigation menu</span>
+        </button>
+      </header>
+
+      <!-- Mobile Navigation -->
+      <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+          <div class="logo-area" style="margin-bottom: 0">
+            <div class="logo-icon" style="width: 35px; height: 35px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                <path d="M12 1v22M5 8v8M19 8v8M2 12h20" stroke-linecap="round" />
+              </svg>
+            </div>
+            <span class="logo-text" style="font-size: 1.2rem">VTW</span>
+          </div>
+          <button class="mobile-menu-toggle" id="mobileMenuClose" style="background: var(--error-gradient)">
+            <span class="sr-only">Close navigation menu</span>
+          </button>
+        </div>
+
+        <div class="mobile-nav-content">
+          <div class="mobile-nav-section">
+            <h4 class="mobile-nav-title">Core</h4>
+            <ul class="mobile-nav-list">
+              <li class="mobile-nav-item"><a href="/">Home</a></li>
+              <li class="mobile-nav-item"><a href="/features">Features</a></li>
+              <li class="mobile-nav-item"><a href="/pricing">Pricing</a></li>
+              <li class="mobile-nav-item"><a href="/blog">Blog</a></li>
+              <li class="mobile-nav-item"><a href="/contact">Contact</a></li>
+              <li class="mobile-nav-item"><a href="/about">About</a></li>
+            </ul>
+          </div>
+
+          <div class="mobile-nav-section">
+            <h4 class="mobile-nav-title">Products</h4>
+            <ul class="mobile-nav-list">
+              <li class="mobile-nav-item"><a href="/the3000">The3000</a></li>
+              <li class="mobile-nav-item"><a href="/webforge">Webforge</a></li>
+              <li class="mobile-nav-item"><a href="/neural-engine">Neural Engine</a></li>
+            </ul>
+          </div>
+
+          <div class="mobile-nav-section">
+            <h4 class="mobile-nav-title">Resources</h4>
+            <ul class="mobile-nav-list">
+              <li class="mobile-nav-item"><a href="/store">Store</a></li>
+              <li class="mobile-nav-item"><a href="/templates">Templates</a></li>
+              <li class="mobile-nav-item"><a href="/appstore">App Store</a></li>
+              <li class="mobile-nav-item"><a href="/support">Support</a></li>
+              <li class="mobile-nav-item"><a href="/admin/login.html">Admin Access</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Sound Effects Control -->
+    <div class="sound-indicator" id="soundToggle" title="Toggle sound effects">
+      <div class="sound-wave">
+        <div class="sound-wave::before"></div>
+        <div class="sound-wave::after"></div>
+      </div>
+    </div>
+
+    <script>
+      // Sound Effects System
+      class SoundManager {
+        constructor() {
+          this.enabled = localStorage.getItem("vtw-sounds-enabled") !== "false";
+          this.audioContext = null;
+          this.sounds = {};
+          this.initAudio();
+        }
+
+        initAudio() {
+          try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          } catch (error) {
+            console.warn("Audio context not available:", error);
+          }
+        }
+
+        createOscillator(frequency = 440, duration = 100) {
+          if (!this.audioContext || !this.enabled) return;
+
+          const oscillator = this.audioContext.createOscillator();
+          const gainNode = this.audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(this.audioContext.destination);
+
+          oscillator.frequency.value = frequency;
+          oscillator.type = "sine";
+          gainNode.gain.value = 0.1;
+
+          oscillator.start();
+          setTimeout(() => {
+            oscillator.stop();
+            oscillator.disconnect();
+            gainNode.disconnect();
+          }, duration);
+        }
+
+        playHoverSound() {
+          if (!this.enabled) return;
+          this.createOscillator(600, 50);
+        }
+
+        playClickSound() {
+          if (!this.enabled) return;
+          this.createOscillator(800, 30);
+        }
+
+        playOpenSound() {
+          if (!this.enabled) return;
+          this.createOscillator(400, 150);
+        }
+
+        toggle() {
+          this.enabled = !this.enabled;
+          localStorage.setItem("vtw-sounds-enabled", this.enabled);
+          this.updateUI();
+        }
+
+        updateUI() {
+          const indicator = document.getElementById("soundToggle");
+          if (indicator) {
+            indicator.classList.toggle("muted", !this.enabled);
+            indicator.title = this.enabled ? "Sound effects enabled" : "Sound effects disabled";
+          }
+        }
+      }
+
+      // Mobile Menu System
+      class MobileMenu {
+        constructor() {
+          this.isOpen = false;
+          this.toggle = document.getElementById("mobileMenuToggle");
+          this.close = document.getElementById("mobileMenuClose");
+          this.menu = document.getElementById("mobileNav");
+          this.init();
+        }
+
+        init() {
+          if (this.toggle) {
+            this.toggle.addEventListener("click", () => this.open());
+          }
+          if (this.close) {
+            this.close.addEventListener("click", () => this.close());
+          }
+
+          // Close menu when clicking outside
+          document.addEventListener("click", (e) => {
+            if (this.isOpen && !this.menu.contains(e.target) && !this.toggle.contains(e.target)) {
+              this.close();
+            }
+          });
+        }
+
+        open() {
+          this.isOpen = true;
+          this.menu.classList.add("active");
+          this.toggle.classList.add("active");
+          document.body.style.overflow = "hidden";
+          soundManager.playOpenSound();
+        }
+
+        close() {
+          this.isOpen = false;
+          this.menu.classList.remove("active");
+          this.toggle.classList.remove("active");
+          document.body.style.overflow = "";
+          soundManager.playClickSound();
+        }
+      }
+
+      // Navigation Interactions
+      class NavigationEffects {
+        constructor() {
+          this.navItems = document.querySelectorAll(".nav-item, .mega-link");
+          this.adminButton = document.querySelector(".admin-trigger");
+          this.init();
+        }
+
+        init() {
+          // Add hover effects to all navigation items
+          this.navItems.forEach((item) => {
+            item.addEventListener("mouseenter", () => soundManager.playHoverSound());
+            item.addEventListener("click", () => soundManager.playClickSound());
+          });
+
+          // Admin button special sound
+          if (this.adminButton) {
+            this.adminButton.addEventListener("mouseenter", () => soundManager.playHoverSound());
+            this.adminButton.addEventListener("click", () => soundManager.playOpenSound());
+          }
+        }
+      }
+
+      // Initialize everything
+      const soundManager = new SoundManager();
+      const mobileMenu = new MobileMenu();
+      const navEffects = new NavigationEffects();
+
+      // Sound toggle functionality
+      document.getElementById("soundToggle")?.addEventListener("click", () => {
+        soundManager.toggle();
+      });
+
+      // Add loading states
+      document.addEventListener("DOMContentLoaded", () => {
+        // Add subtle loading pulse to important elements
+        const logoIcon = document.querySelector(".logo-icon");
+        if (logoIcon) {
+          logoIcon.classList.add("loading-pulse");
+          setTimeout(() => logoIcon.classList.remove("loading-pulse"), 3000);
+        }
+      });
+
+      // Keyboard navigation
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && mobileMenu.isOpen) {
+          mobileMenu.close();
+        }
+      });
+    </script>
+  </body>
+</html>

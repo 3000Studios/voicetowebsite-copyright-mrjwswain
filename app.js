@@ -16,7 +16,7 @@ const controlKey = "youtuneai-control-unlocked";
 const controlPassword =
   window.__ENV && window.__ENV.CONTROL_PASSWORD
     ? window.__ENV.CONTROL_PASSWORD
-    : "5555";
+    : null;
 
 // ============================================
 // UNIFIED COMMAND HANDLER
@@ -25,9 +25,16 @@ const controlPassword =
 const commandHandler = {
   apiEndpoint: "/api/ui-command",
   isProcessing: false,
+  processingQueue: [],
 
   async execute(action, args = {}, source = "app") {
-    if (this.isProcessing) return { error: "Command already processing" };
+    // Atomic check-and-set using a simple queue mechanism
+    if (this.isProcessing) {
+      return new Promise((resolve, reject) => {
+        this.processingQueue.push({ action, args, source, resolve, reject });
+      });
+    }
+
     this.isProcessing = true;
 
     try {
@@ -41,12 +48,29 @@ const commandHandler = {
 
       const result = await response.json();
       addCommandLog(`[${source}] ${action}: ✓`);
+
+      // Process next queued command if any
+      this.processNextInQueue();
+
       return result;
     } catch (err) {
       console.error("Command execution failed:", err);
       addCommandLog(`[${source}] ${action}: ✗ ${err.message}`);
+
+      // Process next queued command even if current failed
+      this.processNextInQueue();
+
       return { error: err.message };
-    } finally {
+    }
+  },
+
+  processNextInQueue() {
+    if (this.processingQueue.length > 0) {
+      const next = this.processingQueue.shift();
+      this.execute(next.action, next.args, next.source)
+        .then(next.resolve)
+        .catch(next.reject);
+    } else {
       this.isProcessing = false;
     }
   },
@@ -413,7 +437,10 @@ const detectMediaType = (url, hint = "") => {
 };
 const renderMediaQueue = () => {
   if (!elements.mediaQueue) return;
-  elements.mediaQueue.innerHTML = "";
+  // Clear safely
+  while (elements.mediaQueue.firstChild) {
+    elements.mediaQueue.removeChild(elements.mediaQueue.firstChild);
+  }
   if (!mediaQueue.length) {
     const chip = document.createElement("span");
     chip.className = "media-chip";
@@ -437,7 +464,10 @@ const enqueueMedia = (item) => {
 };
 const playMedia = (item) => {
   if (!elements.mediaStage || !item?.url) return;
-  elements.mediaStage.innerHTML = "";
+  // Clear safely
+  while (elements.mediaStage.firstChild) {
+    elements.mediaStage.removeChild(elements.mediaStage.firstChild);
+  }
   const type = detectMediaType(item.url, item.type);
   let node = null;
   if (type === "audio") {
@@ -483,7 +513,10 @@ const fetchSearchResults = async (query) => {
 const renderSearchResults = (results, placementHint) => {
   lastSearchResults = results || [];
   if (!elements.searchResults) return;
-  elements.searchResults.innerHTML = "";
+  // Clear safely
+  while (elements.searchResults.firstChild) {
+    elements.searchResults.removeChild(elements.searchResults.firstChild);
+  }
   if (!results || !results.length) {
     const p = document.createElement("p");
     p.className = "muted";
@@ -604,7 +637,10 @@ const handleSearch = async (query, placementHint) => {
   if (!query) return;
   addCommandLog(`Search: ${query}`);
   if (elements.searchResults) {
-    elements.searchResults.innerHTML = "";
+    // Clear safely
+    while (elements.searchResults.firstChild) {
+      elements.searchResults.removeChild(elements.searchResults.firstChild);
+    }
     const status = document.createElement("p");
     status.className = "muted";
     status.textContent = `Searching for "${query}"...`;
@@ -618,7 +654,10 @@ const handleSearch = async (query, placementHint) => {
     }
   } catch (err) {
     if (elements.searchResults) {
-      elements.searchResults.innerHTML = "";
+      // Clear safely
+      while (elements.searchResults.firstChild) {
+        elements.searchResults.removeChild(elements.searchResults.firstChild);
+      }
       const status = document.createElement("p");
       status.className = "muted";
       status.textContent = `Search failed: ${err.message}`;
@@ -938,6 +977,11 @@ const init = () => {
   ) {
     elements.controlUnlock.addEventListener("click", () => {
       const value = elements.controlPassword.value.trim();
+      if (!controlPassword) {
+        elements.controlNote.textContent =
+          "Admin access disabled - no password configured.";
+        return;
+      }
       if (value === controlPassword) {
         sessionStorage.setItem(controlKey, "true");
         elements.controlPassword.value = "";

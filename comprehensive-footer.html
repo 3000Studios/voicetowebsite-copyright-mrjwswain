@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite Comprehensive Footer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;700&family=Space+Grotesk:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-cyan: #22d3ee;
+        --secondary-cyan: #06b6d4;
+        --light-cyan: #7dd3fc;
+        --accent-yellow: #fbbf24;
+        --success-green: #10b981;
+        --error-red: #ef4444;
+        --bg-deep: #0a1428;
+        --bg-darker: #070a16;
+        --panel-bg: rgba(12, 18, 35, 0.82);
+        --glass-surface: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.14);
+        --text-primary: #ffffff;
+        --text-muted: rgba(233, 241, 255, 0.72);
+        --primary-gradient: linear-gradient(135deg, #7dd3fc 0%, #22d3ee 50%, #06b6d4 100%);
+        --secondary-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        --error-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+        --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-darker) 100%);
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        overflow-x: hidden;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      /* Scroll Indicator */
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary-gradient);
+        transform-origin: left;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+      }
+
+      /* Footer Container */
+      .footer-wrapper {
+        position: relative;
+        background: linear-gradient(180deg, rgba(8, 12, 24, 0.9) 0%, rgba(7, 10, 22, 0.95) 100%);
+        border-top: 1px solid var(--glass-border);
+        padding: 80px 0 40px;
+        overflow: hidden;
+      }
+
+      .main-footer {
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      /* Brand Section */
+      .footer-brand {
+        text-align: center;
+        margin-bottom: 60px;
+        position: relative;
+      }
+
+      .brand-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        text-decoration: none;
+        transition: var(--transition-smooth);
+      }
+
+      .brand-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-gradient);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-10px) rotate(5deg);
+        }
+      }
+
+      .brand-icon::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.3;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.6;
+        }
+      }
+
+      .brand-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.5rem;
+        font-weight: 900;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -2px;
+        text-transform: uppercase;
+      }
+
+      .brand-tagline {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+        color: var(--light-cyan);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-top: 10px;
+        opacity: 0.8;
+      }
+
+      /* Navigation Grid */
+      .footer-nav-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-bottom: 60px;
+      }
+
+      .nav-section {
+        background: var(--panel-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 30px;
+        transition: var(--transition-smooth);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .nav-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.05), transparent);
+        transition: all 0.5s ease;
+      }
+
+      .nav-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(34, 211, 238, 0.3);
+      }
+
+      .nav-section:hover::before {
+        background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+      }
+
+      .section-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        color: var(--accent-yellow);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .section-icon {
+        width: 30px;
+        height: 30px;
+        background: var(--secondary-gradient);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .section-icon::after {
+        content: "◆";
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+
+      .nav-list {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .nav-item {
+        position: relative;
+        background: var(--glass-surface);
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 15px 20px;
+        transition: var(--transition-smooth);
+        overflow: hidden;
+      }
+
+      .nav-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: left 0.4s ease;
+        z-index: -1;
+      }
+
+      .nav-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: var(--transition-smooth);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .nav-link:hover {
+        color: var(--text-primary);
+        transform: translateX(5px);
+      }
+
+      .nav-link::after {
+        content: "→";
+        color: var(--primary-cyan);
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .nav-item:hover::before,
+      .nav-link:hover::after {
+        left: 0;
+        opacity: 1;
+      }
+
+      /* Experimental Badge */
+      .experimental-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--error-gradient);
+        color: var(--text-primary);
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        animation: glow 2s ease-in-out infinite;
+      }
+
+      @keyframes glow {
+        0%,
+        100% {
+          box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+        }
+      }
+
+      /* Bottom Bar */
+      .footer-bottom {
+        margin-top: 60px;
+        padding-top: 40px;
+        border-top: 1px solid var(--glass-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 30px;
+      }
+
+      .footer-column {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .column-title {
+        font-family: "Outfit", sans-serif;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        opacity: 0.7;
+      }
+
+      .footer-links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .footer-link-small {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: var(--transition-smooth);
+        padding: 5px 0;
+        border-radius: 6px;
+      }
+
+      .footer-link-small:hover {
+        color: var(--primary-cyan);
+        background: rgba(34, 211, 238, 0.1);
+        transform: translateX(3px);
+      }
+
+      /* Status Indicators */
+      .status-indicators {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success-green);
+        box-shadow: 0 0 10px currentColor;
+      }
+
+      .status-dot.warning {
+        background: var(--accent-yellow);
+        box-shadow: 0 0 10px var(--accent-yellow);
+      }
+
+      .status-dot.error {
+        background: var(--error-red);
+        box-shadow: 0 0 10px var(--error-red);
+        animation: blink 1s ease-in-out infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 1100px) {
+        .footer-nav-grid {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 30px;
+        }
+        .nav-section {
+          padding: 20px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .footer-wrapper {
+          padding: 60px 0 30px;
+        }
+        .brand-text {
+          font-size: 1.8rem;
+        }
+        .footer-nav-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+        .nav-section {
+          padding: 20px;
+        }
+        .section-title {
+          font-size: 0.85rem;
+        }
+        .footer-bottom {
+          flex-direction: column;
+          gap: 20px;
+          align-items: flex-start;
+        }
+      }
+
+      /* Accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        .brand-icon,
+        .experimental-badge {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <div class="footer-wrapper">
+      <footer class="main-footer">
+        <!-- Brand Section -->
+        <div class="footer-brand">
+          <a href="/" class="brand-logo">
+            <div class="brand-icon">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M12 1v22M5 8v8M19 8v8M2 12h20" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div>
+              <span class="brand-text">VOICE TO WEBSITE</span>
+              <div class="brand-tagline">Neural Interface v2.0.4</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Navigation Grid -->
+        <div class="footer-nav-grid">
+          <!-- Games & Entertainment -->
+          <div class="nav-section">
+            <div class="section-title">
+              <div class="section-icon"></div>
+              Games & Entertainment
+            </div>
+            <ul class="nav-list">
+              <li class="nav-item">
+                <a href="/focus-timer.html" class="nav-link"> Focus Timer </a>
+              </li>
+              <li class="nav-item">
+                <a href="/memory-matrix.html" class="nav-link"> Memory Matrix </a>
+              </li>
+              <li class="nav-item">
+                <a href="/neon-snake.html" class="nav-link">
+                  Neon Snake
+                  <span class="experimental-badge">BETA</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Tools & Utilities -->
+          <div class="nav-section">
+            <div class="section-title">
+              <div class="section-icon"></div>
+              Tools & Utilities
+            </div>
+            <ul class="nav-list">
+              <li class="nav-item">
+                <a href="/color-synth.html" class="nav-link"> Color Synth </a>
+              </li>
+              <li class="nav-item">
+                <a href="/project-planning-hub.html" class="nav-link"> Planning Hub </a>
+              </li>
+              <li class="nav-item">
+                <a href="/rush-percussion.html" class="nav-link"> Rush Percussion </a>
+              </li>
+              <li class="nav-item">
+                <a href="/seo-template.html" class="nav-link"> SEO Template </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Experimental Features -->
+          <div class="nav-section">
+            <div class="section-title">
+              <div class="section-icon"></div>
+              Experimental
+              <span class="experimental-badge">LAB</span>
+            </div>
+            <ul class="nav-list">
+              <li class="nav-item">
+                <a href="/cyber-blog.html" class="nav-link"> Cyber Blog </a>
+              </li>
+              <li class="nav-item">
+                <a href="/disclosure.html" class="nav-link"> Disclosure </a>
+              </li>
+              <li class="nav-item">
+                <a href="/gallery.html" class="nav-link"> Gallery </a>
+              </li>
+              <li class="nav-item">
+                <a href="/search.html" class="nav-link"> Search </a>
+              </li>
+              <li class="nav-item">
+                <a href="/sandbox.html" class="nav-link">
+                  Sandbox
+                  <span class="experimental-badge">ALPHA</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Payment & Commerce -->
+          <div class="nav-section">
+            <div class="section-title">
+              <div class="section-icon"></div>
+              Commerce
+            </div>
+            <ul class="nav-list">
+              <li class="nav-item">
+                <a href="/stripe-connect-dashboard.html" class="nav-link"> Stripe Dashboard </a>
+              </li>
+              <li class="nav-item">
+                <a href="/stripe-connect-storefront.html" class="nav-link"> Storefront </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Legacy/Deprecated -->
+          <div class="nav-section">
+            <div class="section-title">
+              <div class="section-icon"></div>
+              Legacy Archive
+            </div>
+            <ul class="nav-list">
+              <li class="nav-item">
+                <a href="/referrals.html" class="nav-link"> Referrals </a>
+              </li>
+              <li class="nav-item">
+                <a href="/projects.html" class="nav-link"> Projects </a>
+              </li>
+              <li class="nav-item">
+                <a href="/legal.html" class="nav-link"> Legal </a>
+              </li>
+              <li class="nav-item">
+                <a href="/strata-design-system.html" class="nav-link"> Design System </a>
+              </li>
+              <li class="nav-item">
+                <a href="/lexicon-pro.html" class="nav-link"> Lexicon Pro </a>
+              </li>
+              <li class="nav-item">
+                <a href="/voice-to-json.html" class="nav-link"> Voice to JSON </a>
+              </li>
+              <li class="nav-item">
+                <a href="/geological-studies.html" class="nav-link"> Geological Studies </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="footer-bottom">
+          <div class="footer-column">
+            <h4 class="column-title">System Status</h4>
+            <div class="status-indicators">
+              <div class="status-item">
+                <div class="status-dot"></div>
+                Core Systems
+              </div>
+              <div class="status-item">
+                <div class="status-dot"></div>
+                API Services
+              </div>
+              <div class="status-item">
+                <div class="status-dot warning"></div>
+                Neural Engine
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-column">
+            <h4 class="column-title">Quick Links</h4>
+            <div class="footer-links">
+              <a href="/about" class="footer-link-small">About</a>
+              <a href="/contact" class="footer-link-small">Contact</a>
+              <a href="/support" class="footer-link-small">Support</a>
+              <a href="/privacy" class="footer-link-small">Privacy</a>
+            </div>
+          </div>
+
+          <div class="footer-column">
+            <h4 class="column-title">Network</h4>
+            <div class="footer-links">
+              <a href="/partners" class="footer-link-small">Partners</a>
+              <a href="/admin/login.html" class="footer-link-small">Admin Access</a>
+              <a href="/status" class="footer-link-small">Status Page</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Copyright -->
+        <div style="text-align: center; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--glass-border)">
+          <p
+            style="
+              font-family: &quot;JetBrains Mono&quot;, monospace;
+              font-size: 0.75rem;
+              color: var(--text-muted);
+              opacity: 0.6;
+            "
+          >
+            &copy; 2024 VOICETOWEBSITE. BIOLUMINESCENT FREQUENCY ARCHITECTURE.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Scroll Progress Indicator
+      function updateScrollProgress() {
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const scrollPercent = (scrollTop / scrollHeight) * 100;
+
+          const progressBar = document.getElementById('scrollProgress');
+          if (progressBar) {
+              progressBar.style.transform = `scaleX(${Math.min(scrollPercent / 100, 1)})`;
+          }
+      }
+
+      // Interactive Hover Effects
+      class FooterEffects {
+          constructor() {
+              this.navItems = document.querySelectorAll('.nav-item');
+              this.brandLogo = document.querySelector('.brand-logo');
+              this.init();
+          }
+
+          init() {
+              // Add hover effects to navigation items
+              this.navItems.forEach(item => {
+                  item.addEventListener('mouseenter', () => this.handleHover(item, true));
+                  item.addEventListener('mouseleave', () => this.handleHover(item, false));
+              });
+
+              // Brand logo special effect
+              if (this.brandLogo) {
+                  this.brandLogo.addEventListener('mouseenter', () => {
+                      this.brandLogo.style.transform = 'scale(1.1) rotate(5deg)';
+                  });
+                  this.brandLogo.addEventListener('mouseleave', () => {
+                      this.brandLogo.style.transform = 'scale(1) rotate(0deg)';
+                  });
+              }
+          }
+
+          handleHover(item, isHovering) {
+              const link = item.querySelector('.nav-link');
+              if (link) {
+                  if (isHovering) {
+                      item.style.background = 'rgba(34, 211, 238, 0.1)';
+                      item.style.borderColor = 'rgba(34, 211, 238, 0.3)';
+                  } else {
+                      item.style.background = 'var(--glass-surface)';
+                      item.style.borderColor = 'transparent';
+                  }
+              }
+          }
+      }
+
+      // Particle System
+      class ParticleSystem {
+          constructor() {
+              this.particles = [];
+              this.container = document.body;
+              this.maxParticles = 15;
+              this.init();
+          }
+
+          init() {
+              for (let i = 0; i < this.maxParticles; i++) {
+                  this.createParticle();
+              }
+              this.animate();
+          }
+
+          createParticle() {
+              const particle = document.createElement('div');
+              particle.style.cssText = `
+                  position: fixed;
+                  width: 2px;
+                  height: 2px;
+                  background: var(--primary-cyan);
+                  border-radius: 50%;
+                  pointer-events: none;
+                  z-index: 1;
+                  opacity: 0;
+              `;
+
+              this.resetParticle(particle);
+              this.container.appendChild(particle);
+              this.particles.push(particle);
+          }
+
+          resetParticle(particle) {
+              const x = Math.random() * window.innerWidth;
+              const y = Math.random() * window.innerHeight;
+              particle.style.left = x + 'px';
+              particle.style.top = y + 'px';
+              particle.style.opacity = '0';
+          }
+
+          animate() {
+              this.particles.forEach((particle, index) => {
+                  setTimeout(() => {
+                      particle.style.opacity = '0.6';
+                      particle.style.transition = 'all 2s ease-out';
+
+                      const newX = parseFloat(particle.style.left) + (Math.random() - 0.5) * 100;
+                      const newY = parseFloat(particle.style.top) + (Math.random() - 0.5) * 100;
+
+                      setTimeout(() => {
+                          particle.style.left = newX + 'px';
+                          particle.style.top = newY + 'px';
+                          particle.style.opacity = '0';
+
+                          setTimeout(() => {
+                              this.resetParticle(particle);
+                              this.animateParticle(particle, index);
+                          }, 2000);
+                      }, 1000);
+                  }, index * 200);
+              });
+          }
+
+          animateParticle(particle, index) {
+              const duration = 3000 + Math.random() * 2000;
+              const steps = 20;
+              let step = 0;
+
+              const moveParticle = () => {
+                  if (step < steps) {
+                      const progress = step / steps;
+                      const x = Math.random() * window.innerWidth;
+                      const y = Math.random() * window.innerHeight;
+
+                      particle.style.left = x + 'px';
+                      particle.style.top = y + 'px';
+                      particle.style.opacity = 0.3 + (1 - progress) * 0.4;
+
+                      step++;
+                      requestAnimationFrame(moveParticle);
+                  } else {
+                      setTimeout(() => this.animateParticle(particle, index), duration);
+                  }
+              };
+
+              moveParticle();
+          }
+      }
+
+      // Initialize everything
+      document.addEventListener('DOMContentLoaded', () => {
+          new FooterEffects();
+          new ParticleSystem();
+
+          // Update scroll progress
+          window.addEventListener('scroll', updateScrollProgress);
+          updateScrollProgress();
+
+          // Add loading animation
+          const sections = document.querySelectorAll('.nav-section');
+          const observer = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                  if (entry.isIntersecting) {
+                      entry.target.style.opacity = '1';
+                      entry.target.style.transform = 'translateY(0)';
+                  }
+              });
+          }, { threshold: 0.1 });
+
+          sections.forEach(section => observer.observe(section));
+      });
+
+      // Performance optimization
+      let ticking = false;
+      function requestTick() {
+          if (!ticking) {
+              requestAnimationFrame(() => {
+                  updateScrollProgress();
+                  ticking = false;
+              });
+              ticking = true;
+      }
+
+      window.addEventListener('scroll', () => {
+          if (!ticking) {
+              requestTick();
+          }
+      });
+    </script>
+  </body>
+</html>

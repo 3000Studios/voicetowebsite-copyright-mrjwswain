@@ -133,6 +133,13 @@
     </div>
 
     <script>
+      // Safe HTML escaping function
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
       document.getElementById("contentForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -147,13 +154,23 @@
         // Simulate AI content generation
         const generatedContent = generateContent(formData);
 
-        document.getElementById("generatedText").innerHTML = `
-                <h4>${formData.type.charAt(0).toUpperCase() + formData.type.slice(1)}: ${formData.topic}</h4>
-                <p><em>Tone: ${formData.tone} | Length: ${formData.length}</em></p>
-                <div style="margin-top: 1rem; line-height: 1.6;">
-                    ${generatedContent}
-                </div>
-            `;
+        // Safely create and append content
+        const generatedTextDiv = document.getElementById("generatedText");
+        generatedTextDiv.innerHTML = ""; // Clear existing content
+
+        const title = document.createElement("h4");
+        title.textContent = `${formData.type.charAt(0).toUpperCase() + formData.type.slice(1)}: ${formData.topic}`;
+        generatedTextDiv.appendChild(title);
+
+        const meta = document.createElement("p");
+        meta.innerHTML = `<em>Tone: ${escapeHtml(formData.tone)} | Length: ${escapeHtml(formData.length)}</em>`;
+        generatedTextDiv.appendChild(meta);
+
+        const contentDiv = document.createElement("div");
+        contentDiv.style.marginTop = "1rem";
+        contentDiv.style.lineHeight = "1.6";
+        contentDiv.textContent = generatedContent;
+        generatedTextDiv.appendChild(contentDiv);
 
         document.getElementById("result").style.display = "block";
       });

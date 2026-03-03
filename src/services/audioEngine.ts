@@ -7,12 +7,12 @@ class AudioEngine {
   private musicSource: MediaElementAudioSourceNode | null = null;
   private musicGain: GainNode | null = null;
   private analyser: AnalyserNode | null = null;
-  private analyserTimeData: Uint8Array | null = null;
-  private analyserFreqData: Uint8Array | null = null;
-  private audioDisabled = true; // Audio disabled flag
+  private analyserTimeData: Uint8Array<ArrayBuffer> | null = null;
+  private analyserFreqData: Uint8Array<ArrayBuffer> | null = null;
+  private audioDisabled = false; // Audio enabled by default
 
   constructor() {
-    // Audio disabled - no initialization needed
+    // Audio engine initialized - ready for use
   }
 
   public async enable() {
@@ -20,16 +20,18 @@ class AudioEngine {
     if (!this.context && typeof window !== "undefined") {
       try {
         this.context = new (
-          window.AudioContext || (window as any).webkitAudioContext
+          window.AudioContext || (window as unknown as typeof AudioContext)
         )();
-      } catch (_) {
-        this.context = null;
+      } catch {
+        // AudioContext initialization failed
       }
     }
     if (this.context?.state === "suspended") {
       try {
         await this.context.resume();
-      } catch (_) {}
+      } catch {
+        // Context resume failed
+      }
     }
     this.isEnabled = true;
 
@@ -40,13 +42,19 @@ class AudioEngine {
   private teardownMusicGraph() {
     try {
       this.musicSource?.disconnect();
-    } catch (_) {}
+    } catch {
+      // Source disconnection failed
+    }
     try {
       this.analyser?.disconnect();
-    } catch (_) {}
+    } catch {
+      // Analyser disconnection failed
+    }
     try {
       this.musicGain?.disconnect();
-    } catch (_) {}
+    } catch {
+      // Gain disconnection failed
+    }
     this.musicSource = null;
     this.musicGain = null;
     this.analyser = null;
@@ -71,10 +79,10 @@ class AudioEngine {
 
     // AGGRESSIVE AUTOPLAY: Set attributes to maximize autoplay success
     try {
-      (audio as any).playsInline = true;
+      (audio as unknown as { playsInline?: boolean }).playsInline = true;
       audio.setAttribute("playsinline", "");
       audio.setAttribute("webkit-playsinline", "");
-    } catch (e) {
+    } catch {
       // Some browsers don't support these attributes
     }
 
@@ -82,7 +90,7 @@ class AudioEngine {
     try {
       audio.muted = false;
       audio.volume = this.currentVolume;
-    } catch (e) {
+    } catch {
       // Some browsers block volume changes before play
     }
 
@@ -106,7 +114,7 @@ class AudioEngine {
         this.musicGain = gain;
         this.analyserTimeData = new Uint8Array(analyser.frequencyBinCount);
         this.analyserFreqData = new Uint8Array(analyser.frequencyBinCount);
-      } catch (err) {
+      } catch {
         // Fallback to direct element playback if the graph cannot be constructed.
         audio.volume = this.currentVolume;
       }
@@ -119,7 +127,7 @@ class AudioEngine {
     try {
       await this.bgMusic.play();
       return true;
-    } catch (e) {
+    } catch {
       // Autoplay with audio is commonly blocked without user gesture.
       // As a best-effort fallback, try starting muted so the user still gets a seamless load,
       // then unmute on the first gesture via `enable()`.
@@ -129,7 +137,7 @@ class AudioEngine {
         await audio.play();
         return true;
       } catch (err) {
-        console.error("Audio playback blocked or invalid format", e, err);
+        console.error("Audio playback blocked or invalid format", err);
         return false;
       }
     }
@@ -141,7 +149,9 @@ class AudioEngine {
     try {
       this.bgMusic.muted = false;
       this.bgMusicWasAutoplayMuted = false;
-    } catch (_) {}
+    } catch {
+      // Mute operation failed
+    }
   }
 
   public stopMusic() {
@@ -170,17 +180,13 @@ class AudioEngine {
 
   public getMusicTimeDomainData() {
     if (!this.analyser || !this.analyserTimeData) return null;
-    this.analyser.getByteTimeDomainData(
-      this.analyserTimeData as Uint8Array<ArrayBuffer>
-    ); // cast for TS AnalyserNode typings
+    this.analyser.getByteTimeDomainData(this.analyserTimeData);
     return this.analyserTimeData;
   }
 
   public getMusicFrequencyData() {
     if (!this.analyser || !this.analyserFreqData) return null;
-    this.analyser.getByteFrequencyData(
-      this.analyserFreqData as Uint8Array<ArrayBuffer>
-    ); // cast for TS AnalyserNode typings
+    this.analyser.getByteFrequencyData(this.analyserFreqData);
     return this.analyserFreqData;
   }
 

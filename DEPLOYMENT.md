@@ -4,6 +4,15 @@ This repo deploys the live site to Cloudflare **Workers**. **Push to `main`** tr
 Action **Deploy to Cloudflare Worker**, which runs `npm install`, `npm run build`, and `wrangler`
 deploy (requires `CF_API_TOKEN` and `CF_ACCOUNT_ID` in repo secrets).
 
+**Secrets / env at a glance**
+
+| Variable                | Where to set it                  | Purpose                                  |
+| ----------------------- | -------------------------------- | ---------------------------------------- |
+| `GH_TOKEN`              | GitHub repo secrets / local      | GitHub API (deploy hooks, repo access).  |
+| `CF_ACCOUNT_ID`         | GitHub repo secrets              | Cloudflare account ID for CI deploy.     |
+| `CLOUDFLARE_ACCOUNT_ID` | Local env (for `npm run deploy`) | Same as above; Wrangler reads this name. |
+| `CLOUDFLARE_API_TOKEN`  | GitHub secrets + local           | Cloudflare API auth for deploy.          |
+
 ## Commands (One-Liners)
 
 - Verify (must pass before any commit/deploy):
@@ -45,6 +54,11 @@ Notes:
 
 - `npm run deploy` runs `wrangler deploy --keep-vars` only (no verify). Use after a local build when
   you need to deploy from your machine; normally GitHub Actions deploys on push to main.
+- For local deploy, set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment (e.g.
+  in PowerShell: `$env:CLOUDFLARE_API_TOKEN = "your-token"` and
+  `$env:CLOUDFLARE_ACCOUNT_ID = "your-account-id"`). If you see "Authentication failed (status: 400)
+  [code: 9106]", the token may be expired or invalid; create a new token in the Cloudflare
+  dashboard.
 - The Worker refuses traffic if `ENVIRONMENT` is set to anything other than `production` or
   `development` (e.g. blocks staging-from-production config).
 - `--keep-vars` prevents Wrangler from wiping runtime vars/secrets set in the Cloudflare Dashboard.

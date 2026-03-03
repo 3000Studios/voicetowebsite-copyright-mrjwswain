@@ -2,12 +2,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ParticleEffects from "./components/ParticleEffects";
 import SiteLogo from "./components/SiteLogo";
 import WarpTunnel from "./components/WarpTunnel";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
 import { SHARED_NAV_ITEMS } from "./constants/navigation";
 import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
+import { escapeHtml } from "./utils/htmlSanitizer";
 import { trackRevenueEvent } from "./utils/revenueTracking";
 
 type PricingTier = {
@@ -36,29 +38,6 @@ type FaqItem = {
 };
 
 const NAV_MENU_ITEMS = SHARED_NAV_ITEMS;
-
-const PARTICLE_LAYOUT = [
-  { left: "15%", top: "20%", delay: "0.1s", opacity: 0.3 },
-  { left: "85%", top: "10%", delay: "1.2s", opacity: 0.6 },
-  { left: "45%", top: "85%", delay: "2.3s", opacity: 0.4 },
-  { left: "25%", top: "55%", delay: "0.8s", opacity: 0.5 },
-  { left: "75%", top: "35%", delay: "3.1s", opacity: 0.2 },
-  { left: "55%", top: "15%", delay: "1.7s", opacity: 0.7 },
-  { left: "35%", top: "75%", delay: "2.9s", opacity: 0.3 },
-  { left: "65%", top: "65%", delay: "0.5s", opacity: 0.6 },
-  { left: "5%", top: "45%", delay: "2.1s", opacity: 0.4 },
-  { left: "95%", top: "25%", delay: "1.4s", opacity: 0.5 },
-  { left: "40%", top: "40%", delay: "3.4s", opacity: 0.2 },
-  { left: "60%", top: "80%", delay: "0.3s", opacity: 0.8 },
-  { left: "20%", top: "90%", delay: "2.6s", opacity: 0.3 },
-  { left: "80%", top: "5%", delay: "1.9s", opacity: 0.6 },
-  { left: "50%", top: "50%", delay: "0.7s", opacity: 0.4 },
-  { left: "30%", top: "30%", delay: "3.2s", opacity: 0.5 },
-  { left: "70%", top: "70%", delay: "1.1s", opacity: 0.3 },
-  { left: "10%", top: "60%", delay: "2.4s", opacity: 0.7 },
-  { left: "90%", top: "40%", delay: "0.9s", opacity: 0.4 },
-  { left: "48%", top: "12%", delay: "2.8s", opacity: 0.6 },
-];
 
 const PRICING_TIERS: PricingTier[] = [
   {
@@ -366,6 +345,9 @@ const App: React.FC = () => {
     recognition.lang = "en-US";
 
     recognition.onresult = (event: any) => {
+      // Only process results if we're still in listening phase
+      if (flowPhaseRef.current !== "listening") return;
+
       const transcript = Array.from(event.results)
         .map((result: any) => result[0])
         .map((result: any) => result.transcript)
@@ -373,11 +355,19 @@ const App: React.FC = () => {
       setTryPrompt(transcript);
     };
     recognition.onend = () => {
-      if (flowPhaseRef.current === "listening") setFlowPhase("confirm");
-    };
-    recognition.onerror = () => {
+      // Only transition to confirm if we're still in listening phase
       if (flowPhaseRef.current === "listening") {
+        setFlowPhase("confirm");
+      }
+    };
+    recognition.onerror = (error: any) => {
+      // Only handle error if we're still in listening phase
+      if (flowPhaseRef.current === "listening") {
+        console.error("Speech recognition error:", error);
         setFlowPhase("ready");
+        setGenerateError(
+          error?.message || "Voice recognition encountered an error"
+        );
       }
     };
     recognitionRef.current = recognition;
@@ -430,53 +420,65 @@ const App: React.FC = () => {
         console.log("Autoplay blocked, will retry on user interaction");
       }
 
-      // Try again after a short delay (some browsers allow delayed autoplay)
-      setTimeout(() => {
+      // Store timer refs for cleanup
+      const timer1 = setTimeout(() => {
         if (!cancelled && !audioPlayingRef.current) {
           tryStart().catch(() => {});
         }
       }, 500);
 
-      // Try one more time after page load
-      setTimeout(() => {
+      const timer2 = setTimeout(() => {
         if (!cancelled && !audioPlayingRef.current) {
           tryStart().catch(() => {});
         }
       }, 1500);
+
+      // Return cleanup function
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
     };
 
-    // Start aggressive autoplay attempts
-    attemptAutoplay();
+    // Start aggressive autoplay attempts and store cleanup
+    attemptAutoplay().then((cleanupFn) => {
+      // Store cleanup function for later use
+      const cleanupAutoplayFn = cleanupFn;
 
-    // Fallback: retry on first user interaction
-    document.addEventListener("pointerdown", onFirstGesture, {
-      capture: true,
-      once: true,
+      // Fallback: retry on first user interaction
+      document.addEventListener("pointerdown", onFirstGesture, {
+        capture: true,
+        once: true,
+      });
+      document.addEventListener("keydown", onFirstGesture, {
+        capture: true,
+        once: true,
+      });
+
+      // Also try on page visibility change (tab switching)
+      const handleVisibilityChange = () => {
+        if (
+          !cancelled &&
+          !audioPlayingRef.current &&
+          !musicManuallyStoppedRef.current &&
+          document.visibilityState === "visible"
+        ) {
+          tryStart().catch(() => {});
+        }
+      };
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+
+      return () => {
+        cancelled = true;
+        cleanupAutoplayFn?.(); // Clean up autoplay timers
+        document.removeEventListener("pointerdown", onFirstGesture, true);
+        document.removeEventListener("keydown", onFirstGesture, true);
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
+      };
     });
-    document.addEventListener("keydown", onFirstGesture, {
-      capture: true,
-      once: true,
-    });
-
-    // Also try on page visibility change (tab switching)
-    const handleVisibilityChange = () => {
-      if (
-        !cancelled &&
-        !audioPlayingRef.current &&
-        !musicManuallyStoppedRef.current &&
-        document.visibilityState === "visible"
-      ) {
-        tryStart().catch(() => {});
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      cancelled = true;
-      document.removeEventListener("pointerdown", onFirstGesture, true);
-      document.removeEventListener("keydown", onFirstGesture, true);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
   }, [startThemeSong]);
 
   // Actions
@@ -541,19 +543,50 @@ const App: React.FC = () => {
       };
     }
 
-    // Basic injection protection - disallow HTML tags and scripts
+    // Enhanced security validation using HTML sanitizer
+    const escaped = escapeHtml(trimmed);
+    if (escaped !== trimmed) {
+      return {
+        valid: false,
+        error: "Prompt contains invalid characters or HTML content",
+      };
+    }
+
+    // Additional security checks for common attack vectors
     const dangerousPatterns = [
       /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
       /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
       /javascript:/gi,
       /on\w+\s*=/gi,
       /data:text\/html/gi,
+      /vbscript:/gi,
+      /<object/gi,
+      /<embed/gi,
+      /<link/gi,
+      /<meta/gi,
+      /@import/gi,
+      /expression\s*\(/gi,
     ];
 
     for (const pattern of dangerousPatterns) {
       if (pattern.test(trimmed)) {
         return { valid: false, error: "Prompt contains invalid content" };
       }
+    }
+
+    // Check for excessive whitespace or repeated characters (potential DoS)
+    if (/\s{20,}/.test(trimmed)) {
+      return {
+        valid: false,
+        error: "Prompt contains excessive whitespace",
+      };
+    }
+
+    if (/(.)\1{50,}/.test(trimmed)) {
+      return {
+        valid: false,
+        error: "Prompt contains excessive repeated characters",
+      };
     }
 
     return { valid: true };
@@ -684,20 +717,7 @@ const App: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
 
           {/* Enhanced particle effects */}
-          <div className="absolute inset-0">
-            {PARTICLE_LAYOUT.map((p, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-                style={{
-                  left: p.left,
-                  top: p.top,
-                  opacity: p.opacity,
-                  animationDelay: p.delay,
-                }}
-              />
-            ))}
-          </div>
+          <ParticleEffects />
         </div>
 
         {/* Simplified Navigation - in-flow so it does not cover page content */}

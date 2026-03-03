@@ -1,45 +1,37 @@
 models:
-  # Primary coding model - best for edits/completions (~13GB)
-  - title: DeepSeek Coder 6.7B
+  # Free-first local profile (Ollama)
+  - title: Qwen2.5 Coder 7B (Local Free)
     provider: ollama
-    model: deepseek-coder:6.7b
+    model: qwen2.5-coder:7b
     apiBase: http://localhost:11434
 
-  # Primary chat model - fast & capable (~14GB)
-  - title: Mistral 7B
+  - title: Llama 3.2 3B (Local Free Chat)
     provider: ollama
-    model: mistral:latest
+    model: llama3.2:3b
     apiBase: http://localhost:11434
 
-  # Backup general purpose (~14GB)
-  - title: Neural Chat 7B
-    provider: ollama
-    model: neural-chat:latest
-    apiBase: http://localhost:11434
-
-  # Optional high-capacity model (~26GB) - enable if needed
-  - title: Llama 2 13B
-    provider: ollama
-    model: llama2:13b
-    apiBase: http://localhost:11434
-
-  # Lightweight embedding model
-  - title: Nomic Embed Text
+  - title: Nomic Embed (Local Free)
     provider: ollama
     model: nomic-embed-text
     apiBase: http://localhost:11434
 
+  # Optional BYO-API profile (enable in Continue UI if you add keys)
+  - title: OpenAI GPT-4o Mini (BYO API)
+    provider: openai
+    model: gpt-4o-mini
+    apiKey: ${OPENAI_API}
+
 chat:
-  model: Mistral 7B
+  model: Llama 3.2 3B (Local Free Chat)
 
 autocomplete:
-  model: DeepSeek Coder 6.7B
+  model: Qwen2.5 Coder 7B (Local Free)
 
 edit:
-  model: DeepSeek Coder 6.7B
+  model: Qwen2.5 Coder 7B (Local Free)
 
 apply:
-  model: DeepSeek Coder 6.7B
+  model: Qwen2.5 Coder 7B (Local Free)
 
 embed:
   provider: ollama
@@ -55,4 +47,4 @@ agent:
   enabled: true
   maxIterations: 8
   temperature: 0.2
-  model: Mistral 7B
+  model: Qwen2.5 Coder 7B (Local Free)

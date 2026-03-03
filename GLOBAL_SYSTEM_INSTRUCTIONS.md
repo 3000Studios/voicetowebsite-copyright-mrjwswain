@@ -94,18 +94,21 @@
 Public pages:
 
 - `/about` -> `about.html`
+- `/admin-auth-system` -> `admin-auth-system.html`
 - `/api-documentation` -> `api-documentation.html`
 - `/appstore-new` -> `appstore-new.html`
 - `/appstore` -> `appstore.html`
 - `/blog` -> `blog.html`
 - `/chromewebdata_2026-02-23_22-31-10.report` -> `chromewebdata_2026-02-23_22-31-10.report.html`
 - `/color-synth` -> `color-synth.html`
+- `/comprehensive-footer` -> `comprehensive-footer.html`
 - `/contact` -> `contact.html`
 - `/copyrights` -> `copyrights.html`
 - `/cursor-demo` -> `cursor-demo.html`
 - `/cyber-blog` -> `cyber-blog.html`
 - `/demo` -> `demo.html`
 - `/disclosure` -> `disclosure.html`
+- `/enhanced-navigation` -> `enhanced-navigation.html`
 - `/features` -> `features.html`
 - `/focus-timer` -> `focus-timer.html`
 - `/gallery` -> `gallery.html`

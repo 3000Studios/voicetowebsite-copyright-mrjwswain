@@ -37,8 +37,8 @@ const getAdSenseClientId = (env) =>
 const SECURITY_HEADERS = {
   "Content-Security-Policy": `
     default-src 'self';
-    script-src 'self' https://cdn.tailwindcss.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://accounts.google.com https://js.stripe.com https://www.paypal.com https://esm.sh;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    script-src 'self' 'nonce-{nonce}' https://cdn.tailwindcss.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://accounts.google.com https://js.stripe.com https://www.paypal.com https://esm.sh;
+    style-src 'self' https://fonts.googleapis.com;
     font-src 'self' data: https://fonts.gstatic.com;
     img-src 'self' data: https:;
     connect-src 'self' https://www.google-analytics.com https://accounts.google.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://www.paypal.com https://js.stripe.com;
@@ -59,10 +59,10 @@ const SECURITY_HEADERS = {
 
 const buildCsp = (nonce) => {
   const base = SECURITY_HEADERS["Content-Security-Policy"];
-  if (!nonce) return base;
+  if (!nonce) return base.replace(/'nonce-\{nonce\}'\s*/g, "");
   // Properly escape nonce for CSP - remove any quotes and ensure it's safe
   const safeNonce = String(nonce).replace(/['"]/g, "");
-  return base.replace("script-src ", `script-src 'nonce-${safeNonce}' `);
+  return base.replace("'nonce-{nonce}'", `'nonce-${safeNonce}'`);
 };
 
 const getCacheControlForPath = (pathname, env) => {

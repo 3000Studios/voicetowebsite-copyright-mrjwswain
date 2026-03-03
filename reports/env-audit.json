@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-02T12:46:23.237Z",
-  "scannedFiles": 376,
+  "generatedAt": "2026-03-02T20:00:49.864Z",
+  "scannedFiles": 381,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -222,7 +222,8 @@
     "VITE_GEMINI_MODEL",
     "VITE_GEMINIAPIKEY2",
     "VITE_PAYPAL_CLIENT_ID",
-    "VOICETOWEBSITE_WORKERS_BUILD_TOKEN"
+    "VOICETOWEBSITE_WORKERS_BUILD_TOKEN",
+    "VTW_CACHE"
   ],
   "missing": [
     "ADMIN_ACCESS_CODE",
@@ -277,7 +278,6 @@
     "UNSPLASH_ACCESS_KEY",
     "VITE_STRIPE_PUBLISHABLE_KEY",
     "VOICETOWEBSITE_HOOK",
-    "VTW_CACHE",
     "VTW_KV",
     "VTW_VAULT",
     "WORKER_NAME",

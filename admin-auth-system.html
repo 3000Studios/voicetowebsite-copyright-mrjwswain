@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Authentication - VoiceToWebsite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-cyan: #22d3ee;
+        --secondary-cyan: #06b6d4;
+        --accent-yellow: #fbbf24;
+        --success-green: #10b981;
+        --error-red: #ef4444;
+        --bg-deep: #0a1428;
+        --bg-darker: #070a16;
+        --panel-bg: rgba(12, 18, 35, 0.82);
+        --glass-surface: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.14);
+        --text-primary: #ffffff;
+        --text-muted: rgba(233, 241, 255, 0.72);
+        --primary-gradient: linear-gradient(135deg, #7dd3fc 0%, #22d3ee 50%, #06b6d4 100%);
+        --error-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-darker) 100%);
+        color: var(--text-primary);
+        font-family: "JetBrains Mono", monospace;
+        overflow: hidden;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Auth Container */
+      .auth-container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        background: var(--panel-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Lock Screen */
+      .lock-screen {
+        text-align: center;
+      }
+
+      .lock-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--primary-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+        position: relative;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 1;
+        }
+      }
+
+      .lock-icon::before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: rotate 3s linear infinite;
+      }
+
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .auth-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        letter-spacing: 2px;
+      }
+
+      .auth-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        opacity: 0.8;
+      }
+
+      /* Passcode Input */
+      .passcode-container {
+        margin-bottom: 2rem;
+      }
+
+      .passcode-label {
+        display: block;
+        color: var(--accent-yellow);
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .passcode-input-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .passcode-input {
+        width: 60px;
+        height: 60px;
+        background: var(--glass-surface);
+        border: 2px solid var(--glass-border);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+      }
+
+      .passcode-input:focus {
+        outline: none;
+        border-color: var(--primary-cyan);
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+        transform: scale(1.05);
+      }
+
+      .passcode-input.filled {
+        background: rgba(34, 211, 238, 0.1);
+        border-color: rgba(34, 211, 238, 0.3);
+      }
+
+      .separator {
+        width: 2px;
+        height: 2px;
+        background: var(--text-muted);
+        opacity: 0.3;
+      }
+
+      /* Submit Button */
+      .submit-btn {
+        width: 100%;
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        color: var(--text-primary);
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(34, 211, 238, 0.4);
+      }
+
+      .submit-btn:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .submit-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+      }
+
+      .submit-btn:hover::before {
+        left: 0;
+      }
+
+      /* Error States */
+      .error-shake {
+        animation: shake 0.5s ease-in-out;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-10px);
+        }
+        75% {
+          transform: translateX(10px);
+        }
+      }
+
+      .error-message {
+        background: var(--error-gradient);
+        color: var(--text-primary);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        display: none;
+      }
+
+      .error-message.show {
+        display: block;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Success State */
+      .success-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(16, 185, 129, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .success-content {
+        background: var(--success-gradient);
+        padding: 2rem;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+      }
+
+      .success-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--text-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+
+      .success-icon::after {
+        content: "✓";
+        color: var(--success-green);
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .success-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+      }
+
+      /* Admin Navigation Reveal */
+      .admin-nav-reveal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(12, 18, 35, 0.95);
+        backdrop-filter: blur(20px);
+        z-index: 999;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      .admin-nav-reveal.show {
+        opacity: 1;
+      }
+
+      .reveal-content {
+        max-width: 1200px;
+        margin: 2rem auto;
+        background: var(--panel-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 2rem;
+      }
+
+      .reveal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .reveal-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.5rem;
+        color: var(--primary-cyan);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+      }
+
+      .close-reveal {
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        color: var(--text-muted);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .close-reveal:hover {
+        background: var(--error-gradient);
+        color: var(--text-primary);
+        transform: scale(1.05);
+      }
+
+      .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .admin-card {
+        background: var(--glass-surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: var(--text-primary);
+      }
+
+      .admin-card:hover {
+        background: rgba(34, 211, 238, 0.1);
+        border-color: rgba(34, 211, 238, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.2);
+      }
+
+      .admin-card-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        color: var(--accent-yellow);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .admin-card-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+      }
+
+      .admin-card-link {
+        color: var(--primary-cyan);
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .auth-container {
+          margin: 1rem;
+          padding: 2rem;
+        }
+        .auth-title {
+          font-size: 1.5rem;
+        }
+        .passcode-input {
+          width: 50px;
+          height: 50px;
+          font-size: 1.2rem;
+        }
+        .admin-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <!-- Lock Screen -->
+      <div class="lock-screen" id="lockScreen">
+        <div class="lock-icon"></div>
+        <h1 class="auth-title">ADMIN ACCESS</h1>
+        <p class="auth-subtitle">Enter passcode to unlock administrative controls</p>
+
+        <div class="passcode-container">
+          <label class="passcode-label">Passcode</label>
+          <div class="passcode-input-group">
+            <input type="text" class="passcode-input" id="passcode1" maxlength="1" inputmode="numeric" />
+            <div class="separator"></div>
+            <input type="text" class="passcode-input" id="passcode2" maxlength="1" inputmode="numeric" />
+            <div class="separator"></div>
+            <input type="text" class="passcode-input" id="passcode3" maxlength="1" inputmode="numeric" />
+            <div class="separator"></div>
+            <input type="text" class="passcode-input" id="passcode4" maxlength="1" inputmode="numeric" />
+          </div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn">UNLOCK</button>
+
+        <div class="error-message" id="errorMessage"></div>
+      </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+      <div class="success-content">
+        <div class="success-icon"></div>
+        <h2 class="success-text">ACCESS GRANTED</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem">Redirecting to admin panel...</p>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Reveal -->
+    <div class="admin-nav-reveal" id="adminNavReveal">
+      <div class="reveal-content">
+        <div class="reveal-header">
+          <h2 class="reveal-title">Admin Navigation</h2>
+          <button class="close-reveal" id="closeReveal">✕ CLOSE</button>
+        </div>
+
+        <div class="admin-grid">
+          <a href="/admin/index.html" class="admin-card">
+            <h3 class="admin-card-title">Main Terminal</h3>
+            <p class="admin-card-desc">Primary admin dashboard with system overview</p>
+            <span class="admin-card-link">→ Launch</span>
+          </a>
+
+          <a href="/admin/analytics.html" class="admin-card">
+            <h3 class="admin-card-title">Analytics</h3>
+            <p class="admin-card-desc">System metrics and user insights</p>
+            <span class="admin-card-link">→ View Data</span>
+          </a>
+
+          <a href="/admin/store-manager.html" class="admin-card">
+            <h3 class="admin-card-title">Store Manager</h3>
+            <p class="admin-card-desc">Manage products and inventory</p>
+            <span class="admin-card-link">→ Manage</span>
+          </a>
+
+          <a href="/admin/bot-command-center.html" class="admin-card">
+            <h3 class="admin-card-title">Bot Command</h3>
+            <p class="admin-card-desc">AI command interface and control</p>
+            <span class="admin-card-link">→ Control</span>
+          </a>
+
+          <a href="/admin/customer-chat.html" class="admin-card">
+            <h3 class="admin-card-title">Live Comms</h3>
+            <p class="admin-card-desc">Real-time customer support</p>
+            <span class="admin-card-link">→ Open Chat</span>
+          </a>
+
+          <a href="/admin/live-stream.html" class="admin-card">
+            <h3 class="admin-card-title">Live Stream</h3>
+            <p class="admin-card-desc">Broadcast and streaming controls</p>
+            <span class="admin-card-link">→ Stream</span>
+          </a>
+
+          <a href="/admin/voice-commands.html" class="admin-card">
+            <h3 class="admin-card-title">Voice Commands</h3>
+            <p class="admin-card-desc">Advanced voice processing</p>
+            <span class="admin-card-link">→ Configure</span>
+          </a>
+
+          <a href="/admin/test-lab-1.html" class="admin-card">
+            <h3 class="admin-card-title">Test Lab 1</h3>
+            <p class="admin-card-desc">Neural testing environment</p>
+            <span class="admin-card-link">→ Test</span>
+          </a>
+
+          <a href="/admin/test-lab-2.html" class="admin-card">
+            <h3 class="admin-card-title">Test Lab 2</h3>
+            <p class="admin-card-desc">Experimental features testing</p>
+            <span class="admin-card-link">→ Experiment</span>
+          </a>
+
+          <a href="/admin/test-lab-3.html" class="admin-card">
+            <h3 class="admin-card-title">Test Lab 3</h3>
+            <p class="admin-card-desc">Advanced R&D testing</p>
+            <span class="admin-card-link">→ Research</span>
+          </a>
+
+          <a href="/admin/app-store-manager.html" class="admin-card">
+            <h3 class="admin-card-title">App Store</h3>
+            <p class="admin-card-desc">Manage applications and integrations</p>
+            <span class="admin-card-link">→ Manage Apps</span>
+          </a>
+
+          <a href="/admin/progress.html" class="admin-card">
+            <h3 class="admin-card-title">Progress</h3>
+            <p class="admin-card-desc">System development progress</p>
+            <span class="admin-card-link">→ Track</span>
+          </a>
+
+          <a href="/admin/nexus.html" class="admin-card">
+            <h3 class="admin-card-title">Nexus Core</h3>
+            <p class="admin-card-desc">Core system configuration</p>
+            <span class="admin-card-link">→ Configure</span>
+          </a>
+
+          <a href="/admin/wallpaper.html" class="admin-card">
+            <h3 class="admin-card-title">Wallpaper</h3>
+            <p class="admin-card-desc">Visual customization</p>
+            <span class="admin-card-link">→ Customize</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      class AdminAuthSystem {
+        constructor() {
+          this.correctPasscode = "2678"; // Change this to your desired passcode
+          this.inputs = [
+            document.getElementById("passcode1"),
+            document.getElementById("passcode2"),
+            document.getElementById("passcode3"),
+            document.getElementById("passcode4"),
+          ];
+          this.currentInput = "";
+          this.errorMessage = document.getElementById("errorMessage");
+          this.submitBtn = document.getElementById("submitBtn");
+          this.lockScreen = document.getElementById("lockScreen");
+          this.successOverlay = document.getElementById("successOverlay");
+          this.adminNavReveal = document.getElementById("adminNavReveal");
+          this.closeReveal = document.getElementById("closeReveal");
+
+          this.init();
+        }
+
+        init() {
+          // Check if already authenticated
+          if (this.isAuthenticated()) {
+            this.showAdminNav();
+          }
+
+          // Input event listeners
+          this.inputs.forEach((input, index) => {
+            input.addEventListener("input", (e) => this.handleInput(e, index));
+            input.addEventListener("keydown", (e) => this.handleKeyDown(e, index));
+          });
+
+          // Submit button
+          this.submitBtn.addEventListener("click", () => this.handleSubmit());
+
+          // Close button
+          this.closeReveal.addEventListener("click", () => this.hideAdminNav());
+
+          // Auto-focus first input
+          this.inputs[0].focus();
+        }
+
+        handleInput(event, index) {
+          const value = event.target.value;
+
+          // Only allow numbers
+          event.target.value = value.replace(/[^0-9]/g, "");
+
+          // Auto-focus next input
+          if (event.target.value.length === 1 && index < this.inputs.length - 1) {
+            this.inputs[index + 1].focus();
+          }
+
+          this.currentInput = this.inputs.map((input) => input.value).join("");
+        }
+
+        handleKeyDown(event, index) {
+          const key = event.key;
+
+          if (key === "Backspace") {
+            if (event.target.value === "" && index > 0) {
+              this.inputs[index - 1].focus();
+            }
+          } else if (key === "Enter") {
+            event.preventDefault();
+            if (index < this.inputs.length - 1) {
+              this.inputs[index + 1].focus();
+            } else {
+              this.handleSubmit();
+            }
+          } else if (key >= "0" && key <= "9") {
+            event.preventDefault();
+            // Handle numeric input
+          }
+        }
+
+        handleSubmit() {
+          const enteredPasscode = this.currentInput;
+
+          if (enteredPasscode === this.correctPasscode) {
+            this.grantAccess();
+          } else {
+            this.denyAccess();
+          }
+        }
+
+        grantAccess() {
+          // Store authentication
+          localStorage.setItem("vtw-admin-auth", "true");
+          localStorage.setItem("vtw-admin-auth-time", Date.now());
+
+          // Show success
+          this.lockScreen.style.display = "none";
+          this.successOverlay.style.display = "flex";
+
+          // Show admin nav after delay
+          setTimeout(() => {
+            this.successOverlay.style.display = "none";
+            this.showAdminNav();
+          }, 2000);
+        }
+
+        denyAccess() {
+          // Add error animation
+          this.lockScreen.classList.add("error-shake");
+          this.errorMessage.textContent = "Invalid passcode. Access denied.";
+          this.errorMessage.classList.add("show");
+
+          // Clear inputs after delay
+          setTimeout(() => {
+            this.clearInputs();
+            this.lockScreen.classList.remove("error-shake");
+            this.errorMessage.classList.remove("show");
+          }, 2000);
+        }
+
+        clearInputs() {
+          this.inputs.forEach((input) => {
+            input.value = "";
+            input.classList.remove("filled");
+          });
+          this.currentInput = "";
+          this.inputs[0].focus();
+        }
+
+        isAuthenticated() {
+          const auth = localStorage.getItem("vtw-admin-auth");
+          const authTime = localStorage.getItem("vtw-admin-auth-time");
+
+          // Check if auth is valid and not expired (24 hours)
+          if (auth === "true" && authTime) {
+            const timeDiff = Date.now() - parseInt(authTime);
+            return timeDiff < 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+          }
+
+          return false;
+        }
+
+        showAdminNav() {
+          this.adminNavReveal.classList.add("show");
+          document.body.style.overflow = "hidden";
+        }
+
+        hideAdminNav() {
+          this.adminNavReveal.classList.remove("show");
+          document.body.style.overflow = "";
+        }
+
+        logout() {
+          localStorage.removeItem("vtw-admin-auth");
+          localStorage.removeItem("vtw-admin-auth-time");
+          this.hideAdminNav();
+          window.location.reload();
+        }
+      }
+
+      // Initialize the system
+      const adminAuth = new AdminAuthSystem();
+
+      // Global logout function (can be called from anywhere)
+      window.vtwAdminLogout = () => {
+        adminAuth.logout();
+      };
+
+      // Check authentication on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        if (adminAuth.isAuthenticated()) {
+          adminAuth.showAdminNav();
+        }
+      });
+
+      // Add keyboard shortcut (Ctrl+Shift+A)
+      document.addEventListener("keydown", (e) => {
+        if (e.ctrlKey && e.shiftKey && e.key === "A") {
+          e.preventDefault();
+          if (adminAuth.isAuthenticated()) {
+            adminAuth.hideAdminNav();
+          } else {
+            adminAuth.showAdminNav();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -14,6 +14,10 @@
   - `admin/integrated-dashboard.html`
   - `admin/ccos.js`
 - Route aliases are normalized by `worker.js` (for example `/admin/login` -> `/admin/login.html`).
+- **The Kraken**: Dashboard module for the Kraken BTC/USD scalper bot (Railway). Implemented in
+  `admin/ccos.js` as `renderKraken` and routes `/admin/the-kraken`, `/admin/kraken`. Nav link in
+  `admin/access-guard.js`. Bot keys (KRAKEN\_\*) live only on Railway and local .env, not in
+  Cloudflare.
 
 ## Navigation/auth expectations
 

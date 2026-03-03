@@ -22,6 +22,7 @@
   const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
   const ADMIN_MODULE_LINKS = [
     { href: "/admin/mission", label: "Mission" },
+    { href: "/admin/the-kraken", label: "The Kraken" },
     { href: "/admin/cc", label: "Command Center" },
     { href: "/admin/vcc", label: "Voice Command Center" },
     { href: "/admin/monetization", label: "Monetization" },
