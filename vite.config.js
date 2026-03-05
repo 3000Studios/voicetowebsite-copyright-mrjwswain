@@ -6,9 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Route API calls to the local Cloudflare Worker (`wrangler dev`).
+      // Route API and preview to the local Cloudflare Worker (`wrangler dev`).
       "/api/orchestrator": "http://127.0.0.1:8787",
-      "/admin/logs": "http://127.0.0.1:8787",
       "/api/analytics": "http://127.0.0.1:8787",
       "/api/generate": "http://127.0.0.1:8787",
       "/api/preview": "http://127.0.0.1:8787",
@@ -17,12 +16,25 @@ export default defineConfig({
       "/api/ui-command": "http://127.0.0.1:8787",
       "/api/deploy": "http://127.0.0.1:8787",
       "/api/voice": "http://127.0.0.1:8787",
-      "/preview": "http://127.0.0.1:8787",
+      "/api/fs": "http://127.0.0.1:8787",
+      "/api/repo": "http://127.0.0.1:8787",
+      "/api/governance": "http://127.0.0.1:8787",
+      "/api/monetization": "http://127.0.0.1:8787",
+      "/api/env": "http://127.0.0.1:8787",
+      "/api/live": "http://127.0.0.1:8787",
+      "/api/store": "http://127.0.0.1:8787",
+      "/api/media": "http://127.0.0.1:8787",
+      "/api/audio": "http://127.0.0.1:8787",
       "/api/bot-hub": "http://127.0.0.1:8787",
+      "/api/bots": "http://127.0.0.1:8787",
       "/api/health": "http://127.0.0.1:8787",
       "/api/config": "http://127.0.0.1:8787",
       "/api/admin": "http://127.0.0.1:8787",
       "/api/paypal": "http://127.0.0.1:8787",
+      "/api/catalog": "http://127.0.0.1:8787",
+      "/api/products": "http://127.0.0.1:8787",
+      "/admin/logs": "http://127.0.0.1:8787",
+      "/preview": "http://127.0.0.1:8787",
     },
   },
   build: {

@@ -851,6 +851,13 @@ export default {
       });
     }
 
+    // Normalize GET /preview to /preview/index so command-center and preview handlers see a consistent path.
+    if (url.pathname === "/preview" && request.method === "GET") {
+      const target = new URL("/preview/index", url.origin);
+      target.search = url.search;
+      return Response.redirect(target.toString(), 302);
+    }
+
     try {
       // Admin access code validation
       if (
