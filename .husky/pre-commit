@@ -1,9 +1,47 @@
 #!/usr/bin/env sh
 # Use Node from .nvmrc so verify (and types:check) run on Node 20
-if [ -f .nvmrc ] && [ -n "$NVM_DIR" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
-  . "$NVM_DIR/nvm.sh"
-  nvm use 2>/dev/null || true
+if [ -f .nvmrc ]; then
+  EXPECTED_NODE="$(tr -d '[:space:]' < .nvmrc | sed 's/^v//')"
+
+  # nvm (Unix/macOS): load nvm.sh when available.
+  if [ -n "$NVM_DIR" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+    nvm use "$EXPECTED_NODE" 2>/dev/null || true
+  fi
+
+  # nvm (Windows): executable on PATH in Git Bash shells.
+  if command -v nvm >/dev/null 2>&1; then
+    nvm use "$EXPECTED_NODE" >/dev/null 2>&1 || true
+  fi
+
+  # fnm/asdf fallback for environments not using nvm.
+  if command -v fnm >/dev/null 2>&1; then
+    fnm use "$EXPECTED_NODE" >/dev/null 2>&1 || true
+  fi
+  if command -v asdf >/dev/null 2>&1; then
+    asdf shell nodejs "$EXPECTED_NODE" >/dev/null 2>&1 || true
+  fi
+
+  # Windows fallback: nvm/fnm may only be available in PowerShell.
+  if command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& {
+      \$expected = '$EXPECTED_NODE'
+      if (Get-Command nvm -ErrorAction SilentlyContinue) {
+        nvm use \$expected *> \$null
+      } elseif (Get-Command fnm -ErrorAction SilentlyContinue) {
+        fnm use \$expected *> \$null
+      }
+    }" >/dev/null 2>&1 || true
+  fi
+
+  CURRENT_NODE="$(node -p "process.versions.node.split('.')[0]")"
+  if [ "$CURRENT_NODE" != "$EXPECTED_NODE" ]; then
+    echo "Node version mismatch: expected Node $EXPECTED_NODE from .nvmrc, current is v$(node -v | sed 's/^v//')."
+    echo "Run 'nvm use $EXPECTED_NODE' (or equivalent), then retry commit."
+    exit 1
+  fi
 fi
+
 node ./scripts/update-global-system-doc.mjs
 git add GLOBAL_SYSTEM_INSTRUCTIONS.md
 npm run lint-staged

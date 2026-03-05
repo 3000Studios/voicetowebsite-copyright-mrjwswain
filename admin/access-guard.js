@@ -74,27 +74,27 @@
       </div>
       <div class="admin-sidebar__section">
         <p class="admin-sidebar__label">Primary</p>
-        <a class="admin-sidebar__link" data-path="/admin/integrated-dashboard.html" href="/admin/integrated-dashboard.html">Mission Control</a>
-        <a class="admin-sidebar__link" data-path="/admin/index.html" href="/admin/index.html">Command Center</a>
-        <a class="admin-sidebar__link" data-path="/admin/voice-commands.html" href="/admin/voice-commands.html">Voice Control</a>
-        <a class="admin-sidebar__link" data-path="/admin/test-lab-1.html" href="/admin/test-lab-1.html">Agent Control</a>
+        <a class="admin-sidebar__link" data-path="/admin/mission" href="/admin/mission">Mission Control</a>
+        <a class="admin-sidebar__link" data-path="/admin/cc" href="/admin/cc">Command Center</a>
+        <a class="admin-sidebar__link" data-path="/admin/vcc" href="/admin/vcc">Voice Control</a>
+        <a class="admin-sidebar__link" data-path="/admin/the-kraken" href="/admin/the-kraken">Agent Control</a>
       </div>
       <div class="admin-sidebar__section">
         <p class="admin-sidebar__label">Operations</p>
-        <a class="admin-sidebar__link" data-path="/admin/bot-command-center.html" href="/admin/bot-command-center.html">Boss Bot</a>
-        <a class="admin-sidebar__link" data-path="/admin/customer-chat.html" href="/admin/customer-chat.html">Customer Chat</a>
-        <a class="admin-sidebar__link" data-path="/admin/live-stream.html" href="/admin/live-stream.html">Live Stream</a>
+        <a class="admin-sidebar__link" data-path="/admin/cc" href="/admin/cc">Boss Bot</a>
+        <a class="admin-sidebar__link" data-path="/admin/cc" href="/admin/cc">Customer Chat</a>
+        <a class="admin-sidebar__link" data-path="/admin/live" href="/admin/live">Live Stream</a>
       </div>
       <div class="admin-sidebar__section">
         <p class="admin-sidebar__label">Commerce</p>
-        <a class="admin-sidebar__link" data-path="/admin/store-manager.html" href="/admin/store-manager.html">Store Manager</a>
-        <a class="admin-sidebar__link" data-path="/admin/app-store-manager.html" href="/admin/app-store-manager.html">App Store</a>
+        <a class="admin-sidebar__link" data-path="/admin/store" href="/admin/store">Store Manager</a>
+        <a class="admin-sidebar__link" data-path="/admin/store" href="/admin/store">App Store</a>
       </div>
       <div class="admin-sidebar__section">
         <p class="admin-sidebar__label">Data</p>
-        <a class="admin-sidebar__link" data-path="/admin/analytics.html" href="/admin/analytics.html">Analytics</a>
-        <a class="admin-sidebar__link" data-path="/admin/progress.html" href="/admin/progress.html">Progress</a>
-        <a class="admin-sidebar__link" data-path="/admin/nexus.html" href="/admin/nexus.html">Nexus</a>
+        <a class="admin-sidebar__link" data-path="/admin/analytics" href="/admin/analytics">Analytics</a>
+        <a class="admin-sidebar__link" data-path="/admin/mission" href="/admin/mission">Progress</a>
+        <a class="admin-sidebar__link" data-path="/admin/mission" href="/admin/mission">Nexus</a>
       </div>
       <div class="admin-sidebar__section">
         <p class="admin-sidebar__label">Labs</p>

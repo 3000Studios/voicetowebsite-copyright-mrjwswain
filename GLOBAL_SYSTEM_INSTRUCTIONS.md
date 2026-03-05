@@ -123,6 +123,7 @@ Public pages:
 - `/neon-snake` -> `neon-snake.html`
 - `/neural-engine` -> `neural-engine.html`
 - `/partners` -> `partners.html`
+- `/paypal-setup` -> `paypal-setup.html`
 - `/pricing` -> `pricing.html`
 - `/privacy` -> `privacy.html`
 - `/project-planning-hub` -> `project-planning-hub.html`
@@ -158,6 +159,7 @@ Admin pages:
 - `/admin/customer-chat` -> `admin/customer-chat.html`
 - `/admin` -> `admin/index.html`
 - `/admin/integrated-dashboard` -> `admin/integrated-dashboard.html`
+- `/admin/live-room-test` -> `admin/live-room-test.html`
 - `/admin/live-stream-enhanced` -> `admin/live-stream-enhanced.html`
 - `/admin/live-stream` -> `admin/live-stream.html`
 - `/admin/login` -> `admin/login.html`
@@ -189,6 +191,8 @@ Scripts available:
 - `scripts/commit-push-deploy.bat`
 - `scripts/continuous-integration.mjs`
 - `scripts/css-budget-validator.mjs`
+- `scripts/deploy-one-shot.ps1`
+- `scripts/deploy-with-oauth.ps1`
 - `scripts/dev-all.mjs`
 - `scripts/env-audit.mjs`
 - `scripts/generate-config.mjs`
@@ -220,6 +224,7 @@ Scripts available:
 - `scripts/update-global-system-doc.mjs`
 - `scripts/validate-governance.mjs`
 - `scripts/verify.mjs`
+- `scripts/wrangler-login.ps1`
 
 Git hooks:
 
@@ -260,6 +265,7 @@ Core governance docs present:
 
 - `ADMIN_COOKIE_SECRET`
 - `ADMIN_EMAIL`
+- `ADMIN_PASSWORD_HASH`
 - `ADMIN_ROLE`
 - `ADSENSE_MAX_SLOTS`
 - `ADSENSE_MODE`
@@ -287,6 +293,8 @@ Core governance docs present:
 - `GH_REPO`
 - `GH_TOKEN`
 - `LICENSE_SECRET`
+- `LIVE_ROOM_ADMIN_TOKEN`
+- `LIVE_ROOM_VIEWER_TOKEN`
 - `OPENAI_API`
 - `OPENAI_API_KEY3`
 - `OPENAI_MODEL`

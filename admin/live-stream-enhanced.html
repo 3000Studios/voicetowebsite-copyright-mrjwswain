@@ -559,6 +559,33 @@
           return `Up to ${maxWidth}x${maxHeight} @ ${maxFps}fps`;
         }
 
+        stopMediaStream(mediaStream) {
+          if (!mediaStream) return;
+          mediaStream.getTracks().forEach((track) => track.stop());
+        }
+
+        getDisplayConstraintsForSource(source) {
+          const qualitySettings = {
+            "1080p": { width: 1920, height: 1080, frameRate: 60 },
+            "720p": { width: 1280, height: 720, frameRate: 30 },
+            "480p": { width: 854, height: 480, frameRate: 30 },
+            "360p": { width: 640, height: 360, frameRate: 30 },
+          };
+
+          const quality = qualitySettings[this.selectedQuality];
+          const caps = source.capabilities || {};
+
+          return {
+            video: {
+              ...(source.type === "window" ? { displaySurface: "window" } : {}),
+              width: { ideal: Math.min(quality.width, caps.width?.max || quality.width) },
+              height: { ideal: Math.min(quality.height, caps.height?.max || quality.height) },
+              frameRate: { ideal: Math.min(quality.frameRate, caps.frameRate?.max || quality.frameRate) },
+            },
+            audio: false,
+          };
+        }
+
         async selectSource(sourceId) {
           // Update UI
           document.querySelectorAll(".source-card").forEach((card) => {
@@ -575,12 +602,20 @@
 
           try {
             // Stop existing preview
-            if (this.stream) {
-              this.stream.getTracks().forEach((track) => track.stop());
-            }
+            this.stopMediaStream(this.stream);
+            this.stream = null;
 
             const constraints = this.getConstraintsForSource(this.currentSource);
-            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            if (this.currentSource.type === "screen" || this.currentSource.type === "window") {
+              if (!navigator.mediaDevices.getDisplayMedia) {
+                throw new Error("Display capture is not supported in this browser");
+              }
+              this.stream = await navigator.mediaDevices.getDisplayMedia(
+                this.getDisplayConstraintsForSource(this.currentSource)
+              );
+            } else {
+              this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            }
 
             this.elements.previewVideo.srcObject = this.stream;
             await this.elements.previewVideo.play();
@@ -606,7 +641,6 @@
           if (source.type === "screen" || source.type === "window") {
             return {
               video: {
-                displaySurface: source.type,
                 width: { ideal: Math.min(quality.width, caps.width?.max || quality.width) },
                 height: { ideal: Math.min(quality.height, caps.height?.max || quality.height) },
                 frameRate: { ideal: Math.min(quality.frameRate, caps.frameRate?.max || quality.frameRate) },
@@ -660,7 +694,10 @@
           // Test the source by trying to get a stream
           try {
             const constraints = this.getConstraintsForSource(this.currentSource);
-            const testStream = await navigator.mediaDevices.getUserMedia(constraints);
+            const testStream =
+              this.currentSource.type === "screen" || this.currentSource.type === "window"
+                ? await navigator.mediaDevices.getDisplayMedia(this.getDisplayConstraintsForSource(this.currentSource))
+                : await navigator.mediaDevices.getUserMedia(constraints);
 
             // Check if we got a valid stream
             const videoTrack = testStream.getVideoTracks()[0];
@@ -676,7 +713,7 @@
               this.renderSources();
             }
 
-            testStream.getTracks().forEach((track) => track.stop());
+            this.stopMediaStream(testStream);
           } catch (error) {
             this.setStatus(`❌ Source test failed: ${error.message}`);
             this.currentSource.status = "unavailable";
@@ -698,7 +735,10 @@
             broadcastConstraints.video.width = { ideal: 1920 };
             broadcastConstraints.video.height = { ideal: 1080 };
 
-            this.broadcastStream = await navigator.mediaDevices.getUserMedia(broadcastConstraints);
+            this.broadcastStream =
+              this.currentSource.type === "screen" || this.currentSource.type === "window"
+                ? await navigator.mediaDevices.getDisplayMedia(this.getDisplayConstraintsForSource(this.currentSource))
+                : await navigator.mediaDevices.getUserMedia(broadcastConstraints);
 
             // Here you would integrate with your streaming service (WebRTC, RTMP protocol, etc.)
             // For now, we'll simulate streaming with enhanced features
@@ -766,7 +806,7 @@
           }
 
           if (this.broadcastStream) {
-            this.broadcastStream.getTracks().forEach((track) => track.stop());
+            this.stopMediaStream(this.broadcastStream);
             this.broadcastStream = null;
           }
 
