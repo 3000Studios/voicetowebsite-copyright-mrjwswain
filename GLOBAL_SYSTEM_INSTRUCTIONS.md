@@ -186,6 +186,7 @@ Scripts available:
 - `scripts/auto-ship.mjs`
 - `scripts/autopilot.mjs`
 - `scripts/check-css-governance.mjs`
+- `scripts/commit-push-deploy.bat`
 - `scripts/continuous-integration.mjs`
 - `scripts/css-budget-validator.mjs`
 - `scripts/dev-all.mjs`
@@ -226,7 +227,25 @@ Git hooks:
 - `.husky/pre-push`
 
 Recommended VS Code extensions:
-_None found_
+
+- `dbaeumer.vscode-eslint`
+- `esbenp.prettier-vscode`
+- `EditorConfig.EditorConfig`
+- `swalkerdev.cloudflare-kv-explorer`
+- `ms-vscode.vscode-typescript-next`
+- `eamodio.gitlens`
+- `christian-kohler.path-intellisense`
+- `streetsidesoftware.code-spell-checker`
+- `usernamehw.errorlens`
+- `dsznajder.es7-react-js-snippets`
+- `PKief.material-icon-theme`
+- `ms-vscode.powershell`
+- `GitHub.vscode-github-actions`
+- `humao.rest-client`
+- `mikestead.dotenv`
+- `vitest.explorer`
+- `rangav.vscode-thunder-client`
+- `yzhang.markdown-all-in-one`
 
 Core governance docs present:
 

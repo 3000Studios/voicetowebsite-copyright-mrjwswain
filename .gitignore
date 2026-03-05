@@ -35,6 +35,8 @@ scripts/test-runner.mjs
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+!.vscode/EXTENSIONS.md
+!.vscode/api-tests.http
 .idea
 .DS_Store
 *.suo

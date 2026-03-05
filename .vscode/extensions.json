@@ -1,38 +1,25 @@
 {
   "recommendations": [
-    // Core Development
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "EditorConfig.EditorConfig",
-
-    // Cloudflare Workers
-    "cloudflare.cloudflare-workers-bindings-extension",
-
-    // TypeScript & JavaScript
+    "swalkerdev.cloudflare-kv-explorer",
     "ms-vscode.vscode-typescript-next",
-
-    // Git Integration (single)
     "eamodio.gitlens",
-
-    // Productivity
     "christian-kohler.path-intellisense",
     "streetsidesoftware.code-spell-checker",
     "usernamehw.errorlens",
-
-    // React
     "dsznajder.es7-react-js-snippets",
-
-    // AI (single primary)
-    "Continue.continue",
-
-    // Utilities / Theme
     "PKief.material-icon-theme",
     "ms-vscode.powershell",
-    "GitHub.vscode-github-actions"
+    "GitHub.vscode-github-actions",
+    "humao.rest-client",
+    "mikestead.dotenv",
+    "vitest.explorer",
+    "rangav.vscode-thunder-client",
+    "yzhang.markdown-all-in-one"
   ],
-
   "unwantedRecommendations": [
-    // Duplicates / non-essential / performance risk
     "GitHub.copilot",
     "GitHub.copilot-chat",
     "mhutchie.git-graph",
@@ -40,13 +27,9 @@
     "christian-kohler.npm-intellisense",
     "aaron-bond.better-comments",
     "oderwat.indent-rainbow",
-
     "Gruntfuggly.todo-tree",
-
     "ms-playwright.playwright",
-
     "ZixuanChen.vitest-explorer",
-    // Already blocked legacy/unwanted set
     "vscodevim.vim",
     "ms-vscode.vscode-typescript-tslint-plugin",
     "bradlc.vscode-tailwindcss",

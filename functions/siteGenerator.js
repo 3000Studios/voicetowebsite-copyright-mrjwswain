@@ -262,32 +262,110 @@ const getStylePacksByIds = (ids) => {
   return STYLE_PACK_LIBRARY.filter((pack) => set.has(pack.id));
 };
 
+const escapeAttr = (s) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .trim();
+
+const sanitizeText = (text) => {
+  if (typeof text !== "string") return "";
+  return text
+    .replace(/[<>]/g, "")
+    .replace(/javascript:/gi, "")
+    .replace(/on\w+=/gi, "")
+    .trim()
+    .substring(0, 500);
+};
+
+const sanitizeUrl = (url) => {
+  if (typeof url !== "string") return "";
+  try {
+    const parsed = new URL(url);
+    // Only allow http/https protocols
+    if (!["http:", "https:"].includes(parsed.protocol)) return "";
+    return parsed.toString();
+  } catch {
+    // Invalid URL, return empty string
+    return "";
+  }
+};
+
 const renderPreviewHtml = ({ siteId, layout, css }) => {
-  const title = layout?.title || "Preview";
-  const description = layout?.description || "Generated preview";
-  const theme = layout?.theme || "midnight";
+  // Validate inputs
+  if (!siteId || typeof siteId !== "string") {
+    throw new Error("Invalid siteId provided");
+  }
+
+  if (!layout || typeof layout !== "object") {
+    layout = {};
+  }
+
+  const title = sanitizeText(layout?.title) || "Preview";
+  const headline = sanitizeText(layout?.headline) || title;
+  const description = sanitizeText(layout?.description) || "Generated preview";
+  const heroCaption = sanitizeText(layout?.heroCaption) || description;
+  const theme = sanitizeText(layout?.theme) || "midnight";
   const pages = Array.isArray(layout?.pages) ? layout.pages : [];
+
+  // Validate theme
+  const validThemes = ["midnight", "volt", "ember", "ocean"];
+  const selectedTheme = validThemes.includes(theme) ? theme : "midnight";
+
   const nav = pages
-    .map((p) => `<a href="#${p.slug || ""}">${p.title || p.slug || "Page"}</a>`)
-    .join("");
-  const sections = pages
+    .filter((p) => p && typeof p === "object")
     .map((p) => {
-      const blocks = Array.isArray(p.sections) ? p.sections : [];
-      const rendered = blocks
-        .map(
-          (s) =>
-            `<section class="vtw-section"><h3>${s.title || ""}</h3><p>${s.body || ""}</p></section>`
-        )
-        .join("");
-      return `<article id="${p.slug || ""}" class="vtw-page"><h2>${p.title || ""}</h2>${rendered}</article>`;
+      const slug = sanitizeText(p?.slug) || "";
+      const pageTitle =
+        sanitizeText(p?.title) || sanitizeText(p?.slug) || "Page";
+      return `<a href="#${escapeAttr(slug)}">${escapeAttr(pageTitle)}</a>`;
     })
     .join("");
+
+  const sections = pages
+    .filter((p) => p && typeof p === "object")
+    .map((p) => {
+      const blocks = Array.isArray(p.sections) ? p.sections : [];
+      const sanitizedSlug = sanitizeText(p?.slug) || "";
+      const sanitizedTitle = sanitizeText(p?.title) || "";
+
+      const rendered = blocks
+        .filter((s) => s && typeof s === "object")
+        .map((s) => {
+          const imageUrl = sanitizeUrl(s?.imageUrl);
+          const imageAlt =
+            sanitizeText(s?.imageAlt) || sanitizeText(s?.title) || "";
+          const title = sanitizeText(s?.title) || "";
+          const body = sanitizeText(s?.body) || "";
+
+          const img =
+            imageUrl && imageUrl.trim()
+              ? `<div class="vtw-section-img"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(imageAlt)}" loading="lazy" /></div>`
+              : "";
+          return `<section class="vtw-section">${img}<h3>${escapeAttr(title)}</h3><p>${escapeAttr(body)}</p></section>`;
+        })
+        .join("");
+      return `<article id="${escapeAttr(sanitizedSlug)}" class="vtw-page"><h2>${escapeAttr(sanitizedTitle)}</h2>${rendered}</article>`;
+    })
+    .join("");
+
+  const heroVideoUrl = sanitizeUrl(layout?.heroVideoUrl) || "";
+  const heroImageUrl = sanitizeUrl(layout?.heroImageUrl) || "";
+
+  const heroMedia = heroVideoUrl
+    ? `<video autoplay muted loop playsinline><source src="${escapeAttr(heroVideoUrl)}" type="video/mp4" /></video>`
+    : heroImageUrl
+      ? `<img src="${escapeAttr(heroImageUrl)}" alt="${escapeAttr(headline)}" />`
+      : `<video autoplay muted loop playsinline poster="/vtw-wallpaper.png"><source src="/media/vtw-home-wallpaper.mp4" type="video/mp4" /></video>`;
 
   const baseCss = `
     :root{color-scheme:dark}
     body{margin:0;background:#050507;color:#f8fafc;font-family:'Manrope',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     .vtw-wrap{max-width:1100px;margin:0 auto;padding:28px 18px}
-    header{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-bottom:22px}
+    .vtw-nav-bar{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 0;margin-bottom:0;border-bottom:1px solid rgba(255,255,255,.08)}
+    .vtw-nav-bar .vtw-logo{font-weight:800;font-size:1.15rem;color:#f8fafc}
     nav{display:flex;gap:12px;flex-wrap:wrap}
     nav a{color:#38bdf8;text-decoration:none;font-weight:600}
     nav a:hover{text-decoration:underline}
@@ -295,6 +373,8 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
     .vtw-page{padding:18px 0;border-top:1px solid rgba(255,255,255,.08)}
     .vtw-section{padding:12px 0}
     .vtw-section h3{margin:0 0 6px 0}
+    .vtw-section-img{margin-bottom:10px;border-radius:12px;overflow:hidden;max-height:280px}
+    .vtw-section-img img{width:100%;height:100%;object-fit:cover;display:block}
     .vtw-hero{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:center;margin-bottom:24px;padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(15,23,42,.65))}
     .vtw-hero-media{position:relative;border-radius:16px;overflow:hidden;min-height:180px}
     .vtw-hero-media video,.vtw-hero-media img{width:100%;height:100%;object-fit:cover;display:block}
@@ -310,14 +390,12 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
   const hero = `
     <section class="vtw-hero">
       <div class="vtw-hero-media">
-        <video autoplay muted loop playsinline poster="/vtw-wallpaper.png">
-          <source src="/media/vtw-home-wallpaper.mp4" type="video/mp4" />
-        </video>
+        ${heroMedia}
       </div>
       <div class="vtw-hero-card vtw-float">
         <div class="vtw-meta">Generated preview</div>
-        <h1 style="margin:0">${title}</h1>
-        <p>${description}</p>
+        <h1 style="margin:0">${escapeAttr(headline)}</h1>
+        <p>${escapeAttr(heroCaption)}</p>
         <div class="vtw-hero-actions">
           <a class="primary" href="#home">Explore</a>
           <a href="#contact">Contact</a>
@@ -327,28 +405,26 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
   `;
 
   return `<!doctype html>
-<html lang="en" data-theme="${theme}">
+<html lang="en" data-theme="${escapeAttr(selectedTheme)}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${title}</title>
-    <meta name="description" content="${description}" />
+    <title>${escapeAttr(title)}</title>
+    <meta name="description" content="${escapeAttr(description)}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css" />
-    <style>${baseCss}\n${css || ""}</style>
+    <style>${baseCss}${css}</style>
   </head>
   <body>
     <div class="vtw-wrap">
       ${hero}
-      <header>
-        <div>
-          <h1 style="margin:0">${title}</h1>
-          <div class="vtw-meta">Preview ID: ${siteId}</div>
-        </div>
+      <header class="vtw-nav-bar">
+        <div class="vtw-logo">${escapeAttr(title)}</div>
         <nav>${nav}</nav>
       </header>
+      ${hero}
+      <div class="vtw-meta" style="margin-bottom:8px">Preview ID: ${escapeAttr(siteId)}</div>
       ${sections || `<p class="vtw-meta">No pages were generated.</p>`}
     </div>
   </body>
@@ -419,26 +495,34 @@ export async function handleGenerateRequest({ request, env }) {
   if (!env.AI) return json(501, { error: "Workers AI binding missing (AI)." });
 
   const system = `
-You are an expert product designer and web IA planner.
+You are an expert product designer and web IA planner. Generate content STRICTLY relevant to the user's topic and request. Every title, description, headline, and section body MUST reflect what the user asked for—do not use generic or off-topic copy.
+
 Return ONLY valid JSON with this schema:
 {
-  "title": "Site title",
-  "description": "One sentence description",
+  "title": "Site title (topic-specific)",
+  "headline": "Hero headline (compelling, topic-specific, can match or expand on title)",
+  "description": "One sentence description (topic-specific)",
   "theme": "midnight|volt|ember|ocean",
+  "layoutType": "business|portfolio|restaurant|tech|editorial|default",
+  "heroCaption": "Short hero tagline or subhead (optional)",
+  "heroVideoUrl": "Optional: URL to a free stock video (e.g. Pexels/Mixkit) that fits the topic, or empty string",
+  "heroImageUrl": "Optional: URL to an image that fits the topic (e.g. https://placehold.co/1200x600?text=TOPIC), or empty string",
   "pages": [
-    {"slug":"home","title":"Home","sections":[{"title":"...","body":"..."}]}
+    {"slug":"home","title":"Home","sections":[{"title":"...","body":"...","imageUrl":"optional image URL","imageAlt":"optional alt text"}]}
   ]
 }
 Rules:
-- 3-6 pages max.
-- Each page: 2-5 sections max.
-- Slugs are lowercase, hyphenated, unique.
-- Keep copy tight and conversion-oriented.
+- 3-6 pages max. Every page title and section content must be about the user's topic.
+- Each page: 2-5 sections. Sections may include "imageUrl" and "imageAlt" for topic-relevant images.
+- Slugs: lowercase, hyphenated, unique (e.g. home, about, services, contact).
+- Always provide "headline" and "nav" is built from pages. Suggest "heroVideoUrl" or "heroImageUrl" when they fit the topic.
+- layoutType: pick the best fit for the topic (e.g. restaurant for food, tech for software, editorial for content).
+- Keep copy tight, conversion-oriented, and 100% relevant to the user's request.
 `.trim();
 
   const user = `
 Tone: ${tone || "default"}
-Input:
+User request (generate all content to match this topic):
 ${mergedPrompt}
 `.trim();
 
@@ -450,14 +534,64 @@ ${mergedPrompt}
         { role: "user", content: user },
       ],
       temperature: 0.3,
-      max_tokens: 900,
+      max_tokens: 1400,
     });
     layout = extractJsonObject(pickAiText(result));
+
+    // Validate layout structure
+    if (!layout || typeof layout !== "object") {
+      throw new Error("Invalid layout structure returned");
+    }
+
+    // Validate required fields
+    if (!layout.title || typeof layout.title !== "string") {
+      layout.title = "Generated Site";
+    }
+
+    if (!Array.isArray(layout.pages)) {
+      layout.pages = [];
+    }
+
+    // Validate pages structure
+    layout.pages = layout.pages.filter((page) => {
+      if (!page || typeof page !== "object") return false;
+      if (!page.title || typeof page.title !== "string") return false;
+      if (!Array.isArray(page.sections)) return false;
+      return true;
+    });
+
+    if (layout.pages.length === 0) {
+      layout.pages = [
+        {
+          slug: "home",
+          title: "Home",
+          sections: [
+            {
+              title: "Welcome",
+              body: "Welcome to your generated site.",
+            },
+          ],
+        },
+      ];
+    }
   } catch (err) {
     return json(502, { error: `Layout generation failed: ${err.message}` });
   }
 
-  const selectedStylePacks = getStylePacksByIds(stylePackIds);
+  const layoutType = (layout?.layoutType || "").trim().toLowerCase();
+  const layoutTypeStylePacks =
+    {
+      restaurant: ["sunset-gradient", "rounded-xl", "bold-headings"],
+      tech: ["neon-edges", "mono-tech", "hover-lift"],
+      portfolio: ["glass-ui", "spacious-density", "subtle-motion"],
+      editorial: ["editorial-serif", "large-type", "high-contrast"],
+      business: ["mint-gradient", "compact-density", "rich-links"],
+    }[layoutType] || [];
+  const mergedStylePackIds =
+    stylePackIds.length > 0
+      ? stylePackIds
+      : [...new Set([...DEFAULT_STYLE_PACKS, ...layoutTypeStylePacks])];
+  const selectedStylePacks = getStylePacksByIds(mergedStylePackIds);
   const generatedCss = layout?.theme
     ? `:root{--vtw-theme:'${layout.theme}';}`
     : "";
@@ -564,7 +698,7 @@ export async function handlePublishRequest({ request, env }) {
   let body;
   try {
     body = await request.clone().json();
-  } catch (_) {
+  } catch {
     body = {};
   }
   const siteId = String(body?.siteId || "");
