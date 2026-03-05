@@ -56,13 +56,16 @@ Notes:
   you need to deploy from your machine; normally GitHub Actions deploys on push to main.
 - For local deploy, set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment (e.g.
   in PowerShell: `$env:CLOUDFLARE_API_TOKEN = "your-token"` and
-  `$env:CLOUDFLARE_ACCOUNT_ID = "your-account-id"`). If you see "Authentication failed (status: 400)
-  [code: 9106]", the token may be expired or invalid; create a new token in the Cloudflare
-  dashboard.
-- Validate auth before deploying:
-  - `npx wrangler whoami`
-  - If it fails, run `npx wrangler login` or set a valid `CLOUDFLARE_API_TOKEN` with Workers deploy
-    permissions for this account.
+  `$env:CLOUDFLARE_ACCOUNT_ID = "your-account-id"`).
+
+**Fix "Authentication failed (status: 400) [code: 9106]":** This means Wrangler cannot authenticate
+to the Workers API. (1) **Easiest:** run `npx wrangler login`, sign in in the browser, then run
+`npm run deploy` again. (2) **Or use an API token:** create one at
+[Cloudflare API Tokens](https://dash.cloudflare.com/profile/api-tokens) using the **Edit Cloudflare
+Workers** template; set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (account ID is in
+Dashboard → Workers → sidebar). Ensure the token is for the same account and not expired. (3) Check
+auth with `npx wrangler whoami` before deploying.
+
 - The Worker refuses traffic if `ENVIRONMENT` is set to anything other than `production` or
   `development` (e.g. blocks staging-from-production config).
 - `--keep-vars` prevents Wrangler from wiping runtime vars/secrets set in the Cloudflare Dashboard.
