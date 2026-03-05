@@ -1065,12 +1065,12 @@ const setupAudio = () => {
   let audio = null;
   let isDestroyed = false;
   let cleanupIndex = -1;
-  let isCreating = false; // Prevent race condition
+  let isCreating = false;
 
   const createAudio = () => {
     if (isDestroyed || isCreating) return null;
 
-    isCreating = true; // Set lock
+    isCreating = true;
 
     try {
       audio = new Audio();
@@ -1091,7 +1091,6 @@ const setupAudio = () => {
 
       audio.addEventListener("ended", handleEnded);
 
-      // Store cleanup for this audio instance
       audio._cleanup = () => {
         audio.removeEventListener("ended", handleEnded);
         audio.pause();
@@ -1099,8 +1098,11 @@ const setupAudio = () => {
       };
 
       return audio;
+    } catch (error) {
+      console.warn("Failed to create audio:", error);
+      return null;
     } finally {
-      isCreating = false; // Release lock
+      isCreating = false;
     }
   };
 
@@ -1111,27 +1113,23 @@ const setupAudio = () => {
       audio = null;
     }
 
-    // Remove cleanup function from global array to prevent memory leaks
     if (cleanupIndex >= 0 && window.__cleanupFunctions) {
       window.__cleanupFunctions.splice(cleanupIndex, 1);
       cleanupIndex = -1;
     }
   };
 
-  // Create and start audio
   audio = createAudio();
   if (audio) {
     audio.play().catch(() => {});
   }
 
-  // Store cleanup function with index for removal
   if (!window.__cleanupFunctions) {
     window.__cleanupFunctions = [];
   }
   cleanupIndex = window.__cleanupFunctions.length;
   window.__cleanupFunctions.push(cleanupAudio);
 
-  // Add page unload cleanup
   const handleUnload = () => {
     cleanupAudio();
     window.removeEventListener("unload", handleUnload);
@@ -1143,7 +1141,6 @@ const setupAudio = () => {
 const setupTicker = () => {
   if (!elements.ticker || !elements.tickerData) return;
 
-  // Configuration with fallback
   const config = {
     apiUrl:
       "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd",
@@ -1193,19 +1190,14 @@ const setupTicker = () => {
     }
   };
 
-  // Start updates
   update();
   marketDataInterval = setInterval(update, config.updateInterval);
 
-  // Store cleanup function in module scope
   const cleanupFunctions = window.__cleanupFunctions || [];
   cleanupFunctions.push(cleanupMarketData);
   window.__cleanupFunctions = cleanupFunctions;
-
-  // Also store for backward compatibility
   window.cleanupMarketData = cleanupMarketData;
 
-  // Add page unload cleanup
   const handleUnload = () => {
     cleanupMarketData();
     window.removeEventListener("unload", handleUnload);

@@ -628,7 +628,7 @@
     { color: "#bc13fe", amp: 40, freq: 0.015, speed: 0.03 },
     { color: "#ff00bd", amp: 80, freq: 0.01, speed: 0.02 },
   ];
-  let latexWaveState = { raf: 0, phase: 0, paths: [] };
+  const latexWaveState = { raf: 0, phase: 0, paths: [] };
   const startLatexWaves = (header) => {
     if (!header) return;
     if (prefersReducedMotion()) return;
@@ -1035,8 +1035,8 @@
     const target = document.getElementById("target");
 
     let width, height;
-    let mouse = { x: -1000, y: -1000, active: false };
-    let points = [];
+    const mouse = { x: -1000, y: -1000, active: false };
+    const points = [];
     const count = 60;
     let animationId = null;
     let audioCtx = null;

@@ -28,7 +28,7 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const phaseRef = useRef(0);
-  const isMountedRef = useRef(true);
+  const [isMounted, setIsMounted] = useState(true);
 
   const [scrollY, setScrollY] = useState(0);
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -62,17 +62,12 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
     []
   );
 
-  // Animation loop - separated from frequently changing values
+  // Animation loop with proper cleanup
   useEffect(() => {
-    // Cancel any existing animation frame before starting new one
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = undefined;
-    }
+    if (!isMounted) return;
 
     const animate = () => {
-      // Check if component is still mounted
-      if (!isMountedRef.current) return;
+      if (!isMounted) return;
 
       phaseRef.current += 0.03; // Slower, smoother animation
       const scrollLift = Math.min(scrollY / 500, 1);
@@ -110,25 +105,31 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
         }
       });
 
-      // Only request next frame if component is still mounted
-      if (isMountedRef.current) {
+      if (isMounted) {
         animationFrameRef.current = requestAnimationFrame(animate);
       }
     };
 
-    // Start animation immediately
     animate();
 
     return () => {
-      isMountedRef.current = false;
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = undefined;
       }
     };
-  }, [scrollY, createWavePath, waveConfig]);
+  }, [scrollY, createWavePath, waveConfig, isMounted]);
 
-  // Scroll handling
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      setIsMounted(false);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = undefined;
+      }
+    };
+  }, []);
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;

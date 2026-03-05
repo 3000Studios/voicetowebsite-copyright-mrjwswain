@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+// Add PayPal global type declaration
+declare global {
+  interface Window {
+    paypal?: unknown;
+  }
+}
 
 interface PayPalConfig {
   clientId?: string;
@@ -51,9 +58,21 @@ const PayPalIntegration: React.FC<PayPalIntegrationProps> = ({
     }
     return [];
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, _setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
+
+  // Load PayPal SDK dynamically
+  useEffect(() => {
+    if (config.clientId && !window.paypal) {
+      const script = document.createElement("script");
+      script.src = `https://www.paypal.com/sdk/js?client-id=${config.clientId}&currency=${config.currency}`;
+      script.async = true;
+      script.onload = () => console.warn("PayPal SDK loaded");
+      script.onerror = () => console.error("Failed to load PayPal SDK");
+      document.head.appendChild(script);
+    }
+  }, [config.clientId, config.currency]);
 
   const saveConfig = (newConfig: PayPalConfig) => {
     setConfig(newConfig);
