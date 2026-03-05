@@ -39,6 +39,15 @@ for (const key of ACCOUNT_KEYS) {
 }
 
 const args = ["wrangler", "deploy", "--keep-vars", ...process.argv.slice(2)];
-const cmd = process.platform === "win32" ? "npx.cmd" : "npx";
-const result = spawnSync(cmd, args, { stdio: "inherit", env });
+const result = spawnSync("npx", args, {
+  stdio: "inherit",
+  env,
+  shell: process.platform === "win32",
+});
+if (result.error) {
+  console.error(
+    `deploy-safe: failed to start wrangler: ${result.error.message}`
+  );
+  process.exit(1);
+}
 process.exit(result.status ?? 1);
