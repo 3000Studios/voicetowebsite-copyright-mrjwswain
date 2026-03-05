@@ -108,6 +108,7 @@ Public pages:
 - `/cyber-blog` -> `cyber-blog.html`
 - `/demo` -> `demo.html`
 - `/disclosure` -> `disclosure.html`
+- `/enhanced-hamburger-nav` -> `enhanced-hamburger-nav.html`
 - `/enhanced-navigation` -> `enhanced-navigation.html`
 - `/features` -> `features.html`
 - `/focus-timer` -> `focus-timer.html`

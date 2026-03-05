@@ -1,6 +1,7 @@
 export interface NavigationItem {
   href: string;
   label: string;
+  requiresAuth?: boolean;
 }
 
 export const SHARED_NAV_ITEMS: NavigationItem[] = [
@@ -40,5 +41,34 @@ export const SHARED_NAV_ITEMS: NavigationItem[] = [
   { href: "/lexicon-pro", label: "Lexicon Pro" },
   { href: "/voice-to-json", label: "Voice to JSON" },
   { href: "/geological-studies", label: "Geological Studies" },
-  { href: "/admin/login.html", label: "Admin Login" },
+  { href: "/admin/login.html", label: "Admin Login", requiresAuth: true },
+  { href: "/admin/access.html", label: "Admin Panel", requiresAuth: true },
+  {
+    href: "/admin/integrated-dashboard.html",
+    label: "Dashboard",
+    requiresAuth: true,
+  },
+  {
+    href: "/admin/store-manager.html",
+    label: "Store Manager",
+    requiresAuth: true,
+  },
+  {
+    href: "/admin/app-store-manager.html",
+    label: "App Store Manager",
+    requiresAuth: true,
+  },
+  { href: "/admin/analytics.html", label: "Analytics", requiresAuth: true },
+  {
+    href: "/admin/voice-commands.html",
+    label: "Voice Commands",
+    requiresAuth: true,
+  },
+  {
+    href: "/admin/live-room-test.html",
+    label: "Live Room Test",
+    requiresAuth: true,
+  },
+  { href: "/admin/media.html", label: "Media Manager", requiresAuth: true },
+  { href: "/admin/settings.html", label: "Settings", requiresAuth: true },
 ];

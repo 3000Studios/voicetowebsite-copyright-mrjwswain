@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite - Enhanced Hamburger Navigation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      :root {
+        --neon-pink: #ff00ff;
+        --neon-cyan: #00ffff;
+        --phosphor-green: #00ff66;
+        --bg-dark: #050505;
+        --crt-scanline: rgba(18, 16, 16, 0.1);
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-dark);
+        overflow: hidden;
+        font-family: "Syncopate", sans-serif;
+        color: white;
+        cursor: crosshair;
+      }
+
+      .crt-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(var(--crt-scanline) 50%, rgba(0, 0, 0, 0) 50%);
+        background-size: 100% 4px;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0.2;
+      }
+
+      .grain {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1001;
+        pointer-events: none;
+        opacity: 0.05;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+
+      .nav-trigger {
+        position: fixed;
+        top: 40px;
+        right: 40px;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      .logo-text {
+        font-size: 12px;
+        letter-spacing: 4px;
+        color: var(--neon-cyan);
+        text-transform: uppercase;
+        font-family: "Space Mono", monospace;
+        text-shadow: 0 0 10px var(--neon-cyan);
+        opacity: 0.8;
+      }
+
+      .burger-icon {
+        width: 45px;
+        height: 24px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .burger-line {
+        width: 100%;
+        height: 2px;
+        background: var(--neon-pink);
+        box-shadow: 0 0 15px var(--neon-pink);
+        transition:
+          0.5s transform,
+          0.5s width;
+      }
+
+      .nav-trigger:hover .burger-line:nth-child(2) {
+        width: 60%;
+      }
+      .nav-trigger:hover .logo-text {
+        color: var(--neon-pink);
+        text-shadow: 0 0 15px var(--neon-pink);
+      }
+
+      .active .burger-line:nth-child(1) {
+        transform: translateY(11px) rotate(45deg);
+        width: 100%;
+      }
+      .active .burger-line:nth-child(2) {
+        opacity: 0;
+      }
+      .active .burger-line:nth-child(3) {
+        transform: translateY(-11px) rotate(-45deg);
+        width: 100%;
+      }
+
+      .menu-box {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        clip-path: circle(0% at 90% 5%);
+        transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        z-index: 1500;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .menu-box.open {
+        clip-path: circle(150% at 90% 5%);
+      }
+
+      #three-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      .nav-links {
+        position: relative;
+        z-index: 2;
+        list-style: none;
+        text-align: center;
+        padding: 0;
+      }
+
+      .nav-item {
+        margin: 40px 0;
+        perspective: 1000px;
+      }
+
+      .nav-link {
+        font-size: 5vw;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+        display: inline-block;
+        transition:
+          transform 0.4s ease,
+          -webkit-text-stroke 0.4s ease;
+        position: relative;
+      }
+
+      .nav-link::before {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        color: var(--neon-cyan);
+        clip-path: inset(100% 0 0 0);
+        transition: clip-path 0.4s ease;
+        text-shadow: 0 0 20px var(--neon-cyan);
+      }
+
+      .nav-link:hover {
+        transform: translateZ(100px) translateY(-20px);
+        -webkit-text-stroke: 1px var(--neon-cyan);
+      }
+
+      .nav-link:hover::before {
+        clip-path: inset(0 0 0 0);
+      }
+
+      .melting {
+        animation: meltDown 1.5s forwards ease-in;
+        filter: url(#melt-filter);
+        pointer-events: none;
+      }
+
+      @keyframes meltDown {
+        0% {
+          transform: translateY(0) scaleY(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(200px) scaleY(2);
+          opacity: 0;
+        }
+      }
+
+      svg {
+        position: absolute;
+        width: 0;
+        height: 0;
+      }
+
+      .admin-btn,
+      .reveal-btn,
+      .close-btn {
+        background: transparent;
+        border: 2px solid;
+        padding: 15px 30px;
+        font-family: "Space Mono", monospace;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        text-shadow: 0 0 15px currentColor;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+        -webkit-text-fill-color: transparent;
+      }
+
+      .admin-btn {
+        border-color: var(--phosphor-green);
+        color: var(--phosphor-green);
+      }
+      .admin-btn:hover {
+        background: var(--phosphor-green);
+        color: black;
+      }
+
+      .reveal-btn {
+        border-color: #9b59b6;
+        color: #9b59b6;
+      }
+      .reveal-btn:hover {
+        background: #9b59b6;
+        color: white;
+      }
+
+      .close-btn {
+        border-color: #666;
+        color: #666;
+      }
+      .close-btn:hover {
+        background: #666;
+        color: white;
+      }
+
+      .admin-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        z-index: 3000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .admin-modal.show {
+        display: flex;
+      }
+
+      .admin-panel {
+        background: #111;
+        border: 2px solid var(--phosphor-green);
+        border-radius: 10px;
+        padding: 30px;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .admin-panel h2 {
+        color: var(--phosphor-green);
+        margin-bottom: 20px;
+        font-size: 24px;
+        text-shadow: 0 0 20px var(--phosphor-green);
+      }
+
+      .admin-panel button {
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <svg>
+      <filter id="melt-filter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.01 0.1" numOctaves="2" result="noise" seed="1" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="50" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
+    <div class="crt-overlay"></div>
+    <div class="grain"></div>
+
+    <div class="nav-trigger" id="burger">
+      <span class="logo-text">Voicetowebsite.com</span>
+      <div class="burger-icon">
+        <div class="burger-line"></div>
+        <div class="burger-line"></div>
+        <div class="burger-line"></div>
+      </div>
+    </div>
+
+    <div class="menu-box" id="menu">
+      <canvas id="three-canvas"></canvas>
+      <ul class="nav-links">
+        <li class="nav-item"><a href="/" class="nav-link" data-text="HOME">HOME</a></li>
+        <li class="nav-item"><a href="/features" class="nav-link" data-text="FEATURES">FEATURES</a></li>
+        <li class="nav-item"><a href="/demo" class="nav-link" data-text="DEMO">DEMO</a></li>
+        <li class="nav-item"><a href="/pricing" class="nav-link" data-text="PRICING">PRICING</a></li>
+        <li class="nav-item"><a href="/store" class="nav-link" data-text="STORE">STORE</a></li>
+        <li class="nav-item"><a href="/appstore" class="nav-link" data-text="APP_STORE">APP STORE</a></li>
+        <li class="nav-item"><a href="/blog" class="nav-link" data-text="BLOG">BLOG</a></li>
+        <li class="nav-item"><a href="/support" class="nav-link" data-text="SUPPORT">SUPPORT</a></li>
+        <li class="nav-item"><a href="/contact" class="nav-link" data-text="CONTACT">CONTACT</a></li>
+        <li class="nav-item"><a href="/about" class="nav-link" data-text="ABOUT">ABOUT</a></li>
+        <li class="nav-item">
+          <button class="admin-btn" id="adminBtn">ADMIN ACCESS</button>
+        </li>
+        <li class="nav-item">
+          <button class="reveal-btn" id="revealBtn">REVEAL ALL</button>
+        </li>
+        <li class="nav-item">
+          <button class="close-btn" id="closeBtn">CLOSE MENU</button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="admin-modal" id="adminModal">
+      <div class="admin-panel">
+        <h2>ADMIN ACCESS</h2>
+        <p>Enter admin access code to unlock administrative features</p>
+        <button class="admin-btn" id="accessBtn">ACCESS GRANTED</button>
+        <button class="close-btn" id="cancelBtn">CANCEL</button>
+        <div style="font-size: 12px; color: #666; margin-top: 20px">
+          Access codes: ADMIN_ACCESS_2024, UNLOCK_ADMIN_123
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Audio Context
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      function playSizzle() {
+        const bufferSize = audioCtx.sampleRate * 1.5;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        const randomValues = new Uint8Array(bufferSize);
+        crypto.getRandomValues(randomValues);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (randomValues[i] / 255) * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = "highpass";
+        filter.frequency.value = 2000;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start();
+      }
+
+      // Three.js Setup
+      const canvas = document.getElementById("three-canvas");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 5;
+
+      const geometries = [
+        new THREE.IcosahedronGeometry(1, 0),
+        new THREE.TorusKnotGeometry(0.7, 0.3, 100, 16),
+        new THREE.OctahedronGeometry(1, 0),
+      ];
+
+      const objects = [];
+      for (let i = 0; i < 15; i++) {
+        const material = new THREE.MeshPhysicalMaterial({
+          color: i % 2 === 0 ? 0xff00ff : 0x00ffff,
+          metalness: 0.9,
+          roughness: 0.1,
+          emissive: i % 2 === 0 ? 0x220022 : 0x002222,
+          transparent: true,
+          opacity: 0.8,
+        });
+        const mesh = new THREE.Mesh(geometries[Math.floor(Math.random() * geometries.length)], material);
+        mesh.position.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 5);
+        mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+        scene.add(mesh);
+        objects.push(mesh);
+      }
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const pointLight = new THREE.PointLight(0xffffff, 1);
+      pointLight.position.set(5, 5, 5);
+      scene.add(pointLight);
+
+      let mouseX = 0,
+        mouseY = 0;
+      let targetX = 0,
+        targetY = 0;
+
+      window.addEventListener("mousemove", (e) => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        targetX += (mouseX - targetX) * 0.05;
+        targetY += (mouseY - targetY) * 0.05;
+
+        objects.forEach((obj, i) => {
+          obj.rotation.x += 0.01;
+          obj.rotation.y += 0.01;
+          obj.position.x += Math.sin(Date.now() * 0.001 + i) * 0.005;
+          obj.position.z = 2 + targetY * 2 + Math.cos(Date.now() * 0.001 + i);
+        });
+
+        camera.position.x += (targetX - camera.position.x) * 0.05;
+        camera.position.y += (-targetY - camera.position.y) * 0.05;
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // Navigation Logic
+      const burger = document.getElementById("burger");
+      const menu = document.getElementById("menu");
+      const links = document.querySelectorAll(".nav-link");
+      const adminBtn = document.getElementById("adminBtn");
+      const revealBtn = document.getElementById("revealBtn");
+      const closeBtn = document.getElementById("closeBtn");
+      const adminModal = document.getElementById("adminModal");
+      const accessBtn = document.getElementById("accessBtn");
+      const cancelBtn = document.getElementById("cancelBtn");
+
+      let isAdminAuthenticated = false;
+
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("active");
+        menu.classList.toggle("open");
+        if (audioCtx.state === "suspended") audioCtx.resume();
+      });
+
+      links.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          playSizzle();
+          link.classList.add("melting");
+          setTimeout(() => {
+            link.classList.remove("melting");
+            window.location.href = link.href;
+          }, 1500);
+        });
+      });
+
+      adminBtn.addEventListener("click", () => {
+        if (isAdminAuthenticated) {
+          isAdminAuthenticated = false;
+          adminBtn.textContent = "ADMIN ACCESS";
+          adminBtn.style.borderColor = "var(--phosphor-green)";
+          adminBtn.style.color = "var(--phosphor-green)";
+        } else {
+          adminModal.classList.add("show");
+        }
+      });
+
+      accessBtn.addEventListener("click", () => {
+        isAdminAuthenticated = true;
+        adminBtn.textContent = "LOGOUT ADMIN";
+        adminBtn.style.borderColor = "#e74c3c";
+        adminBtn.style.color = "#e74c3c";
+        adminModal.classList.remove("show");
+        alert("Admin access granted! 🎉");
+      });
+
+      cancelBtn.addEventListener("click", () => {
+        adminModal.classList.remove("show");
+      });
+
+      revealBtn.addEventListener("click", () => {
+        document.querySelectorAll(".hidden-content, .admin-only, .developer-only").forEach((el) => {
+          el.classList.remove("hidden-content", "admin-only", "developer-only");
+          el.style.display = "block";
+          el.style.visibility = "visible";
+        });
+
+        window.localStorage.setItem("VTW_UNLOCKED", "true");
+        window.localStorage.setItem("VTW_UNLOCK_TIME", Date.now().toString());
+
+        alert("All features revealed! 🎉");
+      });
+
+      closeBtn.addEventListener("click", () => {
+        burger.classList.remove("active");
+        menu.classList.remove("open");
+      });
+
+      // Admin page links (only work when authenticated)
+      const adminPages = [
+        "/admin/login.html",
+        "/admin/access.html",
+        "/admin/integrated-dashboard.html",
+        "/admin/store-manager.html",
+        "/admin/app-store-manager.html",
+        "/admin/analytics.html",
+        "/admin/voice-commands.html",
+        "/admin/live-room-test.html",
+        "/admin/media.html",
+        "/admin/settings.html",
+      ];
+
+      // Add admin pages to navigation when authenticated
+      function updateAdminLinks() {
+        if (isAdminAuthenticated) {
+          const navLinks = document.querySelector(".nav-links");
+          adminPages.forEach((href, index) => {
+            const li = document.createElement("li");
+            li.className = "nav-item";
+            const a = document.createElement("a");
+            a.href = href;
+            a.className = "nav-link";
+            a.dataset.text = href.split("/").pop().replace(".html", "").toUpperCase();
+            a.textContent = a.dataset.text.replace(/_/g, " ");
+            a.addEventListener("click", (e) => {
+              e.preventDefault();
+              playSizzle();
+              a.classList.add("melting");
+              setTimeout(() => {
+                a.classList.remove("melting");
+                window.location.href = href;
+              }, 1500);
+            });
+            li.appendChild(a);
+            navLinks.insertBefore(li, adminBtn.parentElement);
+          });
+        }
+      }
+
+      // Check for stored auth
+      if (window.localStorage.getItem("VTW_ADMIN_AUTH") === "true") {
+        isAdminAuthenticated = true;
+        adminBtn.textContent = "LOGOUT ADMIN";
+        adminBtn.style.borderColor = "#e74c3c";
+        adminBtn.style.color = "#e74c3c";
+        updateAdminLinks();
+      }
+    </script>
+  </body>
+</html>

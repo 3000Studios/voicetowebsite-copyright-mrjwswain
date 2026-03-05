@@ -134,7 +134,7 @@ const AdminAuth: React.FC<AdminAuthProps> = ({
       <div
         style={{
           position: "fixed",
-          top: "20px",
+          bottom: "20px",
           right: "20px",
           background: "rgba(0, 0, 0, 0.9)",
           border: "1px solid #333",
@@ -213,7 +213,7 @@ const AdminAuth: React.FC<AdminAuthProps> = ({
     <div
       style={{
         position: "fixed",
-        top: "20px",
+        bottom: "20px",
         right: "20px",
         background: "rgba(0, 0, 0, 0.9)",
         border: "1px solid #333",
