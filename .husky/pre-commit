@@ -37,9 +37,14 @@ if [ -f .nvmrc ]; then
 
   CURRENT_NODE="$(node -v 2>/dev/null | sed 's/^v//' | cut -d. -f1)"
   if [ "$CURRENT_NODE" != "$EXPECTED_NODE" ]; then
-    echo "Node version mismatch: expected Node major $EXPECTED_NODE from .nvmrc ($EXPECTED_NODE_RAW), current is v$(node -v | sed 's/^v//')."
-    echo "Run 'nvm use $EXPECTED_NODE_RAW' (or equivalent), then retry commit."
-    exit 1
+    if [ -n "$VTW_SKIP_NODE_CHECK" ]; then
+      echo "Node version mismatch (current v$(node -v | sed 's/^v//'), .nvmrc wants $EXPECTED_NODE_RAW). Skipping check (VTW_SKIP_NODE_CHECK)."
+    else
+      echo "Node version mismatch: expected Node major $EXPECTED_NODE from .nvmrc ($EXPECTED_NODE_RAW), current is v$(node -v | sed 's/^v//')."
+      echo "Run 'nvm use $EXPECTED_NODE_RAW' (or equivalent), then retry commit."
+      echo "To commit anyway: VTW_SKIP_NODE_CHECK=1 git commit ..."
+      exit 1
+    fi
   fi
 fi
 

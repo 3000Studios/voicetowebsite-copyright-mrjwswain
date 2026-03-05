@@ -137,6 +137,24 @@
   text-align: center;
   padding: 0;
   margin: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vtw-neon-cyan) transparent;
+}
+
+.vtw-phosphor-nav-links::-webkit-scrollbar {
+  width: 6px;
+}
+
+.vtw-phosphor-nav-links::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.vtw-phosphor-nav-links::-webkit-scrollbar-thumb {
+  background: var(--vtw-neon-cyan);
+  border-radius: 3px;
+  box-shadow: 0 0 10px var(--vtw-neon-cyan);
 }
 
 .vtw-phosphor-nav-item {

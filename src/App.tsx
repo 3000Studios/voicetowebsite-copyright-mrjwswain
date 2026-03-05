@@ -2,9 +2,9 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
 import ComprehensiveAdminPanel from "./components/ComprehensiveAdminPanel";
+import EnhancedHamburgerNav from "./components/EnhancedHamburgerNav";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ParticleEffects from "./components/ParticleEffects";
-import PhosphorNav from "./components/PhosphorNav";
 import WarpTunnel from "./components/WarpTunnel";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
 import { audioEngine } from "./services/audioEngine";
@@ -740,8 +740,12 @@ const App: React.FC = () => {
           <ParticleEffects />
         </div>
 
-        {/* Global phosphor hamburger + fullscreen popout nav */}
-        <PhosphorNav />
+        {/* Global enhanced hamburger + fullscreen popout nav */}
+        <EnhancedHamburgerNav
+          isAdminAuthenticated={isAdminAuthenticated}
+          onAdminLogin={() => setIsAdminAuthenticated(true)}
+          onAdminLogout={() => setIsAdminAuthenticated(false)}
+        />
 
         <div className="fixed bottom-5 right-5 z-50">
           <button
