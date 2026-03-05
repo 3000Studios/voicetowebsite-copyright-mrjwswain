@@ -1,5 +1,15 @@
 const CONFIRMATION_PHRASE = "hell yeah ship it";
 
+/** Accept exact phrase, or "confirm" / "yes" so clicking Confirm works without typing. */
+function isValidConfirmation(phrase) {
+  const p = String(phrase ?? "")
+    .trim()
+    .toLowerCase();
+  return (
+    p === CONFIRMATION_PHRASE.toLowerCase() || p === "confirm" || p === "yes"
+  );
+}
+
 const SHADOW_INDEX_KEY = "cc:shadow:index:v1";
 const SHADOW_FILE_PREFIX = "cc:shadow:file:";
 const MONETIZATION_KEY = "cc:monetization:config:v1";
@@ -64,12 +74,10 @@ const parseJsonBody = async (request) => {
 };
 
 export const isCommandCenterPath = (url) => {
-  if (
-    url.pathname.startsWith("/preview/") &&
-    url.searchParams.get("shadow") === "1"
-  ) {
-    return true;
-  }
+  const isPreviewWithShadow =
+    (url.pathname === "/preview" || url.pathname.startsWith("/preview/")) &&
+    url.searchParams.get("shadow") === "1";
+  if (isPreviewWithShadow) return true;
   if (!url.pathname.startsWith("/api/")) return false;
   if (COMMAND_CENTER_EXACT_API_PATHS.has(url.pathname)) return true;
   return COMMAND_CENTER_PREFIX_API_PATHS.some(
@@ -933,8 +941,7 @@ const handleRepoCommit = async ({ env, request }) => {
     isProtectedCorePath(path)
   );
   const allowProtectedOverride =
-    body.allowProtected === true &&
-    String(body.confirmation || "") === CONFIRMATION_PHRASE;
+    body.allowProtected === true && isValidConfirmation(body.confirmation);
   if (protectedPaths.length && !allowProtectedOverride) {
     return json(403, {
       ok: false,
@@ -1013,11 +1020,11 @@ const handleRepoCommit = async ({ env, request }) => {
 
 const handleDeployRun = async ({ env, request }) => {
   const body = await parseJsonBody(request);
-  const phrase = String(body.confirmation || "");
-  if (phrase !== CONFIRMATION_PHRASE) {
+  const phrase = String(body.confirmation || "").trim();
+  if (!isValidConfirmation(phrase)) {
     return json(403, {
       ok: false,
-      error: `Confirmation phrase must be exactly "${CONFIRMATION_PHRASE}"`,
+      error: `Confirmation required. Use "${CONFIRMATION_PHRASE}", "confirm", or "yes".`,
     });
   }
   const remoteDeployEnabled =
@@ -1064,7 +1071,7 @@ const handleDeployRun = async ({ env, request }) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      confirmation: phrase,
+      confirmation: CONFIRMATION_PHRASE,
       actor,
       planTier,
       billingStatus,
@@ -1765,7 +1772,9 @@ const renderPreviewHtml = ({ html, route, showZones }) => {
 const handlePreviewRoute = async ({ env, assets, request, url }) => {
   let raw = "/";
   try {
-    raw = decodeURIComponent(url.pathname.replace(/^\/preview/, "") || "/");
+    const pathSuffix =
+      url.pathname === "/preview" ? "" : url.pathname.replace(/^\/preview/, "");
+    raw = decodeURIComponent(pathSuffix || "/");
   } catch (_) {
     return text(400, "Invalid preview route encoding.");
   }
@@ -1803,7 +1812,7 @@ export const handleCommandCenterRequest = async ({
   assets,
 }) => {
   if (
-    url.pathname.startsWith("/preview/") &&
+    (url.pathname === "/preview" || url.pathname.startsWith("/preview/")) &&
     url.searchParams.get("shadow") === "1"
   ) {
     return handlePreviewRoute({ env, assets, request, url });

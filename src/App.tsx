@@ -266,6 +266,9 @@ const App: React.FC = () => {
   const [generatedPreviewUrl, setGeneratedPreviewUrl] = useState("");
   const [generatedSiteId, setGeneratedSiteId] = useState("");
   const [generateError, setGenerateError] = useState("");
+  const [previewLoadState, setPreviewLoadState] = useState<
+    "idle" | "loading" | "loaded" | "error"
+  >("idle");
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const [isNavFaded, setIsNavFaded] = useState(false);
   const [activeTierIndex, setActiveTierIndex] = useState(0);
@@ -280,6 +283,14 @@ const App: React.FC = () => {
   useEffect(() => {
     flowPhaseRef.current = flowPhase;
   }, [flowPhase]);
+
+  useEffect(() => {
+    if (flowPhase !== "result" || previewLoadState !== "loading") return;
+    const t = setTimeout(() => {
+      setPreviewLoadState((s) => (s === "loading" ? "error" : s));
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [flowPhase, previewLoadState]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -516,6 +527,7 @@ const App: React.FC = () => {
     setGeneratedPreviewUrl("");
     setGeneratedSiteId("");
     setGenerateError("");
+    setPreviewLoadState("idle");
     audioEngine.stopMusic();
     audioPlayingRef.current = false;
     setIsMusicPlaying(false);
@@ -630,6 +642,7 @@ const App: React.FC = () => {
 
       setGeneratedSiteId(siteId);
       setGeneratedPreviewUrl(previewUrl || FALLBACK_PREVIEW_URL);
+      setPreviewLoadState("loading");
       setFlowPhase("result");
     } catch (err: any) {
       setGenerateError(err?.message || "Generate failed.");
@@ -639,6 +652,10 @@ const App: React.FC = () => {
   };
 
   const activeTier = PRICING_TIERS[activeTierIndex];
+  const resolvedPreviewUrl =
+    generatedPreviewUrl ||
+    (generatedSiteId ? `/preview/${generatedSiteId}` : "") ||
+    FALLBACK_PREVIEW_URL;
 
   const shiftTier = useCallback((direction: number) => {
     setActiveTierIndex((prev) => {
@@ -1037,20 +1054,39 @@ const App: React.FC = () => {
                     <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 px-8 py-3 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-outfit tracking-widest text-white/60 uppercase pointer-events-none">
                       Neural Shield Active
                     </div>
-                    <div className="vt-preview-scroll">
+                    <div className="vt-preview-scroll relative">
+                      {previewLoadState === "loading" && (
+                        <div
+                          className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 text-white/80 font-outfit text-sm uppercase tracking-widest"
+                          aria-live="polite"
+                        >
+                          Loading preview…
+                        </div>
+                      )}
+                      {previewLoadState === "error" && (
+                        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black/90 p-8 text-center">
+                          <p className="font-outfit text-sm uppercase tracking-widest text-white/80">
+                            Preview could not be displayed in-frame.
+                          </p>
+                          <a
+                            href={resolvedPreviewUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cyan-400 underline underline-offset-4"
+                          >
+                            Open in new tab
+                          </a>
+                        </div>
+                      )}
                       <iframe
-                        key={generatedPreviewUrl || FALLBACK_PREVIEW_URL}
-                        src={generatedPreviewUrl || FALLBACK_PREVIEW_URL}
+                        key={resolvedPreviewUrl}
+                        src={resolvedPreviewUrl}
                         className="vt-preview-frame w-full border-none grayscale-[0.2]"
                         title="Website Preview"
                         scrolling="yes"
-                        onLoad={() =>
-                          console.log("Preview loaded successfully")
-                        }
+                        onLoad={() => setPreviewLoadState("loaded")}
                         onError={() => {
-                          console.warn(
-                            "Preview failed to load, using fallback"
-                          );
+                          setPreviewLoadState("error");
                           setGeneratedPreviewUrl(FALLBACK_PREVIEW_URL);
                         }}
                         sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
@@ -1058,6 +1094,17 @@ const App: React.FC = () => {
                     </div>
                     <div className="absolute inset-0 z-40 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
                   </div>
+                  <p className="mb-8 text-sm text-white/70">
+                    If preview does not load in-frame, open it directly:{" "}
+                    <a
+                      href={resolvedPreviewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-cyan-300 underline underline-offset-4"
+                    >
+                      {resolvedPreviewUrl}
+                    </a>
+                  </p>
 
                   <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                     <button

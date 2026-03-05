@@ -46,7 +46,7 @@ const SECURITY_HEADERS = {
     object-src 'none';
     base-uri 'self';
     form-action 'self';
-    frame-ancestors 'none';
+    frame-ancestors {frameAncestors};
     worker-src 'self' blob:;
   `
     .replace(/\s{2,}/g, " ")
@@ -57,12 +57,19 @@ const SECURITY_HEADERS = {
   "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
 };
 
-const buildCsp = (nonce) => {
+const buildCsp = (nonce, frameAncestors = "'none'") => {
   const base = SECURITY_HEADERS["Content-Security-Policy"];
-  if (!nonce) return base.replace(/'nonce-\{nonce\}'\s*/g, "");
+  const frameAncestorsValue =
+    String(frameAncestors).trim() === "'self'" ? "'self'" : "'none'";
+  if (!nonce)
+    return base
+      .replace(/'nonce-\{nonce\}'\s*/g, "")
+      .replace("{frameAncestors}", frameAncestorsValue);
   // Properly escape nonce for CSP - remove any quotes and ensure it's safe
   const safeNonce = String(nonce).replace(/['"]/g, "");
-  return base.replace("'nonce-{nonce}'", `'nonce-${safeNonce}'`);
+  return base
+    .replace("'nonce-{nonce}'", `'nonce-${safeNonce}'`)
+    .replace("{frameAncestors}", frameAncestorsValue);
 };
 
 const getCacheControlForPath = (pathname, env) => {
@@ -111,6 +118,14 @@ const jsonResponse = (status, payload) =>
 
 const addSecurityHeaders = (response, options = {}) => {
   const headers = new Headers(response.headers);
+  const normalizedPath = String(options.pathname || "").toLowerCase();
+  const allowSameOriginFrame = Boolean(
+    options.allowSameOriginFrame ||
+    normalizedPath === "/demo" ||
+    normalizedPath === "/demo.html" ||
+    normalizedPath === "/preview" ||
+    normalizedPath.startsWith("/preview/")
+  );
   if (options.cacheControl) {
     headers.set("Cache-Control", options.cacheControl);
   } else if (options.pathname) {
@@ -128,13 +143,19 @@ const addSecurityHeaders = (response, options = {}) => {
     "X-Content-Type-Options",
     SECURITY_HEADERS["X-Content-Type-Options"]
   );
-  headers.set("X-Frame-Options", SECURITY_HEADERS["X-Frame-Options"]);
+  headers.set(
+    "X-Frame-Options",
+    allowSameOriginFrame ? "SAMEORIGIN" : SECURITY_HEADERS["X-Frame-Options"]
+  );
   headers.set("Referrer-Policy", SECURITY_HEADERS["Referrer-Policy"]);
   headers.set(
     "Permissions-Policy",
     "geolocation=(), microphone=(self), camera=(self)"
   );
-  headers.set("Content-Security-Policy", buildCsp(options.cspNonce));
+  headers.set(
+    "Content-Security-Policy",
+    buildCsp(options.cspNonce, allowSameOriginFrame ? "'self'" : "'none'")
+  );
   headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   headers.set("Cross-Origin-Resource-Policy", "cross-origin");
   // Preserve status + statusText; clone body to avoid locking the original response stream.
@@ -1045,7 +1066,8 @@ export default {
       }
       if (url.pathname.startsWith("/preview/") && request.method === "GET") {
         return addSecurityHeaders(
-          await handlePreviewPageRequest({ request, env, ctx })
+          await handlePreviewPageRequest({ request, env, ctx }),
+          { pathname: url.pathname, env }
         );
       }
       if (url.pathname === "/api/publish" && request.method === "POST") {
@@ -1561,11 +1583,17 @@ export default {
           return jsonResponse(501, {
             error:
               "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (preferred) or CF_USER_TOKEN, and optionally CF_ZONE_ID.",
+            setupRequired: true,
+            setupHint:
+              "Add CF_API_TOKEN (with Zone.Analytics Read) and CF_ZONE_ID to your Worker secrets. Zone ID is in Cloudflare Dashboard → your domain → Overview (right sidebar).",
           });
         }
         try {
-          const since = "-43200"; // last 12 hours; supports relative values
-          const apiUrl = `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`;
+          const until = new Date();
+          const since = new Date(until.getTime() - 12 * 60 * 60 * 1000);
+          const sinceStr = since.toISOString();
+          const untilStr = until.toISOString();
+          const apiUrl = `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${encodeURIComponent(sinceStr)}&until=${encodeURIComponent(untilStr)}&continuous=true`;
           const cfRes = await fetch(apiUrl, {
             headers: {
               Authorization: `Bearer ${apiToken}`,
@@ -1574,14 +1602,31 @@ export default {
           });
           const data = await cfRes.json();
           if (!cfRes.ok || !data?.success) {
+            const errMsg =
+              data?.errors?.[0]?.message ||
+              (Array.isArray(data?.errors)
+                ? data.errors.map((e) => e.message).join("; ")
+                : null) ||
+              data?.messages ||
+              "Analytics fetch failed.";
             return jsonResponse(cfRes.status || 500, {
-              error:
-                data?.errors || data?.messages || "Analytics fetch failed.",
+              error: errMsg,
+              setupRequired: cfRes.status === 403,
             });
           }
-          return jsonResponse(200, { result: data.result });
+          return jsonResponse(200, {
+            result: data.result,
+            _meta: {
+              since: sinceStr,
+              until: untilStr,
+              source: "cloudflare_zone",
+            },
+          });
         } catch (err) {
-          return jsonResponse(500, { error: err.message });
+          return jsonResponse(500, {
+            error: err.message,
+            setupRequired: false,
+          });
         }
       }
 
@@ -1612,17 +1657,27 @@ export default {
         if (!apiToken || !zoneId) {
           return jsonResponse(501, {
             error: "Cloudflare API token or zone ID missing.",
+            setupRequired: true,
           });
         }
 
         try {
-          const since = url.searchParams.get("since") || "-86400"; // default last 24 hours
-          const until = url.searchParams.get("until") || "";
+          const sinceParam = url.searchParams.get("since") || "-86400";
+          const untilParam = url.searchParams.get("until") || "";
+          const now = new Date();
+          const sinceSec = parseInt(sinceParam, 10);
+          const since =
+            Number.isNaN(sinceSec) || sinceParam.startsWith("2")
+              ? sinceParam
+              : new Date(now.getTime() + sinceSec * 1000).toISOString();
+          const until =
+            untilParam || (Number.isNaN(sinceSec) ? "" : now.toISOString());
 
+          const q = `since=${encodeURIComponent(since)}${until ? `&until=${encodeURIComponent(until)}` : ""}&continuous=true`;
           // Fetch multiple analytics endpoints for comprehensive data
           const [dashboardRes, coloRes, httpRes] = await Promise.all([
             fetch(
-              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}&until=${until}&continuous=true`,
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?${q}`,
               {
                 headers: {
                   Authorization: `Bearer ${apiToken}`,
@@ -1631,7 +1686,7 @@ export default {
               }
             ),
             fetch(
-              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/colos?since=${since}&until=${until}`,
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/colos?${q.replace("&continuous=true", "")}`,
               {
                 headers: {
                   Authorization: `Bearer ${apiToken}`,
@@ -1640,7 +1695,7 @@ export default {
               }
             ),
             fetch(
-              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/http?since=${since}&until=${until}`,
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/http?${q.replace("&continuous=true", "")}`,
               {
                 headers: {
                   Authorization: `Bearer ${apiToken}`,
@@ -1675,6 +1730,7 @@ export default {
                 until: until || "now",
                 zoneId,
                 fetchedAt: new Date().toISOString(),
+                source: "cloudflare_zone",
               },
             },
           });
@@ -1710,15 +1766,18 @@ export default {
         if (!apiToken || !zoneId) {
           return jsonResponse(501, {
             error: "Cloudflare API token or zone ID missing.",
+            setupRequired: true,
           });
         }
 
         try {
-          // Get last hour data for real-time feel
-          const since = "-3600";
+          const now = new Date();
+          const since = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+          const until = now.toISOString();
+          const q = `since=${encodeURIComponent(since)}&until=${encodeURIComponent(until)}&continuous=true`;
           const [dashboardRes, httpRes] = await Promise.all([
             fetch(
-              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}`,
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?${q}`,
               {
                 headers: {
                   Authorization: `Bearer ${apiToken}`,
@@ -1727,7 +1786,7 @@ export default {
               }
             ),
             fetch(
-              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/http?since=${since}`,
+              `https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/http?${q.replace("&continuous=true", "")}`,
               {
                 headers: {
                   Authorization: `Bearer ${apiToken}`,

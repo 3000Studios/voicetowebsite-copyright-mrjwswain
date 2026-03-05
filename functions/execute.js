@@ -1,5 +1,10 @@
 import { adminCookieName, verifyAdminCookieValue } from "./adminAuth.js";
 import {
+  CONFIRMATION_PHRASE,
+  handleCommandCenterRequest,
+  isCommandCenterPath,
+} from "./commandCenterApi.js";
+import {
   DatabaseHelper,
   createCachedDatabase,
   createDatabaseMonitor,
@@ -10,11 +15,6 @@ import {
   initializeLogger,
   loggingMiddleware,
 } from "./logger.js";
-import {
-  CONFIRMATION_PHRASE,
-  handleCommandCenterRequest,
-  isCommandCenterPath,
-} from "./commandCenterApi.js";
 import { onRequestPost as handleOrchestrator } from "./orchestrator.js";
 import { createRateLimitMiddleware } from "./rate-limiter.js";
 import {
@@ -1181,7 +1181,7 @@ const parseCommandCenterOperation = (payload) => {
       },
       description: "Run deployment pipeline",
       deployRequired: true,
-      note: `Deployment requires confirmation phrase "${CONFIRMATION_PHRASE}" exactly.`,
+      note: `Deployment requires confirmation ("${CONFIRMATION_PHRASE}", "confirm", or "yes").`,
     };
   }
 

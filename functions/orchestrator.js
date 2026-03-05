@@ -275,7 +275,7 @@ export async function onRequestPost(context) {
     return normalized;
   };
   const sanitizeStylePath = (raw) => {
-    let normalized = String(raw || "")
+    const normalized = String(raw || "")
       .trim()
       .toLowerCase()
       .replace(/^\/+/, "");
@@ -1633,12 +1633,16 @@ Rules:
       });
     }
     const actions = plan.actions || [];
-    if (
-      intent?.confirmation?.required &&
-      payload.confirmation !== intent.confirmation.phrase
-    ) {
+    const phrase = String(payload.confirmation ?? "")
+      .trim()
+      .toLowerCase();
+    const validConfirmation =
+      phrase === (intent?.confirmation?.phrase || "").toLowerCase() ||
+      phrase === "confirm" ||
+      phrase === "yes";
+    if (intent?.confirmation?.required && !validConfirmation) {
       throw new Error(
-        `Confirmation required. Send confirmation phrase: ${intent.confirmation.phrase}`
+        `Confirmation required. Send "${intent.confirmation.phrase}", "confirm", or "yes".`
       );
     }
     const applied = await applyActions(

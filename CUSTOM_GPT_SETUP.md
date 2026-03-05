@@ -63,7 +63,7 @@ RULES:
     - parameters.api.method (GET|POST|PUT|DELETE)
     - parameters.api.query (optional)
     - parameters.api.body (optional)
-15. For deploy operations through command-center, include parameters.confirmation exactly: "hell yeah ship it".
+15. For deploy operations through command-center, include parameters.confirmation: "confirm" (or "yes" or "hell yeah ship it").
 
 SUPPORTED CHANGES (use in command field):
 - Update headline/subhead/cta text
@@ -80,7 +80,7 @@ SUPPORTED CHANGES (use in command field):
   - `ops: run governance check`
   - `ops: list files`
   - `ops: list store products`
-  - `ops: deploy now` (must include `parameters.confirmation`)
+  - `ops: deploy now` (include parameters.confirmation: "confirm")
 
 EXAMPLES:
 - User: "Change the headline to Welcome Home" → call auto with command="Update headline to Welcome Home"

@@ -149,8 +149,6 @@ const refreshDeployLogs = async () => {
 };
 
 const deployFromTopbar = async () => {
-  const phrase = String(byId("deploy-confirm")?.value || "");
-  if (phrase !== CONFIRMATION_PHRASE) return;
   if (state.deployInProgress) return; // Prevent concurrent deploys
 
   const button = byId("deploy-button");
@@ -162,7 +160,7 @@ const deployFromTopbar = async () => {
     await requestJson("/api/deploy/run", {
       method: "POST",
       body: JSON.stringify({
-        confirmation: phrase,
+        confirmation: "confirm",
         summary: { route: state.route },
       }),
     });
@@ -176,14 +174,12 @@ const deployFromTopbar = async () => {
 };
 
 const syncDeployPhraseGate = () => {
-  const phrase = String(byId("deploy-confirm")?.value || "");
-  const matches = phrase === CONFIRMATION_PHRASE;
   const button = byId("deploy-button");
-  button.disabled = !matches || state.deployInProgress;
+  if (button) button.disabled = state.deployInProgress;
 };
 
 const normalizeRoute = (path) => {
-  let next = String(path || "").trim();
+  const next = String(path || "").trim();
   if (!next) return DEFAULT_ROUTE;
   if (next === "/admin" || next === "/admin/") return DEFAULT_ROUTE;
   if (!next.startsWith("/admin/")) return DEFAULT_ROUTE;
@@ -243,18 +239,24 @@ const loadAnalytics = async () => {
 };
 
 const loadCloudflareAnalytics = async () => {
+  const fetchWithMeta = async (url) => {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok)
+        return {
+          error: data?.error || `Request failed (${res.status})`,
+          setupRequired: data?.setupRequired === true,
+        };
+      return data;
+    } catch (e) {
+      return { error: e?.message || "Request failed" };
+    }
+  };
   const [overview, detailed, realtime] = await Promise.all([
-    requestJson("/api/analytics/overview", { method: "GET" }).catch(
-      (error) => ({ error: error.message })
-    ),
-    requestJson("/api/analytics/detailed?since=-86400", {
-      method: "GET",
-    }).catch((error) => ({ error: error.message })),
-    requestJson("/api/analytics/realtime", { method: "GET" }).catch(
-      (error) => ({
-        error: error.message,
-      })
-    ),
+    fetchWithMeta("/api/analytics/overview"),
+    fetchWithMeta("/api/analytics/detailed?since=-86400"),
+    fetchWithMeta("/api/analytics/realtime"),
   ]);
   return { overview, detailed, realtime };
 };
@@ -271,6 +273,28 @@ const renderMission = async () => {
   const lock = deployLogs?.locked ? "Deploy In Progress" : "Idle";
   const auditPass = governance?.ok ? "PASS" : "FAIL";
   const remaining = deployMeter?.metering?.remaining;
+  const deployResp = deployLogs?.lastSuccess?.deployResponse;
+  const deployNeedsHook =
+    deployResp &&
+    [
+      "manual_required",
+      "requires_manual",
+      "skipped",
+      "hook_failed",
+      "error",
+    ].includes(deployResp.status);
+  const deploySetupCard = deployNeedsHook
+    ? `
+    <article class="ccos-card ccos-col-12" style="border-left: 4px solid #f59e0b;">
+      <h3>Deploy from dashboard</h3>
+      <p class="muted">To run deploys from the dashboard (so your commands update the live site), set these Worker secrets in Cloudflare:</p>
+      <ul>
+        <li><strong>ALLOW_REMOTE_DEPLOY_TRIGGER</strong> = <code>1</code></li>
+        <li><strong>CF_DEPLOY_HOOK_URL</strong> = your Workers Builds webhook URL (from Workers → your Worker → Builds → Trigger build, or your CI deploy hook)</li>
+      </ul>
+      <p class="muted">${escapeHtml(deployResp.message || "Configure the deploy hook to trigger builds from the dashboard.")}</p>
+    </article>`
+    : "";
   return `
     <section class="ccos-kpi">
       <article class="ccos-card"><h4>Worker Health</h4><p><span class="ccos-pill ok">ONLINE</span></p></article>
@@ -280,6 +304,7 @@ const renderMission = async () => {
       <article class="ccos-card"><h4>Env Audit</h4><p><span class="ccos-pill ${envStatus === "pass" ? "ok" : "err"}">${escapeHtml(envStatus.toUpperCase())}</span></p></article>
     </section>
     <section class="ccos-grid">
+      ${deploySetupCard}
       <article class="ccos-card ccos-col-8">
         <h3>System Health</h3>
         <table class="ccos-data">
@@ -347,7 +372,7 @@ const renderCC = async () => {
       </article>
       <article class="ccos-card ccos-col-12">
         <h3>Preview</h3>
-        <iframe title="Command Center Preview" id="cc-preview-frame" class="ccos-preview-frame"></iframe>
+        <iframe title="Command Center Preview" id="cc-preview-frame" class="ccos-preview-frame" src="/preview/index?shadow=1&ts=${Date.now()}"></iframe>
       </article>
       <article class="ccos-card ccos-col-12">
         <h3>Staged Diff Summary</h3>
@@ -386,8 +411,7 @@ const renderVCC = async () => {
           <button type="button" class="ccos-button" id="vcc-build-preview">Build Preview</button>
           <button type="button" class="ccos-button" id="vcc-auto">Execute Auto</button>
         </div>
-        <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
-          <input id="vcc-deploy-confirm" class="ccos-input" style="max-width:280px" placeholder="hell yeah ship it" />
+        <div style="margin-top:.5rem">
           <button type="button" class="ccos-button" id="vcc-deploy">Deploy Live</button>
         </div>
         <div id="vcc-status" style="margin-top:.5rem"></div>
@@ -432,7 +456,7 @@ const renderVCC = async () => {
       <article class="ccos-card ccos-col-12">
         <h3>Route Previews</h3>
         <div id="vcc-preview-tabs">${routes.map((route) => `<button type="button" class="ccos-button vcc-preview-open" data-route="${escapeHtml(route)}">${escapeHtml(route)}</button>`).join(" ") || "Compile a command to generate previews."}</div>
-        <iframe title="Voice Preview" id="vcc-preview-frame" class="ccos-preview-frame"></iframe>
+        <iframe title="Voice Preview" id="vcc-preview-frame" class="ccos-preview-frame" src="/preview/index?shadow=1&ts=${Date.now()}"></iframe>
       </article>
       <article class="ccos-card ccos-col-12">
         <h3>Execution Result</h3>
@@ -504,10 +528,35 @@ const renderAnalytics = async () => {
   ]
     .filter(Boolean)
     .join(" | ");
+  const setupRequired =
+    cf?.overview?.setupRequired ||
+    cf?.detailed?.setupRequired ||
+    cf?.realtime?.setupRequired;
+  const cloudflareTrafficUrl =
+    "https://dash.cloudflare.com/?to=/:account/:zone/analytics/traffic";
+  const cloudflareApiTokensUrl =
+    "https://dash.cloudflare.com/profile/api-tokens";
   return `
     <section class="ccos-grid">
+      ${
+        setupRequired || cfErrors
+          ? `
+      <article class="ccos-card ccos-col-12" style="border-left: 4px solid #f59e0b;">
+        <h3>📊 Show real Cloudflare analytics</h3>
+        <p class="muted">To see real-time visitors and zone traffic here, add Worker secrets:</p>
+        <ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+          <li><strong>CF_API_TOKEN</strong> – Cloudflare API token with <em>Zone.Analytics: Read</em> (<a href="${cloudflareApiTokensUrl}" target="_blank" rel="noopener">Create token</a>)</li>
+          <li><strong>CF_ZONE_ID</strong> – Your zone ID (Dashboard → your domain → Overview, right sidebar)</li>
+        </ul>
+        <p style="margin-top: 0.5rem;">Then redeploy the Worker and refresh this page.</p>
+        <p style="margin-top: 0.75rem;"><strong>View all analytics (real-time) in Cloudflare:</strong> <a href="${cloudflareTrafficUrl}" target="_blank" rel="noopener">Open Analytics &amp; Logs → Traffic</a></p>
+      </article>
+      `
+          : ""
+      }
       <article class="ccos-card ccos-col-12">
         <h3>Cloudflare Analytics Overview</h3>
+        <p style="margin-bottom: 0.5rem;"><a href="${cloudflareTrafficUrl}" target="_blank" rel="noopener">View in Cloudflare Dashboard (real-time traffic)</a></p>
         <table class="ccos-data">
           <tr><th>Requests</th><td>${escapeHtml(formatNumber(overviewTotals?.requests?.all))}</td></tr>
           <tr><th>Unique Visitors</th><td>${escapeHtml(formatNumber(overviewTotals?.uniques?.all))}</td></tr>
@@ -1021,7 +1070,6 @@ const wireVCCEvents = () => {
   const buildPreviewButton = byId("vcc-build-preview");
   const autoButton = byId("vcc-auto");
   const deployButton = byId("vcc-deploy");
-  const deployPhraseInput = byId("vcc-deploy-confirm");
   const previewFrame = byId("vcc-preview-frame");
   const planPre = byId("vcc-plan-json");
   const execPre = byId("vcc-exec-json");
@@ -1228,17 +1276,12 @@ const wireVCCEvents = () => {
   });
 
   deployButton?.addEventListener("click", async () => {
-    const phrase = String(deployPhraseInput?.value || "").trim();
-    if (phrase !== CONFIRMATION_PHRASE) {
-      setStatus(`Phrase must be exactly "${CONFIRMATION_PHRASE}".`, true);
-      return;
-    }
     deployButton.disabled = true;
     try {
       const payload = await requestJson("/api/deploy/run", {
         method: "POST",
         body: JSON.stringify({
-          confirmation: phrase,
+          confirmation: "confirm",
           summary: {
             route: state.route,
             source: "voice-command-center",

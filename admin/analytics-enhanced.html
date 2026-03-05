@@ -131,9 +131,31 @@
         </div>
 
         <div class="admin-actions">
+          <a
+            href="https://dash.cloudflare.com/"
+            target="_blank"
+            rel="noopener"
+            class="secondary"
+            style="margin-right: 0.5rem"
+            >View in Cloudflare Dashboard</a
+          >
           <span class="pill">Real-time data</span>
         </div>
       </header>
+      <div id="analytics-setup-card" style="display: none" class="card wide metallic-card" role="alert">
+        <div class="card-head">
+          <h2>Cloudflare analytics setup</h2>
+        </div>
+        <p class="muted">To see real-time visitors and zone traffic, add Worker secrets:</p>
+        <ul style="margin: 0.5rem 0; padding-left: 1.25rem">
+          <li><strong>CF_API_TOKEN</strong> – API token with <em>Zone.Analytics: Read</em></li>
+          <li><strong>CF_ZONE_ID</strong> – Zone ID (Dashboard → your domain → Overview)</li>
+        </ul>
+        <p>
+          <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener">Create API token</a> ·
+          <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Open Dashboard</a>
+        </p>
+      </div>
 
       <main class="admin-grid">
         <section class="card wide metallic-card">
@@ -148,9 +170,53 @@
             </div>
           </div>
 
+          <div
+            id="analytics-setup-card"
+            class="card wide metallic-card"
+            style="display: none; border-left: 4px solid #f59e0b; margin-bottom: 1rem"
+          >
+            <div class="card-head">
+              <h3>📊 Show real Cloudflare analytics</h3>
+            </div>
+            <p class="muted">
+              Configure Worker secrets so this page can load the same data Cloudflare sees (requests, visitors,
+              bandwidth, threats).
+            </p>
+            <ol style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.9rem">
+              <li>
+                Create an API token with <strong>Zone.Analytics: Read</strong> at
+                <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener"
+                  >Cloudflare → Profile → API Tokens</a
+                >.
+              </li>
+              <li>
+                In <strong>Workers &amp; Pages → your Worker → Settings → Variables</strong>, add
+                <code>CF_API_TOKEN</code> (secret) and <code>CF_ZONE_ID</code> (Zone ID from your domain’s Overview).
+              </li>
+              <li>Redeploy the Worker and refresh this page.</li>
+            </ol>
+            <p style="margin-top: 0.75rem">
+              <a
+                href="https://dash.cloudflare.com/?to=/:account/:zone/analytics/traffic"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="secondary"
+                style="display: inline-block"
+                >Open Cloudflare Analytics (real-time traffic)</a
+              >
+            </p>
+          </div>
+
           <div class="refresh-controls">
             <button class="secondary" id="refresh-analytics">🔄 Refresh Now</button>
             <button class="secondary" id="load-detailed">📊 Load Detailed Data</button>
+            <a
+              href="https://dash.cloudflare.com/?to=/:account/:zone/analytics/traffic"
+              target="_blank"
+              rel="noopener"
+              class="secondary"
+              >Open in Cloudflare (real-time)</a
+            >
           </div>
 
           <div class="analytics-tabs">
@@ -527,19 +593,24 @@
         analyticsStatus.textContent = "Loading…";
 
         // 1. Cloudflare Analytics
+        const setupCard = document.getElementById("analytics-setup-card");
         try {
           const res = await fetch("/api/analytics/overview", { cache: "no-store" });
           const data = await res.json();
           if (!res.ok || data?.error) {
+            if (data?.setupRequired && setupCard) {
+              setupCard.style.display = "block";
+            }
             throw new Error(data?.error || "Analytics unavailable");
           }
-
+          if (setupCard) setupCard.style.display = "none";
           renderAnalytics(data.result || {});
           analyticsStatus.textContent = "Live";
           analyticsStatus.classList.add("ok");
         } catch (err) {
           analyticsStatus.textContent = err.message;
           analyticsStatus.classList.add("alert");
+          if (setupCard) setupCard.style.display = "block";
         }
 
         // 2. Sales Analytics

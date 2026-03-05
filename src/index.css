@@ -124,6 +124,14 @@ iframe {
   height: auto;
 }
 
+/* Preview iframe must have explicit height so it renders (global above would collapse it) */
+.vt-preview-scroll .vt-preview-frame,
+iframe.vt-preview-frame {
+  height: 720px;
+  min-height: 720px;
+  max-width: 100%;
+}
+
 #root {
   flex: 1;
   display: flex;

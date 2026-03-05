@@ -422,7 +422,7 @@ planBtn.addEventListener("click", async () => {
     if (data.plan?.actions) {
       applyActionsPreview(data.plan.actions);
     }
-    speak("Plan ready. Say apply now and confirm hell yeah ship it.");
+    speak("Plan ready. Click Apply to confirm.");
   } catch (err) {
     setResponse({ error: err.message });
     speak("Planning failed");

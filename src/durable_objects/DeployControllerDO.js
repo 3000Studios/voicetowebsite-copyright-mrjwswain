@@ -1,4 +1,13 @@
 const CONFIRMATION_PHRASE = "hell yeah ship it";
+
+function isValidConfirmation(phrase) {
+  const p = String(phrase ?? "")
+    .trim()
+    .toLowerCase();
+  return (
+    p === CONFIRMATION_PHRASE.toLowerCase() || p === "confirm" || p === "yes"
+  );
+}
 const LOG_LIMIT = 300;
 const DEPLOY_METER_KEY = "deployMeter";
 const DEFAULT_LIMITS = {
@@ -238,11 +247,11 @@ export class DeployControllerDO {
       });
     }
 
-    const phrase = String(payload.confirmation || "");
-    if (phrase !== CONFIRMATION_PHRASE) {
+    const phrase = String(payload.confirmation || "").trim();
+    if (!isValidConfirmation(phrase)) {
       return json(403, {
         ok: false,
-        error: `Confirmation phrase must be exactly "${CONFIRMATION_PHRASE}"`,
+        error: `Confirmation required. Use "${CONFIRMATION_PHRASE}", "confirm", or "yes".`,
       });
     }
     const actor = String(payload.actor || "admin").slice(0, 120);
@@ -389,10 +398,73 @@ export class DeployControllerDO {
       };
     }
 
+    // Prefer deploy hook (Workers Builds webhook or CI URL) so dashboard deploys actually run.
+    const hookUrl = String(
+      this.env.CF_DEPLOY_HOOK_URL ||
+        this.env.CF_PAGES_DEPLOY_HOOK ||
+        this.env.CF_DEPLOY_WEBHOOK ||
+        ""
+    ).trim();
+    if (hookUrl) {
+      try {
+        const res = await fetch(hookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            source: "voicetowebsite_dashboard",
+            ts: new Date().toISOString(),
+          }),
+        });
+        const text = await res.text();
+        let payload = {};
+        try {
+          payload = text ? JSON.parse(text) : {};
+        } catch (_) {
+          payload = { raw: text?.slice(0, 200) };
+        }
+        if (res.ok) {
+          await this.appendLog(
+            "info",
+            "Deploy hook accepted; build/deploy triggered."
+          );
+          return {
+            mode: "hook",
+            status: "triggered",
+            message:
+              "Deploy hook invoked; check Workers Builds or CI for deploy status.",
+            hook: payload,
+          };
+        }
+        await this.appendLog(
+          "warn",
+          `Deploy hook returned ${res.status}; manual deploy may be required.`,
+          payload
+        );
+        return {
+          mode: "hook",
+          status: "hook_failed",
+          message: `Deploy hook returned ${res.status}. Set CF_DEPLOY_HOOK_URL to your Workers Builds webhook URL.`,
+          hook: payload,
+        };
+      } catch (err) {
+        await this.appendLog("warn", "Deploy hook request failed.", {
+          error: err?.message || String(err),
+        });
+        return {
+          mode: "hook",
+          status: "error",
+          message: err?.message || "Deploy hook request failed.",
+        };
+      }
+    }
+
+    // Fallback: Workers API (requires version_id; often 400 without it). Prefer setting CF_DEPLOY_HOOK_URL.
     const accountId = String(
       this.env.CLOUDFLARE_ACCOUNT_ID || this.env.CF_ACCOUNT_ID || ""
     ).trim();
-    const apiToken = String(this.env.CLOUDFLARE_API_TOKEN || "").trim();
+    const apiToken = String(
+      this.env.CLOUDFLARE_API_TOKEN || this.env.CF_API_TOKEN || ""
+    ).trim();
     const scriptName = String(
       this.env.CLOUDFLARE_WORKER_NAME ||
         this.env.WORKER_NAME ||
@@ -402,13 +474,13 @@ export class DeployControllerDO {
     if (!accountId || !apiToken) {
       await this.appendLog(
         "warn",
-        "Cloudflare API credentials are missing; skipping automatic deploy trigger."
+        "No CF_DEPLOY_HOOK_URL and no Cloudflare API credentials; cannot trigger deploy."
       );
       return {
         mode: "manual",
         status: "skipped",
         message:
-          "Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID for automatic deploy trigger.",
+          "Set CF_DEPLOY_HOOK_URL (Workers Builds webhook) for dashboard deploys, or run npm run deploy locally.",
       };
     }
 
@@ -426,14 +498,22 @@ export class DeployControllerDO {
 
     const payload = await res.json().catch(() => ({}));
     if (!res.ok) {
+      const errMsg =
+        payload?.errors?.[0]?.message ||
+        (Array.isArray(payload?.errors)
+          ? payload.errors.map((e) => e.message).join("; ")
+          : null) ||
+        payload?.message ||
+        "Bad request (API requires version_id; use CF_DEPLOY_HOOK_URL instead).";
       await this.appendLog(
         "warn",
-        `Cloudflare deploy trigger returned ${res.status}; manual deploy fallback required.`,
+        `Cloudflare deploy API returned ${res.status}: ${errMsg}`,
         payload
       );
       return {
         mode: "manual",
         status: "requires_manual",
+        message: `Set CF_DEPLOY_HOOK_URL to your Workers Builds webhook so dashboard deploys run. API error: ${errMsg}`,
         cloudflare: payload,
       };
     }
