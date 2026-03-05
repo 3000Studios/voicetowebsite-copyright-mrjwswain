@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayPal Setup - VoiceToWebsite</title>
+    <meta name="description" content="Configure PayPal payment gateway for VoiceToWebsite" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
+      crossorigin="anonymous"
+    ></script>
+    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
+  </head>
+  <body class="paypal-setup">
+    <div class="video-bg" aria-hidden="true"></div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+
+    <main class="page">
+      <section class="section setup-section">
+        <div class="setup-head">
+          <div>
+            <p class="eyebrow">Payment Gateway</p>
+            <h1>PayPal Setup</h1>
+            <p class="muted">Configure PayPal as your payment gateway for VoiceToWebsite services.</p>
+          </div>
+        </div>
+
+        <div class="setup-grid">
+          <!-- PayPal Configuration -->
+          <div class="setup-card">
+            <h3>🔧 PayPal Configuration</h3>
+            <div class="form-group">
+              <label for="paypal-client-id">PayPal Client ID</label>
+              <input
+                type="text"
+                id="paypal-client-id"
+                placeholder="Your PayPal REST API Client ID"
+                class="form-input"
+              />
+              <small class="form-help">
+                Get your Client ID from the
+                <a href="https://developer.paypal.com/developer/applications/" target="_blank"
+                  >PayPal Developer Dashboard</a
+                >
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="paypal-environment">Environment</label>
+              <select id="paypal-environment" class="form-select">
+                <option value="sandbox">Sandbox (Testing)</option>
+                <option value="production">Production (Live)</option>
+              </select>
+              <small class="form-help"> Use Sandbox for testing, Production for live payments </small>
+            </div>
+
+            <div class="form-group">
+              <label for="paypal-currency">Default Currency</label>
+              <select id="paypal-currency" class="form-select">
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="CAD">CAD - Canadian Dollar</option>
+                <option value="AUD">AUD - Australian Dollar</option>
+              </select>
+            </div>
+
+            <button id="save-paypal-config" class="btn-primary">Save Configuration</button>
+          </div>
+
+          <!-- PayPal Buttons Preview -->
+          <div class="setup-card">
+            <h3>🎯 PayPal Buttons Preview</h3>
+            <div id="paypal-buttons-preview" class="paypal-preview">
+              <div class="preview-placeholder">
+                <p>Configure PayPal to see live preview</p>
+                <div class="preview-icon">💳</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Test Transaction -->
+          <div class="setup-card">
+            <h3>🧪 Test Transaction</h3>
+            <div class="form-group">
+              <label for="test-amount">Test Amount ($)</label>
+              <input type="number" id="test-amount" value="10.00" step="0.01" min="0.01" class="form-input" />
+            </div>
+            <button id="create-test-payment" class="btn-secondary">Create Test Payment</button>
+          </div>
+
+          <!-- Transaction History -->
+          <div class="setup-card">
+            <h3>📊 Transaction History</h3>
+            <div id="transaction-history" class="transaction-list">
+              <div class="empty-state">
+                <p>No transactions yet</p>
+                <div class="empty-icon">📋</div>
+              </div>
+            </div>
+            <button id="clear-transactions" class="btn-outline">Clear History</button>
+          </div>
+
+          <!-- Webhook Configuration -->
+          <div class="setup-card">
+            <h3>🔗 Webhook Configuration</h3>
+            <div class="form-group">
+              <label for="webhook-url">Webhook URL</label>
+              <input
+                type="url"
+                id="webhook-url"
+                value="https://your-domain.com/api/paypal/webhook"
+                readonly
+                class="form-input"
+              />
+              <small class="form-help"> Configure this URL in your PayPal webhook settings </small>
+            </div>
+
+            <div class="form-group">
+              <label for="webhook-events">Webhook Events</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" checked disabled />
+                  Payment completed
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" checked disabled />
+                  Payment failed
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" checked disabled />
+                  Refund processed
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- API Documentation -->
+          <div class="setup-card">
+            <h3>📚 API Documentation</h3>
+            <div class="doc-links">
+              <a href="https://developer.paypal.com/docs/api/orders/v2/" target="_blank" class="doc-link">
+                <div class="doc-icon">📖</div>
+                <div class="doc-content">
+                  <h4>Orders API v2</h4>
+                  <p>Create, manage, and process payments</p>
+                </div>
+              </a>
+
+              <a href="https://developer.paypal.com/docs/api/subscriptions/" target="_blank" class="doc-link">
+                <div class="doc-icon">🔄</div>
+                <div class="doc-content">
+                  <h4>Subscriptions API</h4>
+                  <p>Manage recurring payments</p>
+                </div>
+              </a>
+
+              <a href="https://developer.paypal.com/docs/api/webhooks/" target="_blank" class="doc-link">
+                <div class="doc-icon">🔗</div>
+                <div class="doc-content">
+                  <h4>Webhooks</h4>
+                  <p>Real-time payment notifications</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Status Messages -->
+      <div id="status-container" class="status-container">
+        <div id="status-message" class="status-message"></div>
+      </div>
+    </main>
+
+    <script>
+      // PayPal Setup Script
+      class PayPalSetup {
+        constructor() {
+          this.config = {
+            clientId: "",
+            environment: "sandbox",
+            currency: "USD",
+          };
+          this.transactions = [];
+          this.loadConfig();
+          this.loadTransactions();
+          this.setupEventListeners();
+        }
+
+        loadConfig() {
+          const saved = localStorage.getItem("paypalConfig");
+          if (saved) {
+            try {
+              this.config = JSON.parse(saved);
+              this.updateForm();
+            } catch (e) {
+              console.warn("Failed to load PayPal config:", e);
+            }
+          }
+        }
+
+        saveConfig() {
+          localStorage.setItem("paypalConfig", JSON.stringify(this.config));
+          this.showStatus("PayPal configuration saved", "success");
+        }
+
+        loadTransactions() {
+          const saved = localStorage.getItem("paypalTransactions");
+          if (saved) {
+            try {
+              this.transactions = JSON.parse(saved);
+              this.renderTransactions();
+            } catch (e) {
+              console.warn("Failed to load transactions:", e);
+            }
+          }
+        }
+
+        saveTransaction(transaction) {
+          this.transactions.unshift(transaction);
+          localStorage.setItem("paypalTransactions", JSON.stringify(this.transactions));
+          this.renderTransactions();
+        }
+
+        clearTransactions() {
+          this.transactions = [];
+          localStorage.removeItem("paypalTransactions");
+          this.renderTransactions();
+          this.showStatus("Transaction history cleared", "success");
+        }
+
+        updateForm() {
+          document.getElementById("paypal-client-id").value = this.config.clientId || "";
+          document.getElementById("paypal-environment").value = this.config.environment || "sandbox";
+          document.getElementById("paypal-currency").value = this.config.currency || "USD";
+        }
+
+        setupEventListeners() {
+          // Configuration form
+          document.getElementById("save-paypal-config").addEventListener("click", () => {
+            this.config.clientId = document.getElementById("paypal-client-id").value.trim();
+            this.config.environment = document.getElementById("paypal-environment").value;
+            this.config.currency = document.getElementById("paypal-currency").value;
+            this.saveConfig();
+            this.renderPayPalButtons();
+          });
+
+          // Test payment
+          document.getElementById("create-test-payment").addEventListener("click", () => {
+            this.createTestPayment();
+          });
+
+          // Clear transactions
+          document.getElementById("clear-transactions").addEventListener("click", () => {
+            if (confirm("Are you sure you want to clear all transaction history?")) {
+              this.clearTransactions();
+            }
+          });
+
+          // Load PayPal SDK when config changes
+          this.renderPayPalButtons();
+        }
+
+        renderPayPalButtons() {
+          const container = document.getElementById("paypal-buttons-preview");
+
+          if (!this.config.clientId) {
+            container.innerHTML = `
+                        <div class="preview-placeholder">
+                            <p>Enter PayPal Client ID to see live preview</p>
+                            <div class="preview-icon">💳</div>
+                        </div>
+                    `;
+            return;
+          }
+
+          // Clear existing script
+          const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
+          if (existingScript) {
+            existingScript.remove();
+          }
+
+          // Add PayPal SDK script
+          const script = document.createElement("script");
+          script.src = `https://www.paypal.com/sdk/js?client-id=${this.config.clientId}&currency=${this.config.currency}&intent=capture`;
+          script.async = true;
+
+          script.onload = () => {
+            container.innerHTML = `
+                        <div class="paypal-loaded">
+                            <p class="success-text">✅ PayPal SDK Loaded Successfully</p>
+                            <div id="paypal-button-container" style="min-height: 50px;"></div>
+                        </div>
+                    `;
+
+            // Render PayPal buttons
+            if (window.paypal) {
+              window.paypal
+                .Buttons({
+                  createOrder: (data, actions) => {
+                    return actions.order.create({
+                      purchase_units: [
+                        {
+                          amount: {
+                            value: "10.00",
+                            currency_code: this.config.currency,
+                          },
+                        },
+                      ],
+                    });
+                  },
+                  onApprove: (data, actions) => {
+                    return actions.order.capture().then((details) => {
+                      const transaction = {
+                        id: details.id,
+                        amount: parseFloat(details.purchase_units[0].amount.value),
+                        status: "completed",
+                        timestamp: new Date().toISOString(),
+                        customer: "Test Customer",
+                        email: details.payer.email_address,
+                      };
+                      this.saveTransaction(transaction);
+                      this.showStatus("Payment completed successfully!", "success");
+                    });
+                  },
+                  onError: (err) => {
+                    console.error("PayPal error:", err);
+                    this.showStatus("Payment failed: " + err.message, "error");
+                  },
+                })
+                .render("#paypal-button-container");
+            }
+          };
+
+          script.onerror = () => {
+            container.innerHTML = `
+                        <div class="preview-error">
+                            <p class="error-text">❌ Failed to load PayPal SDK</p>
+                            <p>Please check your Client ID and network connection</p>
+                        </div>
+                    `;
+          };
+
+          document.head.appendChild(script);
+        }
+
+        createTestPayment() {
+          const amount = parseFloat(document.getElementById("test-amount").value);
+
+          const transaction = {
+            id: `test_${Date.now()}`,
+            amount: amount,
+            status: "completed",
+            timestamp: new Date().toISOString(),
+            customer: "Test Customer",
+            email: "test@example.com",
+          };
+
+          this.saveTransaction(transaction);
+          this.showStatus(`Test payment of $${amount.toFixed(2)} created`, "success");
+        }
+
+        renderTransactions() {
+          const container = document.getElementById("transaction-history");
+
+          if (this.transactions.length === 0) {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <p>No transactions yet</p>
+                            <div class="empty-icon">📋</div>
+                        </div>
+                    `;
+            return;
+          }
+
+          const transactionsHtml = this.transactions
+            .map(
+              (tx) => `
+                    <div class="transaction-item">
+                        <div class="transaction-header">
+                            <div class="transaction-amount">$${tx.amount.toFixed(2)} ${this.config.currency}</div>
+                            <div class="transaction-status ${tx.status}">
+                                ${this.getStatusIcon(tx.status)} ${tx.status}
+                            </div>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-id">ID: ${tx.id}</div>
+                            <div class="transaction-time">${new Date(tx.timestamp).toLocaleString()}</div>
+                        </div>
+                        ${tx.customer ? `<div class="transaction-customer">Customer: ${tx.customer}</div>` : ""}
+                        ${tx.email ? `<div class="transaction-email">Email: ${tx.email}</div>` : ""}
+                        <div class="transaction-actions">
+                            ${tx.status === "completed" ? `<button onclick="paypalSetup.refundTransaction('${tx.id}')" class="btn-small">Refund</button>` : ""}
+                            <button onclick="paypalSetup.deleteTransaction('${tx.id}')" class="btn-small btn-danger">Delete</button>
+                        </div>
+                    </div>
+                `
+            )
+            .join("");
+
+          container.innerHTML = transactionsHtml;
+        }
+
+        getStatusIcon(status) {
+          const icons = {
+            completed: "✅",
+            pending: "⏳",
+            failed: "❌",
+            refunded: "↩️",
+          };
+          return icons[status] || "❓";
+        }
+
+        refundTransaction(id) {
+          const transaction = this.transactions.find((tx) => tx.id === id);
+          if (transaction && transaction.status === "completed") {
+            transaction.status = "refunded";
+            this.saveTransaction(transaction);
+            this.showStatus("Transaction refunded", "success");
+          }
+        }
+
+        deleteTransaction(id) {
+          this.transactions = this.transactions.filter((tx) => tx.id !== id);
+          localStorage.setItem("paypalTransactions", JSON.stringify(this.transactions));
+          this.renderTransactions();
+          this.showStatus("Transaction deleted", "success");
+        }
+
+        showStatus(message, type) {
+          const container = document.getElementById("status-message");
+          container.textContent = message;
+          container.className = `status-message ${type}`;
+          container.style.display = "block";
+
+          setTimeout(() => {
+            container.style.display = "none";
+          }, 5000);
+        }
+      }
+
+      // Initialize PayPal Setup
+      const paypalSetup = new PayPalSetup();
+      window.paypalSetup = paypalSetup;
+    </script>
+
+    <style>
+      .paypal-setup {
+        min-height: 100vh;
+        padding: 2rem 0;
+      }
+
+      .setup-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .setup-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .setup-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+      }
+
+      .setup-card h3 {
+        margin: 0 0 1rem 0;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .form-input,
+      .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: #0070ba;
+        box-shadow: 0 0 0 3px rgba(0, 112, 186, 0.3);
+      }
+
+      .form-help {
+        display: block;
+        margin-top: 0.5rem;
+        color: #6b7280;
+        font-size: 0.8rem;
+      }
+
+      .form-help a {
+        color: #3b82f6;
+        text-decoration: none;
+      }
+
+      .form-help a:hover {
+        text-decoration: underline;
+      }
+
+      .paypal-preview {
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .preview-placeholder,
+      .preview-error,
+      .paypal-loaded {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 8px;
+      }
+
+      .preview-placeholder {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .preview-error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .paypal-loaded {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .success-text {
+        color: #22c55e;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .error-text {
+        color: #ef4444;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .preview-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .transaction-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .transaction-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .transaction-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .transaction-amount {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #22c55e;
+      }
+
+      .transaction-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .transaction-status.completed {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+      }
+
+      .transaction-status.pending {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+      }
+
+      .transaction-status.failed {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      .transaction-status.refunded {
+        background: rgba(107, 114, 128, 0.2);
+        color: #6b7280;
+      }
+
+      .transaction-details {
+        margin-bottom: 0.5rem;
+      }
+
+      .transaction-id,
+      .transaction-time,
+      .transaction-customer,
+      .transaction-email {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+      }
+
+      .transaction-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-danger {
+        background: #dc2626;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #b91c1c;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #6b7280;
+      }
+
+      .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .doc-links {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .doc-link {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        text-decoration: none;
+        color: #fff;
+        transition: all 0.2s ease;
+      }
+
+      .doc-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .doc-icon {
+        font-size: 2rem;
+      }
+
+      .doc-content h4 {
+        margin: 0 0 0.5rem 0;
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .doc-content p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      .checkbox-label input[type="checkbox"] {
+        margin: 0;
+      }
+
+      .status-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+      }
+
+      .status-message {
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        display: none;
+        min-width: 250px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .status-message.success {
+        background: rgba(34, 197, 94, 0.9);
+        color: white;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .status-message.error {
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      @media (max-width: 768px) {
+        .setup-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .doc-links {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </body>
+</html>

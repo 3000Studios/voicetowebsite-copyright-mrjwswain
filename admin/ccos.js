@@ -686,6 +686,10 @@ const renderLive = async () => {
           <tr><th>Chat Rate</th><td>${escapeHtml(analytics?.livestream?.chatRatePerMinute ?? 0)}</td></tr>
           <tr><th>Revenue / Stream</th><td>${escapeHtml(analytics?.livestream?.revenuePerStream ?? 0)}</td></tr>
         </table>
+        <h4 style="margin-top:1rem">Live Room WebSocket</h4>
+        <p class="muted" style="font-size:0.875rem">Viewers and hosts connect to the same room. Use <code>?role=viewer</code> or <code>?role=host</code> and pass token via <code>token</code> query param or <code>Authorization: Bearer &lt;token&gt;</code>. Token: <code>LIVE_ROOM_VIEWER_TOKEN</code> or <code>CONTROL_PASSWORD</code> (or <code>LIVE_ROOM_ADMIN_TOKEN</code> for host).</p>
+        <p style="margin-top:0.5rem"><code style="word-break:break-all">${escapeHtml(window.location.protocol === "https:" ? "wss:" : "ws:")}//${escapeHtml(window.location.host)}/api/live/ws?role=viewer</code></p>
+        <p style="margin-top:0.5rem"><a href="/admin/live-room-test.html" target="_blank" rel="noopener">Open Live Room WebSocket test page</a></p>
       </article>
     </section>
     ${renderContextPanels(analytics, ["Live control state loaded"])}

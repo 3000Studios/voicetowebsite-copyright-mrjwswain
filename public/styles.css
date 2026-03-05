@@ -1,4 +1,3 @@
-/* begin import: src/design-system.css */
 /**
  * VoiceToWebsite Unified Design System
  * Single source of truth for all design tokens
@@ -555,8 +554,7 @@
   font-family: var(--font-family-mono);
   font-weight: var(--font-weight-medium);
 }
-/* end import: src/design-system.css */
-/* begin import: src/layout-system.css */
+
 /**
  * VoiceToWebsite Unified Layout System
  * Consistent layout patterns and structure across all pages
@@ -1090,8 +1088,7 @@
 .vt-space-x-8 > * + * {
   margin-left: var(--space-8);
 }
-/* end import: src/layout-system.css */
-/* begin import: styles/base.css */
+
 /**
  * Base globals, theme roots, and document-level primitives.
  */
@@ -1360,8 +1357,7 @@ html {
   outline: 3px solid rgba(var(--accent-rgb), 0.85);
   outline-offset: 3px;
 }
-/* end import: styles/base.css */
-/* begin import: styles/components.css */
+
 /* Plasma Navigation Styles */
 .flash-nav {
   position: fixed;
@@ -6406,8 +6402,7 @@ button.ghost:hover {
     transition: none;
   }
 }
-/* end import: styles/components.css */
-/* begin import: styles/animations.css */
+
 /**
  * Shared animation keyframes.
  */
@@ -6921,8 +6916,7 @@ button.ghost:hover {
     transform: scale(1);
   }
 }
-/* end import: styles/animations.css */
-/* begin import: styles/utilities.css */
+
 /**
  * Utility helpers intended for one-off layout/spacing usage.
  */
@@ -6943,7 +6937,7 @@ button.ghost:hover {
 .mb-6 {
   margin-bottom: 1.5rem !important;
 }
-/* end import: styles/utilities.css */
+
 
 /* Voice-injected styles */
 .hero-section {

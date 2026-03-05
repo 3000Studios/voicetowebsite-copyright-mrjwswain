@@ -562,13 +562,15 @@
   const clearExistingNav = () => {
     document
       .querySelectorAll(
-        ".glass-nav, .crystal-nav, .crystal-nav-wrapper, .mobile-overlay, .site-header, .site-nav, .latex-header, #vtwLatexHeader, .vt-footer, .bubble-footer"
+        ".glass-nav, .crystal-nav, .crystal-nav-wrapper, .mobile-overlay, .site-header, .site-nav, .latex-header, #vtwLatexHeader, .vt-footer, .bubble-footer, #vtwNavWrapper, .flash-nav, .vtw-phosphor-trigger, .vtw-phosphor-menu, .vtw-crt-overlay, .vtw-grain, #vtwPhosphorMenu, #vtwPhosphorTrigger"
       )
       .forEach((el) => el.remove());
     const skip = document.querySelector(".vtw-skip-link");
     if (skip) skip.remove();
     const toggle = document.getElementById("mobileNavToggle");
     if (toggle) toggle.remove();
+    const phosphorSvg = document.getElementById("vtw-phosphor-svg-defs");
+    if (phosphorSvg) phosphorSvg.remove();
   };
   const ensureMainAnchor = () => {
     try {
@@ -715,210 +717,277 @@
     window.requestAnimationFrame(onScroll);
     window.setTimeout(() => header.classList.remove("smash-effect"), 1200);
   };
+  const buildPhosphorLinksHtml = () => {
+    const links = getNavLinks();
+    return links
+      .map((link) => {
+        const text = String(link.label).toUpperCase().replace(/\s+/g, " ");
+        const dataText = String(link.label).toUpperCase().replace(/\s+/g, "_");
+        return `<li class="vtw-phosphor-nav-item"><a class="vtw-phosphor-nav-link" href="${link.href}" data-text="${dataText}">${text}</a></li>`;
+      })
+      .join("");
+  };
+
+  const ensurePhosphorCss = () => {
+    if (document.getElementById("vtw-phosphor-nav-css")) return;
+    const link = document.createElement("link");
+    link.id = "vtw-phosphor-nav-css";
+    link.rel = "stylesheet";
+    link.href = "/phosphor-nav.css";
+    document.head.appendChild(link);
+    const fonts = document.createElement("link");
+    fonts.rel = "stylesheet";
+    fonts.href =
+      "https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Mono&display=swap";
+    document.head.appendChild(fonts);
+  };
+
   const injectNav = () => {
     clearExistingNav();
     ensureLatexFonts();
     ensureMainAnchor();
     ensureVideoBg();
+    ensurePhosphorCss();
     const body = document.body;
     const fragment = document.createDocumentFragment();
 
-    // Latex hero header (VoiceToWebsite + waves) removed so it does not block page content.
-
-    // Skip link for accessibility
     const skip = document.createElement("a");
     skip.className = "vtw-skip-link";
     skip.href = "#main";
     skip.textContent = "Skip to content";
 
-    // Create plasma navigation
-    const navWrapper = document.createElement("div");
-    navWrapper.className = "flash-nav nav-reveal";
-    navWrapper.id = "vtwNavWrapper";
+    const svgDefs = document.createElement("div");
+    svgDefs.id = "vtw-phosphor-svg-defs";
+    svgDefs.className = "vtw-phosphor-svg-defs";
+    svgDefs.setAttribute("aria-hidden", "true");
+    svgDefs.innerHTML = `<svg><filter id="vtw-melt-filter"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.1" numOctaves="2" result="noise" seed="1"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="50" xChannelSelector="R" yChannelSelector="G"/></filter></svg>`;
 
-    const nav = document.createElement("nav");
-    nav.className = "flash-nav nav-reveal";
-    nav.id = "nav";
+    const crtOverlay = document.createElement("div");
+    crtOverlay.className = "vtw-crt-overlay";
+    crtOverlay.setAttribute("aria-hidden", "true");
 
-    // Build navigation HTML
-    const currentLinks = getNavLinks();
-    const navLinks = currentLinks
-      .map(
-        (link, idx) => `
-      <li class="plasma-nav-item" style="--vtw-i:${idx}">
-        <a class="plasma-nav-link" href="${link.href}" data-name="${link.label}">
-          <span class="plasma-icon">${link.icon}</span>
-          <span class="plasma-label">${link.label}</span>
-        </a>
-      </li>
-    `
-      )
-      .join("");
+    const grain = document.createElement("div");
+    grain.className = "vtw-grain";
+    grain.setAttribute("aria-hidden", "true");
 
-    nav.innerHTML = `
-      <canvas id="waveCanvas"></canvas>
-      <div class="plasma-ball" id="ball"></div>
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.id = "vtwPhosphorTrigger";
+    trigger.className = "vtw-phosphor-trigger";
+    trigger.setAttribute("aria-label", "Open menu");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-controls", "vtwPhosphorMenu");
+    trigger.innerHTML = `<span class="vtw-phosphor-logo-text">Voicetowebsite.com</span><div class="vtw-phosphor-burger-icon"><span class="vtw-phosphor-burger-line"></span><span class="vtw-phosphor-burger-line"></span><span class="vtw-phosphor-burger-line"></span></div>`;
 
-      <div class="plasma-nav-brand">
-        <div class="page-title-wrapper" id="target">
-          <h1 class="page-title">VoiceToWebsite</h1>
-        </div>
-      </div>
+    const menu = document.createElement("nav");
+    menu.id = "vtwPhosphorMenu";
+    menu.className = "vtw-phosphor-menu";
+    menu.setAttribute("aria-label", "Main navigation");
+    menu.setAttribute("role", "navigation");
+    menu.hidden = true;
+    menu.innerHTML = `<canvas id="vtw-three-canvas" class="vtw-phosphor-three-canvas" aria-hidden="true"></canvas><ul class="vtw-phosphor-nav-links" id="vtwPhosphorLinks">${buildPhosphorLinksHtml()}</ul>`;
 
-      <!-- Hamburger Menu Toggle -->
-      <button class="hamburger-toggle" id="mobileNavToggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-
-      <ul class="plasma-nav-links">
-        ${navLinks}
-      </ul>
-
-      <div class="data-stream">
-        <div class="status-indicator">
-          <div class="status-dot"></div>
-          <span>Status: Active</span>
-        </div>
-        <div class="signal-info">Signal: 104.2 MHz</div>
-      </div>
-    `;
-
-    navWrapper.appendChild(nav);
-    fragment.append(skip, navWrapper);
-
-    // Create mobile overlay for hamburger menu
-    const mobileOverlay = document.createElement("div");
-    mobileOverlay.className = "mobile-overlay";
-    mobileOverlay.id = "mobileOverlay";
-    mobileOverlay.innerHTML = `
-      <div class="mobile-overlay-content">
-        <div class="mobile-overlay-header">
-          <h2 class="mobile-overlay-title">Navigation</h2>
-          <button class="mobile-overlay-close" id="mobileOverlayClose" type="button" aria-label="Close menu">
-            <span class="close-icon">×</span>
-          </button>
-        </div>
-        <ul class="mobile-nav-list">
-          ${buildListHtml()}
-        </ul>
-      </div>
-    `;
-    fragment.appendChild(mobileOverlay);
-
+    fragment.append(skip, svgDefs, crtOverlay, grain, trigger, menu);
     body.prepend(fragment);
     body.classList.add("nav-ready");
 
-    setupLatexScroll(null, navWrapper);
+    setupLatexScroll(null, null);
 
-    // Initialize plasma effects
-    initPlasmaEffects();
+    const initPhosphorNav = () => {
+      const burger = document.getElementById("vtwPhosphorTrigger");
+      const menuEl = document.getElementById("vtwPhosphorMenu");
+      const linksContainer = document.getElementById("vtwPhosphorLinks");
+      if (!burger || !menuEl || !linksContainer) return;
 
-    // Add navigation interactions
-    const navLinksElements = nav.querySelectorAll(".plasma-nav-link");
-    navLinksElements.forEach((link) => {
-      link.addEventListener("mouseenter", playHover);
-      link.addEventListener("mousedown", playClick);
-    });
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const playSizzle = () => {
+        try {
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const bufferSize = audioCtx.sampleRate * 1.5;
+          const buffer = audioCtx.createBuffer(
+            1,
+            bufferSize,
+            audioCtx.sampleRate
+          );
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = "highpass";
+          filter.frequency.value = 2000;
+          const gain = audioCtx.createGain();
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioCtx.currentTime + 1.2
+          );
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          noise.start();
+        } catch (_) {}
+      };
 
-    // Hamburger menu functionality
-    const hamburgerToggle = document.getElementById("mobileNavToggle");
-    const mobileOverlayElement = document.getElementById("mobileOverlay");
-    const mobileOverlayClose = document.getElementById("mobileOverlayClose");
-
-    const openMobileMenu = () => {
-      mobileOverlayElement.classList.add("is-open");
-      hamburgerToggle.classList.add("is-active");
-      hamburgerToggle.setAttribute("aria-expanded", "true");
-      document.body.style.overflow = "hidden";
-    };
-
-    const closeMobileMenu = () => {
-      mobileOverlayElement.classList.remove("is-open");
-      hamburgerToggle.classList.remove("is-active");
-      hamburgerToggle.setAttribute("aria-expanded", "false");
-      document.body.style.overflow = "";
-    };
-
-    if (hamburgerToggle) {
-      hamburgerToggle.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (mobileOverlayElement.classList.contains("is-open")) {
-          closeMobileMenu();
-        } else {
-          openMobileMenu();
+      const canvas = document.getElementById("vtw-three-canvas");
+      if (typeof THREE !== "undefined" && canvas) {
+        const renderer = new THREE.WebGLRenderer({
+          canvas,
+          antialias: true,
+          alpha: true,
+        });
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.z = 5;
+        const geometries = [
+          new THREE.IcosahedronGeometry(1, 0),
+          new THREE.TorusKnotGeometry(0.7, 0.3, 100, 16),
+          new THREE.OctahedronGeometry(1, 0),
+        ];
+        const objects = [];
+        for (let i = 0; i < 15; i++) {
+          const material = new THREE.MeshPhysicalMaterial({
+            color: i % 2 === 0 ? 0xff00ff : 0x00ffff,
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: i % 2 === 0 ? 0x220022 : 0x002222,
+            transparent: true,
+            opacity: 0.8,
+          });
+          const mesh = new THREE.Mesh(
+            geometries[Math.floor(Math.random() * geometries.length)],
+            material
+          );
+          mesh.position.set(
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 5
+          );
+          mesh.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            0
+          );
+          scene.add(mesh);
+          objects.push(mesh);
         }
-      });
-    }
-
-    if (mobileOverlayClose) {
-      mobileOverlayClose.addEventListener("click", (e) => {
-        e.preventDefault();
-        closeMobileMenu();
-      });
-    }
-
-    // Close menu when clicking outside
-    mobileOverlayElement.addEventListener("click", (e) => {
-      if (e.target === mobileOverlayElement) {
-        closeMobileMenu();
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+        let mouseX = 0,
+          mouseY = 0,
+          targetX = 0,
+          targetY = 0;
+        window.addEventListener("mousemove", (e) => {
+          mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+          mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+        window.addEventListener("deviceorientation", (e) => {
+          if (e.beta != null && e.gamma != null) {
+            targetX = e.gamma / 30;
+            targetY = e.beta / 30;
+          }
+        });
+        const animate = () => {
+          requestAnimationFrame(animate);
+          targetX += (mouseX - targetX) * 0.05;
+          targetY += (mouseY - targetY) * 0.05;
+          objects.forEach((obj, i) => {
+            obj.rotation.x += 0.01;
+            obj.rotation.y += 0.01;
+            obj.position.x += Math.sin(Date.now() * 0.001 + i) * 0.005;
+            obj.position.z = 2 + targetY * 2 + Math.cos(Date.now() * 0.001 + i);
+          });
+          camera.position.x += (targetX - camera.position.x) * 0.05;
+          camera.position.y += (-targetY - camera.position.y) * 0.05;
+          camera.lookAt(scene.position);
+          renderer.render(scene, camera);
+        };
+        animate();
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
       }
-    });
 
-    // Close menu on escape key
+      burger.addEventListener("click", () => {
+        const open = menuEl.classList.toggle("open");
+        burger.classList.toggle("active", open);
+        burger.setAttribute("aria-expanded", open ? "true" : "false");
+        menuEl.hidden = !open;
+        document.body.style.overflow = open ? "hidden" : "";
+        if (audioCtx.state === "suspended") audioCtx.resume();
+      });
+
+      const attachLinkListeners = () => {
+        linksContainer
+          .querySelectorAll(".vtw-phosphor-nav-link")
+          .forEach((link) => {
+            link.addEventListener("click", (e) => {
+              const href = link.getAttribute("href");
+              if (!href || href === "#") return;
+              e.preventDefault();
+              playSizzle();
+              link.classList.add("vtw-phosphor-melting");
+              setTimeout(() => {
+                window.location.href = href;
+              }, 800);
+            });
+          });
+      };
+      attachLinkListeners();
+      window.__vtwPhosphorAttachLinkListeners = attachLinkListeners;
+      window.__vtwPhosphorBuildLinksHtml = buildPhosphorLinksHtml;
+    };
+
+    if (typeof THREE !== "undefined") {
+      initPhosphorNav();
+    } else {
+      const script = document.createElement("script");
+      script.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      script.onload = () => initPhosphorNav();
+      document.head.appendChild(script);
+    }
+
     window.addEventListener("keydown", (e) => {
-      if (
-        e.key === "Escape" &&
-        mobileOverlayElement.classList.contains("is-open")
-      ) {
-        closeMobileMenu();
+      if (e.key === "Escape") {
+        const menuEl = document.getElementById("vtwPhosphorMenu");
+        const burger = document.getElementById("vtwPhosphorTrigger");
+        if (menuEl && menuEl.classList.contains("open")) {
+          menuEl.classList.remove("open");
+          menuEl.hidden = true;
+          if (burger) {
+            burger.classList.remove("active");
+            burger.setAttribute("aria-expanded", "false");
+          }
+          document.body.style.overflow = "";
+        }
       }
     });
 
-    // Update navigation when auth state changes
     let lastAuthState = null;
     let updateTimeout = null;
 
     const updateNavigation = () => {
       const currentState = hasAdminAccess();
-      if (currentState === lastAuthState) return; // No change needed
-
+      if (currentState === lastAuthState) return;
       lastAuthState = currentState;
-
-      const navContainer = document.querySelector(".plasma-nav-links");
-      if (navContainer) {
-        const newLinks = getNavLinks();
-        const newHtml = newLinks
-          .map(
-            (link, idx) => `
-          <li class="plasma-nav-item" style="--vtw-i:${idx}">
-            <a class="plasma-nav-link" href="${link.href}" data-name="${link.label}">
-              <span class="plasma-icon">${link.icon}</span>
-              <span class="plasma-label">${link.label}</span>
-            </a>
-          </li>
-        `
-          )
-          .join("");
-
-        // Only update if HTML actually changed
-        if (navContainer.innerHTML !== newHtml) {
-          navContainer.innerHTML = newHtml;
-
-          // Re-attach event listeners
-          navContainer.querySelectorAll(".plasma-nav-link").forEach((link) => {
-            link.addEventListener("mouseenter", playHover);
-            link.addEventListener("mousedown", playClick);
-          });
-        }
-      }
-
-      const mobileNavList = document.querySelector(".mobile-nav-list");
-      if (mobileNavList) {
-        const nextMobileHtml = buildListHtml();
-        if (mobileNavList.innerHTML !== nextMobileHtml) {
-          mobileNavList.innerHTML = nextMobileHtml;
+      const linksContainer = document.getElementById("vtwPhosphorLinks");
+      if (linksContainer && window.__vtwPhosphorBuildLinksHtml) {
+        const newHtml = window.__vtwPhosphorBuildLinksHtml();
+        if (linksContainer.innerHTML !== newHtml) {
+          linksContainer.innerHTML = newHtml;
+          if (window.__vtwPhosphorAttachLinkListeners)
+            window.__vtwPhosphorAttachLinkListeners();
         }
       }
     };

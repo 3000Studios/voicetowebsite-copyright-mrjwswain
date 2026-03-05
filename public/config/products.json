@@ -1,6 +1,55 @@
 {
   "products": [
     {
+      "id": "starter",
+      "type": "service",
+      "title": "Starter Capsule",
+      "label": "Starter Site",
+      "desc": "Single brand, 3 live pages + contact, AI edit requests, weekly deploy window, 7-day license rotation.",
+      "price": 79.0,
+      "currency": "USD",
+      "interval": "month",
+      "features": ["3 live pages", "AI edit requests", "Weekly deploy", "7-day license rotation"]
+    },
+    {
+      "id": "growth",
+      "type": "service",
+      "title": "Growth Voice",
+      "label": "Growth Voice",
+      "desc": "Daily co-pilot for high-volume sites. Deploy cadence, Slack priority support, monthly keys, livestream pack.",
+      "price": 249.0,
+      "currency": "USD",
+      "interval": "month",
+      "features": ["Daily deploy + rollback", "Slack priority", "Monthly keys", "Livestream pack"]
+    },
+    {
+      "id": "enterprise",
+      "type": "service",
+      "title": "Enterprise Edge",
+      "label": "Enterprise Edge",
+      "desc": "Governed automation for regulated teams. 24/7 ops desk, KV/D1/R2, SSO + custom branding, approval workflow.",
+      "price": 699.0,
+      "currency": "USD",
+      "interval": "month",
+      "features": ["24/7 ops desk", "KV · D1 · R2", "SSO + custom branding", "Approval workflow"]
+    },
+    {
+      "id": "lifetime",
+      "type": "service",
+      "title": "Lifetime App Buyout",
+      "label": "Lifetime App",
+      "desc": "Own the full VoiceToWebsite stack. White-label + resale rights, 12 months updates, priority onboarding.",
+      "price": 4999.0,
+      "currency": "USD",
+      "interval": "one-time",
+      "features": [
+        "White-label + resale",
+        "12 months updates",
+        "Priority onboarding",
+        "Opt-in retainer"
+      ]
+    },
+    {
       "id": "single",
       "type": "service",
       "title": "Solo Page",

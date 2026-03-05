@@ -111,17 +111,235 @@ const commandHandler = {
   },
 };
 
+// Admin Authentication System
+const AdminAuth = {
+  // Use environment variable for admin password hash
+  ADMIN_PASSWORD_HASH: import.meta.env?.VITE_ADMIN_PASSWORD_HASH || "",
+
+  init() {
+    this.setupEventListeners();
+    this.checkAuthStatus();
+  },
+
+  setupEventListeners() {
+    const unlockBtn = document.getElementById("unlock-control");
+    const passwordInput = document.getElementById("control-password");
+
+    if (unlockBtn && passwordInput) {
+      unlockBtn.addEventListener("click", () => this.handleLogin());
+      passwordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") this.handleLogin();
+      });
+    }
+  },
+
+  async hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  },
+
+  async handleLogin() {
+    const passwordInput = document.getElementById("control-password");
+    const lockNote = document.getElementById("control-lock-note");
+
+    if (!passwordInput || !lockNote) return;
+
+    const password = passwordInput.value.trim();
+    if (!password) {
+      lockNote.textContent = "Please enter a password";
+      lockNote.style.color = "#ef4444";
+      return;
+    }
+
+    try {
+      const hashedPassword = await this.hashPassword(password);
+
+      if (hashedPassword === this.ADMIN_PASSWORD_HASH) {
+        this.setAuthState(true);
+        this.showAdminPanel();
+        lockNote.textContent = "Access granted";
+        lockNote.style.color = "#22c55e";
+        passwordInput.value = "";
+      } else {
+        lockNote.textContent = "Invalid password";
+        lockNote.style.color = "#ef4444";
+        passwordInput.value = "";
+        // Add delay to prevent brute force
+        setTimeout(() => {
+          lockNote.textContent = "";
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+      lockNote.textContent = "Authentication error";
+      lockNote.style.color = "#ef4444";
+    }
+  },
+
+  setAuthState(isAuthenticated) {
+    sessionStorage.setItem("adminAuth", isAuthenticated ? "true" : "false");
+    sessionStorage.setItem("adminAuthTime", Date.now().toString());
+  },
+
+  clearAuthState() {
+    sessionStorage.setItem("adminAuth", "false");
+    sessionStorage.removeItem("adminAuthTime");
+  },
+
+  checkAuthStatus() {
+    const isAuthenticated = sessionStorage.getItem("adminAuth") === "true";
+    const authTime = parseInt(sessionStorage.getItem("adminAuthTime") || "0");
+    const now = Date.now();
+
+    // Session expires after 1 hour
+    if (isAuthenticated && now - authTime < 3600000) {
+      this.showAdminPanel();
+    } else {
+      this.hideAdminPanel();
+      this.setAuthState(false);
+    }
+  },
+
+  showAdminPanel() {
+    const controlLock = document.getElementById("control-lock");
+    const controlGrid = document.getElementById("control-grid");
+
+    if (controlLock) controlLock.style.display = "none";
+    if (controlGrid) {
+      controlGrid.style.display = "block";
+      this.populateAdminControls(controlGrid);
+    }
+  },
+
+  hideAdminPanel() {
+    const controlLock = document.getElementById("control-lock");
+    const controlGrid = document.getElementById("control-grid");
+
+    if (controlLock) controlLock.style.display = "none";
+    if (controlGrid) controlGrid.style.display = "none";
+  },
+
+  populateAdminControls(container) {
+    // Sanitize container before adding content
+    container.innerHTML = "";
+
+    const controls = [
+      { label: "Clear Market Data", action: () => this.clearMarketData() },
+      { label: "Stop Audio", action: () => this.stopAudio() },
+      { label: "Restart Ticker", action: () => this.restartTicker() },
+      { label: "Logout", action: () => this.logout() },
+    ];
+
+    controls.forEach((control) => {
+      const button = document.createElement("button");
+      button.textContent = control.label;
+      button.className = "admin-control-btn";
+      button.style.cssText = `
+        margin: 5px;
+        padding: 8px 16px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      `;
+      button.addEventListener("click", control.action);
+      container.appendChild(button);
+    });
+  },
+
+  clearMarketData() {
+    if (window.cleanupMarketData) {
+      window.cleanupMarketData();
+      console.warn("Market data cleared");
+    }
+  },
+
+  stopAudio() {
+    const cleanupFunctions = window.__cleanupFunctions || [];
+    cleanupFunctions.forEach((fn) => {
+      if (fn && typeof fn === "function") {
+        try {
+          fn();
+        } catch (e) {
+          console.warn("Cleanup function failed:", e);
+        }
+      }
+    });
+    console.warn("Audio and other resources stopped");
+  },
+
+  restartTicker() {
+    if (typeof setupTicker === "function") {
+      setupTicker();
+      console.warn("Ticker restarted");
+    }
+  },
+
+  logout() {
+    this.clearAuthState();
+    this.hideAdminPanel();
+    const controlLock = document.getElementById("control-lock");
+    if (controlLock) {
+      controlLock.style.display = "block";
+    }
+  },
+};
+
+// Initialize admin auth when DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => AdminAuth.init());
+} else {
+  AdminAuth.init();
+}
+const sanitizeText = (text) => {
+  if (typeof text !== "string") return "";
+  return text
+    .replace(/[<>]/g, "")
+    .replace(/javascript:/gi, "")
+    .replace(/on\w+=/gi, "")
+    .trim()
+    .substring(0, 200); // Limit length
+};
+
 // Listen for voice commands from window events (from voice.js or speech recognition)
 window.addEventListener("command-executed", (e) => {
   const { action, args, source } = e.detail;
-  commandHandler.execute(action, args, source).catch(console.error);
+  commandHandler.execute(action, args, source).catch((err) => {
+    console.error("Command execution failed:", err);
+    // Add user-friendly error handling with sanitization
+    if (elements.commandLog) {
+      const errorEntry = document.createElement("div");
+      errorEntry.className = "command-error";
+      const safeMessage = sanitizeText(
+        err?.message || "Unknown error occurred"
+      );
+      errorEntry.textContent = `Error: ${safeMessage}`;
+      elements.commandLog.appendChild(errorEntry);
+    }
+  });
 });
 
 // Listen for window message commands (from custom GPT or Continue.dev iframe)
 window.addEventListener("message", (e) => {
   if (e.data?.type === "ui-command") {
     const { action, args } = e.data;
-    commandHandler.execute(action, args, "message").catch(console.error);
+    commandHandler.execute(action, args, "message").catch((err) => {
+      console.error("Message command failed:", err);
+      // Add user-friendly error handling with sanitization
+      if (elements.commandLog) {
+        const errorEntry = document.createElement("div");
+        errorEntry.className = "command-error";
+        const safeMessage = sanitizeText(
+          err?.message || "Unknown error occurred"
+        );
+        errorEntry.textContent = `Error: ${safeMessage}`;
+        elements.commandLog.appendChild(errorEntry);
+      }
+    });
   }
 });
 
@@ -843,37 +1061,158 @@ const setupContactModal = () => {
 };
 const setupAudio = () => {
   if (!audioTracks.length) return;
-  const audio = new Audio();
-  const pick = () =>
-    audioTracks[Math.floor(Math.random() * audioTracks.length)];
-  audio.src = pick();
-  audio.loop = true;
-  audio.volume = 0.15;
-  audio.autoplay = true;
-  audio.addEventListener("ended", () => {
-    audio.src = pick();
+
+  let audio = null;
+  let isDestroyed = false;
+  let cleanupIndex = -1;
+  let isCreating = false; // Prevent race condition
+
+  const createAudio = () => {
+    if (isDestroyed || isCreating) return null;
+
+    isCreating = true; // Set lock
+
+    try {
+      audio = new Audio();
+      const pick = () =>
+        audioTracks[Math.floor(Math.random() * audioTracks.length)];
+
+      audio.src = pick();
+      audio.loop = true;
+      audio.volume = 0.15;
+      audio.preload = "auto";
+
+      const handleEnded = () => {
+        if (!isDestroyed && audio) {
+          audio.src = pick();
+          audio.play().catch(() => {});
+        }
+      };
+
+      audio.addEventListener("ended", handleEnded);
+
+      // Store cleanup for this audio instance
+      audio._cleanup = () => {
+        audio.removeEventListener("ended", handleEnded);
+        audio.pause();
+        audio.src = "";
+      };
+
+      return audio;
+    } finally {
+      isCreating = false; // Release lock
+    }
+  };
+
+  const cleanupAudio = () => {
+    isDestroyed = true;
+    if (audio && audio._cleanup) {
+      audio._cleanup();
+      audio = null;
+    }
+
+    // Remove cleanup function from global array to prevent memory leaks
+    if (cleanupIndex >= 0 && window.__cleanupFunctions) {
+      window.__cleanupFunctions.splice(cleanupIndex, 1);
+      cleanupIndex = -1;
+    }
+  };
+
+  // Create and start audio
+  audio = createAudio();
+  if (audio) {
     audio.play().catch(() => {});
-  });
-  audio.play().catch(() => {});
+  }
+
+  // Store cleanup function with index for removal
+  if (!window.__cleanupFunctions) {
+    window.__cleanupFunctions = [];
+  }
+  cleanupIndex = window.__cleanupFunctions.length;
+  window.__cleanupFunctions.push(cleanupAudio);
+
+  // Add page unload cleanup
+  const handleUnload = () => {
+    cleanupAudio();
+    window.removeEventListener("unload", handleUnload);
+  };
+  window.addEventListener("unload", handleUnload);
+
+  return cleanupAudio;
 };
 const setupTicker = () => {
   if (!elements.ticker || !elements.tickerData) return;
-  const url =
-    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd";
+
+  // Configuration with fallback
+  const config = {
+    apiUrl:
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd",
+    updateInterval: 45000,
+    fallbackText: "Live market data unavailable",
+  };
+
+  let marketDataInterval = null;
+  let isDestroyed = false;
+
   const update = async () => {
+    if (isDestroyed) return;
+
     try {
-      const res = await fetch(url);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const res = await fetch(config.apiUrl, {
+        signal: controller.signal,
+        headers: { Accept: "application/json" },
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
       const items = Object.entries(data).map(
-        ([k, v]) => `${k.toUpperCase()}: $${(v.usd || 0).toLocaleString()}`
+        ([k, v]) => `${k.toUpperCase()}: $${(v?.usd || 0).toLocaleString()}`
       );
-      elements.tickerData.textContent = items.join("   |   ");
+
+      if (!isDestroyed && elements.tickerData) {
+        elements.tickerData.textContent = items.join("   |   ");
+      }
     } catch (e) {
-      elements.tickerData.textContent = "Live market data unavailable";
+      if (!isDestroyed && elements.tickerData) {
+        elements.tickerData.textContent = config.fallbackText;
+      }
     }
   };
+
+  const cleanupMarketData = () => {
+    isDestroyed = true;
+    if (marketDataInterval) {
+      clearInterval(marketDataInterval);
+      marketDataInterval = null;
+    }
+  };
+
+  // Start updates
   update();
-  setInterval(update, 45000);
+  marketDataInterval = setInterval(update, config.updateInterval);
+
+  // Store cleanup function in module scope
+  const cleanupFunctions = window.__cleanupFunctions || [];
+  cleanupFunctions.push(cleanupMarketData);
+  window.__cleanupFunctions = cleanupFunctions;
+
+  // Also store for backward compatibility
+  window.cleanupMarketData = cleanupMarketData;
+
+  // Add page unload cleanup
+  const handleUnload = () => {
+    cleanupMarketData();
+    window.removeEventListener("unload", handleUnload);
+  };
+  window.addEventListener("unload", handleUnload);
+
+  return cleanupMarketData;
 };
 const setupAvatar = () => {
   const avatar = elements.avatar;

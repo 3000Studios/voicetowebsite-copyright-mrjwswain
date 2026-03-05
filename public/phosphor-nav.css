@@ -1,0 +1,202 @@
+/* Phosphor hamburger + fullscreen popout nav - global */
+:root {
+  --vtw-neon-pink: #ff00ff;
+  --vtw-neon-cyan: #00ffff;
+  --vtw-phosphor-green: #00ff66;
+  --vtw-bg-dark: #050505;
+  --vtw-crt-scanline: rgba(18, 16, 16, 0.1);
+}
+
+/* Overlays (fixed, non-blocking) */
+.vtw-crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(var(--vtw-crt-scanline) 50%, rgba(0, 0, 0, 0) 50%);
+  background-size: 100% 4px;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+.vtw-grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1001;
+  pointer-events: none;
+  opacity: 0.05;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Hamburger trigger */
+.vtw-phosphor-trigger {
+  position: fixed;
+  top: 40px;
+  right: 40px;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.vtw-phosphor-logo-text {
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--vtw-neon-cyan);
+  text-transform: uppercase;
+  font-family: "Space Mono", monospace;
+  text-shadow: 0 0 10px var(--vtw-neon-cyan);
+  opacity: 0.8;
+}
+
+.vtw-phosphor-burger-icon {
+  width: 45px;
+  height: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.vtw-phosphor-burger-line {
+  width: 100%;
+  height: 2px;
+  background: var(--vtw-neon-pink);
+  box-shadow: 0 0 15px var(--vtw-neon-pink);
+  transition: 0.5s transform, 0.5s width;
+}
+
+.vtw-phosphor-trigger:hover .vtw-phosphor-burger-line:nth-child(2) {
+  width: 60%;
+}
+
+.vtw-phosphor-trigger:hover .vtw-phosphor-logo-text {
+  color: var(--vtw-neon-pink);
+  text-shadow: 0 0 15px var(--vtw-neon-pink);
+}
+
+.vtw-phosphor-trigger.active .vtw-phosphor-burger-line:nth-child(1) {
+  transform: translateY(11px) rotate(45deg);
+  width: 100%;
+}
+
+.vtw-phosphor-trigger.active .vtw-phosphor-burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.vtw-phosphor-trigger.active .vtw-phosphor-burger-line:nth-child(3) {
+  transform: translateY(-11px) rotate(-45deg);
+  width: 100%;
+}
+
+/* Fullscreen menu */
+.vtw-phosphor-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  clip-path: circle(0% at 90% 5%);
+  transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+  z-index: 1500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vtw-phosphor-menu.open {
+  clip-path: circle(150% at 90% 5%);
+}
+
+.vtw-phosphor-three-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.vtw-phosphor-nav-links {
+  position: relative;
+  z-index: 2;
+  list-style: none;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+
+.vtw-phosphor-nav-item {
+  margin: 40px 0;
+  perspective: 1000px;
+}
+
+.vtw-phosphor-nav-link {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.4s ease, -webkit-text-stroke 0.4s ease;
+  position: relative;
+  font-family: "Syncopate", sans-serif;
+}
+
+.vtw-phosphor-nav-link::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--vtw-neon-cyan);
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 0.4s ease;
+  text-shadow: 0 0 20px var(--vtw-neon-cyan);
+}
+
+.vtw-phosphor-nav-link:hover {
+  transform: translateZ(100px) translateY(-20px);
+  -webkit-text-stroke: 1px var(--vtw-neon-cyan);
+}
+
+.vtw-phosphor-nav-link:hover::before {
+  clip-path: inset(0 0 0 0);
+}
+
+.vtw-phosphor-melting {
+  animation: vtwPhosphorMeltDown 1.5s forwards ease-in;
+  filter: url(#vtw-melt-filter);
+  pointer-events: none;
+}
+
+@keyframes vtwPhosphorMeltDown {
+  0% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200px) scaleY(2);
+    opacity: 0;
+  }
+}
+
+.vtw-phosphor-svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}

@@ -53,11 +53,17 @@ store).
 
 ## Payments
 
-- PayPal (server-side, tamper-resistant):
-  - `POST /api/paypal/order/create` (body: `{ product: 'starter' }` or `{ productId }` or `{ sku }`)
-  - `POST /api/paypal/order/capture` (body: `{ orderId, product|productId|sku }`)
-- Stripe:
-  - `POST /api/stripe/checkout`
+- **Unified checkout:** All buy buttons (store, app store, cart) use `POST /api/checkout` with
+  `provider: "paypal"` or `"stripe"`, then PayPal uses `POST /api/paypal/capture` with `orderId`
+  after approval. **Payouts go to the account whose credentials are set in Worker secrets** (PayPal:
+  `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` or `_PROD`; Stripe: `STRIPE_SECRET_KEY` /
+  `STRIPE_PUBLISHABLE_KEY`). Set these in Cloudflare Dashboard → Worker → Settings → Variables and
+  Secrets so all purchases complete to your account.
+- PayPal: `POST /api/checkout` (body: `{ provider: "paypal", id: "starter" | appId | sku }`) returns
+  `{ id }` (order ID); frontend then calls `POST /api/paypal/capture` with `{ orderId }` after user
+  approves. Orders are logged to D1.
+- Stripe: `POST /api/checkout` (body: `{ provider: "stripe", id }`) returns `{ sessionId }`;
+  frontend redirects to Stripe Checkout.
 
 ## Deploy
 

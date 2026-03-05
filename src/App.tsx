@@ -1,12 +1,12 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import AudioWaveform from "./components/AudioWaveform";
+import ComprehensiveAdminPanel from "./components/ComprehensiveAdminPanel";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ParticleEffects from "./components/ParticleEffects";
-import SiteLogo from "./components/SiteLogo";
+import PhosphorNav from "./components/PhosphorNav";
 import WarpTunnel from "./components/WarpTunnel";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
-import { SHARED_NAV_ITEMS } from "./constants/navigation";
 import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
 import { escapeHtml } from "./utils/htmlSanitizer";
@@ -36,8 +36,6 @@ type FaqItem = {
   question: string;
   answer: string;
 };
-
-const NAV_MENU_ITEMS = SHARED_NAV_ITEMS;
 
 const PRICING_TIERS: PricingTier[] = [
   {
@@ -269,11 +267,11 @@ const App: React.FC = () => {
   const [previewLoadState, setPreviewLoadState] = useState<
     "idle" | "loading" | "loaded" | "error"
   >("idle");
-  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
-  const [isNavFaded, setIsNavFaded] = useState(false);
   const [activeTierIndex, setActiveTierIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const FALLBACK_PREVIEW_URL = "/demo";
 
   const recognitionRef = useRef<any>(null);
@@ -294,7 +292,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      setIsNavFaded(window.scrollY > 18);
+      // Navigation fade logic removed
     };
 
     onScroll();
@@ -710,6 +708,11 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
+        <ComprehensiveAdminPanel
+          isAuthenticated={isAdminAuthenticated}
+          onLogin={() => setIsAdminAuthenticated(true)}
+          onLogout={() => setIsAdminAuthenticated(false)}
+        />
         <ErrorBoundary fallback={null}>
           <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
         </ErrorBoundary>
@@ -737,48 +740,8 @@ const App: React.FC = () => {
           <ParticleEffects />
         </div>
 
-        {/* Simplified Navigation - in-flow so it does not cover page content */}
-        <nav
-          className={`relative z-40 transition-opacity duration-300 ${isNavFaded ? "opacity-70" : "opacity-100"}`}
-        >
-          <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between backdrop-blur-md bg-black/45 border-b border-white/15 rounded-b-3xl shadow-lg shadow-black/20">
-            <a href="/" className="flex items-center gap-3">
-              <SiteLogo size={42} className="text-white" inline />
-            </a>
-            <div ref={navMenuRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setIsNavMenuOpen((prev) => !prev)}
-                aria-expanded={isNavMenuOpen ? "true" : "false"}
-                aria-label="Toggle navigation menu"
-                className="px-4 py-2 rounded-full border border-white/15 bg-white/10 hover:bg-white/15 transition-all font-outfit text-[11px] tracking-[0.16em] uppercase"
-              >
-                Menu
-              </button>
-              <AnimatePresence>
-                {isNavMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                    className="absolute right-0 mt-3 w-56 max-h-[72vh] overflow-y-auto rounded-2xl border border-emerald-400/30 bg-black/85 backdrop-blur-xl p-2"
-                  >
-                    {NAV_MENU_ITEMS.map((item) => (
-                      <a
-                        key={item.label}
-                        href={item.href}
-                        onClick={() => setIsNavMenuOpen(false)}
-                        className="block rounded-xl px-4 py-3 font-outfit text-sm tracking-[0.14em] uppercase text-white/75 hover:text-white hover:bg-emerald-500/20 hover:translate-x-1 transition-all"
-                      >
-                        {item.label}
-                      </a>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </nav>
+        {/* Global phosphor hamburger + fullscreen popout nav */}
+        <PhosphorNav />
 
         <div className="fixed bottom-5 right-5 z-50">
           <button

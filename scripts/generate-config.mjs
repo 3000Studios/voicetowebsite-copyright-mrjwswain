@@ -1,8 +1,11 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const OPS_SITE = "ops/site";
-const PUBLIC_CONFIG = "public/config";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(__dirname, "..");
+const OPS_SITE = path.join(repoRoot, "ops", "site");
+const PUBLIC_CONFIG = path.join(repoRoot, "public", "config");
 
 function ensureDirectory(dir) {
   if (!fs.existsSync(dir)) {
@@ -28,8 +31,10 @@ function processFiles() {
   globalFiles.forEach((file) => {
     const src = path.join(OPS_SITE, file);
     if (fs.existsSync(src)) {
-      fs.copyFileSync(src, path.join(PUBLIC_CONFIG, file));
-      console.log(`Copied ${file} to ${PUBLIC_CONFIG}`);
+      const dest = path.join(PUBLIC_CONFIG, file);
+      ensureDirectory(path.dirname(dest));
+      fs.copyFileSync(src, dest);
+      console.log(`Copied ${file} to public/config`);
     }
   });
 
@@ -48,8 +53,10 @@ function processFiles() {
     const contentFiles = fs.readdirSync(contentDir);
     contentFiles.forEach((file) => {
       const src = path.join(contentDir, file);
-      fs.copyFileSync(src, path.join(PUBLIC_CONFIG, file));
-      console.log(`Copied content ${file} to ${PUBLIC_CONFIG}`);
+      if (!fs.statSync(src).isFile()) return;
+      const dest = path.join(PUBLIC_CONFIG, file);
+      fs.copyFileSync(src, dest);
+      console.log(`Copied content ${file} to public/config`);
     });
   }
 }

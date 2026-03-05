@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-03T07:10:42.558Z",
-  "scannedFiles": 382,
+  "generatedAt": "2026-03-05T10:30:15.396Z",
+  "scannedFiles": 392,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -36,6 +36,7 @@
     "CF_API_TOKEN2",
     "CF_AUTO_DEPLOY_ON_PUSH",
     "CF_DEPLOY_HOOK_URL",
+    "CF_DEPLOY_WEBHOOK",
     "CF_FORCE_DEPLOY_HOOK",
     "CF_FORCE_DEPLOY_WEBHOOK",
     "CF_PAGES_DEPLOY_HOOK",
@@ -139,6 +140,7 @@
   "definedKeys": [
     "ADMIN_COOKIE_SECRET",
     "ADMIN_EMAIL",
+    "ADMIN_PASSWORD_HASH",
     "ADMIN_ROLE",
     "ADSENSE_ALLOW_ALL_PAGES",
     "ADSENSE_CUSTOMER_ID",
@@ -180,6 +182,8 @@
     "KV",
     "LICENSE_SECRET",
     "LIVE_ROOM",
+    "LIVE_ROOM_ADMIN_TOKEN",
+    "LIVE_ROOM_VIEWER_TOKEN",
     "OPENAI_API",
     "OPENAI_API_KEY3",
     "OPENAI_MODEL",
@@ -238,6 +242,7 @@
     "BASE_URL",
     "CF_A",
     "CF_AUTO_DEPLOY_ON_PUSH",
+    "CF_DEPLOY_WEBHOOK",
     "CF_FORCE_DEPLOY_HOOK",
     "CF_FORCE_DEPLOY_WEBHOOK",
     "CI",
@@ -252,8 +257,6 @@
     "GEMINIAPIKEY2",
     "GITHUB_BASE_BRANCH",
     "LEARN",
-    "LIVE_ROOM_ADMIN_TOKEN",
-    "LIVE_ROOM_VIEWER_TOKEN",
     "LOG_LEVEL",
     "NEXT_PUBLIC_ADSENSE_PUBLISHER_ID",
     "NODE_ENV",
@@ -285,6 +288,7 @@
   ],
   "unused": [
     "ADMIN_EMAIL",
+    "ADMIN_PASSWORD_HASH",
     "ALLOW_INSECURE_ADMIN_COOKIE_SECRET",
     "CACHE_CONTROL_HTML",
     "CACHE_CONTROL_STATIC",
@@ -347,13 +351,20 @@
     "CF_ACCOUNT_API_VOICETOWEBSITE": ["worker.js"],
     "CF_ACCOUNT_ID": ["src/durable_objects/DeployControllerDO.js"],
     "CF_ALLOW_LEGACY_DEPLOY_HOOKS": ["functions/orchestrator.js"],
-    "CF_API_TOKEN": ["worker.js"],
+    "CF_API_TOKEN": ["src/durable_objects/DeployControllerDO.js", "worker.js"],
     "CF_API_TOKEN2": ["worker.js"],
     "CF_AUTO_DEPLOY_ON_PUSH": ["functions/orchestrator.js"],
-    "CF_DEPLOY_HOOK_URL": ["functions/orchestrator.js"],
+    "CF_DEPLOY_HOOK_URL": [
+      "functions/orchestrator.js",
+      "src/durable_objects/DeployControllerDO.js"
+    ],
+    "CF_DEPLOY_WEBHOOK": ["src/durable_objects/DeployControllerDO.js"],
     "CF_FORCE_DEPLOY_HOOK": ["functions/orchestrator.js"],
     "CF_FORCE_DEPLOY_WEBHOOK": ["functions/orchestrator.js"],
-    "CF_PAGES_DEPLOY_HOOK": ["functions/orchestrator.js"],
+    "CF_PAGES_DEPLOY_HOOK": [
+      "functions/orchestrator.js",
+      "src/durable_objects/DeployControllerDO.js"
+    ],
     "CF_USER_TOKEN": ["worker.js"],
     "CF_WORKERS_BUILDS_AUTO_DEPLOY": ["functions/orchestrator.js"],
     "CF_ZONE_ID": ["worker.js"],
@@ -427,7 +438,7 @@
     "KV": ["functions/commandCenterApi.js", "worker.js"],
     "LEARN": ["functions/orchestrator.js"],
     "LICENSE_SECRET": ["worker.js"],
-    "LIVE_ROOM": ["functions/commandCenterApi.js"],
+    "LIVE_ROOM": ["functions/commandCenterApi.js", "worker.js"],
     "LIVE_ROOM_ADMIN_TOKEN": ["functions/commandCenterApi.js", "src/durable_objects/LiveRoomDO.js"],
     "LIVE_ROOM_VIEWER_TOKEN": ["src/durable_objects/LiveRoomDO.js"],
     "LOG_LEVEL": [

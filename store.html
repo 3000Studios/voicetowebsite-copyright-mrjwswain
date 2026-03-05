@@ -304,7 +304,9 @@
       const PAYPAL_CLIENT =
         (window.__ENV && window.__ENV.PAYPAL_CLIENT_ID) ||
         (String("__PAYPAL_CLIENT_ID__").startsWith("__") ? "" : "__PAYPAL_CLIENT_ID__");
-      const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
+      const STRIPE_PK =
+        (window.__ENV && window.__ENV.STRIPE_PUBLISHABLE_KEY) ||
+        (String("__STRIPE_PUBLISHABLE_KEY__").startsWith("__") ? "" : "__STRIPE_PUBLISHABLE_KEY__");
       const STRIPE_LINKS = {
         starter: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_STARTER) || "",
         growth: (window.__ENV && window.__ENV.STRIPE_PAYMENT_LINK_GROWTH) || "",

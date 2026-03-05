@@ -858,6 +858,23 @@ export default {
       return Response.redirect(target.toString(), 302);
     }
 
+    // Live Room WebSocket: forward to Durable Object so viewers/hosts can connect (token validated by DO).
+    if (
+      url.pathname === "/api/live/ws" &&
+      request.headers.get("Upgrade") === "websocket" &&
+      env.LIVE_ROOM
+    ) {
+      const doUrl = new URL(url);
+      doUrl.pathname = "/live/ws";
+      const doRequest = new Request(doUrl.toString(), {
+        method: request.method,
+        headers: request.headers,
+      });
+      const id = env.LIVE_ROOM.idFromName("global");
+      const stub = env.LIVE_ROOM.get(id);
+      return stub.fetch(doRequest);
+    }
+
     try {
       // Admin access code validation
       if (

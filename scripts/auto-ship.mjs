@@ -14,7 +14,7 @@ const AUTO_DEPLOY = String(process.env.AUTO_SHIP_DEPLOY || "1").trim() !== "0";
 // Default deploy command intentionally skips re-running verify (unlike `npm run deploy`).
 // When started via `npm run auto:ship`, `wrangler` is available on PATH (node_modules/.bin).
 const DEPLOY_CMD =
-  process.env.AUTO_SHIP_DEPLOY_CMD || "wrangler deploy --keep-vars";
+  process.env.AUTO_SHIP_DEPLOY_CMD || "node ./scripts/deploy-safe.mjs";
 
 const IGNORE_DIRS = new Set([
   ".git",

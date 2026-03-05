@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-03-03T07:10:42.558Z
+Generated: 2026-03-05T10:30:15.396Z
 
 ## Summary
 
-- Scanned files: 382
-- Used keys: 133
-- Defined keys: 87
-- Missing keys: 56
+- Scanned files: 392
+- Used keys: 134
+- Defined keys: 90
+- Missing keys: 55
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -18,6 +18,7 @@ Generated: 2026-03-03T07:10:42.558Z
 | ADMIN_BEARER_TOKEN                       | no      | 3             | missing |
 | ADMIN_COOKIE_SECRET                      | yes     | 1             | ok      |
 | ADMIN_EMAIL                              | yes     | 0             | unused  |
+| ADMIN_PASSWORD_HASH                      | yes     | 0             | unused  |
 | ADMIN_ROLE                               | yes     | 1             | ok      |
 | ADSENSE_ALLOW_ALL_PAGES                  | yes     | 1             | ok      |
 | ADSENSE_CUSTOMER_ID                      | yes     | 1             | ok      |
@@ -48,13 +49,14 @@ Generated: 2026-03-03T07:10:42.558Z
 | CF_ACCOUNT_API_VOICETOWEBSITE            | yes     | 1             | ok      |
 | CF_ACCOUNT_ID                            | no      | 1             | ok      |
 | CF_ALLOW_LEGACY_DEPLOY_HOOKS             | yes     | 1             | ok      |
-| CF_API_TOKEN                             | yes     | 1             | ok      |
+| CF_API_TOKEN                             | yes     | 2             | ok      |
 | CF_API_TOKEN2                            | yes     | 1             | ok      |
 | CF_AUTO_DEPLOY_ON_PUSH                   | no      | 1             | missing |
-| CF_DEPLOY_HOOK_URL                       | yes     | 1             | ok      |
+| CF_DEPLOY_HOOK_URL                       | yes     | 2             | ok      |
+| CF_DEPLOY_WEBHOOK                        | no      | 1             | missing |
 | CF_FORCE_DEPLOY_HOOK                     | no      | 1             | missing |
 | CF_FORCE_DEPLOY_WEBHOOK                  | no      | 1             | missing |
-| CF_PAGES_DEPLOY_HOOK                     | yes     | 1             | ok      |
+| CF_PAGES_DEPLOY_HOOK                     | yes     | 2             | ok      |
 | CF_USER_TOKEN                            | yes     | 1             | ok      |
 | CF_WORKERS_BUILDS_AUTO_DEPLOY            | yes     | 1             | ok      |
 | CF_ZONE_ID                               | yes     | 1             | ok      |
@@ -86,9 +88,9 @@ Generated: 2026-03-03T07:10:42.558Z
 | KV                                       | yes     | 2             | ok      |
 | LEARN                                    | no      | 1             | missing |
 | LICENSE_SECRET                           | yes     | 1             | ok      |
-| LIVE_ROOM                                | yes     | 1             | ok      |
-| LIVE_ROOM_ADMIN_TOKEN                    | no      | 2             | missing |
-| LIVE_ROOM_VIEWER_TOKEN                   | no      | 1             | missing |
+| LIVE_ROOM                                | yes     | 2             | ok      |
+| LIVE_ROOM_ADMIN_TOKEN                    | yes     | 2             | ok      |
+| LIVE_ROOM_VIEWER_TOKEN                   | yes     | 1             | ok      |
 | LOG_LEVEL                                | no      | 4             | missing |
 | NEXT_PUBLIC_ADSENSE_PUBLISHER_ID         | no      | 1             | missing |
 | NODE_ENV                                 | no      | 5             | missing |

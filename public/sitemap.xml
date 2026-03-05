@@ -181,6 +181,16 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
+    <loc>https://voicetowebsite.com/paypal-setup</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://voicetowebsite.com/phosphor-nav</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://voicetowebsite.com/project-planning-hub</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>

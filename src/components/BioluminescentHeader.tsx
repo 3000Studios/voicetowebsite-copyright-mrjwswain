@@ -1,9 +1,22 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { SHARED_NAV_ITEMS } from "../constants/navigation";
 import VitreousLogo from "./VitreousLogo";
 
 interface BioluminescentHeaderProps {
   className?: string;
+}
+
+interface WaveConfig {
+  color: string;
+  amp: number;
+  freq: number;
+  speed: number;
 }
 
 const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
@@ -21,11 +34,14 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
   const [isNavVisible, setIsNavVisible] = useState(false);
 
   // Wave configuration
-  const waveConfig = [
-    { color: "#0ea5e9", amp: 60, freq: 0.02, speed: 0.05 },
-    { color: "#38bdf8", amp: 50, freq: 0.016, speed: 0.035 },
-    { color: "#1d4ed8", amp: 80, freq: 0.012, speed: 0.022 },
-  ];
+  const waveConfig: WaveConfig[] = useMemo(
+    () => [
+      { color: "#0ea5e9", amp: 60, freq: 0.02, speed: 0.05 },
+      { color: "#38bdf8", amp: 50, freq: 0.016, speed: 0.035 },
+      { color: "#1d4ed8", amp: 80, freq: 0.012, speed: 0.022 },
+    ],
+    []
+  );
 
   const createWavePath = useCallback(
     (
@@ -48,24 +64,27 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
 
   // Animation loop - separated from frequently changing values
   useEffect(() => {
+    // Cancel any existing animation frame before starting new one
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = undefined;
+    }
+
     const animate = () => {
       // Check if component is still mounted
       if (!isMountedRef.current) return;
 
       phaseRef.current += 0.03; // Slower, smoother animation
-
-      // Always animate waves regardless of scroll for infinite loop
-      const liftFactor = Math.max(0.1, 1 - scrollY / 400); // Minimum visibility
+      const scrollLift = Math.min(scrollY / 500, 1);
+      const liftFactor = scrollLift * 0.3;
 
       wavePathsRef.current.forEach((path, i) => {
-        // Add null checks to prevent race conditions
-        if (!path || !waveConfig[i] || !isMountedRef.current) return;
+        if (!path) return;
 
         const config = waveConfig[i];
-        const dynamicAmp =
-          config.amp *
-          liftFactor *
-          (1 + Math.sin(phaseRef.current * 0.5) * 0.2);
+        if (!config) return;
+
+        const dynamicAmp = config.amp * (1 - scrollLift * 0.5);
 
         try {
           const d = createWavePath(
@@ -75,16 +94,26 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
             i * 10,
             window.innerWidth || 1440
           );
-          path.setAttribute("d", d);
-          path.setAttribute("stroke", config.color);
-          path.setAttribute("style", `opacity: ${0.4 + liftFactor * 0.6}`);
+          if (path && d) {
+            path.setAttribute("d", d);
+            path.setAttribute("stroke", config.color);
+            path.setAttribute("style", `opacity: ${0.4 + liftFactor * 0.6}`);
+          }
         } catch (error) {
           console.warn("Wave path update failed:", error);
+          // Set fallback path to prevent visual glitches
+          if (path) {
+            path.setAttribute("d", "M0,0 L1440,0");
+            path.setAttribute("stroke", "#666");
+            path.setAttribute("style", "opacity: 0.2");
+          }
         }
       });
 
-      // Always request next frame for infinite loop
-      animationFrameRef.current = requestAnimationFrame(animate);
+      // Only request next frame if component is still mounted
+      if (isMountedRef.current) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
     };
 
     // Start animation immediately
@@ -97,7 +126,7 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
         animationFrameRef.current = undefined;
       }
     };
-  }, [scrollY, createWavePath]);
+  }, [scrollY, createWavePath, waveConfig]);
 
   // Scroll handling
   useEffect(() => {
@@ -364,7 +393,7 @@ const BioluminescentHeader: React.FC<BioluminescentHeaderProps> = ({
             viewBox="0 0 1440 320"
             preserveAspectRatio="none"
           >
-            {waveConfig.map((_, index) => (
+            {waveConfig.map((_config: WaveConfig, index: number) => (
               <path
                 key={index}
                 ref={(el) => {

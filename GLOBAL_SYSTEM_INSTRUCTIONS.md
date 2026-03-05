@@ -83,7 +83,7 @@
 
 - `dev:all`: `node ./scripts/dev-all.mjs`
 - `verify`: `node ./scripts/verify.mjs && npm run env:audit && npm run ops:global-doc:check && npm run format:check && npm run check:css-governance && npm run check:css-budget && npm run type-check && npm run types:check && npm run test && npm run build && npm run governance:check && npm run guard:ui && npm run check:links`
-- `deploy`: `wrangler deploy --keep-vars`
+- `deploy`: `node ./scripts/deploy-safe.mjs`
 - `auto:ship`: `node ./scripts/auto-ship.mjs`
 - `sync`: `node ./scripts/sync.mjs`
 - `ship`: `node ./scripts/ship.mjs`
@@ -124,6 +124,7 @@ Public pages:
 - `/neural-engine` -> `neural-engine.html`
 - `/partners` -> `partners.html`
 - `/paypal-setup` -> `paypal-setup.html`
+- `/phosphor-nav` -> `phosphor-nav.html`
 - `/pricing` -> `pricing.html`
 - `/privacy` -> `privacy.html`
 - `/project-planning-hub` -> `project-planning-hub.html`
@@ -192,6 +193,7 @@ Scripts available:
 - `scripts/continuous-integration.mjs`
 - `scripts/css-budget-validator.mjs`
 - `scripts/deploy-one-shot.ps1`
+- `scripts/deploy-safe.mjs`
 - `scripts/deploy-with-oauth.ps1`
 - `scripts/dev-all.mjs`
 - `scripts/env-audit.mjs`
@@ -215,6 +217,8 @@ Scripts available:
 - `scripts/open-youtube.ps1`
 - `scripts/pre-commit-enhanced.mjs`
 - `scripts/pre-push.mjs`
+- `scripts/prebuild-heal.mjs`
+- `scripts/prebuild.js`
 - `scripts/release.mjs`
 - `scripts/restore.mjs`
 - `scripts/ship.mjs`

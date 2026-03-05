@@ -10,7 +10,8 @@
     />
     <meta name="robots" content="index, follow" />
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD&intent=capture"></script>
+    <script src="https://js.stripe.com/v3"></script>
     <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
   <body>
@@ -85,34 +86,14 @@
         </div>
         <div class="modal-body">
           <div id="purchaseDetails"></div>
-          <form id="purchaseForm">
-            <div class="form-group">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" required placeholder="Enter your email for license delivery" />
-            </div>
-            <div class="form-group">
-              <label>Payment Method</label>
-              <div class="payment-options">
-                <button type="button" class="payment-btn paypal-btn" data-provider="paypal">
-                  <img
-                    src="https://www.paypalobjects.com/webstatic/mktg/logo/PP_AcceptanceMark_RGB_Large.png"
-                    alt="PayPal"
-                    style="height: 24px"
-                  />
-                  PayPal
-                </button>
-                <button type="button" class="payment-btn stripe-btn" data-provider="stripe" disabled>
-                  <img
-                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23635bff'%3E%3Cpath d='M14.5 10c0-2-2-2-2-2h-3v4h3c2 0 2-2 2-2zM12 14h-2v4h2c2 0 3-1 3-2s-1-2-3-2z'/%3E%3C/svg%3E"
-                    alt="Stripe"
-                    style="height: 20px"
-                  />
-                  Stripe (Coming Soon)
-                </button>
-              </div>
-            </div>
-            <button type="submit" class="primary-btn">Complete Purchase</button>
-          </form>
+          <div class="form-group">
+            <label>Pay with PayPal</label>
+            <div id="paypal-button-container" style="min-height: 50px"></div>
+          </div>
+          <div class="form-group" style="margin-top: 1rem">
+            <label>Or pay with Stripe</label>
+            <button type="button" class="primary-btn" id="stripe-checkout-btn">Pay with Stripe</button>
+          </div>
         </div>
       </div>
     </div>
@@ -141,14 +122,17 @@
       let currentApp = null;
       let catalog = [];
 
-      // Load app catalog
+      // Load app catalog (Worker /api/catalog or /api/products returns { products, apps })
       async function loadCatalog() {
         try {
-          const response = await fetch("/api/products");
-          catalog = await response.json();
+          const response = await fetch("/api/catalog");
+          const data = await response.json();
+          catalog = data && (data.apps || data.products) ? data : { products: [], apps: [] };
+          if (!catalog.apps) catalog.apps = [];
           renderApps();
         } catch (err) {
           console.error("Failed to load catalog:", err);
+          catalog = { products: [], apps: [] };
         }
       }
 
@@ -201,9 +185,11 @@
           .join("");
       }
 
-      // Purchase app
+      let paypalButtonsRendered = false;
+
+      // Purchase app: show modal and render PayPal + Stripe
       function purchaseApp(appId) {
-        currentApp = catalog.apps.find((a) => a.id === appId);
+        currentApp = (catalog.apps || []).find((a) => a.id === appId);
         if (!currentApp) return;
 
         const purchaseDetails = document.getElementById("purchaseDetails");
@@ -212,72 +198,93 @@
             <h4>${currentApp.title}</h4>
             <p>${currentApp.desc}</p>
             <div class="price-display">
-              <span class="price">$${currentApp.price}</span>
-              <span class="copyright">© ${currentApp.copyright}</span>
+              <span class="price">$${Number(currentApp.price).toFixed(2)}</span>
+              <span class="copyright">© ${currentApp.copyright || "3000 Studios"}</span>
             </div>
           </div>
         `;
 
+        const container = document.getElementById("paypal-button-container");
+        if (container) container.innerHTML = "";
+        paypalButtonsRendered = false;
         document.getElementById("purchaseModal").style.display = "block";
-      }
 
-      // Handle purchase form submission
-      document.getElementById("purchaseForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById("email").value;
-        const selectedProvider = document.querySelector(".payment-btn.active")?.dataset.provider;
-
-        if (!selectedProvider) {
-          alert("Please select a payment method");
-          return;
+        // Render PayPal Buttons (createOrder -> /api/checkout, onApprove -> /api/paypal/capture)
+        if (window.paypal && container && !paypalButtonsRendered) {
+          window.paypal
+            .Buttons({
+              style: { layout: "vertical", shape: "rect", label: "paypal" },
+              createOrder: async () => {
+                const res = await fetch("/api/checkout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    provider: "paypal",
+                    id: currentApp.id,
+                    name: currentApp.title,
+                    price: currentApp.price,
+                    currency: currentApp.currency || "USD",
+                  }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.id) throw new Error(data.error || "PayPal order create failed");
+                return data.id;
+              },
+              onApprove: async (data) => {
+                try {
+                  const capRes = await fetch("/api/paypal/capture", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderId: data.orderID }),
+                  });
+                  const cap = await capRes.json().catch(() => ({}));
+                  if (!capRes.ok || !cap.ok) throw new Error(cap.error || "Capture failed");
+                  closePurchaseModal();
+                  window.location.href =
+                    window.location.origin +
+                    "/appstore-new.html?purchase=success&app=" +
+                    encodeURIComponent(currentApp.id);
+                } catch (err) {
+                  alert("Payment capture failed: " + err.message);
+                }
+              },
+              onError: (err) => alert("PayPal error: " + err.message),
+            })
+            .render(container);
+          paypalButtonsRendered = true;
         }
 
-        try {
-          const response = await fetch("/api/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              provider: selectedProvider,
-              id: currentApp.id,
-              name: currentApp.title,
-              price: currentApp.price,
-              currency: "USD",
-              successUrl: window.location.origin + "/appstore.html?purchase=success",
-              cancelUrl: window.location.origin + "/appstore.html?purchase=cancelled",
-            }),
-          });
-
-          const result = await response.json();
-
-          if (response.ok && result.success) {
-            // Store license key for download
-            localStorage.setItem(`license_${currentApp.id}`, result.licenseKey);
-
-            if (selectedProvider === "paypal") {
-              // Validate redirect URL with proper regex matching
-              const paypalRegex = /^https:\/\/www\.paypal\.com\/(cgi-bin\/webscr\?|checkout\/)/;
-              if (result.redirectUrl && paypalRegex.test(result.redirectUrl)) {
-                window.location.href = result.redirectUrl;
-              } else {
-                alert("Invalid PayPal redirect URL. Please try again.");
-              }
+        // Stripe button
+        const stripeBtn = document.getElementById("stripe-checkout-btn");
+        if (stripeBtn) {
+          stripeBtn.onclick = async () => {
+            try {
+              const res = await fetch("/api/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  provider: "stripe",
+                  id: currentApp.id,
+                  successUrl:
+                    window.location.origin +
+                    "/appstore-new.html?purchase=success&app=" +
+                    encodeURIComponent(currentApp.id),
+                  cancelUrl: window.location.origin + "/appstore-new.html?purchase=cancelled",
+                }),
+              });
+              const data = await res.json().catch(() => ({}));
+              if (!data.sessionId) throw new Error(data.error || "Stripe session failed");
+              if (window.Stripe) {
+                const pk = (window.__ENV && window.__ENV.STRIPE_PUBLISHABLE_KEY) || "";
+                if (pk) window.Stripe(pk).redirectToCheckout({ sessionId: data.sessionId });
+                else window.location.href = data.url || "#";
+              } else window.location.href = data.url || "#";
+            } catch (err) {
+              alert("Stripe checkout failed: " + err.message);
             }
-          } else {
-            alert("Purchase failed: " + (result.error || "Unknown error"));
-          }
-        } catch (err) {
-          alert("Purchase failed: " + err.message);
+          };
         }
-      });
-
-      // Payment method selection
-      document.querySelectorAll(".payment-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          document.querySelectorAll(".payment-btn").forEach((b) => b.classList.remove("active"));
-          this.classList.add("active");
-        });
-      });
+      }
 
       // License modal functions
       function showLicenseModal(appId) {

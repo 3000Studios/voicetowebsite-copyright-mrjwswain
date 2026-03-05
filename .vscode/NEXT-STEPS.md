@@ -39,7 +39,8 @@ npx wrangler dev --local
 
 Wait for: `Ready on http://127.0.0.1:8787`.
 
-**In the editor:** Open **`.vscode/api-tests.http`** and click **Send Request** above any `###` block (REST Client extension).
+**In the editor:** Open **`.vscode/api-tests.http`** and click **Send Request** above any `###`
+block (REST Client extension).
 
 **Smoke test in browser:** Open **http://127.0.0.1:8787** and click through the site.
 
