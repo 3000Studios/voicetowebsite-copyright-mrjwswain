@@ -1,6 +1,8 @@
 (() => {
+  const livePlayer = document.getElementById("live-player");
   const liveEmbed = document.getElementById("live-embed");
   const liveStatus = document.getElementById("live-status");
+  const liveSessionStatus = document.getElementById("live-session-status");
   const liveUrlInput = document.getElementById("live-url");
   const liveLoadBtn = document.getElementById("live-load");
   const liveSaveBtn = document.getElementById("live-save");
@@ -12,9 +14,187 @@
   const CLIP_KEY = "vtw-live-clips";
   const FALLBACK_STORY_IMG =
     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80";
+  const RTC_CONFIG = {
+    iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }],
+  };
+
+  let liveSessionPollId = 0;
+  let viewerWs = null;
+  let viewerPc = null;
+  let viewerSessionId = "";
+  let hostSessionId = "";
+  let remoteStream = null;
+  let currentViewerToken = "";
 
   const setLiveStatus = (msg) => {
     if (liveStatus) liveStatus.textContent = String(msg || "");
+  };
+
+  const setLiveSessionText = (msg) => {
+    if (liveSessionStatus) liveSessionStatus.textContent = String(msg || "");
+  };
+
+  const setPlaybackMode = (mode) => {
+    const showVideo = mode === "webrtc";
+    if (livePlayer) livePlayer.style.display = showVideo ? "block" : "none";
+    if (liveEmbed) liveEmbed.style.display = showVideo ? "none" : "block";
+  };
+
+  const closePeerConnection = () => {
+    if (viewerPc) {
+      try {
+        viewerPc.close();
+      } catch (_) {}
+    }
+    viewerPc = null;
+    hostSessionId = "";
+    if (remoteStream) {
+      remoteStream.getTracks().forEach((track) => track.stop());
+    }
+    remoteStream = null;
+    if (livePlayer) livePlayer.srcObject = null;
+  };
+
+  const closeViewerSocket = () => {
+    if (viewerWs) {
+      try {
+        viewerWs.close();
+      } catch (_) {}
+    }
+    viewerWs = null;
+    viewerSessionId = "";
+    currentViewerToken = "";
+    closePeerConnection();
+  };
+
+  const sendViewerSignal = (payload) => {
+    if (!viewerWs || viewerWs.readyState !== WebSocket.OPEN) return;
+    viewerWs.send(JSON.stringify(payload));
+  };
+
+  const ensureViewerPeerConnection = () => {
+    if (viewerPc) return viewerPc;
+    const pc = new RTCPeerConnection(RTC_CONFIG);
+    pc.ontrack = (event) => {
+      remoteStream = event.streams?.[0] || null;
+      if (!livePlayer || !remoteStream) return;
+      livePlayer.srcObject = remoteStream;
+      livePlayer.muted = true;
+      setPlaybackMode("webrtc");
+      livePlayer.play().catch(() => {});
+      setLiveSessionText("Live now. Tap the player controls to unmute.");
+    };
+    pc.onicecandidate = (event) => {
+      if (!event.candidate || !hostSessionId) return;
+      sendViewerSignal({
+        type: "signal-ice-candidate",
+        targetSessionId: hostSessionId,
+        candidate: event.candidate,
+      });
+    };
+    pc.onconnectionstatechange = () => {
+      const state = pc.connectionState || "new";
+      if (state === "failed" || state === "disconnected" || state === "closed") {
+        setLiveSessionText("Stream connection interrupted. Reconnecting…");
+      }
+    };
+    viewerPc = pc;
+    return pc;
+  };
+
+  const handleViewerSignal = async (message) => {
+    const type = String(message?.type || "");
+    const payload = message?.payload || {};
+    if (type === "system") {
+      viewerSessionId = String(payload.sessionId || "");
+      sendViewerSignal({
+        type: "viewer_ready",
+        wantsPlayback: true,
+      });
+      return;
+    }
+    if (type === "host_ready") {
+      sendViewerSignal({
+        type: "viewer_ready",
+        wantsPlayback: true,
+      });
+      return;
+    }
+    if (type === "peer_left" && payload.role === "host") {
+      setLiveSessionText("Host went offline. Waiting for stream to resume…");
+      closePeerConnection();
+      return;
+    }
+    if (
+      type === "signal-offer" &&
+      String(payload.targetSessionId || "") === viewerSessionId
+    ) {
+      hostSessionId = String(payload.sessionId || "");
+      const pc = ensureViewerPeerConnection();
+      await pc.setRemoteDescription(payload.description);
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      sendViewerSignal({
+        type: "signal-answer",
+        targetSessionId: hostSessionId,
+        description: pc.localDescription,
+      });
+      return;
+    }
+    if (
+      type === "signal-ice-candidate" &&
+      String(payload.targetSessionId || "") === viewerSessionId &&
+      payload.candidate
+    ) {
+      const pc = ensureViewerPeerConnection();
+      try {
+        await pc.addIceCandidate(payload.candidate);
+      } catch (_) {}
+    }
+  };
+
+  const connectViewerSocket = ({ wsUrl, viewerToken }) => {
+    if (!wsUrl || !viewerToken) return;
+    if (
+      viewerWs &&
+      viewerWs.readyState <= WebSocket.OPEN &&
+      currentViewerToken === viewerToken
+    ) {
+      return;
+    }
+    closeViewerSocket();
+    currentViewerToken = viewerToken;
+    const runtimeWsUrl = (() => {
+      try {
+        const next = new URL(wsUrl);
+        if (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        ) {
+          next.protocol = "ws:";
+          next.host = "127.0.0.1:8787";
+        }
+        return next.toString();
+      } catch (_) {
+        return wsUrl;
+      }
+    })();
+    const socketUrl = `${runtimeWsUrl}${runtimeWsUrl.includes("?") ? "&" : "?"}token=${encodeURIComponent(viewerToken)}`;
+    viewerWs = new WebSocket(socketUrl);
+    viewerWs.addEventListener("open", () => {
+      setLiveSessionText("Connecting to live stream…");
+    });
+    viewerWs.addEventListener("message", (event) => {
+      try {
+        handleViewerSignal(JSON.parse(String(event.data || "{}")));
+      } catch (_) {}
+    });
+    viewerWs.addEventListener("close", () => {
+      setLiveSessionText("Viewer channel closed. Retrying…");
+    });
+    viewerWs.addEventListener("error", () => {
+      setLiveSessionText("Unable to connect to live stream right now.");
+    });
   };
 
   const safeParseUrl = (value) => {
@@ -45,8 +225,36 @@
 
   const setEmbed = (url) => {
     if (!url || !liveEmbed) return;
+    setPlaybackMode("embed");
     liveEmbed.src = url;
     setLiveStatus("Stream loaded.");
+  };
+
+  const loadLiveSession = async () => {
+    try {
+      const res = await fetch("/api/live/session", { cache: "no-store" });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || !payload?.ok) {
+        throw new Error(payload?.error || "Live session unavailable");
+      }
+      const sessionState = payload.state || {};
+      const isLive =
+        sessionState.streamState === "live" &&
+        sessionState.publicPlaybackEnabled &&
+        sessionState.playbackMode === "webrtc";
+      if (!isLive) {
+        closeViewerSocket();
+        setPlaybackMode("embed");
+        setLiveSessionText("No live broadcast is active right now.");
+        return;
+      }
+      setLiveSessionText(
+        `${sessionState.streamTitle || "Live now"} • ${Number(sessionState.viewerCount || 0).toLocaleString()} viewers`
+      );
+      connectViewerSocket(payload);
+    } catch (_) {
+      setLiveSessionText("Live session check failed. Manual embeds are still available.");
+    }
   };
 
   const loadSavedClips = () => {
@@ -267,4 +475,10 @@
 
   renderClips();
   loadLiveBlog();
+  loadLiveSession();
+  liveSessionPollId = window.setInterval(loadLiveSession, 10000);
+  window.addEventListener("beforeunload", () => {
+    if (liveSessionPollId) window.clearInterval(liveSessionPollId);
+    closeViewerSocket();
+  });
 })();

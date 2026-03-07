@@ -10,6 +10,14 @@ const state = {
   lastVoiceExecution: null,
   analytics: null,
   deployInProgress: false,
+  liveIntervalId: null,
+};
+
+const liveRuntime = {
+  previewStream: null,
+  socket: null,
+  hostSessionId: "",
+  peers: new Map(),
 };
 
 const byId = (id) => document.getElementById(id);
@@ -334,7 +342,8 @@ const renderMission = async () => {
       <p class="muted">To run deploys from the dashboard (so your commands update the live site), set these Worker secrets in Cloudflare:</p>
       <ul>
         <li><strong>ALLOW_REMOTE_DEPLOY_TRIGGER</strong> = <code>1</code></li>
-        <li><strong>CF_DEPLOY_HOOK_URL</strong> = your Workers Builds webhook URL (from Workers → your Worker → Builds → Trigger build, or your CI deploy hook)</li>
+        <li><strong>CF_DEPLOY_HOOK_URL</strong> = your Workers Builds webhook URL, or the Cloudflare Builds API URL: <code>https://api.cloudflare.com/client/v4/accounts/YOUR_ACCOUNT_ID/workers/services/voicetowebsite/builds</code></li>
+        <li>If using the API URL above, also set <strong>CLOUD_FLARE_API_TOKEN</strong> so the Worker can authenticate. See <code>DEPLOY_DASHBOARD_AND_BINDINGS.md</code>.</li>
       </ul>
       <p class="muted">${escapeHtml(deployResp.message || "Configure the deploy hook to trigger builds from the dashboard.")}</p>
     </article>`
@@ -610,7 +619,7 @@ const renderAnalytics = async () => {
         <h3>📊 Show real Cloudflare analytics</h3>
         <p class="muted">To see real-time visitors and zone traffic here, add Worker secrets:</p>
         <ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
-          <li><strong>CF_API_TOKEN</strong> – Cloudflare API token with <em>Zone.Analytics: Read</em> (<a href="${cloudflareApiTokensUrl}" target="_blank" rel="noopener">Create token</a>)</li>
+          <li><strong>CLOUD_FLARE_API_TOKEN</strong> – Cloudflare API token with <em>Zone.Analytics: Read</em> (<a href="${cloudflareApiTokensUrl}" target="_blank" rel="noopener">Create token</a>)</li>
           <li><strong>CF_ZONE_ID</strong> – Your zone ID (Dashboard → your domain → Overview, right sidebar)</li>
         </ul>
         <p style="margin-top: 0.5rem;">Then redeploy the Worker and refresh this page.</p>
@@ -724,40 +733,83 @@ const renderLive = async () => {
     loadAnalytics(),
   ]);
   const s = live.state || {};
+  const publicUrl = s.publicPagePath || "/livestream.html";
   return `
     <section class="ccos-grid">
-      <article class="ccos-card ccos-col-6">
+      <article class="ccos-card ccos-col-8">
         <h3>Admin Live Stream Manager</h3>
-        <label>Stream State</label>
-        <select id="live-stream-state" class="ccos-select">
-          <option value="idle"${s.streamState === "idle" ? " selected" : ""}>Idle</option>
-          <option value="live"${s.streamState === "live" ? " selected" : ""}>Live</option>
-          <option value="paused"${s.streamState === "paused" ? " selected" : ""}>Paused</option>
+        <p class="muted">Pick your desktop, phone, camera, or screen source, preview it locally, confirm you are ready, then publish directly to the public livestream page.</p>
+        <label>Stream Title</label>
+        <input id="live-title" class="ccos-input" value="${escapeHtml(s.streamTitle || "VoiceToWebsite Live")}" />
+        <label>Source Type</label>
+        <select id="live-source-type" class="ccos-select">
+          <option value="desktop"${s.sourceType === "desktop" ? " selected" : ""}>Desktop webcam</option>
+          <option value="phone"${s.sourceType === "phone" ? " selected" : ""}>Phone camera</option>
+          <option value="screen"${s.sourceType === "screen" ? " selected" : ""}>Entire screen</option>
+          <option value="window"${s.sourceType === "window" ? " selected" : ""}>Window or tab</option>
         </select>
+        <div class="ccos-grid" style="margin-top:.5rem">
+          <div class="ccos-col-6">
+            <label>Video Device</label>
+            <select id="live-video-device" class="ccos-select">
+              <option value="${escapeHtml(s.videoDeviceId || "")}">${escapeHtml(s.videoDeviceLabel || "Detect cameras after permissions")}</option>
+            </select>
+          </div>
+          <div class="ccos-col-6">
+            <label>Microphone</label>
+            <select id="live-audio-device" class="ccos-select">
+              <option value="${escapeHtml(s.audioDeviceId || "")}">${escapeHtml(s.audioDeviceLabel || "Detect microphones after permissions")}</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem">
+          <button type="button" class="ccos-button secondary" id="live-refresh-devices">Refresh Devices</button>
+          <button type="button" class="ccos-button secondary" id="live-start-preview">Start Preview</button>
+          <button type="button" class="ccos-button secondary" id="live-stop-preview">Stop Preview</button>
+        </div>
+        <video id="live-preview" playsinline autoplay muted style="width:100%;margin-top:1rem;border-radius:16px;background:#020617;min-height:260px"></video>
+        <div style="margin-top:1rem">
+          <label><input type="checkbox" id="live-ready-confirm"${s.readyConfirmed ? " checked" : ""}/> I reviewed the selected source and I am ready to start streaming.</label>
+        </div>
         <label>Bitrate (kbps)</label>
-        <input id="live-bitrate" class="ccos-input" type="number" value="${escapeHtml(s.bitrateKbps ?? 0)}" />
+        <input id="live-bitrate" class="ccos-input" type="number" value="${escapeHtml(s.bitrateKbps ?? 2500)}" />
         <div style="margin-top:.5rem">
           <label><input type="checkbox" id="live-superchat"${s.superchatEnabled ? " checked" : ""}/> Superchat Enabled</label>
           <label><input type="checkbox" id="live-actions"${s.actionsEnabled ? " checked" : ""}/> Viewer Actions Enabled</label>
+          <label><input type="checkbox" id="live-public"${s.publicPlaybackEnabled !== false ? " checked" : ""}/> Public Playback Enabled</label>
         </div>
-        <button type="button" class="ccos-button" id="live-save" style="margin-top:.75rem">Save Live State</button>
-        <div id="live-status"></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem">
+          <button type="button" class="ccos-button" id="live-go">Go Live</button>
+          <button type="button" class="ccos-button secondary" id="live-stop">Stop Live</button>
+          <button type="button" class="ccos-button secondary" id="live-save">Save Live State</button>
+        </div>
+        <div id="live-status" style="margin-top:.75rem">${escapeHtml(s.lastError || "")}</div>
       </article>
-      <article class="ccos-card ccos-col-6">
+      <article class="ccos-card ccos-col-4">
         <h3>Live Metrics</h3>
         <table class="ccos-data">
-          <tr><th>WebSocket State</th><td>${escapeHtml(s.websocketState || "unknown")}</td></tr>
-          <tr><th>Viewer Count</th><td>${escapeHtml(analytics?.livestream?.viewerCount ?? 0)}</td></tr>
-          <tr><th>Chat Rate</th><td>${escapeHtml(analytics?.livestream?.chatRatePerMinute ?? 0)}</td></tr>
-          <tr><th>Revenue / Stream</th><td>${escapeHtml(analytics?.livestream?.revenuePerStream ?? 0)}</td></tr>
+          <tr><th>WebSocket State</th><td id="live-metric-websocket">${escapeHtml(s.websocketState || "unknown")}</td></tr>
+          <tr><th>Stream State</th><td id="live-metric-state">${escapeHtml(s.streamState || "idle")}</td></tr>
+          <tr><th>Viewer Count</th><td id="live-metric-viewers">${escapeHtml(s.viewerCount ?? analytics?.livestream?.viewerCount ?? 0)}</td></tr>
+          <tr><th>Host Connected</th><td id="live-metric-host">${s.hostConnected ? "Yes" : "No"}</td></tr>
+          <tr><th>Room Clients</th><td id="live-metric-clients">${escapeHtml(s.roomClients ?? 0)}</td></tr>
+          <tr><th>Chat Rate</th><td id="live-metric-chat">${escapeHtml(analytics?.livestream?.chatRatePerMinute ?? 0)}</td></tr>
+          <tr><th>Revenue / Stream</th><td id="live-metric-revenue">${escapeHtml(analytics?.livestream?.revenuePerStream ?? 0)}</td></tr>
+          <tr><th>Updated</th><td id="live-metric-updated">${escapeHtml(formatTimestamp(s.updatedAt || ""))}</td></tr>
         </table>
-        <h4 style="margin-top:1rem">Live Room WebSocket</h4>
-        <p class="muted" style="font-size:0.875rem">Viewers and hosts connect to the same room. Use <code>?role=viewer</code> or <code>?role=host</code> and pass token via <code>token</code> query param or <code>Authorization: Bearer &lt;token&gt;</code>. Token: <code>LIVE_ROOM_VIEWER_TOKEN</code> or <code>CONTROL_PASSWORD</code> (or <code>LIVE_ROOM_ADMIN_TOKEN</code> for host).</p>
-        <p style="margin-top:0.5rem"><code style="word-break:break-all">${escapeHtml(window.location.protocol === "https:" ? "wss:" : "ws:")}//${escapeHtml(window.location.host)}/api/live/ws?role=viewer</code></p>
+        <h4 style="margin-top:1rem">Publish Target</h4>
+        <p class="muted" style="font-size:0.875rem">The public livestream page auto-subscribes to the current live session and refreshes viewer counts from the live room.</p>
+        <p style="margin-top:0.5rem"><a href="${escapeHtml(publicUrl)}" target="_blank" rel="noopener">Open public livestream page</a></p>
         <p style="margin-top:0.5rem"><a href="/admin/live-room-test.html" target="_blank" rel="noopener">Open Live Room WebSocket test page</a></p>
       </article>
     </section>
-    ${renderContextPanels(analytics, ["Live control state loaded"])}
+    ${renderContextPanels(analytics, [
+      "Live control state loaded",
+      `Public destination: ${publicUrl}`,
+      s.hostConnected
+        ? "Host WebRTC socket connected"
+        : "Host WebRTC socket not connected",
+    ])}
   `;
 };
 
@@ -1445,20 +1497,426 @@ const wireMonetizationEvents = () => {
 };
 
 const wireLiveEvents = () => {
-  byId("live-save")?.addEventListener("click", async () => {
+  const statusEl = byId("live-status");
+  const previewEl = byId("live-preview");
+
+  const setStatus = (message) => {
+    if (statusEl) statusEl.textContent = String(message || "");
+  };
+
+  const updateMetric = (id, value) => {
+    const el = byId(id);
+    if (el) el.textContent = String(value ?? "");
+  };
+
+  const stopTracks = (stream) => {
+    stream?.getTracks?.().forEach((track) => track.stop());
+  };
+
+  const closePeers = () => {
+    for (const peer of liveRuntime.peers.values()) {
+      try {
+        peer.close();
+      } catch (_) {}
+    }
+    liveRuntime.peers.clear();
+  };
+
+  const closeSocket = () => {
+    if (liveRuntime.socket) {
+      try {
+        liveRuntime.socket.close();
+      } catch (_) {}
+    }
+    liveRuntime.socket = null;
+    liveRuntime.hostSessionId = "";
+  };
+
+  const stopPreview = () => {
+    stopTracks(liveRuntime.previewStream);
+    liveRuntime.previewStream = null;
+    if (previewEl) previewEl.srcObject = null;
+  };
+
+  const persistLiveState = async (overrides = {}) => {
+    const videoSelect = byId("live-video-device");
+    const audioSelect = byId("live-audio-device");
+    const sourceType = byId("live-source-type")?.value || "desktop";
     const payload = await requestJson("/api/live/state", {
       method: "POST",
       body: JSON.stringify({
-        streamState: byId("live-stream-state").value,
-        bitrateKbps: Number(byId("live-bitrate").value || 0),
-        superchatEnabled: byId("live-superchat").checked,
-        actionsEnabled: byId("live-actions").checked,
-        websocketState: "ready",
+        streamState:
+          overrides.streamState ||
+          (liveRuntime.socket
+            ? "live"
+            : liveRuntime.previewStream
+              ? "paused"
+              : "idle"),
+        websocketState:
+          overrides.websocketState ||
+          (liveRuntime.socket ? "connected" : "ready"),
+        bitrateKbps: Number(byId("live-bitrate")?.value || 0),
+        superchatEnabled: Boolean(byId("live-superchat")?.checked),
+        actionsEnabled: Boolean(byId("live-actions")?.checked),
+        publicPlaybackEnabled: Boolean(byId("live-public")?.checked),
+        streamTitle: byId("live-title")?.value || "VoiceToWebsite Live",
+        sourceType,
+        videoDeviceId: videoSelect?.value || "",
+        videoDeviceLabel:
+          videoSelect?.selectedOptions?.[0]?.textContent?.trim() || "",
+        audioDeviceId: audioSelect?.value || "",
+        audioDeviceLabel:
+          audioSelect?.selectedOptions?.[0]?.textContent?.trim() || "",
+        previewReady:
+          overrides.previewReady === undefined
+            ? Boolean(liveRuntime.previewStream)
+            : Boolean(overrides.previewReady),
+        readyConfirmed: Boolean(byId("live-ready-confirm")?.checked),
+        playbackMode: "webrtc",
+        publicPagePath: "/livestream.html",
+        lastError: overrides.lastError || "",
       }),
     });
-    byId("live-status").textContent =
-      `Saved live state: ${payload.state.streamState}`;
+    updateMetric(
+      "live-metric-websocket",
+      payload.state.websocketState || "ready"
+    );
+    updateMetric("live-metric-state", payload.state.streamState || "idle");
+    updateMetric(
+      "live-metric-updated",
+      formatTimestamp(payload.state.updatedAt || "")
+    );
+    return payload;
+  };
+
+  const refreshLiveMetrics = async () => {
+    if (state.route !== "/admin/live") return;
+    try {
+      const payload = await requestJson("/api/live/state", { method: "GET" });
+      const live = payload.state || {};
+      updateMetric("live-metric-websocket", live.websocketState || "ready");
+      updateMetric("live-metric-state", live.streamState || "idle");
+      updateMetric("live-metric-viewers", formatNumber(live.viewerCount || 0));
+      updateMetric("live-metric-host", live.hostConnected ? "Yes" : "No");
+      updateMetric("live-metric-clients", formatNumber(live.roomClients || 0));
+      updateMetric(
+        "live-metric-updated",
+        formatTimestamp(live.updatedAt || "")
+      );
+    } catch (_) {}
+  };
+
+  const populateSelect = (el, items, currentValue, emptyLabel) => {
+    if (!el) return;
+    const options = items.length
+      ? items
+          .map(
+            (item) =>
+              `<option value="${escapeHtml(item.value)}"${
+                item.value === currentValue ? " selected" : ""
+              }>${escapeHtml(item.label)}</option>`
+          )
+          .join("")
+      : `<option value="">${escapeHtml(emptyLabel)}</option>`;
+    el.innerHTML = options;
+  };
+
+  const refreshDevices = async () => {
+    if (!navigator.mediaDevices?.enumerateDevices) {
+      setStatus("This browser does not support media device enumeration.");
+      return;
+    }
+    try {
+      const temp = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      stopTracks(temp);
+    } catch (_) {
+      setStatus(
+        "Camera or microphone permission is required to list named devices."
+      );
+    }
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const sourceType = byId("live-source-type")?.value || "desktop";
+    const videoDevices = devices
+      .filter((device) => device.kind === "videoinput")
+      .filter((device) => {
+        const label = String(device.label || "").toLowerCase();
+        if (sourceType === "phone") {
+          return (
+            label.includes("iphone") ||
+            label.includes("android") ||
+            label.includes("mobile") ||
+            label.includes("continuity")
+          );
+        }
+        return true;
+      })
+      .map((device, index) => ({
+        value: device.deviceId,
+        label: device.label || `Camera ${index + 1}`,
+      }));
+    const audioDevices = devices
+      .filter((device) => device.kind === "audioinput")
+      .map((device, index) => ({
+        value: device.deviceId,
+        label: device.label || `Microphone ${index + 1}`,
+      }));
+    populateSelect(
+      byId("live-video-device"),
+      videoDevices,
+      byId("live-video-device")?.value || "",
+      sourceType === "phone"
+        ? "No phone camera found yet"
+        : "No camera detected"
+    );
+    populateSelect(
+      byId("live-audio-device"),
+      audioDevices,
+      byId("live-audio-device")?.value || "",
+      "No microphone detected"
+    );
+    setStatus(
+      `Detected ${videoDevices.length} camera(s) and ${audioDevices.length} microphone(s).`
+    );
+  };
+
+  const startPreview = async () => {
+    stopPreview();
+    const sourceType = byId("live-source-type")?.value || "desktop";
+    const videoDeviceId = byId("live-video-device")?.value || "";
+    const audioDeviceId = byId("live-audio-device")?.value || "";
+    let stream = null;
+    if (sourceType === "screen" || sourceType === "window") {
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+      });
+    } else {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: videoDeviceId ? { deviceId: { exact: videoDeviceId } } : true,
+        audio: audioDeviceId ? { deviceId: { exact: audioDeviceId } } : true,
+      });
+    }
+    liveRuntime.previewStream = stream;
+    if (previewEl) {
+      previewEl.srcObject = stream;
+      previewEl.muted = true;
+      previewEl.play().catch(() => {});
+    }
+    await persistLiveState({ previewReady: true, streamState: "paused" });
+    setStatus("Preview ready. Confirm you are ready, then click Go Live.");
+  };
+
+  const ensurePeerConnection = (viewerSessionId) => {
+    const existing = liveRuntime.peers.get(viewerSessionId);
+    if (existing) return existing;
+    const peer = new RTCPeerConnection({
+      iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }],
+    });
+    for (const track of liveRuntime.previewStream?.getTracks?.() || []) {
+      peer.addTrack(track, liveRuntime.previewStream);
+    }
+    peer.onicecandidate = (event) => {
+      if (!event.candidate || !liveRuntime.socket) return;
+      liveRuntime.socket.send(
+        JSON.stringify({
+          type: "signal-ice-candidate",
+          targetSessionId: viewerSessionId,
+          candidate: event.candidate,
+        })
+      );
+    };
+    peer.onconnectionstatechange = () => {
+      updateMetric("live-metric-host", "Yes");
+      setStatus(
+        `Viewer ${viewerSessionId.slice(0, 8)} ${peer.connectionState}`
+      );
+    };
+    liveRuntime.peers.set(viewerSessionId, peer);
+    return peer;
+  };
+
+  const handleHostMessage = async (event) => {
+    const type = String(event?.type || "");
+    const payload = event?.payload || {};
+    if (type === "system") {
+      liveRuntime.hostSessionId = String(payload.sessionId || "");
+      liveRuntime.socket?.send(
+        JSON.stringify({
+          type: "host_ready",
+          title: byId("live-title")?.value || "VoiceToWebsite Live",
+        })
+      );
+      return;
+    }
+    if (type === "viewer_ready") {
+      const viewerSessionId = String(payload.sessionId || "");
+      if (!viewerSessionId || !liveRuntime.previewStream) return;
+      const peer = ensurePeerConnection(viewerSessionId);
+      const offer = await peer.createOffer();
+      await peer.setLocalDescription(offer);
+      liveRuntime.socket?.send(
+        JSON.stringify({
+          type: "signal-offer",
+          targetSessionId: viewerSessionId,
+          description: peer.localDescription,
+        })
+      );
+      return;
+    }
+    if (
+      type === "signal-answer" &&
+      String(payload.targetSessionId || "") === liveRuntime.hostSessionId
+    ) {
+      const viewerSessionId = String(payload.sessionId || "");
+      const peer = ensurePeerConnection(viewerSessionId);
+      await peer.setRemoteDescription(payload.description);
+      return;
+    }
+    if (
+      type === "signal-ice-candidate" &&
+      String(payload.targetSessionId || "") === liveRuntime.hostSessionId
+    ) {
+      const viewerSessionId = String(payload.sessionId || "");
+      const peer = ensurePeerConnection(viewerSessionId);
+      try {
+        await peer.addIceCandidate(payload.candidate);
+      } catch (_) {}
+      return;
+    }
+    if (type === "peer_left" && payload.role === "viewer") {
+      const viewerSessionId = String(payload.sessionId || "");
+      const peer = liveRuntime.peers.get(viewerSessionId);
+      if (peer) {
+        try {
+          peer.close();
+        } catch (_) {}
+      }
+      liveRuntime.peers.delete(viewerSessionId);
+    }
+  };
+
+  const goLive = async () => {
+    if (!liveRuntime.previewStream) {
+      await startPreview();
+    }
+    let ready = Boolean(byId("live-ready-confirm")?.checked);
+    if (!ready) {
+      ready = window.confirm(
+        "Are you ready to start streaming this source to the public livestream page?"
+      );
+      if (byId("live-ready-confirm"))
+        byId("live-ready-confirm").checked = ready;
+    }
+    if (!ready) {
+      setStatus("Confirm readiness before going live.");
+      return;
+    }
+    closePeers();
+    closeSocket();
+    const socketUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/api/live/ws?role=host`;
+    liveRuntime.socket = new WebSocket(socketUrl);
+    liveRuntime.socket.addEventListener("open", async () => {
+      await persistLiveState({
+        streamState: "live",
+        websocketState: "connected",
+      });
+      setStatus("Live stream started. Public viewers can join now.");
+      await refreshLiveMetrics();
+    });
+    liveRuntime.socket.addEventListener("message", async (message) => {
+      try {
+        await handleHostMessage(JSON.parse(String(message.data || "{}")));
+      } catch (_) {}
+    });
+    liveRuntime.socket.addEventListener("close", async () => {
+      closePeers();
+      await persistLiveState({
+        streamState: "paused",
+        websocketState: "ready",
+      }).catch(() => {});
+      setStatus("Live socket closed.");
+    });
+    liveRuntime.socket.addEventListener("error", async () => {
+      await persistLiveState({
+        streamState: "paused",
+        websocketState: "error",
+        lastError: "Unable to connect the host socket.",
+      }).catch(() => {});
+      setStatus("Unable to connect the host socket.");
+    });
+  };
+
+  const stopLive = async () => {
+    closePeers();
+    closeSocket();
+    stopPreview();
+    if (byId("live-ready-confirm")) byId("live-ready-confirm").checked = false;
+    await persistLiveState({
+      streamState: "idle",
+      websocketState: "ready",
+      previewReady: false,
+      lastError: "",
+    });
+    setStatus("Live stream stopped. Devices released.");
+    await refreshLiveMetrics();
+  };
+
+  byId("live-refresh-devices")?.addEventListener("click", async () => {
+    await refreshDevices();
   });
+  byId("live-source-type")?.addEventListener("change", async () => {
+    await refreshDevices();
+  });
+  byId("live-start-preview")?.addEventListener("click", async () => {
+    try {
+      await startPreview();
+    } catch (error) {
+      setStatus(`Preview failed: ${error.message}`);
+    }
+  });
+  byId("live-stop-preview")?.addEventListener("click", async () => {
+    stopPreview();
+    await persistLiveState({
+      streamState: "idle",
+      previewReady: false,
+    });
+    setStatus("Preview stopped.");
+  });
+  byId("live-go")?.addEventListener("click", async () => {
+    try {
+      await goLive();
+    } catch (error) {
+      await persistLiveState({
+        streamState: "paused",
+        websocketState: "error",
+        lastError: error.message,
+      }).catch(() => {});
+      setStatus(`Go Live failed: ${error.message}`);
+    }
+  });
+  byId("live-stop")?.addEventListener("click", async () => {
+    try {
+      await stopLive();
+    } catch (error) {
+      setStatus(`Stop failed: ${error.message}`);
+    }
+  });
+  byId("live-save")?.addEventListener("click", async () => {
+    try {
+      const payload = await persistLiveState({});
+      setStatus(`Saved live state: ${payload.state.streamState}`);
+    } catch (error) {
+      setStatus(`Save failed: ${error.message}`);
+    }
+  });
+
+  refreshDevices().catch(() => {});
+  refreshLiveMetrics().catch(() => {});
+  if (state.liveIntervalId) window.clearInterval(state.liveIntervalId);
+  state.liveIntervalId = window.setInterval(refreshLiveMetrics, 8000);
 };
 
 const wireStoreEvents = () => {
@@ -1553,6 +2011,10 @@ const wireRouteHandlers = () => {
 const loadRoute = async (routePath) => {
   const route = normalizeRoute(routePath);
   state.route = route;
+  if (state.liveIntervalId) {
+    window.clearInterval(state.liveIntervalId);
+    state.liveIntervalId = null;
+  }
   const module = ROUTES[route];
   byId("ccos-title").textContent = module.title;
   const activeRoute = module.navRoute || route;

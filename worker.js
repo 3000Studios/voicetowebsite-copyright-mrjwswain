@@ -886,6 +886,7 @@ export default {
     if (!assets && !url.pathname.startsWith("/api/")) {
       return jsonResponse(500, {
         error: "Static assets binding is missing on this Worker route.",
+        hint: "Redeploy with wrangler from the repo that has assets = { directory = 'dist', binding = 'ASSETS' } in wrangler.toml. See DEPLOY_DASHBOARD_AND_BINDINGS.md.",
       });
     }
 
@@ -1023,9 +1024,11 @@ export default {
       const isCommandCenterReq = isCommandCenterPath(url);
       let commandCenterRequest = request;
       if (isCommandCenterReq) {
+        const isPublicLiveSessionRequest =
+          url.pathname === "/api/live/session" && request.method === "GET";
         const hasBearer = hasValidConfiguredAdminBearer(request, env);
         const hasAdminSession = await isAdminRequest(request, env);
-        if (!hasBearer && !hasAdminSession) {
+        if (!isPublicLiveSessionRequest && !hasBearer && !hasAdminSession) {
           return addSecurityHeaders(
             jsonResponse(401, { ok: false, error: "Unauthorized" }),
             {
@@ -1034,20 +1037,25 @@ export default {
             }
           );
         }
-        const actorIp = String(
-          request.headers.get("cf-connecting-ip") || ""
-        ).trim();
-        const actor = actorIp ? `admin:${actorIp}` : "admin:session";
         const forwardedHeaders = new Headers(request.headers);
-        forwardedHeaders.set("x-cc-actor", actor);
-        if (env.DEPLOY_PLAN_TIER) {
-          forwardedHeaders.set("x-cc-plan-tier", String(env.DEPLOY_PLAN_TIER));
-        }
-        if (env.DEPLOY_BILLING_STATUS) {
-          forwardedHeaders.set(
-            "x-cc-billing-status",
-            String(env.DEPLOY_BILLING_STATUS)
-          );
+        if (!isPublicLiveSessionRequest) {
+          const actorIp = String(
+            request.headers.get("cf-connecting-ip") || ""
+          ).trim();
+          const actor = actorIp ? `admin:${actorIp}` : "admin:session";
+          forwardedHeaders.set("x-cc-actor", actor);
+          if (env.DEPLOY_PLAN_TIER) {
+            forwardedHeaders.set(
+              "x-cc-plan-tier",
+              String(env.DEPLOY_PLAN_TIER)
+            );
+          }
+          if (env.DEPLOY_BILLING_STATUS) {
+            forwardedHeaders.set(
+              "x-cc-billing-status",
+              String(env.DEPLOY_BILLING_STATUS)
+            );
+          }
         }
         commandCenterRequest = new Request(request, {
           headers: forwardedHeaders,
@@ -1635,6 +1643,7 @@ export default {
 
         const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
         const apiToken =
+          env.CLOUD_FLARE_API_TOKEN ||
           env.CF_API_TOKEN ||
           env.CF_API_TOKEN2 ||
           env.CF_USER_TOKEN ||
@@ -1644,10 +1653,10 @@ export default {
         if (!apiToken || !zoneId) {
           return jsonResponse(501, {
             error:
-              "Cloudflare API token or zone ID missing. Set CF_API_TOKEN (preferred) or CF_USER_TOKEN, and optionally CF_ZONE_ID.",
+              "Cloudflare API token or zone ID missing. Set CLOUD_FLARE_API_TOKEN (preferred) or CF_ZONE_ID.",
             setupRequired: true,
             setupHint:
-              "Add CF_API_TOKEN (with Zone.Analytics Read) and CF_ZONE_ID to your Worker secrets. Zone ID is in Cloudflare Dashboard → your domain → Overview (right sidebar).",
+              "Add CLOUD_FLARE_API_TOKEN (with Zone.Analytics Read) and CF_ZONE_ID to your Worker secrets. Zone ID is in Cloudflare Dashboard → your domain → Overview (right sidebar).",
           });
         }
         try {
@@ -1710,6 +1719,7 @@ export default {
 
         const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
         const apiToken =
+          env.CLOUD_FLARE_API_TOKEN ||
           env.CF_API_TOKEN ||
           env.CF_API_TOKEN2 ||
           env.CF_USER_TOKEN ||
@@ -1819,6 +1829,7 @@ export default {
 
         const zoneId = request.cf?.zoneId || env.CF_ZONE_ID;
         const apiToken =
+          env.CLOUD_FLARE_API_TOKEN ||
           env.CF_API_TOKEN ||
           env.CF_API_TOKEN2 ||
           env.CF_USER_TOKEN ||
@@ -1957,6 +1968,7 @@ export default {
           cloudflare_analytics: {
             zone_id: !!(request.cf?.zoneId || env.CF_ZONE_ID),
             api_token: !!(
+              env.CLOUD_FLARE_API_TOKEN ||
               env.CF_API_TOKEN ||
               env.CF_API_TOKEN2 ||
               env.CF_USER_TOKEN ||

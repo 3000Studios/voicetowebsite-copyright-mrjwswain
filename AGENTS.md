@@ -100,6 +100,22 @@ See `.cursor/rules/cloudflare-plugin.mdc` for the full rule.
 
 See `README.md` for full documentation.
 
+### PowerShell scripts (user preference)
+
+When writing PowerShell scripts for this repo (e.g. env/config or one-off automation):
+
+- Start with `cd` to the project root so the script works from any current directory.
+- Set `$ErrorActionPreference = "Stop"` and declare variables at the top.
+- If the target file may not exist, create it with
+  `if (!(Test-Path $path)) { New-Item -ItemType File -Path $path | Out-Null }`.
+- Read with `Get-Content $path -ErrorAction SilentlyContinue`.
+- Use a simple `$out = @()` array and `$out += ...` (no ArrayList).
+- Use multi-line, indented `foreach`/`if`/`else` blocks for readability.
+- Write with `$out | Set-Content $path` (no `-NoNewline` unless required).
+- End with a green success message and `Select-String` or similar to show the result.
+
+Example pattern: `scripts/set-admin-env.ps1`.
+
 ### Non-obvious caveats
 
 - **Node 20 required.** The `.nvmrc` pins Node 20. Run `nvm use 20` (or ensure default is 20) before

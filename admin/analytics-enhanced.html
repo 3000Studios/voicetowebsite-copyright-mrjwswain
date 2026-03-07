@@ -148,7 +148,7 @@
         </div>
         <p class="muted">To see real-time visitors and zone traffic, add Worker secrets:</p>
         <ul style="margin: 0.5rem 0; padding-left: 1.25rem">
-          <li><strong>CF_API_TOKEN</strong> – API token with <em>Zone.Analytics: Read</em></li>
+          <li><strong>CLOUD_FLARE_API_TOKEN</strong> – API token with <em>Zone.Analytics: Read</em></li>
           <li><strong>CF_ZONE_ID</strong> – Zone ID (Dashboard → your domain → Overview)</li>
         </ul>
         <p>
@@ -191,7 +191,8 @@
               </li>
               <li>
                 In <strong>Workers &amp; Pages → your Worker → Settings → Variables</strong>, add
-                <code>CF_API_TOKEN</code> (secret) and <code>CF_ZONE_ID</code> (Zone ID from your domain’s Overview).
+                <code>CLOUD_FLARE_API_TOKEN</code> (secret) and <code>CF_ZONE_ID</code> (Zone ID from your domain’s
+                Overview).
               </li>
               <li>Redeploy the Worker and refresh this page.</li>
             </ol>

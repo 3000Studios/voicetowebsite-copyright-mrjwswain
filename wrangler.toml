@@ -1,24 +1,37 @@
-# VoiceToWebsite Worker — see https://developers.cloudflare.com/workers/best-practices/workers-best-practices/
-# Keep compatibility_date current; re-run `npm run types` after changing bindings.
+# VoiceToWebsite Worker
+# Docs: https://developers.cloudflare.com/workers/best-practices/workers-best-practices/
+# After changing bindings, run: npm run types
+
 name = "voicetowebsite"
 compatibility_date = "2026-03-02"
 main = "worker.js"
-
 compatibility_flags = ["nodejs_compat"]
 
-# Static assets from Vite build output.
-assets = { directory = "dist", binding = "ASSETS" }
-
-# Explicitly disable workers.dev + preview URLs for production.
+# No workers.dev or preview URLs in production.
 workers_dev = false
 preview_urls = false
 
-# Production routes for the public site.
+# Production routes — must point to this Worker so ASSETS and all bindings apply.
 routes = [
   { pattern = "voicetowebsite.com/*", zone_name = "voicetowebsite.com" },
   { pattern = "www.voicetowebsite.com/*", zone_name = "voicetowebsite.com" },
 ]
 
+# -----------------------------------------------------------------------------
+# Static assets (Vite build output). Worker runs first for every request so we
+# can do auth, API routing, and HTML injection; then we delegate to ASSETS.
+# SPA: unknown paths serve index.html so client-side routing works.
+# -----------------------------------------------------------------------------
+[assets]
+directory = "dist"
+binding = "ASSETS"
+run_worker_first = true
+not_found_handling = "single-page-application"
+
+# -----------------------------------------------------------------------------
+# Observability (logs + traces). Set observability.traces.head_sampling_rate
+# to 1 when debugging; 0.01 keeps cost low in production.
+# -----------------------------------------------------------------------------
 [observability]
 enabled = true
 head_sampling_rate = 1
@@ -32,33 +45,47 @@ invocation_logs = true
 [observability.traces]
 enabled = true
 persist = true
-# 0.01 = 1% of requests (cost-friendly); use 1 for full traces when debugging
 head_sampling_rate = 0.01
 
+# -----------------------------------------------------------------------------
+# Workers AI
+# -----------------------------------------------------------------------------
 [ai]
 binding = "AI"
 
-# Repo-managed safe runtime vars live here.
-# Private Worker secrets stay in Cloudflare Dashboard → Worker → Settings → Variables and Secrets → Secrets.
-# Manual Wrangler auth stays local in your PowerShell session as CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID.
+# -----------------------------------------------------------------------------
+# Runtime variables (safe to commit). Secrets go in Dashboard or wrangler secret put.
+#
+# Deploy sources and what they need:
+# - CLI / IDE:  npm run deploy  (uses CLOUDFLARE_API_TOKEN / CLOUD_FLARE_API_TOKEN in env)
+# - Dashboard: Deploy button triggers build; set CF_DEPLOY_HOOK_URL + CLOUD_FLARE_API_TOKEN as secrets
+# - Command center / Custom GPT: same as dashboard; backend calls CF Builds API when deploy requested
+# -----------------------------------------------------------------------------
 [vars]
 ENVIRONMENT = "production"
 PUBLIC_GENERATE = "1"
 CF_ALLOW_LEGACY_DEPLOY_HOOKS = "0"
 ALLOW_REMOTE_DEPLOY_TRIGGER = "1"
+CF_WORKERS_BUILDS_AUTO_DEPLOY = "0"
 GH_BASE_BRANCH = "main"
 GH_REPO = "3000Studios/voicetowebsite-copyright-mrjwswain"
 ADMIN_EMAIL = "mr.jwswain@gmail.com"
+
+# AdSense (publishable)
 ADSENSE_PUBLISHER = "ca-pub-5800977493749262"
 ADSENSE_CUSTOMER_ID = "7555696606"
 ADSENSE_MODE = "auto"
 ADSENSE_ALLOW_ALL_PAGES = "1"
 ADSENSE_MAX_SLOTS = "3"
+
+# PayPal
 PAYPAL_ENV = "live"
+
+# Cache headers
 CACHE_CONTROL_STATIC = "public, max-age=31536000, immutable"
 CACHE_CONTROL_HTML = "public, max-age=600"
-# Public commerce/runtime config that the client reads from window.__ENV.
-# These are publishable identifiers and checkout links, not secret API keys.
+
+# Stripe (publishable keys and product IDs only — never commit STRIPE_SECRET_KEY)
 STRIPE_PUBLISHABLE_KEY = "pk_live_51SCLtrGejm3JMan4oTgv5MvjcAIPr1AWhkUamJiUufyqhWkeiq2iZ8GVQBy56xewUSiyLxPp05gPy4KBrZDsvG8e00uM2g1yCd"
 STRIPE_ALLOW_CUSTOM_AMOUNT = "false"
 STRIPE_PAYMENT_METHOD_TYPES = "card,cashapp,klarna"
@@ -74,11 +101,13 @@ STRIPE_BUY_BUTTON_ID_STARTER = "buy_btn_1Sy6ZmGejm3JMan4D4eF5gH6"
 STRIPE_BUY_BUTTON_ID_GROWTH = "buy_btn_1Sy6ZmGejm3JMan4E5fG6hI7"
 STRIPE_BUY_BUTTON_ID_ENTERPRISE = "buy_btn_1Sy6ZmGejm3JMan4F6gH7iJ8"
 STRIPE_BUY_BUTTON_ID_LIFETIME = "buy_btn_1Sy4mXGejm3JMan4DYZEwLhE"
-# NOTE: Do not commit secrets.
-# Set runtime variables/secrets in the Cloudflare Dashboard (Worker settings) or via `wrangler secret put`.
-# Keep secrets there, not here. In particular: CONTROL_PASSWORD, LICENSE_SECRET,
-# ADMIN_COOKIE_SECRET, STRIPE_SECRET_KEY, KRAKEN_API_KEY, KRAKEN_API_SECRET,
-# PAYPAL_CLIENT_SECRET, and UNSPLASH_ACCESS_KEY should stay remote-only.
+
+# -----------------------------------------------------------------------------
+# Secrets (set in Dashboard → Worker → Variables and Secrets, or wrangler secret put):
+# CONTROL_PASSWORD, ADMIN_COOKIE_SECRET, ADMIN_ACCESS_CODE, LICENSE_SECRET,
+# STRIPE_SECRET_KEY, PAYPAL_CLIENT_SECRET, CLOUD_FLARE_API_TOKEN,
+# CF_DEPLOY_HOOK_URL, UNSPLASH_ACCESS_KEY, KRAKEN_API_KEY, KRAKEN_API_SECRET, etc.
+# -----------------------------------------------------------------------------
 
 [[d1_databases]]
 binding = "D1"
@@ -88,7 +117,6 @@ database_id = "df1e9d32-3a53-4994-affc-d395983a8dc4"
 binding = "KV"
 id = "e61605d144ac4348a72b7e85afc6c185"
 
-# Same KV as above; required by /api/ui-command (Custom GPT, voice commands, MCP).
 [[kv_namespaces]]
 binding = "VTW_CACHE"
 id = "e61605d144ac4348a72b7e85afc6c185"

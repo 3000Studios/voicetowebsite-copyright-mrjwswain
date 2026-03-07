@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-07T00:14:41.982Z",
-  "scannedFiles": 396,
+  "generatedAt": "2026-03-07T00:42:17.894Z",
+  "scannedFiles": 397,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -318,7 +318,7 @@
       "src/durable_objects/LiveRoomDO.js",
       "worker.js"
     ],
-    "ADMIN_COOKIE_SECRET": ["functions/adminAuth.js"],
+    "ADMIN_COOKIE_SECRET": ["functions/adminAuth.js", "functions/liveAuth.js"],
     "ADMIN_ROLE": ["functions/orchestrator.js"],
     "ADSENSE_ALLOW_ALL_PAGES": ["worker.js"],
     "ADSENSE_CUSTOMER_ID": ["worker.js"],
@@ -396,6 +396,7 @@
     "CONTROL_PASSWORD": [
       "functions/adminAuth.js",
       "functions/commandCenterApi.js",
+      "functions/liveAuth.js",
       "src/durable_objects/DeployControllerDO.js",
       "src/durable_objects/LiveRoomDO.js",
       "worker.js"
@@ -459,8 +460,12 @@
     "LEARN": ["functions/orchestrator.js"],
     "LICENSE_SECRET": ["worker.js"],
     "LIVE_ROOM": ["functions/commandCenterApi.js", "worker.js"],
-    "LIVE_ROOM_ADMIN_TOKEN": ["functions/commandCenterApi.js", "src/durable_objects/LiveRoomDO.js"],
-    "LIVE_ROOM_VIEWER_TOKEN": ["src/durable_objects/LiveRoomDO.js"],
+    "LIVE_ROOM_ADMIN_TOKEN": [
+      "functions/commandCenterApi.js",
+      "functions/liveAuth.js",
+      "src/durable_objects/LiveRoomDO.js"
+    ],
+    "LIVE_ROOM_VIEWER_TOKEN": ["functions/liveAuth.js", "src/durable_objects/LiveRoomDO.js"],
     "LOG_LEVEL": [
       "functions/chat.js",
       "functions/execute.js",

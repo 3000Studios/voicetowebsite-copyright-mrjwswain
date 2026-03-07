@@ -44,12 +44,12 @@ export const SHARED_NAV_ITEMS: NavigationItem[] = [
   { href: "/admin/login.html", label: "Admin Login", requiresAuth: true },
   { href: "/admin/access.html", label: "Admin Panel", requiresAuth: true },
   {
-    href: "/admin/integrated-dashboard.html",
+    href: "/admin/mission",
     label: "Dashboard",
     requiresAuth: true,
   },
   {
-    href: "/admin/store-manager.html",
+    href: "/admin/store",
     label: "Store Manager",
     requiresAuth: true,
   },
@@ -58,9 +58,9 @@ export const SHARED_NAV_ITEMS: NavigationItem[] = [
     label: "App Store Manager",
     requiresAuth: true,
   },
-  { href: "/admin/analytics.html", label: "Analytics", requiresAuth: true },
+  { href: "/admin/analytics", label: "Analytics", requiresAuth: true },
   {
-    href: "/admin/voice-commands.html",
+    href: "/admin/vcc",
     label: "Voice Commands",
     requiresAuth: true,
   },
@@ -69,6 +69,6 @@ export const SHARED_NAV_ITEMS: NavigationItem[] = [
     label: "Live Room Test",
     requiresAuth: true,
   },
-  { href: "/admin/media.html", label: "Media Manager", requiresAuth: true },
-  { href: "/admin/settings.html", label: "Settings", requiresAuth: true },
+  { href: "/admin/media", label: "Media Manager", requiresAuth: true },
+  { href: "/admin/settings", label: "Settings", requiresAuth: true },
 ];

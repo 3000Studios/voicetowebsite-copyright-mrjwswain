@@ -32,6 +32,14 @@
             <div class="live-block">
               <h3>Current Stream</h3>
               <div class="live-player-shell">
+                <video
+                  id="live-player"
+                  playsinline
+                  autoplay
+                  controls
+                  muted
+                  style="display: none; width: 100%; height: 100%; background: #000"
+                ></video>
                 <iframe
                   id="live-embed"
                   src="https://www.youtube.com/embed/dQw4w9WgXcQ"
@@ -42,6 +50,7 @@
                   sandbox="allow-scripts allow-same-origin allow-presentation"
                 ></iframe>
               </div>
+              <p class="muted" id="live-session-status">Checking live session…</p>
               <label class="sr-only" for="live-url">Live embed URL</label>
               <input
                 type="url"

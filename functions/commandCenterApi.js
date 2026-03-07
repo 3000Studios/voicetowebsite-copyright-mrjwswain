@@ -1,3 +1,5 @@
+import { mintLiveViewerToken } from "./liveAuth.js";
+
 const CONFIRMATION_PHRASE = "hell yeah ship it";
 
 /** Accept exact phrase, or "confirm" / "yes" so clicking Confirm works without typing. */
@@ -112,6 +114,171 @@ const getLiveRoomAdminToken = (env) =>
       env.CONTROL_PASSWORD ||
       ""
   ).trim();
+
+const getLiveStateDefaults = (env) => ({
+  streamState: "idle",
+  websocketState: env.LIVE_ROOM ? "ready" : "missing",
+  superchatEnabled: true,
+  actionsEnabled: true,
+  bitrateKbps: 2500,
+  streamTitle: "VoiceToWebsite Live",
+  sourceType: "desktop",
+  videoDeviceId: "",
+  videoDeviceLabel: "",
+  audioDeviceId: "",
+  audioDeviceLabel: "",
+  previewReady: false,
+  readyConfirmed: false,
+  playbackMode: "webrtc",
+  publicPlaybackEnabled: true,
+  publicPagePath: "/livestream.html",
+  startedAt: "",
+  updatedAt: "",
+  lastError: "",
+});
+
+const sanitizeLiveState = ({ env, current = {}, body = {} }) => {
+  const base = {
+    ...getLiveStateDefaults(env),
+    ...(current || {}),
+  };
+  const now = new Date().toISOString();
+  const next = {
+    ...base,
+    streamState: String(body.streamState || base.streamState || "idle"),
+    websocketState: String(
+      body.websocketState || base.websocketState || "ready"
+    ),
+    superchatEnabled:
+      body.superchatEnabled === undefined
+        ? Boolean(base.superchatEnabled)
+        : Boolean(body.superchatEnabled),
+    actionsEnabled:
+      body.actionsEnabled === undefined
+        ? Boolean(base.actionsEnabled)
+        : Boolean(body.actionsEnabled),
+    bitrateKbps: Number(body.bitrateKbps ?? base.bitrateKbps ?? 0) || 0,
+    streamTitle: String(
+      body.streamTitle || base.streamTitle || "VoiceToWebsite Live"
+    )
+      .trim()
+      .slice(0, 120),
+    sourceType: String(body.sourceType || base.sourceType || "desktop")
+      .trim()
+      .slice(0, 32),
+    videoDeviceId: String(body.videoDeviceId || base.videoDeviceId || "")
+      .trim()
+      .slice(0, 180),
+    videoDeviceLabel: String(
+      body.videoDeviceLabel || base.videoDeviceLabel || ""
+    )
+      .trim()
+      .slice(0, 180),
+    audioDeviceId: String(body.audioDeviceId || base.audioDeviceId || "")
+      .trim()
+      .slice(0, 180),
+    audioDeviceLabel: String(
+      body.audioDeviceLabel || base.audioDeviceLabel || ""
+    )
+      .trim()
+      .slice(0, 180),
+    previewReady:
+      body.previewReady === undefined
+        ? Boolean(base.previewReady)
+        : Boolean(body.previewReady),
+    readyConfirmed:
+      body.readyConfirmed === undefined
+        ? Boolean(base.readyConfirmed)
+        : Boolean(body.readyConfirmed),
+    playbackMode: String(body.playbackMode || base.playbackMode || "webrtc")
+      .trim()
+      .slice(0, 32),
+    publicPlaybackEnabled:
+      body.publicPlaybackEnabled === undefined
+        ? Boolean(base.publicPlaybackEnabled)
+        : Boolean(body.publicPlaybackEnabled),
+    publicPagePath: String(
+      body.publicPagePath || base.publicPagePath || "/livestream.html"
+    )
+      .trim()
+      .slice(0, 180),
+    lastError: String(body.lastError || "")
+      .trim()
+      .slice(0, 300),
+    updatedAt: now,
+  };
+  next.startedAt =
+    next.streamState === "live"
+      ? String(base.startedAt || now)
+      : next.streamState === "paused"
+        ? String(base.startedAt || "")
+        : "";
+  if (next.streamState !== "live" && next.streamState !== "paused") {
+    next.readyConfirmed = false;
+  }
+  return next;
+};
+
+const loadPersistedLiveState = async (env) => {
+  let state = getLiveStateDefaults(env);
+  if (!env.KV) return state;
+  const raw = await env.KV.get(LIVE_STATE_KEY);
+  if (!raw) return state;
+  try {
+    state = { ...state, ...(JSON.parse(raw) || {}) };
+  } catch (_) {}
+  return state;
+};
+
+const getLiveRoomStatus = async (env) => {
+  if (!env.LIVE_ROOM) {
+    return { ok: false, clients: 0, hosts: 0, viewers: 0, historySize: 0 };
+  }
+  try {
+    const id = env.LIVE_ROOM.idFromName("global");
+    const stub = env.LIVE_ROOM.get(id);
+    const res = await stub.fetch("https://live/status");
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { ok: false, clients: 0, hosts: 0, viewers: 0, historySize: 0 };
+    }
+    return {
+      ok: true,
+      clients: Number(payload.clients || 0),
+      hosts: Number(payload.hosts || 0),
+      viewers: Number(payload.viewers || 0),
+      historySize: Number(payload.historySize || 0),
+    };
+  } catch (_) {
+    return { ok: false, clients: 0, hosts: 0, viewers: 0, historySize: 0 };
+  }
+};
+
+const buildPublicLiveSession = async ({ env, url, state }) => {
+  const room = await getLiveRoomStatus(env);
+  const viewerToken =
+    state.streamState === "live" && state.publicPlaybackEnabled
+      ? await mintLiveViewerToken(env)
+      : "";
+  return {
+    ok: true,
+    state: {
+      streamState: state.streamState,
+      websocketState: state.websocketState,
+      streamTitle: state.streamTitle,
+      startedAt: state.startedAt,
+      updatedAt: state.updatedAt,
+      playbackMode: state.playbackMode,
+      publicPlaybackEnabled: Boolean(state.publicPlaybackEnabled),
+      publicPagePath: state.publicPagePath,
+      viewerCount: room.viewers,
+      hostConnected: room.hosts > 0,
+    },
+    viewerToken,
+    wsUrl: `${url.protocol === "https:" ? "wss:" : "ws:"}//${url.host}/api/live/ws?role=viewer`,
+    publicUrl: `${url.origin}${state.publicPagePath || "/livestream.html"}`,
+  };
+};
 
 const isProtectedCorePath = (filePath) =>
   PROTECTED_CORE_PATHS.has(String(filePath || "").trim());
@@ -1120,7 +1287,8 @@ const getCloudflareDeployConfig = (env) => {
     env.CLOUDFLARE_ACCOUNT_ID || env.CF_ACCOUNT_ID || ""
   ).trim();
   const apiToken = String(
-    env.CF_API_TOKEN ||
+    env.CLOUD_FLARE_API_TOKEN ||
+      env.CF_API_TOKEN ||
       env.CF_API_TOKEN2 ||
       env.CF_USER_TOKEN ||
       env.CLOUDFLARE_API_TOKEN ||
@@ -1141,7 +1309,7 @@ const cloudflareApiFetchJson = async (env, path) => {
       ok: false,
       setupRequired: true,
       error:
-        "Cloudflare account ID or API token missing. Set CLOUDFLARE_ACCOUNT_ID/CF_ACCOUNT_ID and CF_API_TOKEN/CLOUDFLARE_API_TOKEN.",
+        "Cloudflare account ID or API token missing. Set CLOUDFLARE_ACCOUNT_ID/CF_ACCOUNT_ID and CLOUD_FLARE_API_TOKEN.",
     };
   }
   const res = await fetch(
@@ -1224,7 +1392,7 @@ const handleDeployStatus = async ({ env, assets, request }) => {
   if (!cloudflare.configured) {
     cloudflare.setupRequired = true;
     cloudflare.error =
-      "Cloudflare deployment status requires CLOUDFLARE_ACCOUNT_ID/CF_ACCOUNT_ID and CF_API_TOKEN/CLOUDFLARE_API_TOKEN.";
+      "Cloudflare deployment status requires CLOUDFLARE_ACCOUNT_ID/CF_ACCOUNT_ID and CLOUD_FLARE_API_TOKEN.";
   } else {
     const workerMeta = await cloudflareApiFetchJson(
       env,
@@ -1877,32 +2045,28 @@ const handleAudioApi = async ({ env, request, url }) => {
 };
 
 const handleLiveApi = async ({ env, request, url }) => {
+  if (url.pathname === "/api/live/session" && request.method === "GET") {
+    const state = await loadPersistedLiveState(env);
+    return json(200, await buildPublicLiveSession({ env, url, state }));
+  }
+
   if (request.method === "GET") {
-    let state = {
-      streamState: "idle",
-      websocketState: env.LIVE_ROOM ? "ready" : "missing",
-      superchatEnabled: true,
-      actionsEnabled: true,
-      bitrateKbps: 0,
-    };
-    if (env.KV) {
-      const raw = await env.KV.get(LIVE_STATE_KEY);
-      if (raw) {
-        try {
-          state = { ...state, ...(JSON.parse(raw) || {}) };
-        } catch (_) {}
-      }
-    }
-    return json(200, { ok: true, state });
+    const state = await loadPersistedLiveState(env);
+    const room = await getLiveRoomStatus(env);
+    return json(200, {
+      ok: true,
+      state: {
+        ...state,
+        viewerCount: room.viewers,
+        hostConnected: room.hosts > 0,
+        roomClients: room.clients,
+        roomHistorySize: room.historySize,
+      },
+    });
   }
   const body = await parseJsonBody(request);
-  const next = {
-    streamState: String(body.streamState || "idle"),
-    websocketState: String(body.websocketState || "ready"),
-    superchatEnabled: Boolean(body.superchatEnabled),
-    actionsEnabled: Boolean(body.actionsEnabled),
-    bitrateKbps: Number(body.bitrateKbps || 0),
-  };
+  const current = await loadPersistedLiveState(env);
+  const next = sanitizeLiveState({ env, current, body });
   if (env.KV) await env.KV.put(LIVE_STATE_KEY, JSON.stringify(next));
   await appendAuditLog({ env, action: "live.update", details: next });
   if (env.LIVE_ROOM) {

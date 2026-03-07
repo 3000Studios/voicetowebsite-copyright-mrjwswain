@@ -1,3 +1,6 @@
+import { hasValidAdminCookie } from "../../functions/adminAuth.js";
+import { verifyLiveViewerToken } from "../../functions/liveAuth.js";
+
 const RATE_WINDOW_MS = 60_000;
 const MAX_MESSAGES_PER_WINDOW = 60;
 const HISTORY_LIMIT = 200;
@@ -32,7 +35,7 @@ export class LiveRoomDO {
       return this.handleWebSocket(request, url);
     }
     if (url.pathname === "/event" && request.method === "POST") {
-      if (!this.hasValidToken(request, "admin", url)) {
+      if (!(await this.hasValidToken(request, "admin", url))) {
         return json(401, { ok: false, error: "Unauthorized" });
       }
       const payload = await request
@@ -50,6 +53,12 @@ export class LiveRoomDO {
       return json(200, {
         ok: true,
         clients: this.clients.size,
+        hosts: [...this.clients.values()].filter(
+          (client) => client.role === "host"
+        ).length,
+        viewers: [...this.clients.values()].filter(
+          (client) => client.role === "viewer"
+        ).length,
         historySize: this.history.length,
       });
     }
@@ -84,16 +93,21 @@ export class LiveRoomDO {
     const token = this.extractToken(request, url);
     const expected =
       role === "admin" ? this.getAdminToken() : this.getViewerToken();
-    if (!expected) return false;
-    return token === expected;
+    if (expected && token === expected) return true;
+    if (role === "host") return hasValidAdminCookie(request, this.env);
+    if (role === "viewer") return verifyLiveViewerToken(this.env, token);
+    return false;
   }
 
-  handleWebSocket(request, url) {
+  async handleWebSocket(request, url) {
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
     const sessionId = crypto.randomUUID();
-    const role = String(url.searchParams.get("role") || "viewer");
-    if (!this.hasValidToken(request, role, url)) {
+    const role =
+      String(url.searchParams.get("role") || "viewer") === "host"
+        ? "host"
+        : "viewer";
+    if (!(await this.hasValidToken(request, role, url))) {
       return json(401, { ok: false, error: "Unauthorized" });
     }
 
@@ -108,6 +122,7 @@ export class LiveRoomDO {
       },
       ts: new Date().toISOString(),
     });
+    this.broadcastPresence("peer_joined", sessionId, role);
 
     server.addEventListener("message", (event) =>
       this.onClientMessage({ sessionId, role, raw: event.data })
@@ -182,10 +197,31 @@ export class LiveRoomDO {
     } catch (_) {}
   }
 
+  broadcastPresence(type, sessionId, role) {
+    const payload = {
+      sessionId,
+      role,
+      hosts: [...this.clients.values()].filter(
+        (client) => client.role === "host"
+      ).length,
+      viewers: [...this.clients.values()].filter(
+        (client) => client.role === "viewer"
+      ).length,
+    };
+    for (const { socket } of this.clients.values()) {
+      this.send(socket, {
+        type,
+        payload,
+        ts: new Date().toISOString(),
+      });
+    }
+  }
+
   disconnect(sessionId) {
     const client = this.clients.get(sessionId);
     if (!client) return;
     this.clients.delete(sessionId);
+    this.broadcastPresence("peer_left", sessionId, client.role);
     try {
       client.socket.close();
     } catch (_) {}

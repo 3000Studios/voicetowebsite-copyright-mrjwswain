@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
 
-const TOKEN_KEYS = ["CLOUDFLARE_API_TOKEN", "CF_API_TOKEN"];
+const TOKEN_KEYS = [
+  "CLOUD_FLARE_API_TOKEN",
+  "CLOUDFLARE_API_TOKEN",
+  "CF_API_TOKEN",
+];
 const ACCOUNT_KEYS = ["CLOUDFLARE_ACCOUNT_ID", "CF_ACCOUNT_ID"];
 
 const PLACEHOLDER_VALUES = new Set([

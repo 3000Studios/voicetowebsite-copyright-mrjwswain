@@ -21,7 +21,7 @@ All Command Center API requests (below) require either a valid admin session coo
 | Command Center       | `/admin/cc`           | `GET /api/fs/tree`, `GET /api/fs/read`, `POST /api/fs/write`, `POST /api/fs/delete`, `POST /api/preview/build`, `GET /api/repo/status`, `GET /api/deploy/logs`, `POST /api/deploy/run` | File tree, editor, preview build, deploy.                                                        |
 | Voice Command Center | `/admin/vcc`          | `POST /api/voice/execute`, `POST /api/execute`, `POST /api/preview/build`, `POST /api/deploy/run`, loadAnalytics (overview/detailed/realtime)                                          | Voice/execute and preview iframe.                                                                |
 | Monetization         | `/admin/monetization` | `GET/POST /api/monetization/config`                                                                                                                                                    | Ad density, CTA variant, donation/superchat/affiliate toggles.                                   |
-| Analytics            | `/admin/analytics`    | `GET /api/analytics/overview`, `GET /api/analytics/detailed`, `GET /api/analytics/realtime` (admin cookie)                                                                             | Cloudflare zone analytics; set `CF_API_TOKEN` + `CF_ZONE_ID` for real data.                      |
+| Analytics            | `/admin/analytics`    | `GET /api/analytics/overview`, `GET /api/analytics/detailed`, `GET /api/analytics/realtime` (admin cookie)                                                                             | Cloudflare zone analytics; set `CLOUD_FLARE_API_TOKEN` + `CF_ZONE_ID` for real data.             |
 | Live Manager         | `/admin/live`         | `GET/POST /api/live/state`, **WebSocket** `wss://host/api/live/ws?role=viewer` (or `?role=host`)                                                                                       | State in KV; WebSocket forwarded to LiveRoomDO. Token: query `token` or `Authorization: Bearer`. |
 | Store Manager        | `/admin/store`        | `GET /api/store/products`, `POST /api/store/products`                                                                                                                                  | D1 `cc_store_products`.                                                                          |
 | Media Library        | `/admin/media`        | `GET /api/media/list`, `POST /api/media/upload`                                                                                                                                        | D1 + R2.                                                                                         |
@@ -76,7 +76,7 @@ All Command Center API requests (below) require either a valid admin session coo
 - [ ] Command Center APIs: All require admin session or bearer token; 401 if not.
 - [ ] Deploy from dashboard: `ALLOW_REMOTE_DEPLOY_TRIGGER=1` and `CF_DEPLOY_HOOK_URL` (or
       equivalent) set so deploy runs.
-- [ ] Analytics (real Cloudflare data): `CF_API_TOKEN` + `CF_ZONE_ID` set.
+- [ ] Analytics (real Cloudflare data): `CLOUD_FLARE_API_TOKEN` + `CF_ZONE_ID` set.
 - [ ] Live WebSocket: `LIVE_ROOM` DO binding; optional `LIVE_ROOM_VIEWER_TOKEN` /
       `LIVE_ROOM_ADMIN_TOKEN`; connect to `/api/live/ws`.
 - [ ] PayPal/Stripe: Secrets set in Worker; frontends use `/api/checkout` and capture endpoints.

@@ -193,6 +193,7 @@ Scripts available:
 - `scripts/commit-push-deploy.bat`
 - `scripts/continuous-integration.mjs`
 - `scripts/css-budget-validator.mjs`
+- `scripts/cursor-session-init.ps1`
 - `scripts/deploy-one-shot.ps1`
 - `scripts/deploy-safe.mjs`
 - `scripts/deploy-with-oauth.ps1`
@@ -222,6 +223,7 @@ Scripts available:
 - `scripts/prebuild.js`
 - `scripts/release.mjs`
 - `scripts/restore.mjs`
+- `scripts/set-admin-env.ps1`
 - `scripts/ship.mjs`
 - `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
@@ -253,9 +255,13 @@ Recommended VS Code extensions:
 - `GitHub.vscode-github-actions`
 - `humao.rest-client`
 - `mikestead.dotenv`
+- `redhat.vscode-yaml`
+- `tamasfe.even-better-toml`
 - `vitest.explorer`
 - `rangav.vscode-thunder-client`
 - `yzhang.markdown-all-in-one`
+- `ms-vscode.vscode-json`
+- `nickytonline.vscode-link-status`
 
 Core governance docs present:
 
@@ -281,11 +287,11 @@ Core governance docs present:
 - `ADSENSE_SLOT_TOP`
 - `ALLOW_ADMIN_HEADER_TOKEN`
 - `ALLOW_INSECURE_ADMIN_COOKIE_SECRET`
-- `CF_API_TOKEN`
 - `CF_DEPLOY_HOOK_URL`
 - `CF_PAGES_DEPLOY_HOOK`
 - `CF_WORKERS_BUILDS_AUTO_DEPLOY`
 - `CF_ZONE_ID`
+- `CLOUD_FLARE_API_TOKEN`
 - `CONTROL_PASSWORD`
 - `DEMO_EMAIL_FROM`
 - `GH_BOT_TOKEN`

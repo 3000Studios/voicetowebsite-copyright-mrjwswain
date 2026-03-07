@@ -12,7 +12,9 @@
   "terminal.integrated.gpuAcceleration": "auto",
   "terminal.integrated.env.windows": {
     "NODE_OPTIONS": "--max-old-space-size=8192",
-    "FORCE_COLOR": "1"
+    "FORCE_COLOR": "1",
+    "NPM_CONFIG_FUND": "false",
+    "NPM_CONFIG_AUDIT": "false"
   },
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
@@ -114,5 +116,39 @@
   "workbench.iconTheme": "material-icon-theme",
   "workbench.startupEditor": "none",
   "window.restoreWindows": "all",
-  "debug.javascript.autoAttachFilter": "smart"
+  "debug.javascript.autoAttachFilter": "smart",
+  "task.allowAutomaticTasks": "on",
+  "chat.commandCenter.enabled": true,
+  "chat.agent.enabled": true,
+  "chat.tools.terminal.autoApprove": {
+    "powershell": true,
+    "powershell.exe": true,
+    "pwsh": true,
+    "pwsh.exe": true,
+    "cmd": true,
+    "node": true,
+    "npm": true,
+    "npx": true,
+    "nvm": true,
+    "wrangler": true,
+    "git": true,
+    "npm run": true,
+    "npm run deploy": true,
+    "npm run verify": true,
+    "npm run ship": true,
+    "npm run ship:push": true,
+    ".\\scripts\\cursor-session-init.ps1": true,
+    "scripts\\cursor-session-init.ps1": true,
+    ".\\scripts\\set-admin-env.ps1": true,
+    ".\\scripts\\deploy-one-shot.ps1": true,
+    "scripts\\set-admin-env.ps1": true,
+    "scripts\\deploy-one-shot.ps1": true,
+    "C:\\WorkSpaces\\voicetowebsite-copyright-mrjwswain\\scripts\\cursor-session-init.ps1": true,
+    "C:\\WorkSpaces\\voicetowebsite-copyright-mrjwswain\\scripts\\set-admin-env.ps1": true,
+    "C:\\WorkSpaces\\voicetowebsite-copyright-mrjwswain\\scripts\\deploy-one-shot.ps1": true
+  },
+  "terminal.integrated.confirmOnExit": "never",
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.defaultLocation": "editor",
+  "terminal.integrated.shellIntegration.enabled": true
 }

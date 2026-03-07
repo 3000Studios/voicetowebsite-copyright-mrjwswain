@@ -1,10 +1,10 @@
 # ENV Schema
 
-Generated: 2026-03-07T00:14:41.982Z
+Generated: 2026-03-07T00:42:17.894Z
 
 ## Summary
 
-- Scanned files: 396
+- Scanned files: 397
 - Used keys: 137
 - Defined keys: 93
 - Missing keys: 55
@@ -16,7 +16,7 @@ Generated: 2026-03-07T00:14:41.982Z
 | ---------------------------------------- | ------- | ------------- | ------- |
 | ADMIN_ACCESS_CODE                        | yes     | 2             | ok      |
 | ADMIN_BEARER_TOKEN                       | no      | 3             | missing |
-| ADMIN_COOKIE_SECRET                      | yes     | 1             | ok      |
+| ADMIN_COOKIE_SECRET                      | yes     | 2             | ok      |
 | ADMIN_EMAIL                              | yes     | 0             | unused  |
 | ADMIN_PASSWORD_HASH                      | yes     | 0             | unused  |
 | ADMIN_ROLE                               | yes     | 1             | ok      |
@@ -65,7 +65,7 @@ Generated: 2026-03-07T00:14:41.982Z
 | CLOUDFLARE_API_TOKEN                     | no      | 3             | missing |
 | CLOUDFLARE_WORKER_NAME                   | no      | 2             | missing |
 | CONFIRM_TOKEN_SECRET                     | no      | 1             | missing |
-| CONTROL_PASSWORD                         | yes     | 5             | ok      |
+| CONTROL_PASSWORD                         | yes     | 6             | ok      |
 | D1                                       | yes     | 9             | ok      |
 | DB                                       | no      | 2             | missing |
 | DEMO_EMAIL_FROM                          | yes     | 1             | ok      |
@@ -89,8 +89,8 @@ Generated: 2026-03-07T00:14:41.982Z
 | LEARN                                    | no      | 1             | missing |
 | LICENSE_SECRET                           | yes     | 1             | ok      |
 | LIVE_ROOM                                | yes     | 2             | ok      |
-| LIVE_ROOM_ADMIN_TOKEN                    | yes     | 2             | ok      |
-| LIVE_ROOM_VIEWER_TOKEN                   | yes     | 1             | ok      |
+| LIVE_ROOM_ADMIN_TOKEN                    | yes     | 3             | ok      |
+| LIVE_ROOM_VIEWER_TOKEN                   | yes     | 2             | ok      |
 | LOG_LEVEL                                | no      | 4             | missing |
 | MODE                                     | no      | 1             | missing |
 | NEXT_PUBLIC_ADSENSE_PUBLISHER_ID         | no      | 1             | missing |

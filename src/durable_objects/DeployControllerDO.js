@@ -407,9 +407,23 @@ export class DeployControllerDO {
     ).trim();
     if (hookUrl) {
       try {
+        const apiToken =
+          String(
+            this.env.CLOUD_FLARE_API_TOKEN ||
+              this.env.CF_API_TOKEN ||
+              this.env.CLOUDFLARE_API_TOKEN ||
+              ""
+          ).trim() || null;
+        const isCloudflareApi = /api\.cloudflare\.com/i.test(hookUrl);
+        const headers = {
+          "Content-Type": "application/json",
+          ...(isCloudflareApi && apiToken
+            ? { Authorization: `Bearer ${apiToken}` }
+            : {}),
+        };
         const res = await fetch(hookUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({
             source: "voicetowebsite_dashboard",
             ts: new Date().toISOString(),
@@ -463,7 +477,10 @@ export class DeployControllerDO {
       this.env.CLOUDFLARE_ACCOUNT_ID || this.env.CF_ACCOUNT_ID || ""
     ).trim();
     const apiToken = String(
-      this.env.CLOUDFLARE_API_TOKEN || this.env.CF_API_TOKEN || ""
+      this.env.CLOUD_FLARE_API_TOKEN ||
+        this.env.CLOUDFLARE_API_TOKEN ||
+        this.env.CF_API_TOKEN ||
+        ""
     ).trim();
     const scriptName = String(
       this.env.CLOUDFLARE_WORKER_NAME ||

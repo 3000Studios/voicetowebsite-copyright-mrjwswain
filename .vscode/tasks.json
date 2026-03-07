@@ -2,6 +2,19 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Cursor: Session Init",
+      "type": "shell",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\cursor-session-init.ps1",
+      "problemMatcher": [],
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated"
+      }
+    },
+    {
       "label": "auto-commit",
       "type": "shell",
       "command": "git add . && git commit -m \"auto-update\" || echo \"no changes\" && git push",

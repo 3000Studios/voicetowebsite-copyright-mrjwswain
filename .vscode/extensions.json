@@ -15,9 +15,13 @@
     "GitHub.vscode-github-actions",
     "humao.rest-client",
     "mikestead.dotenv",
+    "redhat.vscode-yaml",
+    "tamasfe.even-better-toml",
     "vitest.explorer",
     "rangav.vscode-thunder-client",
-    "yzhang.markdown-all-in-one"
+    "yzhang.markdown-all-in-one",
+    "ms-vscode.vscode-json",
+    "nickytonline.vscode-link-status"
   ],
   "unwantedRecommendations": [
     "GitHub.copilot",
