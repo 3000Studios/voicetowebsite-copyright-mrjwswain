@@ -75,6 +75,7 @@
 
       .contact-card {
         background: rgba(255, 255, 255, 0.1);
+        -webkit-backdrop-filter: blur(20px);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 20px;
@@ -161,21 +162,58 @@
         opacity: 1;
         transform: translateY(0);
       }
+
+      .contact-particle-1 {
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .contact-particle-2 {
+        left: 20%;
+        animation-delay: 1s;
+      }
+      .contact-particle-3 {
+        left: 30%;
+        animation-delay: 2s;
+      }
+      .contact-particle-4 {
+        left: 40%;
+        animation-delay: 3s;
+      }
+      .contact-particle-5 {
+        left: 50%;
+        animation-delay: 4s;
+      }
+      .contact-particle-6 {
+        left: 60%;
+        animation-delay: 5s;
+      }
+      .contact-particle-7 {
+        left: 70%;
+        animation-delay: 6s;
+      }
+      .contact-particle-8 {
+        left: 80%;
+        animation-delay: 7s;
+      }
+      .contact-particle-9 {
+        left: 90%;
+        animation-delay: 8s;
+      }
     </style>
   </head>
   <body class="min-h-screen text-white">
     <!-- Unique Contact Page Wallpaper -->
     <div class="contact-wallpaper"></div>
     <div class="contact-particles">
-      <div class="particle" style="left: 10%; animation-delay: 0s"></div>
-      <div class="particle" style="left: 20%; animation-delay: 1s"></div>
-      <div class="particle" style="left: 30%; animation-delay: 2s"></div>
-      <div class="particle" style="left: 40%; animation-delay: 3s"></div>
-      <div class="particle" style="left: 50%; animation-delay: 4s"></div>
-      <div class="particle" style="left: 60%; animation-delay: 5s"></div>
-      <div class="particle" style="left: 70%; animation-delay: 6s"></div>
-      <div class="particle" style="left: 80%; animation-delay: 7s"></div>
-      <div class="particle" style="left: 90%; animation-delay: 8s"></div>
+      <div class="particle contact-particle-1"></div>
+      <div class="particle contact-particle-2"></div>
+      <div class="particle contact-particle-3"></div>
+      <div class="particle contact-particle-4"></div>
+      <div class="particle contact-particle-5"></div>
+      <div class="particle contact-particle-6"></div>
+      <div class="particle contact-particle-7"></div>
+      <div class="particle contact-particle-8"></div>
+      <div class="particle contact-particle-9"></div>
     </div>
 
     <!-- Navigation -->
@@ -258,7 +296,7 @@
             </div>
             <div class="md:col-span-2">
               <label class="block text-gray-300 mb-2">Subject</label>
-              <select class="form-input w-full">
+              <select class="form-input w-full" title="Select inquiry subject">
                 <option>General Inquiry</option>
                 <option>Technical Support</option>
                 <option>Billing Question</option>

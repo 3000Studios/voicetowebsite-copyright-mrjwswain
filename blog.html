@@ -75,7 +75,8 @@
 
       .blog-card {
         background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
         padding: 2rem;
@@ -99,22 +100,63 @@
         opacity: 1;
         transform: translateY(0);
       }
+
+      .particle-1 {
+        left: 5%;
+        animation-delay: 0s;
+      }
+      .particle-2 {
+        left: 15%;
+        animation-delay: 2s;
+      }
+      .particle-3 {
+        left: 25%;
+        animation-delay: 4s;
+      }
+      .particle-4 {
+        left: 35%;
+        animation-delay: 6s;
+      }
+      .particle-5 {
+        left: 45%;
+        animation-delay: 8s;
+      }
+      .particle-6 {
+        left: 55%;
+        animation-delay: 10s;
+      }
+      .particle-7 {
+        left: 65%;
+        animation-delay: 12s;
+      }
+      .particle-8 {
+        left: 75%;
+        animation-delay: 14s;
+      }
+      .particle-9 {
+        left: 85%;
+        animation-delay: 16s;
+      }
+      .particle-10 {
+        left: 95%;
+        animation-delay: 18s;
+      }
     </style>
   </head>
   <body class="min-h-screen text-white">
     <!-- Unique Blog Wallpaper -->
     <div class="blog-wallpaper"></div>
     <div class="blog-particles">
-      <div class="particle" style="left: 5%; animation-delay: 0s"></div>
-      <div class="particle" style="left: 15%; animation-delay: 2s"></div>
-      <div class="particle" style="left: 25%; animation-delay: 4s"></div>
-      <div class="particle" style="left: 35%; animation-delay: 6s"></div>
-      <div class="particle" style="left: 45%; animation-delay: 8s"></div>
-      <div class="particle" style="left: 55%; animation-delay: 10s"></div>
-      <div class="particle" style="left: 65%; animation-delay: 12s"></div>
-      <div class="particle" style="left: 75%; animation-delay: 14s"></div>
-      <div class="particle" style="left: 85%; animation-delay: 16s"></div>
-      <div class="particle" style="left: 95%; animation-delay: 18s"></div>
+      <div class="particle particle-1"></div>
+      <div class="particle particle-2"></div>
+      <div class="particle particle-3"></div>
+      <div class="particle particle-4"></div>
+      <div class="particle particle-5"></div>
+      <div class="particle particle-6"></div>
+      <div class="particle particle-7"></div>
+      <div class="particle particle-8"></div>
+      <div class="particle particle-9"></div>
+      <div class="particle particle-10"></div>
     </div>
 
     <!-- Navigation -->

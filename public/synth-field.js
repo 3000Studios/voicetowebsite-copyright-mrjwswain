@@ -24,7 +24,8 @@
 
   const field = doc.createElement("div");
   field.id = "vtw-synth-field";
-  if (!saveData) {
+  const isHomePage = pageKey === "/";
+  if (!saveData && !isHomePage) {
     const video = doc.createElement("video");
     video.id = "vtw-synth-video";
     video.autoplay = true;

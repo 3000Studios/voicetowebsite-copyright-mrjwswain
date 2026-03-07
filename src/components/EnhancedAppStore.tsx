@@ -103,6 +103,7 @@ const EnhancedAppStore: React.FC = () => {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+                aria-label="Sort apps by"
               >
                 <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
