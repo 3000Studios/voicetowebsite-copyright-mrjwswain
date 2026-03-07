@@ -2899,8 +2899,22 @@ export default {
         ["/admin/access", "/admin/access.html"],
         ["/admin/login", "/admin/login.html"],
       ]);
+      // Serve admin login/access in place for path-without-.html to avoid redirect loop
+      // (some asset handlers redirect .html -> clean URL, causing ERR_TOO_MANY_REDIRECTS)
       const adminAliasTarget = ADMIN_PUBLIC_ROUTE_ALIASES.get(cleanPath);
       if (adminAliasTarget && url.pathname !== adminAliasTarget) {
+        const aliasReq = new Request(new URL(adminAliasTarget, url.origin), {
+          method: request.method,
+          headers: request.headers,
+          redirect: "manual",
+        });
+        const aliasRes = await assets.fetch(aliasReq);
+        if (aliasRes.status === 200) {
+          return addSecurityHeaders(aliasRes, {
+            cacheControl: "no-store",
+            pragmaNoCache: true,
+          });
+        }
         return Response.redirect(new URL(adminAliasTarget, url.origin), 302);
       }
       const isAdminRoot =
@@ -2960,7 +2974,31 @@ export default {
       }
 
       if (isAdminPath) {
-        const adminRes = await assets.fetch(request);
+        let adminRes = await assets.fetch(request);
+        if (
+          ADMIN_PUBLIC_PATHS.has(url.pathname) &&
+          (adminRes.status === 301 || adminRes.status === 302)
+        ) {
+          const noRedirectUrl = new URL(request.url);
+          noRedirectUrl.searchParams.set("_", "1");
+          const retryRes = await assets.fetch(
+            new Request(noRedirectUrl.toString(), { redirect: "manual" })
+          );
+          if (retryRes.status === 200) adminRes = retryRes;
+        }
+        if (
+          ADMIN_PUBLIC_PATHS.has(url.pathname) &&
+          (adminRes.status === 301 || adminRes.status === 302)
+        ) {
+          const body = `<!DOCTYPE html><html><head><title>Admin</title></head><body><p>Use <a href="${url.pathname}?_=1">this link</a> to open the admin login page.</p></body></html>`;
+          return addSecurityHeaders(
+            new Response(body, {
+              status: 200,
+              headers: { "Content-Type": "text/html; charset=utf-8" },
+            }),
+            { cacheControl: "no-store", pragmaNoCache: true }
+          );
+        }
         return addSecurityHeaders(adminRes, {
           cacheControl: "no-store",
           pragmaNoCache: true,
