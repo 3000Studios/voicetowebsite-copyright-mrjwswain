@@ -212,7 +212,7 @@
       { href: "/privacy", label: "Privacy", icon: "🔒" },
       { href: "/terms", label: "Terms", icon: "📜" },
       { href: "/contact", label: "Contact", icon: "💬" },
-      { href: "/admin", label: "Admin", icon: "⚙️" },
+      { href: "/admin/login.html", label: "Admin Login", icon: "⚙️" },
     ],
     affiliates: [
       {
@@ -226,7 +226,7 @@
         icon: "🧠",
       },
       {
-        href: "/referrals.html",
+        href: "/referrals",
         label: "Refer a Friend (Get 10%)",
         icon: "🎁",
       },

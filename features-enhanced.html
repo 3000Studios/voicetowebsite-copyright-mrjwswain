@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite Features - AI-Powered Web Development</title>
+    <meta
+      name="description"
+      content="Discover VoiceToWebsite's revolutionary features: voice-first website creation, AI automation, responsive design, SEO optimization, and more. Build professional websites in minutes."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/src/styles/adsense-optimized.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .features-wallpaper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          45deg,
+          #667eea 0%,
+          #764ba2 20%,
+          #f093fb 40%,
+          #f5576c 60%,
+          #667eea 80%,
+          #764ba2 100%
+        );
+        background-size: 400% 400%;
+        animation: featuresGradient 30s ease infinite;
+        z-index: -2;
+        transition: transform 0.3s ease;
+      }
+
+      @keyframes featuresGradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .features-particles {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .feature-particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        animation: particleFloat 20s infinite linear;
+      }
+
+      @keyframes particleFloat {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .feature-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: slideInUp 0.8s ease-out;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+        border-radius: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+      }
+
+      .feature-card:hover::before {
+        opacity: 1;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-15px) scale(1.05) rotateX(5deg);
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(102, 126, 234, 0.4);
+      }
+
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .scroll-reveal.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .text-gradient {
+        background: linear-gradient(135deg, #667eea, #f093fb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+      }
+
+      .video-container {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .video-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 30px 60px rgba(102, 126, 234, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .feature-card {
+          padding: 1.5rem;
+          margin-bottom: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-white">
+    <!-- Unique Features Wallpaper -->
+    <div class="features-wallpaper" id="wallpaper"></div>
+    <div class="features-particles">
+      <div class="feature-particle" style="left: 5%; animation-delay: 0s"></div>
+      <div class="feature-particle" style="left: 15%; animation-delay: 2s"></div>
+      <div class="feature-particle" style="left: 25%; animation-delay: 4s"></div>
+      <div class="feature-particle" style="left: 35%; animation-delay: 6s"></div>
+      <div class="feature-particle" style="left: 45%; animation-delay: 8s"></div>
+      <div class="feature-particle" style="left: 55%; animation-delay: 10s"></div>
+      <div class="feature-particle" style="left: 65%; animation-delay: 12s"></div>
+      <div class="feature-particle" style="left: 75%; animation-delay: 14s"></div>
+      <div class="feature-particle" style="left: 85%; animation-delay: 16s"></div>
+      <div class="feature-particle" style="left: 95%; animation-delay: 18s"></div>
+    </div>
+
+    <!-- Navigation -->
+    <script src="/nav.js"></script>
+
+    <!-- Main Content -->
+    <main class="relative z-10 container mx-auto px-6 py-20">
+      <!-- Hero Section -->
+      <section class="text-center mb-20 scroll-reveal">
+        <h1 class="text-6xl md:text-8xl font-bold mb-6 text-gradient">Revolutionary Features</h1>
+        <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto">
+          Experience the future of web development with AI-powered voice commands, responsive design, and intelligent
+          automation
+        </p>
+
+        <!-- Hero Video -->
+        <div class="video-container mb-12 max-w-5xl mx-auto">
+          <video autoplay muted loop title="VoiceToWebsite Features Overview">
+            <source
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- Core Features -->
+      <section class="mb-20 scroll-reveal">
+        <h2 class="text-4xl font-bold mb-12 text-center">Core Capabilities</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
+              alt="Voice Commands"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+            />
+            <h3 class="text-2xl font-semibold mb-4">🎤 Voice Commands</h3>
+            <p class="text-gray-300 mb-4">
+              Speak naturally to create, modify, and deploy websites. Our AI understands complex commands and executes
+              them with precision.
+            </p>
+            <ul class="text-gray-400 space-y-2">
+              <li>• Natural language processing</li>
+              <li>• Real-time command execution</li>
+              <li>• Multi-language support</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1555066931-41318d063f33?w=600&h=400&fit=crop"
+              alt="AI Automation"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+            />
+            <h3 class="text-2xl font-semibold mb-4">🤖 AI Automation</h3>
+            <p class="text-gray-300 mb-4">
+              Intelligent automation handles repetitive tasks, optimizes performance, and suggests improvements based on
+              best practices.
+            </p>
+            <ul class="text-gray-400 space-y-2">
+              <li>• Smart code generation</li>
+              <li>• Automated testing</li>
+              <li>• Performance optimization</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1461749280684-dccba630e2f9?w=600&h=400&fit=crop"
+              alt="Responsive Design"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+            />
+            <h3 class="text-2xl font-semibold mb-4">📱 Responsive Design</h3>
+            <p class="text-gray-300 mb-4">
+              Every website is automatically optimized for all devices, from mobile phones to desktop computers.
+            </p>
+            <ul class="text-gray-400 space-y-2">
+              <li>• Mobile-first approach</li>
+              <li>• Adaptive layouts</li>
+              <li>• Touch-optimized interactions</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1556742049-0cfed4f18a8d?w=600&h=400&fit=crop"
+              alt="SEO Optimization"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+            />
+            <h3 class="text-2xl font-semibold mb-4">🔍 SEO Optimization</h3>
+            <p class="text-gray-300 mb-4">
+              Built-in SEO tools ensure your websites rank higher in search results with minimal effort.
+            </p>
+            <ul class="text-gray-400 space-y-2">
+              <li>• Automatic meta tags</li>
+              <li>• Structured data</li>
+              <li>• Performance monitoring</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
+              alt="Real-time Collaboration"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+            />
+            <h3 class="text-2xl font-semibold mb-4">👥 Real-time Collaboration</h3>
+            <p class="text-gray-300 mb-4">
+              Work together with your team in real-time, with live editing and instant updates.
+            </p>
+            <ul class="text-gray-400 space-y-2">
+              <li>• Live editing</li>
+              <li>• Version control</li>
+              <li>• Comment system</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1555066931-41318d063f33?w=600&h=400&fit=crop"
+              alt="Analytics Dashboard"
+              class="w-full h-48 object-cover rounded-xl mb-6"
+            />
+            <h3 class="text-2xl font-semibold mb-4">📊 Analytics Dashboard</h3>
+            <p class="text-gray-300 mb-4">
+              Comprehensive analytics provide insights into visitor behavior, performance metrics, and conversion rates.
+            </p>
+            <ul class="text-gray-400 space-y-2">
+              <li>• Real-time statistics</li>
+              <li>• User behavior tracking</li>
+              <li>• Conversion optimization</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Advanced Features -->
+      <section class="mb-20 scroll-reveal">
+        <h2 class="text-4xl font-bold mb-12 text-center">Advanced Capabilities</h2>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="feature-card">
+            <div class="video-container mb-6">
+              <video autoplay muted loop title="AI Content Generation">
+                <source
+                  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4">🧠 AI Content Generation</h3>
+            <p class="text-gray-300 mb-4">
+              Generate high-quality content including blog posts, product descriptions, and marketing copy using
+              advanced AI.
+            </p>
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-lg">
+              <p class="text-white font-semibold">Generate 1000+ words of content in seconds</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="video-container mb-6">
+              <video autoplay muted loop title="E-commerce Integration">
+                <source
+                  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <h3 class="text-2xl font-semibold mb-4">🛒 E-commerce Integration</h3>
+            <p class="text-gray-300 mb-4">
+              Seamless integration with Stripe, PayPal, and major payment processors for instant monetization.
+            </p>
+            <div class="bg-gradient-to-r from-green-600 to-blue-600 p-4 rounded-lg">
+              <p class="text-white font-semibold">Start selling in 5 minutes</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Demo -->
+      <section class="mb-20 scroll-reveal">
+        <div class="feature-card max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Try It Now</h2>
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <img
+                src="https://images.unsplash.com/photo-1521791136064-0786949c16c1?w=600&h=400&fit=crop"
+                alt="Voice Demo"
+                class="w-full rounded-xl mb-4"
+              />
+              <h3 class="text-xl font-semibold mb-3">Voice Demo</h3>
+              <p class="text-gray-300 mb-4">Experience the power of voice commands with our interactive demo.</p>
+              <a
+                href="/demo"
+                class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform inline-block"
+              >
+                Try Voice Demo
+              </a>
+            </div>
+            <div>
+              <div class="video-container">
+                <video controls title="Interactive Tutorial">
+                  <source
+                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Video Tutorial</h3>
+              <p class="text-gray-300 mb-4">Watch our comprehensive tutorial to learn all features and capabilities.</p>
+              <a
+                href="/blog"
+                class="bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform inline-block"
+              >
+                Watch Tutorial
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Performance Metrics -->
+      <section class="mb-20 scroll-reveal">
+        <div class="feature-card max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Performance Metrics</h2>
+          <div class="grid md:grid-cols-4 gap-6 text-center">
+            <div>
+              <div class="text-4xl font-bold text-blue-400 mb-2">99.9%</div>
+              <p class="text-gray-300">Uptime</p>
+            </div>
+            <div>
+              <div class="text-4xl font-bold text-green-400 mb-2">< 1s</div>
+              <p class="text-gray-300">Load Time</p>
+            </div>
+            <div>
+              <div class="text-4xl font-bold text-purple-400 mb-2">A+</div>
+              <p class="text-gray-300">Page Speed</p>
+            </div>
+            <div>
+              <div class="text-4xl font-bold text-orange-400 mb-2">100+</div>
+              <p class="text-gray-300">Features</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <script src="/footer.js"></script>
+
+    <script>
+      // Phone tilt and scroll responsive wallpaper
+      let ticking = false;
+      let lastScrollY = 0;
+      let lastTiltX = 0;
+      let lastTiltY = 0;
+
+      function updateWallpaper() {
+        const wallpaper = document.getElementById("wallpaper");
+        const scrollY = window.scrollY;
+        const tiltX = window.orientation ? Math.abs(window.orientation) : 0;
+        const tiltY = window.deviceOrientation ? Math.abs(window.deviceOrientation.beta) : 0;
+
+        // Calculate scroll-based transform
+        const scrollDelta = scrollY - lastScrollY;
+        const scrollTransform = `translateY(${scrollY * 0.5}px)`;
+
+        // Calculate tilt-based transform
+        const tiltTransform = `rotateX(${tiltY * 0.1}deg) rotateY(${tiltX * 0.1}deg)`;
+
+        // Combine transforms
+        wallpaper.style.transform = `${scrollTransform} ${tiltTransform}`;
+
+        lastScrollY = scrollY;
+        lastTiltX = tiltX;
+        lastTiltY = tiltY;
+      }
+
+      // Throttled scroll handler
+      function requestTick() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateWallpaper);
+          ticking = true;
+        }
+      }
+
+      function onScroll() {
+        requestTick();
+      }
+
+      function onOrientationChange() {
+        requestTick();
+      }
+
+      // Add event listeners
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("deviceorientation", onOrientationChange);
+      window.addEventListener("orientationchange", onOrientationChange);
+
+      // Scroll reveal animation
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".scroll-reveal").forEach((el) => {
+        observer.observe(el);
+      });
+
+      // Auto-populating content
+      function updateDailyContent() {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const dayOfMonth = today.getDate();
+
+        // Dynamic content based on day
+        const dailyTips = [
+          "Use voice commands to create stunning websites in seconds",
+          "Optimize your SEO with our AI-powered tools",
+          "Collaborate in real-time with your team",
+          "Generate engaging content automatically",
+          "Monitor performance with advanced analytics",
+          "Deploy with confidence using our rollback system",
+        ];
+
+        const tipIndex = dayOfMonth % dailyTips.length;
+        const dailyTip = dailyTips[tipIndex];
+
+        // Update any elements with daily-tip class
+        document.querySelectorAll(".daily-tip").forEach((el) => {
+          el.textContent = dailyTip;
+        });
+      }
+
+      // Update content daily
+      updateDailyContent();
+      setInterval(updateDailyContent, 24 * 60 * 60 * 1000); // Update daily
+    </script>
+  </body>
+</html>

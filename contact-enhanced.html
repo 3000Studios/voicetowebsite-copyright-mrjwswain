@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact VoiceToWebsite - Get in Touch</title>
+    <meta
+      name="description"
+      content="Contact the VoiceToWebsite team. Get support, ask questions, or start a conversation about AI-powered web development."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/src/styles/adsense-optimized.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .contact-wallpaper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, #1e3c72 0%, #2a5298 25%, #7e22ce 50%, #c026d3 75%, #1e3c72 100%);
+        background-size: 400% 400%;
+        animation: contactGradient 20s ease infinite;
+        z-index: -2;
+      }
+
+      @keyframes contactGradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .contact-particles {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        animation: particleFloat 15s infinite linear;
+      }
+
+      @keyframes particleFloat {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      .contact-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        animation: slideInUp 0.8s ease-out;
+      }
+
+      .contact-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .form-input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 12px 16px;
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #7e22ce;
+        box-shadow: 0 0 20px rgba(126, 34, 206, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .submit-btn {
+        background: linear-gradient(135deg, #7e22ce, #c026d3);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 28px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(126, 34, 206, 0.4);
+      }
+
+      .submit-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .submit-btn:hover::before {
+        left: 100%;
+      }
+
+      .contact-method {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .contact-method:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+      }
+
+      .scroll-reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-white">
+    <!-- Unique Contact Page Wallpaper -->
+    <div class="contact-wallpaper"></div>
+    <div class="contact-particles">
+      <div class="particle" style="left: 10%; animation-delay: 0s"></div>
+      <div class="particle" style="left: 20%; animation-delay: 1s"></div>
+      <div class="particle" style="left: 30%; animation-delay: 2s"></div>
+      <div class="particle" style="left: 40%; animation-delay: 3s"></div>
+      <div class="particle" style="left: 50%; animation-delay: 4s"></div>
+      <div class="particle" style="left: 60%; animation-delay: 5s"></div>
+      <div class="particle" style="left: 70%; animation-delay: 6s"></div>
+      <div class="particle" style="left: 80%; animation-delay: 7s"></div>
+      <div class="particle" style="left: 90%; animation-delay: 8s"></div>
+    </div>
+
+    <!-- Navigation -->
+    <script src="/nav.js"></script>
+
+    <!-- Main Content -->
+    <main class="relative z-10 container mx-auto px-6 py-20">
+      <!-- Hero Section -->
+      <section class="text-center mb-20 scroll-reveal">
+        <h1
+          class="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent"
+        >
+          Get in Touch
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+          Have questions? Need support? Ready to start your AI-powered web development journey? We're here to help!
+        </p>
+
+        <!-- Hero Video -->
+        <div class="rounded-2xl overflow-hidden mb-12 shadow-2xl max-w-4xl mx-auto">
+          <video autoplay muted loop class="w-full h-auto">
+            <source
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- Contact Methods -->
+      <section class="mb-20 scroll-reveal">
+        <h2 class="text-4xl font-bold mb-12 text-center">How to Reach Us</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="contact-method text-center">
+            <div class="text-5xl mb-4">📧</div>
+            <h3 class="text-xl font-semibold mb-3">Email Support</h3>
+            <p class="text-gray-300 mb-4">Get help within 24 hours</p>
+            <a href="mailto:support@voicetowebsite.com" class="text-blue-400 hover:text-blue-300 transition-colors">
+              support@voicetowebsite.com
+            </a>
+          </div>
+          <div class="contact-method text-center">
+            <div class="text-5xl mb-4">💬</div>
+            <h3 class="text-xl font-semibold mb-3">Live Chat</h3>
+            <p class="text-gray-300 mb-4">Instant support during business hours</p>
+            <button class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-full transition-colors">Start Chat</button>
+          </div>
+          <div class="contact-method text-center">
+            <div class="text-5xl mb-4">🎤</div>
+            <h3 class="text-xl font-semibold mb-3">Voice Support</h3>
+            <p class="text-gray-300 mb-4">Speak directly with our AI assistant</p>
+            <button class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-full transition-colors">
+              Voice Call
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Form -->
+      <section class="mb-20 scroll-reveal">
+        <div class="contact-card max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Send us a Message</h2>
+          <form class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-gray-300 mb-2">First Name</label>
+              <input type="text" class="form-input w-full" placeholder="John" required />
+            </div>
+            <div>
+              <label class="block text-gray-300 mb-2">Last Name</label>
+              <input type="text" class="form-input w-full" placeholder="Doe" required />
+            </div>
+            <div>
+              <label class="block text-gray-300 mb-2">Email Address</label>
+              <input type="email" class="form-input w-full" placeholder="john@example.com" required />
+            </div>
+            <div>
+              <label class="block text-gray-300 mb-2">Phone Number</label>
+              <input type="tel" class="form-input w-full" placeholder="+1 (555) 123-4567" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-gray-300 mb-2">Subject</label>
+              <select class="form-input w-full">
+                <option>General Inquiry</option>
+                <option>Technical Support</option>
+                <option>Billing Question</option>
+                <option>Feature Request</option>
+                <option>Partnership Opportunity</option>
+                <option>Press Inquiry</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-gray-300 mb-2">Message</label>
+              <textarea class="form-input w-full" rows="6" placeholder="Tell us how we can help..." required></textarea>
+            </div>
+            <div class="md:col-span-2 text-center mt-6">
+              <button type="submit" class="submit-btn text-lg">Send Message</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Office Locations -->
+      <section class="mb-20 scroll-reveal">
+        <h2 class="text-4xl font-bold mb-12 text-center">Global Presence</h2>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="contact-card">
+            <h3 class="text-2xl font-semibold mb-4">Headquarters</h3>
+            <img
+              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=400&fit=crop"
+              alt="Headquarters"
+              class="rounded-xl w-full mb-4"
+            />
+            <p class="text-gray-300 mb-2">📍 San Francisco, CA</p>
+            <p class="text-gray-300 mb-2">🏢 1234 Tech Street</p>
+            <p class="text-gray-300 mb-2">🕒 Mon-Fri 9AM-6PM PST</p>
+            <p class="text-gray-300">🌐 Serving customers worldwide</p>
+          </div>
+          <div class="contact-card">
+            <h3 class="text-2xl font-semibold mb-4">European Office</h3>
+            <img
+              src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=600&h=400&fit=crop"
+              alt="European Office"
+              class="rounded-xl w-full mb-4"
+            />
+            <p class="text-gray-300 mb-2">📍 London, UK</p>
+            <p class="text-gray-300 mb-2">🏢 567 Innovation Road</p>
+            <p class="text-gray-300 mb-2">🕒 Mon-Fri 9AM-5PM GMT</p>
+            <p class="text-gray-300">🌐 EMEA Support Center</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="mb-20 scroll-reveal">
+        <div class="contact-card max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+          <div class="space-y-6">
+            <div class="border-b border-gray-600 pb-4">
+              <h3 class="text-xl font-semibold mb-2">How quickly can I build a website?</h3>
+              <p class="text-gray-300">
+                Most users can create a fully functional website in under 5 minutes using our voice commands.
+              </p>
+            </div>
+            <div class="border-b border-gray-600 pb-4">
+              <h3 class="text-xl font-semibold mb-2">Do I need coding experience?</h3>
+              <p class="text-gray-300">
+                No! VoiceToWebsite is designed for everyone, from complete beginners to professional developers.
+              </p>
+            </div>
+            <div class="border-b border-gray-600 pb-4">
+              <h3 class="text-xl font-semibold mb-2">What's included in the free plan?</h3>
+              <p class="text-gray-300">
+                The free plan includes up to 3 websites, basic templates, and community support.
+              </p>
+            </div>
+            <div class="pb-4">
+              <h3 class="text-xl font-semibold mb-2">Can I export my websites?</h3>
+              <p class="text-gray-300">
+                Yes! You can export your websites as code, static files, or deploy to any hosting provider.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Social Media -->
+      <section class="text-center scroll-reveal">
+        <div class="contact-card max-w-2xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8">Follow Our Journey</h2>
+          <div class="flex justify-center space-x-6">
+            <a href="/contact" class="text-4xl hover:scale-110 transition-transform">📘</a>
+            <a href="/contact" class="text-4xl hover:scale-110 transition-transform">🐦</a>
+            <a href="/contact" class="text-4xl hover:scale-110 transition-transform">📷</a>
+            <a href="/contact" class="text-4xl hover:scale-110 transition-transform">💼</a>
+            <a href="/contact" class="text-4xl hover:scale-110 transition-transform">🎥</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <script src="/footer.js"></script>
+
+    <script>
+      // Scroll reveal animation
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".scroll-reveal").forEach((el) => {
+        observer.observe(el);
+      });
+
+      // Form submission
+      document.querySelector("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        alert("Thank you for your message! We will get back to you within 24 hours.");
+      });
+    </script>
+  </body>
+</html>

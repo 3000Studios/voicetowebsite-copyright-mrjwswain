@@ -1,5 +1,6 @@
-import React from "react";
 import { motion } from "framer-motion";
+import React from "react";
+import { Link } from "react-router-dom";
 
 const GlobalFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -110,13 +111,14 @@ const GlobalFooter: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.slice(0, 5).map((link) => (
                 <li key={link.name}>
-                  <motion.a
-                    href={link.href}
-                    className="text-slate-300 hover:text-white transition-colors"
-                    whileHover={{ x: 5 }}
-                  >
-                    {link.name}
-                  </motion.a>
+                  <motion.div whileHover={{ x: 5 }}>
+                    <Link
+                      to={link.href}
+                      className="text-slate-300 hover:text-white transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
                 </li>
               ))}
             </ul>
@@ -132,16 +134,17 @@ const GlobalFooter: React.FC = () => {
             <ul className="space-y-2">
               {appCategories.map((category) => (
                 <li key={category.name}>
-                  <motion.a
-                    href={`/apps/category/${category.name.toLowerCase()}`}
-                    className="text-slate-300 hover:text-white transition-colors flex justify-between"
-                    whileHover={{ x: 5 }}
-                  >
-                    <span>{category.name}</span>
-                    <span className="text-xs bg-slate-700 px-2 py-1 rounded-full">
-                      {category.count}
-                    </span>
-                  </motion.a>
+                  <motion.div whileHover={{ x: 5 }}>
+                    <Link
+                      to={`/apps/category/${category.name.toLowerCase()}`}
+                      className="text-slate-300 hover:text-white transition-colors flex justify-between"
+                    >
+                      <span>{category.name}</span>
+                      <span className="text-xs bg-slate-700 px-2 py-1 rounded-full">
+                        {category.count}
+                      </span>
+                    </Link>
+                  </motion.div>
                 </li>
               ))}
             </ul>
@@ -157,13 +160,14 @@ const GlobalFooter: React.FC = () => {
             <ul className="space-y-2">
               {footerLinks.slice(5).map((link) => (
                 <li key={link.name}>
-                  <motion.a
-                    href={link.href}
-                    className="text-slate-300 hover:text-white transition-colors"
-                    whileHover={{ x: 5 }}
-                  >
-                    {link.name}
-                  </motion.a>
+                  <motion.div whileHover={{ x: 5 }}>
+                    <Link
+                      to={link.href}
+                      className="text-slate-300 hover:text-white transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
                 </li>
               ))}
             </ul>

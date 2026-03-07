@@ -1,6 +1,10 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
+import BlogPage from "./pages/BlogPage";
+import CategoryPage from "./pages/CategoryPage";
+import GenericContentPage from "./pages/GenericContentPage";
 import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
 import { escapeHtml } from "./utils/htmlSanitizer";
@@ -113,12 +117,12 @@ const CONTENT_GUIDES: ContentGuide[] = [
     ],
   },
   {
-    title: "Monetization quality controls",
+    title: "Quality controls",
     summary:
-      "Revenue actions are evaluated alongside user experience signals so performance gains do not degrade readability or trust.",
+      "Placement and CTAs are evaluated alongside user experience so layout stays readable and trustworthy.",
     bullets: [
       "Measured CTA placement and low-friction funnels.",
-      "Traffic source + intent alignment checks.",
+      "Traffic and intent alignment checks.",
       "Analytics-backed iteration with audit trails.",
     ],
   },
@@ -133,12 +137,12 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Can I control ad density?",
     answer:
-      "Yes. The admin monetization controls enforce density caps and keep placements within a predictable, reviewable structure.",
+      "Yes. Placement controls enforce density caps and keep layouts predictable and reviewable.",
   },
   {
-    question: "How is dashboard revenue calculated?",
+    question: "How are dashboard metrics calculated?",
     answer:
-      "Dashboard metrics are computed from observed orders, sessions, and trailing windows with explicit formulas for AOV, conversion, RPM, and run-rate projections.",
+      "Dashboard metrics are computed from orders, sessions, and trailing windows with clear formulas for conversion and engagement.",
   },
 ];
 
@@ -246,7 +250,7 @@ const EnhancedTypography = () => (
   </section>
 );
 
-const App: React.FC = () => {
+const HomeView: React.FC = () => {
   const reduceMotion = useReducedMotion();
   const heroHeadline =
     siteConfig?.copy?.headline?.trim() ||
@@ -607,7 +611,7 @@ const App: React.FC = () => {
       const search = new URLSearchParams({
         utm_source: source,
         utm_medium: "website",
-        utm_campaign: "revenue_max",
+        utm_campaign: "website",
       });
       Object.entries(params).forEach(([key, value]) => {
         if (!value) return;
@@ -697,8 +701,8 @@ const App: React.FC = () => {
 
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_TOP"
-            title="Top-of-page monetization zone"
-            description="Editorial content appears before and after this block to keep user intent, readability, and ad density aligned."
+            title="Top placement"
+            description="Editorial content appears before and after this block to keep layout and readability aligned."
           />
 
           <section className="mb-20 grid gap-6 lg:grid-cols-[1.35fr_1fr]">
@@ -713,7 +717,7 @@ const App: React.FC = () => {
                 VoiceToWebsite generates and refines structured, useful content
                 so each page can pass quality review with clear navigation,
                 policy visibility, and meaningful editorial depth. The system
-                prioritizes user intent first, then monetization placement.
+                prioritizes user intent first, then placement and structure.
               </p>
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -734,10 +738,10 @@ const App: React.FC = () => {
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
-                    Revenue signal
+                    Conversion signal
                   </p>
                   <p className="mt-2 font-inter text-sm text-white/80">
-                    Monetization surfaces are measurable and configurable.
+                    Placements and conversions are measurable and configurable.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -764,13 +768,13 @@ const App: React.FC = () => {
               </p>
               <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {AD_COMPLIANCE_LINKS.map((item) => (
-                  <a
+                  <Link
                     key={item.href}
-                    href={item.href}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-outfit text-xs tracking-[0.14em] text-white/70 uppercase hover:text-white hover:border-emerald-300/45 transition-colors"
+                    to={item.href}
+                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-outfit text-xs tracking-[0.14em] text-white/70 uppercase hover:text-white hover:border-emerald-300/45 transition-colors vtw-card-hover block text-center"
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </aside>
@@ -1006,7 +1010,7 @@ const App: React.FC = () => {
                 Content engine
               </p>
               <h2 className="mt-3 font-outfit text-4xl md:text-6xl font-black">
-                Built for readers, crawlers, and monetization reviewers.
+                Built for readers, crawlers, and quality review.
               </h2>
               <p className="mt-4 max-w-3xl mx-auto font-inter text-white/70">
                 Each page module is written to be useful by itself, connected to
@@ -1018,7 +1022,7 @@ const App: React.FC = () => {
               {CONTENT_GUIDES.map((guide) => (
                 <article
                   key={guide.title}
-                  className="rounded-3xl border border-white/12 bg-white/[0.03] p-6"
+                  className="vtw-card-hover rounded-3xl border border-white/12 bg-white/[0.03] p-6"
                 >
                   <h3 className="font-outfit text-xl font-bold">
                     {guide.title}
@@ -1044,8 +1048,8 @@ const App: React.FC = () => {
 
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_MID"
-            title="Mid-content monetization zone"
-            description="Placed between substantial editorial sections to preserve policy-friendly content-to-ad balance."
+            title="Mid-content placement"
+            description="Placed between substantial editorial sections to preserve a balanced layout."
           />
 
           {/* Enhanced Typography Section */}
@@ -1166,8 +1170,8 @@ const App: React.FC = () => {
 
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_BOTTOM"
-            title="Post-pricing monetization zone"
-            description="A lower-page ad area for users who reviewed pricing and continue exploring long-form content."
+            title="Lower-page placement"
+            description="A lower-page area for users who reviewed pricing and continue exploring content."
           />
 
           <section className="mt-16 rounded-3xl border border-white/15 bg-black/45 p-6 md:p-8">
@@ -1191,7 +1195,7 @@ const App: React.FC = () => {
               {FAQ_ITEMS.map((item) => (
                 <article
                   key={item.question}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                  className="vtw-card-hover rounded-2xl border border-white/10 bg-white/[0.03] p-4"
                 >
                   <h3 className="font-outfit text-base font-semibold">
                     {item.question}
@@ -1215,5 +1219,18 @@ const App: React.FC = () => {
     </ErrorBoundary>
   );
 };
+
+const App: React.FC = () => (
+  <ErrorBoundary>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomeView />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/apps/category/:name" element={<CategoryPage />} />
+        <Route path="/:slug" element={<GenericContentPage />} />
+      </Routes>
+    </BrowserRouter>
+  </ErrorBoundary>
+);
 
 export default App;

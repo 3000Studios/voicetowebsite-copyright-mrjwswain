@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search VoiceToWebsite - Find Everything</title>
+    <meta
+      name="description"
+      content="Search through VoiceToWebsite's entire ecosystem of apps, documentation, and resources."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/src/styles/adsense-optimized.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .search-wallpaper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0f0c29 0%, #302b63 25%, #24243e 50%, #302b63 75%, #0f0c29 100%);
+        background-size: 400% 400%;
+        animation: searchGradient 25s ease infinite;
+        z-index: -2;
+      }
+
+      @keyframes searchGradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .search-grid {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: gridMove 10s linear infinite;
+      }
+
+      @keyframes gridMove {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(50px, 50px);
+        }
+      }
+
+      .search-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        animation: slideInUp 0.8s ease-out;
+      }
+
+      .search-container:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .search-input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 16px 20px;
+        color: white;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+        width: 100%;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #302b63;
+        box-shadow: 0 0 30px rgba(48, 43, 99, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .result-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .result-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .category-tag {
+        background: linear-gradient(135deg, #302b63, #24243e);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .highlight {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #000;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+      }
+
+      .scroll-reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-white">
+    <!-- Unique Search Page Wallpaper -->
+    <div class="search-wallpaper"></div>
+    <div class="search-grid"></div>
+
+    <!-- Navigation -->
+    <script src="/nav.js"></script>
+
+    <!-- Main Content -->
+    <main class="relative z-10 container mx-auto px-6 py-20">
+      <!-- Search Hero -->
+      <section class="text-center mb-20 scroll-reveal">
+        <h1
+          class="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-600 bg-clip-text text-transparent"
+        >
+          Search Everything
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+          Find apps, documentation, tutorials, and resources across the entire VoiceToWebsite ecosystem
+        </p>
+
+        <!-- Search Video -->
+        <div class="rounded-2xl overflow-hidden mb-12 shadow-2xl max-w-4xl mx-auto">
+          <video autoplay muted loop class="w-full h-auto">
+            <source
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- Search Interface -->
+      <section class="mb-20 scroll-reveal">
+        <div class="search-container max-w-4xl mx-auto">
+          <div class="flex flex-col md:flex-row gap-4 mb-8">
+            <input
+              type="text"
+              class="search-input flex-1"
+              placeholder="Search for apps, features, documentation..."
+              id="searchInput"
+              autocomplete="off"
+            />
+            <button
+              class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:scale-105 transition-transform"
+              onclick="performSearch()"
+            >
+              🔍 Search
+            </button>
+          </div>
+
+          <!-- Quick Filters -->
+          <div class="flex flex-wrap gap-3 justify-center mb-8">
+            <span class="category-tag cursor-pointer" onclick="filterByCategory('apps')">📱 Apps</span>
+            <span class="category-tag cursor-pointer" onclick="filterByCategory('docs')">📚 Documentation</span>
+            <span class="category-tag cursor-pointer" onclick="filterByCategory('tutorials')">🎓 Tutorials</span>
+            <span class="category-tag cursor-pointer" onclick="filterByCategory('templates')">🎨 Templates</span>
+            <span class="category-tag cursor-pointer" onclick="filterByCategory('api')">⚡ API</span>
+            <span class="category-tag cursor-pointer" onclick="filterByCategory('blog')">📝 Blog</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search Results -->
+      <section class="mb-20 scroll-reveal">
+        <div id="searchResults" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Results will be populated here -->
+        </div>
+      </section>
+
+      <!-- Popular Searches -->
+      <section class="mb-20 scroll-reveal">
+        <div class="search-container max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Popular Searches</h2>
+          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="result-card" onclick="quickSearch('AI Logo Designer')">
+              <h3 class="text-xl font-semibold mb-2">🎨 AI Logo Designer</h3>
+              <p class="text-gray-300 mb-3">Create professional logos with AI</p>
+              <span class="category-tag">App</span>
+            </div>
+            <div class="result-card" onclick="quickSearch('Voice Commands')">
+              <h3 class="text-xl font-semibold mb-2">🎤 Voice Commands</h3>
+              <p class="text-gray-300 mb-3">Complete voice command reference</p>
+              <span class="category-tag">Documentation</span>
+            </div>
+            <div class="result-card" onclick="quickSearch('Payment Integration')">
+              <h3 class="text-xl font-semibold mb-2">💳 Payment Integration</h3>
+              <p class="text-gray-300 mb-3">Stripe and PayPal setup guides</p>
+              <span class="category-tag">Tutorial</span>
+            </div>
+            <div class="result-card" onclick="quickSearch('API Reference')">
+              <h3 class="text-xl font-semibold mb-2">⚡ API Reference</h3>
+              <p class="text-gray-300 mb-3">Complete API documentation</p>
+              <span class="category-tag">API</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Activity -->
+      <section class="mb-20 scroll-reveal">
+        <div class="search-container max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Recent Activity</h2>
+          <div class="space-y-4">
+            <div class="result-card flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=80&h=80&fit=crop"
+                alt="App"
+                class="w-16 h-16 rounded-lg"
+              />
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold mb-1">New App: AI Content Generator</h3>
+                <p class="text-gray-300">Generate blog posts and marketing copy with AI</p>
+              </div>
+              <span class="category-tag">New</span>
+            </div>
+            <div class="result-card flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1461749280684-dccba630e2f9?w=80&h=80&fit=crop"
+                alt="Tutorial"
+                class="w-16 h-16 rounded-lg"
+              />
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold mb-1">Tutorial: Advanced Voice Commands</h3>
+                <p class="text-gray-300">Master complex voice control techniques</p>
+              </div>
+              <span class="category-tag">Tutorial</span>
+            </div>
+            <div class="result-card flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1555066931-41318d063f33?w=80&h=80&fit=crop"
+                alt="Update"
+                class="w-16 h-16 rounded-lg"
+              />
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold mb-1">API v2.0 Released</h3>
+                <p class="text-gray-300">Enhanced endpoints and better performance</p>
+              </div>
+              <span class="category-tag">API</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Help Section -->
+      <section class="text-center scroll-reveal">
+        <div class="search-container max-w-2xl mx-auto">
+          <h2 class="text-3xl font-bold mb-6">Can't find what you're looking for?</h2>
+          <p class="text-lg text-gray-200 mb-8">Our team is here to help you find exactly what you need</p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/contact-enhanced"
+              class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 transition-transform"
+            >
+              💬 Contact Support
+            </a>
+            <a
+              href="/blog"
+              class="border-2 border-purple-500 text-purple-300 px-8 py-4 rounded-full font-semibold text-lg hover:bg-purple-500 hover:text-white transition-all"
+            >
+              📝 Browse Blog
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <script src="/footer.js"></script>
+
+    <script>
+      // Sample search data
+      const searchData = [
+        {
+          title: "AI Logo Designer",
+          category: "App",
+          description: "Create professional logos with AI",
+          url: "/appstore-new",
+          image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&h=200&fit=crop",
+        },
+        {
+          title: "Voice Commands Guide",
+          category: "Documentation",
+          description: "Complete voice command reference",
+          url: "/admin/voice-commands.html",
+          image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f9?w=200&h=200&fit=crop",
+        },
+        {
+          title: "Payment Integration",
+          category: "Tutorial",
+          description: "Stripe and PayPal setup guides",
+          url: "/blog",
+          image: "https://images.unsplash.com/photo-1556742049-0cfed4f18a8d?w=200&h=200&fit=crop",
+        },
+        {
+          title: "API Reference",
+          category: "API",
+          description: "Complete API documentation",
+          url: "/api-documentation",
+          image: "https://images.unsplash.com/photo-1555066931-41318d063f33?w=200&h=200&fit=crop",
+        },
+        {
+          title: "Video Editor Pro",
+          category: "App",
+          description: "Professional video editing tools",
+          url: "/src/apps/video-editor.html",
+          image: "https://images.unsplash.com/photo-1611162617474-5b21a824f321?w=200&h=200&fit=crop",
+        },
+        {
+          title: "CRM System",
+          category: "App",
+          description: "Customer relationship management",
+          url: "/src/apps/crm-system.html",
+          image: "https://images.unsplash.com/photo-1551434675678-e076c223a692?w=200&h=200&fit=crop",
+        },
+        {
+          title: "Getting Started",
+          category: "Tutorial",
+          description: "Quick start guide for beginners",
+          url: "/how-it-works",
+          image: "https://images.unsplash.com/photo-1521791136064-e7cd1e6b8d5c?w=200&h=200&fit=crop",
+        },
+        {
+          title: "Design System",
+          category: "Documentation",
+          description: "Complete design system reference",
+          url: "/strata-design-system",
+          image: "https://images.unsplash.com/photo-1542831371-66b5fe1c6ec9?w=200&h=200&fit=crop",
+        },
+      ];
+
+      let currentFilter = "all";
+
+      function performSearch() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const results = searchData.filter(
+          (item) =>
+            item.title.toLowerCase().includes(query) ||
+            item.description.toLowerCase().includes(query) ||
+            (currentFilter !== "all" && item.category.toLowerCase() === currentFilter)
+        );
+        displayResults(results);
+      }
+
+      function filterByCategory(category) {
+        currentFilter = category.toLowerCase();
+        performSearch();
+      }
+
+      function quickSearch(query) {
+        document.getElementById("searchInput").value = query;
+        performSearch();
+      }
+
+      function displayResults(results) {
+        const resultsContainer = document.getElementById("searchResults");
+
+        if (results.length === 0) {
+          resultsContainer.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="text-6xl mb-4">🔍</div>
+                        <h3 class="text-2xl font-semibold mb-2">No results found</h3>
+                        <p class="text-gray-300">Try different keywords or browse our categories</p>
+                    </div>
+                `;
+          return;
+        }
+
+        resultsContainer.innerHTML = results
+          .map(
+            (result) => `
+                <div class="result-card" onclick="window.location.href='${result.url}'">
+                    <img src="${result.image}" alt="${result.title}" class="w-full h-32 object-cover rounded-lg mb-4">
+                    <h3 class="text-xl font-semibold mb-2">${highlightMatch(result.title)}</h3>
+                    <p class="text-gray-300 mb-3">${highlightMatch(result.description)}</p>
+                    <span class="category-tag">${result.category}</span>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function highlightMatch(text) {
+        const query = document.getElementById("searchInput").value;
+        if (!query) return text;
+        const regex = new RegExp(`(${query})`, "gi");
+        return text.replace(regex, '<span class="highlight">$1</span>');
+      }
+
+      // Initialize with all results
+      displayResults(searchData);
+
+      // Scroll reveal animation
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".scroll-reveal").forEach((el) => {
+        observer.observe(el);
+      });
+
+      // Search on enter key
+      document.getElementById("searchInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          performSearch();
+        }
+      });
+    </script>
+  </body>
+</html>

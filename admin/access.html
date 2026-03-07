@@ -376,12 +376,12 @@
             throw new Error(result.error || "Access denied");
           }
 
-          // Success transition and redirect to admin.
+          // Success transition and redirect to dashboard (avoid /admin/ redirect loop).
           markAdminSession();
           accessButton.disabled = true;
           accessCard?.classList.add("success");
           window.setTimeout(() => {
-            window.location.href = "/admin/";
+            window.location.href = "/admin/integrated-dashboard.html";
           }, 260);
         } catch (error) {
           clearAdminSession();
@@ -396,12 +396,12 @@
         }
       });
 
-      // If already authenticated, go straight to admin.
+      // If already authenticated, go straight to dashboard (do not redirect to /admin/ to avoid worker redirect loop).
       fetch("/api/config/status", { credentials: "include" })
         .then((res) => {
           if (res.ok) {
             markAdminSession();
-            window.location.href = "/admin/";
+            window.location.href = "/admin/integrated-dashboard.html";
           }
         })
         .catch(() => {});

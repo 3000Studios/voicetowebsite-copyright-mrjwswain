@@ -1,5 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { SHARED_NAV_ITEMS } from "../constants/navigation";
+
+/** True if link should open in same tab as full page (admin or .html), not SPA */
+const isAdminOrStatic = (href: string) =>
+  href.startsWith("/admin") || href.includes(".html");
+
+/** Shuffled delays for letter spin (fixed order so no hydration mismatch) */
+const LETTER_DELAYS = [
+  0, 1.1, 0.3, 0.8, 1.6, 0.2, 1.4, 0.5, 1.0, 0.7, 1.3, 0.1, 1.5, 0.4, 0.9, 1.2,
+  0.6,
+];
+const LETTER_DURATIONS = [
+  2.2, 2.8, 2.5, 3.0, 2.3, 2.9, 2.4, 3.1, 2.6, 2.7, 2.1, 3.2, 2.0, 2.5, 2.8,
+  2.3, 2.6,
+];
 
 interface EnhancedHamburgerNavProps {
   isAdminAuthenticated?: boolean;
@@ -12,6 +27,7 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
   onAdminLogin,
   onAdminLogout,
 }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -98,11 +114,12 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
 
   const handleNavClick = (
     href: string,
-    requiresAuth = false,
-    e?: React.MouseEvent<HTMLAnchorElement>
+    requiresAuth: boolean,
+    e: React.MouseEvent,
+    isInternal: boolean
   ) => {
-    if (requiresAuth && !isAdminAuthenticated) {
-      // Show admin access code prompt
+    if (requiresAuth && !isAdminAuthenticated && isAdminOrStatic(href)) {
+      e.preventDefault();
       const code = prompt("Enter admin access code:");
       if (code === "ADMIN_ACCESS_2024" || code === "UNLOCK_ADMIN_123") {
         onAdminLogin?.();
@@ -113,17 +130,23 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
       return;
     }
 
-    // Play sizzle and melt effect
     playSizzle();
-
-    // Add melt effect to clicked link
     const target = e?.currentTarget as HTMLElement;
     if (target) {
       target.classList.add("vtw-phosphor-melting");
+    }
+
+    if (isInternal) {
       setTimeout(() => {
-        target.classList.remove("vtw-phosphor-melting");
+        target?.classList.remove("vtw-phosphor-melting");
+        setIsOpen(false);
+        navigate(href);
+      }, 400);
+    } else {
+      setTimeout(() => {
+        target?.classList.remove("vtw-phosphor-melting");
         window.location.href = href;
-      }, 800);
+      }, 400);
     }
   };
 
@@ -167,26 +190,33 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
         }}
       />
 
-      {/* Hamburger Menu */}
-      <div className="fixed top-6 right-6 z-[2000] flex items-center gap-4">
+      {/* Hamburger: VOICETOWEBSITE.COM (3D, letter-spin) + animated 3 lines */}
+      <div className="fixed top-6 right-6 z-[2000] flex items-center gap-3">
+        <span className="vtw-hamburger-brand" aria-hidden="true">
+          {"VOICETOWEBSITE.COM".split("").map((char, i) => (
+            <span
+              key={`${i}-${char}`}
+              className="vtw-hamburger-letter"
+              style={{
+                animationDelay: `${LETTER_DELAYS[i % LETTER_DELAYS.length]}s`,
+                animationDuration: `${LETTER_DURATIONS[i % LETTER_DURATIONS.length]}s`,
+              }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </span>
+          ))}
+        </span>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="relative z-[2001] group"
+          className="relative z-[2001] group vtw-hamburger-btn"
           aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={isOpen}
         >
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-cyan-400 font-mono text-xs tracking-widest uppercase opacity-80 group-hover:opacity-100 transition-opacity">
-              Voicetowebsite.com
-            </span>
-            <div className="relative">
-              <div className="w-8 h-0.5 bg-gradient-to-r from-cyan-400 to-pink-400 group-hover:from-pink-400 group-hover:to-cyan-400 transition-all duration-300" />
-              <div className="absolute inset-0 flex flex-col justify-between">
-                <div className="w-0.5 h-3 bg-cyan-400 group-hover:bg-pink-400 transition-all duration-300 origin-top" />
-                <div className="w-0.5 h-3 bg-cyan-400 group-hover:bg-pink-400 transition-all duration-300 origin-bottom" />
-              </div>
-            </div>
+          <div className="vtw-hamburger-lines">
+            <span className="vtw-hamburger-line vtw-hamburger-line-1" />
+            <span className="vtw-hamburger-line vtw-hamburger-line-2" />
+            <span className="vtw-hamburger-line vtw-hamburger-line-3" />
           </div>
         </button>
       </div>
@@ -217,31 +247,65 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
           >
             <ul className="text-center space-y-8 p-8">
               {/* Main Navigation */}
-              {SHARED_NAV_ITEMS.map((item, index) => (
-                <li
-                  key={item.label}
-                  className="transform transition-all duration-500 hover:scale-110"
-                >
-                  <a
-                    href={item.href}
-                    className={`block text-4xl md:text-6xl font-mono tracking-wider uppercase transition-all duration-300 ${
-                      index % 2 === 0 ? "text-cyan-400" : "text-pink-400"
-                    } hover:text-white hover:scale-125`}
-                    style={{
-                      textShadow: `0 0 20px currentColor`,
-                      WebkitTextStroke: "1px rgba(255,255,255,0.3)",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                    data-text={item.label.toUpperCase().replace(/\s+/g, "_")}
-                    onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                      e.preventDefault();
-                      handleNavClick(item.href, item.requiresAuth || false);
-                    }}
+              {SHARED_NAV_ITEMS.map((item, index) => {
+                const isInternal = !isAdminOrStatic(item.href);
+                const linkClass = `block text-4xl md:text-6xl font-mono tracking-wider uppercase transition-all duration-300 vtw-hamburger-link ${
+                  index % 2 === 0 ? "text-cyan-400" : "text-pink-400"
+                } hover:text-white hover:scale-125`;
+                const style = {
+                  textShadow: "0 0 20px currentColor",
+                  WebkitTextStroke: "1px rgba(255,255,255,0.3)",
+                  WebkitTextFillColor: "transparent",
+                };
+                return (
+                  <li
+                    key={`${item.href}-${item.label}`}
+                    className="transform transition-all duration-500 hover:scale-110"
                   >
-                    {item.label.toUpperCase().replace(/_/g, " ")}
-                  </a>
-                </li>
-              ))}
+                    {isInternal ? (
+                      <Link
+                        to={item.href}
+                        className={linkClass}
+                        style={style}
+                        data-text={item.label
+                          .toUpperCase()
+                          .replace(/\s+/g, "_")}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavClick(
+                            item.href,
+                            item.requiresAuth ?? false,
+                            e,
+                            true
+                          );
+                        }}
+                      >
+                        {item.label.toUpperCase().replace(/_/g, " ")}
+                      </Link>
+                    ) : (
+                      <a
+                        href={item.href}
+                        className={linkClass}
+                        style={style}
+                        data-text={item.label
+                          .toUpperCase()
+                          .replace(/\s+/g, "_")}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavClick(
+                            item.href,
+                            item.requiresAuth ?? false,
+                            e,
+                            false
+                          );
+                        }}
+                      >
+                        {item.label.toUpperCase().replace(/_/g, " ")}
+                      </a>
+                    )}
+                  </li>
+                );
+              })}
 
               {/* Admin Access */}
               <li className="pt-8 border-t border-cyan-400/30">
@@ -321,16 +385,30 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
                 >
                   ACCESS GRANTED
                 </button>
-                <button
-                  onClick={() => setShowAdminPanel(false)}
-                  className="py-3 px-4 bg-red-600 hover:bg-red-500 text-white font-mono text-sm uppercase transition-colors"
+                <a
+                  href="/admin/login.html"
+                  className="py-3 px-4 bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-sm uppercase transition-colors rounded text-center flex items-center justify-center"
                 >
-                  CANCEL
-                </button>
+                  ADMIN LOGIN PAGE
+                </a>
               </div>
-              <div className="text-xs text-gray-500 text-center">
+              <div className="mt-4 flex justify-center">
+                <a
+                  href="/admin/login.html"
+                  className="text-cyan-400 hover:text-cyan-300 text-sm underline"
+                >
+                  Open Admin Login in new tab
+                </a>
+              </div>
+              <div className="text-xs text-gray-500 text-center mt-2">
                 Access codes: ADMIN_ACCESS_2024, UNLOCK_ADMIN_123
               </div>
+              <button
+                onClick={() => setShowAdminPanel(false)}
+                className="w-full mt-4 py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white font-mono text-sm uppercase transition-colors"
+              >
+                CANCEL
+              </button>
             </div>
           </div>
         </div>

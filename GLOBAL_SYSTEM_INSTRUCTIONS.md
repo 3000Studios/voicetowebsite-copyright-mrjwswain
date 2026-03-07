@@ -102,6 +102,7 @@ Public pages:
 - `/chromewebdata_2026-02-23_22-31-10.report` -> `chromewebdata_2026-02-23_22-31-10.report.html`
 - `/color-synth` -> `color-synth.html`
 - `/comprehensive-footer` -> `comprehensive-footer.html`
+- `/contact-enhanced` -> `contact-enhanced.html`
 - `/contact` -> `contact.html`
 - `/copyrights` -> `copyrights.html`
 - `/cursor-demo` -> `cursor-demo.html`
@@ -110,6 +111,7 @@ Public pages:
 - `/disclosure` -> `disclosure.html`
 - `/enhanced-hamburger-nav` -> `enhanced-hamburger-nav.html`
 - `/enhanced-navigation` -> `enhanced-navigation.html`
+- `/features-enhanced` -> `features-enhanced.html`
 - `/features` -> `features.html`
 - `/focus-timer` -> `focus-timer.html`
 - `/gallery` -> `gallery.html`
@@ -126,6 +128,7 @@ Public pages:
 - `/partners` -> `partners.html`
 - `/paypal-setup` -> `paypal-setup.html`
 - `/phosphor-nav` -> `phosphor-nav.html`
+- `/pricing-enhanced` -> `pricing-enhanced.html`
 - `/pricing` -> `pricing.html`
 - `/privacy` -> `privacy.html`
 - `/project-planning-hub` -> `project-planning-hub.html`
@@ -133,6 +136,7 @@ Public pages:
 - `/referrals` -> `referrals.html`
 - `/rush-percussion` -> `rush-percussion.html`
 - `/sandbox` -> `sandbox.html`
+- `/search-enhanced` -> `search-enhanced.html`
 - `/search` -> `search.html`
 - `/seo-template` -> `seo-template.html`
 - `/status` -> `status.html`

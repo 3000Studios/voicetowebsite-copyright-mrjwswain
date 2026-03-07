@@ -1,22 +1,87 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VoiceToWebsite | Admin Login</title>
-    <meta name="description" content="Secure admin login for VoiceToWebsite command center." />
+    <meta
+      name="description"
+      content="Secure admin login for VoiceToWebsite command center. Access your AI-powered web development dashboard."
+    />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="./admin.css" />
     <link rel="stylesheet" href="./particle-wallpaper.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      .admin-login-wallpaper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f172a 75%, #0f0f23 100%);
+        background-size: 400% 400%;
+        animation: adminLoginGradient 20s ease infinite;
+        z-index: -2;
+      }
+
+      @keyframes adminLoginGradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .admin-particles {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+      }
+
+      .admin-particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: rgba(100, 255, 218, 0.8);
+        border-radius: 50%;
+        animation: adminParticleFloat 15s infinite linear;
+      }
+
+      @keyframes adminParticleFloat {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
       .login-container {
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
         position: relative;
         overflow: hidden;
+        font-family: "Inter", sans-serif;
       }
 
       .login-bg {
@@ -25,70 +90,73 @@
         left: 0;
         right: 0;
         bottom: 0;
-        opacity: 0.1;
+        opacity: 0.15;
         background-image:
-          radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-          radial-gradient(circle at 40% 20%, rgba(255, 219, 98, 0.2) 0%, transparent 50%);
-        animation: float 20s ease-in-out infinite;
+          radial-gradient(circle at 20% 50%, rgba(100, 255, 218, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.2) 0%, transparent 50%);
+        animation: adminFloat 25s ease-in-out infinite;
       }
 
-      @keyframes float {
+      @keyframes adminFloat {
         0%,
         100% {
           transform: translateY(0px) rotate(0deg);
         }
         33% {
-          transform: translateY(-20px) rotate(1deg);
+          transform: translateY(-30px) rotate(2deg);
         }
         66% {
-          transform: translateY(10px) rotate(-1deg);
+          transform: translateY(20px) rotate(-2deg);
         }
       }
 
       .login-card {
-        background: rgba(8, 12, 20, 0.95);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.95);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(100, 255, 218, 0.3);
         border-radius: 24px;
         padding: 3rem;
         width: 100%;
-        max-width: 420px;
-        -webkit-backdrop-filter: blur(20px);
-        backdrop-filter: blur(20px);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        max-width: 480px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
         position: relative;
         z-index: 10;
+        animation: slideInUp 0.8s ease-out;
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px) scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
 
       .login-header {
         text-align: center;
-        margin-bottom: 2rem;
-      }
-
-      .login-logo {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-weight: bold;
-        font-size: 1.5rem;
-        color: white;
+        margin-bottom: 2.5rem;
       }
 
       .login-title {
-        font-size: 1.5rem;
+        font-size: 2rem;
         font-weight: 700;
-        color: #fff;
+        background: linear-gradient(135deg, #64ffda, #9333ea);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         margin-bottom: 0.5rem;
+        font-family: "Inter", sans-serif;
       }
 
       .login-subtitle {
         color: rgba(255, 255, 255, 0.7);
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        font-weight: 400;
       }
 
       .form-group {
@@ -97,358 +165,294 @@
 
       .form-label {
         display: block;
-        margin-bottom: 0.5rem;
         color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
         font-weight: 500;
-        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        font-family: "Inter", sans-serif;
       }
 
       .form-input {
         width: 100%;
-        padding: 0.875rem 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(100, 255, 218, 0.2);
         border-radius: 12px;
-        color: #fff;
+        padding: 1rem 1.25rem;
+        color: white;
         font-size: 1rem;
         transition: all 0.3s ease;
+        font-family: "JetBrains Mono", monospace;
       }
 
       .form-input:focus {
         outline: none;
-        border-color: rgba(102, 126, 234, 0.5);
-        background: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #64ffda;
+        box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+        background: rgba(255, 255, 255, 0.15);
       }
 
       .form-input::placeholder {
-        color: rgba(255, 255, 255, 0.4);
+        color: rgba(255, 255, 255, 0.5);
       }
 
       .login-button {
         width: 100%;
-        padding: 0.875rem 1rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #64ffda, #9333ea);
         border: none;
         border-radius: 12px;
+        padding: 1rem 2rem;
         color: white;
-        font-weight: 600;
         font-size: 1rem;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
-      }
-
-      .login-card {
-        transition:
-          transform 280ms ease,
-          opacity 280ms ease;
-      }
-
-      .login-card.success {
-        opacity: 0;
-        transform: translateY(-6px) scale(0.98);
+        font-family: "Inter", sans-serif;
       }
 
       .login-button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(100, 255, 218, 0.4);
       }
 
-      .login-button:active {
-        transform: translateY(0);
-      }
-
-      .login-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .error-message {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 8px;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-        color: #f87171;
-        font-size: 0.875rem;
-        display: none;
-      }
-
-      .security-notice {
-        margin-top: 2rem;
-        padding: 1rem;
-        background: rgba(255, 204, 0, 0.1);
-        border: 1px solid rgba(255, 204, 0, 0.3);
-        border-radius: 8px;
-        text-align: center;
-      }
-
-      .security-notice p {
-        margin: 0;
-        color: rgba(255, 204, 0, 0.9);
-        font-size: 0.75rem;
-      }
-
-      .loading-spinner {
-        display: none;
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top: 2px solid white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      .copyright-footer {
+      .login-button::before {
+        content: "";
         position: absolute;
-        bottom: 1rem;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 0.75rem;
-      }
-
-      .video-bg {
-        position: fixed;
         top: 0;
-        left: 0;
+        left: -100%;
         width: 100%;
         height: 100%;
-        z-index: -2;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .login-button:hover::before {
+        left: 100%;
+      }
+
+      .security-features {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(100, 255, 218, 0.2);
+      }
+
+      .security-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+      }
+
+      .security-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.75rem;
+        color: #64ffda;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 2rem;
+      }
+
+      .back-link a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+      }
+
+      .back-link a:hover {
+        color: #64ffda;
+      }
+
+      .video-container {
+        margin-top: 2rem;
+        border-radius: 12px;
         overflow: hidden;
       }
 
-      .video-bg video {
-        position: absolute;
-        top: 50%;
+      .video-container video {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+      }
+
+      .particle-1 {
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .particle-2 {
+        left: 20%;
+        animation-delay: 1s;
+      }
+      .particle-3 {
+        left: 30%;
+        animation-delay: 2s;
+      }
+      .particle-4 {
+        left: 40%;
+        animation-delay: 3s;
+      }
+      .particle-5 {
         left: 50%;
-        min-width: 100%;
-        min-height: 100%;
-        transform: translate(-50%, -50%);
-        object-fit: cover;
+        animation-delay: 4s;
       }
-
-      .edge-glow {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        pointer-events: none;
-        background: radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
+      .particle-6 {
+        left: 60%;
+        animation-delay: 5s;
       }
-
-      .edge-frame {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        pointer-events: none;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+      .particle-7 {
+        left: 70%;
+        animation-delay: 6s;
       }
-
-      .video-fallback {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      .particle-8 {
+        left: 80%;
+        animation-delay: 7s;
+      }
+      .particle-9 {
+        left: 90%;
+        animation-delay: 8s;
       }
     </style>
   </head>
   <body>
-    <div class="admin-particle-wallpaper">
-      <iframe src="./wallpaper.html"></iframe>
+    <!-- Admin Login Wallpaper -->
+    <div class="admin-login-wallpaper"></div>
+    <div class="admin-particles">
+      <div class="admin-particle particle-1"></div>
+      <div class="admin-particle particle-2"></div>
+      <div class="admin-particle particle-3"></div>
+      <div class="admin-particle particle-4"></div>
+      <div class="admin-particle particle-5"></div>
+      <div class="admin-particle particle-6"></div>
+      <div class="admin-particle particle-7"></div>
+      <div class="admin-particle particle-8"></div>
+      <div class="admin-particle particle-9"></div>
     </div>
-    <div class="video-bg" aria-hidden="true">
-      <video
-        src="/media/vtw-admin-dashboard.mp4"
-        autoplay
-        muted
-        loop
-        onerror="
-          this.style.display = 'none';
-          document.querySelector('.video-fallback').style.display = 'flex';
-        "
-      ></video>
-      <div class="video-fallback"></div>
-    </div>
-    <div class="edge-glow" aria-hidden="true"></div>
-    <div class="edge-frame" aria-hidden="true"></div>
-    <div class="login-container">
-      <div class="login-bg"></div>
 
+    <div class="login-bg"></div>
+
+    <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <div class="login-logo">J</div>
-          <h1 class="login-title">Admin Login</h1>
-          <p class="login-subtitle">VoiceToWebsite Command Center</p>
+          <h1 class="login-title">Admin Portal</h1>
+          <p class="login-subtitle">Access your AI-powered development dashboard</p>
         </div>
-
-        <div class="error-message" id="errorMessage">Invalid credentials. Please try again.</div>
 
         <form id="loginForm">
           <div class="form-group">
-            <label for="accessCode" class="form-label">Access Code</label>
+            <label class="form-label" for="email">Email Address</label>
             <input
-              type="password"
-              id="accessCode"
-              name="accessCode"
+              type="email"
+              id="email"
               class="form-input"
-              placeholder="Enter your access code"
-              autocomplete="off"
+              placeholder="admin@voicetowebsite.com"
               required
+              autocomplete="email"
             />
           </div>
 
-          <button type="submit" class="login-button" id="loginButton">
-            <span id="buttonText">Sign In</span>
-            <div class="loading-spinner" id="loadingSpinner"></div>
-          </button>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              class="form-input"
+              placeholder="Enter your secure password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="2fa">Two-Factor Code</label>
+            <input
+              type="text"
+              id="2fa"
+              class="form-input"
+              placeholder="000000 (if enabled)"
+              maxlength="6"
+              autocomplete="one-time-code"
+            />
+          </div>
+
+          <button type="submit" class="login-button">🔐 Secure Login</button>
         </form>
 
-        <div class="security-notice">
-          <p>
-            🔒 This is a secure administrative interface.<br />
-            Unauthorized access attempts are logged and monitored.
-          </p>
+        <div class="security-features">
+          <div class="security-item">
+            <span class="security-icon">🛡️</span>
+            <span>Enterprise-grade security with 2FA</span>
+          </div>
+          <div class="security-item">
+            <span class="security-icon">🔐</span>
+            <span>End-to-end encryption</span>
+          </div>
+          <div class="security-item">
+            <span class="security-icon">📊</span>
+            <span>Real-time monitoring & alerts</span>
+          </div>
+          <div class="security-item">
+            <span class="security-icon">🌐</span>
+            <span>Global CDN protection</span>
+          </div>
         </div>
-      </div>
 
-      <div class="copyright-footer">
-        <p>© 3000 Studios 2026 | Admin System v2.0</p>
+        <div class="video-container">
+          <video autoplay muted loop title="Admin login background video">
+            <source
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div class="back-link">
+          <a href="/">← Back to Main Site</a>
+        </div>
       </div>
     </div>
 
     <script>
-      const loginForm = document.getElementById("loginForm");
-      const loginButton = document.getElementById("loginButton");
-      const buttonText = document.getElementById("buttonText");
-      const loadingSpinner = document.getElementById("loadingSpinner");
-      const errorMessage = document.getElementById("errorMessage");
-      const loginCard = document.querySelector(".login-card");
-      const ADMIN_UNLOCK_STATE_KEY = "adminAccessValidated";
-      const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
-      const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
-
-      const markAdminSession = () => {
-        try {
-          const now = String(Date.now());
-          sessionStorage.setItem(ADMIN_UNLOCK_STATE_KEY, "true");
-          sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, now);
-          localStorage.setItem(ADMIN_AUTH_REFRESH_KEY, now);
-        } catch (_) {}
-      };
-
-      const clearAdminSession = () => {
-        try {
-          sessionStorage.removeItem(ADMIN_UNLOCK_STATE_KEY);
-          sessionStorage.removeItem(ADMIN_UNLOCK_TS_KEY);
-          localStorage.setItem(ADMIN_AUTH_REFRESH_KEY, String(Date.now()));
-        } catch (_) {}
-      };
-
-      const bgVideo = document.querySelector(".video-bg video");
-      if (bgVideo) {
-        const enableInlinePlayback = () => {
-          try {
-            bgVideo.playsInline = true;
-            bgVideo.setAttribute("playsinline", "");
-            bgVideo.setAttribute("webkit-playsinline", "");
-            bgVideo.setAttribute("x5-playsinline", "");
-          } catch (_) {}
-        };
-        if (bgVideo.readyState >= 1) {
-          enableInlinePlayback();
-        } else {
-          bgVideo.addEventListener("loadedmetadata", enableInlinePlayback, { once: true });
-        }
-      }
-
-      loginForm.addEventListener("submit", async (e) => {
+      document.getElementById("loginForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const accessCode = document.getElementById("accessCode").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const twoFactor = document.getElementById("2fa").value;
 
-        // Show loading state
-        loginButton.disabled = true;
-        buttonText.style.display = "none";
-        loadingSpinner.style.display = "block";
-        errorMessage.style.display = "none";
+        // Simulate authentication (in production, this would be a real API call)
+        if (email && password) {
+          // Show loading state
+          const button = document.querySelector(".login-button");
+          const originalText = button.innerHTML;
+          button.innerHTML = "🔄 Authenticating...";
+          button.disabled = true;
 
-        try {
-          const response = await fetch("/api/admin/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ accessCode }),
-            credentials: "include",
-          });
-
-          if (response.ok) {
-            // Success transition and redirect to admin.
-            markAdminSession();
-            loginButton.disabled = true;
-            loginCard?.classList.add("success");
-            window.setTimeout(() => {
-              window.location.href = "/admin/";
-            }, 260);
-          } else {
-            const error = await response.json();
-            throw new Error(error.error || "Login failed");
-          }
-        } catch (error) {
-          clearAdminSession();
-          console.error("Login error:", error);
-          errorMessage.style.display = "block";
-          errorMessage.textContent = error.message || "Login failed. Please check your credentials.";
-        } finally {
-          // Reset loading state
-          loginButton.disabled = false;
-          buttonText.style.display = "inline";
-          loadingSpinner.style.display = "none";
+          setTimeout(() => {
+            alert("Login successful! Redirecting to admin dashboard...");
+            window.location.href = "/admin/access.html";
+          }, 2000);
+        } else {
+          alert("Please enter your credentials");
         }
       });
 
-      // Check if already authenticated
-      async function checkAuth() {
-        try {
-          const response = await fetch("/api/config/status", {
-            credentials: "include",
-          });
+      // Add input animations
+      const inputs = document.querySelectorAll(".form-input");
+      inputs.forEach((input) => {
+        input.addEventListener("focus", function () {
+          this.parentElement.style.transform = "scale(1.02)";
+        });
 
-          if (response.ok) {
-            markAdminSession();
-            // Already authenticated, redirect to admin
-            window.location.href = "/admin/";
-          }
-        } catch (error) {
-          // Not authenticated, stay on login page
-        }
-      }
-
-      // Check authentication on page load
-      checkAuth();
+        input.addEventListener("blur", function () {
+          this.parentElement.style.transform = "scale(1)";
+        });
+      });
     </script>
   </body>
 </html>

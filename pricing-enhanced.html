@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite Pricing - Plans for Every Need</title>
+    <meta
+      name="description"
+      content="Choose the perfect VoiceToWebsite plan: Free for beginners, Pro for professionals, or Enterprise for teams. AI-powered web development at affordable prices."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/src/styles/adsense-optimized.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .pricing-wallpaper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #7e22ce 50%, #c026d3 75%, #1e3c72 100%);
+        background-size: 400% 400%;
+        animation: pricingGradient 35s ease infinite;
+        z-index: -2;
+        transition: transform 0.3s ease;
+      }
+
+      @keyframes pricingGradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .pricing-particles {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .pricing-particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        animation: pricingParticleFloat 25s infinite linear;
+      }
+
+      @keyframes pricingParticleFloat {
+        0% {
+          transform: translateY(100vh) rotate(0deg) scale(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        90% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          transform: translateY(-100vh) rotate(720deg) scale(0);
+          opacity: 0;
+        }
+      }
+
+      .pricing-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: slideInUp 0.8s ease-out;
+      }
+
+      .pricing-card::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, transparent, rgba(126, 34, 206, 0.3), transparent);
+        border-radius: 24px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+      }
+
+      .pricing-card:hover::before {
+        opacity: 1;
+      }
+
+      .pricing-card:hover {
+        transform: translateY(-20px) scale(1.05) rotateY(2deg);
+        box-shadow: 0 30px 60px rgba(126, 34, 206, 0.5);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(126, 34, 206, 0.5);
+      }
+
+      .featured {
+        border-color: #7e22ce;
+        background: rgba(126, 34, 206, 0.15);
+      }
+
+      .featured::after {
+        content: "MOST POPULAR";
+        position: absolute;
+        top: 20px;
+        right: -30px;
+        background: linear-gradient(135deg, #7e22ce, #c026d3);
+        color: white;
+        padding: 8px 30px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        transform: rotate(45deg);
+        box-shadow: 0 5px 15px rgba(126, 34, 206, 0.4);
+      }
+
+      .scroll-reveal {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .scroll-reveal.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .text-gradient {
+        background: linear-gradient(135deg, #7e22ce, #c026d3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+      }
+
+      .video-container {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .video-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 30px 60px rgba(126, 34, 206, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .pricing-card {
+          padding: 2rem;
+          margin-bottom: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-white">
+    <!-- Unique Pricing Wallpaper -->
+    <div class="pricing-wallpaper" id="wallpaper"></div>
+    <div class="pricing-particles">
+      <div class="pricing-particle" style="left: 3%; animation-delay: 0s"></div>
+      <div class="pricing-particle" style="left: 12%; animation-delay: 3s"></div>
+      <div class="pricing-particle" style="left: 21%; animation-delay: 6s"></div>
+      <div class="pricing-particle" style="left: 30%; animation-delay: 9s"></div>
+      <div class="pricing-particle" style="left: 39%; animation-delay: 12s"></div>
+      <div class="pricing-particle" style="left: 48%; animation-delay: 15s"></div>
+      <div class="pricing-particle" style="left: 57%; animation-delay: 18s"></div>
+      <div class="pricing-particle" style="left: 66%; animation-delay: 21s"></div>
+      <div class="pricing-particle" style="left: 75%; animation-delay: 24s"></div>
+      <div class="pricing-particle" style="left: 84%; animation-delay: 27s"></div>
+      <div class="pricing-particle" style="left: 93%; animation-delay: 30s"></div>
+    </div>
+
+    <!-- Navigation -->
+    <script src="/nav.js"></script>
+
+    <!-- Main Content -->
+    <main class="relative z-10 container mx-auto px-6 py-20">
+      <!-- Hero Section -->
+      <section class="text-center mb-20 scroll-reveal">
+        <h1 class="text-6xl md:text-8xl font-bold mb-6 text-gradient">Simple, Transparent Pricing</h1>
+        <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto">
+          Choose the perfect plan for your needs. Start free, scale as you grow.
+        </p>
+
+        <!-- Hero Video -->
+        <div class="video-container mb-12 max-w-5xl mx-auto">
+          <video autoplay muted loop title="VoiceToWebsite Pricing Overview">
+            <source
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+
+      <!-- Pricing Plans -->
+      <section class="mb-20 scroll-reveal">
+        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <!-- Free Plan -->
+          <div class="pricing-card">
+            <h3 class="text-2xl font-semibold mb-4">Free</h3>
+            <div class="text-4xl font-bold mb-4">$0</div>
+            <p class="text-gray-300 mb-6">Perfect for getting started</p>
+
+            <img
+              src="https://images.unsplash.com/photo-1554226975-5a9a1d9cd1e?w=600&h=400&fit=crop"
+              alt="Free Plan"
+              class="w-full h-40 object-cover rounded-lg mb-6"
+            />
+
+            <ul class="text-gray-300 space-y-3 mb-8">
+              <li>✓ 3 Websites</li>
+              <li>✓ Basic Templates</li>
+              <li>✓ Voice Commands</li>
+              <li>✓ Community Support</li>
+              <li>✓ Basic Analytics</li>
+            </ul>
+
+            <button
+              class="w-full bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-full font-semibold transition-colors"
+            >
+              Start Free
+            </button>
+          </div>
+
+          <!-- Pro Plan -->
+          <div class="pricing-card featured relative">
+            <h3 class="text-2xl font-semibold mb-4">Pro</h3>
+            <div class="text-4xl font-bold mb-4">$29<span class="text-lg font-normal">/month</span></div>
+            <p class="text-gray-300 mb-6">For professionals and growing businesses</p>
+
+            <img
+              src="https://images.unsplash.com/photo-1556742049-0cfed4f18a8d?w=600&h=400&fit=crop"
+              alt="Pro Plan"
+              class="w-full h-40 object-cover rounded-lg mb-6"
+            />
+
+            <ul class="text-gray-300 space-y-3 mb-8">
+              <li>✓ Unlimited Websites</li>
+              <li>✓ Premium Templates</li>
+              <li>✓ Advanced Voice Commands</li>
+              <li>✓ Priority Support</li>
+              <li>✓ Advanced Analytics</li>
+              <li>✓ AI Content Generation</li>
+              <li>✓ E-commerce Integration</li>
+            </ul>
+
+            <button
+              class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform"
+            >
+              Start Pro Trial
+            </button>
+          </div>
+
+          <!-- Enterprise Plan -->
+          <div class="pricing-card">
+            <h3 class="text-2xl font-semibold mb-4">Enterprise</h3>
+            <div class="text-4xl font-bold mb-4">$99<span class="text-lg font-normal">/month</span></div>
+            <p class="text-gray-300 mb-6">For large teams and organizations</p>
+
+            <img
+              src="https://images.unsplash.com/photo-1551432670778-9d649b75e4c?w=600&h=400&fit=crop"
+              alt="Enterprise Plan"
+              class="w-full h-40 object-cover rounded-lg mb-6"
+            />
+
+            <ul class="text-gray-300 space-y-3 mb-8">
+              <li>✓ Everything in Pro</li>
+              <li>✓ Custom Templates</li>
+              <li>✓ White Label Options</li>
+              <li>✓ Dedicated Support</li>
+              <li>✓ Custom Analytics</li>
+              <li>✓ API Access</li>
+              <li>✓ SLA Guarantee</li>
+            </ul>
+
+            <button
+              class="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform"
+            >
+              Contact Sales
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature Comparison -->
+      <section class="mb-20 scroll-reveal">
+        <div class="pricing-card max-w-6xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Feature Comparison</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="border-b border-gray-600">
+                  <th class="p-4">Feature</th>
+                  <th class="p-4">Free</th>
+                  <th class="p-4">Pro</th>
+                  <th class="p-4">Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-700">
+                  <td class="p-4 font-semibold">Websites</td>
+                  <td class="p-4">3</td>
+                  <td class="p-4 text-green-400">Unlimited</td>
+                  <td class="p-4 text-green-400">Unlimited</td>
+                </tr>
+                <tr class="border-b border-gray-700">
+                  <td class="p-4 font-semibold">Templates</td>
+                  <td class="p-4">Basic</td>
+                  <td class="p-4 text-green-400">Premium</td>
+                  <td class="p-4 text-green-400">Custom</td>
+                </tr>
+                <tr class="border-b border-gray-700">
+                  <td class="p-4 font-semibold">AI Content</td>
+                  <td class="p-4">-</td>
+                  <td class="p-4 text-green-400">✓</td>
+                  <td class="p-4 text-green-400">✓</td>
+                </tr>
+                <tr class="border-b border-gray-700">
+                  <td class="p-4 font-semibold">Support</td>
+                  <td class="p-4">Community</td>
+                  <td class="p-4 text-green-400">Priority</td>
+                  <td class="p-4 text-green-400">Dedicated</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="mb-20 scroll-reveal">
+        <div class="pricing-card max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <div class="video-container mb-4">
+                <video autoplay muted loop title="Pricing FAQ">
+                  <source
+                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Can I switch plans anytime?</h3>
+              <p class="text-gray-300">
+                Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-3">Is there a free trial?</h3>
+              <p class="text-gray-300">
+                Yes! Pro plan comes with a 14-day free trial. No credit card required to start.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-3">What payment methods do you accept?</h3>
+              <p class="text-gray-300">
+                We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.
+              </p>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-3">Can I cancel anytime?</h3>
+              <p class="text-gray-300">
+                Absolutely. No long-term contracts or cancellation fees. You're in complete control.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="text-center scroll-reveal">
+        <div class="pricing-card max-w-4xl mx-auto">
+          <h2 class="text-3xl font-bold mb-6">Ready to get started?</h2>
+          <p class="text-xl text-gray-200 mb-8">Join thousands of developers and businesses using VoiceToWebsite</p>
+
+          <div class="grid md:grid-cols-2 gap-6 items-center">
+            <div>
+              <img
+                src="https://images.unsplash.com/photo-1521791136064-0786949c16c1?w=600&h=400&fit=crop"
+                alt="Get Started"
+                class="w-full rounded-xl mb-4"
+              />
+              <a
+                href="/demo"
+                class="bg-gradient-to-r from-green-600 to-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:scale-105 transition-transform inline-block"
+              >
+                Try Free Demo
+              </a>
+            </div>
+            <div>
+              <div class="video-container">
+                <video controls title="Getting Started Video">
+                  <source
+                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <a
+                href="/contact-enhanced"
+                class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-semibold hover:scale-105 transition-transform inline-block"
+              >
+                Talk to Sales
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <script src="/footer.js"></script>
+
+    <script>
+      // Phone tilt and scroll responsive wallpaper
+      let ticking = false;
+      let lastScrollY = 0;
+      let lastTiltX = 0;
+      let lastTiltY = 0;
+
+      function updateWallpaper() {
+        const wallpaper = document.getElementById("wallpaper");
+        const scrollY = window.scrollY;
+        const tiltX = window.orientation ? Math.abs(window.orientation) : 0;
+        const tiltY = window.deviceOrientation ? Math.abs(window.deviceOrientation.beta) : 0;
+
+        // Calculate scroll-based transform
+        const scrollTransform = `translateY(${scrollY * 0.3}px) rotateX(${scrollY * 0.01}deg)`;
+
+        // Calculate tilt-based transform
+        const tiltTransform = `rotateX(${tiltY * 0.05}deg) rotateY(${tiltX * 0.05}deg)`;
+
+        // Combine transforms
+        wallpaper.style.transform = `${scrollTransform} ${tiltTransform}`;
+
+        lastScrollY = scrollY;
+        lastTiltX = tiltX;
+        lastTiltY = tiltY;
+      }
+
+      // Throttled scroll handler
+      function requestTick() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateWallpaper);
+          ticking = true;
+        }
+      }
+
+      function onScroll() {
+        requestTick();
+      }
+
+      function onOrientationChange() {
+        requestTick();
+      }
+
+      // Add event listeners
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("deviceorientation", onOrientationChange);
+      window.addEventListener("orientationchange", onOrientationChange);
+
+      // Scroll reveal animation
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".scroll-reveal").forEach((el) => {
+        observer.observe(el);
+      });
+
+      // Auto-populating content
+      function updateDailyPricing() {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const dayOfMonth = today.getDate();
+
+        // Dynamic pricing based on day
+        const dailyOffers = [
+          "Today only: Get 20% off Pro plan!",
+          "Limited time: Free domain with Pro plan",
+          "Special offer: Double websites on all plans",
+          "Today's deal: 3 months free on Enterprise",
+          "Flash sale: Lifetime access 50% off",
+          "Weekend special: Priority support on Free plan",
+        ];
+
+        const offerIndex = dayOfMonth % dailyOffers.length;
+        const dailyOffer = dailyOffers[offerIndex];
+
+        // Update any elements with daily-offer class
+        document.querySelectorAll(".daily-offer").forEach((el) => {
+          el.textContent = dailyOffer;
+        });
+      }
+
+      // Update pricing daily
+      updateDailyPricing();
+      setInterval(updateDailyPricing, 24 * 60 * 60 * 1000); // Update daily
+    </script>
+  </body>
+</html>
