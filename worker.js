@@ -38,7 +38,7 @@ const SECURITY_HEADERS = {
   "Content-Security-Policy": `
     default-src 'self';
     script-src 'self' 'nonce-{nonce}' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://accounts.google.com https://js.stripe.com https://www.paypal.com https://esm.sh;
-    style-src 'self' data: https://fonts.googleapis.com;
+    style-src 'self' 'unsafe-inline' data: https://fonts.googleapis.com;
     font-src 'self' data: https://fonts.gstatic.com;
     img-src 'self' data: https:;
     connect-src 'self' https://www.google-analytics.com https://accounts.google.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://www.paypal.com https://js.stripe.com;
@@ -912,6 +912,23 @@ export default {
       const id = env.LIVE_ROOM.idFromName("global");
       const stub = env.LIVE_ROOM.get(id);
       return stub.fetch(doRequest);
+    }
+
+    // Fast path: GET requests for static assets (css, js, images, fonts, assets/) skip API routing.
+    if (assets && request.method === "GET" && !pathname.startsWith("/api/")) {
+      const isStatic =
+        /\.(css|js|mjs|map|svg|png|jpg|jpeg|gif|webp|ico|woff2?|txt|json|xml)$/i.test(
+          pathname
+        ) || pathname.startsWith("/assets/");
+      if (isStatic) {
+        const assetRes = await assets.fetch(request);
+        if (assetRes.status !== 404) {
+          return addSecurityHeaders(assetRes, {
+            pathname,
+            env,
+          });
+        }
+      }
     }
 
     try {
