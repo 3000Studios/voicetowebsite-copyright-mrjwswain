@@ -11,6 +11,8 @@ const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
 const ParticleEffects = lazy(() => import("./components/ParticleEffects"));
 const WarpTunnel = lazy(() => import("./components/WarpTunnel"));
 const ErrorBoundary = lazy(() => import("./components/ErrorBoundary"));
+const ParallaxWallpaper = lazy(() => import("./components/ParallaxWallpaper"));
+const GlobalFooter = lazy(() => import("./components/GlobalFooter"));
 
 type PricingTier = {
   name: string;
@@ -619,6 +621,11 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
+        {/* 3D Animated Parallax Wallpaper */}
+        <ErrorBoundary fallback={null}>
+          <ParallaxWallpaper />
+        </ErrorBoundary>
+
         <ErrorBoundary fallback={null}>
           <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
         </ErrorBoundary>
@@ -1199,6 +1206,11 @@ const App: React.FC = () => {
 
           <div className="h-24" />
         </main>
+
+        {/* Global AdSense-Approved Footer */}
+        <ErrorBoundary fallback={null}>
+          <GlobalFooter />
+        </ErrorBoundary>
       </div>
     </ErrorBoundary>
   );
