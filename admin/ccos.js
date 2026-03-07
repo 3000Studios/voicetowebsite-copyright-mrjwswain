@@ -852,6 +852,28 @@ const renderStore = async () => {
   `;
 };
 
+const renderUIGenerator = async () => {
+  const appUrl = "/downloads/ui-generator.html";
+  return `
+    <section class="ccos-grid">
+      <article class="ccos-card ccos-col-12">
+        <h3>UI Generator</h3>
+        <p class="ccos-muted">Choose a design and add it to any route or page. The app runs in the frame below.</p>
+        <iframe
+          id="ui-generator-frame"
+          src="${escapeHtml(appUrl)}"
+          title="UI Generator"
+          style="width:100%;height:720px;border:1px solid rgba(255,255,255,0.12);border-radius:12px;background:#0a0f1f;"
+          sandbox="allow-scripts allow-same-origin allow-forms"
+        ></iframe>
+        <p style="margin-top:0.5rem;font-size:0.9rem">
+          <a href="${escapeHtml(appUrl)}" target="_blank" rel="noopener">Open UI Generator in new tab</a>
+        </p>
+      </article>
+    </section>
+  `;
+};
+
 const renderMedia = async () => {
   const [media, analytics] = await Promise.all([
     requestJson("/api/media/list", { method: "GET" }).catch(() => ({
@@ -1045,6 +1067,12 @@ const ROUTES = {
     render: renderStore,
     navRoute: "/admin/store",
     moduleKey: "store",
+  },
+  "/admin/ui-generator": {
+    title: "UI Generator",
+    render: renderUIGenerator,
+    navRoute: "/admin/ui-generator",
+    moduleKey: "ui-generator",
   },
   "/admin/media": {
     title: "Media Library",

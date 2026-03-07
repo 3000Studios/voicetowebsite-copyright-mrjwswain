@@ -1,2 +1,8 @@
 #!/usr/bin/env sh
 node ./scripts/pre-push.mjs
+
+# Auto-deploy trigger for local development using Wrangler
+if [ "$VTW_AUTO_DEPLOY_ON_PUSH" = "1" ]; then
+  echo "🚀 Auto-deploying with Wrangler..."
+  npx wrangler deploy
+fi

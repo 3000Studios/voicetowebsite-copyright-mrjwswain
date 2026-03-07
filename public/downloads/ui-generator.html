@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Generator | VoiceToWebsite</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      background: linear-gradient(180deg, #0a0f1f 0%, #060912 100%);
+      color: #f8fbff;
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+    .container { max-width: 920px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+    .sub { color: rgba(233,241,255,0.65); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; margin-bottom: 1rem; }
+    label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(233,241,255,0.8); margin-bottom: 0.35rem; }
+    input, select, textarea {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      color: #f8fbff;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.95rem;
+      min-width: 200px;
+    }
+    textarea { min-height: 100px; width: 100%; resize: vertical; }
+    button {
+      background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+      color: #031018;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    button:hover { opacity: 0.95; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status { margin-top: 1rem; font-size: 0.9rem; padding: 0.5rem; border-radius: 6px; }
+    .status.ok { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+    .status.err { background: rgba(239,68,68,0.2); color: #fca5a5; }
+    .design-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    .design-option {
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .design-option:hover { border-color: rgba(14,165,233,0.5); background: rgba(14,165,233,0.08); }
+    .design-option.selected { border-color: #0ea5e9; background: rgba(14,165,233,0.15); }
+    .design-option .name { font-weight: 600; font-size: 0.9rem; }
+    .design-option .desc { font-size: 0.75rem; color: rgba(233,241,255,0.6); margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>UI Generator</h1>
+    <p class="sub">Choose a design and add it to the page or route you specify. Changes are applied via the site file system.</p>
+
+    <div class="card">
+      <h3 style="margin:0 0 0.5rem">1. Choose design</h3>
+      <div class="design-grid" id="design-grid"></div>
+      <label>Or paste custom HTML snippet</label>
+      <textarea id="custom-html" placeholder="<section class='my-block'>...</section>"></textarea>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 0.5rem">2. Where to add it</h3>
+      <div class="row">
+        <div>
+          <label>Target path (e.g. index.html, pricing.html, /)</label>
+          <input type="text" id="target-path" placeholder="index.html" value="index.html" />
+        </div>
+        <div>
+          <label>Insert before (optional)</label>
+          <input type="text" id="insert-before" placeholder="</body>" value="</body>" />
+        </div>
+      </div>
+      <p style="font-size:0.85rem; color: rgba(233,241,255,0.6); margin: 0.5rem 0 0 0;">
+        The snippet will be inserted immediately before the first occurrence of the text above. Use <code>&lt;/body&gt;</code> to add at end of body.
+      </p>
+    </div>
+
+    <div class="card">
+      <button type="button" id="add-btn">Add design to target</button>
+      <div id="status" class="status" style="display:none"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const DESIGNS = [
+        { id: "hero-cta", name: "Hero CTA", desc: "Headline + button block", snippet: '<section class="vtw-ui-gen-hero-cta" style="padding:3rem 1.5rem;text-align:center;background:linear-gradient(180deg,rgba(14,165,233,0.12),transparent);border-radius:16px;"><h2 style="font-size:clamp(1.75rem,4vw,2.5rem);margin:0 0 1rem;">Your headline</h2><p style="margin:0 0 1.5rem;opacity:0.9;">Supporting copy.</p><a href="/store" style="display:inline-block;padding:0.75rem 1.5rem;background:#0ea5e9;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">Get started</a></section>' },
+        { id: "card-row", name: "Card row", desc: "3 feature cards", snippet: '<section class="vtw-ui-gen-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;padding:2rem 0;"><div class="card" style="padding:1.5rem;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);"><h3 style="margin:0 0 0.5rem;">Feature 1</h3><p style="margin:0;font-size:0.9rem;opacity:0.85;">Description.</p></div><div class="card" style="padding:1.5rem;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);"><h3 style="margin:0 0 0.5rem;">Feature 2</h3><p style="margin:0;font-size:0.9rem;opacity:0.85;">Description.</p></div><div class="card" style="padding:1.5rem;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);"><h3 style="margin:0 0 0.5rem;">Feature 3</h3><p style="margin:0;font-size:0.9rem;opacity:0.85;">Description.</p></div></section>' },
+        { id: "banner", name: "Banner", desc: "Top announcement bar", snippet: '<div class="vtw-ui-gen-banner" style="padding:0.6rem 1rem;text-align:center;background:linear-gradient(90deg,#0ea5e9,#06b6d4);color:#031018;font-size:0.9rem;font-weight:600;">Announcement or promo text. <a href="/pricing" style="color:inherit;text-decoration:underline;">Learn more</a></div>' },
+        { id: "footer-block", name: "Footer block", desc: "Simple footer strip", snippet: '<footer class="vtw-ui-gen-footer" style="margin-top:3rem;padding:1.5rem;text-align:center;border-top:1px solid rgba(255,255,255,0.1);font-size:0.85rem;opacity:0.85;">&copy; ' + new Date().getFullYear() + ' VoiceToWebsite. <a href="/privacy">Privacy</a> | <a href="/terms">Terms</a></footer>' },
+      ];
+
+      const grid = document.getElementById("design-grid");
+      const customHtml = document.getElementById("custom-html");
+      const targetPath = document.getElementById("target-path");
+      const insertBefore = document.getElementById("insert-before");
+      const addBtn = document.getElementById("add-btn");
+      const statusEl = document.getElementById("status");
+
+      let selectedId = null;
+      DESIGNS.forEach(function (d) {
+        const el = document.createElement("div");
+        el.className = "design-option";
+        el.dataset.id = d.id;
+        el.innerHTML = '<span class="name">' + escapeHtml(d.name) + '</span><span class="desc">' + escapeHtml(d.desc) + '</span>';
+        el.addEventListener("click", function () {
+          selectedId = d.id;
+          document.querySelectorAll(".design-option").forEach(function (o) { o.classList.remove("selected"); });
+          el.classList.add("selected");
+          customHtml.value = "";
+        });
+        grid.appendChild(el);
+      });
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function showStatus(msg, ok) {
+        statusEl.style.display = "block";
+        statusEl.textContent = msg;
+        statusEl.className = "status " + (ok ? "ok" : "err");
+      }
+
+      addBtn.addEventListener("click", async function () {
+        const path = (targetPath.value || "").trim() || "index.html";
+        const before = (insertBefore.value || "").trim() || "</body>";
+        let snippet = (customHtml.value || "").trim();
+        if (!snippet && selectedId) {
+          const d = DESIGNS.find(function (x) { return x.id === selectedId; });
+          if (d) snippet = d.snippet;
+        }
+        if (!snippet) {
+          showStatus("Choose a design or paste a custom HTML snippet.", false);
+          return;
+        }
+        addBtn.disabled = true;
+        showStatus("Applying…", true);
+        try {
+          const readRes = await fetch("/api/fs/read?path=" + encodeURIComponent(path), { method: "GET", credentials: "include" });
+          const readData = await readRes.json().catch(function () { return {}; });
+          if (!readRes.ok) {
+            showStatus(readData.error || "Failed to read " + path, false);
+            addBtn.disabled = false;
+            return;
+          }
+          const content = String(readData.content || "");
+          const idx = content.indexOf(before);
+          if (idx === -1) {
+            showStatus('Target path does not contain "' + before + '". Try another insert point.', false);
+            addBtn.disabled = false;
+            return;
+          }
+          const newContent = content.slice(0, idx) + "\n" + snippet + "\n" + content.slice(idx);
+          const writeRes = await fetch("/api/fs/write", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ path: path, content: newContent }),
+          });
+          const writeData = await writeRes.json().catch(function () { return {}; });
+          if (!writeRes.ok) {
+            showStatus(writeData.error || "Failed to write " + path, false);
+            addBtn.disabled = false;
+            return;
+          }
+          showStatus('Design added to ' + path + '. Redeploy or refresh preview to see changes.', true);
+        } catch (e) {
+          showStatus("Error: " + (e.message || String(e)), false);
+        }
+        addBtn.disabled = false;
+      });
+    })();
+  </script>
+</body>
+</html>

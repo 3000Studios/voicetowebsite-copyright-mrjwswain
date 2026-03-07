@@ -63,6 +63,9 @@
     "debug:tail": "wrangler tail",
     "debug:local": "DEBUG=vtw:* npm run dev",
     "orch:start": "cd voicetowebsite-orchestrator && npm start",
+    "auto:run": "node ./scripts/auto-run-everything.mjs",
+    "auto:run:install": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-auto-run-task.ps1",
+    "auto:run:uninstall": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/uninstall-auto-run-task.ps1",
     "orch:install": "cd voicetowebsite-orchestrator && npm install"
   },
   "lint-staged": {

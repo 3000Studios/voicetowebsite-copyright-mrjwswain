@@ -186,6 +186,7 @@ Scripts available:
 - `scripts/advanced-heal.mjs`
 - `scripts/AGENTS.md`
 - `scripts/auto-dev-push.ps1`
+- `scripts/auto-run-everything.mjs`
 - `scripts/auto-ship-runner.ps1`
 - `scripts/auto-ship.mjs`
 - `scripts/autopilot.mjs`
@@ -206,6 +207,7 @@ Scripts available:
 - `scripts/guard-ui.mjs`
 - `scripts/heal.mjs`
 - `scripts/husky-install.mjs`
+- `scripts/install-auto-run-task.ps1`
 - `scripts/install-auto-ship-task.ps1`
 - `scripts/install-bots.ps1`
 - `scripts/install-jules.ps1`
@@ -227,6 +229,7 @@ Scripts available:
 - `scripts/ship.mjs`
 - `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
+- `scripts/uninstall-auto-run-task.ps1`
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
 - `scripts/validate-governance.mjs`
