@@ -55,6 +55,14 @@ const formatBytes = (value) => {
   return `${(num / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 };
 
+const formatTimestamp = (value) => {
+  const text = String(value || "").trim();
+  if (!text) return "n/a";
+  const date = new Date(text);
+  if (Number.isNaN(date.getTime())) return text;
+  return date.toLocaleString();
+};
+
 const makeIdempotencyKey = (prefix = "op") => {
   const stamp = new Date()
     .toISOString()
@@ -135,12 +143,42 @@ const refreshDeployLogs = async () => {
   const statusEl = byId("deploy-rail-status");
   const logsEl = byId("deploy-rail-logs");
   try {
-    const payload = await requestJson("/api/deploy/logs", { method: "GET" });
-    statusEl.textContent = payload.locked ? "Deploy in progress" : "Idle";
-    logsEl.textContent = (payload.logs || [])
+    const payload = await requestJson("/api/deploy/status", { method: "GET" });
+    const controller = payload?.controller || {};
+    const cloudflare = payload?.cloudflare || {};
+    const latestBuild = cloudflare?.latestBuild || {};
+    const latestDeployment = cloudflare?.latestDeployment || {};
+    const summaryLines = [
+      `State: ${payload?.stateLabel || (controller.locked ? "Deploy in progress" : "Idle")}`,
+      `Live build ID: ${payload?.live?.buildId || "n/a"}`,
+      `Worker modified: ${formatTimestamp(cloudflare?.worker?.modifiedOn)}`,
+      `Latest deployment: ${
+        latestDeployment?.id ||
+        latestDeployment?.version_id ||
+        latestDeployment?.source ||
+        "n/a"
+      }`,
+      `Latest build: ${
+        latestBuild?.buildUUID || latestBuild?.id || latestBuild?.uuid || "n/a"
+      }`,
+      `Latest commit: ${
+        latestBuild?.commitMessage ||
+        latestBuild?.commitHash ||
+        latestDeployment?.version_id ||
+        "n/a"
+      }`,
+    ];
+    if (cloudflare?.error) {
+      summaryLines.push(`Cloudflare status error: ${cloudflare.error}`);
+    }
+    statusEl.textContent =
+      payload?.stateLabel ||
+      (controller.locked ? "Deploy in progress" : "Idle");
+    const logLines = (controller.logs || [])
       .slice(-40)
       .map((entry) => `[${entry.ts}] [${entry.level}] ${entry.message}`)
       .join("\n");
+    logsEl.textContent = `${summaryLines.join("\n")}\n\n${logLines}`.trim();
     if (!logsEl.textContent) logsEl.textContent = "No deployment logs yet.";
   } catch (error) {
     statusEl.textContent = "Unavailable";
@@ -262,15 +300,21 @@ const loadCloudflareAnalytics = async () => {
 };
 
 const renderMission = async () => {
-  const [governance, deployLogs, deployMeter, analytics] = await Promise.all([
+  const [governance, deployStatus, deployMeter, analytics] = await Promise.all([
     requestJson("/api/governance/check", { method: "GET" }).catch(() => null),
-    requestJson("/api/deploy/logs", { method: "GET" }).catch(() => null),
+    requestJson("/api/deploy/status", { method: "GET" }).catch(() => null),
     requestJson("/api/deploy/meter", { method: "GET" }).catch(() => null),
     loadAnalytics(),
   ]);
+  const deployLogs = deployStatus?.controller || {};
+  const cloudflare = deployStatus?.cloudflare || {};
+  const latestBuild = cloudflare?.latestBuild || {};
+  const latestDeployment = cloudflare?.latestDeployment || {};
   const envStatus = governance?.checks?.envAudit?.status || "fail";
   const envMissing = governance?.checks?.envAudit?.missing || [];
-  const lock = deployLogs?.locked ? "Deploy In Progress" : "Idle";
+  const lock =
+    deployStatus?.stateLabel ||
+    (deployLogs?.locked ? "Deploy In Progress" : "Idle");
   const auditPass = governance?.ok ? "PASS" : "FAIL";
   const remaining = deployMeter?.metering?.remaining;
   const deployResp = deployLogs?.lastSuccess?.deployResponse;
@@ -312,10 +356,31 @@ const renderMission = async () => {
           <tr><th>Monetization Density Guard</th><td>${escapeHtml(governance?.checks?.monetizationDensityGuard?.maxSlotsPerPage ?? "n/a")}</td></tr>
           <tr><th>Missing Environment Vars</th><td>${envMissing.length ? escapeHtml(envMissing.join(", ")) : "None"}</td></tr>
           <tr><th>Confirmation Phrase</th><td>${escapeHtml(governance?.checks?.deployConfirmationPhrase || CONFIRMATION_PHRASE)}</td></tr>
+          <tr><th>Live Build ID</th><td>${escapeHtml(deployStatus?.live?.buildId || "n/a")}</td></tr>
+          <tr><th>Cloudflare Worker Modified</th><td>${escapeHtml(formatTimestamp(cloudflare?.worker?.modifiedOn))}</td></tr>
+          <tr><th>Latest Cloudflare Build</th><td>${escapeHtml(latestBuild?.buildUUID || latestBuild?.id || latestBuild?.uuid || "n/a")}</td></tr>
+          <tr><th>Latest Commit</th><td>${escapeHtml(latestBuild?.commitMessage || latestBuild?.commitHash || "n/a")}</td></tr>
         </table>
       </article>
       <article class="ccos-card ccos-col-4">
-        <h3>Recent Deploy Log</h3>
+        <h3>Cloudflare Live Deploy</h3>
+        <pre>${escapeHtml(
+          [
+            `worker: ${cloudflare?.worker?.name || cloudflare?.scriptName || "voicetowebsite"}`,
+            `modified: ${formatTimestamp(cloudflare?.worker?.modifiedOn)}`,
+            `build: ${latestBuild?.buildUUID || latestBuild?.id || latestBuild?.uuid || "n/a"}`,
+            `build status: ${latestBuild?.status || latestBuild?.buildOutcome || "n/a"}`,
+            `branch: ${latestBuild?.branch || "n/a"}`,
+            `commit: ${latestBuild?.commitHash || "n/a"}`,
+            `deployment: ${latestDeployment?.id || latestDeployment?.version_id || latestDeployment?.source || "n/a"}`,
+            cloudflare?.error ? `error: ${cloudflare.error}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n")
+        )}</pre>
+      </article>
+      <article class="ccos-card ccos-col-12">
+        <h3>Recent Deploy Rail Log</h3>
         <pre>${escapeHtml(
           (deployLogs?.logs || [])
             .slice(-8)

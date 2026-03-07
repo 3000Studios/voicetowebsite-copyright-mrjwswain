@@ -38,12 +38,17 @@ head_sampling_rate = 0.01
 [ai]
 binding = "AI"
 
+# Repo-managed safe runtime vars live here.
+# Private Worker secrets stay in Cloudflare Dashboard → Worker → Settings → Variables and Secrets → Secrets.
+# Manual Wrangler auth stays local in your PowerShell session as CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID.
 [vars]
 ENVIRONMENT = "production"
 PUBLIC_GENERATE = "1"
 CF_ALLOW_LEGACY_DEPLOY_HOOKS = "0"
+ALLOW_REMOTE_DEPLOY_TRIGGER = "1"
 GH_BASE_BRANCH = "main"
 GH_REPO = "3000Studios/voicetowebsite-copyright-mrjwswain"
+ADMIN_EMAIL = "mr.jwswain@gmail.com"
 ADSENSE_PUBLISHER = "ca-pub-5800977493749262"
 ADSENSE_CUSTOMER_ID = "7555696606"
 ADSENSE_MODE = "auto"
@@ -52,10 +57,28 @@ ADSENSE_MAX_SLOTS = "3"
 PAYPAL_ENV = "live"
 CACHE_CONTROL_STATIC = "public, max-age=31536000, immutable"
 CACHE_CONTROL_HTML = "public, max-age=600"
+# Public commerce/runtime config that the client reads from window.__ENV.
+# These are publishable identifiers and checkout links, not secret API keys.
+STRIPE_PUBLISHABLE_KEY = "pk_live_51SCLtrGejm3JMan4oTgv5MvjcAIPr1AWhkUamJiUufyqhWkeiq2iZ8GVQBy56xewUSiyLxPp05gPy4KBrZDsvG8e00uM2g1yCd"
+STRIPE_ALLOW_CUSTOM_AMOUNT = "false"
+STRIPE_PAYMENT_METHOD_TYPES = "card,cashapp,klarna"
+STRIPE_PRICE_STARTER = "price_1Sy6XhGejm3JMan4X8zL9kPQ"
+STRIPE_PRICE_GROWTH = "price_1Sy6XhGejm3JMan4Y9aM0lQR"
+STRIPE_PRICE_ENTERPRISE = "price_1Sy6XhGejm3JMan4Z0bN1mST"
+STRIPE_PRICE_LIFETIME = "price_1Sy4jgGejm3JMan47v7bgnSa"
+STRIPE_PAYMENT_LINK_STARTER = "plink_1Sy6YmGejm3JMan4A1bC2dE3"
+STRIPE_PAYMENT_LINK_GROWTH = "plink_1Sy6YmGejm3JMan4B2cD3eF4"
+STRIPE_PAYMENT_LINK_ENTERPRISE = "plink_1Sy6YmGejm3JMan4C3dE4fG5"
+STRIPE_PAYMENT_LINK_LIFETIME = "plink_1Sy4mXGejm3JMan4LPzDQ31I"
+STRIPE_BUY_BUTTON_ID_STARTER = "buy_btn_1Sy6ZmGejm3JMan4D4eF5gH6"
+STRIPE_BUY_BUTTON_ID_GROWTH = "buy_btn_1Sy6ZmGejm3JMan4E5fG6hI7"
+STRIPE_BUY_BUTTON_ID_ENTERPRISE = "buy_btn_1Sy6ZmGejm3JMan4F6gH7iJ8"
+STRIPE_BUY_BUTTON_ID_LIFETIME = "buy_btn_1Sy4mXGejm3JMan4DYZEwLhE"
 # NOTE: Do not commit secrets.
 # Set runtime variables/secrets in the Cloudflare Dashboard (Worker settings) or via `wrangler secret put`.
-# Examples (dashboard): ADMIN_EMAIL, PAYPAL_CLIENT_ID, ADSENSE_*.
-# Examples (secrets): CONTROL_PASSWORD, LICENSE_SECRET, ADMIN_COOKIE_SECRET, STRIPE_SECRET_KEY, etc.
+# Keep secrets there, not here. In particular: CONTROL_PASSWORD, LICENSE_SECRET,
+# ADMIN_COOKIE_SECRET, STRIPE_SECRET_KEY, KRAKEN_API_KEY, KRAKEN_API_SECRET,
+# PAYPAL_CLIENT_SECRET, and UNSPLASH_ACCESS_KEY should stay remote-only.
 
 [[d1_databases]]
 binding = "D1"

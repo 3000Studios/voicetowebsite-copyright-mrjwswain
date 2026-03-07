@@ -33,6 +33,7 @@ const COMMAND_CENTER_EXACT_API_PATHS = new Set([
   "/api/repo/commit",
   "/api/deploy/run",
   "/api/deploy/logs",
+  "/api/deploy/status",
   "/api/deploy/meter",
   "/api/analytics/metrics",
   "/api/monetization/config",
@@ -540,7 +541,6 @@ const getEnvAudit = (env) => {
     "ADMIN_COOKIE_SECRET",
     "GH_REPO",
     "GH_TOKEN",
-    "CLOUDFLARE_API_TOKEN",
   ];
   const aliases = {
     GH_REPO: ["GITHUB_REPO"],
@@ -1100,6 +1100,205 @@ const handleDeployLogs = async ({ env }) => {
   const res = await stub.fetch("https://deploy/logs");
   const payload = await res.json().catch(() => ({}));
   return json(res.status, payload);
+};
+
+const getDeployControllerState = async (env) => {
+  if (!env.DEPLOY_CONTROLLER) {
+    return {
+      ok: false,
+      error: "DeployControllerDO binding missing.",
+    };
+  }
+  const id = env.DEPLOY_CONTROLLER.idFromName("global");
+  const stub = env.DEPLOY_CONTROLLER.get(id);
+  const res = await stub.fetch("https://deploy/logs");
+  return res.json().catch(() => ({}));
+};
+
+const getCloudflareDeployConfig = (env) => {
+  const accountId = String(
+    env.CLOUDFLARE_ACCOUNT_ID || env.CF_ACCOUNT_ID || ""
+  ).trim();
+  const apiToken = String(
+    env.CF_API_TOKEN ||
+      env.CF_API_TOKEN2 ||
+      env.CF_USER_TOKEN ||
+      env.CLOUDFLARE_API_TOKEN ||
+      env.CF_ACCOUNT_API_VOICETOWEBSITE ||
+      env.CF_Account_API_VoicetoWebsite ||
+      ""
+  ).trim();
+  const scriptName = String(
+    env.CLOUDFLARE_WORKER_NAME || env.WORKER_NAME || "voicetowebsite"
+  ).trim();
+  return { accountId, apiToken, scriptName };
+};
+
+const cloudflareApiFetchJson = async (env, path) => {
+  const { accountId, apiToken } = getCloudflareDeployConfig(env);
+  if (!accountId || !apiToken) {
+    return {
+      ok: false,
+      setupRequired: true,
+      error:
+        "Cloudflare account ID or API token missing. Set CLOUDFLARE_ACCOUNT_ID/CF_ACCOUNT_ID and CF_API_TOKEN/CLOUDFLARE_API_TOKEN.",
+    };
+  }
+  const res = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok || payload?.success === false) {
+    const error =
+      payload?.errors?.[0]?.message ||
+      (Array.isArray(payload?.errors)
+        ? payload.errors
+            .map((entry) => entry?.message)
+            .filter(Boolean)
+            .join("; ")
+        : null) ||
+      payload?.message ||
+      `Cloudflare request failed (${res.status})`;
+    return {
+      ok: false,
+      status: res.status,
+      error,
+      payload,
+    };
+  }
+  return {
+    ok: true,
+    status: res.status,
+    result: payload?.result ?? payload,
+    payload,
+  };
+};
+
+const extractFirstRecord = (result) => {
+  if (Array.isArray(result)) return result[0] || null;
+  if (Array.isArray(result?.deployments)) return result.deployments[0] || null;
+  if (Array.isArray(result?.builds)) return result.builds[0] || null;
+  if (Array.isArray(result?.items)) return result.items[0] || null;
+  return result && typeof result === "object" ? result : null;
+};
+
+const handleDeployStatus = async ({ env, assets, request }) => {
+  const controller = await getDeployControllerState(env).catch((error) => ({
+    ok: false,
+    error: error?.message || "Unable to load deploy controller state.",
+  }));
+
+  let buildId = "";
+  if (assets) {
+    try {
+      const buildRes = await assets.fetch(
+        new Request(new URL("/.build-id", request.url).toString(), {
+          method: "GET",
+        })
+      );
+      if (buildRes.ok) {
+        buildId = String((await buildRes.text()) || "").trim();
+      }
+    } catch (_) {}
+  }
+
+  const { accountId, apiToken, scriptName } = getCloudflareDeployConfig(env);
+  const cloudflare = {
+    configured: Boolean(accountId && apiToken),
+    accountId: accountId || "",
+    scriptName,
+    worker: null,
+    latestDeployment: null,
+    latestBuild: null,
+    source: "cloudflare_api",
+    error: "",
+    setupRequired: false,
+  };
+
+  if (!cloudflare.configured) {
+    cloudflare.setupRequired = true;
+    cloudflare.error =
+      "Cloudflare deployment status requires CLOUDFLARE_ACCOUNT_ID/CF_ACCOUNT_ID and CF_API_TOKEN/CLOUDFLARE_API_TOKEN.";
+  } else {
+    const workerMeta = await cloudflareApiFetchJson(
+      env,
+      `/workers/scripts/${encodeURIComponent(scriptName)}`
+    );
+    if (workerMeta.ok) {
+      const result = workerMeta.result || {};
+      cloudflare.worker = {
+        id: result.id || "",
+        name: result.id ? scriptName : result.name || scriptName,
+        modifiedOn: result.modified_on || result.modifiedOn || "",
+        createdOn: result.created_on || result.createdOn || "",
+      };
+    }
+
+    const deploymentsMeta = await cloudflareApiFetchJson(
+      env,
+      `/workers/scripts/${encodeURIComponent(scriptName)}/deployments`
+    );
+    if (deploymentsMeta.ok) {
+      cloudflare.latestDeployment = extractFirstRecord(deploymentsMeta.result);
+    }
+
+    const buildPaths = [
+      `/workers/scripts/${encodeURIComponent(scriptName)}/builds?page=1&per_page=5`,
+      `/workers/builds/scripts/${encodeURIComponent(scriptName)}/builds?page=1&per_page=5`,
+    ];
+    for (const path of buildPaths) {
+      const buildMeta = await cloudflareApiFetchJson(env, path);
+      if (buildMeta.ok) {
+        cloudflare.latestBuild = extractFirstRecord(buildMeta.result);
+        cloudflare.error = "";
+        break;
+      }
+      if (!cloudflare.error) {
+        cloudflare.error = buildMeta.error || "";
+      }
+    }
+
+    if (
+      !cloudflare.worker &&
+      !cloudflare.latestDeployment &&
+      !cloudflare.latestBuild
+    ) {
+      cloudflare.setupRequired = true;
+      if (!cloudflare.error) {
+        cloudflare.error =
+          "Cloudflare API responded, but no worker deployment/build metadata was returned.";
+      }
+    }
+  }
+
+  const cloudflareLiveTs =
+    cloudflare.latestBuild?.createdOn ||
+    cloudflare.latestBuild?.created_on ||
+    cloudflare.latestDeployment?.created_on ||
+    cloudflare.latestDeployment?.modified_on ||
+    cloudflare.worker?.modifiedOn ||
+    "";
+  const stateLabel = controller?.locked
+    ? "Deploy in progress"
+    : cloudflareLiveTs
+      ? "Live on Cloudflare"
+      : "Idle";
+
+  return json(200, {
+    ok: true,
+    stateLabel,
+    controller,
+    live: {
+      buildId,
+    },
+    cloudflare,
+  });
 };
 
 const handleDeployMeter = async ({ env, request }) => {
@@ -1843,6 +2042,8 @@ export const handleCommandCenterRequest = async ({
     return handleDeployRun({ env, request });
   if (url.pathname === "/api/deploy/logs" && request.method === "GET")
     return handleDeployLogs({ env });
+  if (url.pathname === "/api/deploy/status" && request.method === "GET")
+    return handleDeployStatus({ env, assets, request });
   if (url.pathname === "/api/deploy/meter" && request.method === "GET")
     return handleDeployMeter({ env, request });
 

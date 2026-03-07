@@ -2,6 +2,9 @@
 
 Source of truth: `ops/site/progress.json` (copied to `public/config/progress.json` during build).
 
+Monetization + automation head plan: `MONETIZATION_AUTOMATION_HEAD_PLAN.md` (roadmap JSON:
+`ops/site/monetization-roadmap.json` -> `public/config/monetization-roadmap.json`).
+
 ## How to update
 
 - Update `ops/site/progress.json` status fields for tasks you complete.

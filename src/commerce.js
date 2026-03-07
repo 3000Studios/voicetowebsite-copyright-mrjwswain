@@ -51,8 +51,12 @@ export const handleStripePurchase = async (product, amount, redirectUrl) => {
       }),
     });
     const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
     if (!data.sessionId) throw new Error(data.error || "No session");
-    await stripe.redirectToCheckout({ sessionId: data.sessionId });
+    throw new Error(data.error || "Missing checkout url");
   } catch (err) {
     console.error(err);
     throw err;

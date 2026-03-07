@@ -26,6 +26,7 @@ function processFiles() {
     "affiliates.json",
     "redirects.json",
     "progress.json",
+    "monetization-roadmap.json",
   ];
 
   globalFiles.forEach((file) => {

@@ -273,12 +273,12 @@
                 }),
               });
               const data = await res.json().catch(() => ({}));
+              if (data.url) {
+                window.location.href = data.url;
+                return;
+              }
               if (!data.sessionId) throw new Error(data.error || "Stripe session failed");
-              if (window.Stripe) {
-                const pk = (window.__ENV && window.__ENV.STRIPE_PUBLISHABLE_KEY) || "";
-                if (pk) window.Stripe(pk).redirectToCheckout({ sessionId: data.sessionId });
-                else window.location.href = data.url || "#";
-              } else window.location.href = data.url || "#";
+              throw new Error(data.error || "Missing checkout url");
             } catch (err) {
               alert("Stripe checkout failed: " + err.message);
             }

@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "updatedAt": "2026-02-18",
+  "updatedAt": "2026-03-06",
   "status": "in_progress",
   "protocol": {
     "summary": "Every agent updates progress.json and PROJECT_PROGRESS.md when a task status changes.",
@@ -227,8 +227,9 @@
           "id": "adsense-affiliates",
           "title": "AdSense + affiliate IDs editable live",
           "status": "in_progress",
-          "updatedBy": "unassigned",
-          "updatedAt": "2026-02-13"
+          "updatedBy": "codex",
+          "updatedAt": "2026-03-06",
+          "notes": "Added monetization head plan + machine roadmap for phased execution: MONETIZATION_AUTOMATION_HEAD_PLAN.md and ops/site/monetization-roadmap.json."
         },
         {
           "id": "checkout-unification",

@@ -314,8 +314,11 @@ const openStripeCheckout = async (product) => {
       }),
     });
     const data = await res.json();
-    if (!data.sessionId) throw new Error(data.error || "No session");
-    await stripe.redirectToCheckout({ sessionId: data.sessionId });
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+    throw new Error(data.error || "Missing checkout url");
   } catch (err) {
     console.warn(err);
     alert("Stripe checkout failed. " + err.message);

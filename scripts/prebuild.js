@@ -76,6 +76,7 @@ const globalFiles = [
   "affiliates.json",
   "redirects.json",
   "progress.json",
+  "monetization-roadmap.json",
 ];
 globalFiles.forEach((file) => {
   if (safeCopy(path.join(opsSite, file), path.join(publicConfig, file))) {

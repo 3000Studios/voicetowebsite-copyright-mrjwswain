@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-05T10:45:32.467Z",
-  "scannedFiles": 394,
+  "generatedAt": "2026-03-06T22:37:19.723Z",
+  "scannedFiles": 396,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -115,6 +115,7 @@
     "STRIPE_BUY_BUTTON_ID_GROWTH",
     "STRIPE_BUY_BUTTON_ID_LIFETIME",
     "STRIPE_BUY_BUTTON_ID_STARTER",
+    "STRIPE_ENDPOINT_SECRET",
     "STRIPE_PAYMENT_LINK_ENTERPRISE",
     "STRIPE_PAYMENT_LINK_GROWTH",
     "STRIPE_PAYMENT_LINK_LIFETIME",
@@ -124,6 +125,7 @@
     "STRIPE_SECRET",
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_WEBHOOK_SECRET_LIVE",
     "SYSTEM_FREEZE",
     "UNSPLASH_ACCESS_KEY",
     "VITE_GEMINI_MODEL",
@@ -211,6 +213,7 @@
     "STRIPE_BUY_BUTTON_ID_GROWTH",
     "STRIPE_BUY_BUTTON_ID_LIFETIME",
     "STRIPE_BUY_BUTTON_ID_STARTER",
+    "STRIPE_ENDPOINT_SECRET",
     "STRIPE_PAYMENT_LINK_ENTERPRISE",
     "STRIPE_PAYMENT_LINK_GROWTH",
     "STRIPE_PAYMENT_LINK_LIFETIME",
@@ -223,6 +226,7 @@
     "STRIPE_PUBLIC",
     "STRIPE_PUBLISHABLE_KEY",
     "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
     "VITE_GEMINI_MODEL",
     "VITE_GEMINIAPIKEY2",
     "VITE_PAYPAL_CLIENT_ID",
@@ -276,7 +280,7 @@
     "SITE_ASSETS",
     "SITE_URL",
     "STRIPE_SECRET",
-    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_WEBHOOK_SECRET_LIVE",
     "SYSTEM_FREEZE",
     "UNSPLASH_ACCESS_KEY",
     "VITE_STRIPE_PUBLISHABLE_KEY",
@@ -347,12 +351,16 @@
     "AUTO_SHIP_MIN_INTERVAL_MS": ["scripts/auto-ship.mjs"],
     "BASE_URL": ["stripe-connect-integration.js"],
     "BOT_HUB": ["src/functions/execute.js"],
-    "CF_A": ["worker.js"],
-    "CF_ACCOUNT_API_VOICETOWEBSITE": ["worker.js"],
-    "CF_ACCOUNT_ID": ["src/durable_objects/DeployControllerDO.js"],
+    "CF_A": ["functions/commandCenterApi.js", "worker.js"],
+    "CF_ACCOUNT_API_VOICETOWEBSITE": ["functions/commandCenterApi.js", "worker.js"],
+    "CF_ACCOUNT_ID": ["functions/commandCenterApi.js", "src/durable_objects/DeployControllerDO.js"],
     "CF_ALLOW_LEGACY_DEPLOY_HOOKS": ["functions/orchestrator.js"],
-    "CF_API_TOKEN": ["src/durable_objects/DeployControllerDO.js", "worker.js"],
-    "CF_API_TOKEN2": ["worker.js"],
+    "CF_API_TOKEN": [
+      "functions/commandCenterApi.js",
+      "src/durable_objects/DeployControllerDO.js",
+      "worker.js"
+    ],
+    "CF_API_TOKEN2": ["functions/commandCenterApi.js", "worker.js"],
     "CF_AUTO_DEPLOY_ON_PUSH": ["functions/orchestrator.js"],
     "CF_DEPLOY_HOOK_URL": [
       "functions/orchestrator.js",
@@ -365,13 +373,23 @@
       "functions/orchestrator.js",
       "src/durable_objects/DeployControllerDO.js"
     ],
-    "CF_USER_TOKEN": ["worker.js"],
+    "CF_USER_TOKEN": ["functions/commandCenterApi.js", "worker.js"],
     "CF_WORKERS_BUILDS_AUTO_DEPLOY": ["functions/orchestrator.js"],
     "CF_ZONE_ID": ["worker.js"],
     "CI": ["scripts/husky-install.mjs"],
-    "CLOUDFLARE_ACCOUNT_ID": ["src/durable_objects/DeployControllerDO.js"],
-    "CLOUDFLARE_API_TOKEN": ["src/durable_objects/DeployControllerDO.js", "worker.js"],
-    "CLOUDFLARE_WORKER_NAME": ["src/durable_objects/DeployControllerDO.js"],
+    "CLOUDFLARE_ACCOUNT_ID": [
+      "functions/commandCenterApi.js",
+      "src/durable_objects/DeployControllerDO.js"
+    ],
+    "CLOUDFLARE_API_TOKEN": [
+      "functions/commandCenterApi.js",
+      "src/durable_objects/DeployControllerDO.js",
+      "worker.js"
+    ],
+    "CLOUDFLARE_WORKER_NAME": [
+      "functions/commandCenterApi.js",
+      "src/durable_objects/DeployControllerDO.js"
+    ],
     "CONFIRM_TOKEN_SECRET": ["functions/execute.js"],
     "CONTROL_PASSWORD": [
       "functions/adminAuth.js",
@@ -493,6 +511,7 @@
     "STRIPE_BUY_BUTTON_ID_GROWTH": ["worker.js"],
     "STRIPE_BUY_BUTTON_ID_LIFETIME": ["worker.js"],
     "STRIPE_BUY_BUTTON_ID_STARTER": ["worker.js"],
+    "STRIPE_ENDPOINT_SECRET": ["worker.js"],
     "STRIPE_PAYMENT_LINK_ENTERPRISE": ["worker.js"],
     "STRIPE_PAYMENT_LINK_GROWTH": ["worker.js"],
     "STRIPE_PAYMENT_LINK_LIFETIME": ["worker.js"],
@@ -501,7 +520,8 @@
     "STRIPE_PUBLISHABLE_KEY": ["store-products.js", "worker.js"],
     "STRIPE_SECRET": ["worker.js"],
     "STRIPE_SECRET_KEY": ["stripe-connect-integration.js", "worker.js"],
-    "STRIPE_WEBHOOK_SECRET": ["stripe-connect-integration.js"],
+    "STRIPE_WEBHOOK_SECRET": ["stripe-connect-integration.js", "worker.js"],
+    "STRIPE_WEBHOOK_SECRET_LIVE": ["worker.js"],
     "SYSTEM_FREEZE": ["src/durable_objects/BotHubDO.js"],
     "UNSPLASH_ACCESS_KEY": ["src/utils/imageDiscovery.js"],
     "VITE_GEMINI_MODEL": [
@@ -521,7 +541,7 @@
     "VTW_CACHE": ["src/functions/uiCommand.js", "src/utils/imageDiscovery.js"],
     "VTW_KV": ["src/utils/vaultLogger.js"],
     "VTW_VAULT": ["src/utils/vaultLogger.js"],
-    "WORKER_NAME": ["src/durable_objects/DeployControllerDO.js"],
+    "WORKER_NAME": ["functions/commandCenterApi.js", "src/durable_objects/DeployControllerDO.js"],
     "X_ORCH_TOKEN": ["functions/execute.js", "worker.js"]
   }
 }

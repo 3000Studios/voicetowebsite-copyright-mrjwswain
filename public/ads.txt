@@ -1,1 +1,4 @@
+# ads.txt - Authorized digital sellers (IAB Tech Lab)
+# See https://iabtechlab.com/ads-txt/
+# Update seller and publisher IDs to match your AdSense/partner setup.
 google.com, pub-5800977493749262, DIRECT, f08c47fec0942fa0

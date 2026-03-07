@@ -714,6 +714,44 @@ const ensureOrdersTable = async (env) => {
   }
 };
 
+/** Verify Stripe webhook signature (raw body + Stripe-Signature header). Returns true if valid. */
+const verifyStripeWebhookSignature = async (
+  rawBody,
+  signatureHeader,
+  secret
+) => {
+  if (!rawBody || !signatureHeader || !secret) return false;
+  const parts = {};
+  for (const p of signatureHeader.split(",")) {
+    const [k, v] = p.trim().split("=");
+    if (k && v) parts[k] = v;
+  }
+  const t = parts.t;
+  const v1 = parts.v1;
+  if (!t || !v1) return false;
+  const timestamp = parseInt(t, 10);
+  if (Number.isNaN(timestamp)) return false;
+  const tolerance = 300;
+  if (Math.abs(Date.now() / 1000 - timestamp) > tolerance) return false;
+  const signedPayload = `${t}.${rawBody}`;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(signedPayload)
+  );
+  const hex = Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hex === v1;
+};
+
 const normalizeAnalyticsEventName = (value) =>
   String(value || "")
     .trim()
@@ -2136,6 +2174,64 @@ export default {
         } catch (err) {
           return jsonResponse(500, { error: err.message });
         }
+      }
+
+      // Stripe webhook (signature verification + raw body; do not consume body before this)
+      if (url.pathname === "/api/stripe/webhook" && request.method === "POST") {
+        const secret =
+          env.STRIPE_WEBHOOK_SECRET ||
+          env.STRIPE_ENDPOINT_SECRET ||
+          env.STRIPE_WEBHOOK_SECRET_LIVE;
+        if (!secret) {
+          return jsonResponse(500, { error: "Webhook secret not configured" });
+        }
+        const rawBody = await request.text();
+        const sig = request.headers.get("Stripe-Signature") || "";
+        const valid = await verifyStripeWebhookSignature(rawBody, sig, secret);
+        if (!valid) {
+          return jsonResponse(400, { error: "Invalid signature" });
+        }
+        let event;
+        try {
+          event = JSON.parse(rawBody);
+        } catch (_) {
+          return jsonResponse(400, { error: "Invalid JSON" });
+        }
+        if (event.type === "checkout.session.completed" && event.data?.object) {
+          const session = event.data.object;
+          const orderId =
+            session.id || session.payment_intent || `evt_${event.id}`;
+          const amount =
+            session.amount_total != null ? session.amount_total / 100 : 0;
+          const currency = session.currency || "USD";
+          const customerEmail =
+            session.customer_email || session.customer_details?.email || "";
+          await ensureOrdersTable(env);
+          if (env.D1) {
+            try {
+              await env.D1.prepare(
+                "INSERT OR IGNORE INTO orders (id, product_id, amount, currency, status, customer_email) VALUES (?, ?, ?, ?, ?, ?)"
+              )
+                .bind(
+                  orderId,
+                  session.metadata?.product_id ||
+                    session.metadata?.sku ||
+                    "stripe",
+                  amount,
+                  currency,
+                  "completed",
+                  customerEmail
+                )
+                .run();
+            } catch (err) {
+              // Log but do not fail the webhook response
+            }
+          }
+        }
+        return new Response("ok", {
+          status: 200,
+          headers: { "Content-Type": "text/plain" },
+        });
       }
 
       // Unified Checkout API (Stripe + PayPal)

@@ -27,6 +27,32 @@ store).
 - PayPal server-side checkout uses `PAYPAL_CLIENT_ID(_PROD)` + `PAYPAL_CLIENT_SECRET(_PROD)` and
   optional `PAYPAL_ENV=sandbox|live`.
 
+## Production Variable Mapping
+
+- Cloudflare Worker `voicetowebsite` → `wrangler.toml` `[vars]` (repo-managed safe vars):
+  `ENVIRONMENT`, `PUBLIC_GENERATE`, `CF_ALLOW_LEGACY_DEPLOY_HOOKS`, `ALLOW_REMOTE_DEPLOY_TRIGGER`,
+  `GH_BASE_BRANCH`, `GH_REPO`, `ADMIN_EMAIL`, `ADSENSE_PUBLISHER`, `ADSENSE_CUSTOMER_ID`,
+  `ADSENSE_MODE`, `ADSENSE_ALLOW_ALL_PAGES`, `ADSENSE_MAX_SLOTS`, `PAYPAL_ENV`,
+  `CACHE_CONTROL_STATIC`, `CACHE_CONTROL_HTML`, `STRIPE_PUBLISHABLE_KEY`,
+  `STRIPE_ALLOW_CUSTOM_AMOUNT`, `STRIPE_PAYMENT_METHOD_TYPES`, `STRIPE_PRICE_STARTER`,
+  `STRIPE_PRICE_GROWTH`, `STRIPE_PRICE_ENTERPRISE`, `STRIPE_PRICE_LIFETIME`,
+  `STRIPE_PAYMENT_LINK_STARTER`, `STRIPE_PAYMENT_LINK_GROWTH`, `STRIPE_PAYMENT_LINK_ENTERPRISE`,
+  `STRIPE_PAYMENT_LINK_LIFETIME`, `STRIPE_BUY_BUTTON_ID_STARTER`, `STRIPE_BUY_BUTTON_ID_GROWTH`,
+  `STRIPE_BUY_BUTTON_ID_ENTERPRISE`, `STRIPE_BUY_BUTTON_ID_LIFETIME`
+- Cloudflare Dashboard → Worker `voicetowebsite` → Settings → Variables and Secrets → `Secrets`
+  (private): `CONTROL_PASSWORD`, `ADMIN_ACCESS_CODE` (optional alternative to `CONTROL_PASSWORD`),
+  `ADMIN_COOKIE_SECRET`, `LICENSE_SECRET`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`,
+  `PAYPAL_CLIENT_ID_PROD`, `PAYPAL_CLIENT_SECRET_PROD`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+  (or `STRIPE_ENDPOINT_SECRET`), `UNSPLASH_ACCESS_KEY`, `LIVE_ROOM_VIEWER_TOKEN` (optional),
+  `LIVE_ROOM_ADMIN_TOKEN` (optional), `CF_API_TOKEN` (optional for API-triggered deploy/analytics
+  paths), `CF_ZONE_ID` (optional for API-triggered deploy/analytics paths)
+- Cloudflare Dashboard → Worker `voicetowebsite` → Settings → Variables and Secrets → `Variables`
+  (non-secret toggles if used): `CF_WORKERS_BUILDS_AUTO_DEPLOY`, `CF_DEPLOY_HOOK_URL`,
+  `CF_PAGES_DEPLOY_HOOK`
+- Railway project vars only: `KRAKEN_API_KEY`, `KRAKEN_API_SECRET`
+- Local PowerShell session only for manual Wrangler auth: `CLOUDFLARE_API_TOKEN`,
+  `CLOUDFLARE_ACCOUNT_ID`
+
 ## Agent operations docs
 
 - Root agent contract: `AGENTS.md`
@@ -38,6 +64,12 @@ store).
   - `functions/AGENTS.md`
   - `scripts/AGENTS.md`
   - `tests/AGENTS.md`
+
+## Head Plans
+
+- Monetization + Automation (human plan): `MONETIZATION_AUTOMATION_HEAD_PLAN.md`
+- Monetization + Automation (machine roadmap): `ops/site/monetization-roadmap.json`
+- Public roadmap mirror: `public/config/monetization-roadmap.json`
 
 ## Edge AI + R2
 
@@ -62,8 +94,11 @@ store).
 - PayPal: `POST /api/checkout` (body: `{ provider: "paypal", id: "starter" | appId | sku }`) returns
   `{ id }` (order ID); frontend then calls `POST /api/paypal/capture` with `{ orderId }` after user
   approves. Orders are logged to D1.
-- Stripe: `POST /api/checkout` (body: `{ provider: "stripe", id }`) returns `{ sessionId }`;
-  frontend redirects to Stripe Checkout.
+- Stripe: `POST /api/checkout` (body: `{ provider: "stripe", id }`) returns `{ url, sessionId }`;
+  frontend redirects via `window.location.href = data.url` (do not use deprecated
+  `stripe.redirectToCheckout`). Configure `STRIPE_WEBHOOK_SECRET` and point Stripe to
+  `POST /api/stripe/webhook` for authoritative payment confirmation and order logging.
+- **ads.txt:** Served at `/ads.txt` from `public/ads.txt`; update for your AdSense/partner IDs.
 
 ## Deploy
 

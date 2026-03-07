@@ -1,16 +1,24 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import AudioWaveform from "./components/AudioWaveform";
-import ComprehensiveAdminPanel from "./components/ComprehensiveAdminPanel";
-import EnhancedHamburgerNav from "./components/EnhancedHamburgerNav";
-import ErrorBoundary from "./components/ErrorBoundary";
-import ParticleEffects from "./components/ParticleEffects";
-import WarpTunnel from "./components/WarpTunnel";
+import React, {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
 import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
 import { escapeHtml } from "./utils/htmlSanitizer";
 import { trackRevenueEvent } from "./utils/revenueTracking";
+
+// Lazy load heavy components
+const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
+const ParticleEffects = lazy(() => import("./components/ParticleEffects"));
+const WarpTunnel = lazy(() => import("./components/WarpTunnel"));
+const PhosphorNav = lazy(() => import("./components/PhosphorNav"));
+const ErrorBoundary = lazy(() => import("./components/ErrorBoundary"));
 
 type PricingTier = {
   name: string;
@@ -270,7 +278,6 @@ const App: React.FC = () => {
   const [activeTierIndex, setActiveTierIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const FALLBACK_PREVIEW_URL = "/demo";
 
@@ -394,101 +401,7 @@ const App: React.FC = () => {
     audioEngine.setVolume(0.4);
   }, []);
 
-  // AGGRESSIVE AUTOPLAY - Play music immediately on page load
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const hostname = (window.location.hostname || "").toLowerCase();
-    const isVoiceToWebsiteHost = /(^|\.)voicetowebsite\.com$/.test(hostname);
-    const allowDevHost = ["localhost", "127.0.0.1", "0.0.0.0"].includes(
-      hostname
-    );
-    if (!isVoiceToWebsiteHost && !allowDevHost) return;
-
-    let cancelled = false;
-
-    const tryStart = async () => {
-      if (cancelled) return;
-      // Force start the song immediately
-      await startThemeSong();
-    };
-
-    const onFirstGesture = async () => {
-      if (audioPlayingRef.current) return;
-      // Force start on first user interaction if blocked
-      await startThemeSong();
-    };
-
-    // Multiple attempts for immediate autoplay
-    const attemptAutoplay = async () => {
-      if (cancelled) return;
-
-      // Try immediately
-      try {
-        await startThemeSong();
-      } catch (error) {
-        console.log("Autoplay blocked, will retry on user interaction");
-      }
-
-      // Store timer refs for cleanup
-      const timer1 = setTimeout(() => {
-        if (!cancelled && !audioPlayingRef.current) {
-          tryStart().catch(() => {});
-        }
-      }, 500);
-
-      const timer2 = setTimeout(() => {
-        if (!cancelled && !audioPlayingRef.current) {
-          tryStart().catch(() => {});
-        }
-      }, 1500);
-
-      // Return cleanup function
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-      };
-    };
-
-    // Start aggressive autoplay attempts and store cleanup
-    attemptAutoplay().then((cleanupFn) => {
-      // Store cleanup function for later use
-      const cleanupAutoplayFn = cleanupFn;
-
-      // Fallback: retry on first user interaction
-      document.addEventListener("pointerdown", onFirstGesture, {
-        capture: true,
-        once: true,
-      });
-      document.addEventListener("keydown", onFirstGesture, {
-        capture: true,
-        once: true,
-      });
-
-      // Also try on page visibility change (tab switching)
-      const handleVisibilityChange = () => {
-        if (
-          !cancelled &&
-          !audioPlayingRef.current &&
-          !musicManuallyStoppedRef.current &&
-          document.visibilityState === "visible"
-        ) {
-          tryStart().catch(() => {});
-        }
-      };
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-
-      return () => {
-        cancelled = true;
-        cleanupAutoplayFn?.(); // Clean up autoplay timers
-        document.removeEventListener("pointerdown", onFirstGesture, true);
-        document.removeEventListener("keydown", onFirstGesture, true);
-        document.removeEventListener(
-          "visibilitychange",
-          handleVisibilityChange
-        );
-      };
-    });
-  }, [startThemeSong]);
+  // No autoplay: music starts only on explicit user gesture (e.g. "Play Song" button) for better UX and AdSense review
 
   // Actions
   const startListening = () => {
@@ -612,9 +525,6 @@ const App: React.FC = () => {
     setFlowPhase("generating");
     setGenerateError("");
 
-    // Play the song as requested
-    await startThemeSong();
-
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -645,7 +555,6 @@ const App: React.FC = () => {
     } catch (err: any) {
       setGenerateError(err?.message || "Generate failed.");
       setFlowPhase("confirm");
-    } finally {
     }
   };
 
@@ -708,11 +617,6 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
-        <ComprehensiveAdminPanel
-          isAuthenticated={isAdminAuthenticated}
-          onLogin={() => setIsAdminAuthenticated(true)}
-          onLogout={() => setIsAdminAuthenticated(false)}
-        />
         <ErrorBoundary fallback={null}>
           <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
         </ErrorBoundary>
@@ -740,12 +644,10 @@ const App: React.FC = () => {
           <ParticleEffects />
         </div>
 
-        {/* Global enhanced hamburger + fullscreen popout nav */}
-        <EnhancedHamburgerNav
-          isAdminAuthenticated={isAdminAuthenticated}
-          onAdminLogin={() => setIsAdminAuthenticated(true)}
-          onAdminLogout={() => setIsAdminAuthenticated(false)}
-        />
+        {/* Global phosphor hamburger + fullscreen popout nav */}
+        <Suspense fallback={null}>
+          <PhosphorNav />
+        </Suspense>
 
         <div className="fixed bottom-5 right-5 z-50">
           <button

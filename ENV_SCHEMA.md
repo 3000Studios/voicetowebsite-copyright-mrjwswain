@@ -1,12 +1,12 @@
 # ENV Schema
 
-Generated: 2026-03-05T10:45:32.467Z
+Generated: 2026-03-06T22:37:19.723Z
 
 ## Summary
 
-- Scanned files: 394
-- Used keys: 134
-- Defined keys: 90
+- Scanned files: 396
+- Used keys: 136
+- Defined keys: 92
 - Missing keys: 55
 - Critical missing keys: 0
 
@@ -45,25 +45,25 @@ Generated: 2026-03-05T10:45:32.467Z
 | BOT_HUB                                  | yes     | 1             | ok      |
 | CACHE_CONTROL_HTML                       | yes     | 0             | unused  |
 | CACHE_CONTROL_STATIC                     | yes     | 0             | unused  |
-| CF_A                                     | no      | 1             | missing |
-| CF_ACCOUNT_API_VOICETOWEBSITE            | yes     | 1             | ok      |
-| CF_ACCOUNT_ID                            | no      | 1             | ok      |
+| CF_A                                     | no      | 2             | missing |
+| CF_ACCOUNT_API_VOICETOWEBSITE            | yes     | 2             | ok      |
+| CF_ACCOUNT_ID                            | no      | 2             | ok      |
 | CF_ALLOW_LEGACY_DEPLOY_HOOKS             | yes     | 1             | ok      |
-| CF_API_TOKEN                             | yes     | 2             | ok      |
-| CF_API_TOKEN2                            | yes     | 1             | ok      |
+| CF_API_TOKEN                             | yes     | 3             | ok      |
+| CF_API_TOKEN2                            | yes     | 2             | ok      |
 | CF_AUTO_DEPLOY_ON_PUSH                   | no      | 1             | missing |
 | CF_DEPLOY_HOOK_URL                       | yes     | 2             | ok      |
 | CF_DEPLOY_WEBHOOK                        | no      | 1             | missing |
 | CF_FORCE_DEPLOY_HOOK                     | no      | 1             | missing |
 | CF_FORCE_DEPLOY_WEBHOOK                  | no      | 1             | missing |
 | CF_PAGES_DEPLOY_HOOK                     | yes     | 2             | ok      |
-| CF_USER_TOKEN                            | yes     | 1             | ok      |
+| CF_USER_TOKEN                            | yes     | 2             | ok      |
 | CF_WORKERS_BUILDS_AUTO_DEPLOY            | yes     | 1             | ok      |
 | CF_ZONE_ID                               | yes     | 1             | ok      |
 | CI                                       | no      | 1             | missing |
-| CLOUDFLARE_ACCOUNT_ID                    | yes     | 1             | ok      |
-| CLOUDFLARE_API_TOKEN                     | yes     | 2             | ok      |
-| CLOUDFLARE_WORKER_NAME                   | no      | 1             | missing |
+| CLOUDFLARE_ACCOUNT_ID                    | yes     | 2             | ok      |
+| CLOUDFLARE_API_TOKEN                     | yes     | 3             | ok      |
+| CLOUDFLARE_WORKER_NAME                   | no      | 2             | missing |
 | CONFIRM_TOKEN_SECRET                     | no      | 1             | missing |
 | CONTROL_PASSWORD                         | yes     | 5             | ok      |
 | D1                                       | yes     | 9             | ok      |
@@ -137,6 +137,7 @@ Generated: 2026-03-05T10:45:32.467Z
 | STRIPE_BUY_BUTTON_ID_GROWTH              | yes     | 1             | ok      |
 | STRIPE_BUY_BUTTON_ID_LIFETIME            | yes     | 1             | ok      |
 | STRIPE_BUY_BUTTON_ID_STARTER             | yes     | 1             | ok      |
+| STRIPE_ENDPOINT_SECRET                   | yes     | 1             | ok      |
 | STRIPE_PAYMENT_LINK_ENTERPRISE           | yes     | 1             | ok      |
 | STRIPE_PAYMENT_LINK_GROWTH               | yes     | 1             | ok      |
 | STRIPE_PAYMENT_LINK_LIFETIME             | yes     | 1             | ok      |
@@ -150,7 +151,8 @@ Generated: 2026-03-05T10:45:32.467Z
 | STRIPE_PUBLISHABLE_KEY                   | yes     | 2             | ok      |
 | STRIPE_SECRET                            | no      | 1             | missing |
 | STRIPE_SECRET_KEY                        | yes     | 2             | ok      |
-| STRIPE_WEBHOOK_SECRET                    | no      | 1             | missing |
+| STRIPE_WEBHOOK_SECRET                    | yes     | 2             | ok      |
+| STRIPE_WEBHOOK_SECRET_LIVE               | no      | 1             | missing |
 | SYSTEM_FREEZE                            | no      | 1             | missing |
 | UNSPLASH_ACCESS_KEY                      | no      | 1             | missing |
 | VITE_GEMINI_MODEL                        | yes     | 3             | ok      |
@@ -162,5 +164,5 @@ Generated: 2026-03-05T10:45:32.467Z
 | VTW_CACHE                                | yes     | 2             | ok      |
 | VTW_KV                                   | no      | 1             | missing |
 | VTW_VAULT                                | no      | 1             | missing |
-| WORKER_NAME                              | no      | 1             | missing |
+| WORKER_NAME                              | no      | 2             | missing |
 | X_ORCH_TOKEN                             | no      | 2             | missing |

@@ -580,8 +580,8 @@ export class CheckoutModal {
         throw new Error(data.error || "Checkout failed");
       }
 
-      // Redirect to provider checkout
-      if (this.selectedProvider === "stripe" && data.sessionId) {
+      // Redirect to provider checkout (use session.url; redirectToCheckout is deprecated)
+      if (this.selectedProvider === "stripe" && data.url) {
         window.location.href = data.url;
       } else if (this.selectedProvider === "paypal" && data.id) {
         // PayPal will be handled by provider

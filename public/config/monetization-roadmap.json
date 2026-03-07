@@ -1,0 +1,157 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-03-06",
+  "status": "in_progress",
+  "owner": "growth-engine",
+  "headPlanPath": "MONETIZATION_AUTOMATION_HEAD_PLAN.md",
+  "phases": [
+    {
+      "id": "phase-1-foundations",
+      "title": "Revenue Foundations",
+      "window": "Weeks 1-2",
+      "status": "in_progress",
+      "items": [
+        {
+          "id": "payment-health-audit",
+          "title": "Payment reliability audit (PayPal + Stripe)",
+          "status": "in_progress",
+          "kpi": "checkout_success_rate",
+          "target": ">=98%"
+        },
+        {
+          "id": "adsense-policy-enablement",
+          "title": "AdSense policy-compliant enablement and slot validation",
+          "status": "todo",
+          "kpi": "adsense_active_pages",
+          "target": "approved pages only"
+        },
+        {
+          "id": "referral-flow-activation",
+          "title": "Referral link generation and attribution flow activation",
+          "status": "todo",
+          "kpi": "referral_attributed_paid_signups",
+          "target": ">=15%"
+        },
+        {
+          "id": "mobile-conversion-ux",
+          "title": "Sticky CTA and conversion UX pass for mobile",
+          "status": "todo",
+          "kpi": "mobile_conversion_lift",
+          "target": "+15%"
+        }
+      ]
+    },
+    {
+      "id": "phase-2-conversion",
+      "title": "Conversion Engine",
+      "window": "Weeks 3-4",
+      "status": "todo",
+      "items": [
+        {
+          "id": "pricing-experiments",
+          "title": "Run pricing/packaging experiments",
+          "status": "todo",
+          "kpi": "paid_conversion_rate",
+          "target": "+25%"
+        },
+        {
+          "id": "coupon-automation",
+          "title": "Abandonment-triggered coupon automation",
+          "status": "todo",
+          "kpi": "recovered_checkouts",
+          "target": "upward trend"
+        },
+        {
+          "id": "upsell-automation",
+          "title": "Usage-based upsells and post-purchase order bumps",
+          "status": "todo",
+          "kpi": "average_revenue_per_user",
+          "target": "upward trend"
+        }
+      ]
+    },
+    {
+      "id": "phase-3-growth-automation",
+      "title": "Automated Growth",
+      "window": "Weeks 5-8",
+      "status": "todo",
+      "items": [
+        {
+          "id": "ai-content-pipeline",
+          "title": "AI-assisted content pipeline with human review gate",
+          "status": "todo",
+          "kpi": "posts_per_week",
+          "target": ">=2"
+        },
+        {
+          "id": "distribution-automation",
+          "title": "Auto-distribution to social and lifecycle email",
+          "status": "todo",
+          "kpi": "content_amplification_coverage",
+          "target": ">=2 channels/post"
+        },
+        {
+          "id": "affiliate-partner-ops",
+          "title": "Affiliate partner onboarding and promo automation",
+          "status": "todo",
+          "kpi": "active_affiliate_partners",
+          "target": "monthly growth"
+        }
+      ]
+    },
+    {
+      "id": "phase-4-scale-optimization",
+      "title": "Scale and Optimization",
+      "window": "Weeks 9-12",
+      "status": "todo",
+      "items": [
+        {
+          "id": "app-catalog-expansion",
+          "title": "Launch high-demand apps and improve category merchandising",
+          "status": "todo",
+          "kpi": "app_revenue_share",
+          "target": "upward trend"
+        },
+        {
+          "id": "seo-cwv-optimization",
+          "title": "SEO and Core Web Vitals optimization cycle",
+          "status": "todo",
+          "kpi": "organic_sessions",
+          "target": "upward trend"
+        },
+        {
+          "id": "experiment-promotion",
+          "title": "Promote winning experiments and retire underperformers",
+          "status": "todo",
+          "kpi": "rolling_30_day_revenue",
+          "target": "upward trend"
+        }
+      ]
+    }
+  ],
+  "integrationPaths": {
+    "commerce": [
+      "worker.js",
+      "store.html",
+      "store-products.js",
+      "src/commerce.js",
+      "src/utils/cartManager.js",
+      "src/components/Checkout.tsx",
+      "ops/site/products.json"
+    ],
+    "adsenseAffiliate": [
+      "public/nav.js",
+      "worker.js",
+      "ops/site/adsense.json",
+      "ops/site/affiliates.json",
+      "public/ads.txt"
+    ],
+    "automation": [
+      "scripts/autopilot.mjs",
+      "scripts/generate-config.mjs",
+      "scripts/prebuild.js",
+      "voicetowebsite-orchestrator"
+    ],
+    "seo": ["scripts/generate-sitemap.mjs", "public/sitemap.xml", "index.html", "blog.html"]
+  }
+}

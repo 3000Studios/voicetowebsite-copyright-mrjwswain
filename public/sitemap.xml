@@ -131,6 +131,11 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
+    <loc>https://voicetowebsite.com/enhanced-hamburger-nav</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://voicetowebsite.com/enhanced-navigation</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
