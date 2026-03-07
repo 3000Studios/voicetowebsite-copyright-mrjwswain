@@ -39,7 +39,7 @@ let updatedCount = 0;
 
 htmlFiles.forEach((file) => {
   let content = fs.readFileSync(file, "utf8");
-  let originalContent = content;
+  const originalContent = content;
 
   // Calculate relative path to root
   const dir = path.dirname(file);

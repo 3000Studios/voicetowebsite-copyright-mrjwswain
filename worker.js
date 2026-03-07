@@ -2502,7 +2502,9 @@ export default {
               if (row && String(row.status || "").toLowerCase() !== "active") {
                 return jsonResponse(403, { error: "License revoked." });
               }
-            } catch (_) {}
+            } catch (_) {
+              // License check failed silently
+            }
           }
           return jsonResponse(200, { ok: true, data });
         } catch (err) {

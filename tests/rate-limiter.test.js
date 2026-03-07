@@ -374,7 +374,7 @@ describe("Rate Limiter", () => {
       }
 
       // Should be blocked
-      let result = await rateLimiter.checkRateLimit(identifier, "auto");
+      const result = await rateLimiter.checkRateLimit(identifier, "auto");
       expect(result.allowed).toBe(false);
 
       // Mock time passing (beyond window)

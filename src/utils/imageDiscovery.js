@@ -22,7 +22,7 @@ export class ImageDiscoverySystem {
 
     try {
       // 1. Search for image
-      let imageUrl = await this.searchImage(query);
+      const imageUrl = await this.searchImage(query);
       if (!imageUrl) {
         throw new Error(`No images found for: ${query}`);
       }

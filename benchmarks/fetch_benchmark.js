@@ -30,9 +30,9 @@ async function runConcurrent(needsIndex, needsApp, needsStyles) {
     needsStyles ? getFileContent("styles.css", "main") : Promise.resolve(null),
   ]);
 
-  let indexHtml = results[0];
-  let appJs = results[1];
-  let styles = results[2];
+  const indexHtml = results[0];
+  const appJs = results[1];
+  const styles = results[2];
 
   const end = performance.now();
   return end - start;

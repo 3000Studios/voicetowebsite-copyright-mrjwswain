@@ -1,5 +1,5 @@
-const express = require("express");
-const { execSync } = require("child_process");
+import { execSync } from "child_process";
+import express from "express";
 
 const app = express();
 app.use(express.json());

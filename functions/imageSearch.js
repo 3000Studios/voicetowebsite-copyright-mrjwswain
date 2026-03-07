@@ -113,7 +113,7 @@ async function handleVideoSearch(discoverySystem, payload, env) {
   // For now, return video embed instructions
   // In production, would validate URL and generate embed code
 
-  let videoUrl = query;
+  const videoUrl = query;
   let embedCode = "";
   let provider = "unknown";
 

@@ -13,7 +13,7 @@
   let pollTimer = 0;
   let speakTimer = 0;
   let speakEnabled = false;
-  let lastSpokenIdBySession = Object.create(null);
+  const lastSpokenIdBySession = Object.create(null);
 
   const setSpeakEnabled = (next) => {
     speakEnabled = Boolean(next);

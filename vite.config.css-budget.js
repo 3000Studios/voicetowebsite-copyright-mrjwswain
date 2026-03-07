@@ -191,7 +191,7 @@ function revenueOptimizer() {
 
       cssAssets.forEach((assetName) => {
         const asset = bundle[assetName];
-        let css = asset.code;
+        const css = asset.code;
 
         // Add revenue optimization classes
         const revenueVariants = `
@@ -248,7 +248,7 @@ function canaryBranchProcessor() {
 
       cssAssets.forEach((assetName) => {
         const asset = bundle[assetName];
-        let css = asset.code;
+        const css = asset.code;
 
         // Add canary feature flags
         const canaryFlags = `
