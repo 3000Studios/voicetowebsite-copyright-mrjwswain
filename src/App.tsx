@@ -348,12 +348,13 @@ const App: React.FC = () => {
     setIsMusicPlaying(false);
   }, []);
 
-  // Initialize speech recognition once; start only when user explicitly taps CTA.
-  useEffect(() => {
+  const initializeSpeechRecognition = useCallback(() => {
+    if (recognitionRef.current) return recognitionRef.current;
+
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    if (!SpeechRecognition) return null;
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
@@ -386,14 +387,22 @@ const App: React.FC = () => {
         );
       }
     };
+
     recognitionRef.current = recognition;
+    return recognition;
+  }, []);
+
+  // Initialize speech recognition once; start only when user explicitly taps CTA.
+  useEffect(() => {
+    const recognition = initializeSpeechRecognition();
+    if (!recognition) return;
 
     return () => {
       try {
         recognition.stop();
       } catch (_) {}
     };
-  }, []);
+  }, [initializeSpeechRecognition]);
 
   // Audio Control
   useEffect(() => {
@@ -405,7 +414,7 @@ const App: React.FC = () => {
 
   // Actions
   const startListening = () => {
-    const recognition = recognitionRef.current;
+    const recognition = initializeSpeechRecognition();
     if (!recognition) {
       setGenerateError(
         "Voice capture is not available in this browser. Use Chrome or Edge."

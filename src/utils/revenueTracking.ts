@@ -2,6 +2,20 @@ type RevenueProperties = Record<string, unknown>;
 
 const ENDPOINT = "/api/analytics/event";
 
+const isTestEnvironment = () => import.meta.env.MODE === "test";
+
+const resolveEndpoint = () => {
+  if (isTestEnvironment()) return null;
+  if (/^https?:\/\//i.test(ENDPOINT)) return ENDPOINT;
+  if (typeof window === "undefined" || !window.location?.origin) return null;
+
+  try {
+    return new URL(ENDPOINT, window.location.origin).toString();
+  } catch (_) {
+    return null;
+  }
+};
+
 const normalizeEventName = (value: string) =>
   String(value || "")
     .trim()
@@ -10,17 +24,19 @@ const normalizeEventName = (value: string) =>
     .slice(0, 64);
 
 const postEvent = (payload: Record<string, unknown>) => {
+  const endpoint = resolveEndpoint();
+  if (!endpoint) return;
   const body = JSON.stringify(payload);
   if (typeof navigator !== "undefined" && "sendBeacon" in navigator) {
     try {
       const blob = new Blob([body], { type: "application/json" });
-      if (navigator.sendBeacon(ENDPOINT, blob)) return;
+      if (navigator.sendBeacon(endpoint, blob)) return;
     } catch (_) {
       // Fall through to fetch-based transport.
     }
   }
 
-  fetch(ENDPOINT, {
+  fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body,
