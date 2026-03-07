@@ -43,7 +43,6 @@ const CRITICAL_GROUPS = [
   ["CONTROL_PASSWORD"],
   ["GH_TOKEN", "GITHUB_TOKEN", "GITHUB_PAT"],
   ["GH_REPO", "GITHUB_REPO"],
-  ["CLOUDFLARE_API_TOKEN"],
 ];
 
 const stableSort = (values) =>

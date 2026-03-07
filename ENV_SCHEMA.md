@@ -1,12 +1,12 @@
 # ENV Schema
 
-Generated: 2026-03-06T22:37:19.723Z
+Generated: 2026-03-07T00:14:41.982Z
 
 ## Summary
 
 - Scanned files: 396
-- Used keys: 136
-- Defined keys: 92
+- Used keys: 137
+- Defined keys: 93
 - Missing keys: 55
 - Critical missing keys: 0
 
@@ -14,7 +14,7 @@ Generated: 2026-03-06T22:37:19.723Z
 
 | Key                                      | Defined | Used In Files | Status  |
 | ---------------------------------------- | ------- | ------------- | ------- |
-| ADMIN_ACCESS_CODE                        | no      | 2             | missing |
+| ADMIN_ACCESS_CODE                        | yes     | 2             | ok      |
 | ADMIN_BEARER_TOKEN                       | no      | 3             | missing |
 | ADMIN_COOKIE_SECRET                      | yes     | 1             | ok      |
 | ADMIN_EMAIL                              | yes     | 0             | unused  |
@@ -62,7 +62,7 @@ Generated: 2026-03-06T22:37:19.723Z
 | CF_ZONE_ID                               | yes     | 1             | ok      |
 | CI                                       | no      | 1             | missing |
 | CLOUDFLARE_ACCOUNT_ID                    | yes     | 2             | ok      |
-| CLOUDFLARE_API_TOKEN                     | yes     | 3             | ok      |
+| CLOUDFLARE_API_TOKEN                     | no      | 3             | missing |
 | CLOUDFLARE_WORKER_NAME                   | no      | 2             | missing |
 | CONFIRM_TOKEN_SECRET                     | no      | 1             | missing |
 | CONTROL_PASSWORD                         | yes     | 5             | ok      |
@@ -92,6 +92,7 @@ Generated: 2026-03-06T22:37:19.723Z
 | LIVE_ROOM_ADMIN_TOKEN                    | yes     | 2             | ok      |
 | LIVE_ROOM_VIEWER_TOKEN                   | yes     | 1             | ok      |
 | LOG_LEVEL                                | no      | 4             | missing |
+| MODE                                     | no      | 1             | missing |
 | NEXT_PUBLIC_ADSENSE_PUBLISHER_ID         | no      | 1             | missing |
 | NODE_ENV                                 | no      | 5             | missing |
 | OPENAI_API                               | yes     | 1             | ok      |
@@ -154,7 +155,7 @@ Generated: 2026-03-06T22:37:19.723Z
 | STRIPE_WEBHOOK_SECRET                    | yes     | 2             | ok      |
 | STRIPE_WEBHOOK_SECRET_LIVE               | no      | 1             | missing |
 | SYSTEM_FREEZE                            | no      | 1             | missing |
-| UNSPLASH_ACCESS_KEY                      | no      | 1             | missing |
+| UNSPLASH_ACCESS_KEY                      | yes     | 1             | ok      |
 | VITE_GEMINI_MODEL                        | yes     | 3             | ok      |
 | VITE_GEMINIAPIKEY2                       | yes     | 4             | ok      |
 | VITE_PAYPAL_CLIENT_ID                    | yes     | 2             | ok      |

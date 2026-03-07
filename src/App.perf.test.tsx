@@ -1,6 +1,5 @@
-import { render, fireEvent, act } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
-import App from "./App";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock dependencies
 vi.mock("./services/audioEngine", () => ({
@@ -28,17 +27,23 @@ vi.mock("./components/WarpTunnel", () => ({
 }));
 
 describe("App Performance", () => {
-  beforeEach(() => {
+  let App: (typeof import("./App"))["default"];
+
+  beforeEach(async () => {
     warpRenderCount = 0;
     vi.clearAllMocks();
+    vi.resetModules();
+    ({ default: App } = await import("./App"));
   });
 
-  it("should demonstrate re-render behavior on mousemove", () => {
+  it("should demonstrate re-render behavior on mousemove", async () => {
     render(<App />);
 
-    // Initial render
+    await waitFor(() => {
+      expect(warpRenderCount).toBeGreaterThan(0);
+    });
+
     const initialCount = warpRenderCount;
-    expect(initialCount).toBeGreaterThan(0);
 
     // Simulate mouse movement
     act(() => {
