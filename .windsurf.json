@@ -7,8 +7,11 @@
     "enabled": true,
     "contextAware": true,
     "autoSuggest": true,
+    "autoExecute": true,
+    "fullAutomation": true,
     "codeCompletion": {
       "enabled": true,
+      "autoApply": true,
       "triggerCharacters": [".", "(", "[", "{", "<", "\"", "'"],
       "languages": [
         "javascript",
@@ -22,6 +25,7 @@
     },
     "chatAssistant": {
       "enabled": true,
+      "autoExecuteCommands": true,
       "contextFiles": ["PROJECT_PROGRESS.md", "README.md", "package.json", "ops/site/progress.json"]
     }
   },
@@ -34,7 +38,9 @@
     "buildCommand": "npm run build",
     "devCommand": "npm run dev:all",
     "testCommand": "npm run test",
-    "deployCommand": "npm run deploy"
+    "deployCommand": "npm run deploy",
+    "autoRun": true,
+    "autoDeploy": true
   },
 
   "paths": {
@@ -77,31 +83,97 @@
       "enabled": true,
       "accountId": "${CLOUDFLARE_ACCOUNT_ID}",
       "workersEnabled": true,
-      "pagesEnabled": true
+      "pagesEnabled": true,
+      "autoDeploy": true
     },
     "git": {
       "enabled": true,
-      "autoCommit": false,
-      "branchProtection": true
+      "autoCommit": true,
+      "autoPush": true,
+      "branchProtection": false,
+      "skipConfirmation": true
+    }
+  },
+
+  "terminal": {
+    "autoRun": {
+      "enabled": true,
+      "allCommands": true,
+      "skipConfirmation": true,
+      "allowWriteAccess": true,
+      "allowSystemAccess": true,
+      "allowFileOperations": true,
+      "allowNetworkAccess": true,
+      "allowEnvironmentAccess": true
+    },
+    "permissions": {
+      "fullAccess": true,
+      "readWrite": true,
+      "systemLevel": true,
+      "fileSystem": true,
+      "network": true,
+      "environment": true,
+      "processManagement": true
+    },
+    "automation": {
+      "autoExecuteNpmCommands": true,
+      "autoExecuteGitCommands": true,
+      "autoExecuteWranglerCommands": true,
+      "autoExecuteSystemCommands": true,
+      "autoExecutePowerShellCommands": true,
+      "silentMode": true,
+      "noPrompts": true,
+      "autoApproveAll": true
     }
   },
 
   "tasks": {
     "dev": {
       "command": "npm run dev:all",
-      "description": "Start development servers (Vite + Wrangler)"
+      "description": "Start development servers (Vite + Wrangler)",
+      "autoRun": true,
+      "autoRestart": true
     },
     "build": {
       "command": "npm run build",
-      "description": "Build production bundle"
+      "description": "Build production bundle",
+      "autoRun": true,
+      "autoDeploy": true
     },
     "verify": {
       "command": "npm run verify",
-      "description": "Run all verification checks"
+      "description": "Run all verification checks",
+      "autoRun": true,
+      "autoFix": true
     },
     "deploy": {
       "command": "npm run deploy",
-      "description": "Deploy to Cloudflare Workers"
+      "description": "Deploy to Cloudflare Workers",
+      "autoRun": true,
+      "skipConfirmation": true
+    },
+    "auto:run": {
+      "command": "npm run auto:run",
+      "description": "Start auto-run everything system",
+      "autoRun": true,
+      "background": true
+    }
+  },
+
+  "automation": {
+    "fullAccess": true,
+    "autoAcceptAll": true,
+    "noPrompts": true,
+    "silentMode": true,
+    "permissions": {
+      "readWrite": true,
+      "systemLevel": true,
+      "fileSystem": true,
+      "network": true,
+      "environment": true,
+      "processManagement": true,
+      "registryAccess": true,
+      "adminAccess": true
     }
   },
 
