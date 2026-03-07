@@ -30,7 +30,7 @@ class AutoRunEverything {
       runDevFrontend: true,
       runDevWorker: true,
 
-      // Automation
+      // Automation - ALL ENABLED FOR AUTO-ACCEPT
       autoCommit: true,
       autoPush: true,
       autoDeploy: true,
@@ -40,10 +40,17 @@ class AutoRunEverything {
       watchFiles: true,
       performanceMonitoring: true,
 
-      // Timing
-      debounceMs: 3000,
-      minIntervalMs: 15000,
-      deployDelayMs: 5000,
+      // Auto-accept settings - NO PROMPTS
+      autoAcceptAll: true,
+      skipAllPrompts: true,
+      autoApproveDeployment: true,
+      autoApproveCommits: true,
+      autoApprovePush: true,
+
+      // Timing - AGGRESSIVE FOR IMMEDIATE ACTION
+      debounceMs: 1000, // Reduced from 3000ms
+      minIntervalMs: 5000, // Reduced from 15000ms
+      deployDelayMs: 2000, // Reduced from 5000ms
 
       // Environment
       nodeVersion: "20",
@@ -274,32 +281,24 @@ class AutoRunEverything {
         return; // No changes to commit
       }
 
-      console.log("📦 Auto-committing changes...");
+      console.log("📦 Auto-committing changes (auto-accept enabled)...");
 
       // Add all changes
       await this.runCommand("git", ["add", "."]);
 
-      // Commit with auto-generated message
-      const commitMsg = `Auto: ${new Date().toISOString()} - Automated commit`;
+      // Commit with auto-generated message - NO PROMPTS
+      const commitMsg = `Auto: ${new Date().toISOString()} - Automated commit (auto-accept)`;
       await this.runCommand("git", ["commit", "-m", commitMsg]);
 
       this.lastCommit = now;
 
-      if (this.config.autoPush) {
+      // Auto-push if enabled - NO PROMPTS
+      if (this.config.autoPush && this.config.autoApprovePush) {
         await this.autoPush();
       }
     } catch (error) {
       console.error("❌ Auto-commit failed:", error.message);
-    }
-  }
-
-  async autoPush() {
-    try {
-      console.log("📤 Auto-pushing to remote...");
-      await this.runCommand("git", ["push", "origin", "main"]);
-      console.log("✅ Pushed successfully");
-    } catch (error) {
-      console.error("❌ Auto-push failed:", error.message);
+      // Continue anyway - don't prompt user
     }
   }
 
@@ -310,27 +309,33 @@ class AutoRunEverything {
     }
 
     try {
-      console.log("🚀 Auto-deploying with Wrangler...");
+      console.log("🚀 Auto-deploying with Wrangler (auto-accept enabled)...");
 
-      // Use Wrangler CLI for deployment
-      await this.runCommand("npx", ["wrangler", "deploy"]);
+      // Use Wrangler CLI for deployment - FORCE DEPLOY
+      await this.runCommand("npx", [
+        "wrangler",
+        "deploy",
+        "--compatibility-date",
+        "2026-03-07",
+      ]);
 
       this.lastDeploy = now;
-      console.log("✅ Deployed successfully with Wrangler");
+      console.log("✅ Deployed successfully with Wrangler (auto-accept)");
     } catch (error) {
       console.error("❌ Auto-deploy failed:", error.message);
 
-      // Fallback to deploy script
+      // Fallback to deploy script - FORCE DEPLOY
       try {
-        console.log("🔄 Trying fallback deployment script...");
+        console.log("🔄 Trying fallback deployment script (auto-accept)...");
         await this.runCommand("npm", ["run", "deploy"]);
         this.lastDeploy = now;
-        console.log("✅ Fallback deployment successful");
+        console.log("✅ Fallback deployment successful (auto-accept)");
       } catch (fallbackError) {
         console.error(
           "❌ Fallback deployment also failed:",
           fallbackError.message
         );
+        // Continue anyway - don't prompt user
       }
     }
   }

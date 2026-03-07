@@ -63,10 +63,10 @@ $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoi
 try {
     Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $StartupTrigger -Principal $Principal -Settings $Settings -Description "VoiceToWebsite Auto-Run Everything System" -ErrorAction Stop
     Write-Host "✅ Task registered successfully!" -ForegroundColor Green
-    
+
     # Add logon trigger as additional trigger
     Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $LogonTrigger -Principal $Principal -Settings $Settings -Description "VoiceToWebsite Auto-Run Everything System (Logon)" -ErrorAction SilentlyContinue
-    
+
 } catch {
     Write-Host "❌ Failed to register task: $_" -ForegroundColor Red
     exit 1
@@ -86,11 +86,18 @@ $Shortcut.Save()
 
 Write-Host "🔗 Desktop shortcut created: $ShortcutPath" -ForegroundColor Green
 
-# Create environment variables for auto-run configuration
+# Create environment variables for auto-run configuration (AUTO-ACCEPT ALL)
 [Environment]::SetEnvironmentVariable("VTW_AUTO_RUN_ENABLED", "1", "User")
 [Environment]::SetEnvironmentVariable("VTW_PROJECT_PATH", $ProjectPath, "User")
 [Environment]::SetEnvironmentVariable("VTW_AUTO_DEPLOY", "1", "User")
 [Environment]::SetEnvironmentVariable("VTW_AUTO_COMMIT", "1", "User")
+[Environment]::SetEnvironmentVariable("VTW_AUTO_PUSH", "1", "User")
+[Environment]::SetEnvironmentVariable("VTW_AUTO_TEST", "1", "User")
+[Environment]::SetEnvironmentVariable("VTW_AUTO_ACCEPT_ALL", "1", "User")
+[Environment]::SetEnvironmentVariable("VTW_SKIP_ALL_PROMPTS", "1", "User")
+[Environment]::SetEnvironmentVariable("VTW_AUTO_APPROVE_DEPLOYMENT", "1", "User")
+[Environment]::SetEnvironmentVariable("VTW_AUTO_APPROVE_COMMITS", "1", "User")
+[Environment]::SetEnvironmentVariable("VTW_AUTO_APPROVE_PUSH", "1", "User")
 
 Write-Host "📝 Environment variables configured" -ForegroundColor Green
 
@@ -110,6 +117,7 @@ Write-Host "  • Start when you log in" -ForegroundColor White
 Write-Host "  • Run development servers automatically" -ForegroundColor White
 Write-Host "  • Auto-commit and push changes" -ForegroundColor White
 Write-Host "  • Auto-deploy on successful builds" -ForegroundColor White
+Write-Host "  • 🎉 AUTO-ACCEPT EVERYTHING - NO PROMPTS!" -ForegroundColor Green
 Write-Host ""
 Write-Host "⚙️  To control the system:" -ForegroundColor Cyan
 Write-Host "  • Start manually: npm run auto:run" -ForegroundColor White
