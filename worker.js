@@ -37,8 +37,8 @@ const getAdSenseClientId = (env) =>
 const SECURITY_HEADERS = {
   "Content-Security-Policy": `
     default-src 'self';
-    script-src 'self' 'nonce-{nonce}' https://cdn.tailwindcss.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://accounts.google.com https://js.stripe.com https://www.paypal.com https://esm.sh;
-    style-src 'self' https://fonts.googleapis.com;
+    script-src 'self' 'nonce-{nonce}' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://accounts.google.com https://js.stripe.com https://www.paypal.com https://esm.sh;
+    style-src 'self' data: https://fonts.googleapis.com;
     font-src 'self' data: https://fonts.gstatic.com;
     img-src 'self' data: https:;
     connect-src 'self' https://www.google-analytics.com https://accounts.google.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://www.paypal.com https://js.stripe.com;
@@ -2915,7 +2915,33 @@ export default {
       }
 
       // Default: serve the built static assets from ./dist with optional placeholder injection.
-      const assetRes = await assets.fetch(request);
+      let assetRes = await assets.fetch(request);
+      // SPA fallback: if asset 404 and this is a document navigation, serve index.html so client routing works.
+      const hasFileExtension = (path) => {
+        const cleanPath = path.split("?")[0].split("#")[0];
+        return /\.[a-zA-Z0-9]+$/.test(cleanPath);
+      };
+      const isDocumentNavigation =
+        request.method === "GET" &&
+        (/\btext\/html\b/i.test(request.headers.get("Accept") || "") ||
+          request.headers.get("Sec-Fetch-Dest") === "document" ||
+          request.headers.get("Purpose") === "prefetch");
+      if (
+        assetRes.status === 404 &&
+        isDocumentNavigation &&
+        !hasFileExtension(pathname)
+      ) {
+        try {
+          const indexReq = new Request(
+            new URL("/index.html", url.origin),
+            request
+          );
+          const indexRes = await assets.fetch(indexReq);
+          if (indexRes.ok) assetRes = indexRes;
+        } catch (error) {
+          console.error("Failed to fetch index.html for SPA fallback:", error);
+        }
+      }
       const contentType = assetRes.headers.get("Content-Type") || "";
       if (contentType.includes("text/html")) {
         const normalizedPathForInjection =

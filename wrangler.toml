@@ -20,13 +20,13 @@ routes = [
 # -----------------------------------------------------------------------------
 # Static assets (Vite build output). Worker runs first for every request so we
 # can do auth, API routing, and HTML injection; then we delegate to ASSETS.
-# SPA: unknown paths serve index.html so client-side routing works.
+# Use not_found_handling = "none" so CSS/JS requests get real 404s, not index.html.
 # -----------------------------------------------------------------------------
 [assets]
 directory = "dist"
 binding = "ASSETS"
 run_worker_first = true
-not_found_handling = "single-page-application"
+not_found_handling = "none"
 
 # -----------------------------------------------------------------------------
 # Observability (logs + traces). Set observability.traces.head_sampling_rate

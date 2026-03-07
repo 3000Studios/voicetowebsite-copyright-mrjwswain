@@ -1,10 +1,10 @@
 # ENV Schema
 
-Generated: 2026-03-07T09:27:28.607Z
+Generated: 2026-03-07T10:47:46.438Z
 
 ## Summary
 
-- Scanned files: 398
+- Scanned files: 399
 - Used keys: 138
 - Defined keys: 85
 - Missing keys: 64

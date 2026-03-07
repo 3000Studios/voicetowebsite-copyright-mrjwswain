@@ -1,12 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import React, {
-  Suspense,
-  lazy,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
 import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
 import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
@@ -17,7 +10,6 @@ import { trackRevenueEvent } from "./utils/revenueTracking";
 const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
 const ParticleEffects = lazy(() => import("./components/ParticleEffects"));
 const WarpTunnel = lazy(() => import("./components/WarpTunnel"));
-const PhosphorNav = lazy(() => import("./components/PhosphorNav"));
 const ErrorBoundary = lazy(() => import("./components/ErrorBoundary"));
 
 type PricingTier = {
@@ -195,8 +187,7 @@ const AdSensePlacement: React.FC<{
       <div className="mt-4 min-h-[130px] rounded-2xl border border-dashed border-white/20 bg-black/35 px-3 py-4">
         {showLiveUnit ? (
           <ins
-            className="adsbygoogle"
-            style={{ display: "block" }}
+            className="adsbygoogle vtw-ad-block"
             data-ad-client={publisher}
             data-ad-slot={slot}
             data-ad-format="auto"
@@ -406,11 +397,13 @@ const App: React.FC = () => {
 
   // Audio Control
   useEffect(() => {
-    // Set optimal volume for immediate autoplay
     audioEngine.setVolume(0.4);
   }, []);
 
-  // No autoplay: music starts only on explicit user gesture (e.g. "Play Song" button) for better UX and AdSense review
+  // Theme song on homepage load; other pages get it from nav.js
+  useEffect(() => {
+    startThemeSong().catch(() => {});
+  }, [startThemeSong]);
 
   // Actions
   const startListening = () => {
@@ -653,10 +646,7 @@ const App: React.FC = () => {
           <ParticleEffects />
         </div>
 
-        {/* Global phosphor hamburger + fullscreen popout nav */}
-        <Suspense fallback={null}>
-          <PhosphorNav />
-        </Suspense>
+        {/* Phosphor nav is injected by nav.js on every page (including this one) — no duplicate */}
 
         <div className="fixed bottom-5 right-5 z-50">
           <button

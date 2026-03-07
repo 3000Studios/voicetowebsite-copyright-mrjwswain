@@ -1,0 +1,51 @@
+---
+description: VoiceToWebsite production governance aligned to current repo and deployment flow.
+alwaysApply: true
+---
+
+# VoiceToWebsite Production Governance
+
+Scope:
+- Applies to this repository only.
+- This rule is authoritative for production behavior in Cursor.
+
+Current production path (must follow):
+1. Use Node 20 (`.nvmrc`) before verify/ship/deploy.
+2. Run `npm run verify`.
+3. If verify fails, fix in-session and rerun until green.
+4. Run `npm run ship` (or equivalent verify+commit flow).
+5. Push with `npm run ship:push` (or equivalent).
+6. Deploy with `npm run deploy` (or CI on `main` push when healthy).
+7. Confirm deploy/build success before saying live/ready.
+
+Branch and release policy:
+- `main` is the only production branch.
+- Do not force-push `main`.
+- Do not create long-lived alternate production branches.
+
+Safety rules:
+- Never ship or deploy a red/broken state.
+- Never claim production changed unless command output confirms success.
+- Reuse/refactor existing code before creating duplicate routes/pages/components.
+- Keep Cloudflare Worker compatibility and binding integrity (`worker.js`, `wrangler.toml`, `functions/*`).
+- Keep command center, execute flow, auth, schema validation, and preview/apply/deploy token flow working.
+
+Verification gates that are implemented now:
+- Treat `npm run verify` as mandatory pre-ship/pre-deploy gate.
+- Respect existing checks in verify (types, tests, build, governance, UI guard, links, env/doc checks).
+
+Target-state gates (enforce when configured in this repo):
+- Playwright E2E + visual diffs.
+- Accessibility scan with axe in browser tests.
+- Lighthouse CI assertions/budgets.
+- Additional security/dependency scanning gates.
+
+Cloudflare hygiene:
+- Keep `compatibility_date` current when touching Worker config.
+- After binding changes, run `npm run types` and keep `worker-configuration.d.ts` in sync.
+- Use existing Wrangler/Workers deployment path; do not introduce a different platform.
+
+Change quality bar:
+- Provide concrete impact summary, files changed, and risks.
+- Include rollback steps for non-trivial changes.
+- For public-page edits, preserve metadata, robots/sitemap correctness, and core UX paths.
