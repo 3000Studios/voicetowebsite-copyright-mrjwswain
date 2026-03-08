@@ -1,7 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
-import { FALLBACK_INTRO_SONG, HOME_VIDEO, INTRO_SONG } from "./constants";
+import { FALLBACK_INTRO_SONG, INTRO_SONG } from "./constants";
 import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
 import GenericContentPage from "./pages/GenericContentPage";
@@ -634,23 +634,9 @@ const HomeView: React.FC = () => {
           <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
         </ErrorBoundary>
 
-        {/* Enhanced Background atmosphere with multiple media types */}
+        {/* Enhanced Background atmosphere */}
         <div className="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-30">
-          {reduceMotion ? (
-            <div className="w-full h-full brightness-50 bg-radial-atmosphere" />
-          ) : (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              className="w-full h-full object-cover brightness-50"
-              onPlay={() => startThemeSong()}
-            >
-              <source src={HOME_VIDEO} type="video/mp4" />
-            </video>
-          )}
+          <div className="w-full h-full brightness-50 bg-radial-atmosphere" />
           <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
 
           {/* Enhanced particle effects */}
