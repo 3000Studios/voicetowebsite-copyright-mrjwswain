@@ -1,6 +1,12 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import { FALLBACK_INTRO_SONG, INTRO_SONG } from "./constants";
 import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
@@ -9,6 +15,12 @@ import { audioEngine } from "./services/audioEngine";
 import siteConfig from "./site-config.json";
 import { escapeHtml } from "./utils/htmlSanitizer";
 import { trackRevenueEvent } from "./utils/revenueTracking";
+
+declare global {
+  interface Window {
+    __VTW_REACT_NAVIGATE__?: (to: string) => void;
+  }
+}
 
 // Lazy load heavy components
 const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
@@ -41,6 +53,22 @@ type ContentGuide = {
 type FaqItem = {
   question: string;
   answer: string;
+};
+
+const RouterNavigationBridge: React.FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.__VTW_REACT_NAVIGATE__ = (to: string) => {
+      navigate(to);
+    };
+
+    return () => {
+      delete window.__VTW_REACT_NAVIGATE__;
+    };
+  }, [navigate]);
+
+  return null;
 };
 
 const PRICING_TIERS: PricingTier[] = [
@@ -1209,6 +1237,7 @@ const HomeView: React.FC = () => {
 const App: React.FC = () => (
   <ErrorBoundary>
     <BrowserRouter>
+      <RouterNavigationBridge />
       <Routes>
         <Route path="/" element={<HomeView />} />
         <Route path="/blog" element={<BlogPage />} />
