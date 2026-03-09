@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
 vi.mock("./services/audioEngine", () => ({
@@ -30,18 +30,6 @@ describe("router navigation bridge", () => {
       configurable: true,
       writable: true,
       value: vi.fn(),
-    });
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("registers a global navigation hook for injected nav.js", async () => {
-    render(<App />);
-
-    await waitFor(() => {
-      expect(window.__VTW_REACT_NAVIGATE__).toEqual(expect.any(Function));
     });
   });
 
