@@ -18,8 +18,6 @@ const TOKEN_KEYS = [
   "CF_API_TOKEN",
 ];
 const ACCOUNT_KEYS = ["CLOUDFLARE_ACCOUNT_ID", "CF_ACCOUNT_ID"];
-const NPX_CMD = process.platform === "win32" ? "npx.cmd" : "npx";
-
 const PLACEHOLDER_VALUES = new Set([
   "",
   "placeholder",
@@ -57,13 +55,27 @@ function log(msg) {
   console.error(`[deploy-safe] ${msg}`);
 }
 
-function hasWranglerSession(env) {
-  const result = spawnSync(NPX_CMD, ["wrangler", "whoami"], {
-    stdio: "pipe",
+function runWrangler(env, extraArgs, stdio = "pipe") {
+  if (process.platform === "win32") {
+    const commandLine = ["wrangler", ...extraArgs].join(" ");
+    return spawnSync("cmd.exe", ["/d", "/s", "/c", commandLine], {
+      stdio,
+      env,
+      shell: false,
+      cwd: root,
+    });
+  }
+
+  return spawnSync("wrangler", extraArgs, {
+    stdio,
     env,
     shell: false,
     cwd: root,
   });
+}
+
+function hasWranglerSession(env) {
+  const result = runWrangler(env, ["whoami"]);
   return result.status === 0;
 }
 
@@ -100,19 +112,11 @@ function main() {
       process.exit(3);
     }
 
-    const args = [
-      "wrangler",
-      "deploy",
-      "--keep-vars",
-      ...process.argv.slice(2),
-    ];
-    const result = spawnSync(NPX_CMD, args, {
-      stdio: "inherit",
+    const result = runWrangler(
       env,
-      shell: false,
-      cwd: root,
-    });
-
+      ["deploy", "--keep-vars", ...process.argv.slice(2)],
+      "inherit"
+    );
     if (result.error) {
       log(`Failed to start wrangler: ${result.error.message}`);
       process.exit(4);
