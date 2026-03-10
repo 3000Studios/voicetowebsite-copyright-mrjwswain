@@ -69,7 +69,15 @@ function run(name, cmd, args, opts = {}) {
   };
 
   let result;
-  if (process.platform === "win32") {
+  if (process.platform === "win32" && cmd === "node") {
+    result = spawnSync(process.execPath, args, {
+      stdio: "inherit",
+      shell: false,
+      cwd: root,
+      env,
+      ...opts,
+    });
+  } else if (process.platform === "win32") {
     // On Windows, run via cmd.exe so npm/node are found in PATH (same pattern as deploy-safe.mjs).
     result = spawnSync("cmd.exe", ["/d", "/s", "/c", fullCmd], {
       stdio: "inherit",
@@ -123,6 +131,180 @@ function run(name, cmd, args, opts = {}) {
   }
 
   return result;
+}
+
+// Run verify steps using current Node (avoids broken npm in some Windows/nvm setups)
+function runVerifySteps() {
+  const node = process.execPath;
+  const nodeDir = path.dirname(node);
+  const binDir = path.join(root, "node_modules", ".bin");
+  const pathSep = process.platform === "win32" ? ";" : ":";
+  const env = {
+    ...process.env,
+    NODE_ENV: "production",
+    CI: "true",
+    PATH: nodeDir + pathSep + binDir + pathSep + (process.env.PATH || ""),
+  };
+  const spawnOpts = { stdio: "inherit", cwd: root, env, shell: false };
+
+  // Steps in same order as package.json "verify" script
+  const nodeStepsFirst = [
+    ["verify (scripts)", [path.join(root, "scripts", "verify.mjs")]],
+    ["env:audit", [path.join(root, "scripts", "env-audit.mjs")]],
+    [
+      "ops:global-doc:check",
+      [path.join(root, "scripts", "update-global-system-doc.mjs"), "--check"],
+    ],
+  ];
+  const binStepFormat = [
+    "format:check",
+    "prettier",
+    ["--check", "--ignore-unknown", "."],
+  ];
+  const nodeStepsRest = [
+    [
+      "check:css-governance",
+      [path.join(root, "scripts", "check-css-governance.mjs")],
+    ],
+    [
+      "check:css-budget",
+      [path.join(root, "scripts", "css-budget-validator.mjs"), "css"],
+    ],
+    [
+      "governance:check",
+      [path.join(root, "scripts", "validate-governance.mjs")],
+    ],
+    ["guard:ui", [path.join(root, "scripts", "guard-ui.mjs")]],
+    ["check:links", [path.join(root, "link-checker.js")]],
+  ];
+  const binStepsRest = [
+    ["type-check", "tsc", ["--noEmit"]],
+    ["types:check", "wrangler", ["types", "--check"]],
+    ["test", "vitest", ["run"]],
+    ["build", "vite", ["build"]],
+  ];
+
+  for (const [name, args] of nodeStepsFirst) {
+    logStep("verify", `Starting: ${name}`);
+    const start = Date.now();
+    const result = spawnSync(node, args, spawnOpts);
+    if (result.error) {
+      const err = new DeployError(
+        `Command failed to start: ${result.error.message}`,
+        "verify",
+        1,
+        result.error
+      );
+      logError("verify", err);
+      throw err;
+    }
+    if (result.status !== 0) {
+      const err = new DeployError(
+        `Command failed with exit code ${result.status}`,
+        "verify",
+        result.status
+      );
+      logError("verify", err);
+      throw err;
+    }
+    logStep("verify", `Completed ${name} in ${Date.now() - start}ms`);
+  }
+
+  const runBin = (name, binName, args) => {
+    logStep("verify", `Starting: ${name}`);
+    const start = Date.now();
+    let result;
+    if (process.platform === "win32") {
+      const cmdLine = [binName, ...args]
+        .map((a) => (a.includes(" ") ? `"${a}"` : a))
+        .join(" ");
+      result = spawnSync("cmd.exe", ["/d", "/s", "/c", cmdLine], spawnOpts);
+    } else {
+      result = spawnSync(path.join(binDir, binName), args, spawnOpts);
+    }
+    if (result.error) {
+      const err = new DeployError(
+        `Command failed to start: ${result.error.message}`,
+        "verify",
+        1,
+        result.error
+      );
+      logError("verify", err);
+      throw err;
+    }
+    if (result.status !== 0) {
+      const err = new DeployError(
+        `Command failed with exit code ${result.status}`,
+        "verify",
+        result.status
+      );
+      logError("verify", err);
+      throw err;
+    }
+    logStep("verify", `Completed ${name} in ${Date.now() - start}ms`);
+  };
+
+  runBin(...binStepFormat);
+
+  for (const [name, args] of nodeStepsRest) {
+    logStep("verify", `Starting: ${name}`);
+    const start = Date.now();
+    const result = spawnSync(node, args, spawnOpts);
+    if (result.error) {
+      const err = new DeployError(
+        `Command failed to start: ${result.error.message}`,
+        "verify",
+        1,
+        result.error
+      );
+      logError("verify", err);
+      throw err;
+    }
+    if (result.status !== 0) {
+      const err = new DeployError(
+        `Command failed with exit code ${result.status}`,
+        "verify",
+        result.status
+      );
+      logError("verify", err);
+      throw err;
+    }
+    logStep("verify", `Completed ${name} in ${Date.now() - start}ms`);
+  }
+
+  for (const [name, binName, args] of binStepsRest) {
+    logStep("verify", `Starting: ${name}`);
+    const start = Date.now();
+    let result;
+    if (process.platform === "win32") {
+      const cmdLine = [binName, ...args]
+        .map((a) => (a.includes(" ") ? `"${a}"` : a))
+        .join(" ");
+      result = spawnSync("cmd.exe", ["/d", "/s", "/c", cmdLine], spawnOpts);
+    } else {
+      result = spawnSync(path.join(binDir, binName), args, spawnOpts);
+    }
+    if (result.error) {
+      const err = new DeployError(
+        `Command failed to start: ${result.error.message}`,
+        "verify",
+        1,
+        result.error
+      );
+      logError("verify", err);
+      throw err;
+    }
+    if (result.status !== 0) {
+      const err = new DeployError(
+        `Command failed with exit code ${result.status}`,
+        "verify",
+        result.status
+      );
+      logError("verify", err);
+      throw err;
+    }
+    logStep("verify", `Completed ${name} in ${Date.now() - start}ms`);
+  }
 }
 
 // Deployment lock to prevent concurrent deployments
@@ -235,9 +417,9 @@ async function main() {
       // Run pre-flight checks
       preFlightChecks();
 
-      // Run verify step
+      // Run verify step (using current Node to avoid broken npm on Windows/nvm)
       logStep("VERIFY", "Running verification pipeline");
-      run("verify", "npm", ["run", "verify"]);
+      runVerifySteps();
 
       // Run deploy step
       logStep("DEPLOY", "Starting deployment to Cloudflare Workers");
