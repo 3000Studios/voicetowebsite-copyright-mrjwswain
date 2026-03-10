@@ -6,6 +6,10 @@ import {
   listEditableSources,
 } from "./functions/contentInventory.js";
 import {
+  generateBlogFeedUpdate,
+  storeBlogFeed,
+} from "./functions/blogAutomation.js";
+import {
   clearAdminCookieHeaders,
   hasValidAdminCookie,
   isAdminEnabled,
@@ -38,6 +42,11 @@ import { BotHubDO } from "./src/durable_objects/BotHubDO.js";
 import { DeployControllerDO } from "./src/durable_objects/DeployControllerDO.js";
 import { LiveRoomDO } from "./src/durable_objects/LiveRoomDO.js";
 import { handleUICommand } from "./src/functions/uiCommand.js";
+import {
+  getSeoCopyForPath,
+  normalizeSeoPath,
+  SITE_SEO_PATHS,
+} from "./src/shared/siteManifest.js";
 
 const getAdSenseClientId = (env) =>
   String(env.ADSENSE_PUBLISHER || "").trim() || "ca-pub-demo";
@@ -958,6 +967,24 @@ const buildAutoContentPage = ({ url, path }) => {
 };
 
 export default {
+  async scheduled(controller, env) {
+    try {
+      const nextFeed = await generateBlogFeedUpdate({
+        env,
+        assets: env.ASSETS,
+        now: new Date(controller?.scheduledTime || Date.now()),
+      });
+      await storeBlogFeed(env, nextFeed);
+      console.log("Scheduled blog refresh complete", {
+        generatedAt: nextFeed.generatedAt,
+        posts: nextFeed.posts.length,
+      });
+    } catch (error) {
+      console.error("Scheduled blog refresh failed", error);
+      throw error;
+    }
+  },
+
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
@@ -3202,20 +3229,10 @@ export default {
           (cleanPath || "/").replace(/\/$/, "") || "/";
         const pathWithoutHtml =
           normalizedPathForInjection.replace(/\.html$/i, "") || "/";
-        const seoInjectionPaths = new Set([
-          "/",
-          "/index",
-          "/blog",
-          "/pricing",
-          "/store",
-          "/features",
-          "/demo",
-          "/how-it-works",
-          "/contact",
-        ]);
+        const normalizedSeoPath = normalizeSeoPath(pathWithoutHtml);
         const skipHeavyInjection =
-          !seoInjectionPaths.has(pathWithoutHtml) &&
-          !seoInjectionPaths.has(normalizedPathForInjection);
+          !SITE_SEO_PATHS.has(normalizedSeoPath) &&
+          !SITE_SEO_PATHS.has(normalizeSeoPath(normalizedPathForInjection));
         const text = await assetRes.text();
         const cspNonce = crypto.randomUUID().replace(/-/g, "");
 
@@ -3268,7 +3285,8 @@ export default {
             return "/";
           }
         })();
-        const canonicalUrl = `${url.origin}${seoPath === "/" ? "/" : seoPath}`;
+        const canonicalSeoPath = normalizeSeoPath(seoPath);
+        const canonicalUrl = `${url.origin}${canonicalSeoPath === "/" ? "/" : canonicalSeoPath}`;
         const isAdminPage =
           url.pathname === "/admin" || url.pathname.startsWith("/admin/");
         const isSecretPage = url.pathname.startsWith("/the3000");
@@ -3280,12 +3298,7 @@ export default {
             : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
         const defaultOgImage = `${url.origin}/vtw-wallpaper.png`;
-        const defaultDescription =
-          "VoiceToWebsite — autonomous web engineering, deployment, and monetization.";
-        const descriptionByPath = {
-          "/rush-percussion":
-            "RUSH PERCUSSION: an interactive microgame demo from the VoiceToWebsite App Store.",
-        };
+        const seoCopy = getSeoCopyForPath(seoPath);
         const seoJsonLd = JSON.stringify(
           {
             "@context": "https://schema.org",
@@ -3353,7 +3366,21 @@ export default {
           seoInjected = seoInjected
             .replace(/<link\b[^>]*rel=["']canonical["'][^>]*>\s*/gi, "")
             .replace(/<meta\b[^>]*name=["']robots["'][^>]*>\s*/gi, "")
+            .replace(/<meta\b[^>]*name=["']description["'][^>]*>\s*/gi, "")
+            .replace(/<meta\b[^>]*property=["']og:title["'][^>]*>\s*/gi, "")
+            .replace(
+              /<meta\b[^>]*property=["']og:description["'][^>]*>\s*/gi,
+              ""
+            )
             .replace(/<meta\b[^>]*property=["']og:url["'][^>]*>\s*/gi, "")
+            .replace(
+              /<meta\b[^>]*(?:name|property)=["']twitter:title["'][^>]*>\s*/gi,
+              ""
+            )
+            .replace(
+              /<meta\b[^>]*(?:name|property)=["']twitter:description["'][^>]*>\s*/gi,
+              ""
+            )
             .replace(
               /<meta\b[^>]*(?:name|property)=["']twitter:url["'][^>]*>\s*/gi,
               ""
@@ -3366,6 +3393,8 @@ export default {
 
         let withAdsense = seoInjected;
         if (!skipHeavyInjection) {
+          const safeTitle = escapeHtml(seoCopy.title);
+          const safeDescription = escapeHtml(seoCopy.description);
           const hasOgImage = /<meta\b[^>]*property=["']og:image["']/i.test(
             seoInjected
           );
@@ -3382,19 +3411,39 @@ export default {
           );
           const hasOgSiteName =
             /<meta\b[^>]*property=["']og:site_name["']/i.test(seoInjected);
-          const hasDescription = /<meta\b[^>]*name=["']description["']/i.test(
+          const hasOgTitle = /<meta\b[^>]*property=["']og:title["']/i.test(
             seoInjected
           );
-          const fallbackDescription =
-            descriptionByPath[seoPath] || defaultDescription;
+          const hasTwitterTitle =
+            /<meta\b[^>]*(?:name|property)=["']twitter:title["']/i.test(
+              seoInjected
+            );
+          const hasTwitterDescription =
+            /<meta\b[^>]*(?:name|property)=["']twitter:description["']/i.test(
+              seoInjected
+            );
+
+          seoInjected = /<title>[\s\S]*?<\/title>/i.test(seoInjected)
+            ? seoInjected.replace(
+                /<title>[\s\S]*?<\/title>/i,
+                `<title>${safeTitle}</title>`
+              )
+            : seoInjected.replace(
+                "</head>",
+                `<title>${safeTitle}</title>\n</head>`
+              );
 
           const seoBlock = `
         <link rel="canonical" href="${canonicalUrl}" />
         <meta name="robots" content="${robotsTag}" />
-        ${hasDescription ? "" : `<meta name="description" content="${fallbackDescription}" />`}
+        <meta name="description" content="${safeDescription}" />
+        ${hasOgTitle ? "" : `<meta property="og:title" content="${safeTitle}" />`}
+        <meta property="og:description" content="${safeDescription}" />
         <meta property="og:url" content="${canonicalUrl}" />
         <meta property="og:type" content="${hasOgType ? "" : "website"}" />
         <meta property="og:site_name" content="${hasOgSiteName ? "" : "VoiceToWebsite"}" />
+        ${hasTwitterTitle ? "" : `<meta name="twitter:title" content="${safeTitle}" />`}
+        <meta name="twitter:description" content="${safeDescription}" />
         <meta name="twitter:url" content="${canonicalUrl}" />
         ${hasTwitterCard ? "" : `<meta name="twitter:card" content="summary_large_image" />`}
         ${hasOgImage ? "" : `<meta property="og:image" content="${defaultOgImage}" />`}

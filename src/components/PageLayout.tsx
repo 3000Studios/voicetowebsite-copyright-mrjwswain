@@ -1,5 +1,10 @@
 import { motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
+import GlobalFooter from "./GlobalFooter";
+import {
+  buildDocumentTitle,
+  DEFAULT_SEO_DESCRIPTION,
+} from "../shared/siteManifest";
 
 export type WallpaperVariant =
   | "default"
@@ -150,6 +155,72 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   const gradient =
     WALLPAPER_GRADIENTS[wallpaper] ?? WALLPAPER_GRADIENTS.default;
 
+  useEffect(() => {
+    const description = subtitle?.trim() || DEFAULT_SEO_DESCRIPTION;
+    const canonicalHref = window.location.href;
+
+    document.title = buildDocumentTitle(title);
+
+    const upsertMeta = (
+      selector: string,
+      attributes: Record<string, string>,
+      content: string
+    ) => {
+      let tag = document.head.querySelector(selector) as HTMLMetaElement | null;
+      if (!tag) {
+        tag = document.createElement("meta");
+        Object.entries(attributes).forEach(([key, value]) =>
+          tag?.setAttribute(key, value)
+        );
+        document.head.appendChild(tag);
+      }
+      tag.content = content;
+    };
+
+    const upsertLink = (
+      selector: string,
+      attributes: Record<string, string>,
+      href: string
+    ) => {
+      let tag = document.head.querySelector(selector) as HTMLLinkElement | null;
+      if (!tag) {
+        tag = document.createElement("link");
+        Object.entries(attributes).forEach(([key, value]) =>
+          tag?.setAttribute(key, value)
+        );
+        document.head.appendChild(tag);
+      }
+      tag.href = href;
+    };
+
+    upsertMeta(
+      'meta[name="description"]',
+      { name: "description" },
+      description
+    );
+    upsertMeta(
+      'meta[property="og:title"]',
+      { property: "og:title" },
+      buildDocumentTitle(title)
+    );
+    upsertMeta(
+      'meta[property="og:description"]',
+      { property: "og:description" },
+      description
+    );
+    upsertMeta(
+      'meta[name="twitter:title"]',
+      { name: "twitter:title" },
+      buildDocumentTitle(title)
+    );
+    upsertMeta(
+      'meta[name="twitter:description"]',
+      { name: "twitter:description" },
+      description
+    );
+    upsertLink('link[rel="canonical"]', { rel: "canonical" }, canonicalHref);
+  }, [subtitle, title]);
+
   return (
     <div
       className={`vtw-page-layout min-h-screen relative overflow-x-hidden ${className}`}
@@ -193,6 +264,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         </motion.header>
         {children}
       </main>
+      <GlobalFooter />
     </div>
   );
 };

@@ -1,168 +1,257 @@
-import React, { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-interface AvatarMessage {
-  text: string;
-  type: "greeting" | "help" | "dance" | "talk";
+type ChatRole = "assistant" | "user";
+
+interface ChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string;
 }
 
+const INITIAL_MESSAGES: ChatMessage[] = [
+  {
+    id: "welcome",
+    role: "assistant",
+    content:
+      "I can guide people to pricing, demo, support, and the right pages without covering the screen. Ask me anything about the site.",
+  },
+];
+
+const QUICK_ACTIONS = [
+  { label: "Show Pricing", path: "/pricing" },
+  { label: "Open Demo", path: "/demo" },
+  { label: "Need Support", path: "/support" },
+];
+
+const buildMessageId = () =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+const AvatarArt: React.FC<{ compact?: boolean }> = ({ compact = false }) => (
+  <div
+    className={`relative ${compact ? "h-14 w-14" : "h-20 w-20"} shrink-0`}
+    aria-hidden
+  >
+    <div className="absolute inset-0 rounded-full bg-cyan-400/15 blur-xl" />
+    <div className="absolute inset-1 rounded-full bg-gradient-to-br from-cyan-300 via-sky-400 to-emerald-300 opacity-90" />
+    <div className="absolute inset-[7px] rounded-full border border-white/40 bg-slate-950/85 shadow-[0_0_25px_rgba(34,211,238,0.35)]" />
+    <div className="absolute left-1/2 top-[26%] h-2 w-2 -translate-x-4 rounded-full bg-cyan-100 shadow-[0_0_10px_rgba(207,250,254,0.8)]" />
+    <div className="absolute left-1/2 top-[26%] h-2 w-2 translate-x-2 rounded-full bg-cyan-100 shadow-[0_0_10px_rgba(207,250,254,0.8)]" />
+    <div className="absolute left-1/2 top-[50%] h-7 w-10 -translate-x-1/2 rounded-[999px] border border-cyan-300/35 bg-cyan-400/10" />
+    <div className="absolute left-1/2 top-[58%] h-2 w-5 -translate-x-1/2 rounded-full bg-gradient-to-r from-cyan-200 to-emerald-200" />
+    <div className="absolute left-1/2 top-0 h-3 w-14 -translate-x-1/2 rounded-full border border-cyan-300/30 bg-cyan-400/10" />
+  </div>
+);
+
 const AvatarAssistant: React.FC = () => {
-  const [isTalking, setIsTalking] = useState(false);
-  const [isDancing, setIsDancing] = useState(false);
-  const [currentMessage, setCurrentMessage] = useState("");
-  const [position, setPosition] = useState({ x: 20, y: 80 });
-  const [particlePositions, setParticlePositions] = useState<
-    Array<{ top: number; left: number }>
-  >([]);
-  const avatarRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [draft, setDraft] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const conversationHistory = useMemo(
+    () =>
+      messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      })),
+    [messages]
+  );
 
   useEffect(() => {
-    const messages: AvatarMessage[] = [
-      { text: "Hey there! I'm your AI assistant! 👋", type: "greeting" },
-      { text: "Need help with anything? Just ask!", type: "help" },
-      { text: "Let me show you some moves! 💃", type: "dance" },
-      { text: "I love helping you build amazing websites!", type: "talk" },
-      { text: "Want to see me dance? Click me!", type: "dance" },
-      { text: "I'm here to make your experience awesome!", type: "help" },
-    ];
+    listRef.current?.scrollTo({
+      top: listRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages, isOpen]);
 
-    const interval = setInterval(() => {
-      const randomMessage =
-        messages[Math.floor(Math.random() * messages.length)];
-      setCurrentMessage(randomMessage.text);
-      setIsTalking(true);
+  const sendMessage = async (value: string) => {
+    const message = value.trim();
+    if (!message || isSending) return;
 
-      setTimeout(() => setIsTalking(false), 3000);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth) * 30;
-      const y = 70 + (e.clientY / window.innerHeight) * 20;
-      setPosition({ x, y });
+    const userMessage: ChatMessage = {
+      id: buildMessageId(),
+      role: "user",
+      content: message,
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    setMessages((current) => [...current, userMessage]);
+    setDraft("");
+    setIsSending(true);
 
-  const handleAvatarClick = () => {
-    setIsDancing(true);
-    setCurrentMessage("Wooo! Let's dance! 🎵");
-    setIsTalking(true);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message,
+          history: conversationHistory.slice(-8),
+        }),
+      });
 
-    // Generate particle positions
-    const newParticles = [...Array(6)].map(() => ({
-      top: Math.random() * 100,
-      left: Math.random() * 100,
-    }));
-    setParticlePositions(newParticles);
+      const payload = (await response.json().catch(() => null)) as {
+        reply?: string;
+        error?: string;
+      } | null;
 
-    setTimeout(() => {
-      setIsDancing(false);
-      setIsTalking(false);
-      setParticlePositions([]);
-    }, 5000);
+      const reply =
+        response.ok && payload?.reply
+          ? payload.reply
+          : "I can help with pricing, demo flow, support, and where pages live on this site.";
+
+      setMessages((current) => [
+        ...current,
+        {
+          id: buildMessageId(),
+          role: "assistant",
+          content: reply,
+        },
+      ]);
+    } catch (_) {
+      setMessages((current) => [
+        ...current,
+        {
+          id: buildMessageId(),
+          role: "assistant",
+          content:
+            "The live chat service is unavailable right now. You can still use the quick links here to get to the main pages.",
+        },
+      ]);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
-    <div
-      ref={avatarRef}
-      className="fixed z-50 cursor-pointer transition-all duration-300 ease-out"
-      style={{
-        left: `${position.x}%`,
-        bottom: `${position.y}px`,
-        transform: "translateX(-50%)",
-      }}
-      onClick={handleAvatarClick}
-    >
-      {/* Avatar Container */}
-      <div className={`relative ${isDancing ? "animate-bounce" : ""}`}>
-        {/* Speech Bubble */}
-        {isTalking && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-4 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-purple-200 whitespace-nowrap">
-            <div className="text-sm font-medium text-gray-800">
-              {currentMessage}
-            </div>
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-2">
-              <div className="w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-white/90"></div>
-            </div>
-          </div>
-        )}
-
-        {/* Avatar Body */}
-        <div className="relative w-20 h-24">
-          {/* Head */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-br from-pink-200 to-pink-300 rounded-full border-2 border-pink-400 shadow-lg">
-            {/* Hair */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-14 h-8 bg-black rounded-t-full -mt-2"></div>
-
-            {/* Face */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {/* Eyes */}
-              <div className="absolute top-3 left-1/2 transform -translate-x-1/2 flex gap-2">
-                <div className="w-1.5 h-1.5 bg-black rounded-full animate-pulse"></div>
-                <div className="w-1.5 h-1.5 bg-black rounded-full animate-pulse"></div>
+    <div className="fixed bottom-5 left-5 z-50">
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.section
+            initial={{ opacity: 0, y: 18, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="mb-4 w-[min(92vw,24rem)] overflow-hidden rounded-[1.75rem] border border-cyan-300/20 bg-slate-950/92 shadow-[0_24px_80px_rgba(2,12,27,0.55)] backdrop-blur-xl"
+          >
+            <div className="border-b border-white/8 bg-gradient-to-r from-cyan-500/12 via-sky-500/8 to-emerald-400/10 p-5">
+              <div className="flex items-start gap-4">
+                <AvatarArt />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-outfit text-lg font-black text-white">
+                      Voice Assistant
+                    </h2>
+                    <span className="rounded-full border border-emerald-300/25 bg-emerald-400/10 px-2 py-0.5 text-[0.62rem] uppercase tracking-[0.2em] text-emerald-200">
+                      Fixed
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-white/68">
+                    Stable position, better contrast, real answers, and direct
+                    shortcuts to the pages people usually need first.
+                  </p>
+                </div>
               </div>
 
-              {/* Mouth */}
-              <div
-                className={`absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-2 border-b-2 border-pink-600 rounded-b-full ${isTalking ? "animate-pulse" : ""}`}
-              ></div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {QUICK_ACTIONS.map((action) => (
+                  <button
+                    key={action.path}
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false);
+                      navigate(action.path);
+                    }}
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors hover:border-cyan-300/35 hover:bg-cyan-400/10 hover:text-white"
+                  >
+                    {action.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Body */}
-          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-16 h-12 bg-gradient-to-br from-pink-400 to-pink-500 rounded-t-lg border-2 border-pink-600 shadow-lg">
-            {/* Bikini Top */}
-            <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-14 h-8 bg-gradient-to-br from-pink-300 to-pink-400 rounded-t-lg border border-pink-500">
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-8 h-4 bg-pink-200 rounded-full"></div>
-            </div>
-          </div>
-
-          {/* Arms */}
-          <div
-            className={`absolute top-12 left-0 w-3 h-8 bg-gradient-to-br from-pink-200 to-pink-300 rounded-full border border-pink-400 ${isDancing ? "animate-pulse" : ""} ${isDancing ? "transform rotate-12" : ""}`}
-          ></div>
-          <div
-            className={`absolute top-12 right-0 w-3 h-8 bg-gradient-to-br from-pink-200 to-pink-300 rounded-full border border-pink-400 ${isDancing ? "animate-pulse" : ""} ${isDancing ? "transform -rotate-12" : ""}`}
-          ></div>
-
-          {/* Bikini Bottom */}
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-12 h-4 bg-gradient-to-br from-pink-400 to-pink-500 rounded-lg border-2 border-pink-600 shadow-lg"></div>
-
-          {/* Legs */}
-          <div
-            className={`absolute top-24 left-2 w-3 h-8 bg-gradient-to-br from-pink-200 to-pink-300 rounded-full border border-pink-400 ${isDancing ? "animate-pulse" : ""}`}
-          ></div>
-          <div
-            className={`absolute top-24 right-2 w-3 h-8 bg-gradient-to-br from-pink-200 to-pink-300 rounded-full border border-pink-400 ${isDancing ? "animate-pulse" : ""}`}
-          ></div>
-        </div>
-
-        {/* Glow Effect */}
-        <div className="absolute inset-0 w-24 h-28 bg-gradient-to-br from-pink-400/30 to-purple-400/30 rounded-full blur-xl animate-pulse"></div>
-      </div>
-
-      {/* Dance Particles */}
-      {isDancing && (
-        <div className="absolute inset-0 pointer-events-none">
-          {particlePositions.map((pos, i) => (
             <div
-              key={i}
-              className="absolute w-2 h-2 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full animate-ping"
-              style={{
-                top: `${pos.top}%`,
-                left: `${pos.left}%`,
-                animationDelay: `${i * 0.2}s`,
-                animationDuration: "1s",
+              ref={listRef}
+              className="max-h-[22rem] space-y-3 overflow-y-auto p-4"
+            >
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                      message.role === "user"
+                        ? "bg-cyan-400 text-slate-950"
+                        : "border border-white/10 bg-white/[0.04] text-white/80"
+                    }`}
+                  >
+                    {message.content}
+                  </div>
+                </div>
+              ))}
+              {isSending && (
+                <div className="flex justify-start">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/60">
+                    Thinking...
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <form
+              className="border-t border-white/8 p-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void sendMessage(draft);
               }}
-            ></div>
-          ))}
+            >
+              <label htmlFor="vtw-avatar-chat" className="sr-only">
+                Ask the assistant
+              </label>
+              <div className="flex items-end gap-3">
+                <textarea
+                  id="vtw-avatar-chat"
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  rows={2}
+                  placeholder="Ask about pricing, demo, support, or where a page lives..."
+                  className="min-h-[3.25rem] flex-1 resize-none rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/35 focus:border-cyan-300/35"
+                />
+                <button
+                  type="submit"
+                  disabled={isSending || !draft.trim()}
+                  className="rounded-2xl bg-gradient-to-r from-cyan-400 to-emerald-300 px-4 py-3 text-sm font-black text-slate-950 transition-opacity disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  Send
+                </button>
+              </div>
+            </form>
+          </motion.section>
+        )}
+      </AnimatePresence>
+
+      <button
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        className="group flex items-center gap-3 rounded-full border border-cyan-300/25 bg-slate-950/88 px-3 py-2 pr-5 shadow-[0_18px_50px_rgba(8,47,73,0.45)] backdrop-blur-xl transition-colors hover:border-cyan-200/45"
+        aria-expanded={isOpen}
+        aria-label={isOpen ? "Close assistant" : "Open assistant"}
+      >
+        <AvatarArt compact />
+        <div className="text-left">
+          <p className="font-outfit text-sm font-black uppercase tracking-[0.16em] text-white">
+            Ask VoiceToWebsite
+          </p>
+          <p className="text-xs text-white/58">
+            Stable help panel. No mouse chasing.
+          </p>
         </div>
-      )}
+      </button>
     </div>
   );
 };

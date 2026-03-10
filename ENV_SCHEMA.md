@@ -1,10 +1,10 @@
 # ENV Schema
 
-Generated: 2026-03-10T20:09:38.009Z
+Generated: 2026-03-10T20:35:03.080Z
 
 ## Summary
 
-- Scanned files: 452
+- Scanned files: 456
 - Used keys: 143
 - Defined keys: 87
 - Missing keys: 68
@@ -29,14 +29,14 @@ Generated: 2026-03-10T20:09:38.009Z
 | ADSENSE_SLOT_BOTTOM                      | yes     | 4             | ok      |
 | ADSENSE_SLOT_MID                         | yes     | 4             | ok      |
 | ADSENSE_SLOT_TOP                         | yes     | 4             | ok      |
-| AI                                       | yes     | 7             | ok      |
+| AI                                       | yes     | 8             | ok      |
 | ALLOW_ADMIN_HEADER_TOKEN                 | yes     | 2             | ok      |
 | ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 0             | unused  |
 | ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 4             | ok      |
 | ANALYZE                                  | no      | 1             | missing |
 | ANTHROPIC_API                            | yes     | 0             | unused  |
 | API_BASE_URL                             | no      | 2             | missing |
-| ASSETS                                   | yes     | 3             | ok      |
+| ASSETS                                   | yes     | 4             | ok      |
 | AUDIT_LOG                                | yes     | 2             | ok      |
 | AUTO_SHIP_COMMIT_PREFIX                  | no      | 1             | missing |
 | AUTO_SHIP_DEBOUNCE_MS                    | no      | 1             | missing |
@@ -88,7 +88,7 @@ Generated: 2026-03-10T20:09:38.009Z
 | GITHUB_PAT                               | no      | 4             | ok      |
 | GITHUB_REPO                              | no      | 4             | ok      |
 | GITHUB_TOKEN                             | no      | 4             | ok      |
-| KV                                       | yes     | 3             | ok      |
+| KV                                       | yes     | 4             | ok      |
 | LEARN                                    | no      | 2             | missing |
 | LICENSE_SECRET                           | yes     | 2             | ok      |
 | LIVE_ROOM                                | yes     | 3             | ok      |

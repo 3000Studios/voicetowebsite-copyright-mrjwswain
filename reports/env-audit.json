@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-10T20:09:38.009Z",
-  "scannedFiles": 452,
+  "generatedAt": "2026-03-10T20:35:03.080Z",
+  "scannedFiles": 456,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -350,6 +350,7 @@
     "ADSENSE_SLOT_MID": ["nav.js", "null/worker.js", "public/nav.js", "worker.js"],
     "ADSENSE_SLOT_TOP": ["nav.js", "null/worker.js", "public/nav.js", "worker.js"],
     "AI": [
+      "functions/blogAutomation.js",
       "functions/botHub.js",
       "functions/chat.js",
       "functions/orchestrator.js",
@@ -367,7 +368,12 @@
     ],
     "ANALYZE": ["vite.config.js"],
     "API_BASE_URL": ["stripe-connect-dashboard.html", "stripe-connect-storefront.html"],
-    "ASSETS": ["null/worker.js", "src/functions/deterministicRouting.js", "worker.js"],
+    "ASSETS": [
+      "null/worker.js",
+      "src/functions/deterministicRouting.js",
+      "tests/blogAutomation.test.js",
+      "worker.js"
+    ],
     "AUDIT_LOG": ["functions/commandCenterApi.js", "null/worker.js"],
     "AUTO_SHIP_COMMIT_PREFIX": ["scripts/auto-ship.mjs"],
     "AUTO_SHIP_DEBOUNCE_MS": ["scripts/auto-ship.mjs"],
@@ -530,7 +536,12 @@
       "null/worker.js",
       "src/durable_objects/DeployControllerDO.js"
     ],
-    "KV": ["functions/commandCenterApi.js", "null/worker.js", "worker.js"],
+    "KV": [
+      "functions/blogAutomation.js",
+      "functions/commandCenterApi.js",
+      "null/worker.js",
+      "worker.js"
+    ],
     "LEARN": ["functions/orchestrator.js", "null/worker.js"],
     "LICENSE_SECRET": ["null/worker.js", "worker.js"],
     "LIVE_ROOM": ["functions/commandCenterApi.js", "null/worker.js", "worker.js"],

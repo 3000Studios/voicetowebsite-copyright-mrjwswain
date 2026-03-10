@@ -14,6 +14,7 @@ import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
 import GenericContentPage from "./pages/GenericContentPage";
 import { audioEngine } from "./services/audioEngine";
+import { getSeoCopyForPath } from "./shared/siteManifest";
 import siteConfig from "./site-config.json";
 import { escapeHtml } from "./utils/htmlSanitizer";
 import { trackRevenueEvent } from "./utils/revenueTracking";
@@ -318,6 +319,64 @@ const HomeView: React.FC = () => {
     runtimeHomeConfig?.hero?.subheadline?.trim() ||
     siteConfig?.copy?.subhead?.trim() ||
     "Voice-to-website automation that builds, tests, and deploys in minutes with no handoffs or guesswork.";
+  const homeSeoCopy = getSeoCopyForPath("/");
+
+  useEffect(() => {
+    document.title = homeSeoCopy.title;
+
+    const description = heroSubhead.trim() || homeSeoCopy.description;
+    const upsertMeta = (
+      selector: string,
+      attributes: Record<string, string>,
+      content: string
+    ) => {
+      let meta = document.querySelector(selector) as HTMLMetaElement | null;
+      if (!meta) {
+        meta = document.createElement("meta");
+        Object.entries(attributes).forEach(([key, value]) =>
+          meta?.setAttribute(key, value)
+        );
+        document.head.appendChild(meta);
+      }
+      meta.content = content;
+    };
+
+    let canonical = document.querySelector(
+      'link[rel="canonical"]'
+    ) as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = window.location.href;
+
+    upsertMeta(
+      'meta[name="description"]',
+      { name: "description" },
+      description
+    );
+    upsertMeta(
+      'meta[property="og:title"]',
+      { property: "og:title" },
+      homeSeoCopy.title
+    );
+    upsertMeta(
+      'meta[property="og:description"]',
+      { property: "og:description" },
+      description
+    );
+    upsertMeta(
+      'meta[name="twitter:title"]',
+      { name: "twitter:title" },
+      homeSeoCopy.title
+    );
+    upsertMeta(
+      'meta[name="twitter:description"]',
+      { name: "twitter:description" },
+      description
+    );
+  }, [heroSubhead, homeSeoCopy.description, homeSeoCopy.title]);
 
   useEffect(() => {
     const format = () => {
@@ -709,11 +768,6 @@ const HomeView: React.FC = () => {
         className="relative min-h-screen text-white select-none overflow-x-hidden font-outfit"
         style={{ background: "var(--basalt-dark, #050506)" }}
       >
-        {/* Avatar Assistant */}
-        <ErrorBoundary fallback={null}>
-          <AvatarAssistant />
-        </ErrorBoundary>
-
         <div className="fixed bottom-5 right-5 z-50">
           <button
             type="button"
@@ -1337,6 +1391,9 @@ const App: React.FC = () => (
       </React.Suspense>
       <div className="tectonic-border" aria-hidden="true" />
       <EnhancedHamburgerNav />
+      <ErrorBoundary fallback={null}>
+        <AvatarAssistant />
+      </ErrorBoundary>
       <Routes>
         <Route path="/" element={<HomeView />} />
         <Route path="/blog" element={<BlogPage />} />
