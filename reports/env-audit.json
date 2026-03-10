@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-07T22:43:04.009Z",
-  "scannedFiles": 420,
+  "generatedAt": "2026-03-10T04:10:08.708Z",
+  "scannedFiles": 442,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -18,6 +18,7 @@
     "AI",
     "ALLOW_ADMIN_HEADER_TOKEN",
     "ALLOW_REMOTE_DEPLOY_TRIGGER",
+    "ANALYZE",
     "API_BASE_URL",
     "ASSETS",
     "AUDIT_LOG",
@@ -130,16 +131,19 @@
     "STRIPE_WEBHOOK_SECRET_LIVE",
     "SYSTEM_FREEZE",
     "UNSPLASH_ACCESS_KEY",
+    "VITE_ANALYZE",
     "VITE_GEMINI_MODEL",
     "VITE_GEMINIAPIKEY2",
     "VITE_PAYPAL_CLIENT_ID",
     "VITE_STRIPE_PUBLISHABLE_KEY",
     "VOICETOWEBSITE_HOOK",
+    "VTW_BASE_URL",
     "VTW_CACHE",
     "VTW_KV",
     "VTW_VAULT",
     "WORKER_NAME",
-    "X_ORCH_TOKEN"
+    "X_ORCH_TOKEN",
+    "ZONE_ID"
   ],
   "definedKeys": [
     "ADMIN_ACCESS_CODE",
@@ -230,6 +234,7 @@
   ],
   "missing": [
     "ADMIN_BEARER_TOKEN",
+    "ANALYZE",
     "API_BASE_URL",
     "AUTO_SHIP_COMMIT_PREFIX",
     "AUTO_SHIP_DEBOUNCE_MS",
@@ -287,12 +292,15 @@
     "STRIPE_SECRET",
     "STRIPE_WEBHOOK_SECRET_LIVE",
     "SYSTEM_FREEZE",
+    "VITE_ANALYZE",
     "VITE_STRIPE_PUBLISHABLE_KEY",
     "VOICETOWEBSITE_HOOK",
+    "VTW_BASE_URL",
     "VTW_KV",
     "VTW_VAULT",
     "WORKER_NAME",
-    "X_ORCH_TOKEN"
+    "X_ORCH_TOKEN",
+    "ZONE_ID"
   ],
   "unused": [
     "ADMIN_EMAIL",
@@ -353,6 +361,7 @@
       "null/worker.js",
       "src/durable_objects/DeployControllerDO.js"
     ],
+    "ANALYZE": ["vite.config.js"],
     "API_BASE_URL": ["stripe-connect-dashboard.html", "stripe-connect-storefront.html"],
     "ASSETS": ["null/worker.js", "src/functions/deterministicRouting.js", "worker.js"],
     "AUDIT_LOG": ["functions/commandCenterApi.js", "null/worker.js"],
@@ -361,7 +370,7 @@
     "AUTO_SHIP_DEPLOY": ["scripts/auto-ship.mjs"],
     "AUTO_SHIP_DEPLOY_CMD": ["scripts/auto-ship.mjs"],
     "AUTO_SHIP_MIN_INTERVAL_MS": ["scripts/auto-ship.mjs"],
-    "BASE_URL": ["stripe-connect-integration.js"],
+    "BASE_URL": ["scripts/test-all-pages.mjs", "stripe-connect-integration.js"],
     "BOT_HUB": ["src/functions/execute.js"],
     "CF_A": ["functions/commandCenterApi.js", "null/worker.js", "worker.js"],
     "CF_ACCOUNT_API_VOICETOWEBSITE": [
@@ -398,11 +407,12 @@
     ],
     "CF_USER_TOKEN": ["functions/commandCenterApi.js", "null/worker.js", "worker.js"],
     "CF_WORKERS_BUILDS_AUTO_DEPLOY": ["functions/orchestrator.js", "null/worker.js"],
-    "CF_ZONE_ID": ["null/worker.js", "worker.js"],
+    "CF_ZONE_ID": ["null/worker.js", "scripts/apply-zone-settings.mjs", "worker.js"],
     "CI": ["scripts/husky-install.mjs"],
     "CLOUD_FLARE_API_TOKEN": [
       "functions/commandCenterApi.js",
       "null/worker.js",
+      "scripts/apply-zone-settings.mjs",
       "src/durable_objects/DeployControllerDO.js",
       "worker.js"
     ],
@@ -414,6 +424,7 @@
     "CLOUDFLARE_API_TOKEN": [
       "functions/commandCenterApi.js",
       "null/worker.js",
+      "scripts/apply-zone-settings.mjs",
       "src/durable_objects/DeployControllerDO.js",
       "worker.js"
     ],
@@ -545,6 +556,8 @@
       "functions/godmode.js",
       "functions/supportChat.js",
       "null/worker.js",
+      "scripts/deploy-unified.mjs",
+      "src/components/HomeWireframeBackground.tsx",
       "vitest.config.ts"
     ],
     "OPENAI_API": ["functions/orchestrator.js", "null/worker.js"],
@@ -611,6 +624,7 @@
     "STRIPE_WEBHOOK_SECRET_LIVE": ["null/worker.js", "worker.js"],
     "SYSTEM_FREEZE": ["null/worker.js", "src/durable_objects/BotHubDO.js"],
     "UNSPLASH_ACCESS_KEY": ["null/worker.js", "src/utils/imageDiscovery.js"],
+    "VITE_ANALYZE": ["vite.config.js"],
     "VITE_GEMINI_MODEL": [
       "app Store apps to Sell/project-planning-hub/services/geminiService.ts",
       "src/services/gemini.ts",
@@ -625,6 +639,7 @@
     "VITE_PAYPAL_CLIENT_ID": ["src/commerce.js", "src/utils/envManager.js"],
     "VITE_STRIPE_PUBLISHABLE_KEY": ["src/commerce.js", "src/utils/envManager.js"],
     "VOICETOWEBSITE_HOOK": ["functions/orchestrator.js", "null/worker.js"],
+    "VTW_BASE_URL": ["scripts/test-all-pages.mjs"],
     "VTW_CACHE": ["null/worker.js", "src/functions/uiCommand.js", "src/utils/imageDiscovery.js"],
     "VTW_KV": ["null/worker.js", "src/utils/vaultLogger.js"],
     "VTW_VAULT": ["null/worker.js", "src/utils/vaultLogger.js"],
@@ -633,6 +648,7 @@
       "null/worker.js",
       "src/durable_objects/DeployControllerDO.js"
     ],
-    "X_ORCH_TOKEN": ["functions/execute.js", "null/worker.js", "worker.js"]
+    "X_ORCH_TOKEN": ["functions/execute.js", "null/worker.js", "worker.js"],
+    "ZONE_ID": ["scripts/apply-zone-settings.mjs"]
   }
 }

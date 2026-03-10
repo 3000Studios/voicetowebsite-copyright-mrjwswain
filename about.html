@@ -1,236 +1,614 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About VoiceToWebsite | Autonomous Web Engineering</title>
     <meta
       name="description"
       content="Meet VoiceToWebsite: the autonomous web engineering collective building revenue-ready experiences with codex-driven automation, human creativity, and a safety-first deployment loop."
     />
-    <meta
-      name="keywords"
-      content="about voicetowebsite, autonomous web engineering, voice-first delivery, j.w. swain, cloudflare worker builder"
-    />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://voicetowebsite.com/about" />
 
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
 
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
-      crossorigin="anonymous"
-    ></script>
-    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
-    <script type="module" src="/nav.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://js.stripe.com/v3"></script>
+
+    <style>
+      :root {
+        --card-radius: 24px;
+        --neon-glow: 0 0 20px rgba(0, 243, 255, 0.4);
+        --bg-deep: #050505;
+        --accent-cyan: #00f3ff;
+        --accent-purple: #8b5cf6;
+        --mercury-silver: #e0e0e0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg-deep);
+        color: white;
+        font-family: "Inter", sans-serif;
+        overflow-x: hidden;
+        perspective: 1200px;
+      }
+
+      canvas#bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        filter: contrast(1.2) brightness(0.8);
+      }
+
+      .edge-frame {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        border: 2px solid rgba(0, 243, 255, 0.15);
+        box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.15);
+      }
+
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        background: linear-gradient(to bottom, rgba(5, 5, 5, 0.85), transparent);
+        backdrop-filter: blur(10px);
+      }
+
+      .logo {
+        font-family: "Playfair Display", serif;
+        font-size: 1.25rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+
+      .logo a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 28px;
+        list-style: none;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+        transition: 0.3s;
+      }
+
+      .nav-links a:hover {
+        opacity: 1;
+        text-shadow: var(--neon-glow);
+      }
+
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 100px 20px 60px;
+      }
+
+      .hero h1 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(2.5rem, 8vw, 5.5rem);
+        line-height: 0.95;
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow:
+          0 1px 0 #ccc,
+          0 2px 0 #c9c9c9,
+          0 4px 0 #bbb,
+          0 6px 1px rgba(0, 0, 0, 0.1),
+          0 10px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .hero .subhead {
+        max-width: 580px;
+        font-size: 1.1rem;
+        margin-top: 20px;
+        color: var(--accent-cyan);
+        letter-spacing: 2px;
+        opacity: 0.95;
+      }
+
+      .hero .cta-row {
+        margin-top: 28px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+        box-shadow: var(--neon-glow);
+      }
+
+      .btn-primary {
+        background: white;
+        color: #000;
+        border-color: white;
+      }
+
+      .section {
+        padding: 80px 5%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .section h2 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .section .subhead {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        max-width: 640px;
+        margin: 0 auto 32px;
+      }
+
+      .vt-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+      }
+
+      .feature-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--card-radius);
+        padding: 28px;
+        transition: 0.3s;
+      }
+
+      .feature-card:hover {
+        border-color: rgba(0, 243, 255, 0.3);
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+      }
+
+      .feature-card .pill {
+        display: inline-block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--accent-cyan);
+        margin-bottom: 12px;
+      }
+
+      .feature-card h3 {
+        font-size: 1.15rem;
+        margin-bottom: 8px;
+      }
+
+      .feature-card p {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.9rem;
+      }
+
+      /* App Store carousel */
+      .carousel-section {
+        padding: 80px 5% 100px;
+      }
+
+      .carousel-section h2 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        text-align: center;
+        margin-bottom: 12px;
+      }
+
+      .carousel-section .subhead {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 40px;
+      }
+
+      .carousel-wrap {
+        position: relative;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .carousel-track {
+        display: flex;
+        gap: 24px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding: 16px 0;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .carousel-track::-webkit-scrollbar {
+        height: 8px;
+      }
+      .carousel-track::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+      }
+      .carousel-track::-webkit-scrollbar-thumb {
+        background: var(--accent-cyan);
+        border-radius: 4px;
+      }
+
+      .app-card {
+        flex: 0 0 min(320px, 85vw);
+        scroll-snap-align: start;
+        height: 380px;
+        border-radius: var(--card-radius);
+        background: rgba(17, 17, 17, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s;
+      }
+
+      .app-card:hover {
+        border-color: rgba(0, 243, 255, 0.35);
+        transform: translateY(-4px);
+      }
+
+      .app-card-preview {
+        height: 160px;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-cyan);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+      }
+
+      .app-card-body {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .app-card-body h3 {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+      }
+
+      .app-card-body p {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.9rem;
+        flex: 1;
+      }
+
+      .app-card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .app-card-actions .btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+      }
+
+      .carousel-prev,
+      .carousel-next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 1.25rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: 0.3s;
+      }
+
+      .carousel-prev:hover,
+      .carousel-next:hover {
+        background: rgba(0, 243, 255, 0.2);
+        border-color: var(--accent-cyan);
+      }
+
+      .carousel-prev {
+        left: -20px;
+      }
+      .carousel-next {
+        right: -20px;
+      }
+
+      @media (max-width: 900px) {
+        .carousel-prev {
+          left: 8px;
+        }
+        .carousel-next {
+          right: 8px;
+        }
+      }
+
+      footer {
+        padding: 60px 5% 40px;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      footer p {
+        font-size: 0.8rem;
+        opacity: 0.5;
+      }
+    </style>
   </head>
-  <body class="vt-page vt-page-about">
-    <div class="video-bg" aria-hidden="true">
-      <video
-        src="https://cdn.coverr.co/videos/coverr-abstract-blue-spiral-7534/1080p.mp4"
-        autoplay
-        muted
-        loop
-        playsinline
-      ></video>
-    </div>
-    <div class="edge-glow" aria-hidden="true"></div>
-    <div class="edge-frame" aria-hidden="true"></div>
+  <body>
+    <div class="edge-frame"></div>
+    <canvas id="bg-canvas"></canvas>
 
-    <main class="page">
-      <section class="section hero">
-        <p class="eyebrow">About</p>
-        <h1 class="vt-h1">We build the future of autonomous web engineering.</h1>
-        <p class="subhead">
-          VoiceToWebsite is a revenue-ready framework that turns spoken intent into performant, deployable, monetized
-          experiences. Codex, Gemini, Jules, and Windsurf orchestrate design, tests, and deployment while you stay
-          focused on the big idea.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="/demo">Run a voice build</a>
-          <a class="btn btn-ghost" href="/pricing">See pricing</a>
+    <nav>
+      <div class="logo"><a href="/">VoiceToWebsite</a></div>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/appstore.html">App Store</a></li>
+        <li><a href="/store.html">Store</a></li>
+        <li><a href="/demo">Demo</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero">
+      <h1>About<br />VoiceToWebsite</h1>
+      <p class="subhead">Autonomous web engineering. Revenue-ready from day one.</p>
+      <div class="cta-row">
+        <a href="/demo" class="btn btn-primary">Run a voice build</a>
+        <a href="/pricing" class="btn">See pricing</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Mission & Vision</h2>
+      <p class="subhead">
+        We blend voice, automation, and expert stewardship so every creator can ship production-ready experiences.
+      </p>
+      <div class="vt-grid">
+        <article class="feature-card">
+          <div class="pill">01</div>
+          <h3>Codex — parallel engineering</h3>
+          <p>Breaks commands into tasks, writes code, refactors, and runs tests before deployment.</p>
+        </article>
+        <article class="feature-card">
+          <div class="pill">02</div>
+          <h3>Gemini — integration intelligence</h3>
+          <p>Orchestrates APIs and dependencies so each build knows the full system context.</p>
+        </article>
+        <article class="feature-card">
+          <div class="pill">03</div>
+          <h3>Jules — safety & security</h3>
+          <p>Audits, best practices, and deployment compliance.</p>
+        </article>
+        <article class="feature-card">
+          <div class="pill">04</div>
+          <h3>Windsurf — UX & polish</h3>
+          <p>Animations, visual layers, and cinematic yet accessible interfaces.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Values that guide every build</h2>
+      <div class="vt-grid">
+        <article class="feature-card">
+          <div class="pill">Performance</div>
+          <h3>Lighthouse-ready</h3>
+          <p>Lazy-load assets, lean metadata, edge-native hosting.</p>
+        </article>
+        <article class="feature-card">
+          <div class="pill">Voice-native</div>
+          <h3>Intent first</h3>
+          <p>Spoken direction wires page drafts, CTAs, and metadata in moments.</p>
+        </article>
+        <article class="feature-card">
+          <div class="pill">Revenue-ready</div>
+          <h3>Monetize day one</h3>
+          <p>Checkout flows, subscriptions, and analytics built in.</p>
+        </article>
+        <article class="feature-card">
+          <div class="pill">Human oversight</div>
+          <h3>Reversible automation</h3>
+          <p>Every change logged, reviewed, and rollback-ready.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="carousel-section" id="app-store">
+      <h2>App Store</h2>
+      <p class="subhead">Try the demo, then buy. Every app is complete and viewable.</p>
+      <div class="carousel-wrap">
+        <button type="button" class="carousel-prev" id="carouselPrev" aria-label="Previous">‹</button>
+        <button type="button" class="carousel-next" id="carouselNext" aria-label="Next">›</button>
+        <div class="carousel-track" id="carouselTrack">
+          <!-- Filled by JS from /data/storefront-apps.json -->
         </div>
-        <div class="trust-strip" role="note">
-          <span>Plan → Apply → Rollback</span>
-          <span>Cloudflare edge-native</span>
-          <span>Human-reviewed automations</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div style="text-align: center">
+        <h2>Partner with us</h2>
+        <p class="subhead">From proof-of-concept to live production. Contact the team or see the workflow.</p>
+        <div class="cta-row" style="justify-content: center">
+          <a href="/contact" class="btn btn-primary">Contact the team</a>
+          <a href="/demo" class="btn">See the workflow</a>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="section">
-        <div class="glass">
-          <h2>Mission & Vision</h2>
-          <div class="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <p class="subhead">
-                We believe best digital work is a blend of voice, automation, and expert stewardship. Our mission is to
-                make autonomous engineering accessible to every creator by wrapping complex infrastructure (Cloudflare
-                Workers, Stripe/PayPal, SEO, analytics) inside a conversational revenue engine.
-              </p>
-              <img
-                src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop"
-                alt="AI Technology"
-                class="rounded-xl shadow-lg w-full mt-4"
-              />
-            </div>
-            <div>
-              <video autoplay muted loop class="w-full rounded-xl shadow-lg">
-                <source
-                  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video>
-              <p class="mt-4">
-                VoiceToWebsite is not just a product; it is a living workflow. We ship updates daily, log every action,
-                and guard production with a safety-first rollback plan so teams can experiment fearlessly.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <footer>
+      <p>&copy; 2025 VoiceToWebsite. All rights reserved.</p>
+    </footer>
 
-      <section class="section">
-        <h2>How we operate</h2>
-        <p class="subhead">
-          Every request runs through Codex, Gemini, Jules, and Windsurf, each playing a bespoke role.
-        </p>
-        <div class="vt-grid">
-          <article class="feature-card">
-            <div class="pill">01</div>
-            <h3>Codex (parallel engineering)</h3>
-            <p class="muted">
-              Breaks your command into low-level tasks, writes code, refactors, and authorizes unit tests before any
-              deployment.
-            </p>
-          </article>
-          <article class="feature-card">
-            <div class="pill">02</div>
-            <h3>Gemini (integration intelligence)</h3>
-            <p class="muted">
-              Orchestrates APIs, dependencies, and architectural reasoning so each build knows the entire system
-              context.
-            </p>
-          </article>
-          <article class="feature-card">
-            <div class="pill">03</div>
-            <h3>Jules (safety & security)</h3>
-            <p class="muted">
-              Guards hygiene with audits, enforces best practices, and keeps deployment compliance tight while powering
-              operational quality.
-            </p>
-          </article>
-          <article class="feature-card">
-            <div class="pill">04</div>
-            <h3>Windsurf (ux & polish)</h3>
-            <p class="muted">
-              Tunes animations, visual layers, and cemented polish so the interface feels cinematic yet accessible.
-            </p>
-          </article>
-        </div>
-      </section>
+    <script>
+      (function () {
+        // Three.js mercury background
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const canvas = document.getElementById("bg-canvas");
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
 
-      <section class="section">
-        <h2>Values that guide every build</h2>
-        <div class="glass" style="display: grid; gap: 1rem">
-          <div class="muted">
-            <strong>Performance-first</strong> – We deploy Lighthouse-ready defaults, lazy-load assets, and keep
-            metadata lean.
-          </div>
-          <div class="muted">
-            <strong>Voice-native</strong> – Human intent is front and center. A spoken direction wires page drafts, CTA
-            copy, and metadata in moments.
-          </div>
-          <div class="muted">
-            <strong>Revenue-ready</strong> – Built-in checkout flows, subscription engines, and analytics mean you can
-            monetize from day one.
-          </div>
-          <div class="muted">
-            <strong>Human oversight</strong> – Automation never runs unchecked. Every change is logged, reviewed, and
-            reversible.
-          </div>
-        </div>
-      </section>
+        const geometry = new THREE.IcosahedronGeometry(2, 64);
+        const material = new THREE.MeshPhysicalMaterial({
+          color: 0xffffff,
+          metalness: 1,
+          roughness: 0.05,
+          transmission: 0.5,
+          thickness: 1,
+        });
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
 
-      <section class="section">
-        <h2>By the numbers</h2>
-        <div class="vt-grid">
-          <article class="feature-card">
-            <div class="pill">99.998%</div>
-            <h3>Uptime</h3>
-            <p class="muted">Edge-native hosting with auto-scaling Worker fleets and real-time monitoring.</p>
-          </article>
-          <article class="feature-card">
-            <div class="pill">34</div>
-            <h3>Live automations</h3>
-            <p class="muted">Agents, plug-ins, and safety checks working in parallel to deliver production builds.</p>
-          </article>
-          <article class="feature-card">
-            <div class="pill">$0 → $1M+</div>
-            <h3>Built-in monetization</h3>
-            <p class="muted">Stripe, PayPal, and subscription logic ready for creators from launch.</p>
-          </article>
-          <article class="feature-card">
-            <div class="pill">2024</div>
-            <h3>Formation</h3>
-            <p class="muted">Started with a simple question: “Why can’t voice write code?”</p>
-          </article>
-        </div>
-      </section>
+        const light = new THREE.DirectionalLight(0x00f3ff, 2);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+        const light2 = new THREE.PointLight(0x8b5cf6, 2);
+        light2.position.set(-5, -5, 5);
+        scene.add(light2);
+        camera.position.z = 5;
 
-      <section class="section">
-        <h2>Meet the founders</h2>
-        <div class="glass" style="display: grid; gap: 1rem">
-          <p>
-            <strong>Mr. J.W. Swain</strong> conceived VoiceToWebsite from a desire to remove friction between intent and
-            production. He leads strategy, tone, and the mission to keep automation ethical, transparent, and
-            revenue-minded.
-          </p>
-          <p>
-            The broader VoiceToWebsite collective includes creative engineers, deployment ops, and legal guardians who
-            keep the Cloudflare edges stable and every revenue channel compliant.
-          </p>
-        </div>
-      </section>
+        function animate() {
+          requestAnimationFrame(animate);
+          sphere.rotation.y += 0.004;
+          sphere.rotation.x += 0.002;
+          renderer.render(scene, camera);
+        }
+        animate();
 
-      <section class="section">
-        <h2>Next milestones</h2>
-        <ol class="vt-grid" style="list-style: none; padding: 0">
-          <li class="feature-card">
-            <div class="pill">2026 Q1</div>
-            <h3>Multi-voice workflows</h3>
-            <p class="muted">Collaborative sessions that let teams co-author builds in real-time.</p>
-          </li>
-          <li class="feature-card">
-            <div class="pill">2026 Q2</div>
-            <h3>Analytics cockpit</h3>
-            <p class="muted">Live revenue, UX, and rollout metrics stitched into one console.</p>
-          </li>
-          <li class="feature-card">
-            <div class="pill">2026+</div>
-            <h3>Global deploy pods</h3>
-            <p class="muted">Expand worker-run clusters for sub-20ms global response.</p>
-          </li>
-        </ol>
-      </section>
+        window.addEventListener("resize", function () {
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+        });
 
-      <section class="section">
-        <div class="glass" style="max-width: 840px; margin: 0 auto; padding: 2rem">
-          <h2>Partner with us</h2>
-          <p class="subhead">
-            Whether you are a creator, agency, or brand, we plug you into the VoiceToWebsite engine and stand beside you
-            from proof-of-concept to live production.
-          </p>
-          <div class="cta-row">
-            <a class="btn btn-primary" href="/contact">Contact the team</a>
-            <a class="btn btn-ghost" href="/demo">See the workflow</a>
-          </div>
-        </div>
-      </section>
-    </main>
+        // GSAP hero
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from(".hero h1", { opacity: 0, y: 40, duration: 1, ease: "expo.out" });
+        gsap.from(".hero .subhead", { opacity: 0, y: 20, duration: 1, delay: 0.3, ease: "expo.out" });
+        gsap.from(".hero .cta-row", { opacity: 0, y: 20, duration: 1, delay: 0.5, ease: "expo.out" });
 
+        document.querySelectorAll(".feature-card").forEach(function (el, i) {
+          gsap.from(el, {
+            scrollTrigger: { trigger: el, start: "top 90%" },
+            y: 50,
+            opacity: 0,
+            duration: 0.6,
+            delay: i * 0.08,
+            ease: "power3.out",
+          });
+        });
+
+        // Carousel: load apps and render
+        var track = document.getElementById("carouselTrack");
+        var prevBtn = document.getElementById("carouselPrev");
+        var nextBtn = document.getElementById("carouselNext");
+
+        function renderAppCard(app) {
+          var isFree = app.price <= 0;
+          var demoUrl = app.demoUrl || "/" + (app.id || "").replace(/-/g, "") + ".html";
+          var card = document.createElement("div");
+          card.className = "app-card";
+          card.innerHTML = `
+            <div class="app-card-preview">${app.category}</div>
+            <div class="app-card-body">
+              <h3>${app.name || app.id}</h3>
+              <p>${app.description || ""}</p>
+              <div class="app-card-actions">
+                <a href="${demoUrl}" class="btn">View Demo</a>
+                ${
+                  isFree
+                    ? '<span class="btn" style="opacity:0.8;">Free</span>'
+                    : `<a href="/appstore.html?buy=${encodeURIComponent(app.id || "")}" class="btn btn-primary">Buy $${Number(app.price).toFixed(2)}</a>`
+                }
+              </div>
+            </div>`;
+          return card;
+        }
+
+        fetch("/data/storefront-apps.json")
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (apps) {
+            if (!Array.isArray(apps)) return;
+            track.innerHTML = "";
+            apps.forEach(function (app) {
+              track.appendChild(renderAppCard(app));
+            });
+          })
+          .catch(function () {
+            track.innerHTML =
+              '<p style="color:rgba(255,255,255,0.6); padding: 2rem;">Load <a href="/appstore.html" style="color: var(--accent-cyan);">App Store</a> for the full catalog.</p>';
+          });
+
+        if (prevBtn)
+          prevBtn.addEventListener("click", function () {
+            track.scrollBy({ left: -340, behavior: "smooth" });
+          });
+        if (nextBtn)
+          nextBtn.addEventListener("click", function () {
+            track.scrollBy({ left: 340, behavior: "smooth" });
+          });
+      })();
+    </script>
     <script type="module" src="/nav.js"></script>
   </body>
 </html>

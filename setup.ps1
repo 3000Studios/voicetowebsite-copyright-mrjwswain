@@ -49,22 +49,11 @@ try {
 
 if ($InstallVSCodeExtensions) {
   Write-Step "Installing VS Code extensions (optional)"
-  if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
-    throw "VS Code 'code' CLI not found on PATH. In VS Code: Command Palette -> 'Shell Command: Install 'code' command in PATH'."
+  if (-not (Test-Path -LiteralPath ".\scripts\install-vscode-extensions.ps1")) {
+    throw "Missing scripts/install-vscode-extensions.ps1"
   }
 
-  $extensions = @(
-    "cloudflare.cloudflare-workers-bindings-extension",
-    "ms-vscode.vscode-typescript-next",
-    "esbenp.prettier-vscode",
-    "christian-kohler.path-intellisense",
-    "streetsidesoftware.code-spell-checker"
-  )
-
-  foreach ($ext in $extensions) {
-    code --install-extension $ext | Out-Null
-    Write-Host "Installed: $ext"
-  }
+  powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-vscode-extensions.ps1
 }
 
 Write-Step "Done"

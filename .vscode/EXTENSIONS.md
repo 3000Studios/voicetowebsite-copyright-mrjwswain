@@ -19,6 +19,7 @@ filter → "Install Workspace Recommended Extensions".
 | **Code Spell Checker**     | Catches typos in prose and identifiers.                                                    |
 | **Error Lens**             | Inline errors and warnings in the editor.                                                  |
 | **ES7+ React Snippets**    | Fast React/JSX snippets.                                                                   |
+| **Continue**               | AI pair-programming/chat workflows in-editor.                                              |
 | **Material Icon Theme**    | Clear file/folder icons.                                                                   |
 | **PowerShell**             | Run scripts and `npm run` from integrated terminal on Windows.                             |
 | **GitHub Actions**         | Edit and validate `.github/workflows/*.yml`.                                               |

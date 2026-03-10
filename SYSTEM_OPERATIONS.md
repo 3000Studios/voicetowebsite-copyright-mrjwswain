@@ -9,7 +9,7 @@ production.
 - Never commit if `npm run verify` fails.
 - Never put secrets in git (no keys/passwords in files or client bundles).
 - Production is Cloudflare **Workers** using `wrangler deploy` (not GitHub Actions).
-- `DONE` means: deployed live to `voicetowebsite.com` via `npm run deploy`.
+- `DONE` means: deployed live to `voicetowebsite.com` via `npm run deploy:live`.
 
 ## Architecture (What’s Actually Running)
 
@@ -29,8 +29,8 @@ Source of truth: `DEPLOYMENT.md`.
 - Verify:
   - `npm run verify`
 - Deploy production:
-  - `npm run deploy`
-  - This is enforced as: `npm run verify && wrangler deploy --keep-vars` (`package.json`).
+  - `npm run deploy:live`
+  - `npm run deploy` is Wrangler-only and should be used only after verify already passed.
 - Auto everything (watch -> verify -> commit -> push -> deploy):
   - `npm run auto:ship`
 
@@ -52,7 +52,7 @@ Source of truth: `AGENT_HANDSHAKE.txt`, `AGENTS.md`, and `skills/README.md`.
 - Commander (you):
   - Sets priorities, approves destructive actions, owns product direction.
 - Antigravity (Ops/Architecture):
-  - Keeps deploy pipeline stable; prefers `npm run sync`, `npm run verify`, `npm run deploy`.
+  - Keeps deploy pipeline stable; prefers `npm run sync`, `npm run verify`, `npm run deploy:live`.
 - Codex / Gemini Code Assist (Implementation):
   - Makes code changes, refactors, fixes, tests, and ships through the gates.
 - Jules (Quality/Safety/UX):
@@ -69,7 +69,7 @@ Source of truth: `AGENT_HANDSHAKE.txt`, `AGENTS.md`, and `skills/README.md`.
   2. Small change set
   3. `npm run verify`
   4. Commit + push
-  5. Deploy via `npm run deploy` (if shipping)
+  5. Deploy via `npm run deploy:live` (if shipping)
 - Shared vocabulary:
   - `verify` means `npm run verify`
   - `ship` means commit + push (and deploy only if explicitly requested)
@@ -122,7 +122,7 @@ Site is down (fast path):
   - `git revert <sha>`
 - Verify and redeploy:
   - `npm run verify`
-  - `npm run deploy`
+  - `npm run deploy:live`
 
 Deploy is failing:
 
@@ -169,7 +169,7 @@ Core commands:
 
 - `npm run dev:all` for local site + worker
 - `npm run verify` before committing
-- `npm run deploy` for production
+- `npm run deploy:live` for production
 
 ## Adding A New Bot (Registration Checklist)
 

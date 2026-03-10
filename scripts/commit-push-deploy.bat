@@ -11,5 +11,5 @@ git commit -m "fix: preview routes, Custom GPT/deploy routes, deploy hook for da
 if errorlevel 1 exit /b 1
 git push
 if errorlevel 1 exit /b 1
-npm run deploy
+npm run deploy:live
 exit /b 0

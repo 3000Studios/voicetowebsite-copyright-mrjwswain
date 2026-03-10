@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 interface VoiceInputProps {
   onResult: (text: string) => void;
@@ -13,9 +13,13 @@ const VoiceInput: React.FC<VoiceInputProps> = ({
   const [supported, setSupported] = useState(false);
 
   useEffect(() => {
-    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-      setSupported(true);
-    }
+    const checkSpeechSupport = () => {
+      const hasSupport =
+        "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
+      setSupported(hasSupport);
+    };
+
+    checkSpeechSupport();
   }, []);
 
   const toggleListening = () => {

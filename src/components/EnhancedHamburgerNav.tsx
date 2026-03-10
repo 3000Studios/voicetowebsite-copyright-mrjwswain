@@ -211,7 +211,7 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
           onClick={() => setIsOpen(!isOpen)}
           className="relative z-[2001] group vtw-hamburger-btn"
           aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={isOpen}
+          aria-expanded={isOpen ? true : false}
         >
           <div className="vtw-hamburger-lines">
             <span className="vtw-hamburger-line vtw-hamburger-line-1" />

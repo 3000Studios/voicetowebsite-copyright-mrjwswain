@@ -498,6 +498,7 @@ const PayPalIntegration: React.FC<PayPalIntegrationProps> = ({
                     sandbox: e.target.value === "sandbox",
                   })
                 }
+                title="PayPal environment selection"
                 style={{
                   width: "100%",
                   padding: "8px",
@@ -527,6 +528,7 @@ const PayPalIntegration: React.FC<PayPalIntegrationProps> = ({
                 onChange={(e) =>
                   setConfig({ ...config, currency: e.target.value })
                 }
+                title="PayPal currency selection"
                 style={{
                   width: "100%",
                   padding: "8px",

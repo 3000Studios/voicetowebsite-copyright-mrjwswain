@@ -16,6 +16,12 @@
     "NPM_CONFIG_FUND": "false",
     "NPM_CONFIG_AUDIT": "false"
   },
+  "vitest.enable": true,
+  "vitest.nodeExecutable": "node",
+  "vitest.commandLine": "npx vitest",
+  "vitest.configFile": "vitest.config.ts",
+  "vitest.rootPath": ".",
+  "search.followSymlinks": false,
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.formatOnType": false,
@@ -38,7 +44,7 @@
   "editor.tabCompletion": "on",
   "editor.inlayHints.enabled": "on",
   "editor.stickyScroll.enabled": true,
-  "editor.minimap.enabled": true,
+  "editor.minimap.enabled": false,
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
   "editor.linkedEditing": true,
@@ -66,7 +72,9 @@
     "**/test-results/**": true,
     "**/.turbo/**": true,
     "**/.cache/**": true,
-    "**/coverage/**": true
+    "**/coverage/**": true,
+    "**/app Store apps to Sell/**": true,
+    "**/src/webforge/**": true
   },
   "search.exclude": {
     "**/node_modules": true,
@@ -76,7 +84,9 @@
     "**/black-vault": true,
     "**/test-results": true,
     "**/package-lock.json": true,
-    "**/coverage": true
+    "**/coverage": true,
+    "**/app Store apps to Sell/**": true,
+    "**/src/webforge/**": true
   },
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
@@ -85,7 +95,8 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.tsserver.maxTsServerMemory": 8192,
-  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "typescript.disableAutomaticTypeAcquisition": true,
   "typescript.tsserver.watchOptions": {
     "watchFile": "useFsEvents",
     "watchDirectory": "useFsEvents"
@@ -108,7 +119,7 @@
   "git.confirmEmptyCommits": false,
   "git.confirmForcePush": false,
   "git.confirmNoVerifyCommit": false,
-  "git.autofetchPeriod": 180,
+  "git.autofetchPeriod": 300,
   "gitlens.codeLens.enabled": true,
   "errorLens.enabledDiagnosticLevels": ["error", "warning"],
   "path-intellisense.extensionOnImport": true,

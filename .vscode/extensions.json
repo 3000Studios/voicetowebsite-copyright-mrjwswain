@@ -10,6 +10,7 @@
     "streetsidesoftware.code-spell-checker",
     "usernamehw.errorlens",
     "dsznajder.es7-react-js-snippets",
+    "continue.continue",
     "PKief.material-icon-theme",
     "ms-vscode.powershell",
     "GitHub.vscode-github-actions",
@@ -19,9 +20,7 @@
     "tamasfe.even-better-toml",
     "vitest.explorer",
     "rangav.vscode-thunder-client",
-    "yzhang.markdown-all-in-one",
-    "ms-vscode.vscode-json",
-    "nickytonline.vscode-link-status"
+    "yzhang.markdown-all-in-one"
   ],
   "unwantedRecommendations": [
     "GitHub.copilot",

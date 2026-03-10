@@ -561,7 +561,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     total
                   );
                 }}
-                aria-pressed={paymentMethod === "stripe"}
+                aria-pressed={paymentMethod === "stripe" ? true : false}
               >
                 <div className="payment-icon">💳</div>
                 <div>Credit Card</div>
@@ -581,7 +581,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                     total
                   );
                 }}
-                aria-pressed={paymentMethod === "paypal"}
+                aria-pressed={paymentMethod === "paypal" ? true : false}
               >
                 <div className="payment-icon">🅿️</div>
                 <div>PayPal</div>

@@ -1,6 +1,8 @@
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import AvatarAssistant from "./components/AvatarAssistant";
+import ResponsiveWallpaper from "./components/ResponsiveWallpaper";
 import { FALLBACK_INTRO_SONG, INTRO_SONG } from "./constants";
 import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
@@ -12,11 +14,11 @@ import { trackRevenueEvent } from "./utils/revenueTracking";
 
 // Lazy load heavy components
 const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
-const ParticleEffects = lazy(() => import("./components/ParticleEffects"));
-const WarpTunnel = lazy(() => import("./components/WarpTunnel"));
 const ErrorBoundary = lazy(() => import("./components/ErrorBoundary"));
-const ParallaxWallpaper = lazy(() => import("./components/ParallaxWallpaper"));
 const GlobalFooter = lazy(() => import("./components/GlobalFooter"));
+const HomeWireframeBackground = lazy(
+  () => import("./components/HomeWireframeBackground")
+);
 
 type PricingTier = {
   name: string;
@@ -251,7 +253,6 @@ const EnhancedTypography = () => (
 );
 
 const HomeView: React.FC = () => {
-  const reduceMotion = useReducedMotion();
   const heroHeadline =
     siteConfig?.copy?.headline?.trim() ||
     "Launch production-ready sites with one spoken command.";
@@ -625,23 +626,20 @@ const HomeView: React.FC = () => {
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
-        {/* 3D Animated Parallax Wallpaper */}
+        {/* Responsive Wallpaper */}
         <ErrorBoundary fallback={null}>
-          <ParallaxWallpaper />
+          <ResponsiveWallpaper configIndex={Math.floor(Math.random() * 5)} />
         </ErrorBoundary>
 
+        {/* Wireframe + gradient + floating shapes only; no wallpapers or tinted filters */}
         <ErrorBoundary fallback={null}>
-          <WarpTunnel isVisible={!reduceMotion && flowPhase === "generating"} />
+          <HomeWireframeBackground />
         </ErrorBoundary>
 
-        {/* Enhanced Background atmosphere */}
-        <div className="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-30">
-          <div className="w-full h-full brightness-50 bg-radial-atmosphere" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
-
-          {/* Enhanced particle effects */}
-          <ParticleEffects />
-        </div>
+        {/* Avatar Assistant */}
+        <ErrorBoundary fallback={null}>
+          <AvatarAssistant />
+        </ErrorBoundary>
 
         {/* Phosphor nav is injected by nav.js on every page (including this one) — no duplicate */}
 

@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "name": "Windsurf Full Automation Configuration",
-  "description": "Complete automation settings for Windsurf AI assistant with full access and no prompts",
+  "description": "Automation settings for Windsurf aligned to repo verify, ship, and deploy rules",
 
   "terminal": {
     "autoRun": {
@@ -42,7 +42,7 @@
       "noPrompts": true,
       "autoApproveAll": true,
       "autoRetryOnFailure": true,
-      "continueOnError": true
+      "continueOnError": false
     }
   },
 
@@ -75,13 +75,13 @@
   "git": {
     "autoCommit": true,
     "autoPush": true,
-    "autoPull": true,
-    "autoMerge": true,
-    "autoResolveConflicts": true,
+    "autoPull": false,
+    "autoMerge": false,
+    "autoResolveConflicts": false,
     "skipConfirmation": true,
-    "autoForcePush": true,
-    "autoCreateBranches": true,
-    "autoDeleteBranches": true
+    "autoForcePush": false,
+    "autoCreateBranches": false,
+    "autoDeleteBranches": false
   },
 
   "deployment": {
@@ -91,12 +91,12 @@
     "autoValidate": true,
     "skipConfirmation": true,
     "autoRetry": true,
-    "autoRollback": true,
-    "forceDeploy": true
+    "autoRollback": false,
+    "forceDeploy": false
   },
 
   "security": {
-    "bypassAllRestrictions": true,
+    "bypassAllRestrictions": false,
     "allowUnsignedScripts": true,
     "allowRemoteExecution": true,
     "allowElevatedPrivileges": true,
@@ -124,9 +124,9 @@
     },
     "git": {
       "autoExecute": true,
-      "allowForcePush": true,
-      "allowForceOperations": true,
-      "allowRewriteHistory": true,
+      "allowForcePush": false,
+      "allowForceOperations": false,
+      "allowRewriteHistory": false,
       "skipConfirmation": true
     },
     "wrangler": {
@@ -180,14 +180,14 @@
   "automation": {
     "enabled": true,
     "level": "maximum",
-    "noRestrictions": true,
+    "noRestrictions": false,
     "noPrompts": true,
     "noConfirmations": true,
     "noWarnings": true,
     "noDialogs": true,
     "silentExecution": true,
     "immediateExecution": true,
-    "continueOnError": true,
+    "continueOnError": false,
     "autoRetry": true,
     "autoHeal": true
   }

@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /**
- * Guard-deploy: no-op. GitHub Actions now owns deploy on push to main.
+ * Guard-deploy: no-op compatibility shim.
+ * The canonical live path is npm run deploy:live; CI currently verifies only.
  * Kept for backward compatibility if any script still invokes guard:deploy.
  */
-console.log("guard-deploy: OK (deploy via GitHub Actions)");
+console.log(
+  "guard-deploy: OK (use npm run deploy:live for production deploys)"
+);

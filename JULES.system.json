@@ -12,5 +12,5 @@
     "body": "Inter",
     "system": "JetBrains Mono"
   },
-  "deploy": "cloudflare-pages"
+  "deploy": "cloudflare-workers"
 }

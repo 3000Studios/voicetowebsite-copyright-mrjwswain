@@ -387,6 +387,110 @@
         font-size: 0.9rem;
       }
 
+      /* Storefront carousel */
+      .carousel-section {
+        margin-bottom: 4rem;
+      }
+      .carousel-section h2 {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+      }
+      .carousel-wrap {
+        position: relative;
+        margin-top: 2rem;
+      }
+      .carousel-track {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding: 1rem 0;
+        -webkit-overflow-scrolling: touch;
+      }
+      .carousel-track::-webkit-scrollbar {
+        height: 6px;
+      }
+      .carousel-track::-webkit-scrollbar-thumb {
+        background: var(--conductive-cyan);
+        border-radius: 3px;
+      }
+      .carousel-card {
+        flex: 0 0 min(300px, 82vw);
+        scroll-snap-align: start;
+        background: var(--membrane-fill);
+        border: 1px solid var(--border-membrane);
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s;
+      }
+      .carousel-card:hover {
+        border-color: rgba(0, 242, 255, 0.35);
+      }
+      .carousel-card-preview {
+        height: 120px;
+        background: linear-gradient(135deg, rgba(0, 242, 255, 0.08), rgba(112, 0, 255, 0.08));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--conductive-cyan);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .carousel-card-body {
+        padding: 1.25rem;
+        flex: 1;
+      }
+      .carousel-card-body h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+      .carousel-card-body p {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+      }
+      .carousel-card-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .carousel-card-actions .primary-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+      }
+      .carousel-card-actions a.primary-btn {
+        text-decoration: none;
+      }
+      .carousel-prev,
+      .carousel-next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid var(--border-membrane);
+        background: rgba(0, 0, 0, 0.6);
+        color: var(--text-main);
+        font-size: 1.2rem;
+        cursor: pointer;
+        z-index: 5;
+        transition: 0.3s;
+      }
+      .carousel-prev:hover,
+      .carousel-next:hover {
+        border-color: var(--conductive-cyan);
+        background: rgba(0, 242, 255, 0.1);
+      }
+      .carousel-prev {
+        left: -12px;
+      }
+      .carousel-next {
+        right: -12px;
+      }
+
       @media (max-width: 768px) {
         h1 {
           font-size: 2.5rem;
@@ -396,6 +500,12 @@
         }
         .nav {
           display: none;
+        }
+        .carousel-prev {
+          left: 4px;
+        }
+        .carousel-next {
+          right: 4px;
         }
       }
     </style>
@@ -446,6 +556,18 @@
           <span class="category-pill">Growth Ops</span>
           <span class="category-pill">Data Rooms</span>
           <span class="category-pill">Motion Kits</span>
+        </div>
+      </section>
+
+      <section class="carousel-section">
+        <h2>Storefront — Demo &amp; Buy</h2>
+        <p class="subhead">Every app has a viewable demo. Try it, then buy.</p>
+        <div class="carousel-wrap">
+          <button type="button" class="carousel-prev" id="storefrontCarouselPrev" aria-label="Previous">‹</button>
+          <button type="button" class="carousel-next" id="storefrontCarouselNext" aria-label="Next">›</button>
+          <div class="carousel-track" id="storefrontCarouselTrack">
+            <!-- Filled by storefront-apps.json -->
+          </div>
         </div>
       </section>
 
@@ -658,6 +780,60 @@
       });
     </script>
     <script type="module" src="/src/appstore-init.js"></script>
+    <script>
+      (function () {
+        var track = document.getElementById("storefrontCarouselTrack");
+        var prevBtn = document.getElementById("storefrontCarouselPrev");
+        var nextBtn = document.getElementById("storefrontCarouselNext");
+        if (!track) return;
+
+        function renderCard(app) {
+          var isFree = !app.price || app.price <= 0;
+          var demoUrl = app.demoUrl || "/" + (app.id || "").replace(/-/g, "") + ".html";
+          var card = document.createElement("div");
+          card.className = "carousel-card";
+          card.innerHTML = `
+            <div class="carousel-card-preview">${app.category || "App"}</div>
+            <div class="carousel-card-body">
+              <h3>${app.name || app.id}</h3>
+              <p>${app.description || ""}</p>
+              <div class="carousel-card-actions">
+                <a href="${demoUrl}" class="primary-btn">View Demo</a>
+                ${
+                  isFree
+                    ? '<span class="monetization">Free</span>'
+                    : `<button type="button" class="primary-btn purchase-btn" data-product="${app.id || ""}" data-sku="${app.id || ""}" data-label="${app.name || app.id}" data-price="${app.price}" data-url="${demoUrl}">Buy $${Number(app.price).toFixed(2)}</button>`
+                }
+              </div>
+            </div>`;
+          return card;
+        }
+
+        fetch("/data/storefront-apps.json")
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (apps) {
+            if (!Array.isArray(apps)) return;
+            track.innerHTML = "";
+            apps.forEach(function (app) {
+              track.appendChild(renderCard(app));
+            });
+          })
+          .catch(function () {
+            track.innerHTML = '<p class="subhead" style="padding:2rem;">Catalog loading…</p>';
+          });
+
+        if (prevBtn)
+          prevBtn.addEventListener("click", function () {
+            track.scrollBy({ left: -320, behavior: "smooth" });
+          });
+        if (nextBtn)
+          nextBtn.addEventListener("click", function () {
+            track.scrollBy({ left: 320, behavior: "smooth" });
+          });
+      })();
+    </script>
     <script type="module" src="/nav.js"></script>
   </body>
 </html>

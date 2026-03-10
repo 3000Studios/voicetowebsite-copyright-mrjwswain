@@ -1,4 +1,3 @@
-/* Plasma Navigation Styles */
 .flash-nav {
   position: fixed;
   top: 0;
@@ -18,7 +17,6 @@
   padding: 0 var(--space-8);
 }
 
-/* Bioluminescent Header Wave Animations */
 .wave-path-0 {
   animation: infinite-wave 8s ease-in-out infinite;
   animation-delay: 0s;
@@ -34,7 +32,6 @@
   animation-delay: 1s;
 }
 
-/* Canvas Background */
 .flash-nav #waveCanvas {
   position: absolute;
   top: 0;
@@ -45,7 +42,6 @@
   opacity: 0.7;
 }
 
-/* Plasma Ball Follower */
 .plasma-ball {
   position: absolute;
   width: 120px;
@@ -62,7 +58,6 @@
   transition: transform 0.1s linear;
 }
 
-/* Brand Section */
 .plasma-nav-brand {
   position: relative;
   z-index: 10;
@@ -102,7 +97,6 @@
   text-shadow: var(--plasma-glow);
 }
 
-/* Navigation Links */
 .plasma-nav-links {
   display: flex;
   align-items: center;
@@ -865,6 +859,7 @@ h3,
   );
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border-radius: 12px;
 }
@@ -1065,8 +1060,8 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--border-radius-xl);
   padding: var(--space-xl);
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   box-shadow: var(--shadow-lg);
   display: grid;
   gap: var(--space-md);
@@ -1567,6 +1562,7 @@ a {
   padding: 0.9rem 2rem;
   background: rgba(4, 6, 10, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   /* Allow dropdowns and right-side actions to render outside the bar. */
   overflow: visible;
@@ -2297,6 +2293,7 @@ a {
   position: fixed;
   inset: 0;
   background: rgba(4, 8, 16, 0.92);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   z-index: 140;
   opacity: 0;
@@ -3041,6 +3038,7 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--border-radius-2xl);
   padding: var(--space-xl);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   box-shadow: var(--shadow-lg);
   display: grid;
@@ -4812,6 +4810,7 @@ button.ghost:hover {
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(0, 0, 0, 0.72);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   overflow: hidden;
   display: grid;

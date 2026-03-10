@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-03-07T22:43:04.009Z
+Generated: 2026-03-10T04:10:08.708Z
 
 ## Summary
 
-- Scanned files: 420
-- Used keys: 138
+- Scanned files: 442
+- Used keys: 142
 - Defined keys: 85
-- Missing keys: 64
+- Missing keys: 68
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -33,6 +33,7 @@ Generated: 2026-03-07T22:43:04.009Z
 | ALLOW_ADMIN_HEADER_TOKEN                 | yes     | 2             | ok      |
 | ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 0             | unused  |
 | ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 4             | ok      |
+| ANALYZE                                  | no      | 1             | missing |
 | API_BASE_URL                             | no      | 2             | missing |
 | ASSETS                                   | yes     | 3             | ok      |
 | AUDIT_LOG                                | yes     | 2             | ok      |
@@ -41,7 +42,7 @@ Generated: 2026-03-07T22:43:04.009Z
 | AUTO_SHIP_DEPLOY                         | no      | 1             | missing |
 | AUTO_SHIP_DEPLOY_CMD                     | no      | 1             | missing |
 | AUTO_SHIP_MIN_INTERVAL_MS                | no      | 1             | missing |
-| BASE_URL                                 | no      | 1             | missing |
+| BASE_URL                                 | no      | 2             | missing |
 | BOT_HUB                                  | yes     | 1             | ok      |
 | CACHE_CONTROL_HTML                       | yes     | 0             | unused  |
 | CACHE_CONTROL_STATIC                     | yes     | 0             | unused  |
@@ -59,11 +60,11 @@ Generated: 2026-03-07T22:43:04.009Z
 | CF_PAGES_DEPLOY_HOOK                     | yes     | 3             | ok      |
 | CF_USER_TOKEN                            | no      | 3             | missing |
 | CF_WORKERS_BUILDS_AUTO_DEPLOY            | yes     | 2             | ok      |
-| CF_ZONE_ID                               | yes     | 2             | ok      |
+| CF_ZONE_ID                               | yes     | 3             | ok      |
 | CI                                       | no      | 1             | missing |
-| CLOUD_FLARE_API_TOKEN                    | yes     | 4             | ok      |
+| CLOUD_FLARE_API_TOKEN                    | yes     | 5             | ok      |
 | CLOUDFLARE_ACCOUNT_ID                    | no      | 3             | missing |
-| CLOUDFLARE_API_TOKEN                     | no      | 4             | missing |
+| CLOUDFLARE_API_TOKEN                     | no      | 5             | missing |
 | CLOUDFLARE_WORKER_NAME                   | no      | 3             | missing |
 | CONFIRM_TOKEN_SECRET                     | no      | 2             | missing |
 | CONTROL_PASSWORD                         | yes     | 7             | ok      |
@@ -95,7 +96,7 @@ Generated: 2026-03-07T22:43:04.009Z
 | LOG_LEVEL                                | no      | 5             | missing |
 | MODE                                     | no      | 1             | missing |
 | NEXT_PUBLIC_ADSENSE_PUBLISHER_ID         | no      | 2             | missing |
-| NODE_ENV                                 | no      | 6             | missing |
+| NODE_ENV                                 | no      | 8             | missing |
 | OPENAI_API                               | yes     | 2             | ok      |
 | OPENAI_API_KEY                           | no      | 2             | missing |
 | OPENAI_API_KEY3                          | yes     | 2             | ok      |
@@ -157,13 +158,16 @@ Generated: 2026-03-07T22:43:04.009Z
 | STRIPE_WEBHOOK_SECRET_LIVE               | no      | 2             | missing |
 | SYSTEM_FREEZE                            | no      | 2             | missing |
 | UNSPLASH_ACCESS_KEY                      | yes     | 2             | ok      |
+| VITE_ANALYZE                             | no      | 1             | missing |
 | VITE_GEMINI_MODEL                        | yes     | 3             | ok      |
 | VITE_GEMINIAPIKEY2                       | yes     | 4             | ok      |
 | VITE_PAYPAL_CLIENT_ID                    | yes     | 2             | ok      |
 | VITE_STRIPE_PUBLISHABLE_KEY              | no      | 2             | missing |
 | VOICETOWEBSITE_HOOK                      | no      | 2             | missing |
+| VTW_BASE_URL                             | no      | 1             | missing |
 | VTW_CACHE                                | yes     | 3             | ok      |
 | VTW_KV                                   | no      | 2             | missing |
 | VTW_VAULT                                | no      | 2             | missing |
 | WORKER_NAME                              | no      | 3             | missing |
 | X_ORCH_TOKEN                             | no      | 3             | missing |
+| ZONE_ID                                  | no      | 1             | missing |

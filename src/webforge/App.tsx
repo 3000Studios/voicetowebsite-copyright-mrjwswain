@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Logo from "./components/Logo";
+import ResultView from "./components/ResultView";
+import ScreenshotUpload from "./components/ScreenshotUpload";
+import VoiceInput from "./components/VoiceInput";
 import { analyzeSource, forgeWebsite } from "./services/geminiService";
 import { AppState } from "./types";
-import ScreenshotUpload from "./components/ScreenshotUpload";
-import ResultView from "./components/ResultView";
-import Logo from "./components/Logo";
-import VoiceInput from "./components/VoiceInput";
 
 const statusMessages = [
   "Infecting Neural Pathways...",
@@ -50,24 +50,28 @@ const App: React.FC = () => {
   useEffect(() => {
     let timer: any;
     let statusTimer: any;
+
+    const cleanup = () => {
+      if (timer) clearInterval(timer);
+      if (statusTimer) clearInterval(statusTimer);
+    };
+
     if (state.isAnalyzing) {
-      setState((s) => ({ ...s, progress: 0 }));
+      const newState = { ...state, progress: 0 };
+      setState(newState);
       setStatusIdx(0);
+
       timer = setInterval(() => {
-        setState((s) => ({
-          ...s,
-          progress: Math.min(s.progress + Math.random() * 8, 98),
-        }));
+        const newProgress = Math.min(newState.progress + Math.random() * 8, 98);
+        setState((s) => ({ ...s, progress: newProgress }));
       }, 400);
 
       statusTimer = setInterval(() => {
         setStatusIdx((i) => (i + 1) % (statusMessages.length - 1));
-      }, 2500);
+      }, 3000);
     }
-    return () => {
-      if (timer) clearInterval(timer);
-      if (statusTimer) clearInterval(statusTimer);
-    };
+
+    return cleanup;
   }, [state.isAnalyzing]);
 
   const runAnalysis = async (source: string, isUrl: boolean) => {

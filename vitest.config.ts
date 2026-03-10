@@ -13,6 +13,17 @@ export default defineConfig({
     restoreMocks: true,
     watch: false,
     pool: "threads",
+
+    // Fix Node.js path issues for Windsurf/Vitest
+    poolOptions: {
+      threads: {
+        isolate: false,
+        singleThread: true,
+      },
+    },
+
+    // Use node executable directly to avoid path issues
+    exec: "node",
   },
 
   // Resolve configuration

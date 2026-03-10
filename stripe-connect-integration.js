@@ -737,10 +737,11 @@ async function handleV2AccountEvent(event) {
 
     console.log(`Processing V2 account event: ${fullEvent.type}`);
 
+    let accountId;
     switch (fullEvent.type) {
       case "v2.core.account.requirements.updated":
         // Account requirements have changed
-        const accountId = fullEvent.account;
+        accountId = fullEvent.account;
         console.log(`Requirements updated for account: ${accountId}`);
 
         // TODO: Update database with new requirements

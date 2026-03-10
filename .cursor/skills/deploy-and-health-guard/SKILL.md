@@ -14,8 +14,9 @@ description:
 This skill implements the **Deployment Lock Policy** in `AGENTS.md`. Do not deviate unless the user
 explicitly says otherwise.
 
-**Source of truth:** Cloudflare Workers + Wrangler. Deploy via `npm run deploy` and existing
-Cloudflare config. Do not introduce a different deploy method, platform, or branch strategy.
+**Source of truth:** Cloudflare Workers + Wrangler. **Single deploy path:** use
+`npm run deploy:live` from any entry point (IDE, Custom GPT, CLI). It runs verify then deploy. Do
+not introduce a different deploy method, platform, or branch strategy.
 
 **Branch:** Use `main` only. Keep local and remote in sync. Do not create side branches unless the
 user explicitly requests it.
@@ -26,10 +27,11 @@ user explicitly requests it.
 2. If verify fails: fix issues immediately in the same session; re-run `npm run verify` until green.
 3. When green: run `npm run ship` (or equivalent verify+commit flow).
 4. Push with `npm run ship:push` (or equivalent).
-5. Deploy with `npm run deploy` (or rely on CI deploy-on-push if configured and healthy).
+5. Deploy with `npm run deploy:live` (single path: verify + deploy).
 6. Confirm deploy/build success and report result.
 
-**Default behavior:** verify → ship → push → deploy.
+**Default behavior:** verify → ship → push → deploy:live. From any environment, always use
+`npm run deploy:live` so the same path runs everywhere.
 
 ## Hard Rules
 
@@ -99,7 +101,8 @@ user explicitly requests it.
 | Full check (gate before commit)     | `npm run verify`                           |
 | Commit (verify + add + commit)      | `npm run ship`                             |
 | Commit and push                     | `npm run ship:push`                        |
-| Deploy                              | `npm run deploy`                           |
+| Deploy                              | `npm run deploy:live`                      |
+| Wrangler-only deploy                | `npm run deploy`                           |
 | Production deploy (verify + guards) | `npm run deploy:prod`                      |
 | Tests                               | `npm test`                                 |
 | Build                               | `npm run build`                            |

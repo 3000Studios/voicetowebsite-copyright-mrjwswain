@@ -1,8 +1,8 @@
-var __defProp = Object.defineProperty;
-var __name = (target, value) =>
+const __defProp = Object.defineProperty;
+const __name = (target, value) =>
   __defProp(target, "name", { value, configurable: true });
-var __export = (target, all) => {
-  for (var name in all)
+const __export = (target, all) => {
+  for (const name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
@@ -14,11 +14,11 @@ function createNotImplementedError(name) {
 __name(createNotImplementedError, "createNotImplementedError");
 
 // node_modules/unenv/dist/runtime/node/internal/perf_hooks/performance.mjs
-var _timeOrigin = globalThis.performance?.timeOrigin ?? Date.now();
-var _performanceNow = globalThis.performance?.now
+const _timeOrigin = globalThis.performance?.timeOrigin ?? Date.now();
+const _performanceNow = globalThis.performance?.now
   ? globalThis.performance.now.bind(globalThis.performance)
   : () => Date.now() - _timeOrigin;
-var nodeTiming = {
+const nodeTiming = {
   name: "node",
   entryType: "node",
   startTime: 0,
@@ -40,7 +40,7 @@ var nodeTiming = {
     return this;
   },
 };
-var PerformanceEntry = class {
+const PerformanceEntry = class {
   static {
     __name(this, "PerformanceEntry");
   }
@@ -67,7 +67,7 @@ var PerformanceEntry = class {
     };
   }
 };
-var PerformanceMark = class PerformanceMark2 extends PerformanceEntry {
+const PerformanceMark = class PerformanceMark2 extends PerformanceEntry {
   static {
     __name(this, "PerformanceMark");
   }
@@ -79,13 +79,13 @@ var PerformanceMark = class PerformanceMark2 extends PerformanceEntry {
     return 0;
   }
 };
-var PerformanceMeasure = class extends PerformanceEntry {
+const PerformanceMeasure = class extends PerformanceEntry {
   static {
     __name(this, "PerformanceMeasure");
   }
   entryType = "measure";
 };
-var PerformanceResourceTiming = class extends PerformanceEntry {
+const PerformanceResourceTiming = class extends PerformanceEntry {
   static {
     __name(this, "PerformanceResourceTiming");
   }
@@ -112,7 +112,7 @@ var PerformanceResourceTiming = class extends PerformanceEntry {
   workerStart = 0;
   responseStatus = 0;
 };
-var PerformanceObserverEntryList = class {
+const PerformanceObserverEntryList = class {
   static {
     __name(this, "PerformanceObserverEntryList");
   }
@@ -127,7 +127,7 @@ var PerformanceObserverEntryList = class {
     return [];
   }
 };
-var Performance = class {
+const Performance = class {
   static {
     __name(this, "Performance");
   }
@@ -225,7 +225,7 @@ var Performance = class {
     return this;
   }
 };
-var PerformanceObserver = class {
+const PerformanceObserver = class {
   static {
     __name(this, "PerformanceObserver");
   }
@@ -260,7 +260,7 @@ var PerformanceObserver = class {
     return this;
   }
 };
-var performance2 =
+const performance2 =
   globalThis.performance && "addEventListener" in globalThis.performance
     ? globalThis.performance
     : new Performance();
@@ -276,8 +276,8 @@ globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList;
 globalThis.PerformanceResourceTiming = PerformanceResourceTiming;
 
 // functions/adminAuth.js
-var textEncoder = new TextEncoder();
-var base64UrlEncode = /* @__PURE__ */ __name(
+const textEncoder = new TextEncoder();
+const base64UrlEncode = /* @__PURE__ */ __name(
   (data) =>
     btoa(String.fromCharCode(...data))
       .replace(/\+/g, "-")
@@ -285,13 +285,13 @@ var base64UrlEncode = /* @__PURE__ */ __name(
       .replace(/=+$/g, ""),
   "base64UrlEncode"
 );
-var timingSafeEqual = /* @__PURE__ */ __name((a, b) => {
+const timingSafeEqual = /* @__PURE__ */ __name((a, b) => {
   if (a.length !== b.length) return false;
   let out = 0;
   for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return out === 0;
 }, "timingSafeEqual");
-var getCookie = /* @__PURE__ */ __name((cookieHeader, name) => {
+const getCookie = /* @__PURE__ */ __name((cookieHeader, name) => {
   const header = cookieHeader || "";
   const parts = header.split(";");
   for (const part of parts) {
@@ -300,7 +300,7 @@ var getCookie = /* @__PURE__ */ __name((cookieHeader, name) => {
   }
   return "";
 }, "getCookie");
-var importHmacKey = /* @__PURE__ */ __name(
+const importHmacKey = /* @__PURE__ */ __name(
   async (secret) =>
     crypto.subtle.importKey(
       "raw",
@@ -311,7 +311,7 @@ var importHmacKey = /* @__PURE__ */ __name(
     ),
   "importHmacKey"
 );
-var sign = /* @__PURE__ */ __name(async (secret, message) => {
+const sign = /* @__PURE__ */ __name(async (secret, message) => {
   const key = await importHmacKey(secret);
   const sig = await crypto.subtle.sign(
     "HMAC",
@@ -320,11 +320,11 @@ var sign = /* @__PURE__ */ __name(async (secret, message) => {
   );
   return base64UrlEncode(new Uint8Array(sig));
 }, "sign");
-var getAdminSigningSecret = /* @__PURE__ */ __name(
+const getAdminSigningSecret = /* @__PURE__ */ __name(
   (env) => String(env.ADMIN_COOKIE_SECRET || "").trim(),
   "getAdminSigningSecret"
 );
-var isAdminEnabled = /* @__PURE__ */ __name(
+const isAdminEnabled = /* @__PURE__ */ __name(
   (env) =>
     Boolean(
       String(env.CONTROL_PASSWORD || "").trim() ||
@@ -332,9 +332,9 @@ var isAdminEnabled = /* @__PURE__ */ __name(
     ),
   "isAdminEnabled"
 );
-var adminCookieName = "vtw_admin";
-var adminCookieTtlSeconds = 60 * 60 * 2;
-var mintAdminCookieValue = /* @__PURE__ */ __name(async (env) => {
+const adminCookieName = "vtw_admin";
+const adminCookieTtlSeconds = 60 * 60 * 2;
+const mintAdminCookieValue = /* @__PURE__ */ __name(async (env) => {
   const secret = getAdminSigningSecret(env);
   if (!secret) {
     throw new Error(
@@ -346,7 +346,7 @@ var mintAdminCookieValue = /* @__PURE__ */ __name(async (env) => {
   const sig = await sign(secret, msg);
   return `${msg}.${sig}`;
 }, "mintAdminCookieValue");
-var verifyAdminCookieValue = /* @__PURE__ */ __name(async (env, value) => {
+const verifyAdminCookieValue = /* @__PURE__ */ __name(async (env, value) => {
   const secret = getAdminSigningSecret(env);
   if (!secret) return false;
   const parts = String(value || "").split(".");
@@ -361,12 +361,12 @@ var verifyAdminCookieValue = /* @__PURE__ */ __name(async (env, value) => {
   const expected = await sign(secret, msg);
   return timingSafeEqual(sig, expected);
 }, "verifyAdminCookieValue");
-var hasValidAdminCookie = /* @__PURE__ */ __name(async (request, env) => {
+const hasValidAdminCookie = /* @__PURE__ */ __name(async (request, env) => {
   const cookieHeader = request.headers.get("cookie") || "";
   const value = getCookie(cookieHeader, adminCookieName);
   return verifyAdminCookieValue(env, value);
 }, "hasValidAdminCookie");
-var isAdminRequest = /* @__PURE__ */ __name(async (request, env) => {
+const isAdminRequest = /* @__PURE__ */ __name(async (request, env) => {
   const allowHeaderToken =
     String(env.ALLOW_ADMIN_HEADER_TOKEN || "").trim() === "1";
   const headerToken = request.headers.get("x-admin-token") || "";
@@ -380,7 +380,7 @@ var isAdminRequest = /* @__PURE__ */ __name(async (request, env) => {
   }
   return hasValidAdminCookie(request, env);
 }, "isAdminRequest");
-var setAdminCookieHeaders = /* @__PURE__ */ __name(
+const setAdminCookieHeaders = /* @__PURE__ */ __name(
   (headers, cookieValue, { secure = true } = {}) => {
     headers.append(
       "Set-Cookie",
@@ -389,7 +389,7 @@ var setAdminCookieHeaders = /* @__PURE__ */ __name(
   },
   "setAdminCookieHeaders"
 );
-var clearAdminCookieHeaders = /* @__PURE__ */ __name(
+const clearAdminCookieHeaders = /* @__PURE__ */ __name(
   (headers, { secure = true } = {}) => {
     headers.append(
       "Set-Cookie",
@@ -400,7 +400,7 @@ var clearAdminCookieHeaders = /* @__PURE__ */ __name(
 );
 
 // functions/botHub.js
-var json = /* @__PURE__ */ __name(
+const json = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -408,7 +408,7 @@ var json = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var ensureBotHubTables = /* @__PURE__ */ __name(async (env) => {
+const ensureBotHubTables = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS bot_agents (
@@ -432,7 +432,7 @@ var ensureBotHubTables = /* @__PURE__ */ __name(async (env) => {
     );`
   ).run();
 }, "ensureBotHubTables");
-var pickAiText = /* @__PURE__ */ __name((result) => {
+const pickAiText = /* @__PURE__ */ __name((result) => {
   if (!result) return "";
   if (typeof result === "string") return result;
   if (typeof result.response === "string") return result.response;
@@ -440,7 +440,7 @@ var pickAiText = /* @__PURE__ */ __name((result) => {
   if (typeof result.output_text === "string") return result.output_text;
   return JSON.stringify(result);
 }, "pickAiText");
-var extractJson = /* @__PURE__ */ __name((text2) => {
+const extractJson = /* @__PURE__ */ __name((text2) => {
   const raw = String(text2 || "").trim();
   if (!raw) throw new Error("AI response empty.");
   if (raw.startsWith("{")) return JSON.parse(raw);
@@ -451,7 +451,7 @@ var extractJson = /* @__PURE__ */ __name((text2) => {
   if (first >= 0 && last > first) return JSON.parse(raw.slice(first, last + 1));
   throw new Error("Failed to parse JSON.");
 }, "extractJson");
-var brief = /* @__PURE__ */ __name(
+const brief = /* @__PURE__ */ __name(
   (env) => ({
     project: "VoiceToWebsite",
     stack: {
@@ -605,8 +605,8 @@ ${notes}`.trim();
 __name(handleBotHubRequest, "handleBotHubRequest");
 
 // functions/capabilities.js
-var MANIFEST_VERSION = "1.0";
-var getCapabilityManifest = /* @__PURE__ */ __name((env) => {
+const MANIFEST_VERSION = "1.0";
+const getCapabilityManifest = /* @__PURE__ */ __name((env) => {
   const confirmationPhrase = "hell yeah ship it";
   return {
     system: {
@@ -691,14 +691,14 @@ var getCapabilityManifest = /* @__PURE__ */ __name((env) => {
 }, "getCapabilityManifest");
 
 // functions/logger.js
-var LOG_LEVELS = {
+const LOG_LEVELS = {
   ERROR: 0,
   WARN: 1,
   INFO: 2,
   DEBUG: 3,
   TRACE: 4,
 };
-var DEFAULT_CONFIG = {
+const DEFAULT_CONFIG = {
   level: LOG_LEVELS.INFO,
   enableConsole: true,
   enableStructured: true,
@@ -719,7 +719,7 @@ var DEFAULT_CONFIG = {
     "api_key",
   ],
 };
-var Logger = class {
+const Logger = class {
   static {
     __name(this, "Logger");
   }
@@ -987,7 +987,7 @@ var Logger = class {
     return this.logSecurity(event, details);
   }
 };
-var globalLogger = null;
+let globalLogger = null;
 function initializeLogger(config2 = {}) {
   globalLogger = new Logger(config2);
   return globalLogger;
@@ -1014,8 +1014,8 @@ function loggingMiddleware(request) {
 __name(loggingMiddleware, "loggingMiddleware");
 
 // functions/chat.js
-var JSON_HEADERS = { "Content-Type": "application/json" };
-var json2 = /* @__PURE__ */ __name(
+const JSON_HEADERS = { "Content-Type": "application/json" };
+const json2 = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -1023,7 +1023,7 @@ var json2 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var pickAiText2 = /* @__PURE__ */ __name((result) => {
+const pickAiText2 = /* @__PURE__ */ __name((result) => {
   if (!result) return "";
   if (typeof result === "string") return result;
   if (typeof result.response === "string") return result.response;
@@ -1031,7 +1031,7 @@ var pickAiText2 = /* @__PURE__ */ __name((result) => {
   if (typeof result.output_text === "string") return result.output_text;
   return "";
 }, "pickAiText");
-var buildSystemPrompt = /* @__PURE__ */ __name(
+const buildSystemPrompt = /* @__PURE__ */ __name(
   () => `You are VoiceToWebsite's customer assistant.
 You help visitors understand what VoiceToWebsite does, pricing, demo flow, and admin safety model.
 
@@ -1042,7 +1042,7 @@ Rules:
 - Keep replies concise, helpful, and concrete.`,
   "buildSystemPrompt"
 );
-var callWorkersAI = /* @__PURE__ */ __name(async (env, messages) => {
+const callWorkersAI = /* @__PURE__ */ __name(async (env, messages) => {
   if (!env?.AI) return "";
   const result = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
     messages,
@@ -1051,7 +1051,7 @@ var callWorkersAI = /* @__PURE__ */ __name(async (env, messages) => {
   });
   return pickAiText2(result);
 }, "callWorkersAI");
-var callOpenAI = /* @__PURE__ */ __name(async (env, messages) => {
+const callOpenAI = /* @__PURE__ */ __name(async (env, messages) => {
   const OPENAI_API =
     env?.OPENAI_API || env?.OPENAI_API_KEY || env?.OPENAI_API_KEY3;
   const OPENAI_MODEL = env?.OPENAI_MODEL || "gpt-4o-mini";
@@ -1127,8 +1127,8 @@ async function onRequestPost(context) {
 __name(onRequestPost, "onRequestPost");
 
 // functions/liveAuth.js
-var textEncoder2 = new TextEncoder();
-var base64UrlEncode2 = /* @__PURE__ */ __name(
+const textEncoder2 = new TextEncoder();
+const base64UrlEncode2 = /* @__PURE__ */ __name(
   (data) =>
     btoa(String.fromCharCode(...data))
       .replace(/\+/g, "-")
@@ -1136,13 +1136,13 @@ var base64UrlEncode2 = /* @__PURE__ */ __name(
       .replace(/=+$/g, ""),
   "base64UrlEncode"
 );
-var timingSafeEqual2 = /* @__PURE__ */ __name((a, b) => {
+const timingSafeEqual2 = /* @__PURE__ */ __name((a, b) => {
   if (a.length !== b.length) return false;
   let out = 0;
   for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return out === 0;
 }, "timingSafeEqual");
-var importHmacKey2 = /* @__PURE__ */ __name(
+const importHmacKey2 = /* @__PURE__ */ __name(
   async (secret) =>
     crypto.subtle.importKey(
       "raw",
@@ -1153,7 +1153,7 @@ var importHmacKey2 = /* @__PURE__ */ __name(
     ),
   "importHmacKey"
 );
-var sign2 = /* @__PURE__ */ __name(async (secret, message) => {
+const sign2 = /* @__PURE__ */ __name(async (secret, message) => {
   const key = await importHmacKey2(secret);
   const sig = await crypto.subtle.sign(
     "HMAC",
@@ -1162,7 +1162,7 @@ var sign2 = /* @__PURE__ */ __name(async (secret, message) => {
   );
   return base64UrlEncode2(new Uint8Array(sig));
 }, "sign");
-var getLiveTokenSigningSecret = /* @__PURE__ */ __name(
+const getLiveTokenSigningSecret = /* @__PURE__ */ __name(
   (env) =>
     String(
       env.ADMIN_COOKIE_SECRET ||
@@ -1173,7 +1173,7 @@ var getLiveTokenSigningSecret = /* @__PURE__ */ __name(
     ).trim(),
   "getLiveTokenSigningSecret"
 );
-var mintLiveViewerToken = /* @__PURE__ */ __name(
+const mintLiveViewerToken = /* @__PURE__ */ __name(
   async (env, ttlSeconds = 60 * 10) => {
     const secret = getLiveTokenSigningSecret(env);
     if (!secret) return "";
@@ -1184,7 +1184,7 @@ var mintLiveViewerToken = /* @__PURE__ */ __name(
   },
   "mintLiveViewerToken"
 );
-var verifyLiveViewerToken = /* @__PURE__ */ __name(async (env, value) => {
+const verifyLiveViewerToken = /* @__PURE__ */ __name(async (env, value) => {
   const secret = getLiveTokenSigningSecret(env);
   if (!secret) return false;
   const parts = String(value || "").split(".");
@@ -1199,7 +1199,7 @@ var verifyLiveViewerToken = /* @__PURE__ */ __name(async (env, value) => {
 }, "verifyLiveViewerToken");
 
 // functions/commandCenterApi.js
-var CONFIRMATION_PHRASE = "hell yeah ship it";
+const CONFIRMATION_PHRASE = "hell yeah ship it";
 function isValidConfirmation(phrase) {
   const p = String(phrase ?? "")
     .trim()
@@ -1209,19 +1209,19 @@ function isValidConfirmation(phrase) {
   );
 }
 __name(isValidConfirmation, "isValidConfirmation");
-var SHADOW_INDEX_KEY = "cc:shadow:index:v1";
-var SHADOW_FILE_PREFIX = "cc:shadow:file:";
-var MONETIZATION_KEY = "cc:monetization:config:v1";
-var LIVE_STATE_KEY = "cc:live:state:v1";
-var PREVIEW_WATERMARK = "PREVIEW - SHADOW STATE";
-var PROTECTED_CORE_PATHS = /* @__PURE__ */ new Set([
+const SHADOW_INDEX_KEY = "cc:shadow:index:v1";
+const SHADOW_FILE_PREFIX = "cc:shadow:file:";
+const MONETIZATION_KEY = "cc:monetization:config:v1";
+const LIVE_STATE_KEY = "cc:live:state:v1";
+const PREVIEW_WATERMARK = "PREVIEW - SHADOW STATE";
+const PROTECTED_CORE_PATHS = /* @__PURE__ */ new Set([
   "worker.js",
   "wrangler.toml",
   "admin/integrated-dashboard.html",
   "admin/ccos.js",
   "admin/ccos.css",
 ]);
-var COMMAND_CENTER_EXACT_API_PATHS = /* @__PURE__ */ new Set([
+const COMMAND_CENTER_EXACT_API_PATHS = /* @__PURE__ */ new Set([
   "/api/fs/tree",
   "/api/fs/read",
   "/api/fs/write",
@@ -1241,14 +1241,14 @@ var COMMAND_CENTER_EXACT_API_PATHS = /* @__PURE__ */ new Set([
   "/api/governance/check",
   "/api/store",
 ]);
-var COMMAND_CENTER_PREFIX_API_PATHS = [
+const COMMAND_CENTER_PREFIX_API_PATHS = [
   "/api/store/",
   "/api/media/",
   "/api/audio/",
   "/api/live/",
 ];
-var MEMORY_SHADOW = /* @__PURE__ */ new Map();
-var json3 = /* @__PURE__ */ __name(
+const MEMORY_SHADOW = /* @__PURE__ */ new Map();
+const json3 = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -1259,7 +1259,7 @@ var json3 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var text = /* @__PURE__ */ __name(
+const text = /* @__PURE__ */ __name(
   (status, body, contentType = "text/plain; charset=utf-8") =>
     new Response(body, {
       status,
@@ -1267,14 +1267,14 @@ var text = /* @__PURE__ */ __name(
     }),
   "text"
 );
-var parseJsonBody = /* @__PURE__ */ __name(async (request) => {
+const parseJsonBody = /* @__PURE__ */ __name(async (request) => {
   try {
     return await request.clone().json();
   } catch (_) {
     return {};
   }
 }, "parseJsonBody");
-var isCommandCenterPath = /* @__PURE__ */ __name((url2) => {
+const isCommandCenterPath = /* @__PURE__ */ __name((url2) => {
   const isPreviewWithShadow =
     (url2.pathname === "/preview" || url2.pathname.startsWith("/preview/")) &&
     url2.searchParams.get("shadow") === "1";
@@ -1285,7 +1285,7 @@ var isCommandCenterPath = /* @__PURE__ */ __name((url2) => {
     (prefix) => url2.pathname === prefix || url2.pathname.startsWith(prefix)
   );
 }, "isCommandCenterPath");
-var safePath = /* @__PURE__ */ __name((value) => {
+const safePath = /* @__PURE__ */ __name((value) => {
   const normalized = String(value || "")
     .trim()
     .replace(/^\/+/, "")
@@ -1295,14 +1295,14 @@ var safePath = /* @__PURE__ */ __name((value) => {
   if (!/^[a-zA-Z0-9._/-]+$/.test(normalized)) return "";
   return normalized;
 }, "safePath");
-var getRequestActor = /* @__PURE__ */ __name((request) => {
+const getRequestActor = /* @__PURE__ */ __name((request) => {
   const actorHeader = String(request.headers.get("x-cc-actor") || "").trim();
   if (actorHeader) return actorHeader.slice(0, 120);
   const ip = String(request.headers.get("cf-connecting-ip") || "").trim();
   if (ip) return `admin:${ip}`;
   return "admin:unknown";
 }, "getRequestActor");
-var getLiveRoomAdminToken = /* @__PURE__ */ __name(
+const getLiveRoomAdminToken = /* @__PURE__ */ __name(
   (env) =>
     String(
       env.LIVE_ROOM_ADMIN_TOKEN ||
@@ -1312,7 +1312,7 @@ var getLiveRoomAdminToken = /* @__PURE__ */ __name(
     ).trim(),
   "getLiveRoomAdminToken"
 );
-var getLiveStateDefaults = /* @__PURE__ */ __name(
+const getLiveStateDefaults = /* @__PURE__ */ __name(
   (env) => ({
     streamState: "idle",
     websocketState: env.LIVE_ROOM ? "ready" : "missing",
@@ -1336,7 +1336,7 @@ var getLiveStateDefaults = /* @__PURE__ */ __name(
   }),
   "getLiveStateDefaults"
 );
-var sanitizeLiveState = /* @__PURE__ */ __name(
+const sanitizeLiveState = /* @__PURE__ */ __name(
   ({ env, current = {}, body = {} }) => {
     const base = {
       ...getLiveStateDefaults(env),
@@ -1420,7 +1420,7 @@ var sanitizeLiveState = /* @__PURE__ */ __name(
   },
   "sanitizeLiveState"
 );
-var loadPersistedLiveState = /* @__PURE__ */ __name(async (env) => {
+const loadPersistedLiveState = /* @__PURE__ */ __name(async (env) => {
   let state = getLiveStateDefaults(env);
   if (!env.KV) return state;
   const raw = await env.KV.get(LIVE_STATE_KEY);
@@ -1430,7 +1430,7 @@ var loadPersistedLiveState = /* @__PURE__ */ __name(async (env) => {
   } catch (_) {}
   return state;
 }, "loadPersistedLiveState");
-var getLiveRoomStatus = /* @__PURE__ */ __name(async (env) => {
+const getLiveRoomStatus = /* @__PURE__ */ __name(async (env) => {
   if (!env.LIVE_ROOM) {
     return { ok: false, clients: 0, hosts: 0, viewers: 0, historySize: 0 };
   }
@@ -1453,7 +1453,7 @@ var getLiveRoomStatus = /* @__PURE__ */ __name(async (env) => {
     return { ok: false, clients: 0, hosts: 0, viewers: 0, historySize: 0 };
   }
 }, "getLiveRoomStatus");
-var buildPublicLiveSession = /* @__PURE__ */ __name(
+const buildPublicLiveSession = /* @__PURE__ */ __name(
   async ({ env, url: url2, state }) => {
     const room = await getLiveRoomStatus(env);
     const viewerToken =
@@ -1481,11 +1481,11 @@ var buildPublicLiveSession = /* @__PURE__ */ __name(
   },
   "buildPublicLiveSession"
 );
-var isProtectedCorePath = /* @__PURE__ */ __name(
+const isProtectedCorePath = /* @__PURE__ */ __name(
   (filePath) => PROTECTED_CORE_PATHS.has(String(filePath || "").trim()),
   "isProtectedCorePath"
 );
-var normalizePreviewRoute = /* @__PURE__ */ __name((value) => {
+const normalizePreviewRoute = /* @__PURE__ */ __name((value) => {
   let route = String(value || "").trim();
   if (!route) return "";
   try {
@@ -1503,7 +1503,7 @@ var normalizePreviewRoute = /* @__PURE__ */ __name((value) => {
   if (!/^\/[a-zA-Z0-9/_-]*$/.test(route)) return "";
   return route || "/";
 }, "normalizePreviewRoute");
-var toRouteFromFilePath = /* @__PURE__ */ __name((filePath) => {
+const toRouteFromFilePath = /* @__PURE__ */ __name((filePath) => {
   const p = safePath(filePath);
   if (!p) return "/";
   const lower = p.toLowerCase();
@@ -1537,7 +1537,7 @@ var toRouteFromFilePath = /* @__PURE__ */ __name((filePath) => {
   }
   return "/";
 }, "toRouteFromFilePath");
-var toFilePathFromRoute = /* @__PURE__ */ __name((route) => {
+const toFilePathFromRoute = /* @__PURE__ */ __name((route) => {
   let r = String(route || "/").trim();
   if (!r) r = "/";
   if (!r.startsWith("/")) r = `/${r}`;
@@ -1546,11 +1546,11 @@ var toFilePathFromRoute = /* @__PURE__ */ __name((route) => {
   if (r.endsWith(".html")) return safePath(r);
   return safePath(`${r.slice(1)}.html`);
 }, "toFilePathFromRoute");
-var getShadowKey = /* @__PURE__ */ __name(
+const getShadowKey = /* @__PURE__ */ __name(
   (filePath) => `${SHADOW_FILE_PREFIX}${filePath}`,
   "getShadowKey"
 );
-var getRepoConfig = /* @__PURE__ */ __name((env) => {
+const getRepoConfig = /* @__PURE__ */ __name((env) => {
   const token = String(
     env.GH_TOKEN ||
       env.GITHUB_TOKEN ||
@@ -1574,7 +1574,7 @@ var getRepoConfig = /* @__PURE__ */ __name((env) => {
     ready: Boolean(token && owner && name),
   };
 }, "getRepoConfig");
-var githubRequest = /* @__PURE__ */ __name(async (env, path, init = {}) => {
+const githubRequest = /* @__PURE__ */ __name(async (env, path, init = {}) => {
   const cfg = getRepoConfig(env);
   if (!cfg.ready) throw new Error("GitHub integration not configured.");
   const response = await fetch(`https://api.github.com${path}`, {
@@ -1599,7 +1599,7 @@ var githubRequest = /* @__PURE__ */ __name(async (env, path, init = {}) => {
   }
   return body;
 }, "githubRequest");
-var listRepoTree = /* @__PURE__ */ __name(async (env) => {
+const listRepoTree = /* @__PURE__ */ __name(async (env) => {
   const cfg = getRepoConfig(env);
   if (!cfg.ready) return [];
   const ref = await githubRequest(
@@ -1617,7 +1617,7 @@ var listRepoTree = /* @__PURE__ */ __name(async (env) => {
     .map((entry) => safePath(entry.path))
     .filter(Boolean);
 }, "listRepoTree");
-var readRepoFile = /* @__PURE__ */ __name(async (env, filePath) => {
+const readRepoFile = /* @__PURE__ */ __name(async (env, filePath) => {
   const cfg = getRepoConfig(env);
   if (!cfg.ready) return null;
   const encoded = encodeURIComponent(filePath);
@@ -1630,7 +1630,7 @@ var readRepoFile = /* @__PURE__ */ __name(async (env, filePath) => {
   const decoded = atob(b64);
   return { content: decoded, sha: String(data.sha || "") };
 }, "readRepoFile");
-var listShadowIndex = /* @__PURE__ */ __name(async (env) => {
+const listShadowIndex = /* @__PURE__ */ __name(async (env) => {
   if (env.KV) {
     const raw = await env.KV.get(SHADOW_INDEX_KEY);
     if (!raw) return {};
@@ -1652,13 +1652,13 @@ var listShadowIndex = /* @__PURE__ */ __name(async (env) => {
   }
   return out;
 }, "listShadowIndex");
-var saveShadowIndex = /* @__PURE__ */ __name(async (env, index) => {
+const saveShadowIndex = /* @__PURE__ */ __name(async (env, index) => {
   if (env.KV) {
     await env.KV.put(SHADOW_INDEX_KEY, JSON.stringify(index));
     return;
   }
 }, "saveShadowIndex");
-var readShadowFile = /* @__PURE__ */ __name(async (env, filePath) => {
+const readShadowFile = /* @__PURE__ */ __name(async (env, filePath) => {
   const key = getShadowKey(filePath);
   if (env.KV) {
     const raw = await env.KV.get(key);
@@ -1671,16 +1671,19 @@ var readShadowFile = /* @__PURE__ */ __name(async (env, filePath) => {
   }
   return MEMORY_SHADOW.get(key) || null;
 }, "readShadowFile");
-var writeShadowFile = /* @__PURE__ */ __name(async (env, filePath, payload) => {
-  const key = getShadowKey(filePath);
-  const value = JSON.stringify(payload);
-  if (env.KV) {
-    await env.KV.put(key, value);
-    return;
-  }
-  MEMORY_SHADOW.set(key, payload);
-}, "writeShadowFile");
-var deleteShadowFile = /* @__PURE__ */ __name(async (env, filePath) => {
+const writeShadowFile = /* @__PURE__ */ __name(
+  async (env, filePath, payload) => {
+    const key = getShadowKey(filePath);
+    const value = JSON.stringify(payload);
+    if (env.KV) {
+      await env.KV.put(key, value);
+      return;
+    }
+    MEMORY_SHADOW.set(key, payload);
+  },
+  "writeShadowFile"
+);
+const deleteShadowFile = /* @__PURE__ */ __name(async (env, filePath) => {
   const key = getShadowKey(filePath);
   if (env.KV) {
     await env.KV.delete(key);
@@ -1688,7 +1691,7 @@ var deleteShadowFile = /* @__PURE__ */ __name(async (env, filePath) => {
   }
   MEMORY_SHADOW.delete(key);
 }, "deleteShadowFile");
-var buildTreeObject = /* @__PURE__ */ __name((filePaths) => {
+const buildTreeObject = /* @__PURE__ */ __name((filePaths) => {
   const root = { name: "/", type: "dir", children: {} };
   for (const filePath of filePaths) {
     const parts = String(filePath).split("/").filter(Boolean);
@@ -1725,7 +1728,7 @@ var buildTreeObject = /* @__PURE__ */ __name((filePaths) => {
   }, "normalize");
   return normalize6(root);
 }, "buildTreeObject");
-var readAssetFile = /* @__PURE__ */ __name(
+const readAssetFile = /* @__PURE__ */ __name(
   async ({ assets, request, filePath, url: url2 }) => {
     if (!assets) return null;
     const fileUrl = new URL(`/${filePath}`, url2.origin);
@@ -1735,7 +1738,7 @@ var readAssetFile = /* @__PURE__ */ __name(
   },
   "readAssetFile"
 );
-var getMonetizationConfig = /* @__PURE__ */ __name(async (env) => {
+const getMonetizationConfig = /* @__PURE__ */ __name(async (env) => {
   const fallback = {
     adDensityCap: 3,
     ctaVariant: "cta-dominant",
@@ -1753,11 +1756,11 @@ var getMonetizationConfig = /* @__PURE__ */ __name(async (env) => {
     return fallback;
   }
 }, "getMonetizationConfig");
-var saveMonetizationConfig = /* @__PURE__ */ __name(async (env, config2) => {
+const saveMonetizationConfig = /* @__PURE__ */ __name(async (env, config2) => {
   if (!env.KV) return;
   await env.KV.put(MONETIZATION_KEY, JSON.stringify(config2));
 }, "saveMonetizationConfig");
-var appendAuditLog = /* @__PURE__ */ __name(
+const appendAuditLog = /* @__PURE__ */ __name(
   async ({ env, action, actor = "admin", details = {} }) => {
     const entry = {
       id: crypto.randomUUID(),
@@ -1804,7 +1807,7 @@ var appendAuditLog = /* @__PURE__ */ __name(
   },
   "appendAuditLog"
 );
-var ensureStoreTable = /* @__PURE__ */ __name(async (env) => {
+const ensureStoreTable = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS cc_store_products (
@@ -1820,7 +1823,7 @@ var ensureStoreTable = /* @__PURE__ */ __name(async (env) => {
     )`
   ).run();
 }, "ensureStoreTable");
-var ensureMediaTable = /* @__PURE__ */ __name(async (env) => {
+const ensureMediaTable = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS cc_media_assets (
@@ -1838,7 +1841,7 @@ var ensureMediaTable = /* @__PURE__ */ __name(async (env) => {
     )`
   ).run();
 }, "ensureMediaTable");
-var ensureAudioTable = /* @__PURE__ */ __name(async (env) => {
+const ensureAudioTable = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS cc_audio_assets (
@@ -1856,7 +1859,7 @@ var ensureAudioTable = /* @__PURE__ */ __name(async (env) => {
     )`
   ).run();
 }, "ensureAudioTable");
-var ensureAnalyticsSnapshotTable = /* @__PURE__ */ __name(async (env) => {
+const ensureAnalyticsSnapshotTable = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS cc_analytics_snapshots (
@@ -1866,7 +1869,7 @@ var ensureAnalyticsSnapshotTable = /* @__PURE__ */ __name(async (env) => {
     )`
   ).run();
 }, "ensureAnalyticsSnapshotTable");
-var getEnvAudit = /* @__PURE__ */ __name((env) => {
+const getEnvAudit = /* @__PURE__ */ __name((env) => {
   const required2 = [
     "CONTROL_PASSWORD",
     "ADMIN_COOKIE_SECRET",
@@ -1900,7 +1903,7 @@ var getEnvAudit = /* @__PURE__ */ __name((env) => {
     unusedCandidateVars: unknown2.slice(0, 100),
   };
 }, "getEnvAudit");
-var mergeRepoAndShadowFiles = /* @__PURE__ */ __name(
+const mergeRepoAndShadowFiles = /* @__PURE__ */ __name(
   ({ repoFiles, shadowIndex }) => {
     const set2 = new Set((repoFiles || []).filter(Boolean));
     for (const [path, meta3] of Object.entries(shadowIndex || {})) {
@@ -1914,7 +1917,7 @@ var mergeRepoAndShadowFiles = /* @__PURE__ */ __name(
   },
   "mergeRepoAndShadowFiles"
 );
-var resolveFileContent = /* @__PURE__ */ __name(
+const resolveFileContent = /* @__PURE__ */ __name(
   async ({
     env,
     assets,
@@ -1956,7 +1959,7 @@ var resolveFileContent = /* @__PURE__ */ __name(
   },
   "resolveFileContent"
 );
-var getShadowSummary = /* @__PURE__ */ __name(async (env) => {
+const getShadowSummary = /* @__PURE__ */ __name(async (env) => {
   const index = await listShadowIndex(env);
   const files = Object.entries(index).map(([path, meta3]) => ({
     path,
@@ -1979,7 +1982,7 @@ var getShadowSummary = /* @__PURE__ */ __name(async (env) => {
     files: files.sort((a, b) => a.path.localeCompare(b.path)),
   };
 }, "getShadowSummary");
-var parseVoiceIntent = /* @__PURE__ */ __name((commandText = "") => {
+const parseVoiceIntent = /* @__PURE__ */ __name((commandText = "") => {
   const textLower = String(commandText || "").toLowerCase();
   const fileTargets = [];
   const routeTargets = [];
@@ -2024,7 +2027,7 @@ var parseVoiceIntent = /* @__PURE__ */ __name((commandText = "") => {
     deployRequired,
   };
 }, "parseVoiceIntent");
-var handleFsTree = /* @__PURE__ */ __name(async ({ env }) => {
+const handleFsTree = /* @__PURE__ */ __name(async ({ env }) => {
   const shadowIndex = await listShadowIndex(env);
   let repoFiles = [];
   try {
@@ -2038,7 +2041,7 @@ var handleFsTree = /* @__PURE__ */ __name(async ({ env }) => {
     shadowCount: Object.keys(shadowIndex).length,
   });
 }, "handleFsTree");
-var handleFsRead = /* @__PURE__ */ __name(
+const handleFsRead = /* @__PURE__ */ __name(
   async ({ env, assets, request, url: url2 }) => {
     const filePath = safePath(url2.searchParams.get("path"));
     if (!filePath) return json3(400, { ok: false, error: "Missing path." });
@@ -2059,7 +2062,7 @@ var handleFsRead = /* @__PURE__ */ __name(
   },
   "handleFsRead"
 );
-var handleFsWrite = /* @__PURE__ */ __name(async ({ env, request }) => {
+const handleFsWrite = /* @__PURE__ */ __name(async ({ env, request }) => {
   const body = await parseJsonBody(request);
   const filePath = safePath(body.path);
   const content = String(body.content || "");
@@ -2099,7 +2102,7 @@ var handleFsWrite = /* @__PURE__ */ __name(async ({ env, request }) => {
     whatChanged: [`Updated ${filePath}`, `${payload.bytes} bytes staged`],
   });
 }, "handleFsWrite");
-var handleFsDelete = /* @__PURE__ */ __name(async ({ env, request }) => {
+const handleFsDelete = /* @__PURE__ */ __name(async ({ env, request }) => {
   const body = await parseJsonBody(request);
   const filePath = safePath(body.path);
   if (!filePath) return json3(400, { ok: false, error: "Invalid path." });
@@ -2138,7 +2141,7 @@ var handleFsDelete = /* @__PURE__ */ __name(async ({ env, request }) => {
     whatChanged: [`Staged delete ${filePath}`],
   });
 }, "handleFsDelete");
-var handleFsSearch = /* @__PURE__ */ __name(
+const handleFsSearch = /* @__PURE__ */ __name(
   async ({ env, assets, request, url: url2 }) => {
     const q = String(url2.searchParams.get("q") || "")
       .trim()
@@ -2180,7 +2183,7 @@ var handleFsSearch = /* @__PURE__ */ __name(
   },
   "handleFsSearch"
 );
-var handlePreviewBuild = /* @__PURE__ */ __name(async ({ request }) => {
+const handlePreviewBuild = /* @__PURE__ */ __name(async ({ request }) => {
   const body = await parseJsonBody(request);
   const routes = /* @__PURE__ */ new Set();
   const addRoute = /* @__PURE__ */ __name((candidate) => {
@@ -2221,7 +2224,7 @@ var handlePreviewBuild = /* @__PURE__ */ __name(async ({ request }) => {
     })),
   });
 }, "handlePreviewBuild");
-var handleRepoStatus = /* @__PURE__ */ __name(async ({ env }) => {
+const handleRepoStatus = /* @__PURE__ */ __name(async ({ env }) => {
   const summary = await getShadowSummary(env);
   return json3(200, {
     ok: true,
@@ -2229,14 +2232,14 @@ var handleRepoStatus = /* @__PURE__ */ __name(async ({ env }) => {
     confirmationPhrase: CONFIRMATION_PHRASE,
   });
 }, "handleRepoStatus");
-var clearShadowState = /* @__PURE__ */ __name(async (env) => {
+const clearShadowState = /* @__PURE__ */ __name(async (env) => {
   const index = await listShadowIndex(env);
   for (const filePath of Object.keys(index)) {
     await deleteShadowFile(env, filePath);
   }
   await saveShadowIndex(env, {});
 }, "clearShadowState");
-var handleRepoCommit = /* @__PURE__ */ __name(async ({ env, request }) => {
+const handleRepoCommit = /* @__PURE__ */ __name(async ({ env, request }) => {
   const cfg = getRepoConfig(env);
   if (!cfg.ready) {
     return json3(503, {
@@ -2327,7 +2330,7 @@ var handleRepoCommit = /* @__PURE__ */ __name(async ({ env, request }) => {
     whatChanged: changed.map((c) => `${c.operation}: ${c.path}`),
   });
 }, "handleRepoCommit");
-var handleDeployRun = /* @__PURE__ */ __name(async ({ env, request }) => {
+const handleDeployRun = /* @__PURE__ */ __name(async ({ env, request }) => {
   const body = await parseJsonBody(request);
   const phrase = String(body.confirmation || "").trim();
   if (!isValidConfirmation(phrase)) {
@@ -2396,7 +2399,7 @@ var handleDeployRun = /* @__PURE__ */ __name(async ({ env, request }) => {
   });
   return json3(res.status, payload);
 }, "handleDeployRun");
-var handleDeployLogs = /* @__PURE__ */ __name(async ({ env }) => {
+const handleDeployLogs = /* @__PURE__ */ __name(async ({ env }) => {
   if (!env.DEPLOY_CONTROLLER) {
     return json3(503, {
       ok: false,
@@ -2409,7 +2412,7 @@ var handleDeployLogs = /* @__PURE__ */ __name(async ({ env }) => {
   const payload = await res.json().catch(() => ({}));
   return json3(res.status, payload);
 }, "handleDeployLogs");
-var getDeployControllerState = /* @__PURE__ */ __name(async (env) => {
+const getDeployControllerState = /* @__PURE__ */ __name(async (env) => {
   if (!env.DEPLOY_CONTROLLER) {
     return {
       ok: false,
@@ -2421,7 +2424,7 @@ var getDeployControllerState = /* @__PURE__ */ __name(async (env) => {
   const res = await stub.fetch("https://deploy/logs");
   return res.json().catch(() => ({}));
 }, "getDeployControllerState");
-var getCloudflareDeployConfig = /* @__PURE__ */ __name((env) => {
+const getCloudflareDeployConfig = /* @__PURE__ */ __name((env) => {
   const accountId = String(
     env.CLOUDFLARE_ACCOUNT_ID || env.CF_ACCOUNT_ID || ""
   ).trim();
@@ -2440,7 +2443,7 @@ var getCloudflareDeployConfig = /* @__PURE__ */ __name((env) => {
   ).trim();
   return { accountId, apiToken, scriptName };
 }, "getCloudflareDeployConfig");
-var cloudflareApiFetchJson = /* @__PURE__ */ __name(async (env, path) => {
+const cloudflareApiFetchJson = /* @__PURE__ */ __name(async (env, path) => {
   const { accountId, apiToken } = getCloudflareDeployConfig(env);
   if (!accountId || !apiToken) {
     return {
@@ -2485,14 +2488,14 @@ var cloudflareApiFetchJson = /* @__PURE__ */ __name(async (env, path) => {
     payload,
   };
 }, "cloudflareApiFetchJson");
-var extractFirstRecord = /* @__PURE__ */ __name((result) => {
+const extractFirstRecord = /* @__PURE__ */ __name((result) => {
   if (Array.isArray(result)) return result[0] || null;
   if (Array.isArray(result?.deployments)) return result.deployments[0] || null;
   if (Array.isArray(result?.builds)) return result.builds[0] || null;
   if (Array.isArray(result?.items)) return result.items[0] || null;
   return result && typeof result === "object" ? result : null;
 }, "extractFirstRecord");
-var handleDeployStatus = /* @__PURE__ */ __name(
+const handleDeployStatus = /* @__PURE__ */ __name(
   async ({ env, assets, request }) => {
     const controller = await getDeployControllerState(env).catch((error48) => ({
       ok: false,
@@ -2601,7 +2604,7 @@ var handleDeployStatus = /* @__PURE__ */ __name(
   },
   "handleDeployStatus"
 );
-var handleDeployMeter = /* @__PURE__ */ __name(async ({ env, request }) => {
+const handleDeployMeter = /* @__PURE__ */ __name(async ({ env, request }) => {
   if (!env.DEPLOY_CONTROLLER) {
     return json3(503, {
       ok: false,
@@ -2633,29 +2636,29 @@ var handleDeployMeter = /* @__PURE__ */ __name(async ({ env, request }) => {
   const payload = await res.json().catch(() => ({}));
   return json3(res.status, payload);
 }, "handleDeployMeter");
-var roundTo = /* @__PURE__ */ __name((value, precision = 2) => {
+const roundTo = /* @__PURE__ */ __name((value, precision = 2) => {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
   const factor = 10 ** precision;
   return Math.round(n * factor) / factor;
 }, "roundTo");
-var safeDivide = /* @__PURE__ */ __name((num, den) => {
+const safeDivide = /* @__PURE__ */ __name((num, den) => {
   const n = Number(num);
   const d = Number(den);
   if (!Number.isFinite(n) || !Number.isFinite(d) || d === 0) return 0;
   return n / d;
 }, "safeDivide");
-var clamp = /* @__PURE__ */ __name(
+const clamp = /* @__PURE__ */ __name(
   (value, min, max) => Math.min(max, Math.max(min, Number(value) || 0)),
   "clamp"
 );
-var average = /* @__PURE__ */ __name((values = []) => {
+const average = /* @__PURE__ */ __name((values = []) => {
   if (!values.length) return 0;
   return (
     values.reduce((sum, value) => sum + Number(value || 0), 0) / values.length
   );
 }, "average");
-var stdDev = /* @__PURE__ */ __name((values = []) => {
+const stdDev = /* @__PURE__ */ __name((values = []) => {
   if (values.length < 2) return 0;
   const mu = average(values);
   const variance =
@@ -2665,7 +2668,7 @@ var stdDev = /* @__PURE__ */ __name((values = []) => {
     }, 0) / values.length;
   return Math.sqrt(Math.max(0, variance));
 }, "stdDev");
-var handleAnalyticsMetrics = /* @__PURE__ */ __name(async ({ env }) => {
+const handleAnalyticsMetrics = /* @__PURE__ */ __name(async ({ env }) => {
   let productCount = 0;
   let orderCount = 0;
   let storeRevenue = 0;
@@ -2944,7 +2947,7 @@ var handleAnalyticsMetrics = /* @__PURE__ */ __name(async ({ env }) => {
   }
   return json3(200, payload);
 }, "handleAnalyticsMetrics");
-var handleMonetizationConfig = /* @__PURE__ */ __name(
+const handleMonetizationConfig = /* @__PURE__ */ __name(
   async ({ env, request }) => {
     if (request.method === "GET") {
       const config2 = await getMonetizationConfig(env);
@@ -2969,7 +2972,7 @@ var handleMonetizationConfig = /* @__PURE__ */ __name(
   },
   "handleMonetizationConfig"
 );
-var handleStoreApi = /* @__PURE__ */ __name(
+const handleStoreApi = /* @__PURE__ */ __name(
   async ({ env, request, url: url2 }) => {
     if (!env.D1) return json3(503, { ok: false, error: "D1 binding missing." });
     await ensureStoreTable(env);
@@ -3042,12 +3045,12 @@ var handleStoreApi = /* @__PURE__ */ __name(
   },
   "handleStoreApi"
 );
-var parseMetadataForm = /* @__PURE__ */ __name((form, fields) => {
+const parseMetadataForm = /* @__PURE__ */ __name((form, fields) => {
   const out = {};
   for (const field of fields) out[field] = String(form.get(field) || "").trim();
   return out;
 }, "parseMetadataForm");
-var handleMediaApi = /* @__PURE__ */ __name(
+const handleMediaApi = /* @__PURE__ */ __name(
   async ({ env, request, url: url2 }) => {
     if (!env.D1 || !env.R2) {
       return json3(503, {
@@ -3116,7 +3119,7 @@ var handleMediaApi = /* @__PURE__ */ __name(
   },
   "handleMediaApi"
 );
-var handleAudioApi = /* @__PURE__ */ __name(
+const handleAudioApi = /* @__PURE__ */ __name(
   async ({ env, request, url: url2 }) => {
     if (!env.D1 || !env.R2) {
       return json3(503, {
@@ -3185,7 +3188,7 @@ var handleAudioApi = /* @__PURE__ */ __name(
   },
   "handleAudioApi"
 );
-var handleLiveApi = /* @__PURE__ */ __name(
+const handleLiveApi = /* @__PURE__ */ __name(
   async ({ env, request, url: url2 }) => {
     if (url2.pathname === "/api/live/session" && request.method === "GET") {
       const state = await loadPersistedLiveState(env);
@@ -3230,7 +3233,7 @@ var handleLiveApi = /* @__PURE__ */ __name(
   },
   "handleLiveApi"
 );
-var handleVoiceExecute = /* @__PURE__ */ __name(async ({ env, request }) => {
+const handleVoiceExecute = /* @__PURE__ */ __name(async ({ env, request }) => {
   const body = await parseJsonBody(request);
   const command = String(body.command || "").trim();
   if (!command) return json3(400, { ok: false, error: "command is required." });
@@ -3259,23 +3262,27 @@ var handleVoiceExecute = /* @__PURE__ */ __name(async ({ env, request }) => {
     whatChanged: ["Execution plan generated from command input"],
   });
 }, "handleVoiceExecute");
-var renderPreviewHtml = /* @__PURE__ */ __name(({ html, route, showZones }) => {
-  const watermark = `<div style="position:fixed;bottom:12px;right:12px;z-index:2147483647;font:700 12px/1.2 monospace;padding:8px 10px;border:1px solid #ef4444;background:rgba(127,29,29,.84);color:#fff;border-radius:8px;">${PREVIEW_WATERMARK}</div>`;
-  const zones = showZones
-    ? `<div style="position:fixed;inset:0;pointer-events:none;z-index:2147483646">
+const renderPreviewHtml = /* @__PURE__ */ __name(
+  ({ html, route, showZones }) => {
+    const watermark = `<div style="position:fixed;bottom:12px;right:12px;z-index:2147483647;font:700 12px/1.2 monospace;padding:8px 10px;border:1px solid #ef4444;background:rgba(127,29,29,.84);color:#fff;border-radius:8px;">${PREVIEW_WATERMARK}</div>`;
+    const zones = showZones
+      ? `<div style="position:fixed;inset:0;pointer-events:none;z-index:2147483646">
         <div style="position:absolute;top:8%;left:4%;right:4%;height:16%;border:2px dashed #22c55e;background:rgba(34,197,94,.08)"></div>
         <div style="position:absolute;top:36%;left:4%;right:4%;height:18%;border:2px dashed #f59e0b;background:rgba(245,158,11,.08)"></div>
         <div style="position:absolute;bottom:6%;left:4%;right:4%;height:14%;border:2px dashed #3b82f6;background:rgba(59,130,246,.08)"></div>
       </div>`
-    : "";
-  const marker = `<meta name="robots" content="noindex,nofollow" /><meta name="vtw-preview-route" content="${route}" />`;
-  let out = String(html || "");
-  if (out.includes("</head>")) out = out.replace("</head>", `${marker}</head>`);
-  if (out.includes("</body>"))
-    out = out.replace("</body>", `${zones}${watermark}</body>`);
-  return out;
-}, "renderPreviewHtml");
-var handlePreviewRoute = /* @__PURE__ */ __name(
+      : "";
+    const marker = `<meta name="robots" content="noindex,nofollow" /><meta name="vtw-preview-route" content="${route}" />`;
+    let out = String(html || "");
+    if (out.includes("</head>"))
+      out = out.replace("</head>", `${marker}</head>`);
+    if (out.includes("</body>"))
+      out = out.replace("</body>", `${zones}${watermark}</body>`);
+    return out;
+  },
+  "renderPreviewHtml"
+);
+const handlePreviewRoute = /* @__PURE__ */ __name(
   async ({ env, assets, request, url: url2 }) => {
     let raw = "/";
     try {
@@ -3315,7 +3322,7 @@ var handlePreviewRoute = /* @__PURE__ */ __name(
   },
   "handlePreviewRoute"
 );
-var handleCommandCenterRequest = /* @__PURE__ */ __name(
+const handleCommandCenterRequest = /* @__PURE__ */ __name(
   async ({ request, env, url: url2, assets }) => {
     if (
       (url2.pathname === "/preview" || url2.pathname.startsWith("/preview/")) &&
@@ -3399,7 +3406,7 @@ var handleCommandCenterRequest = /* @__PURE__ */ __name(
 );
 
 // functions/database-cache.js
-var StatementCache = class {
+const StatementCache = class {
   static {
     __name(this, "StatementCache");
   }
@@ -3507,7 +3514,7 @@ var StatementCache = class {
     this.evictions = 0;
   }
 };
-var CachedDatabase = class {
+const CachedDatabase = class {
   static {
     __name(this, "CachedDatabase");
   }
@@ -3642,7 +3649,7 @@ function createDatabaseMonitor(db, logger) {
   return cachedDb;
 }
 __name(createDatabaseMonitor, "createDatabaseMonitor");
-var QUERY_TEMPLATES = {
+const QUERY_TEMPLATES = {
   // Token operations
   INSERT_TOKEN: `INSERT OR REPLACE INTO execute_confirm_tokens
     (token_hash, action, idempotency_key, trace_id, expires_at, used_at)
@@ -3668,7 +3675,7 @@ var QUERY_TEMPLATES = {
   ADD_BLOCK: `INSERT OR REPLACE INTO rate_limit_blocks (key, blocked_until)
     VALUES (?, ?)`,
 };
-var DatabaseHelper = class {
+const DatabaseHelper = class {
   static {
     __name(this, "DatabaseHelper");
   }
@@ -3754,7 +3761,7 @@ var DatabaseHelper = class {
 };
 
 // functions/orchestrator.js
-var FALLBACK_REGEX = {
+const FALLBACK_REGEX = {
   url: /https?:\/\/\S+/,
   say: /make .*say (.+)/i,
   sayAlt: /say (.+)/i,
@@ -5495,7 +5502,7 @@ ${normalizedCss}`;
 __name(onRequestPost2, "onRequestPost");
 
 // functions/rate-limiter.js
-var RATE_LIMIT_CONFIGS = {
+const RATE_LIMIT_CONFIGS = {
   // General API limits
   default: {
     windowMs: 6e4,
@@ -5548,7 +5555,7 @@ var RATE_LIMIT_CONFIGS = {
     // 5 minutes
   },
 };
-var RateLimiter = class {
+const RateLimiter = class {
   static {
     __name(this, "RateLimiter");
   }
@@ -5849,7 +5856,7 @@ function rateLimitMiddleware(rateLimitFn) {
 __name(rateLimitMiddleware, "rateLimitMiddleware");
 
 // functions/schema-validator.js
-var SchemaValidationError = class extends Error {
+const SchemaValidationError = class extends Error {
   static {
     __name(this, "SchemaValidationError");
   }
@@ -5861,7 +5868,7 @@ var SchemaValidationError = class extends Error {
     this.schema = schema;
   }
 };
-var SchemaValidator = class {
+const SchemaValidator = class {
   static {
     __name(this, "SchemaValidator");
   }
@@ -6235,7 +6242,7 @@ var SchemaValidator = class {
     });
   }
 };
-var globalValidator = new SchemaValidator();
+const globalValidator = new SchemaValidator();
 function createValidationMiddleware(schemaName) {
   return (data) => {
     const result = globalValidator.validate(schemaName, data);
@@ -6254,10 +6261,11 @@ function createValidationMiddleware(schemaName) {
   };
 }
 __name(createValidationMiddleware, "createValidationMiddleware");
-var validateExecuteRequest = createValidationMiddleware("ExecuteRequest");
-var validateExecuteResponse = createValidationMiddleware("ExecuteResponse");
-var validateErrorResponse = createValidationMiddleware("ErrorResponse");
-var validateRateLimitResponse = createValidationMiddleware("RateLimitResponse");
+const validateExecuteRequest = createValidationMiddleware("ExecuteRequest");
+const validateExecuteResponse = createValidationMiddleware("ExecuteResponse");
+const validateErrorResponse = createValidationMiddleware("ErrorResponse");
+const validateRateLimitResponse =
+  createValidationMiddleware("RateLimitResponse");
 function validateRequest(request, schemaName) {
   try {
     const data = typeof request === "string" ? JSON.parse(request) : request;
@@ -6285,9 +6293,9 @@ function validateResponse(response, schemaName = "ExecuteResponse") {
 __name(validateResponse, "validateResponse");
 
 // functions/execute.js
-var JSON_HEADERS2 = { "Content-Type": "application/json" };
-var CONFIRM_TTL_MS = 10 * 60 * 1e3;
-var VALID_ACTIONS = /* @__PURE__ */ new Set([
+const JSON_HEADERS2 = { "Content-Type": "application/json" };
+const CONFIRM_TTL_MS = 10 * 60 * 1e3;
+const VALID_ACTIONS = /* @__PURE__ */ new Set([
   "plan",
   "preview",
   "apply",
@@ -6298,26 +6306,26 @@ var VALID_ACTIONS = /* @__PURE__ */ new Set([
   "list_pages",
   "read_page",
 ]);
-var JSON_BODY_METHODS = /* @__PURE__ */ new Set([
+const JSON_BODY_METHODS = /* @__PURE__ */ new Set([
   "POST",
   "PUT",
   "PATCH",
   "DELETE",
 ]);
-var CC_ROUTABLE_ACTIONS = /* @__PURE__ */ new Set([
+const CC_ROUTABLE_ACTIONS = /* @__PURE__ */ new Set([
   "plan",
   "preview",
   "apply",
   "auto",
 ]);
-var ALLOWED_CC_METHODS = /* @__PURE__ */ new Set([
+const ALLOWED_CC_METHODS = /* @__PURE__ */ new Set([
   "GET",
   "POST",
   "PUT",
   "DELETE",
 ]);
-var VALID_PUBLIC_PAGE_RE = /^[a-z0-9-]+(?:\.html)?$/;
-var toJsonResponse = /* @__PURE__ */ __name((status, payload, env) => {
+const VALID_PUBLIC_PAGE_RE = /^[a-z0-9-]+(?:\.html)?$/;
+const toJsonResponse = /* @__PURE__ */ __name((status, payload, env) => {
   const enableValidation =
     env?.ENABLE_RESPONSE_VALIDATION === "true" ||
     (env?.NODE_ENV === "production" &&
@@ -6340,11 +6348,11 @@ var toJsonResponse = /* @__PURE__ */ __name((status, payload, env) => {
     headers: JSON_HEADERS2,
   });
 }, "toJsonResponse");
-var toIso = /* @__PURE__ */ __name(
+const toIso = /* @__PURE__ */ __name(
   (value) => new Date(value).toISOString(),
   "toIso"
 );
-var readJsonBody = /* @__PURE__ */ __name(async (request) => {
+const readJsonBody = /* @__PURE__ */ __name(async (request) => {
   try {
     const contentLength = request.headers.get("content-length");
     const maxSize = 1024 * 1024;
@@ -6363,7 +6371,7 @@ var readJsonBody = /* @__PURE__ */ __name(async (request) => {
     return null;
   }
 }, "readJsonBody");
-var validatePageName = /* @__PURE__ */ __name((page) => {
+const validatePageName = /* @__PURE__ */ __name((page) => {
   if (!page || typeof page !== "string") {
     return { valid: false, error: "Page name must be a non-empty string" };
   }
@@ -6395,19 +6403,19 @@ var validatePageName = /* @__PURE__ */ __name((page) => {
   }
   return { valid: true, page: trimmedPage };
 }, "validatePageName");
-var getOrchestratorToken = /* @__PURE__ */ __name(
+const getOrchestratorToken = /* @__PURE__ */ __name(
   (env) =>
     String(
       env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || ""
     ).trim(),
   "getOrchestratorToken"
 );
-var hasValidHeaderToken = /* @__PURE__ */ __name((request, env) => {
+const hasValidHeaderToken = /* @__PURE__ */ __name((request, env) => {
   const provided = String(request.headers.get("x-orch-token") || "").trim();
   if (!provided) return false;
   return provided === getOrchestratorToken(env);
 }, "hasValidHeaderToken");
-var isSameOriginRequest = /* @__PURE__ */ __name((request) => {
+const isSameOriginRequest = /* @__PURE__ */ __name((request) => {
   const origin = request.headers.get("origin");
   if (!origin) return true;
   try {
@@ -6416,7 +6424,7 @@ var isSameOriginRequest = /* @__PURE__ */ __name((request) => {
     return false;
   }
 }, "isSameOriginRequest");
-var getCookieValue = /* @__PURE__ */ __name((cookieHeader, name) => {
+const getCookieValue = /* @__PURE__ */ __name((cookieHeader, name) => {
   const parts = String(cookieHeader || "").split(";");
   for (const part of parts) {
     const [k, ...rest] = part.trim().split("=");
@@ -6424,21 +6432,21 @@ var getCookieValue = /* @__PURE__ */ __name((cookieHeader, name) => {
   }
   return "";
 }, "getCookieValue");
-var hasVerifiedAdminCookie = /* @__PURE__ */ __name(async (request, env) => {
+const hasVerifiedAdminCookie = /* @__PURE__ */ __name(async (request, env) => {
   const cookieHeader = request.headers.get("cookie") || "";
   const cookieValue = getCookieValue(cookieHeader, adminCookieName);
   if (!cookieValue) return false;
   return verifyAdminCookieValue(env, cookieValue);
 }, "hasVerifiedAdminCookie");
-var isAuthorized = /* @__PURE__ */ __name(async (request, env) => {
+const isAuthorized = /* @__PURE__ */ __name(async (request, env) => {
   if (hasValidHeaderToken(request, env)) return true;
   return hasVerifiedAdminCookie(request, env);
 }, "isAuthorized");
-var dbFromEnv = /* @__PURE__ */ __name(
+const dbFromEnv = /* @__PURE__ */ __name(
   (env) => env.D1 || env.DB || null,
   "dbFromEnv"
 );
-var ensureExecuteTables = /* @__PURE__ */ __name(async (db) => {
+const ensureExecuteTables = /* @__PURE__ */ __name(async (db) => {
   if (!db) return;
   await db
     .prepare(
@@ -6467,7 +6475,7 @@ var ensureExecuteTables = /* @__PURE__ */ __name(async (db) => {
     )
     .run();
 }, "ensureExecuteTables");
-var findExistingEvent = /* @__PURE__ */ __name(
+const findExistingEvent = /* @__PURE__ */ __name(
   async (db, action, idempotencyKey) => {
     if (!db) return null;
     try {
@@ -6483,7 +6491,7 @@ var findExistingEvent = /* @__PURE__ */ __name(
   },
   "findExistingEvent"
 );
-var writeEventRecord = /* @__PURE__ */ __name(
+const writeEventRecord = /* @__PURE__ */ __name(
   async (db, { eventId, action, idempotencyKey, traceId, status, payload }) => {
     if (!db) return;
     try {
@@ -6506,7 +6514,7 @@ var writeEventRecord = /* @__PURE__ */ __name(
   },
   "writeEventRecord"
 );
-var makeActionRecord = /* @__PURE__ */ __name(
+const makeActionRecord = /* @__PURE__ */ __name(
   ({ action, idempotencyKey, safetyLevel, command, target, actor }) => ({
     action,
     idempotencyKey,
@@ -6517,7 +6525,7 @@ var makeActionRecord = /* @__PURE__ */ __name(
   }),
   "makeActionRecord"
 );
-var makeEvent = /* @__PURE__ */ __name(
+const makeEvent = /* @__PURE__ */ __name(
   ({
     eventType,
     actionPayload,
@@ -6537,7 +6545,7 @@ var makeEvent = /* @__PURE__ */ __name(
   }),
   "makeEvent"
 );
-var decodeJsonResponse = /* @__PURE__ */ __name(async (response) => {
+const decodeJsonResponse = /* @__PURE__ */ __name(async (response) => {
   const text2 = await response.text();
   try {
     return text2 ? JSON.parse(text2) : {};
@@ -6545,19 +6553,19 @@ var decodeJsonResponse = /* @__PURE__ */ __name(async (response) => {
     return { raw: text2 };
   }
 }, "decodeJsonResponse");
-var encodeBase64Url = /* @__PURE__ */ __name(
+const encodeBase64Url = /* @__PURE__ */ __name(
   (value) =>
     btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, ""),
   "encodeBase64Url"
 );
-var decodeBase64Url = /* @__PURE__ */ __name((value) => {
+const decodeBase64Url = /* @__PURE__ */ __name((value) => {
   const input = String(value || "")
     .replace(/-/g, "+")
     .replace(/_/g, "/");
   const padded = input + "=".repeat((4 - (input.length % 4 || 4)) % 4);
   return atob(padded);
 }, "decodeBase64Url");
-var importHmacKey3 = /* @__PURE__ */ __name(
+const importHmacKey3 = /* @__PURE__ */ __name(
   async (secret) =>
     crypto.subtle.importKey(
       "raw",
@@ -6568,7 +6576,7 @@ var importHmacKey3 = /* @__PURE__ */ __name(
     ),
   "importHmacKey"
 );
-var signHmac = /* @__PURE__ */ __name(async (secret, message) => {
+const signHmac = /* @__PURE__ */ __name(async (secret, message) => {
   const key = await importHmacKey3(secret);
   const signature = await crypto.subtle.sign(
     "HMAC",
@@ -6577,7 +6585,7 @@ var signHmac = /* @__PURE__ */ __name(async (secret, message) => {
   );
   return encodeBase64Url(String.fromCharCode(...new Uint8Array(signature)));
 }, "signHmac");
-var sha256Hex = /* @__PURE__ */ __name(async (value) => {
+const sha256Hex = /* @__PURE__ */ __name(async (value) => {
   const hash2 = await crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(value)
@@ -6586,11 +6594,11 @@ var sha256Hex = /* @__PURE__ */ __name(async (value) => {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }, "sha256Hex");
-var getConfirmSecret = /* @__PURE__ */ __name(
+const getConfirmSecret = /* @__PURE__ */ __name(
   (env) => String(env.CONFIRM_TOKEN_SECRET || getOrchestratorToken(env)).trim(),
   "getConfirmSecret"
 );
-var createConfirmToken = /* @__PURE__ */ __name(
+const createConfirmToken = /* @__PURE__ */ __name(
   async (env, db, { action, idempotencyKey, traceId }) => {
     const secret = getConfirmSecret(env);
     const expiresAtMs = Date.now() + CONFIRM_TTL_MS;
@@ -6624,7 +6632,7 @@ var createConfirmToken = /* @__PURE__ */ __name(
   },
   "createConfirmToken"
 );
-var matchesTokenAction = /* @__PURE__ */ __name(
+const matchesTokenAction = /* @__PURE__ */ __name(
   (tokenAction, requestedAction) => {
     if (tokenAction === requestedAction) {
       return true;
@@ -6645,7 +6653,7 @@ var matchesTokenAction = /* @__PURE__ */ __name(
   },
   "matchesTokenAction"
 );
-var canReuseConsumedTokenForDeploy = /* @__PURE__ */ __name(
+const canReuseConsumedTokenForDeploy = /* @__PURE__ */ __name(
   async (db, row, idempotencyKey, action) => {
     if (action !== "deploy") return false;
     if (row?.action !== "preview" && row?.action !== "execute") return false;
@@ -6660,7 +6668,7 @@ var canReuseConsumedTokenForDeploy = /* @__PURE__ */ __name(
   },
   "canReuseConsumedTokenForDeploy"
 );
-var validateAndConsumeConfirmToken = /* @__PURE__ */ __name(
+const validateAndConsumeConfirmToken = /* @__PURE__ */ __name(
   async (env, db, { token, action, idempotencyKey }) => {
     const logger = getLogger();
     if (!token)
@@ -6806,7 +6814,7 @@ var validateAndConsumeConfirmToken = /* @__PURE__ */ __name(
   },
   "validateAndConsumeConfirmToken"
 );
-var buildOrchestratorRequest = /* @__PURE__ */ __name(
+const buildOrchestratorRequest = /* @__PURE__ */ __name(
   (request, payload) =>
     new Request(request.url, {
       method: "POST",
@@ -6815,26 +6823,26 @@ var buildOrchestratorRequest = /* @__PURE__ */ __name(
     }),
   "buildOrchestratorRequest"
 );
-var runOrchestrator = /* @__PURE__ */ __name(async (context, payload) => {
+const runOrchestrator = /* @__PURE__ */ __name(async (context, payload) => {
   const request = buildOrchestratorRequest(context.request, payload);
   return onRequestPost2({
     ...context,
     request,
   });
 }, "runOrchestrator");
-var asObject = /* @__PURE__ */ __name(
+const asObject = /* @__PURE__ */ __name(
   (value) =>
     value && typeof value === "object" && !Array.isArray(value) ? value : {},
   "asObject"
 );
-var normalizeText = /* @__PURE__ */ __name(
+const normalizeText = /* @__PURE__ */ __name(
   (value) =>
     String(value || "")
       .replace(/\s+/g, " ")
       .trim(),
   "normalizeText"
 );
-var extractPathCandidate = /* @__PURE__ */ __name((payload, command) => {
+const extractPathCandidate = /* @__PURE__ */ __name((payload, command) => {
   const params = asObject(payload.raw?.parameters);
   const direct = String(
     params.path || params.file || payload.path || payload.file || ""
@@ -6845,7 +6853,7 @@ var extractPathCandidate = /* @__PURE__ */ __name((payload, command) => {
   );
   return match ? String(match[1] || "").trim() : "";
 }, "extractPathCandidate");
-var extractSearchQuery = /* @__PURE__ */ __name((payload, command) => {
+const extractSearchQuery = /* @__PURE__ */ __name((payload, command) => {
   const params = asObject(payload.raw?.parameters);
   const direct = String(params.q || params.query || "").trim();
   if (direct) return direct;
@@ -6854,7 +6862,7 @@ var extractSearchQuery = /* @__PURE__ */ __name((payload, command) => {
   const forMatch = String(command || "").match(/\bfor\s+(.+)$/i);
   return forMatch?.[1] ? String(forMatch[1]).trim() : "";
 }, "extractSearchQuery");
-var extractStoreId = /* @__PURE__ */ __name((payload, command) => {
+const extractStoreId = /* @__PURE__ */ __name((payload, command) => {
   const params = asObject(payload.raw?.parameters);
   const direct = String(params.id || params.productId || "").trim();
   if (direct) return direct;
@@ -6863,7 +6871,7 @@ var extractStoreId = /* @__PURE__ */ __name((payload, command) => {
   );
   return match ? String(match[1] || "").trim() : "";
 }, "extractStoreId");
-var toBooleanOrUndefined = /* @__PURE__ */ __name((value) => {
+const toBooleanOrUndefined = /* @__PURE__ */ __name((value) => {
   if (typeof value === "boolean") return value;
   const normalized = String(value || "")
     .trim()
@@ -6875,7 +6883,7 @@ var toBooleanOrUndefined = /* @__PURE__ */ __name((value) => {
     return false;
   return void 0;
 }, "toBooleanOrUndefined");
-var extractInteger = /* @__PURE__ */ __name((value) => {
+const extractInteger = /* @__PURE__ */ __name((value) => {
   if (typeof value === "number" && Number.isFinite(value)) {
     return Math.round(value);
   }
@@ -6884,7 +6892,7 @@ var extractInteger = /* @__PURE__ */ __name((value) => {
   const parsed = Number.parseInt(normalized, 10);
   return Number.isFinite(parsed) ? parsed : void 0;
 }, "extractInteger");
-var looksLikeContentEdit = /* @__PURE__ */ __name((command) => {
+const looksLikeContentEdit = /* @__PURE__ */ __name((command) => {
   const lower = String(command || "").toLowerCase();
   const editVerb =
     /\b(update|change|set|edit|replace|make|insert|add|rewrite)\b/.test(lower);
@@ -6894,7 +6902,7 @@ var looksLikeContentEdit = /* @__PURE__ */ __name((command) => {
     );
   return editVerb && contentTarget;
 }, "looksLikeContentEdit");
-var parseExplicitApiOperation = /* @__PURE__ */ __name((payload) => {
+const parseExplicitApiOperation = /* @__PURE__ */ __name((payload) => {
   const params = asObject(payload.raw?.parameters);
   const api = asObject(params.api);
   const path = String(api.path || api.endpoint || "").trim();
@@ -6933,7 +6941,7 @@ var parseExplicitApiOperation = /* @__PURE__ */ __name((payload) => {
     deployRequired: url2.pathname === "/api/deploy/run",
   };
 }, "parseExplicitApiOperation");
-var parseCommandCenterOperation = /* @__PURE__ */ __name((payload) => {
+const parseCommandCenterOperation = /* @__PURE__ */ __name((payload) => {
   if (!CC_ROUTABLE_ACTIONS.has(payload.action)) return null;
   const explicit = parseExplicitApiOperation(payload);
   if (explicit) return explicit;
@@ -7295,7 +7303,7 @@ var parseCommandCenterOperation = /* @__PURE__ */ __name((payload) => {
   }
   return null;
 }, "parseCommandCenterOperation");
-var callCommandCenter = /* @__PURE__ */ __name(
+const callCommandCenter = /* @__PURE__ */ __name(
   async (context, payload, operation) => {
     if (!operation || operation.invalid) {
       const reason =
@@ -7372,7 +7380,7 @@ var callCommandCenter = /* @__PURE__ */ __name(
   },
   "callCommandCenter"
 );
-var buildCommandCenterPlan = /* @__PURE__ */ __name(
+const buildCommandCenterPlan = /* @__PURE__ */ __name(
   (operation) => ({
     ok: true,
     mode: "plan",
@@ -7410,7 +7418,7 @@ var buildCommandCenterPlan = /* @__PURE__ */ __name(
   }),
   "buildCommandCenterPlan"
 );
-var mapActionToEventType = /* @__PURE__ */ __name((action) => {
+const mapActionToEventType = /* @__PURE__ */ __name((action) => {
   switch (action) {
     case "plan":
       return "planned";
@@ -7438,7 +7446,7 @@ var mapActionToEventType = /* @__PURE__ */ __name((action) => {
       return "planned";
   }
 }, "mapActionToEventType");
-var fetchStatus = /* @__PURE__ */ __name(async (db) => {
+const fetchStatus = /* @__PURE__ */ __name(async (db) => {
   if (!db) {
     return {
       commands: [],
@@ -8148,7 +8156,7 @@ async function onRequestPost3(context) {
 __name(onRequestPost3, "onRequestPost");
 
 // config/intent-map.json
-var intent_map_default = {
+const intent_map_default = {
   "make me money": ["make_money"],
   monetize: ["make_money"],
   ads: ["enable_adsense", "create_ad_placements"],
@@ -8173,7 +8181,7 @@ var intent_map_default = {
 };
 
 // config/monetization-map.json
-var monetization_map_default = {
+const monetization_map_default = {
   "make me money": "hybrid",
   "make me money fast": "leadgen",
   "make me money passively": "seo_affiliate_ads",
@@ -8187,7 +8195,7 @@ var monetization_map_default = {
 };
 
 // config/provider-defaults.json
-var provider_defaults_default = {
+const provider_defaults_default = {
   ads: {
     default: "adsense",
   },
@@ -8203,7 +8211,7 @@ var provider_defaults_default = {
 };
 
 // config/risk-policies.json
-var risk_policies_default = {
+const risk_policies_default = {
   highRiskWords: [
     "delete",
     "remove",
@@ -8237,7 +8245,7 @@ var risk_policies_default = {
 };
 
 // config/money-strategies.json
-var money_strategies_default = {
+const money_strategies_default = {
   ads: {
     stack: ["adsense", "analytics", "ad_placements"],
     dependencies: ["verify adsense publisher + slots", "add ad placements"],
@@ -8287,7 +8295,7 @@ var money_strategies_default = {
 };
 
 // config/synonyms.json
-var synonyms_default = {
+const synonyms_default = {
   "hell yeah ship it": "deploy",
   "deploy it": "deploy",
   "push it live": "deploy",
@@ -8305,7 +8313,7 @@ var synonyms_default = {
 };
 
 // worker/entityExtractor.js
-var normalize = /* @__PURE__ */ __name(
+const normalize = /* @__PURE__ */ __name(
   (s) =>
     String(s || "")
       .toLowerCase()
@@ -8313,14 +8321,14 @@ var normalize = /* @__PURE__ */ __name(
       .trim(),
   "normalize"
 );
-var hasAny = /* @__PURE__ */ __name((t, words) => {
+const hasAny = /* @__PURE__ */ __name((t, words) => {
   for (const w of words || []) {
     if (!w) continue;
     if (t.includes(String(w).toLowerCase())) return true;
   }
   return false;
 }, "hasAny");
-var extractPages = /* @__PURE__ */ __name((t) => {
+const extractPages = /* @__PURE__ */ __name((t) => {
   const pages = /* @__PURE__ */ new Set();
   if (
     t.includes("home") ||
@@ -8333,7 +8341,7 @@ var extractPages = /* @__PURE__ */ __name((t) => {
   if (t.includes("admin")) pages.add("admin");
   return [...pages];
 }, "extractPages");
-var extractFeatures = /* @__PURE__ */ __name((t) => {
+const extractFeatures = /* @__PURE__ */ __name((t) => {
   const features = /* @__PURE__ */ new Set();
   if (hasAny(t, ["adsense", "ads"])) features.add("ads");
   if (hasAny(t, ["affiliate", "affiliates"])) features.add("affiliate");
@@ -8355,7 +8363,7 @@ var extractFeatures = /* @__PURE__ */ __name((t) => {
     features.add("voice");
   return [...features];
 }, "extractFeatures");
-var extractDesign = /* @__PURE__ */ __name((t) => {
+const extractDesign = /* @__PURE__ */ __name((t) => {
   const design = {
     theme: "",
     tone: "",
@@ -8384,7 +8392,7 @@ var extractDesign = /* @__PURE__ */ __name((t) => {
   design.tone = "minimal";
   return design;
 }, "extractDesign");
-var extractActions = /* @__PURE__ */ __name((t) => {
+const extractActions = /* @__PURE__ */ __name((t) => {
   const actions = /* @__PURE__ */ new Set();
   if (hasAny(t, ["add", "create", "build", "enable", "turn on"]))
     actions.add("add");
@@ -8418,7 +8426,7 @@ function extractEntities(rawInput) {
 __name(extractEntities, "extractEntities");
 
 // worker/intentClassifier.js
-var normalize2 = /* @__PURE__ */ __name(
+const normalize2 = /* @__PURE__ */ __name(
   (s) =>
     String(s || "")
       .toLowerCase()
@@ -8426,11 +8434,11 @@ var normalize2 = /* @__PURE__ */ __name(
       .trim(),
   "normalize"
 );
-var uniq = /* @__PURE__ */ __name(
+const uniq = /* @__PURE__ */ __name(
   (arr) => [...new Set((arr || []).filter(Boolean))],
   "uniq"
 );
-var baseIntentFromPhrase = /* @__PURE__ */ __name((phraseIntent) => {
+const baseIntentFromPhrase = /* @__PURE__ */ __name((phraseIntent) => {
   switch (phraseIntent) {
     case "update_theme_midnight_steel":
       return "update_theme";
@@ -8442,7 +8450,7 @@ var baseIntentFromPhrase = /* @__PURE__ */ __name((phraseIntent) => {
       return phraseIntent;
   }
 }, "baseIntentFromPhrase");
-var intentMapCache = /* @__PURE__ */ new WeakMap();
+const intentMapCache = /* @__PURE__ */ new WeakMap();
 function getPreparedIntentMap(intentMap) {
   if (!intentMap) return [];
   let prepared = intentMapCache.get(intentMap);
@@ -8525,7 +8533,7 @@ function classifyIntents(rawInput, entities, intentMap) {
 __name(classifyIntents, "classifyIntents");
 
 // worker/strategySelector.js
-var normalize3 = /* @__PURE__ */ __name(
+const normalize3 = /* @__PURE__ */ __name(
   (s) =>
     String(s || "")
       .toLowerCase()
@@ -8533,7 +8541,7 @@ var normalize3 = /* @__PURE__ */ __name(
       .trim(),
   "normalize"
 );
-var keysCache = /* @__PURE__ */ new WeakMap();
+const keysCache = /* @__PURE__ */ new WeakMap();
 function selectStrategy(rawInput, entities, monetizationMap, moneyStrategies) {
   const t = normalize3(rawInput);
   const useCache = monetizationMap && typeof monetizationMap === "object";
@@ -8574,7 +8582,7 @@ function selectStrategy(rawInput, entities, monetizationMap, moneyStrategies) {
 __name(selectStrategy, "selectStrategy");
 
 // worker/riskPolicies.js
-var normalize4 = /* @__PURE__ */ __name(
+const normalize4 = /* @__PURE__ */ __name(
   (s) =>
     String(s || "")
       .toLowerCase()
@@ -8582,7 +8590,7 @@ var normalize4 = /* @__PURE__ */ __name(
       .trim(),
   "normalize"
 );
-var maxRisk = /* @__PURE__ */ __name((a, b) => {
+const maxRisk = /* @__PURE__ */ __name((a, b) => {
   const order = { low: 0, medium: 1, high: 2 };
   const aa = order[String(a || "low")] ?? 0;
   const bb = order[String(b || "low")] ?? 0;
@@ -8606,11 +8614,11 @@ function inferRiskLevel(rawInput, intents, riskPolicies) {
 __name(inferRiskLevel, "inferRiskLevel");
 
 // worker/commandBundler.js
-var clamp01 = /* @__PURE__ */ __name(
+const clamp01 = /* @__PURE__ */ __name(
   (n) => Math.max(0, Math.min(1, Number(n || 0))),
   "clamp01"
 );
-var intentTargets = /* @__PURE__ */ __name((intent) => {
+const intentTargets = /* @__PURE__ */ __name((intent) => {
   switch (intent) {
     case "update_theme":
       return ["global.theme"];
@@ -8626,7 +8634,7 @@ var intentTargets = /* @__PURE__ */ __name((intent) => {
       return [];
   }
 }, "intentTargets");
-var intentPayload = /* @__PURE__ */ __name(
+const intentPayload = /* @__PURE__ */ __name(
   (intent, entities, providerDefaults) => {
     switch (intent) {
       case "update_theme":
@@ -8670,7 +8678,7 @@ function bundleIntents(classified, entities, providerDefaults) {
 __name(bundleIntents, "bundleIntents");
 
 // worker/patchPlanner.js
-var uniq2 = /* @__PURE__ */ __name(
+const uniq2 = /* @__PURE__ */ __name(
   (arr) => [...new Set((arr || []).filter(Boolean))],
   "uniq"
 );
@@ -8728,7 +8736,7 @@ function estimateRevenue({ strategy }) {
 __name(estimateRevenue, "estimateRevenue");
 
 // worker/predictiveQueue.js
-var uniq3 = /* @__PURE__ */ __name(
+const uniq3 = /* @__PURE__ */ __name(
   (arr) => [...new Set((arr || []).filter(Boolean))],
   "uniq"
 );
@@ -8770,7 +8778,7 @@ function buildPredictiveQueue({ intentBundle, strategy }) {
 __name(buildPredictiveQueue, "buildPredictiveQueue");
 
 // worker/confirmationInterpreter.js
-var normalize5 = /* @__PURE__ */ __name(
+const normalize5 = /* @__PURE__ */ __name(
   (s) =>
     String(s || "")
       .toLowerCase()
@@ -8794,22 +8802,25 @@ function interpretConfirmation(rawInput, synonyms) {
 __name(interpretConfirmation, "interpretConfirmation");
 
 // worker/inferenceEngine.js
-var looksLikeRush = /* @__PURE__ */ __name(
+const looksLikeRush = /* @__PURE__ */ __name(
   (raw) => /\b(rush|asap|urgent|now)\b/i.test(String(raw || "")),
   "looksLikeRush"
 );
-var primaryGoalFrom = /* @__PURE__ */ __name((raw, entities, confirmation) => {
-  const t = String(raw || "").toLowerCase();
-  if (confirmation === "deploy") return "deploy";
-  if (confirmation === "rollback") return "rollback";
-  if (t.includes("seo") || t.includes("blog") || t.includes("posts"))
-    return "seo";
-  if (t.includes("speed") || t.includes("performance")) return "performance";
-  if (entities?.moneyKeywords?.length) return "monetization";
-  if (entities?.design?.theme || entities?.design?.tone) return "ui";
-  return "content";
-}, "primaryGoalFrom");
-var NaturalLanguageInferenceEngine = class {
+const primaryGoalFrom = /* @__PURE__ */ __name(
+  (raw, entities, confirmation) => {
+    const t = String(raw || "").toLowerCase();
+    if (confirmation === "deploy") return "deploy";
+    if (confirmation === "rollback") return "rollback";
+    if (t.includes("seo") || t.includes("blog") || t.includes("posts"))
+      return "seo";
+    if (t.includes("speed") || t.includes("performance")) return "performance";
+    if (entities?.moneyKeywords?.length) return "monetization";
+    if (entities?.design?.theme || entities?.design?.tone) return "ui";
+    return "content";
+  },
+  "primaryGoalFrom"
+);
+const NaturalLanguageInferenceEngine = class {
   static {
     __name(this, "NaturalLanguageInferenceEngine");
   }
@@ -8869,8 +8880,8 @@ var NaturalLanguageInferenceEngine = class {
 };
 
 // functions/godmode.js
-var JSON_HEADERS3 = { "Content-Type": "application/json" };
-var json4 = /* @__PURE__ */ __name(
+const JSON_HEADERS3 = { "Content-Type": "application/json" };
+const json4 = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -8878,7 +8889,7 @@ var json4 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var ensureInferenceTables = /* @__PURE__ */ __name(async (db) => {
+const ensureInferenceTables = /* @__PURE__ */ __name(async (db) => {
   if (!db) return;
   await db
     .prepare(
@@ -8892,7 +8903,7 @@ var ensureInferenceTables = /* @__PURE__ */ __name(async (db) => {
     )
     .run();
 }, "ensureInferenceTables");
-var ensureExecuteConfirmTables = /* @__PURE__ */ __name(async (db) => {
+const ensureExecuteConfirmTables = /* @__PURE__ */ __name(async (db) => {
   if (!db) return;
   await db
     .prepare(
@@ -8907,7 +8918,7 @@ var ensureExecuteConfirmTables = /* @__PURE__ */ __name(async (db) => {
     )
     .run();
 }, "ensureExecuteConfirmTables");
-var buildEnrichedCommand = /* @__PURE__ */ __name((rawInput, ioo) => {
+const buildEnrichedCommand = /* @__PURE__ */ __name((rawInput, ioo) => {
   const bundle = (ioo?.intentBundle || []).map((i) => i.intent).join(", ");
   return `${rawInput}
 
@@ -9023,7 +9034,7 @@ async function onRequestPost4(context) {
 __name(onRequestPost4, "onRequestPost");
 
 // src/utils/imageDiscovery.js
-var ImageDiscoverySystem = class {
+const ImageDiscoverySystem = class {
   static {
     __name(this, "ImageDiscoverySystem");
   }
@@ -9460,7 +9471,7 @@ function jsonResponse(status, payload) {
 __name(jsonResponse, "jsonResponse");
 
 // functions/siteGenerator.js
-var json5 = /* @__PURE__ */ __name(
+const json5 = /* @__PURE__ */ __name(
   (status, payload, headers = {}) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -9468,7 +9479,7 @@ var json5 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var sanitizeContent = /* @__PURE__ */ __name((content) => {
+const sanitizeContent = /* @__PURE__ */ __name((content) => {
   if (typeof content !== "string") return content;
   return content
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
@@ -9487,7 +9498,7 @@ var sanitizeContent = /* @__PURE__ */ __name((content) => {
     .replace(/javascript\s*:/gi, "")
     .replace(/behavior\s*:\s*url\(/gi, "");
 }, "sanitizeContent");
-var extractJsonObject = /* @__PURE__ */ __name((text2) => {
+const extractJsonObject = /* @__PURE__ */ __name((text2) => {
   const raw = String(text2 || "").trim();
   if (!raw) throw new Error("AI response was empty.");
   const sanitized = sanitizeContent(raw);
@@ -9501,7 +9512,7 @@ var extractJsonObject = /* @__PURE__ */ __name((text2) => {
     return JSON.parse(sanitized.slice(first, last + 1));
   throw new Error("Failed to parse JSON response.");
 }, "extractJsonObject");
-var pickAiText3 = /* @__PURE__ */ __name((result) => {
+const pickAiText3 = /* @__PURE__ */ __name((result) => {
   if (!result) return "";
   if (typeof result === "string") return result;
   if (typeof result.response === "string") return result.response;
@@ -9511,7 +9522,7 @@ var pickAiText3 = /* @__PURE__ */ __name((result) => {
     return String(result.choices[0].message.content);
   return JSON.stringify(result);
 }, "pickAiText");
-var ensureSiteTables = /* @__PURE__ */ __name(async (env) => {
+const ensureSiteTables = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS sites (
@@ -9537,7 +9548,7 @@ var ensureSiteTables = /* @__PURE__ */ __name(async (env) => {
     );`
   ).run();
 }, "ensureSiteTables");
-var STYLE_PACK_LIBRARY = [
+const STYLE_PACK_LIBRARY = [
   {
     id: "glass-ui",
     name: "Glass UI",
@@ -9686,14 +9697,14 @@ var STYLE_PACK_LIBRARY = [
     css: `h1{font-size:clamp(1.6rem,3vw,2.4rem);} h2{font-size:clamp(1.2rem,2vw,1.8rem);} p{font-size:.96rem;}`,
   },
 ];
-var STYLE_PACK_IDS = new Set(STYLE_PACK_LIBRARY.map((pack) => pack.id));
-var DEFAULT_STYLE_PACKS = [
+const STYLE_PACK_IDS = new Set(STYLE_PACK_LIBRARY.map((pack) => pack.id));
+const DEFAULT_STYLE_PACKS = [
   "subtle-motion",
   "rich-links",
   "bold-headings",
   "ocean-gradient",
 ];
-var normalizeStylePackIds = /* @__PURE__ */ __name((value) => {
+const normalizeStylePackIds = /* @__PURE__ */ __name((value) => {
   if (!Array.isArray(value)) return [];
   const unique = [];
   value.forEach((item) => {
@@ -9702,11 +9713,11 @@ var normalizeStylePackIds = /* @__PURE__ */ __name((value) => {
   });
   return unique.slice(0, 24);
 }, "normalizeStylePackIds");
-var getStylePacksByIds = /* @__PURE__ */ __name((ids) => {
+const getStylePacksByIds = /* @__PURE__ */ __name((ids) => {
   const set2 = new Set(normalizeStylePackIds(ids));
   return STYLE_PACK_LIBRARY.filter((pack) => set2.has(pack.id));
 }, "getStylePacksByIds");
-var escapeAttr = /* @__PURE__ */ __name(
+const escapeAttr = /* @__PURE__ */ __name(
   (s) =>
     String(s ?? "")
       .replace(/&/g, "&amp;")
@@ -9716,7 +9727,7 @@ var escapeAttr = /* @__PURE__ */ __name(
       .trim(),
   "escapeAttr"
 );
-var sanitizeText = /* @__PURE__ */ __name((text2) => {
+const sanitizeText = /* @__PURE__ */ __name((text2) => {
   if (typeof text2 !== "string") return "";
   return text2
     .replace(/[<>]/g, "")
@@ -9725,7 +9736,7 @@ var sanitizeText = /* @__PURE__ */ __name((text2) => {
     .trim()
     .substring(0, 500);
 }, "sanitizeText");
-var sanitizeUrl = /* @__PURE__ */ __name((url2) => {
+const sanitizeUrl = /* @__PURE__ */ __name((url2) => {
   if (typeof url2 !== "string") return "";
   try {
     const parsed = new URL(url2);
@@ -9735,7 +9746,7 @@ var sanitizeUrl = /* @__PURE__ */ __name((url2) => {
     return "";
   }
 }, "sanitizeUrl");
-var renderPreviewHtml2 = /* @__PURE__ */ __name(({ siteId, layout, css }) => {
+const renderPreviewHtml2 = /* @__PURE__ */ __name(({ siteId, layout, css }) => {
   if (!siteId || typeof siteId !== "string") {
     throw new Error("Invalid siteId provided");
   }
@@ -10169,8 +10180,8 @@ async function handlePublishRequest({ request, env }) {
 __name(handlePublishRequest, "handlePublishRequest");
 
 // functions/supportChat.js
-var JSON_HEADERS4 = { "Content-Type": "application/json" };
-var json6 = /* @__PURE__ */ __name(
+const JSON_HEADERS4 = { "Content-Type": "application/json" };
+const json6 = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -10178,8 +10189,8 @@ var json6 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var cookieName = "vtw_support_session";
-var getCookie2 = /* @__PURE__ */ __name((request, name) => {
+const cookieName = "vtw_support_session";
+const getCookie2 = /* @__PURE__ */ __name((request, name) => {
   const header = request.headers.get("cookie") || "";
   const parts = header.split(";").map((p) => p.trim());
   for (const part of parts) {
@@ -10188,11 +10199,11 @@ var getCookie2 = /* @__PURE__ */ __name((request, name) => {
   }
   return "";
 }, "getCookie");
-var setCookie = /* @__PURE__ */ __name((headers, name, value) => {
+const setCookie = /* @__PURE__ */ __name((headers, name, value) => {
   const secure = "Secure; SameSite=Lax; Path=/";
   headers.append("Set-Cookie", `${name}=${value}; ${secure}`);
 }, "setCookie");
-var ensureTables = /* @__PURE__ */ __name(async (db) => {
+const ensureTables = /* @__PURE__ */ __name(async (db) => {
   if (!db) return;
   await db
     .prepare(
@@ -10223,14 +10234,14 @@ var ensureTables = /* @__PURE__ */ __name(async (db) => {
     )
     .run();
 }, "ensureTables");
-var buildSupportSystemPrompt = /* @__PURE__ */ __name(
+const buildSupportSystemPrompt = /* @__PURE__ */ __name(
   () => `You are VoiceToWebsite support.
 You help customers understand the product and troubleshoot basic issues.
 If the user asks to change the site, tell them to use the demo or Admin Voice Commands.
 Do not request secrets. Keep it concise.`,
   "buildSupportSystemPrompt"
 );
-var pickAiText4 = /* @__PURE__ */ __name((result) => {
+const pickAiText4 = /* @__PURE__ */ __name((result) => {
   if (!result) return "";
   if (typeof result === "string") return result;
   if (typeof result.response === "string") return result.response;
@@ -10238,7 +10249,7 @@ var pickAiText4 = /* @__PURE__ */ __name((result) => {
   if (typeof result.output_text === "string") return result.output_text;
   return "";
 }, "pickAiText");
-var buildStaticReply = /* @__PURE__ */ __name((message) => {
+const buildStaticReply = /* @__PURE__ */ __name((message) => {
   const t = String(message || "")
     .trim()
     .toLowerCase();
@@ -10257,7 +10268,7 @@ var buildStaticReply = /* @__PURE__ */ __name((message) => {
   }
   return "Try /demo to build instantly, or /pricing to compare tiers. For urgent help, email support@voicetowebsite.com.";
 }, "buildStaticReply");
-var generateAutoReply = /* @__PURE__ */ __name(async (env, message) => {
+const generateAutoReply = /* @__PURE__ */ __name(async (env, message) => {
   const userText = String(message || "").trim();
   if (!userText) return "";
   const messages = [
@@ -10289,16 +10300,16 @@ var generateAutoReply = /* @__PURE__ */ __name(async (env, message) => {
   const data = JSON.parse(raw);
   return String(data?.choices?.[0]?.message?.content || "").trim();
 }, "generateAutoReply");
-var requireAdmin = /* @__PURE__ */ __name(async (request, env) => {
+const requireAdmin = /* @__PURE__ */ __name(async (request, env) => {
   const okCookie = await hasValidAdminCookie(request, env);
   if (!okCookie) return false;
   return await isAdminRequest(request, env);
 }, "requireAdmin");
-var nowIso = /* @__PURE__ */ __name(
+const nowIso = /* @__PURE__ */ __name(
   () => /* @__PURE__ */ new Date().toISOString(),
   "nowIso"
 );
-var readJson = /* @__PURE__ */ __name(async (request) => {
+const readJson = /* @__PURE__ */ __name(async (request) => {
   try {
     return await request.json();
   } catch (_) {
@@ -10527,7 +10538,7 @@ async function handleSupportChatRequest({ request, env }) {
 __name(handleSupportChatRequest, "handleSupportChatRequest");
 
 // products.json
-var products_default = {
+const products_default = {
   products: [
     {
       id: "starter",
@@ -11119,8 +11130,8 @@ var products_default = {
 };
 
 // src/durable_objects/AuditLogDO.js
-var LOG_LIMIT = 2e3;
-var json7 = /* @__PURE__ */ __name(
+const LOG_LIMIT = 2e3;
+const json7 = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -11131,7 +11142,7 @@ var json7 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var AuditLogDO = class {
+const AuditLogDO = class {
   static {
     __name(this, "AuditLogDO");
   }
@@ -11185,16 +11196,16 @@ var AuditLogDO = class {
 };
 
 // src/durable_objects/BotHubDO.js
-var DEFAULT_LOCK_TTL_MS = 5 * 60 * 1e3;
-var MAX_LOCK_TTL_MS = 15 * 60 * 1e3;
-var MIN_LOCK_TTL_MS = 15 * 1e3;
-var MAX_OPS_PER_PATCH = 200;
-var MAX_IDEMPOTENCY_CACHE_PER_ROUTE = 250;
-var IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1e3;
-var PATCH_RATE_WINDOW_MS = 60 * 1e3;
-var DEFAULT_PATCH_RATE_LIMIT = 30;
-var SAFE_PATH_RE = /^[a-zA-Z0-9._/-]+$/;
-var BotHubDO = class {
+const DEFAULT_LOCK_TTL_MS = 5 * 60 * 1e3;
+const MAX_LOCK_TTL_MS = 15 * 60 * 1e3;
+const MIN_LOCK_TTL_MS = 15 * 1e3;
+const MAX_OPS_PER_PATCH = 200;
+const MAX_IDEMPOTENCY_CACHE_PER_ROUTE = 250;
+const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1e3;
+const PATCH_RATE_WINDOW_MS = 60 * 1e3;
+const DEFAULT_PATCH_RATE_LIMIT = 30;
+const SAFE_PATH_RE = /^[a-zA-Z0-9._/-]+$/;
+const BotHubDO = class {
   static {
     __name(this, "BotHubDO");
   }
@@ -11572,7 +11583,7 @@ var BotHubDO = class {
 };
 
 // src/durable_objects/DeployControllerDO.js
-var CONFIRMATION_PHRASE2 = "hell yeah ship it";
+const CONFIRMATION_PHRASE2 = "hell yeah ship it";
 function isValidConfirmation2(phrase) {
   const p = String(phrase ?? "")
     .trim()
@@ -11582,16 +11593,16 @@ function isValidConfirmation2(phrase) {
   );
 }
 __name(isValidConfirmation2, "isValidConfirmation");
-var LOG_LIMIT2 = 300;
-var DEPLOY_METER_KEY = "deployMeter";
-var DEFAULT_LIMITS = {
+const LOG_LIMIT2 = 300;
+const DEPLOY_METER_KEY = "deployMeter";
+const DEFAULT_LIMITS = {
   free: 1,
   starter: 3,
   pro: 10,
   business: 25,
   enterprise: 1e3,
 };
-var json8 = /* @__PURE__ */ __name(
+const json8 = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -11602,7 +11613,7 @@ var json8 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var DeployControllerDO = class {
+const DeployControllerDO = class {
   static {
     __name(this, "DeployControllerDO");
   }
@@ -12086,10 +12097,10 @@ var DeployControllerDO = class {
 };
 
 // src/durable_objects/LiveRoomDO.js
-var RATE_WINDOW_MS = 6e4;
-var MAX_MESSAGES_PER_WINDOW = 60;
-var HISTORY_LIMIT = 200;
-var json9 = /* @__PURE__ */ __name(
+const RATE_WINDOW_MS = 6e4;
+const MAX_MESSAGES_PER_WINDOW = 60;
+const HISTORY_LIMIT = 200;
+const json9 = /* @__PURE__ */ __name(
   (status, payload) =>
     new Response(JSON.stringify(payload), {
       status,
@@ -12100,7 +12111,7 @@ var json9 = /* @__PURE__ */ __name(
     }),
   "json"
 );
-var LiveRoomDO = class {
+const LiveRoomDO = class {
   static {
     __name(this, "LiveRoomDO");
   }
@@ -12301,7 +12312,7 @@ var LiveRoomDO = class {
 };
 
 // node_modules/zod/v4/classic/external.js
-var external_exports = {};
+const external_exports = {};
 __export(external_exports, {
   $brand: () => $brand,
   $input: () => $input,
@@ -12859,7 +12870,7 @@ function $constructor(name, initializer3, params) {
   }
   Object.defineProperty(Definition, "name", { value: name });
   function _(def) {
-    var _a2;
+    let _a2;
     const inst = params?.Parent ? new Definition() : this;
     init(inst, def);
     (_a2 = inst._zod).deferred ?? (_a2.deferred = []);
@@ -13048,7 +13059,7 @@ function floatSafeRemainder(val, step) {
   return (valInt % stepInt) / 10 ** decCount;
 }
 __name(floatSafeRemainder, "floatSafeRemainder");
-var EVALUATING = /* @__PURE__ */ Symbol("evaluating");
+const EVALUATING = /* @__PURE__ */ Symbol("evaluating");
 function defineLazy(object2, key, getter) {
   let value = void 0;
   Object.defineProperty(object2, key, {
@@ -13542,7 +13553,7 @@ function aborted(x, startIndex = 0) {
 __name(aborted, "aborted");
 function prefixIssues(path, issues) {
   return issues.map((iss) => {
-    var _a2;
+    let _a2;
     (_a2 = iss).path ?? (_a2.path = []);
     iss.path.unshift(path);
     return iss;
@@ -13689,7 +13700,7 @@ var Class = class {
 };
 
 // node_modules/zod/v4/core/errors.js
-var initializer = /* @__PURE__ */ __name((inst, def) => {
+const initializer = /* @__PURE__ */ __name((inst, def) => {
   inst.name = "$ZodError";
   Object.defineProperty(inst, "_zod", {
     value: inst._zod,
@@ -13758,7 +13769,7 @@ __name(formatError, "formatError");
 function treeifyError(error48, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
   const processError = /* @__PURE__ */ __name((error49, path = []) => {
-    var _a2, _b;
+    let _a2, _b;
     for (const issue2 of error49.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
         issue2.errors.map((issues) => processError({ issues }, issue2.path));
@@ -14064,7 +14075,7 @@ var unicodeEmail = /^[^\s@"]{1,64}@[^\s@]{1,255}$/u;
 var idnEmail = unicodeEmail;
 var browserEmail =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-var _emoji = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
+const _emoji = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
 function emoji() {
   return new RegExp(_emoji, "u");
 }
@@ -14090,7 +14101,7 @@ var hostname =
   /^(?=.{1,253}\.?$)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[-0-9a-zA-Z]{0,61}[0-9a-zA-Z])?)*\.?$/;
 var domain = /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 var e164 = /^\+[1-9]\d{6,14}$/;
-var dateSource = `(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))`;
+const dateSource = `(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))`;
 var date = /* @__PURE__ */ new RegExp(`^${dateSource}$`);
 function timeSource(args) {
   const hhmm = `(?:[01]\\d|2[0-3]):[0-5]\\d`;
@@ -14159,12 +14170,12 @@ var sha512_base64url = /* @__PURE__ */ fixedBase64url(86);
 
 // node_modules/zod/v4/core/checks.js
 var $ZodCheck = /* @__PURE__ */ $constructor("$ZodCheck", (inst, def) => {
-  var _a2;
+  let _a2;
   inst._zod ?? (inst._zod = {});
   inst._zod.def = def;
   (_a2 = inst._zod).onattach ?? (_a2.onattach = []);
 });
-var numericOriginMap = {
+const numericOriginMap = {
   number: "number",
   bigint: "bigint",
   object: "date",
@@ -14242,7 +14253,7 @@ var $ZodCheckMultipleOf = /* @__PURE__ */ $constructor(
   (inst, def) => {
     $ZodCheck.init(inst, def);
     inst._zod.onattach.push((inst2) => {
-      var _a2;
+      let _a2;
       (_a2 = inst2._zod.bag).multipleOf ?? (_a2.multipleOf = def.value);
     });
     inst._zod.check = (payload) => {
@@ -14386,7 +14397,7 @@ var $ZodCheckBigIntFormat = /* @__PURE__ */ $constructor(
 var $ZodCheckMaxSize = /* @__PURE__ */ $constructor(
   "$ZodCheckMaxSize",
   (inst, def) => {
-    var _a2;
+    let _a2;
     $ZodCheck.init(inst, def);
     (_a2 = inst._zod.def).when ??
       (_a2.when = (payload) => {
@@ -14416,7 +14427,7 @@ var $ZodCheckMaxSize = /* @__PURE__ */ $constructor(
 var $ZodCheckMinSize = /* @__PURE__ */ $constructor(
   "$ZodCheckMinSize",
   (inst, def) => {
-    var _a2;
+    let _a2;
     $ZodCheck.init(inst, def);
     (_a2 = inst._zod.def).when ??
       (_a2.when = (payload) => {
@@ -14446,7 +14457,7 @@ var $ZodCheckMinSize = /* @__PURE__ */ $constructor(
 var $ZodCheckSizeEquals = /* @__PURE__ */ $constructor(
   "$ZodCheckSizeEquals",
   (inst, def) => {
-    var _a2;
+    let _a2;
     $ZodCheck.init(inst, def);
     (_a2 = inst._zod.def).when ??
       (_a2.when = (payload) => {
@@ -14481,7 +14492,7 @@ var $ZodCheckSizeEquals = /* @__PURE__ */ $constructor(
 var $ZodCheckMaxLength = /* @__PURE__ */ $constructor(
   "$ZodCheckMaxLength",
   (inst, def) => {
-    var _a2;
+    let _a2;
     $ZodCheck.init(inst, def);
     (_a2 = inst._zod.def).when ??
       (_a2.when = (payload) => {
@@ -14512,7 +14523,7 @@ var $ZodCheckMaxLength = /* @__PURE__ */ $constructor(
 var $ZodCheckMinLength = /* @__PURE__ */ $constructor(
   "$ZodCheckMinLength",
   (inst, def) => {
-    var _a2;
+    let _a2;
     $ZodCheck.init(inst, def);
     (_a2 = inst._zod.def).when ??
       (_a2.when = (payload) => {
@@ -14543,7 +14554,7 @@ var $ZodCheckMinLength = /* @__PURE__ */ $constructor(
 var $ZodCheckLengthEquals = /* @__PURE__ */ $constructor(
   "$ZodCheckLengthEquals",
   (inst, def) => {
-    var _a2;
+    let _a2;
     $ZodCheck.init(inst, def);
     (_a2 = inst._zod.def).when ??
       (_a2.when = (payload) => {
@@ -14579,7 +14590,7 @@ var $ZodCheckLengthEquals = /* @__PURE__ */ $constructor(
 var $ZodCheckStringFormat = /* @__PURE__ */ $constructor(
   "$ZodCheckStringFormat",
   (inst, def) => {
-    var _a2, _b;
+    let _a2, _b;
     $ZodCheck.init(inst, def);
     inst._zod.onattach.push((inst2) => {
       const bag = inst2._zod.bag;
@@ -14829,7 +14840,7 @@ var version = {
 
 // node_modules/zod/v4/core/schemas.js
 var $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
-  var _a2;
+  let _a2;
   inst ?? (inst = {});
   inst._zod.def = def;
   inst._zod.bag = inst._zod.bag || {};
@@ -17029,7 +17040,7 @@ __export(locales_exports, {
 });
 
 // node_modules/zod/v4/locales/ar.js
-var error = /* @__PURE__ */ __name(() => {
+const error = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u062D\u0631\u0641",
@@ -17157,7 +17168,7 @@ function ar_default() {
 __name(ar_default, "default");
 
 // node_modules/zod/v4/locales/az.js
-var error2 = /* @__PURE__ */ __name(() => {
+const error2 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "simvol", verb: "olmal\u0131d\u0131r" },
     file: { unit: "bayt", verb: "olmal\u0131d\u0131r" },
@@ -17281,7 +17292,7 @@ function getBelarusianPlural(count, one, few, many) {
   return many;
 }
 __name(getBelarusianPlural, "getBelarusianPlural");
-var error3 = /* @__PURE__ */ __name(() => {
+const error3 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: {
@@ -17438,7 +17449,7 @@ function be_default() {
 __name(be_default, "default");
 
 // node_modules/zod/v4/locales/bg.js
-var error4 = /* @__PURE__ */ __name(() => {
+const error4 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u0441\u0438\u043C\u0432\u043E\u043B\u0430",
@@ -17582,7 +17593,7 @@ function bg_default() {
 __name(bg_default, "default");
 
 // node_modules/zod/v4/locales/ca.js
-var error5 = /* @__PURE__ */ __name(() => {
+const error5 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "car\xE0cters", verb: "contenir" },
     file: { unit: "bytes", verb: "contenir" },
@@ -17693,7 +17704,7 @@ function ca_default() {
 __name(ca_default, "default");
 
 // node_modules/zod/v4/locales/cs.js
-var error6 = /* @__PURE__ */ __name(() => {
+const error6 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "znak\u016F", verb: "m\xEDt" },
     file: { unit: "bajt\u016F", verb: "m\xEDt" },
@@ -17807,7 +17818,7 @@ function cs_default() {
 __name(cs_default, "default");
 
 // node_modules/zod/v4/locales/da.js
-var error7 = /* @__PURE__ */ __name(() => {
+const error7 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "tegn", verb: "havde" },
     file: { unit: "bytes", verb: "havde" },
@@ -17925,7 +17936,7 @@ function da_default() {
 __name(da_default, "default");
 
 // node_modules/zod/v4/locales/de.js
-var error8 = /* @__PURE__ */ __name(() => {
+const error8 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "Zeichen", verb: "zu haben" },
     file: { unit: "Bytes", verb: "zu haben" },
@@ -18036,7 +18047,7 @@ function de_default() {
 __name(de_default, "default");
 
 // node_modules/zod/v4/locales/en.js
-var error9 = /* @__PURE__ */ __name(() => {
+const error9 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "characters", verb: "to have" },
     file: { unit: "bytes", verb: "to have" },
@@ -18147,7 +18158,7 @@ function en_default() {
 __name(en_default, "default");
 
 // node_modules/zod/v4/locales/eo.js
-var error10 = /* @__PURE__ */ __name(() => {
+const error10 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "karaktrojn", verb: "havi" },
     file: { unit: "bajtojn", verb: "havi" },
@@ -18259,7 +18270,7 @@ function eo_default() {
 __name(eo_default, "default");
 
 // node_modules/zod/v4/locales/es.js
-var error11 = /* @__PURE__ */ __name(() => {
+const error11 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "caracteres", verb: "tener" },
     file: { unit: "bytes", verb: "tener" },
@@ -18394,7 +18405,7 @@ function es_default() {
 __name(es_default, "default");
 
 // node_modules/zod/v4/locales/fa.js
-var error12 = /* @__PURE__ */ __name(() => {
+const error12 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u06A9\u0627\u0631\u0627\u06A9\u062A\u0631",
@@ -18525,7 +18536,7 @@ function fa_default() {
 __name(fa_default, "default");
 
 // node_modules/zod/v4/locales/fi.js
-var error13 = /* @__PURE__ */ __name(() => {
+const error13 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "merkki\xE4", subject: "merkkijonon" },
     file: { unit: "tavua", subject: "tiedoston" },
@@ -18640,7 +18651,7 @@ function fi_default() {
 __name(fi_default, "default");
 
 // node_modules/zod/v4/locales/fr.js
-var error14 = /* @__PURE__ */ __name(() => {
+const error14 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "caract\xE8res", verb: "avoir" },
     file: { unit: "octets", verb: "avoir" },
@@ -18751,7 +18762,7 @@ function fr_default() {
 __name(fr_default, "default");
 
 // node_modules/zod/v4/locales/fr-CA.js
-var error15 = /* @__PURE__ */ __name(() => {
+const error15 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "caract\xE8res", verb: "avoir" },
     file: { unit: "octets", verb: "avoir" },
@@ -18861,7 +18872,7 @@ function fr_CA_default() {
 __name(fr_CA_default, "default");
 
 // node_modules/zod/v4/locales/he.js
-var error16 = /* @__PURE__ */ __name(() => {
+const error16 = /* @__PURE__ */ __name(() => {
   const TypeNames = {
     string: { label: "\u05DE\u05D7\u05E8\u05D5\u05D6\u05EA", gender: "f" },
     number: { label: "\u05DE\u05E1\u05E4\u05E8", gender: "m" },
@@ -19153,7 +19164,7 @@ function he_default() {
 __name(he_default, "default");
 
 // node_modules/zod/v4/locales/hu.js
-var error17 = /* @__PURE__ */ __name(() => {
+const error17 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "karakter", verb: "legyen" },
     file: { unit: "byte", verb: "legyen" },
@@ -19283,7 +19294,7 @@ function withDefiniteArticle(word) {
   return word + (vowels.includes(lastChar) ? "\u0576" : "\u0568");
 }
 __name(withDefiniteArticle, "withDefiniteArticle");
-var error18 = /* @__PURE__ */ __name(() => {
+const error18 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: {
@@ -19435,7 +19446,7 @@ function hy_default() {
 __name(hy_default, "default");
 
 // node_modules/zod/v4/locales/id.js
-var error19 = /* @__PURE__ */ __name(() => {
+const error19 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "karakter", verb: "memiliki" },
     file: { unit: "byte", verb: "memiliki" },
@@ -19544,7 +19555,7 @@ function id_default() {
 __name(id_default, "default");
 
 // node_modules/zod/v4/locales/is.js
-var error20 = /* @__PURE__ */ __name(() => {
+const error20 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "stafi", verb: "a\xF0 hafa" },
     file: { unit: "b\xE6ti", verb: "a\xF0 hafa" },
@@ -19656,7 +19667,7 @@ function is_default() {
 __name(is_default, "default");
 
 // node_modules/zod/v4/locales/it.js
-var error21 = /* @__PURE__ */ __name(() => {
+const error21 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "caratteri", verb: "avere" },
     file: { unit: "byte", verb: "avere" },
@@ -19767,7 +19778,7 @@ function it_default() {
 __name(it_default, "default");
 
 // node_modules/zod/v4/locales/ja.js
-var error22 = /* @__PURE__ */ __name(() => {
+const error22 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "\u6587\u5B57", verb: "\u3067\u3042\u308B" },
     file: { unit: "\u30D0\u30A4\u30C8", verb: "\u3067\u3042\u308B" },
@@ -19881,7 +19892,7 @@ function ja_default() {
 __name(ja_default, "default");
 
 // node_modules/zod/v4/locales/ka.js
-var error23 = /* @__PURE__ */ __name(() => {
+const error23 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u10E1\u10D8\u10DB\u10D1\u10DD\u10DA\u10DD",
@@ -20012,7 +20023,7 @@ function ka_default() {
 __name(ka_default, "default");
 
 // node_modules/zod/v4/locales/km.js
-var error24 = /* @__PURE__ */ __name(() => {
+const error24 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u178F\u17BD\u17A2\u1780\u17D2\u179F\u179A",
@@ -20152,7 +20163,7 @@ function kh_default() {
 __name(kh_default, "default");
 
 // node_modules/zod/v4/locales/ko.js
-var error25 = /* @__PURE__ */ __name(() => {
+const error25 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "\uBB38\uC790", verb: "to have" },
     file: { unit: "\uBC14\uC774\uD2B8", verb: "to have" },
@@ -20272,7 +20283,7 @@ function ko_default() {
 __name(ko_default, "default");
 
 // node_modules/zod/v4/locales/lt.js
-var capitalizeFirstCharacter = /* @__PURE__ */ __name((text2) => {
+const capitalizeFirstCharacter = /* @__PURE__ */ __name((text2) => {
   return text2.charAt(0).toUpperCase() + text2.slice(1);
 }, "capitalizeFirstCharacter");
 function getUnitTypeFromNumber(number4) {
@@ -20284,7 +20295,7 @@ function getUnitTypeFromNumber(number4) {
   return "few";
 }
 __name(getUnitTypeFromNumber, "getUnitTypeFromNumber");
-var error26 = /* @__PURE__ */ __name(() => {
+const error26 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: {
@@ -20492,7 +20503,7 @@ function lt_default() {
 __name(lt_default, "default");
 
 // node_modules/zod/v4/locales/mk.js
-var error27 = /* @__PURE__ */ __name(() => {
+const error27 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u0437\u043D\u0430\u0446\u0438",
@@ -20621,7 +20632,7 @@ function mk_default() {
 __name(mk_default, "default");
 
 // node_modules/zod/v4/locales/ms.js
-var error28 = /* @__PURE__ */ __name(() => {
+const error28 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "aksara", verb: "mempunyai" },
     file: { unit: "bait", verb: "mempunyai" },
@@ -20731,7 +20742,7 @@ function ms_default() {
 __name(ms_default, "default");
 
 // node_modules/zod/v4/locales/nl.js
-var error29 = /* @__PURE__ */ __name(() => {
+const error29 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "tekens", verb: "heeft" },
     file: { unit: "bytes", verb: "heeft" },
@@ -20854,7 +20865,7 @@ function nl_default() {
 __name(nl_default, "default");
 
 // node_modules/zod/v4/locales/no.js
-var error30 = /* @__PURE__ */ __name(() => {
+const error30 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "tegn", verb: "\xE5 ha" },
     file: { unit: "bytes", verb: "\xE5 ha" },
@@ -20965,7 +20976,7 @@ function no_default() {
 __name(no_default, "default");
 
 // node_modules/zod/v4/locales/ota.js
-var error31 = /* @__PURE__ */ __name(() => {
+const error31 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "harf", verb: "olmal\u0131d\u0131r" },
     file: { unit: "bayt", verb: "olmal\u0131d\u0131r" },
@@ -21077,7 +21088,7 @@ function ota_default() {
 __name(ota_default, "default");
 
 // node_modules/zod/v4/locales/ps.js
-var error32 = /* @__PURE__ */ __name(() => {
+const error32 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u062A\u0648\u06A9\u064A",
@@ -21203,7 +21214,7 @@ function ps_default() {
 __name(ps_default, "default");
 
 // node_modules/zod/v4/locales/pl.js
-var error33 = /* @__PURE__ */ __name(() => {
+const error33 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "znak\xF3w", verb: "mie\u0107" },
     file: { unit: "bajt\xF3w", verb: "mie\u0107" },
@@ -21315,7 +21326,7 @@ function pl_default() {
 __name(pl_default, "default");
 
 // node_modules/zod/v4/locales/pt.js
-var error34 = /* @__PURE__ */ __name(() => {
+const error34 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "caracteres", verb: "ter" },
     file: { unit: "bytes", verb: "ter" },
@@ -21442,7 +21453,7 @@ function getRussianPlural(count, one, few, many) {
   return many;
 }
 __name(getRussianPlural, "getRussianPlural");
-var error35 = /* @__PURE__ */ __name(() => {
+const error35 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: {
@@ -21600,7 +21611,7 @@ function ru_default() {
 __name(ru_default, "default");
 
 // node_modules/zod/v4/locales/sl.js
-var error36 = /* @__PURE__ */ __name(() => {
+const error36 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "znakov", verb: "imeti" },
     file: { unit: "bajtov", verb: "imeti" },
@@ -21712,7 +21723,7 @@ function sl_default() {
 __name(sl_default, "default");
 
 // node_modules/zod/v4/locales/sv.js
-var error37 = /* @__PURE__ */ __name(() => {
+const error37 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "tecken", verb: "att ha" },
     file: { unit: "bytes", verb: "att ha" },
@@ -21825,7 +21836,7 @@ function sv_default() {
 __name(sv_default, "default");
 
 // node_modules/zod/v4/locales/ta.js
-var error38 = /* @__PURE__ */ __name(() => {
+const error38 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u0B8E\u0BB4\u0BC1\u0BA4\u0BCD\u0BA4\u0BC1\u0B95\u0BCD\u0B95\u0BB3\u0BCD",
@@ -21951,7 +21962,7 @@ function ta_default() {
 __name(ta_default, "default");
 
 // node_modules/zod/v4/locales/th.js
-var error39 = /* @__PURE__ */ __name(() => {
+const error39 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u0E15\u0E31\u0E27\u0E2D\u0E31\u0E01\u0E29\u0E23",
@@ -22088,7 +22099,7 @@ function th_default() {
 __name(th_default, "default");
 
 // node_modules/zod/v4/locales/tr.js
-var error40 = /* @__PURE__ */ __name(() => {
+const error40 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "karakter", verb: "olmal\u0131" },
     file: { unit: "bayt", verb: "olmal\u0131" },
@@ -22196,7 +22207,7 @@ function tr_default() {
 __name(tr_default, "default");
 
 // node_modules/zod/v4/locales/uk.js
-var error41 = /* @__PURE__ */ __name(() => {
+const error41 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u0441\u0438\u043C\u0432\u043E\u043B\u0456\u0432",
@@ -22330,7 +22341,7 @@ function ua_default() {
 __name(ua_default, "default");
 
 // node_modules/zod/v4/locales/ur.js
-var error42 = /* @__PURE__ */ __name(() => {
+const error42 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: {
       unit: "\u062D\u0631\u0648\u0641",
@@ -22466,7 +22477,7 @@ function ur_default() {
 __name(ur_default, "default");
 
 // node_modules/zod/v4/locales/uz.js
-var error43 = /* @__PURE__ */ __name(() => {
+const error43 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "belgi", verb: "bo\u2018lishi kerak" },
     file: { unit: "bayt", verb: "bo\u2018lishi kerak" },
@@ -22578,7 +22589,7 @@ function uz_default() {
 __name(uz_default, "default");
 
 // node_modules/zod/v4/locales/vi.js
-var error44 = /* @__PURE__ */ __name(() => {
+const error44 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "k\xFD t\u1EF1", verb: "c\xF3" },
     file: { unit: "byte", verb: "c\xF3" },
@@ -22689,7 +22700,7 @@ function vi_default() {
 __name(vi_default, "default");
 
 // node_modules/zod/v4/locales/zh-CN.js
-var error45 = /* @__PURE__ */ __name(() => {
+const error45 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "\u5B57\u7B26", verb: "\u5305\u542B" },
     file: { unit: "\u5B57\u8282", verb: "\u5305\u542B" },
@@ -22801,7 +22812,7 @@ function zh_CN_default() {
 __name(zh_CN_default, "default");
 
 // node_modules/zod/v4/locales/zh-TW.js
-var error46 = /* @__PURE__ */ __name(() => {
+const error46 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "\u5B57\u5143", verb: "\u64C1\u6709" },
     file: { unit: "\u4F4D\u5143\u7D44", verb: "\u64C1\u6709" },
@@ -22911,7 +22922,7 @@ function zh_TW_default() {
 __name(zh_TW_default, "default");
 
 // node_modules/zod/v4/locales/yo.js
-var error47 = /* @__PURE__ */ __name(() => {
+const error47 = /* @__PURE__ */ __name(() => {
   const Sizable = {
     string: { unit: "\xE0mi", verb: "n\xED" },
     file: { unit: "bytes", verb: "n\xED" },
@@ -23021,7 +23032,7 @@ function yo_default() {
 __name(yo_default, "default");
 
 // node_modules/zod/v4/core/registries.js
-var _a;
+let _a;
 var $output = /* @__PURE__ */ Symbol("ZodOutput");
 var $input = /* @__PURE__ */ Symbol("ZodInput");
 var $ZodRegistry = class {
@@ -24257,7 +24268,7 @@ function initializeContext(params) {
 }
 __name(initializeContext, "initializeContext");
 function process(schema, ctx, _params = { path: [], schemaPath: [] }) {
-  var _a2;
+  let _a2;
   const def = schema._zod.def;
   const seen = ctx.seen.get(schema);
   if (seen) {
@@ -24624,7 +24635,7 @@ var createStandardJSONSchemaMethod = /* @__PURE__ */ __name(
 );
 
 // node_modules/zod/v4/core/json-schema-processors.js
-var formatMap = {
+const formatMap = {
   guid: "uuid",
   url: "uri",
   datetime: "date-time",
@@ -24632,109 +24643,124 @@ var formatMap = {
   regex: "",
   // do not set
 };
-var stringProcessor = /* @__PURE__ */ __name((schema, ctx, _json, _params) => {
-  const json11 = _json;
-  json11.type = "string";
-  const { minimum, maximum, format, patterns, contentEncoding } =
-    schema._zod.bag;
-  if (typeof minimum === "number") json11.minLength = minimum;
-  if (typeof maximum === "number") json11.maxLength = maximum;
-  if (format) {
-    json11.format = formatMap[format] ?? format;
-    if (json11.format === "") delete json11.format;
-    if (format === "time") {
-      delete json11.format;
+const stringProcessor = /* @__PURE__ */ __name(
+  (schema, ctx, _json, _params) => {
+    const json11 = _json;
+    json11.type = "string";
+    const { minimum, maximum, format, patterns, contentEncoding } =
+      schema._zod.bag;
+    if (typeof minimum === "number") json11.minLength = minimum;
+    if (typeof maximum === "number") json11.maxLength = maximum;
+    if (format) {
+      json11.format = formatMap[format] ?? format;
+      if (json11.format === "") delete json11.format;
+      if (format === "time") {
+        delete json11.format;
+      }
     }
-  }
-  if (contentEncoding) json11.contentEncoding = contentEncoding;
-  if (patterns && patterns.size > 0) {
-    const regexes = [...patterns];
-    if (regexes.length === 1) json11.pattern = regexes[0].source;
-    else if (regexes.length > 1) {
-      json11.allOf = [
-        ...regexes.map((regex) => ({
-          ...(ctx.target === "draft-07" ||
-          ctx.target === "draft-04" ||
-          ctx.target === "openapi-3.0"
-            ? { type: "string" }
-            : {}),
-          pattern: regex.source,
-        })),
-      ];
+    if (contentEncoding) json11.contentEncoding = contentEncoding;
+    if (patterns && patterns.size > 0) {
+      const regexes = [...patterns];
+      if (regexes.length === 1) json11.pattern = regexes[0].source;
+      else if (regexes.length > 1) {
+        json11.allOf = [
+          ...regexes.map((regex) => ({
+            ...(ctx.target === "draft-07" ||
+            ctx.target === "draft-04" ||
+            ctx.target === "openapi-3.0"
+              ? { type: "string" }
+              : {}),
+            pattern: regex.source,
+          })),
+        ];
+      }
     }
-  }
-}, "stringProcessor");
-var numberProcessor = /* @__PURE__ */ __name((schema, ctx, _json, _params) => {
-  const json11 = _json;
-  const {
-    minimum,
-    maximum,
-    format,
-    multipleOf,
-    exclusiveMaximum,
-    exclusiveMinimum,
-  } = schema._zod.bag;
-  if (typeof format === "string" && format.includes("int"))
-    json11.type = "integer";
-  else json11.type = "number";
-  if (typeof exclusiveMinimum === "number") {
-    if (ctx.target === "draft-04" || ctx.target === "openapi-3.0") {
-      json11.minimum = exclusiveMinimum;
-      json11.exclusiveMinimum = true;
-    } else {
-      json11.exclusiveMinimum = exclusiveMinimum;
+  },
+  "stringProcessor"
+);
+const numberProcessor = /* @__PURE__ */ __name(
+  (schema, ctx, _json, _params) => {
+    const json11 = _json;
+    const {
+      minimum,
+      maximum,
+      format,
+      multipleOf,
+      exclusiveMaximum,
+      exclusiveMinimum,
+    } = schema._zod.bag;
+    if (typeof format === "string" && format.includes("int"))
+      json11.type = "integer";
+    else json11.type = "number";
+    if (typeof exclusiveMinimum === "number") {
+      if (ctx.target === "draft-04" || ctx.target === "openapi-3.0") {
+        json11.minimum = exclusiveMinimum;
+        json11.exclusiveMinimum = true;
+      } else {
+        json11.exclusiveMinimum = exclusiveMinimum;
+      }
     }
-  }
-  if (typeof minimum === "number") {
-    json11.minimum = minimum;
-    if (typeof exclusiveMinimum === "number" && ctx.target !== "draft-04") {
-      if (exclusiveMinimum >= minimum) delete json11.minimum;
-      else delete json11.exclusiveMinimum;
+    if (typeof minimum === "number") {
+      json11.minimum = minimum;
+      if (typeof exclusiveMinimum === "number" && ctx.target !== "draft-04") {
+        if (exclusiveMinimum >= minimum) delete json11.minimum;
+        else delete json11.exclusiveMinimum;
+      }
     }
-  }
-  if (typeof exclusiveMaximum === "number") {
-    if (ctx.target === "draft-04" || ctx.target === "openapi-3.0") {
-      json11.maximum = exclusiveMaximum;
-      json11.exclusiveMaximum = true;
-    } else {
-      json11.exclusiveMaximum = exclusiveMaximum;
+    if (typeof exclusiveMaximum === "number") {
+      if (ctx.target === "draft-04" || ctx.target === "openapi-3.0") {
+        json11.maximum = exclusiveMaximum;
+        json11.exclusiveMaximum = true;
+      } else {
+        json11.exclusiveMaximum = exclusiveMaximum;
+      }
     }
-  }
-  if (typeof maximum === "number") {
-    json11.maximum = maximum;
-    if (typeof exclusiveMaximum === "number" && ctx.target !== "draft-04") {
-      if (exclusiveMaximum <= maximum) delete json11.maximum;
-      else delete json11.exclusiveMaximum;
+    if (typeof maximum === "number") {
+      json11.maximum = maximum;
+      if (typeof exclusiveMaximum === "number" && ctx.target !== "draft-04") {
+        if (exclusiveMaximum <= maximum) delete json11.maximum;
+        else delete json11.exclusiveMaximum;
+      }
     }
-  }
-  if (typeof multipleOf === "number") json11.multipleOf = multipleOf;
-}, "numberProcessor");
-var booleanProcessor = /* @__PURE__ */ __name(
+    if (typeof multipleOf === "number") json11.multipleOf = multipleOf;
+  },
+  "numberProcessor"
+);
+const booleanProcessor = /* @__PURE__ */ __name(
   (_schema, _ctx, json11, _params) => {
     json11.type = "boolean";
   },
   "booleanProcessor"
 );
-var bigintProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
-  if (ctx.unrepresentable === "throw") {
-    throw new Error("BigInt cannot be represented in JSON Schema");
-  }
-}, "bigintProcessor");
-var symbolProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
-  if (ctx.unrepresentable === "throw") {
-    throw new Error("Symbols cannot be represented in JSON Schema");
-  }
-}, "symbolProcessor");
-var nullProcessor = /* @__PURE__ */ __name((_schema, ctx, json11, _params) => {
-  if (ctx.target === "openapi-3.0") {
-    json11.type = "string";
-    json11.nullable = true;
-    json11.enum = [null];
-  } else {
-    json11.type = "null";
-  }
-}, "nullProcessor");
-var undefinedProcessor = /* @__PURE__ */ __name(
+const bigintProcessor = /* @__PURE__ */ __name(
+  (_schema, ctx, _json, _params) => {
+    if (ctx.unrepresentable === "throw") {
+      throw new Error("BigInt cannot be represented in JSON Schema");
+    }
+  },
+  "bigintProcessor"
+);
+const symbolProcessor = /* @__PURE__ */ __name(
+  (_schema, ctx, _json, _params) => {
+    if (ctx.unrepresentable === "throw") {
+      throw new Error("Symbols cannot be represented in JSON Schema");
+    }
+  },
+  "symbolProcessor"
+);
+const nullProcessor = /* @__PURE__ */ __name(
+  (_schema, ctx, json11, _params) => {
+    if (ctx.target === "openapi-3.0") {
+      json11.type = "string";
+      json11.nullable = true;
+      json11.enum = [null];
+    } else {
+      json11.type = "null";
+    }
+  },
+  "nullProcessor"
+);
+const undefinedProcessor = /* @__PURE__ */ __name(
   (_schema, ctx, _json, _params) => {
     if (ctx.unrepresentable === "throw") {
       throw new Error("Undefined cannot be represented in JSON Schema");
@@ -24742,38 +24768,41 @@ var undefinedProcessor = /* @__PURE__ */ __name(
   },
   "undefinedProcessor"
 );
-var voidProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
+const voidProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
   if (ctx.unrepresentable === "throw") {
     throw new Error("Void cannot be represented in JSON Schema");
   }
 }, "voidProcessor");
-var neverProcessor = /* @__PURE__ */ __name(
+const neverProcessor = /* @__PURE__ */ __name(
   (_schema, _ctx, json11, _params) => {
     json11.not = {};
   },
   "neverProcessor"
 );
-var anyProcessor = /* @__PURE__ */ __name(
+const anyProcessor = /* @__PURE__ */ __name(
   (_schema, _ctx, _json, _params) => {},
   "anyProcessor"
 );
-var unknownProcessor = /* @__PURE__ */ __name(
+const unknownProcessor = /* @__PURE__ */ __name(
   (_schema, _ctx, _json, _params) => {},
   "unknownProcessor"
 );
-var dateProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
+const dateProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
   if (ctx.unrepresentable === "throw") {
     throw new Error("Date cannot be represented in JSON Schema");
   }
 }, "dateProcessor");
-var enumProcessor = /* @__PURE__ */ __name((schema, _ctx, json11, _params) => {
-  const def = schema._zod.def;
-  const values = getEnumValues(def.entries);
-  if (values.every((v) => typeof v === "number")) json11.type = "number";
-  if (values.every((v) => typeof v === "string")) json11.type = "string";
-  json11.enum = values;
-}, "enumProcessor");
-var literalProcessor = /* @__PURE__ */ __name(
+const enumProcessor = /* @__PURE__ */ __name(
+  (schema, _ctx, json11, _params) => {
+    const def = schema._zod.def;
+    const values = getEnumValues(def.entries);
+    if (values.every((v) => typeof v === "number")) json11.type = "number";
+    if (values.every((v) => typeof v === "string")) json11.type = "string";
+    json11.enum = values;
+  },
+  "enumProcessor"
+);
+const literalProcessor = /* @__PURE__ */ __name(
   (schema, ctx, json11, _params) => {
     const def = schema._zod.def;
     const vals = [];
@@ -24816,12 +24845,12 @@ var literalProcessor = /* @__PURE__ */ __name(
   },
   "literalProcessor"
 );
-var nanProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
+const nanProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
   if (ctx.unrepresentable === "throw") {
     throw new Error("NaN cannot be represented in JSON Schema");
   }
 }, "nanProcessor");
-var templateLiteralProcessor = /* @__PURE__ */ __name(
+const templateLiteralProcessor = /* @__PURE__ */ __name(
   (schema, _ctx, json11, _params) => {
     const _json = json11;
     const pattern = schema._zod.pattern;
@@ -24831,40 +24860,46 @@ var templateLiteralProcessor = /* @__PURE__ */ __name(
   },
   "templateLiteralProcessor"
 );
-var fileProcessor = /* @__PURE__ */ __name((schema, _ctx, json11, _params) => {
-  const _json = json11;
-  const file2 = {
-    type: "string",
-    format: "binary",
-    contentEncoding: "binary",
-  };
-  const { minimum, maximum, mime } = schema._zod.bag;
-  if (minimum !== void 0) file2.minLength = minimum;
-  if (maximum !== void 0) file2.maxLength = maximum;
-  if (mime) {
-    if (mime.length === 1) {
-      file2.contentMediaType = mime[0];
-      Object.assign(_json, file2);
+const fileProcessor = /* @__PURE__ */ __name(
+  (schema, _ctx, json11, _params) => {
+    const _json = json11;
+    const file2 = {
+      type: "string",
+      format: "binary",
+      contentEncoding: "binary",
+    };
+    const { minimum, maximum, mime } = schema._zod.bag;
+    if (minimum !== void 0) file2.minLength = minimum;
+    if (maximum !== void 0) file2.maxLength = maximum;
+    if (mime) {
+      if (mime.length === 1) {
+        file2.contentMediaType = mime[0];
+        Object.assign(_json, file2);
+      } else {
+        Object.assign(_json, file2);
+        _json.anyOf = mime.map((m) => ({ contentMediaType: m }));
+      }
     } else {
       Object.assign(_json, file2);
-      _json.anyOf = mime.map((m) => ({ contentMediaType: m }));
     }
-  } else {
-    Object.assign(_json, file2);
-  }
-}, "fileProcessor");
-var successProcessor = /* @__PURE__ */ __name(
+  },
+  "fileProcessor"
+);
+const successProcessor = /* @__PURE__ */ __name(
   (_schema, _ctx, json11, _params) => {
     json11.type = "boolean";
   },
   "successProcessor"
 );
-var customProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
-  if (ctx.unrepresentable === "throw") {
-    throw new Error("Custom types cannot be represented in JSON Schema");
-  }
-}, "customProcessor");
-var functionProcessor = /* @__PURE__ */ __name(
+const customProcessor = /* @__PURE__ */ __name(
+  (_schema, ctx, _json, _params) => {
+    if (ctx.unrepresentable === "throw") {
+      throw new Error("Custom types cannot be represented in JSON Schema");
+    }
+  },
+  "customProcessor"
+);
+const functionProcessor = /* @__PURE__ */ __name(
   (_schema, ctx, _json, _params) => {
     if (ctx.unrepresentable === "throw") {
       throw new Error("Function types cannot be represented in JSON Schema");
@@ -24872,7 +24907,7 @@ var functionProcessor = /* @__PURE__ */ __name(
   },
   "functionProcessor"
 );
-var transformProcessor = /* @__PURE__ */ __name(
+const transformProcessor = /* @__PURE__ */ __name(
   (_schema, ctx, _json, _params) => {
     if (ctx.unrepresentable === "throw") {
       throw new Error("Transforms cannot be represented in JSON Schema");
@@ -24880,17 +24915,17 @@ var transformProcessor = /* @__PURE__ */ __name(
   },
   "transformProcessor"
 );
-var mapProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
+const mapProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
   if (ctx.unrepresentable === "throw") {
     throw new Error("Map cannot be represented in JSON Schema");
   }
 }, "mapProcessor");
-var setProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
+const setProcessor = /* @__PURE__ */ __name((_schema, ctx, _json, _params) => {
   if (ctx.unrepresentable === "throw") {
     throw new Error("Set cannot be represented in JSON Schema");
   }
 }, "setProcessor");
-var arrayProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
+const arrayProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   const json11 = _json;
   const def = schema._zod.def;
   const { minimum, maximum } = schema._zod.bag;
@@ -24902,7 +24937,7 @@ var arrayProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
     path: [...params.path, "items"],
   });
 }, "arrayProcessor");
-var objectProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
+const objectProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   const json11 = _json;
   const def = schema._zod.def;
   json11.type = "object";
@@ -24939,7 +24974,7 @@ var objectProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
     });
   }
 }, "objectProcessor");
-var unionProcessor = /* @__PURE__ */ __name((schema, ctx, json11, params) => {
+const unionProcessor = /* @__PURE__ */ __name((schema, ctx, json11, params) => {
   const def = schema._zod.def;
   const isExclusive = def.inclusive === false;
   const options = def.options.map((x, i) =>
@@ -24954,7 +24989,7 @@ var unionProcessor = /* @__PURE__ */ __name((schema, ctx, json11, params) => {
     json11.anyOf = options;
   }
 }, "unionProcessor");
-var intersectionProcessor = /* @__PURE__ */ __name(
+const intersectionProcessor = /* @__PURE__ */ __name(
   (schema, ctx, json11, params) => {
     const def = schema._zod.def;
     const a = process(def.left, ctx, {
@@ -24977,7 +25012,7 @@ var intersectionProcessor = /* @__PURE__ */ __name(
   },
   "intersectionProcessor"
 );
-var tupleProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
+const tupleProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   const json11 = _json;
   const def = schema._zod.def;
   json11.type = "array";
@@ -25030,7 +25065,7 @@ var tupleProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   if (typeof minimum === "number") json11.minItems = minimum;
   if (typeof maximum === "number") json11.maxItems = maximum;
 }, "tupleProcessor");
-var recordProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
+const recordProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   const json11 = _json;
   const def = schema._zod.def;
   json11.type = "object";
@@ -25068,7 +25103,7 @@ var recordProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
     }
   }
 }, "recordProcessor");
-var nullableProcessor = /* @__PURE__ */ __name(
+const nullableProcessor = /* @__PURE__ */ __name(
   (schema, ctx, json11, params) => {
     const def = schema._zod.def;
     const inner = process(def.innerType, ctx, params);
@@ -25082,7 +25117,7 @@ var nullableProcessor = /* @__PURE__ */ __name(
   },
   "nullableProcessor"
 );
-var nonoptionalProcessor = /* @__PURE__ */ __name(
+const nonoptionalProcessor = /* @__PURE__ */ __name(
   (schema, ctx, _json, params) => {
     const def = schema._zod.def;
     process(def.innerType, ctx, params);
@@ -25091,14 +25126,17 @@ var nonoptionalProcessor = /* @__PURE__ */ __name(
   },
   "nonoptionalProcessor"
 );
-var defaultProcessor = /* @__PURE__ */ __name((schema, ctx, json11, params) => {
-  const def = schema._zod.def;
-  process(def.innerType, ctx, params);
-  const seen = ctx.seen.get(schema);
-  seen.ref = def.innerType;
-  json11.default = JSON.parse(JSON.stringify(def.defaultValue));
-}, "defaultProcessor");
-var prefaultProcessor = /* @__PURE__ */ __name(
+const defaultProcessor = /* @__PURE__ */ __name(
+  (schema, ctx, json11, params) => {
+    const def = schema._zod.def;
+    process(def.innerType, ctx, params);
+    const seen = ctx.seen.get(schema);
+    seen.ref = def.innerType;
+    json11.default = JSON.parse(JSON.stringify(def.defaultValue));
+  },
+  "defaultProcessor"
+);
+const prefaultProcessor = /* @__PURE__ */ __name(
   (schema, ctx, json11, params) => {
     const def = schema._zod.def;
     process(def.innerType, ctx, params);
@@ -25109,7 +25147,7 @@ var prefaultProcessor = /* @__PURE__ */ __name(
   },
   "prefaultProcessor"
 );
-var catchProcessor = /* @__PURE__ */ __name((schema, ctx, json11, params) => {
+const catchProcessor = /* @__PURE__ */ __name((schema, ctx, json11, params) => {
   const def = schema._zod.def;
   process(def.innerType, ctx, params);
   const seen = ctx.seen.get(schema);
@@ -25122,7 +25160,7 @@ var catchProcessor = /* @__PURE__ */ __name((schema, ctx, json11, params) => {
   }
   json11.default = catchValue;
 }, "catchProcessor");
-var pipeProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
+const pipeProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   const def = schema._zod.def;
   const innerType =
     ctx.io === "input"
@@ -25134,7 +25172,7 @@ var pipeProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   const seen = ctx.seen.get(schema);
   seen.ref = innerType;
 }, "pipeProcessor");
-var readonlyProcessor = /* @__PURE__ */ __name(
+const readonlyProcessor = /* @__PURE__ */ __name(
   (schema, ctx, json11, params) => {
     const def = schema._zod.def;
     process(def.innerType, ctx, params);
@@ -25144,25 +25182,31 @@ var readonlyProcessor = /* @__PURE__ */ __name(
   },
   "readonlyProcessor"
 );
-var promiseProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
-  const def = schema._zod.def;
-  process(def.innerType, ctx, params);
-  const seen = ctx.seen.get(schema);
-  seen.ref = def.innerType;
-}, "promiseProcessor");
-var optionalProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
-  const def = schema._zod.def;
-  process(def.innerType, ctx, params);
-  const seen = ctx.seen.get(schema);
-  seen.ref = def.innerType;
-}, "optionalProcessor");
-var lazyProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
+const promiseProcessor = /* @__PURE__ */ __name(
+  (schema, ctx, _json, params) => {
+    const def = schema._zod.def;
+    process(def.innerType, ctx, params);
+    const seen = ctx.seen.get(schema);
+    seen.ref = def.innerType;
+  },
+  "promiseProcessor"
+);
+const optionalProcessor = /* @__PURE__ */ __name(
+  (schema, ctx, _json, params) => {
+    const def = schema._zod.def;
+    process(def.innerType, ctx, params);
+    const seen = ctx.seen.get(schema);
+    seen.ref = def.innerType;
+  },
+  "optionalProcessor"
+);
+const lazyProcessor = /* @__PURE__ */ __name((schema, ctx, _json, params) => {
   const innerType = schema._zod.innerType;
   process(innerType, ctx, params);
   const seen = ctx.seen.get(schema);
   seen.ref = innerType;
 }, "lazyProcessor");
-var allProcessors = {
+const allProcessors = {
   string: stringProcessor,
   number: numberProcessor,
   boolean: booleanProcessor,
@@ -25319,7 +25363,7 @@ var JSONSchemaGenerator = class {
 var json_schema_exports = {};
 
 // node_modules/zod/v4/classic/schemas.js
-var schemas_exports2 = {};
+const schemas_exports2 = {};
 __export(schemas_exports2, {
   ZodAny: () => ZodAny,
   ZodArray: () => ZodArray,
@@ -25488,7 +25532,7 @@ __export(schemas_exports2, {
 });
 
 // node_modules/zod/v4/classic/checks.js
-var checks_exports2 = {};
+const checks_exports2 = {};
 __export(checks_exports2, {
   endsWith: () => _endsWith,
   gt: () => _gt,
@@ -25573,7 +25617,7 @@ function duration2(params) {
 __name(duration2, "duration");
 
 // node_modules/zod/v4/classic/errors.js
-var initializer2 = /* @__PURE__ */ __name((inst, issues) => {
+const initializer2 = /* @__PURE__ */ __name((inst, issues) => {
   $ZodError.init(inst, issues);
   inst.name = "ZodError";
   Object.defineProperties(inst, {
@@ -26951,18 +26995,18 @@ function getErrorMap() {
   return config().customError;
 }
 __name(getErrorMap, "getErrorMap");
-var ZodFirstPartyTypeKind;
+let ZodFirstPartyTypeKind;
 /* @__PURE__ */ (function (ZodFirstPartyTypeKind2) {})(
   ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {})
 );
 
 // node_modules/zod/v4/classic/from-json-schema.js
-var z = {
+const z = {
   ...schemas_exports2,
   ...checks_exports2,
   iso: iso_exports,
 };
-var RECOGNIZED_KEYS = /* @__PURE__ */ new Set([
+const RECOGNIZED_KEYS = /* @__PURE__ */ new Set([
   // Schema identification
   "$schema",
   "$ref",
@@ -27534,22 +27578,22 @@ __name(date4, "date");
 config(en_default());
 
 // src/functions/uiCommand.js
-var commandSchema = external_exports.object({
+const commandSchema = external_exports.object({
   action: external_exports.string().min(1).max(50),
   args: external_exports.record(external_exports.any()).optional().default({}),
   source: external_exports.string().min(1).max(20).optional().default("api"),
 });
-var stateActionSchema = external_exports.object({
+const stateActionSchema = external_exports.object({
   value: external_exports.string().max(500),
 });
-var themeActionSchema = external_exports.object({
+const themeActionSchema = external_exports.object({
   theme: external_exports.enum(["ember", "ocean", "volt", "midnight"]),
 });
-var metricActionSchema = external_exports.object({
+const metricActionSchema = external_exports.object({
   metricNum: external_exports.number().int().min(1).max(3),
   value: external_exports.string().max(200),
 });
-var modalActionSchema = external_exports.object({
+const modalActionSchema = external_exports.object({
   modalName: external_exports
     .string()
     .min(1)
@@ -27754,7 +27798,7 @@ async function executeUIAction(action, args, source, env) {
 __name(executeUIAction, "executeUIAction");
 
 // worker.js
-var SECURITY_HEADERS = {
+const SECURITY_HEADERS = {
   "Content-Security-Policy": `
     default-src 'self';
     script-src 'self' 'nonce-{nonce}' https://cdn.tailwindcss.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google-analytics.com https://accounts.google.com https://js.stripe.com https://www.paypal.com https://esm.sh;
@@ -27776,7 +27820,7 @@ var SECURITY_HEADERS = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
 };
-var buildCsp = /* @__PURE__ */ __name((nonce, frameAncestors = "'none'") => {
+const buildCsp = /* @__PURE__ */ __name((nonce, frameAncestors = "'none'") => {
   const base = SECURITY_HEADERS["Content-Security-Policy"];
   const frameAncestorsValue =
     String(frameAncestors).trim() === "'self'" ? "'self'" : "'none'";
@@ -27789,7 +27833,7 @@ var buildCsp = /* @__PURE__ */ __name((nonce, frameAncestors = "'none'") => {
     .replace("'nonce-{nonce}'", `'nonce-${safeNonce}'`)
     .replace("{frameAncestors}", frameAncestorsValue);
 }, "buildCsp");
-var getCacheControlForPath = /* @__PURE__ */ __name((pathname, env) => {
+const getCacheControlForPath = /* @__PURE__ */ __name((pathname, env) => {
   const normalized = String(pathname || "").toLowerCase();
   const staticByExt =
     /\.(?:js|mjs|css|map|svg|png|jpg|jpeg|gif|webp|ico|woff2?)$/i;
@@ -27813,19 +27857,19 @@ var getCacheControlForPath = /* @__PURE__ */ __name((pathname, env) => {
     "public, max-age=31536000, immutable"
   );
 }, "getCacheControlForPath");
-var getBearerToken = /* @__PURE__ */ __name(
+const getBearerToken = /* @__PURE__ */ __name(
   (request) =>
     String(request.headers.get("Authorization") || "")
       .replace(/^bearer\s+/i, "")
       .trim(),
   "getBearerToken"
 );
-var hasValidConfiguredAdminBearer = /* @__PURE__ */ __name((request, env) => {
+const hasValidConfiguredAdminBearer = /* @__PURE__ */ __name((request, env) => {
   const expectedBearer = String(env.ADMIN_BEARER_TOKEN || "").trim();
   if (!expectedBearer) return false;
   return getBearerToken(request) === expectedBearer;
 }, "hasValidConfiguredAdminBearer");
-var jsonResponse2 = /* @__PURE__ */ __name(
+const jsonResponse2 = /* @__PURE__ */ __name(
   (status, payload) =>
     addSecurityHeaders(
       new Response(JSON.stringify(payload), {
@@ -27883,13 +27927,13 @@ var addSecurityHeaders = /* @__PURE__ */ __name((response, options = {}) => {
     headers,
   });
 }, "addSecurityHeaders");
-var paypalTokenCache = {
+let paypalTokenCache = {
   mode: "",
   clientId: "",
   accessToken: "",
   expiresAtMs: 0,
 };
-var getPayPalMode = /* @__PURE__ */ __name((env) => {
+const getPayPalMode = /* @__PURE__ */ __name((env) => {
   const explicit = String(env.PAYPAL_ENV || env.PAYPAL_MODE || "")
     .trim()
     .toLowerCase();
@@ -27897,7 +27941,7 @@ var getPayPalMode = /* @__PURE__ */ __name((env) => {
   if (env.PAYPAL_CLIENT_ID_PROD || env.PAYPAL_CLIENT_SECRET_PROD) return "live";
   return "sandbox";
 }, "getPayPalMode");
-var getPayPalCredentials = /* @__PURE__ */ __name((env) => {
+const getPayPalCredentials = /* @__PURE__ */ __name((env) => {
   const mode = getPayPalMode(env);
   const liveClientId = String(env.PAYPAL_CLIENT_ID_PROD || "").trim();
   const liveSecret = String(env.PAYPAL_CLIENT_SECRET_PROD || "").trim();
@@ -27918,7 +27962,7 @@ var getPayPalCredentials = /* @__PURE__ */ __name((env) => {
     apiBase: "https://api-m.sandbox.paypal.com",
   };
 }, "getPayPalCredentials");
-var getPayPalCredentialsForMode = /* @__PURE__ */ __name((env, mode) => {
+const getPayPalCredentialsForMode = /* @__PURE__ */ __name((env, mode) => {
   const liveClientId = String(env.PAYPAL_CLIENT_ID_PROD || "").trim();
   const liveSecret = String(env.PAYPAL_CLIENT_SECRET_PROD || "").trim();
   const sandboxClientId = String(env.PAYPAL_CLIENT_ID || "").trim();
@@ -27938,7 +27982,7 @@ var getPayPalCredentialsForMode = /* @__PURE__ */ __name((env, mode) => {
     apiBase: "https://api-m.sandbox.paypal.com",
   };
 }, "getPayPalCredentialsForMode");
-var isPayPalAuthError = /* @__PURE__ */ __name((status, detail) => {
+const isPayPalAuthError = /* @__PURE__ */ __name((status, detail) => {
   const d = String(detail || "").toLowerCase();
   return (
     status === 401 ||
@@ -27946,7 +27990,7 @@ var isPayPalAuthError = /* @__PURE__ */ __name((status, detail) => {
     d.includes("invalid client")
   );
 }, "isPayPalAuthError");
-var requestPayPalAccessToken = /* @__PURE__ */ __name(
+const requestPayPalAccessToken = /* @__PURE__ */ __name(
   async ({ clientId, clientSecret, apiBase }) => {
     const basic = btoa(`${clientId}:${clientSecret}`);
     const form = new URLSearchParams();
@@ -27964,7 +28008,7 @@ var requestPayPalAccessToken = /* @__PURE__ */ __name(
   },
   "requestPayPalAccessToken"
 );
-var getPayPalAccessToken = /* @__PURE__ */ __name(async (env) => {
+const getPayPalAccessToken = /* @__PURE__ */ __name(async (env) => {
   const { mode, clientId, clientSecret, apiBase } = getPayPalCredentials(env);
   if (!clientId) {
     throw new Error(
@@ -28025,7 +28069,7 @@ var getPayPalAccessToken = /* @__PURE__ */ __name(async (env) => {
   };
   return { accessToken, apiBase: active.apiBase };
 }, "getPayPalAccessToken");
-var paypalApiFetch = /* @__PURE__ */ __name(async (env, path, init = {}) => {
+const paypalApiFetch = /* @__PURE__ */ __name(async (env, path, init = {}) => {
   const { accessToken, apiBase } = await getPayPalAccessToken(env);
   const url2 = `${apiBase}${path.startsWith("/") ? path : `/${path}`}`;
   const headers = new Headers(init.headers || {});
@@ -28037,7 +28081,7 @@ var paypalApiFetch = /* @__PURE__ */ __name(async (env, path, init = {}) => {
   headers.set("Accept", headers.get("Accept") || "application/json");
   return fetch(url2, { ...init, headers });
 }, "paypalApiFetch");
-var getPayPalClientToken = /* @__PURE__ */ __name(async (env) => {
+const getPayPalClientToken = /* @__PURE__ */ __name(async (env) => {
   const { apiBase } = await getPayPalAccessToken(env);
   const res = await paypalApiFetch(env, "/v1/identity/generate-token", {
     method: "POST",
@@ -28047,7 +28091,7 @@ var getPayPalClientToken = /* @__PURE__ */ __name(async (env) => {
     throw new Error(data?.message || "Failed to generate PayPal client token.");
   return data.client_token;
 }, "getPayPalClientToken");
-var createErrorResponse = /* @__PURE__ */ __name(
+const createErrorResponse = /* @__PURE__ */ __name(
   (status, message, code = null) => {
     return jsonResponse2(status, {
       success: false,
@@ -28058,7 +28102,7 @@ var createErrorResponse = /* @__PURE__ */ __name(
   },
   "createErrorResponse"
 );
-var escapeHtml = /* @__PURE__ */ __name(
+const escapeHtml = /* @__PURE__ */ __name(
   (value) =>
     String(value || "")
       .replace(/&/g, "&amp;")
@@ -28067,21 +28111,21 @@ var escapeHtml = /* @__PURE__ */ __name(
       .replace(/"/g, "&quot;"),
   "escapeHtml"
 );
-var normalizeBlogPostId = /* @__PURE__ */ __name((value) => {
+const normalizeBlogPostId = /* @__PURE__ */ __name((value) => {
   const raw = String(value || "")
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "");
   return raw || "general";
 }, "normalizeBlogPostId");
-var getClientIp = /* @__PURE__ */ __name(
+const getClientIp = /* @__PURE__ */ __name(
   (request) =>
     request.headers.get("CF-Connecting-IP") ||
     request.headers.get("x-forwarded-for") ||
     "unknown",
   "getClientIp"
 );
-var loadBlogComments = /* @__PURE__ */ __name(async (env, postId) => {
+const loadBlogComments = /* @__PURE__ */ __name(async (env, postId) => {
   if (!env.KV) return [];
   const key = `blog:comments:${postId}`;
   const raw = await env.KV.get(key);
@@ -28093,13 +28137,16 @@ var loadBlogComments = /* @__PURE__ */ __name(async (env, postId) => {
     return [];
   }
 }, "loadBlogComments");
-var saveBlogComments = /* @__PURE__ */ __name(async (env, postId, comments) => {
-  if (!env.KV) return;
-  const key = `blog:comments:${postId}`;
-  const trimmed = Array.isArray(comments) ? comments.slice(0, 200) : [];
-  await env.KV.put(key, JSON.stringify(trimmed));
-}, "saveBlogComments");
-var blogCommentRateLimit = /* @__PURE__ */ __name(async (env, ip) => {
+const saveBlogComments = /* @__PURE__ */ __name(
+  async (env, postId, comments) => {
+    if (!env.KV) return;
+    const key = `blog:comments:${postId}`;
+    const trimmed = Array.isArray(comments) ? comments.slice(0, 200) : [];
+    await env.KV.put(key, JSON.stringify(trimmed));
+  },
+  "saveBlogComments"
+);
+const blogCommentRateLimit = /* @__PURE__ */ __name(async (env, ip) => {
   if (!env.KV || !ip || ip === "unknown") return true;
   const key = `blog:rate:${ip}`;
   const raw = await env.KV.get(key);
@@ -28108,7 +28155,7 @@ var blogCommentRateLimit = /* @__PURE__ */ __name(async (env, ip) => {
   await env.KV.put(key, String(count + 1), { expirationTtl: 3600 });
   return true;
 }, "blogCommentRateLimit");
-var getPayPalPlanLinks = /* @__PURE__ */ __name((env, origin) => {
+const getPayPalPlanLinks = /* @__PURE__ */ __name((env, origin) => {
   const fallback = /* @__PURE__ */ __name(
     (plan) =>
       `${origin}/store.html?plan=${encodeURIComponent(plan)}&pay=paypal`,
@@ -28141,7 +28188,7 @@ var getPayPalPlanLinks = /* @__PURE__ */ __name((env, origin) => {
     },
   ];
 }, "getPayPalPlanLinks");
-var buildDemoEmailHtml = /* @__PURE__ */ __name(
+const buildDemoEmailHtml = /* @__PURE__ */ __name(
   ({ previewUrl, prompt, plans }) => {
     const promptSafe = escapeHtml(prompt || "");
     const planLinks = plans
@@ -28163,7 +28210,7 @@ var buildDemoEmailHtml = /* @__PURE__ */ __name(
   },
   "buildDemoEmailHtml"
 );
-var buildDemoEmailText = /* @__PURE__ */ __name(
+const buildDemoEmailText = /* @__PURE__ */ __name(
   ({ previewUrl, prompt, plans }) => {
     const options = plans.map((p) => `- ${p.label}: ${p.link}`).join("\n");
     return `Your VoiceToWebsite preview is ready.
@@ -28178,7 +28225,7 @@ ${options}
   },
   "buildDemoEmailText"
 );
-var sendDemoEmail = /* @__PURE__ */ __name(
+const sendDemoEmail = /* @__PURE__ */ __name(
   async (env, { to, subject, html, text: text2 }) => {
     const resendKey = String(env.RESEND_API_KEY || "").trim();
     const sendgridKey = String(env.SENDGRID_API_KEY || "").trim();
@@ -28253,55 +28300,61 @@ var sendDemoEmail = /* @__PURE__ */ __name(
   },
   "sendDemoEmail"
 );
-var createPayPalOrder = /* @__PURE__ */ __name(async (env, itemsOrProduct) => {
-  const items = Array.isArray(itemsOrProduct)
-    ? itemsOrProduct
-    : [itemsOrProduct];
-  if (items.length === 0) throw new Error("No items provided.");
-  const total = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
-  const currency = (items[0].currency || "USD").toUpperCase();
-  const amountStr = toUsdString(total);
-  if (!amountStr) throw new Error("Invalid total price.");
-  const body = {
-    intent: "CAPTURE",
-    purchase_units: [
-      {
-        reference_id: items[0].sku || "custom",
-        description:
-          items
-            .map((i) => i.name)
-            .join(", ")
-            .slice(0, 127) || "Order",
-        amount: {
-          currency_code: currency,
-          value: amountStr,
-          breakdown: {
-            item_total: { currency_code: currency, value: amountStr },
+const createPayPalOrder = /* @__PURE__ */ __name(
+  async (env, itemsOrProduct) => {
+    const items = Array.isArray(itemsOrProduct)
+      ? itemsOrProduct
+      : [itemsOrProduct];
+    if (items.length === 0) throw new Error("No items provided.");
+    const total = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
+    const currency = (items[0].currency || "USD").toUpperCase();
+    const amountStr = toUsdString(total);
+    if (!amountStr) throw new Error("Invalid total price.");
+    const body = {
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          reference_id: items[0].sku || "custom",
+          description:
+            items
+              .map((i) => i.name)
+              .join(", ")
+              .slice(0, 127) || "Order",
+          amount: {
+            currency_code: currency,
+            value: amountStr,
+            breakdown: {
+              item_total: { currency_code: currency, value: amountStr },
+            },
           },
+          items: items.map((i) => ({
+            name: (i.name || "Product").slice(0, 127),
+            unit_amount: {
+              currency_code: currency,
+              value: toUsdString(i.price),
+            },
+            quantity: "1",
+          })),
         },
-        items: items.map((i) => ({
-          name: (i.name || "Product").slice(0, 127),
-          unit_amount: { currency_code: currency, value: toUsdString(i.price) },
-          quantity: "1",
-        })),
-      },
-    ],
-  };
-  const res = await paypalApiFetch(env, "/v2/checkout/orders", {
-    method: "POST",
-    headers: { Prefer: "return=representation" },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok)
-    throw new Error(
-      data?.message ||
-        data?.details?.[0]?.description ||
-        "PayPal order create failed"
-    );
-  return data;
-}, "createPayPalOrder");
-var capturePayPalOrder = /* @__PURE__ */ __name(async (env, orderID) => {
+      ],
+    };
+    const res = await paypalApiFetch(env, "/v2/checkout/orders", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok)
+      throw new Error(
+        data?.message ||
+          data?.details?.[0]?.description ||
+          "PayPal order create failed"
+      );
+    return data;
+  },
+  "createPayPalOrder"
+);
+const capturePayPalOrder = /* @__PURE__ */ __name(async (env, orderID) => {
   const id = String(orderID || "").trim();
   if (!id) throw new Error("orderID required.");
   const res = await paypalApiFetch(
@@ -28327,7 +28380,7 @@ var toUsdString = /* @__PURE__ */ __name((amount) => {
   if (!Number.isFinite(n) || n <= 0) return "";
   return n.toFixed(2);
 }, "toUsdString");
-var findProduct = /* @__PURE__ */ __name((idOrSlug) => {
+const findProduct = /* @__PURE__ */ __name((idOrSlug) => {
   const searchId = String(idOrSlug || "")
     .trim()
     .toLowerCase();
@@ -28343,7 +28396,7 @@ var findProduct = /* @__PURE__ */ __name((idOrSlug) => {
       String(p.title || "").toLowerCase() === searchId
   );
 }, "findProduct");
-var ensureOrdersTable = /* @__PURE__ */ __name(async (env) => {
+const ensureOrdersTable = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS orders (
@@ -28363,7 +28416,7 @@ var ensureOrdersTable = /* @__PURE__ */ __name(async (env) => {
     ).run();
   } catch (err) {}
 }, "ensureOrdersTable");
-var verifyStripeWebhookSignature = /* @__PURE__ */ __name(
+const verifyStripeWebhookSignature = /* @__PURE__ */ __name(
   async (rawBody, signatureHeader, secret) => {
     if (!rawBody || !signatureHeader || !secret) return false;
     const parts = {};
@@ -28398,7 +28451,7 @@ var verifyStripeWebhookSignature = /* @__PURE__ */ __name(
   },
   "verifyStripeWebhookSignature"
 );
-var normalizeAnalyticsEventName = /* @__PURE__ */ __name(
+const normalizeAnalyticsEventName = /* @__PURE__ */ __name(
   (value) =>
     String(value || "")
       .trim()
@@ -28407,7 +28460,7 @@ var normalizeAnalyticsEventName = /* @__PURE__ */ __name(
       .slice(0, 64),
   "normalizeAnalyticsEventName"
 );
-var stringifyAnalyticsProperties = /* @__PURE__ */ __name((value) => {
+const stringifyAnalyticsProperties = /* @__PURE__ */ __name((value) => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return "{}";
   try {
     return JSON.stringify(value);
@@ -28415,7 +28468,7 @@ var stringifyAnalyticsProperties = /* @__PURE__ */ __name((value) => {
     return "{}";
   }
 }, "stringifyAnalyticsProperties");
-var ensureAnalyticsEventsTable = /* @__PURE__ */ __name(async (env) => {
+const ensureAnalyticsEventsTable = /* @__PURE__ */ __name(async (env) => {
   if (!env.D1) return;
   await env.D1.prepare(
     `CREATE TABLE IF NOT EXISTS analytics_events (
@@ -28434,7 +28487,7 @@ var ensureAnalyticsEventsTable = /* @__PURE__ */ __name(async (env) => {
     "CREATE INDEX IF NOT EXISTS idx_analytics_events_name_ts ON analytics_events(event_name, ts DESC);"
   ).run();
 }, "ensureAnalyticsEventsTable");
-var base64UrlEncode3 = /* @__PURE__ */ __name((input) => {
+const base64UrlEncode3 = /* @__PURE__ */ __name((input) => {
   const bytes =
     input instanceof Uint8Array
       ? input
@@ -28446,7 +28499,7 @@ var base64UrlEncode3 = /* @__PURE__ */ __name((input) => {
     .replace(/\//g, "_")
     .replace(/=+$/g, "");
 }, "base64UrlEncode");
-var base64UrlDecode = /* @__PURE__ */ __name((input) => {
+const base64UrlDecode = /* @__PURE__ */ __name((input) => {
   const padded = String(input)
     .replace(/-/g, "+")
     .replace(/_/g, "/")
@@ -28456,22 +28509,25 @@ var base64UrlDecode = /* @__PURE__ */ __name((input) => {
   for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
   return new TextDecoder().decode(bytes);
 }, "base64UrlDecode");
-var signLicensePayload = /* @__PURE__ */ __name(async (secret, payloadB64) => {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
-  );
-  const sig = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(payloadB64)
-  );
-  return base64UrlEncode3(new Uint8Array(sig));
-}, "signLicensePayload");
-var issueLicenseToken = /* @__PURE__ */ __name(
+const signLicensePayload = /* @__PURE__ */ __name(
+  async (secret, payloadB64) => {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign", "verify"]
+    );
+    const sig = await crypto.subtle.sign(
+      "HMAC",
+      key,
+      new TextEncoder().encode(payloadB64)
+    );
+    return base64UrlEncode3(new Uint8Array(sig));
+  },
+  "signLicensePayload"
+);
+const issueLicenseToken = /* @__PURE__ */ __name(
   async (env, { email: email3, term, plan, orderId }) => {
     const secret = String(env.LICENSE_SECRET || "").trim();
     if (!secret) throw new Error("License secret missing. Set LICENSE_SECRET.");
@@ -28502,7 +28558,7 @@ var issueLicenseToken = /* @__PURE__ */ __name(
   },
   "issueLicenseToken"
 );
-var verifyLicenseToken = /* @__PURE__ */ __name(async (env, token) => {
+const verifyLicenseToken = /* @__PURE__ */ __name(async (env, token) => {
   const secret = String(env.LICENSE_SECRET || "").trim();
   if (!secret) throw new Error("License secret missing. Set LICENSE_SECRET.");
   const parts = String(token || "").split(".");
@@ -28517,7 +28573,7 @@ var verifyLicenseToken = /* @__PURE__ */ __name(async (env, token) => {
   if (payload?.exp && now > payload.exp) throw new Error("License expired.");
   return payload;
 }, "verifyLicenseToken");
-var worker_default = {
+const worker_default = {
   async fetch(request, env, ctx) {
     const url2 = new URL(request.url);
     const pathname = url2.pathname;

@@ -9,7 +9,9 @@ Follow this workflow for this repo unless the user explicitly says otherwise.
 **Source of truth**
 
 - Cloudflare Workers + Wrangler is the deployment path.
-- Deploy using project scripts (`npm run deploy`) and existing Cloudflare config.
+- **Single deploy path:** From any entry point (Cursor, another IDE, Custom GPT, CLI) run
+  `npm run deploy:live`. It runs verify then deploy (`scripts/deploy-unified.mjs`). Do not use a
+  different deploy flow.
 - Do not introduce a different deploy method, platform, or branch strategy.
 
 **Branch and release model**
@@ -25,7 +27,7 @@ Follow this workflow for this repo unless the user explicitly says otherwise.
    green.
 3. When green: run `npm run ship` (or equivalent verify+commit flow).
 4. Push with `npm run ship:push` (or equivalent).
-5. Deploy with `npm run deploy` (or rely on CI deploy-on-push if configured and healthy).
+5. Deploy with `npm run deploy:live` (single path: verify + deploy).
 6. Confirm deploy/build success and report result.
 
 **Hard rules**

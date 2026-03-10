@@ -1,8 +1,3 @@
-/**
- * Utility helpers intended for one-off layout/spacing usage.
- */
-
-/* Enhanced Typography */
 .text-gradient {
   background: var(--gradient-primary);
   -webkit-background-clip: text;

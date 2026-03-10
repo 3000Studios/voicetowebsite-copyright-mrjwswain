@@ -76,7 +76,7 @@
 ### Runtime Profile
 
 - Runtime: Cloudflare Workers + Vite static assets (`worker.js` + `dist/` via `ASSETS` binding)
-- Deploy lock: local Wrangler deploy only (`npm run deploy`)
+- Deploy lock: unified live deploy path (`npm run deploy:live`)
 - Deploy safety: `npm run verify` must pass before deploy/commit
 
 ### Canonical Commands (from package.json)
@@ -189,11 +189,15 @@ Scripts available:
 
 - `scripts/advanced-heal.mjs`
 - `scripts/AGENTS.md`
+- `scripts/analyze-components.mjs`
+- `scripts/apply-zone-settings.mjs`
 - `scripts/auto-dev-push.ps1`
 - `scripts/auto-run-everything.mjs`
 - `scripts/auto-ship-runner.ps1`
 - `scripts/auto-ship.mjs`
 - `scripts/autopilot.mjs`
+- `scripts/build-analyze.mjs`
+- `scripts/bundle-size-analyzer.mjs`
 - `scripts/check-css-governance.mjs`
 - `scripts/commit-push-deploy.bat`
 - `scripts/continuous-integration.mjs`
@@ -201,6 +205,7 @@ Scripts available:
 - `scripts/cursor-session-init.ps1`
 - `scripts/deploy-one-shot.ps1`
 - `scripts/deploy-safe.mjs`
+- `scripts/deploy-unified.mjs`
 - `scripts/deploy-with-oauth.ps1`
 - `scripts/dev-all.mjs`
 - `scripts/env-audit.mjs`
@@ -229,10 +234,12 @@ Scripts available:
 - `scripts/prebuild.js`
 - `scripts/release.mjs`
 - `scripts/restore.mjs`
+- `scripts/rollback-safe.mjs`
 - `scripts/set-admin-env.ps1`
 - `scripts/ship.mjs`
 - `scripts/sync-public-assets.mjs`
 - `scripts/sync.mjs`
+- `scripts/test-all-pages.mjs`
 - `scripts/uninstall-auto-run-task.ps1`
 - `scripts/uninstall-auto-ship-task.ps1`
 - `scripts/update-global-system-doc.mjs`
@@ -257,6 +264,7 @@ Recommended VS Code extensions:
 - `streetsidesoftware.code-spell-checker`
 - `usernamehw.errorlens`
 - `dsznajder.es7-react-js-snippets`
+- `continue.continue`
 - `PKief.material-icon-theme`
 - `ms-vscode.powershell`
 - `GitHub.vscode-github-actions`
@@ -267,8 +275,6 @@ Recommended VS Code extensions:
 - `vitest.explorer`
 - `rangav.vscode-thunder-client`
 - `yzhang.markdown-all-in-one`
-- `ms-vscode.vscode-json`
-- `nickytonline.vscode-link-status`
 
 Core governance docs present:
 

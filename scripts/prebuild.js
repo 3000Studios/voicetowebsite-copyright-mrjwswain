@@ -152,4 +152,61 @@ if (safeCopy(navSrc, navDest)) {
   console.log("[prebuild] public/nav.js");
 }
 
+// --- 7. Sync absolute script assets referenced by HTML pages ---
+function collectHtmlFiles(dir, out) {
+  let entries = [];
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch (e) {
+    console.warn("[prebuild] readDir " + dir + ": " + e.message);
+    return;
+  }
+  entries.forEach((entry) => {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === "node_modules" || entry.name === "dist") return;
+      collectHtmlFiles(full, out);
+      return;
+    }
+    if (entry.isFile() && entry.name.toLowerCase().endsWith(".html")) {
+      out.push(full);
+    }
+  });
+}
+
+const htmlFiles = [];
+collectHtmlFiles(rootDir, htmlFiles);
+
+const ABS_JS_SRC_REGEX =
+  /<script[^>]+src=(["'])(\/[^"'?#]+\.js)(?:\?[^"']*)?\1/gi;
+const copiedScriptAssets = new Set();
+
+htmlFiles.forEach((htmlPath) => {
+  let source = "";
+  try {
+    source = fs.readFileSync(htmlPath, "utf8");
+  } catch (e) {
+    console.warn("[prebuild] read html " + htmlPath + ": " + e.message);
+    return;
+  }
+
+  let match;
+  while ((match = ABS_JS_SRC_REGEX.exec(source)) !== null) {
+    const rel = match[2].replace(/^\/+/, "");
+    const srcCandidate = path.join(rootDir, rel);
+    const publicCandidate = path.join(rootDir, "public", rel);
+    if (!fs.existsSync(srcCandidate)) continue;
+    if (fs.existsSync(publicCandidate)) continue;
+    if (!safeCopy(srcCandidate, publicCandidate)) continue;
+    copiedScriptAssets.add(rel);
+  }
+});
+
+if (copiedScriptAssets.size > 0) {
+  console.log(
+    "[prebuild] Synced page scripts: " +
+      Array.from(copiedScriptAssets).sort().join(", ")
+  );
+}
+
 console.log("[prebuild] Done. Ready to compile.");

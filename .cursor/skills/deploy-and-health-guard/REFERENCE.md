@@ -13,7 +13,7 @@ Use this when performing a full health pass or when the user asks to ensure ever
 - [ ] `npm run verify` passes (env audit, format, type-check, types:check, test, build, governance,
       guard:ui, check:links).
 - [ ] `npm run build` succeeds; `dist/` is produced.
-- [ ] Deploy succeeds (`npm run deploy` or CI deploy on push to `main`).
+- [ ] Deploy succeeds (`npm run deploy:live`; `npm run deploy` only after verify already passed).
 - [ ] Worker and frontend assets are live and serving.
 
 ## 3. Command Center and Custom GPT
@@ -108,9 +108,9 @@ Use this when performing a full health pass or when the user asks to ensure ever
   issues.
 
 **Validation result:** With format clean and Node/env correct, full `npm run verify` passes. Scripts
-and `wrangler.toml` are present and aligned with Workers/Wrangler. Deploy path: `npm run deploy` (or
-CI deploy-on-push to `main` when configured). Use `npx wrangler deploy --dry-run` to validate deploy
-packaging without deploying.
+and `wrangler.toml` are present and aligned with Workers/Wrangler. Canonical deploy path:
+`npm run deploy:live`; use `npm run deploy` only after verify already passed. Use
+`npx wrangler deploy --dry-run` to validate deploy packaging without deploying.
 
 ---
 

@@ -195,7 +195,7 @@ export default function PhosphorNav() {
         id="vtwPhosphorTrigger"
         className={`vtw-phosphor-trigger ${menuOpen ? "active" : ""}`}
         aria-label={menuOpen ? "Close menu" : "Open menu"}
-        aria-expanded={menuOpen}
+        aria-expanded={menuOpen ? true : false}
         aria-controls="vtwPhosphorMenu"
         onClick={() => setMenuOpen((o) => !o)}
       >

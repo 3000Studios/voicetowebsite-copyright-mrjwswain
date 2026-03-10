@@ -261,7 +261,7 @@ const MonolithNav: React.FC<MonolithNavProps> = ({ className = "" }) => {
             }
           }}
           aria-label="Toggle navigation menu"
-          aria-expanded={isOpen ? "true" : "false"}
+          aria-expanded={isOpen ? true : false}
         >
           <div className="bar"></div>
           <div className="bar"></div>

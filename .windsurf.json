@@ -38,7 +38,7 @@
     "buildCommand": "npm run build",
     "devCommand": "npm run dev:all",
     "testCommand": "npm run test",
-    "deployCommand": "npm run deploy",
+    "deployCommand": "npm run deploy:live",
     "autoRun": true,
     "autoDeploy": true
   },
@@ -147,7 +147,7 @@
       "autoFix": true
     },
     "deploy": {
-      "command": "npm run deploy",
+      "command": "npm run deploy:live",
       "description": "Deploy to Cloudflare Workers",
       "autoRun": true,
       "skipConfirmation": true

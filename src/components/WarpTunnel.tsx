@@ -1,11 +1,15 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useMemo } from "react";
 
 interface WarpTunnelProps {
   isVisible: boolean;
 }
 
 const WarpTunnel: React.FC<WarpTunnelProps> = ({ isVisible }) => {
+  const particleDelays = useMemo(
+    () => Array.from({ length: 40 }, (_, i) => (i * 0.005) % 0.2),
+    []
+  );
   return (
     <AnimatePresence>
       {isVisible && (
@@ -47,7 +51,7 @@ const WarpTunnel: React.FC<WarpTunnelProps> = ({ isVisible }) => {
                   transition={{
                     duration: 0.6,
                     ease: "circIn",
-                    delay: Math.random() * 0.2,
+                    delay: particleDelays[i] || 0,
                   }}
                   className="absolute left-1/2 top-1/2 bg-cyan-400"
                   style={{ transformOrigin: "center bottom" }}

@@ -168,7 +168,7 @@ const buildAutoBlock = () => {
 
 ### Runtime Profile
 - Runtime: Cloudflare Workers + Vite static assets (\`worker.js\` + \`dist/\` via \`ASSETS\` binding)
-- Deploy lock: local Wrangler deploy only (\`npm run deploy\`)
+- Deploy lock: unified live deploy path (\`npm run deploy:live\`)
 - Deploy safety: \`npm run verify\` must pass before deploy/commit
 
 ### Canonical Commands (from package.json)
@@ -241,7 +241,8 @@ const ensureBaseDoc = () => {
 
 ## Deploy Laws (Never Break)
 - \`npm run verify\` must pass before commit/deploy.
-- \`npm run deploy\` remains: \`npm run verify && wrangler deploy --keep-vars\`.
+- Default deploy path: \`npm run deploy:live\` (verify -> deploy).
+- \`npm run deploy\` is Wrangler-only and should be used only after verify already passed.
 - Keep Worker wiring intact in \`wrangler.toml\`:
   - \`main = "worker.js"\`
   - \`assets = { directory = "dist", binding = "ASSETS" }\`

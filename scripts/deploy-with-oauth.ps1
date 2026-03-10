@@ -15,5 +15,5 @@ $env:CF_API_TOKEN = $null
 $env:CF_ACCOUNT_ID = $null
 
 # If .env contains CLOUDFLARE_API_TOKEN, wrangler will still load it and override OAuth.
-# Run deploy (will use OAuth only if those vars are not in .env)
-& npm run deploy
+# Use unified path (verify + deploy) — same as all other entry points
+& npm run deploy:live

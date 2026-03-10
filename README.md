@@ -102,8 +102,9 @@ store).
 
 ## Deploy
 
-- Manual production deploy: `npm run deploy` (runs `wrangler deploy --keep-vars`; run
-  `npm run verify` first if you want full checks).
+- **Single path from any environment (IDE, Custom GPT, CLI):** `npm run deploy:live` — runs verify
+  then deploy. Use this everywhere so the same pipeline runs regardless of entry point.
+- Wrangler-only (e.g. after CI already ran verify): `npm run deploy`.
 - Regenerate Worker binding types after editing `wrangler.toml`: `npm run types`. Check they’re up
   to date: `npm run types:check`.
 - Set required Worker vars/secrets in Cloudflare (examples in `ENV.example` and `wrangler.toml`

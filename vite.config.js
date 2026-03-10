@@ -1,9 +1,26 @@
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
+import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 
+const enableAnalyzer =
+  process.env.ANALYZE === "1" || process.env.VITE_ANALYZE === "1";
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    ...(enableAnalyzer
+      ? [
+          visualizer({
+            filename: resolve(__dirname, "dist", "stats.html"),
+            open: false,
+            gzipSize: true,
+            brotliSize: true,
+            template: "treemap",
+          }),
+        ]
+      : []),
+  ],
   server: {
     proxy: {
       // Route API and preview to the local Cloudflare Worker (`wrangler dev`).
@@ -47,6 +64,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
+        about: resolve(__dirname, "about.html"),
         sandbox: resolve(__dirname, "sandbox.html"),
         admin: resolve(__dirname, "admin/index.html"),
         adminAccess: resolve(__dirname, "admin/access.html"),
@@ -65,9 +83,12 @@ export default defineConfig({
         howItWorks: resolve(__dirname, "how-it-works.html"),
         templates: resolve(__dirname, "templates.html"),
         features: resolve(__dirname, "features.html"),
+        featuresEnhanced: resolve(__dirname, "features-enhanced.html"),
         pricing: resolve(__dirname, "pricing.html"),
+        pricingEnhanced: resolve(__dirname, "pricing-enhanced.html"),
         demo: resolve(__dirname, "demo.html"),
         search: resolve(__dirname, "search.html"),
+        searchEnhanced: resolve(__dirname, "search-enhanced.html"),
         support: resolve(__dirname, "support.html"),
         status: resolve(__dirname, "status.html"),
         trust: resolve(__dirname, "trust.html"),
@@ -78,6 +99,7 @@ export default defineConfig({
         rushPercussion: resolve(__dirname, "rush-percussion.html"),
         blog: resolve(__dirname, "blog.html"),
         contact: resolve(__dirname, "contact.html"),
+        contactEnhanced: resolve(__dirname, "contact-enhanced.html"),
         gallery: resolve(__dirname, "gallery.html"),
         legal: resolve(__dirname, "legal.html"),
         copyrights: resolve(__dirname, "copyrights.html"),

@@ -293,6 +293,129 @@ const sanitizeUrl = (url) => {
   }
 };
 
+const slugify = (value, fallback = "section") => {
+  const normalized = String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return normalized || fallback;
+};
+
+const sanitizeItems = (value) => {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => sanitizeText(item))
+    .filter(Boolean)
+    .slice(0, 6);
+};
+
+const normalizeSection = (section, index = 0) => {
+  const title = sanitizeText(section?.title) || `Section ${index + 1}`;
+  const body = sanitizeText(section?.body) || "Generated content section.";
+  const items = sanitizeItems(section?.items);
+  const imageUrl = sanitizeUrl(section?.imageUrl);
+  const imageAlt =
+    sanitizeText(section?.imageAlt) || sanitizeText(section?.title) || title;
+  const ctaLabel = sanitizeText(section?.ctaLabel);
+  const ctaHref = sanitizeUrl(section?.ctaHref);
+  const variant =
+    items.length >= 3
+      ? "list"
+      : imageUrl
+        ? "media"
+        : /(testimonial|proof|result|review|quote)/i.test(title)
+          ? "quote"
+          : /(pricing|plan|package|tier)/i.test(title)
+            ? "pricing"
+            : "copy";
+
+  return {
+    title,
+    body,
+    items,
+    imageUrl,
+    imageAlt,
+    ctaLabel,
+    ctaHref,
+    variant,
+  };
+};
+
+const normalizePage = (page, index = 0) => {
+  const title = sanitizeText(page?.title) || `Page ${index + 1}`;
+  const slug = slugify(page?.slug || title, index === 0 ? "home" : "page");
+  const sections = Array.isArray(page?.sections)
+    ? page.sections
+        .filter((section) => section && typeof section === "object")
+        .map((section, sectionIndex) => normalizeSection(section, sectionIndex))
+    : [];
+
+  return {
+    slug,
+    title,
+    sections: sections.length
+      ? sections
+      : [normalizeSection({ title: "Overview", body: "Generated preview." })],
+  };
+};
+
+const resolveThemeCss = (theme, layoutType) => {
+  const themes = {
+    midnight: `
+      --vtw-bg:#07111f;
+      --vtw-panel:#0e1a2b;
+      --vtw-panel-strong:#13233a;
+      --vtw-text:#eff6ff;
+      --vtw-muted:#bfd3ea;
+      --vtw-accent:#67e8f9;
+      --vtw-accent-2:#38bdf8;
+      --vtw-border:rgba(148,163,184,.22);
+      --vtw-glow:rgba(56,189,248,.22);
+    `,
+    volt: `
+      --vtw-bg:#0b1020;
+      --vtw-panel:#131a2e;
+      --vtw-panel-strong:#192543;
+      --vtw-text:#f8fafc;
+      --vtw-muted:#c9d4e7;
+      --vtw-accent:#facc15;
+      --vtw-accent-2:#22c55e;
+      --vtw-border:rgba(250,204,21,.24);
+      --vtw-glow:rgba(250,204,21,.18);
+    `,
+    ember: `
+      --vtw-bg:#1a0f12;
+      --vtw-panel:#27161a;
+      --vtw-panel-strong:#321d22;
+      --vtw-text:#fff7ed;
+      --vtw-muted:#fed7aa;
+      --vtw-accent:#fb923c;
+      --vtw-accent-2:#f43f5e;
+      --vtw-border:rgba(251,146,60,.24);
+      --vtw-glow:rgba(244,63,94,.18);
+    `,
+    ocean: `
+      --vtw-bg:#041b23;
+      --vtw-panel:#0a2832;
+      --vtw-panel-strong:#0e3340;
+      --vtw-text:#ecfeff;
+      --vtw-muted:#bae6fd;
+      --vtw-accent:#2dd4bf;
+      --vtw-accent-2:#0ea5e9;
+      --vtw-border:rgba(45,212,191,.22);
+      --vtw-glow:rgba(14,165,233,.18);
+    `,
+  };
+  const layoutDensity =
+    layoutType === "editorial"
+      ? "letter-spacing:-0.02em;"
+      : layoutType === "tech"
+        ? "text-transform:none;"
+        : "";
+
+  return `${themes[theme] || themes.midnight} ${layoutDensity}`;
+};
+
 const renderPreviewHtml = ({ siteId, layout, css }) => {
   // Validate inputs
   if (!siteId || typeof siteId !== "string") {
@@ -309,50 +432,63 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
   const heroCaption = sanitizeText(layout?.heroCaption) || description;
   const theme = sanitizeText(layout?.theme) || "midnight";
   const pages = Array.isArray(layout?.pages) ? layout.pages : [];
+  const layoutType = sanitizeText(layout?.layoutType) || "default";
 
   // Validate theme
   const validThemes = ["midnight", "volt", "ember", "ocean"];
   const selectedTheme = validThemes.includes(theme) ? theme : "midnight";
-
-  const nav = pages
+  const seenSlugs = new Set();
+  const normalizedPages = pages
     .filter((p) => p && typeof p === "object")
+    .map((p, index) => {
+      const page = normalizePage(p, index);
+      let slug = page.slug;
+      let suffix = 2;
+      while (seenSlugs.has(slug)) {
+        slug = `${page.slug}-${suffix}`;
+        suffix += 1;
+      }
+      seenSlugs.add(slug);
+      return { ...page, slug };
+    });
+
+  const nav = normalizedPages
     .map((p) => {
-      const slug = sanitizeText(p?.slug) || "";
-      const pageTitle =
-        sanitizeText(p?.title) || sanitizeText(p?.slug) || "Page";
-      return `<a href="#${escapeAttr(slug)}">${escapeAttr(pageTitle)}</a>`;
+      return `<a href="#${escapeAttr(p.slug)}">${escapeAttr(p.title)}</a>`;
     })
     .join("");
 
-  const sections = pages
-    .filter((p) => p && typeof p === "object")
-    .map((p) => {
-      const blocks = Array.isArray(p.sections) ? p.sections : [];
-      const sanitizedSlug = sanitizeText(p?.slug) || "";
-      const sanitizedTitle = sanitizeText(p?.title) || "";
-
-      const rendered = blocks
-        .filter((s) => s && typeof s === "object")
-        .map((s) => {
-          const imageUrl = sanitizeUrl(s?.imageUrl);
-          const imageAlt =
-            sanitizeText(s?.imageAlt) || sanitizeText(s?.title) || "";
-          const title = sanitizeText(s?.title) || "";
-          const body = sanitizeText(s?.body) || "";
-
-          const img =
-            imageUrl && imageUrl.trim()
-              ? `<div class="vtw-section-img"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(imageAlt)}" loading="lazy" /></div>`
+  const sections = normalizedPages
+    .map((page, index) => {
+      const rendered = page.sections
+        .map((section, sectionIndex) => {
+          const img = section.imageUrl
+            ? `<div class="vtw-section-img"><img src="${escapeAttr(section.imageUrl)}" alt="${escapeAttr(section.imageAlt)}" loading="lazy" /></div>`
+            : "";
+          const items = section.items.length
+            ? `<ul class="vtw-list">${section.items.map((item) => `<li>${escapeAttr(item)}</li>`).join("")}</ul>`
+            : "";
+          const cta =
+            section.ctaLabel && section.ctaHref
+              ? `<a class="vtw-inline-cta" href="${escapeAttr(section.ctaHref)}" target="_blank" rel="noreferrer">${escapeAttr(section.ctaLabel)}</a>`
               : "";
-          return `<section class="vtw-section">${img}<h3>${escapeAttr(title)}</h3><p>${escapeAttr(body)}</p></section>`;
+          return `<section class="vtw-section vtw-section-${escapeAttr(section.variant)}">${img}<div class="vtw-section-copy"><div class="vtw-section-kicker">Block ${sectionIndex + 1}</div><h3>${escapeAttr(section.title)}</h3><p>${escapeAttr(section.body)}</p>${items}${cta}</div></section>`;
         })
         .join("");
-      return `<article id="${escapeAttr(sanitizedSlug)}" class="vtw-page"><h2>${escapeAttr(sanitizedTitle)}</h2>${rendered}</article>`;
+      return `<article id="${escapeAttr(page.slug)}" class="vtw-page"><div class="vtw-page-head"><div class="vtw-meta">Page ${index + 1}</div><h2>${escapeAttr(page.title)}</h2></div><div class="vtw-page-grid">${rendered}</div></article>`;
     })
     .join("");
 
   const heroVideoUrl = sanitizeUrl(layout?.heroVideoUrl) || "";
   const heroImageUrl = sanitizeUrl(layout?.heroImageUrl) || "";
+
+  const primaryTarget = normalizedPages[0]?.slug || "home";
+  const contactTarget =
+    normalizedPages.find((page) =>
+      /contact|get-started|book|pricing/i.test(page.slug)
+    )?.slug ||
+    normalizedPages[normalizedPages.length - 1]?.slug ||
+    primaryTarget;
 
   const heroMedia = heroVideoUrl
     ? `<video autoplay muted loop playsinline><source src="${escapeAttr(heroVideoUrl)}" type="video/mp4" /></video>`
@@ -361,29 +497,52 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
       : `<video autoplay muted loop playsinline poster="/vtw-wallpaper.png"><source src="/media/vtw-home-wallpaper.mp4" type="video/mp4" /></video>`;
 
   const baseCss = `
-    :root{color-scheme:dark}
-    body{margin:0;background:#050507;color:#f8fafc;font-family:'Manrope',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    .vtw-wrap{max-width:1100px;margin:0 auto;padding:28px 18px}
-    .vtw-nav-bar{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 0;margin-bottom:0;border-bottom:1px solid rgba(255,255,255,.08)}
-    .vtw-nav-bar .vtw-logo{font-weight:800;font-size:1.15rem;color:#f8fafc}
+    :root{color-scheme:dark;${resolveThemeCss(selectedTheme, layoutType)}}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:
+      radial-gradient(circle at top left,var(--vtw-glow),transparent 32%),
+      radial-gradient(circle at top right,rgba(255,255,255,.06),transparent 20%),
+      var(--vtw-bg);
+      color:var(--vtw-text);
+      font-family:'Manrope',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .vtw-wrap{max-width:1180px;margin:0 auto;padding:28px 18px 48px}
+    .vtw-nav-bar{position:sticky;top:0;z-index:10;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:16px 0 18px;margin-bottom:24px;background:linear-gradient(180deg,var(--vtw-bg),rgba(7,17,31,.7));backdrop-filter:blur(12px);border-bottom:1px solid var(--vtw-border)}
+    .vtw-nav-bar .vtw-logo{font-weight:800;font-size:1.15rem;color:var(--vtw-text)}
     nav{display:flex;gap:12px;flex-wrap:wrap}
-    nav a{color:#38bdf8;text-decoration:none;font-weight:600}
-    nav a:hover{text-decoration:underline}
-    .vtw-meta{opacity:.7;font-size:14px}
-    .vtw-page{padding:18px 0;border-top:1px solid rgba(255,255,255,.08)}
-    .vtw-section{padding:12px 0}
-    .vtw-section h3{margin:0 0 6px 0}
-    .vtw-section-img{margin-bottom:10px;border-radius:12px;overflow:hidden;max-height:280px}
+    nav a{color:var(--vtw-accent);text-decoration:none;font-weight:700}
+    nav a:hover{color:var(--vtw-text)}
+    .vtw-meta{opacity:.82;font-size:14px;color:var(--vtw-muted)}
+    .vtw-page{padding:28px 0;border-top:1px solid var(--vtw-border)}
+    .vtw-page-head{display:grid;gap:8px;margin-bottom:18px}
+    .vtw-page-head h2{margin:0;font-size:clamp(1.6rem,3vw,2.4rem)}
+    .vtw-page-grid{display:grid;gap:16px}
+    .vtw-section{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:18px;border-radius:22px;background:linear-gradient(180deg,var(--vtw-panel),var(--vtw-panel-strong));border:1px solid var(--vtw-border);box-shadow:0 18px 48px rgba(2,8,23,.24)}
+    .vtw-section-media,.vtw-section-copy{min-width:0}
+    .vtw-section-copy{display:grid;gap:12px}
+    .vtw-section-kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--vtw-accent)}
+    .vtw-section h3{margin:0;font-size:clamp(1.15rem,2vw,1.5rem)}
+    .vtw-section p{margin:0;color:var(--vtw-muted);line-height:1.7}
+    .vtw-section-img{border-radius:16px;overflow:hidden;max-height:320px;background:#020617}
     .vtw-section-img img{width:100%;height:100%;object-fit:cover;display:block}
-    .vtw-hero{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:center;margin-bottom:24px;padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(15,23,42,.65))}
-    .vtw-hero-media{position:relative;border-radius:16px;overflow:hidden;min-height:180px}
+    .vtw-list{display:grid;gap:8px;margin:0;padding-left:18px;color:var(--vtw-text)}
+    .vtw-list li::marker{color:var(--vtw-accent)}
+    .vtw-inline-cta{display:inline-flex;justify-content:center;align-items:center;width:fit-content;padding:11px 16px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--vtw-border);color:var(--vtw-text);text-decoration:none;font-weight:700}
+    .vtw-hero{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center;margin:0 0 24px;padding:22px;border-radius:28px;border:1px solid var(--vtw-border);background:
+      linear-gradient(135deg,rgba(255,255,255,.06),transparent 55%),
+      linear-gradient(180deg,var(--vtw-panel),var(--vtw-panel-strong))}
+    .vtw-hero-media{position:relative;border-radius:24px;overflow:hidden;min-height:260px;box-shadow:0 24px 64px rgba(2,8,23,.3)}
     .vtw-hero-media video,.vtw-hero-media img{width:100%;height:100%;object-fit:cover;display:block}
-    .vtw-hero-card{display:grid;gap:12px}
+    .vtw-hero-card{display:grid;gap:14px}
+    .vtw-hero-card h1{margin:0;font-size:clamp(2.2rem,5vw,4.6rem);line-height:.95}
+    .vtw-hero-card p{margin:0;color:var(--vtw-muted);font-size:1.02rem;line-height:1.7}
     .vtw-hero-actions{display:flex;flex-wrap:wrap;gap:10px}
-    .vtw-hero-actions a{padding:10px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2);text-decoration:none;color:#fff}
-    .vtw-hero-actions a.primary{background:#38bdf8;color:#020617;border-color:transparent}
+    .vtw-hero-actions a{padding:11px 16px;border-radius:999px;border:1px solid var(--vtw-border);text-decoration:none;color:var(--vtw-text);font-weight:700}
+    .vtw-hero-actions a.primary{background:linear-gradient(135deg,var(--vtw-accent),var(--vtw-accent-2));color:#03111f;border-color:transparent}
     .vtw-float{animation:vtwFloat 5s ease-in-out infinite}
     @keyframes vtwFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @media (min-width: 860px){.vtw-page-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.vtw-section-list,.vtw-section-pricing{grid-column:span 2}.vtw-section-media{grid-template-columns:1.1fr .9fr}.vtw-section:has(.vtw-section-img){grid-template-columns:minmax(240px,.95fr) minmax(0,1.05fr)}}
+    @media (max-width: 720px){.vtw-wrap{padding:20px 14px 36px}.vtw-hero-card h1{font-size:clamp(2rem,12vw,3rem)}.vtw-nav-bar{position:static}.vtw-page{padding:22px 0}}
     @media (prefers-reduced-motion:reduce){.vtw-float{animation:none}}
   `;
 
@@ -397,8 +556,8 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
         <h1 style="margin:0">${escapeAttr(headline)}</h1>
         <p>${escapeAttr(heroCaption)}</p>
         <div class="vtw-hero-actions">
-          <a class="primary" href="#home">Explore</a>
-          <a href="#contact">Contact</a>
+          <a class="primary" href="#${escapeAttr(primaryTarget)}">Explore</a>
+          <a href="#${escapeAttr(contactTarget)}">Next step</a>
         </div>
       </div>
     </section>
@@ -423,12 +582,32 @@ const renderPreviewHtml = ({ siteId, layout, css }) => {
         <div class="vtw-logo">${escapeAttr(title)}</div>
         <nav>${nav}</nav>
       </header>
-      ${hero}
       <div class="vtw-meta" style="margin-bottom:8px">Preview ID: ${escapeAttr(siteId)}</div>
       ${sections || `<p class="vtw-meta">No pages were generated.</p>`}
     </div>
   </body>
 </html>`;
+};
+
+const resolveStylePackIds = ({ requestedIds = [], layoutType = "" }) => {
+  const layoutTypeStylePacks =
+    {
+      restaurant: ["sunset-gradient", "rounded-xl", "bold-headings"],
+      tech: ["neon-edges", "mono-tech", "hover-lift"],
+      portfolio: ["glass-ui", "spacious-density", "subtle-motion"],
+      editorial: ["editorial-serif", "large-type", "high-contrast"],
+      business: ["mint-gradient", "compact-density", "rich-links"],
+    }[
+      String(layoutType || "")
+        .trim()
+        .toLowerCase()
+    ] || [];
+
+  return normalizeStylePackIds([
+    ...DEFAULT_STYLE_PACKS,
+    ...layoutTypeStylePacks,
+    ...normalizeStylePackIds(requestedIds),
+  ]);
 };
 
 export async function handleGenerateRequest({ request, env }) {
@@ -508,12 +687,14 @@ Return ONLY valid JSON with this schema:
   "heroVideoUrl": "Optional: URL to a free stock video (e.g. Pexels/Mixkit) that fits the topic, or empty string",
   "heroImageUrl": "Optional: URL to an image that fits the topic (e.g. https://placehold.co/1200x600?text=TOPIC), or empty string",
   "pages": [
-    {"slug":"home","title":"Home","sections":[{"title":"...","body":"...","imageUrl":"optional image URL","imageAlt":"optional alt text"}]}
+    {"slug":"home","title":"Home","sections":[{"title":"...","body":"...","items":["optional bullet"],"imageUrl":"optional image URL","imageAlt":"optional alt text","ctaLabel":"optional CTA","ctaHref":"optional https URL"}]}
   ]
 }
 Rules:
 - 3-6 pages max. Every page title and section content must be about the user's topic.
 - Each page: 2-5 sections. Sections may include "imageUrl" and "imageAlt" for topic-relevant images.
+- Prefer at least one visually rich hero asset and at least one section with 3-5 bullets in "items".
+- Include a conversion path: pricing, booking, contact, or CTA section when relevant to the request.
 - Slugs: lowercase, hyphenated, unique (e.g. home, about, services, contact).
 - Always provide "headline" and "nav" is built from pages. Suggest "heroVideoUrl" or "heroImageUrl" when they fit the topic.
 - layoutType: pick the best fit for the topic (e.g. restaurant for food, tech for software, editorial for content).
@@ -579,18 +760,10 @@ ${mergedPrompt}
   }
 
   const layoutType = (layout?.layoutType || "").trim().toLowerCase();
-  const layoutTypeStylePacks =
-    {
-      restaurant: ["sunset-gradient", "rounded-xl", "bold-headings"],
-      tech: ["neon-edges", "mono-tech", "hover-lift"],
-      portfolio: ["glass-ui", "spacious-density", "subtle-motion"],
-      editorial: ["editorial-serif", "large-type", "high-contrast"],
-      business: ["mint-gradient", "compact-density", "rich-links"],
-    }[layoutType] || [];
-  const mergedStylePackIds =
-    stylePackIds.length > 0
-      ? stylePackIds
-      : [...new Set([...DEFAULT_STYLE_PACKS, ...layoutTypeStylePacks])];
+  const mergedStylePackIds = resolveStylePackIds({
+    requestedIds: stylePackIds,
+    layoutType,
+  });
   const selectedStylePacks = getStylePacksByIds(mergedStylePackIds);
   const generatedCss = layout?.theme
     ? `:root{--vtw-theme:'${layout.theme}';}`
@@ -761,3 +934,5 @@ export async function handlePublishRequest({ request, env }) {
 
   return json(200, { ok: true, siteId, r2Prefix: base });
 }
+
+export { renderPreviewHtml, resolveStylePackIds };

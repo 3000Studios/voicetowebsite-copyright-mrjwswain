@@ -1,4 +1,5 @@
-# One-shot deploy: cd to repo root, allow OAuth by temporarily neutralizing token vars in .env, then deploy.
+# One-shot deploy: cd to repo root, allow OAuth by temporarily neutralizing token vars in .env, then run unified deploy (verify + deploy).
+# Uses the same path as all other entry points: npm run deploy:live.
 # Run from anywhere: & "C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\scripts\deploy-one-shot.ps1"
 # Or from repo root: .\scripts\deploy-one-shot.ps1
 
@@ -37,8 +38,8 @@ if (Test-Path $EnvPath) {
 }
 
 try {
-  # 4) Deploy
-  & npm run deploy
+  # 4) Unified deploy (verify + deploy) — same path as IDE / Custom GPT / CLI
+  & npm run deploy:live
 } finally {
   # 5) Restore .env if we modified it
   if ($restored -and (Test-Path $BakPath)) {

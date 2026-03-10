@@ -1,12 +1,12 @@
 ---
-description: In this project the agent must run all commands and tests itself and fix any errors; do not ask the user to run things unless absolutely unavoidable.
+description: Agent must ALWAYS run all scripts, commands, and code itself. Never ask the user to run things. Run and fix until passing unless the action requires user-only auth or secrets.
 alwaysApply: true
 ---
 
-# Run and Fix — No Ask-to-Run
+# Run and Fix — Always Run, Never Ask
 
-- **Run scripts and commands yourself**: Use the terminal to run `npm run types`, `npm run type-check`, `npm run build`, `npm test`, `npm run deploy`, etc. Do not tell the user to run them.
+- **Always run scripts and code yourself**: Execute every script, command, build, test, and deploy in this project. Never tell the user to run them. You are to run scripts and code always.
+- **Never ask the user to run** unless the action truly requires interactive auth, 2FA, or a secret the agent cannot access (e.g. not in .env or env).
 - **Run tests after changes**: Execute the test suite (e.g. `npm test`) and fix failures before concluding.
-- **Fix errors**: If a command, test, or linter fails, fix the cause and re-run until it passes. Do not leave a list of "run this to fix" unless the fix requires user-only input or secrets.
-- **Windows fallback**: If `npm`/`npx` are not in PATH in the current shell, use `cmd /c "cd /d C:\WorkSpaces\voicetowebsite-copyright-mrjwswain && <command>"` to run from the project root.
-- **Only ask the user to run** when the action requires interactive auth, 2FA, or a secret not available to the agent.
+- **Fix errors**: If a command, test, or linter fails, fix the cause and re-run until it passes. Do not leave "run this to fix" for the user.
+- **Windows / PATH fallback**: If `npm` or `node` are not in PATH, try: `cmd /c "cd /d C:\WorkSpaces\voicetowebsite-copyright-mrjwswain && npx ..."` or use the full path to Node (e.g. from nvm or Program Files). Keep trying alternate invocations so the command runs in this environment.

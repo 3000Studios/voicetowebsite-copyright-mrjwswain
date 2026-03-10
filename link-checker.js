@@ -38,6 +38,13 @@ const isSkippable = (raw) => {
   )
     return true;
   if (link.startsWith("/api/")) return true;
+  // Skip JS template concatenation (e.g. "' + demoUrl + '"')
+  if (
+    /['"]\s*\+\s*\w+\s*\+/.test(link) ||
+    link.includes("' +") ||
+    link.includes("+ '")
+  )
+    return true;
   return false;
 };
 

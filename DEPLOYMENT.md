@@ -1,8 +1,29 @@
 # Deployment (Authoritative)
 
-This repo deploys the live site to Cloudflare **Workers**. **Push to `main`** triggers the GitHub
-Action **Deploy to Cloudflare Worker**, which runs `npm ci`, `npm run verify`, and Wrangler deploy
-(requires `CF_API_TOKEN` and `CF_ACCOUNT_ID` in repo secrets).
+## Single deploy path (use from any entry point)
+
+**No matter where you deploy from** — Cursor, another IDE, Custom GPT, or CLI — use this one
+command:
+
+```bash
+npm run deploy:live
+```
+
+That runs the **unified path**: `verify` → `deploy` (see `scripts/deploy-unified.mjs`). Do not run
+`npm run deploy` alone from a cold state; use `deploy:live` so verify always runs first. CI and
+scripts that already ran verify may call `npm run deploy` directly.
+
+| Command               | Use when                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| `npm run deploy:live` | **Default.** Deploy from any environment (IDE, GPT, CLI). Runs verify then deploy. |
+| `npm run deploy:prod` | Same as `deploy:live` (alias).                                                     |
+| `npm run deploy`      | Wrangler only. Use after you already ran verify (e.g. in CI).                      |
+
+---
+
+This repo deploys the live site to Cloudflare **Workers**. The checked-in GitHub workflows currently
+run verification only; deployment is driven through Wrangler using the locked live path
+`npm run deploy:live`.
 
 **Secrets / env at a glance**
 
@@ -15,16 +36,48 @@ Action **Deploy to Cloudflare Worker**, which runs `npm ci`, `npm run verify`, a
 
 ## Commands (One-Liners)
 
+- **Deploy to production (single path from any IDE/GPT/CLI):**
+  - `npm run deploy:live`
 - Verify (must pass before any commit/deploy):
   - `npm run verify`
 - Local dev:
   - `npm run dev:all`
-- Deploy production (local; optional—GitHub deploys on push to main):
+- Deploy wrangler only (after verify already passed, e.g. CI):
   - `npm run deploy`
-- Emergency rollback (resets to previous commit and force-pushes main):
+- Emergency rollback (safe revert flow):
   - `npm run rollback`
-- Auto everything (watch -> verify -> commit -> push; GitHub Action deploys):
+- Auto everything (watch -> verify -> commit -> push; optional local deploy command):
   - `npm run auto:ship`
+
+## Cloudflare Workers Builds (dashboard build syntax)
+
+When you connect the Worker to Git in the Cloudflare dashboard (**Workers & Pages → voicetowebsite →
+Builds**), use this build configuration.
+
+**Recommended (simple, fast, fewer CI failures):**
+
+| Field                 | Value                             |
+| --------------------- | --------------------------------- |
+| **Root directory**    | `/`                               |
+| **Build command**     | `npm ci && npm run build`         |
+| **Deploy command**    | `npx wrangler deploy --keep-vars` |
+| **Production branch** | `main`                            |
+
+- **Build:** `npm ci && npm run build` — install and build only. Fast and reliable in CI; no tests
+  or link checks that can be flaky or slow in the Cloudflare build environment.
+- **Deploy:** `npx wrangler deploy --keep-vars` — deploys the built `dist/` and Worker; keeps
+  existing Dashboard vars/secrets.
+- **Gate on green:** Run `npm run deploy:live` (verify + deploy) locally or from Custom GPT before
+  pushing to `main`, so you never push red. Cloudflare then just build + deploy.
+
+**Optional (strict, same as deploy:live in CI):** If you want CI to block deploy when verify fails
+(tests, type-check, links, etc.), set **Build command** to `npm ci && npm run verify`. Same pipeline
+as local `deploy:live`, but builds are slower and can fail on link checks or test env quirks in
+Cloudflare.
+
+Ensure **Variables and secrets** in the dashboard include what Wrangler needs (e.g. account
+context). To confirm deploys: push to `main`, open the latest build in the dashboard, and check both
+build and deploy succeed.
 
 ## What `npm run verify` Does
 
@@ -46,14 +99,14 @@ From repo root:
 ```powershell
 git pull --rebase
 npm ci
-npm run verify
-npm run deploy
+npm run deploy:live
 ```
 
 Notes:
 
-- `npm run deploy` runs `wrangler deploy --keep-vars` only (no verify). Use after a local build when
-  you need to deploy from your machine; normally GitHub Actions deploys on push to main.
+- `npm run deploy:live` runs verify then deploy (unified path). Use this from any environment.
+- `npm run deploy` runs `wrangler deploy --keep-vars` only (no verify). Use after verify already
+  passed (e.g. CI).
 - For local deploy, set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment (e.g.
   in PowerShell: `$env:CLOUDFLARE_API_TOKEN = "your-token"` and
   `$env:CLOUDFLARE_ACCOUNT_ID = "your-account-id"`).
@@ -139,13 +192,14 @@ Use this order unless explicitly overridden:
 1. `npm run verify`
 2. `npm run ship`
 3. `npm run ship:push`
-4. `npm run deploy` (or rely on CI deploy-on-push to `main`)
+4. `npm run deploy:live` (single path: verify + deploy)
 5. Confirm deploy/build success and report
 
 Hard rules:
 
 - Never commit or deploy on red.
 - Never skip verify.
+- Use the single deploy path: `npm run deploy:live` from any entry point (IDE, Custom GPT, CLI).
 - Keep Cloudflare Workers + Wrangler as the deploy path.
 
 ## Rollback
@@ -155,7 +209,7 @@ Fast rollback approach:
 ```powershell
 git revert <bad_commit_sha>
 npm run verify
-npm run deploy
+npm run deploy:live
 ```
 
 Or redeploy a known-good commit by checking it out in a temporary branch and deploying it.

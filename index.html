@@ -99,7 +99,13 @@
     <!-- Preconnect to External Domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- No font preload: async font link below avoids competing with critical CSS/JS -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@200;300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Responsive Wallpapers CSS -->
+    <link rel="stylesheet" href="/src/styles/responsive-wallpapers.css" />
 
     <!-- Critical CSS inline -->
     <style>
@@ -161,11 +167,14 @@
     <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
   <body>
+    <!-- Responsive Wallpaper -->
+    <div class="responsive-wallpaper-container wallpaper-gradient-1"></div>
+
     <!-- Loading indicator -->
     <div id="initial-loader" class="loading">
       <div style="text-align: center">
-        <div style="font-size: 1.5rem; margin-bottom: 1rem; color: #7dd3fc">VoiceToWebsite</div>
-        <div style="font-size: 0.9rem; color: #64748b">Loading amazing experiences...</div>
+        <div class="million-dollar-heading" style="font-size: 2rem; margin-bottom: 1rem">VoiceToWebsite</div>
+        <div class="tech-luxury-text" style="font-size: 0.9rem">Loading amazing experiences...</div>
       </div>
     </div>
 
@@ -187,6 +196,9 @@
       </div>
     </div>
     <div id="root"></div>
+
+    <!-- Avatar Assistant (will be rendered by React) -->
+    <div id="avatar-assistant-root"></div>
 
     <!-- Optimize JavaScript loading: hide loader as soon as main content can paint -->
     <script>

@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
 import {
-  Search,
-  X,
-  Globe,
   FileText,
-  User,
+  Globe,
+  Search,
   Settings,
   ShoppingCart,
+  User,
+  X,
   Zap,
 } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface SearchResult {
   id: string;
@@ -133,7 +133,8 @@ const GlobalSearch: React.FC = () => {
   }, [query]);
 
   const handleResultClick = (result: SearchResult) => {
-    window.location.href = result.url;
+    // Use window.location.href directly for navigation
+    window.location.assign(result.url);
     setIsOpen(false);
     setQuery("");
   };
@@ -195,6 +196,7 @@ const GlobalSearch: React.FC = () => {
           <button
             onClick={() => setIsOpen(false)}
             className="p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
+            title="Close search"
           >
             <X className="w-4 h-4" />
           </button>

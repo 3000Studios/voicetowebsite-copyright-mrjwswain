@@ -10,7 +10,8 @@ parameters:
 
 # Full Automation Workflow
 
-This workflow enables complete automation for Windsurf with full system access and zero prompts.
+This workflow enables automation for Windsurf while still respecting repo ship gates and deployment
+policy.
 
 ## 🔧 Configuration
 
@@ -30,16 +31,16 @@ This workflow enables complete automation for Windsurf with full system access a
 
 ### Git Operations
 
-- **Auto-commit/push**: Enabled
-- **Auto-merge conflicts**: Enabled
-- **Force operations**: Enabled
-- **Branch management**: Auto
+- **Auto-commit/push**: Enabled after verify passes
+- **Auto-merge conflicts**: Disabled
+- **Force push / history rewrite**: Disabled
+- **Branch management**: `main` only unless explicitly requested
 
 ### Deployment
 
 - **Auto-deploy**: Enabled
-- **Force deploy**: Enabled
-- **Auto-rollback**: Enabled
+- **Force deploy**: Disabled
+- **Auto-rollback**: Manual
 - **Production access**: Granted
 
 ## 🚀 Execution Flow
@@ -50,7 +51,7 @@ This workflow enables complete automation for Windsurf with full system access a
 # Any terminal command is auto-executed
 npm run dev:all          # Auto-started
 npm run build           # Auto-executed
-npm run deploy          # Auto-deployed
+npm run deploy:live     # Auto-deployed after verify
 git add .               # Auto-executed
 git commit -m "msg"     # Auto-executed
 npx wrangler deploy     # Auto-executed
@@ -84,14 +85,14 @@ npx wrangler deploy     # Auto-executed
 - All system commands
 - All PowerShell commands
 - All file operations
-- All deployment commands
+- Deployment commands that follow verify -> ship -> push -> deploy:live
 
 ### Never Prompt
 
 - File creation/deletion
 - Code modifications
 - System changes
-- Deployment operations
+- Deployment operations after verify succeeds
 - Configuration changes
 - Security changes
 
@@ -103,7 +104,7 @@ npx wrangler deploy     # Auto-executed
 - Network access
 - Process management
 - Service management
-- User account control bypass
+- No force-push or history rewrite
 
 ## 🎯 Usage Examples
 
@@ -114,7 +115,7 @@ npx wrangler deploy     # Auto-executed
 npm run dev:all
 npm run build
 npm run test
-npm run deploy
+npm run deploy:live
 ```
 
 ### Git Operations
@@ -124,7 +125,6 @@ npm run deploy
 git add .
 git commit -m "auto commit"
 git push origin main
-git merge feature-branch
 ```
 
 ### System Operations
@@ -149,11 +149,10 @@ Restart-Service -Name "service-name"
 
 ### Full Access Mode
 
-- **All restrictions bypassed**: Yes
-- **UAC disabled**: Yes
-- **File permissions ignored**: Yes
-- **Registry access**: Full
-- **System modification**: Allowed
+- **Verify gate enforced**: Yes
+- **Force-push blocked**: Yes
+- **Main branch protected by workflow rules**: Yes
+- **Registry/system access**: Only when explicitly required
 
 ### Automation Level
 
@@ -240,7 +239,7 @@ taskkill /f /im windsurf.exe
 {
   "automation": {
     "level": "maximum",
-    "noRestrictions": true,
+    "noRestrictions": false,
     "noPrompts": true,
     "silentMode": true
   }
@@ -253,7 +252,7 @@ taskkill /f /im windsurf.exe
 {
   "permissions": {
     "fullSystemAccess": true,
-    "bypassAllRestrictions": true,
+    "bypassAllRestrictions": false,
     "allowSystemModification": true
   }
 }
@@ -266,5 +265,5 @@ taskkill /f /im windsurf.exe
 
 ---
 
-_This workflow provides complete automation with full system access and zero prompts. Use with
-caution - all operations will be executed immediately without confirmation._
+_This workflow provides high automation while keeping verify, ship, push, and deploy safeguards
+intact._

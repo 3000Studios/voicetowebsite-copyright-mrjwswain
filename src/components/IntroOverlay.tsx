@@ -10,6 +10,7 @@ interface IntroOverlayProps {
 const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [splatterActive, setSplatterActive] = useState(false);
+  const [blobStyles, setBlobStyles] = useState({ x: 0, y: 0 });
   const blobRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,8 +20,8 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
     return () => window.removeEventListener("mousemove", updateMouse);
   }, []);
 
-  const getBlobStyles = () => {
-    if (!blobRef.current) return {};
+  useEffect(() => {
+    if (!blobRef.current) return;
     const rect = blobRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -32,13 +33,14 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
     if (dist < pullRadius) {
       const pullFactor = (1 - dist / pullRadius) * maxPull;
       const angle = Math.atan2(mousePos.y - centerY, mousePos.x - centerX);
-      return {
+      setBlobStyles({
         x: Math.cos(angle) * pullFactor,
         y: Math.sin(angle) * pullFactor,
-      };
+      });
+    } else {
+      setBlobStyles({ x: 0, y: 0 });
     }
-    return { x: 0, y: 0 };
-  };
+  }, [mousePos]);
 
   const handleClick = () => {
     onStart();
@@ -78,7 +80,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
             borderRadius: splatterActive
               ? "50%"
               : ["50% 50% 50% 50%", "48% 52% 45% 55%", "52% 48% 55% 45%"],
-            ...getBlobStyles(),
+            ...blobStyles,
           }}
           transition={{
             opacity: { duration: 1 },
