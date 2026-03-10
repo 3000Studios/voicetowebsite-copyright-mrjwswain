@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-03-10T08:13:47.308Z
+Generated: 2026-03-10T09:43:58.578Z
 
 ## Summary
 
-- Scanned files: 443
-- Used keys: 142
+- Scanned files: 447
+- Used keys: 143
 - Defined keys: 87
-- Missing keys: 67
+- Missing keys: 68
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -107,6 +107,7 @@ Generated: 2026-03-10T08:13:47.308Z
 | ORCH_TOKEN                               | yes     | 4             | ok      |
 | OWNER_KEY                                | no      | 2             | missing |
 | PATCH_APPLY_RATE_LIMIT                   | no      | 2             | missing |
+| PATH                                     | no      | 1             | missing |
 | PAYPAL_CLIENT_ID                         | yes     | 3             | ok      |
 | PAYPAL_CLIENT_ID_PROD                    | yes     | 3             | ok      |
 | PAYPAL_CLIENT_SECRET                     | yes     | 2             | ok      |

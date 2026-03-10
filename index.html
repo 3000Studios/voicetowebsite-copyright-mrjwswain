@@ -15,7 +15,6 @@
     <meta name="author" content="3000 Studios" />
     <meta name="robots" content="index, follow" />
 
-    <!-- Enhanced Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://voicetowebsite.com/" />
     <meta property="og:title" content="VoiceToWebsite | Build Sites with Your Voice" />
@@ -30,7 +29,6 @@
     <meta property="og:site_name" content="VoiceToWebsite" />
     <meta property="og:locale" content="en_US" />
 
-    <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -64,7 +62,6 @@
       }
     </script>
 
-    <!-- Enhanced Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://voicetowebsite.com/" />
     <meta property="twitter:title" content="VoiceToWebsite | Build Sites with Your Voice" />
@@ -76,7 +73,6 @@
     <meta property="twitter:creator" content="@3000studios" />
     <meta property="twitter:site" content="@voicetowebsite" />
 
-    <!-- Additional SEO Meta Tags -->
     <meta name="theme-color" content="#7dd3fc" />
     <meta name="application-name" content="VoiceToWebsite" />
     <meta name="apple-mobile-web-app-title" content="VoiceToWebsite" />
@@ -86,17 +82,14 @@
     <meta name="msapplication-TileColor" content="#7dd3fc" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
 
-    <!-- Canonical URL -->
     <link rel="canonical" href="https://voicetowebsite.com/" />
 
-    <!-- Favicon and Icons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Preconnect to External Domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -104,31 +97,26 @@
       rel="stylesheet"
     />
 
-    <!-- ICONS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-    <!-- Responsive Wallpapers CSS -->
     <link rel="stylesheet" href="/src/styles/responsive-wallpapers.css" />
-
-    <!-- Obsidian Kinetic Flow CSS -->
     <link rel="stylesheet" href="/src/styles/obsidian-kinetic-flow.css" />
 
-    <!-- Critical CSS inline -->
     <style>
-      /* Minimal critical styles for above-the-fold content; starfield canvas sits behind */
       body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
         background: #050505;
       }
+
       #root {
         min-height: 100vh;
       }
+
       .loading {
         display: flex;
         justify-content: center;
@@ -137,11 +125,9 @@
       }
     </style>
 
-    <!-- Critical CSS: load synchronously so first paint is styled (no FOUC) -->
     <link rel="stylesheet" href="/phosphor-nav.css" />
     <link rel="stylesheet" href="/styles.css" />
 
-    <!-- Fonts: DM Sans (body), Plus Jakarta Sans (UI), Outfit (headings), Syne (display) -->
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;600;800&family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -155,9 +141,7 @@
       />
     </noscript>
 
-    <!-- Defer Tailwind CSS -->
     <script>
-      // Load Tailwind asynchronously after critical resources
       window.addEventListener("load", function () {
         var script = document.createElement("script");
         script.src = "https://cdn.tailwindcss.com";
@@ -165,7 +149,6 @@
       });
     </script>
 
-    <!-- AdSense: load after page ready to avoid blocking render -->
     <script>
       window.addEventListener("load", function () {
         var s = document.createElement("script");
@@ -178,10 +161,8 @@
     <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
   <body>
-    <!-- Responsive Wallpaper -->
     <div class="responsive-wallpaper-container wallpaper-gradient-1"></div>
 
-    <!-- Loading indicator -->
     <div id="initial-loader" class="loading">
       <div style="text-align: center">
         <div class="million-dollar-heading" style="font-size: 2rem; margin-bottom: 1rem">VoiceToWebsite</div>
@@ -189,7 +170,6 @@
       </div>
     </div>
 
-    <!-- Admin Control Panel (Hidden by default) -->
     <div id="control-lock" style="display: none">
       <div class="control-panel">
         <h3>Admin Controls</h3>
@@ -202,16 +182,12 @@
         <button id="unlock-control">Unlock</button>
         <div id="control-lock-note"></div>
       </div>
-      <div id="control-grid" style="display: none">
-        <!-- Admin controls will be inserted here -->
-      </div>
+      <div id="control-grid" style="display: none"></div>
     </div>
     <div id="root"></div>
 
-    <!-- Avatar Assistant (will be rendered by React) -->
     <div id="avatar-assistant-root"></div>
 
-    <!-- Optimize JavaScript loading: hide loader as soon as main content can paint -->
     <script>
       function hideLoader() {
         var loader = document.getElementById("initial-loader");
@@ -230,7 +206,6 @@
       }
     </script>
 
-    <!-- React app first for faster TTI; nav (shell, starfield) loads after page is interactive -->
     <script defer src="/tracking.js"></script>
     <script type="module" src="/src/main.tsx"></script>
     <script>

@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-10T08:13:47.308Z",
-  "scannedFiles": 443,
+  "generatedAt": "2026-03-10T09:43:58.578Z",
+  "scannedFiles": 447,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -89,6 +89,7 @@
     "ORCH_TOKEN",
     "OWNER_KEY",
     "PATCH_APPLY_RATE_LIMIT",
+    "PATH",
     "PAYPAL_CLIENT_ID",
     "PAYPAL_CLIENT_ID_PROD",
     "PAYPAL_CLIENT_SECRET",
@@ -276,6 +277,7 @@
     "ORCH_MAX_ALL_PAGES_HTML",
     "OWNER_KEY",
     "PATCH_APPLY_RATE_LIMIT",
+    "PATH",
     "PAYPAL_MODE",
     "PAYPAL_PAYMENT_LINK_ENTERPRISE",
     "PAYPAL_PAYMENT_LINK_GROWTH",
@@ -576,6 +578,7 @@
     ],
     "OWNER_KEY": ["src/functions/execute.js", "src/functions/security/ownerAuth.js"],
     "PATCH_APPLY_RATE_LIMIT": ["null/worker.js", "src/durable_objects/BotHubDO.js"],
+    "PATH": ["scripts/deploy-unified.mjs"],
     "PAYPAL_CLIENT_ID": ["null/worker.js", "store-products.js", "worker.js"],
     "PAYPAL_CLIENT_ID_PROD": ["null/worker.js", "store-products.js", "worker.js"],
     "PAYPAL_CLIENT_SECRET": ["null/worker.js", "worker.js"],

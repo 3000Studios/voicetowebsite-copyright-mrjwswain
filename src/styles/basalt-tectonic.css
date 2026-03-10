@@ -1,0 +1,113 @@
+/**
+ * Basalt / Tectonic theme — resonance cyan & magenta, dark strata
+ * Used for landing and global wallpaper styling.
+ */
+:root {
+  --basalt-dark: #050506;
+  --basalt-grey: #111113;
+  --resonance-cyan: #00f2ff;
+  --resonance-mag: #ff00ea;
+  --basalt-text-main: #ffffff;
+  --basalt-glass: rgba(5, 5, 5, 0.7);
+  --basalt-border: rgba(255, 255, 255, 0.08);
+  --basalt-glow: rgba(0, 242, 255, 0.3);
+}
+
+/* Perimeter frame — fixed inset, non-interactive */
+.tectonic-border {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  border: 1px solid var(--basalt-border);
+  margin: 20px;
+  transition: border-color 0.5s ease;
+}
+
+/* Strata card (used in home and content sections) */
+.strata-card {
+  background: rgba(20, 20, 22, 0.4);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--basalt-border);
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.strata-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: var(--resonance-cyan);
+  background: rgba(30, 30, 35, 0.6);
+}
+
+.strata-card h3 {
+  font-family: var(--font-family-mono);
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  color: var(--basalt-text-main);
+}
+
+.strata-card p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.7;
+}
+
+.strata-card .index {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  font-family: var(--font-family-mono);
+  font-size: 0.65rem;
+  opacity: 0.3;
+}
+
+/* Tectonic pulse indicator */
+.tectonic-pulse {
+  width: 8px;
+  height: 8px;
+  background: var(--resonance-cyan);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  box-shadow: 0 0 10px var(--resonance-cyan);
+  animation: tectonic-pulse 2s infinite;
+}
+
+@keyframes tectonic-pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.strata-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+
+.strata-grid .strata-card {
+  grid-column: span 4;
+}
+
+@media (max-width: 1024px) {
+  .strata-grid .strata-card {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 640px) {
+  .strata-grid .strata-card {
+    grid-column: span 12;
+  }
+}

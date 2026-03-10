@@ -1,6 +1,7 @@
 @import "./design-system.css";
 @import "../styles/particles.css";
 @import "./styles/responsive-wallpapers.css";
+@import "./styles/basalt-tectonic.css";
 
 :root {
   --wallpaper-image:

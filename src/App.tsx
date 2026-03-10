@@ -8,7 +8,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import AvatarAssistant from "./components/AvatarAssistant";
-import ResponsiveWallpaper from "./components/ResponsiveWallpaper";
+import EnhancedHamburgerNav from "./components/EnhancedHamburgerNav";
 import { FALLBACK_INTRO_SONG, INTRO_SONG } from "./constants";
 import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
@@ -28,8 +28,8 @@ declare global {
 const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
 const ErrorBoundary = lazy(() => import("./components/ErrorBoundary"));
 const GlobalFooter = lazy(() => import("./components/GlobalFooter"));
-const HomeWireframeBackground = lazy(
-  () => import("./components/HomeWireframeBackground")
+const TectonicBackgroundLazy = lazy(
+  () => import("./components/TectonicBackground")
 );
 
 type PricingTier = {
@@ -55,6 +55,13 @@ type ContentGuide = {
 type FaqItem = {
   question: string;
   answer: string;
+};
+
+type RuntimeHomeConfig = {
+  hero?: {
+    headline?: string;
+    subheadline?: string;
+  };
 };
 
 const RouterNavigationBridge: React.FC = () => {
@@ -281,12 +288,6 @@ const EnhancedTypography = () => (
 );
 
 const HomeView: React.FC = () => {
-  const heroHeadline =
-    siteConfig?.copy?.headline?.trim() ||
-    "Launch production-ready sites with one spoken command.";
-  const heroSubhead =
-    siteConfig?.copy?.subhead?.trim() ||
-    "Voice-to-website automation that builds, tests, and deploys in minutes—no handoffs, no guesswork.";
   const audioPlayingRef = useRef(false);
   const musicManuallyStoppedRef = useRef(false);
 
@@ -305,7 +306,58 @@ const HomeView: React.FC = () => {
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  const [heroClock, setHeroClock] = useState("");
+  const [runtimeHomeConfig, setRuntimeHomeConfig] =
+    useState<RuntimeHomeConfig | null>(null);
   const FALLBACK_PREVIEW_URL = "/demo";
+  const heroHeadline =
+    runtimeHomeConfig?.hero?.headline?.trim() ||
+    siteConfig?.copy?.headline?.trim() ||
+    "Launch production-ready sites with one spoken command.";
+  const heroSubhead =
+    runtimeHomeConfig?.hero?.subheadline?.trim() ||
+    siteConfig?.copy?.subhead?.trim() ||
+    "Voice-to-website automation that builds, tests, and deploys in minutes with no handoffs or guesswork.";
+
+  useEffect(() => {
+    const format = () => {
+      const now = new Date();
+      return now
+        .toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+        .replace(/:/g, ":");
+    };
+    setHeroClock(format());
+    const id = setInterval(() => setHeroClock(format()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadRuntimeHomeConfig = async () => {
+      try {
+        const response = await fetch("/config/home.json", {
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) return;
+        const data = (await response.json()) as RuntimeHomeConfig;
+        if (active) setRuntimeHomeConfig(data);
+      } catch (_) {
+        // Fallback to bundled config when runtime content is unavailable.
+      }
+    };
+
+    loadRuntimeHomeConfig();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const recognitionRef = useRef<any>(null);
   const flowPhaseRef = useRef(flowPhase);
@@ -653,23 +705,14 @@ const HomeView: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="relative min-h-screen bg-black text-white select-none overflow-x-hidden font-outfit">
-        {/* Responsive Wallpaper */}
-        <ErrorBoundary fallback={null}>
-          <ResponsiveWallpaper configIndex={Math.floor(Math.random() * 5)} />
-        </ErrorBoundary>
-
-        {/* Wireframe + gradient + floating shapes only; no wallpapers or tinted filters */}
-        <ErrorBoundary fallback={null}>
-          <HomeWireframeBackground />
-        </ErrorBoundary>
-
+      <div
+        className="relative min-h-screen text-white select-none overflow-x-hidden font-outfit"
+        style={{ background: "var(--basalt-dark, #050506)" }}
+      >
         {/* Avatar Assistant */}
         <ErrorBoundary fallback={null}>
           <AvatarAssistant />
         </ErrorBoundary>
-
-        {/* Phosphor nav is injected by nav.js on every page (including this one) — no duplicate */}
 
         <div className="fixed bottom-5 right-5 z-50">
           <button
@@ -684,32 +727,85 @@ const HomeView: React.FC = () => {
           </button>
         </div>
 
-        <main className="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-32">
-          {/* Enhanced Header with better typography */}
-          <div className="text-center mb-20">
+        <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-8 pb-32">
+          {/* Basalt hero */}
+          <section className="min-h-[70vh] flex flex-col justify-center px-2 md:px-0">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="font-outfit text-xs tracking-[0.8em] text-cyan-400/80 uppercase mb-6"
+              className="font-mono text-[0.7rem] mb-4 text-white/50"
+              style={{ fontFamily: "var(--font-family-mono)" }}
             >
-              VoiceToWebsite.com
+              TIMESTAMP:{" "}
+              <span id="vtw-hero-clock">{heroClock || "00:00:00"}</span> //
+              STATUS: NOMINAL
             </motion.div>
             <motion.h1
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="vtw-metallic-heading font-outfit font-black text-5xl md:text-8xl lg:text-9xl tracking-tight leading-none mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="font-outfit font-black text-5xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tight leading-[0.85] uppercase mb-6"
+              style={{
+                letterSpacing: "-0.04em",
+                color: "var(--basalt-text-main)",
+              }}
             >
-              {heroHeadline}
+              {heroHeadline.toUpperCase().startsWith("VOICE") ||
+              !heroHeadline.trim() ? (
+                <>
+                  VOICE TO
+                  <br />
+                  WEBSITE
+                </>
+              ) : (
+                heroHeadline
+              )}
             </motion.h1>
-            <motion.p
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-white/60 text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed font-inter"
+              className="font-mono text-sm max-w-md border-l-2 pl-6"
+              style={{
+                borderColor: "var(--resonance-mag)",
+                color: "var(--resonance-cyan)",
+              }}
             >
               {heroSubhead}
-            </motion.p>
-          </div>
+            </motion.div>
+          </section>
+
+          {/* Strata grid — theme names + VoiceToWebsite value */}
+          <section className="mt-8 mb-20">
+            <div className="strata-grid">
+              <div className="strata-card">
+                <span className="index">01/03</span>
+                <h3>Crystalline Frequency Refraction</h3>
+                <p>
+                  Sub-surface processing for voice-to-site generation. Every
+                  command is parsed and executed with precision—structured
+                  content, clear navigation, and deployment in minutes.
+                </p>
+              </div>
+              <div className="strata-card" style={{ transitionDelay: "0.1s" }}>
+                <span className="index">02/03</span>
+                <h3>Kinetic Acoustic Lattice</h3>
+                <p>
+                  Dynamic UI and build flows that respond to your voice. Start a
+                  build, confirm, and deploy—fluid yet reliable under load.
+                </p>
+              </div>
+              <div className="strata-card" style={{ transitionDelay: "0.2s" }}>
+                <span className="index">03/03</span>
+                <h3>Refractive Vitreous Suspension</h3>
+                <p>
+                  Natural structural optimization for pages and layouts.
+                  Ad-ready content, policy visibility, and measurable conversion
+                  paths.
+                </p>
+              </div>
+            </div>
+          </section>
 
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_TOP"
@@ -1236,6 +1332,11 @@ const App: React.FC = () => (
   <ErrorBoundary>
     <BrowserRouter>
       <RouterNavigationBridge />
+      <React.Suspense fallback={null}>
+        <TectonicBackgroundLazy />
+      </React.Suspense>
+      <div className="tectonic-border" aria-hidden="true" />
+      <EnhancedHamburgerNav />
       <Routes>
         <Route path="/" element={<HomeView />} />
         <Route path="/blog" element={<BlogPage />} />
