@@ -18,6 +18,7 @@ const TOKEN_KEYS = [
   "CF_API_TOKEN",
 ];
 const ACCOUNT_KEYS = ["CLOUDFLARE_ACCOUNT_ID", "CF_ACCOUNT_ID"];
+const NPX_CMD = process.platform === "win32" ? "npx.cmd" : "npx";
 
 const PLACEHOLDER_VALUES = new Set([
   "",
@@ -56,6 +57,16 @@ function log(msg) {
   console.error(`[deploy-safe] ${msg}`);
 }
 
+function hasWranglerSession(env) {
+  const result = spawnSync(NPX_CMD, ["wrangler", "whoami"], {
+    stdio: "pipe",
+    env,
+    shell: false,
+    cwd: root,
+  });
+  return result.status === 0;
+}
+
 function main() {
   try {
     const requiredFiles = ["package.json", "wrangler.toml", "worker.js"];
@@ -79,8 +90,9 @@ function main() {
       if (!val || !isValidAccountId(val)) delete env[key];
     }
 
-    const hasAuth =
+    const hasTokenAuth =
       TOKEN_KEYS.some((k) => env[k]) || ACCOUNT_KEYS.some((k) => env[k]);
+    const hasAuth = hasTokenAuth || hasWranglerSession(env);
     if (!hasAuth) {
       log(
         "No valid Cloudflare auth found. Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, or run 'npx wrangler login'."
@@ -94,10 +106,10 @@ function main() {
       "--keep-vars",
       ...process.argv.slice(2),
     ];
-    const result = spawnSync("npx", args, {
+    const result = spawnSync(NPX_CMD, args, {
       stdio: "inherit",
       env,
-      shell: process.platform === "win32",
+      shell: false,
       cwd: root,
     });
 
