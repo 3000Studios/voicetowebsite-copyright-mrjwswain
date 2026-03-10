@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import AvatarAssistant from "./components/AvatarAssistant";
 import EnhancedHamburgerNav from "./components/EnhancedHamburgerNav";
+import GlobalFooter from "./components/GlobalFooter";
 import { FALLBACK_INTRO_SONG, INTRO_SONG } from "./constants";
 import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
@@ -28,7 +29,6 @@ declare global {
 // Lazy load heavy components
 const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
 const ErrorBoundary = lazy(() => import("./components/ErrorBoundary"));
-const GlobalFooter = lazy(() => import("./components/GlobalFooter"));
 const TectonicBackgroundLazy = lazy(
   () => import("./components/TectonicBackground")
 );
