@@ -583,6 +583,8 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
 };
 
 const ROUTE_ALIASES: Record<string, string> = {
+  "features-enhanced": "features",
+  "pricing-enhanced": "pricing",
   "contact-enhanced": "contact",
   "search-enhanced": "search",
   "features-enhanced": "features",

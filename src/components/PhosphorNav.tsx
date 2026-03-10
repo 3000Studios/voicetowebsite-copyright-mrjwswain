@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SHARED_NAV_ITEMS } from "../constants/navigation";
 
 declare global {
@@ -9,6 +10,9 @@ declare global {
 
 const THREE_CDN =
   "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+
+const isSpaRoute = (href: string) =>
+  !href.startsWith("/admin") && !href.endsWith(".html");
 
 function loadThree(): Promise<typeof import("three")> {
   if (typeof window === "undefined")
@@ -24,6 +28,7 @@ function loadThree(): Promise<typeof import("three")> {
 }
 
 export default function PhosphorNav() {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -182,8 +187,15 @@ export default function PhosphorNav() {
     playSizzle();
     e.currentTarget.classList.add("vtw-phosphor-melting");
     setTimeout(() => {
+      e.currentTarget.classList.remove("vtw-phosphor-melting");
+      setMenuOpen(false);
+      if (isSpaRoute(href)) {
+        navigate(href);
+        window.scrollTo(0, 0);
+        return;
+      }
       window.location.href = href;
-    }, 800);
+    }, 400);
   };
 
   return (

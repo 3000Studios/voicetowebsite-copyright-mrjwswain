@@ -828,6 +828,48 @@
           noise.start();
         } catch (_) {}
       };
+      const setMenuState = (open) => {
+        menuEl.classList.toggle("open", open);
+        burger.classList.toggle("active", open);
+        burger.setAttribute("aria-expanded", open ? "true" : "false");
+        menuEl.hidden = !open;
+        document.body.style.overflow = open ? "hidden" : "";
+        if (open && audioCtx.state === "suspended") audioCtx.resume();
+      };
+      const isSpaRoute = (href) => {
+        try {
+          const url = new URL(href, window.location.href);
+          return (
+            url.origin === window.location.origin &&
+            !url.pathname.startsWith("/admin") &&
+            !url.pathname.endsWith(".html")
+          );
+        } catch (_) {
+          return false;
+        }
+      };
+      const navigateWithinApp = (href) => {
+        if (!isSpaRoute(href)) {
+          window.location.href = href;
+          return;
+        }
+        const url = new URL(href, window.location.href);
+        const nextPath = `${url.pathname}${url.search}${url.hash}`;
+        const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+        if (nextPath === currentPath) {
+          setMenuState(false);
+          return;
+        }
+        if (typeof window.__VTW_REACT_NAVIGATE__ === "function") {
+          window.__VTW_REACT_NAVIGATE__(nextPath);
+        } else {
+          window.location.assign(nextPath);
+          return;
+        }
+        if (!url.hash) {
+          window.scrollTo(0, 0);
+        }
+      };
 
       const canvas = document.getElementById("vtw-three-canvas");
       if (typeof THREE !== "undefined" && canvas) {
@@ -919,12 +961,7 @@
       }
 
       burger.addEventListener("click", () => {
-        const open = menuEl.classList.toggle("open");
-        burger.classList.toggle("active", open);
-        burger.setAttribute("aria-expanded", open ? "true" : "false");
-        menuEl.hidden = !open;
-        document.body.style.overflow = open ? "hidden" : "";
-        if (audioCtx.state === "suspended") audioCtx.resume();
+        setMenuState(!menuEl.classList.contains("open"));
       });
 
       const attachLinkListeners = () => {
@@ -934,18 +971,25 @@
             link.addEventListener("click", (e) => {
               const href = link.getAttribute("href");
               if (!href || href === "#") return;
+              const internalRoute = isSpaRoute(href);
               e.preventDefault();
               playSizzle();
               link.classList.add("vtw-phosphor-melting");
-              setTimeout(() => {
-                window.location.href = href;
-              }, 800);
+              setTimeout(
+                () => {
+                  link.classList.remove("vtw-phosphor-melting");
+                  setMenuState(false);
+                  navigateWithinApp(href);
+                },
+                internalRoute ? 150 : 400
+              );
             });
           });
       };
       attachLinkListeners();
       window.__vtwPhosphorAttachLinkListeners = attachLinkListeners;
       window.__vtwPhosphorBuildLinksHtml = buildPhosphorLinksHtml;
+      window.__vtwPhosphorSetMenuState = setMenuState;
     };
 
     if (typeof THREE !== "undefined") {

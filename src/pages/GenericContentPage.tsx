@@ -11,7 +11,7 @@ const GenericContentPage: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  return <ContentPage config={config} />;
+  return <ContentPage key={slug} config={config} />;
 };
 
 export default GenericContentPage;
