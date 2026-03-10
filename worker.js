@@ -1,4 +1,11 @@
 import {
+  buildContentInventory,
+  getConfigOverrideKey,
+  getInventorySourceDescriptor,
+  isEditableConfigPath,
+  listEditableSources,
+} from "./functions/contentInventory.js";
+import {
   clearAdminCookieHeaders,
   hasValidAdminCookie,
   isAdminEnabled,
@@ -404,6 +411,24 @@ const blogCommentRateLimit = async (env, ip) => {
   if (count >= 6) return false;
   await env.KV.put(key, String(count + 1), { expirationTtl: 3600 });
   return true;
+};
+
+const loadConfigOverride = async (env, path) => {
+  if (!env.KV || !isEditableConfigPath(path)) return null;
+  const raw = await env.KV.get(getConfigOverrideKey(path));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch (_) {
+    return null;
+  }
+};
+
+const saveConfigOverride = async (env, path, value) => {
+  if (!env.KV) {
+    throw new Error("KV binding is required to save config overrides.");
+  }
+  await env.KV.put(getConfigOverrideKey(path), JSON.stringify(value));
 };
 
 const getPayPalPlanLinks = (env, origin) => {
@@ -953,6 +978,19 @@ export default {
       const target = new URL("/preview/index", url.origin);
       target.search = url.search;
       return Response.redirect(target.toString(), 302);
+    }
+
+    if (request.method === "GET" && isEditableConfigPath(url.pathname)) {
+      const override = await loadConfigOverride(env, url.pathname);
+      if (override) {
+        return addSecurityHeaders(
+          new Response(JSON.stringify(override, null, 2), {
+            status: 200,
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+          }),
+          { pathname: url.pathname, env }
+        );
+      }
     }
 
     // Live Room WebSocket: forward to Durable Object so viewers/hosts can connect (token validated by DO).
@@ -2003,6 +2041,112 @@ export default {
         return jsonResponse(200, {
           ok: true,
           manifest: getCapabilityManifest(env),
+        });
+      }
+
+      if (
+        url.pathname === "/api/admin/content-inventory" &&
+        request.method === "GET"
+      ) {
+        const isAdmin = await isAdminRequest(request, env);
+        if (!isAdmin) {
+          return jsonResponse(401, { error: "Unauthorized" });
+        }
+
+        const inventory = await buildContentInventory({ assets });
+        return jsonResponse(200, inventory);
+      }
+
+      if (
+        url.pathname === "/api/admin/content-inventory/source" &&
+        request.method === "GET"
+      ) {
+        const isAdmin = await isAdminRequest(request, env);
+        if (!isAdmin) {
+          return jsonResponse(401, { error: "Unauthorized" });
+        }
+
+        const path = String(url.searchParams.get("path") || "").trim();
+        const source = getInventorySourceDescriptor(path);
+        if (!source) {
+          return jsonResponse(404, { error: "Unknown inventory source." });
+        }
+
+        const override = await loadConfigOverride(env, path);
+        if (override) {
+          return jsonResponse(200, {
+            path,
+            title: source.title,
+            sourcePath: source.sourcePath,
+            editable: source.editable,
+            overridden: true,
+            content: override,
+          });
+        }
+
+        const assetRes = assets
+          ? await assets.fetch(new Request(new URL(path, url.origin), request))
+          : null;
+        if (!assetRes || assetRes.status === 404) {
+          return jsonResponse(404, {
+            error: "Source asset not found.",
+            path,
+          });
+        }
+        const content = await assetRes.json().catch(() => null);
+        if (!content) {
+          return jsonResponse(500, {
+            error: "Source asset could not be parsed as JSON.",
+            path,
+          });
+        }
+
+        return jsonResponse(200, {
+          path,
+          title: source.title,
+          sourcePath: source.sourcePath,
+          editable: source.editable,
+          overridden: false,
+          content,
+        });
+      }
+
+      if (
+        url.pathname === "/api/admin/content-inventory/source" &&
+        request.method === "POST"
+      ) {
+        const isAdmin = await isAdminRequest(request, env);
+        if (!isAdmin) {
+          return jsonResponse(401, { error: "Unauthorized" });
+        }
+
+        const body = await request
+          .clone()
+          .json()
+          .catch(() => null);
+        const path = String(body?.path || "").trim();
+        if (!isEditableConfigPath(path)) {
+          return jsonResponse(400, {
+            error: "This source is not editable from the inventory UI.",
+            editableSources: listEditableSources(),
+          });
+        }
+        if (!env.KV) {
+          return jsonResponse(503, {
+            error: "KV binding is required to save runtime config overrides.",
+          });
+        }
+        if (typeof body?.content !== "object" || body.content === null) {
+          return jsonResponse(400, {
+            error: "Content must be a JSON object or array.",
+          });
+        }
+
+        await saveConfigOverride(env, path, body.content);
+        return jsonResponse(200, {
+          ok: true,
+          path,
+          message: "Runtime config override saved.",
         });
       }
 

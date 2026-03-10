@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AccessGuard } from "./AccessGuard";
+import ContentInventoryPanel from "./ContentInventoryPanel";
 
 type HealthStatus = {
   status?: string;
@@ -113,6 +114,7 @@ const AdminDashboard: React.FC = () => {
     { id: "live", label: "Live Stream", icon: "🎥" },
     { id: "agent", label: "Agent Control", icon: "🤖" },
     { id: "progress", label: "Progress", icon: "📈" },
+    { id: "inventory", label: "Content Inventory", icon: "🗂️" },
   ];
 
   const renderTabContent = () => {
@@ -534,6 +536,9 @@ const AdminDashboard: React.FC = () => {
             </div>
           </section>
         );
+
+      case "inventory":
+        return <ContentInventoryPanel />;
 
       default:
         return null;
