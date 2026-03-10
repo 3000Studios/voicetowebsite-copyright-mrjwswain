@@ -110,10 +110,10 @@
     "wrangler": "^4.71.0"
   },
   "dependencies": {
-    "@google/genai": "^1.42.0",
+    "@google/genai": "^1.44.0",
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "framer-motion": "^12.34.3",
-    "lucide-react": "^0.575.0",
+    "framer-motion": "^12.35.2",
+    "lucide-react": "^0.577.0",
     "minimatch": "^10.2.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
