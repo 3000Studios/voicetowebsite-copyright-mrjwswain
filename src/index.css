@@ -1,5 +1,6 @@
 @import "./design-system.css";
 @import "../styles/particles.css";
+@import "./styles/responsive-wallpapers.css";
 
 :root {
   --wallpaper-image:

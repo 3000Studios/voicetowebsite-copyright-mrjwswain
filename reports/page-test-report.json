@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-03-10T04:13:24.388Z",
+  "timestamp": "2026-03-10T07:09:42.663Z",
   "baseUrl": "https://voicetowebsite.com",
   "pages": [
     {
       "url": "https://voicetowebsite.com/",
       "name": "Home",
       "status": 200,
-      "loadTime": 248,
+      "loadTime": 258,
       "error": null,
       "issues": []
     },
@@ -101,10 +101,10 @@
     {
       "url": "https://voicetowebsite.com/about.html",
       "name": "About",
-      "status": 404,
-      "loadTime": 24,
-      "error": null,
-      "issues": ["HTTP 404: Not Found"]
+      "status": "unknown",
+      "loadTime": 0,
+      "error": "fetch failed",
+      "issues": ["Network error: fetch failed"]
     },
     {
       "url": "https://voicetowebsite.com/store.html",

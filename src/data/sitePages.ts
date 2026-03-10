@@ -585,6 +585,8 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
 const ROUTE_ALIASES: Record<string, string> = {
   "contact-enhanced": "contact",
   "search-enhanced": "search",
+  "features-enhanced": "features",
+  "pricing-enhanced": "pricing",
 };
 
 export function getPageConfig(path: string): ContentPageConfig | undefined {

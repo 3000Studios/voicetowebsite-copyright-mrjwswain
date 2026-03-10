@@ -3005,17 +3005,7 @@ export default {
         });
       }
 
-      // Canonical storefront
-      if (
-        url.pathname === "/appstore" ||
-        url.pathname === "/appstore/" ||
-        url.pathname === "/appstore.html" ||
-        url.pathname === "/appstore-new" ||
-        url.pathname === "/appstore-new.html"
-      ) {
-        return Response.redirect(new URL("/store", url.origin), 302);
-      }
-
+      // Serve appstore and appstore-new as their HTML pages (no redirect to store)
       if (cleanPath && !cleanPath.includes(".") && cleanPath !== "/") {
         const htmlUrl = new URL(`${cleanPath}.html`, url.origin);
         const htmlRes = await assets.fetch(new Request(htmlUrl, request));

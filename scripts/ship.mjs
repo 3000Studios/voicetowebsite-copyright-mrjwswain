@@ -2,7 +2,6 @@ import { spawnSync } from "node:child_process";
 
 const isWin = process.platform === "win32";
 const npmCmd = isWin ? process.env.ComSpec || "cmd.exe" : "npm";
-const npmPrefixArgs = isWin ? ["/d", "/s", "/c", "npm"] : [];
 const gitCmd = isWin ? "git.exe" : "git";
 
 const args = process.argv.slice(2);
@@ -20,7 +19,10 @@ const message =
   `chore: ship ${new Date().toISOString().replace("T", " ").slice(0, 16)} UTC`;
 
 const run = (cmd, cmdArgs, opts = {}) => {
-  const res = spawnSync(cmd, cmdArgs, {
+  const finalCmd = isWin && cmd === npmCmd ? cmd : cmd;
+  const finalArgs =
+    isWin && cmd === npmCmd ? ["/d", "/s", "/c", cmdArgs.join(" ")] : cmdArgs;
+  const res = spawnSync(finalCmd, finalArgs, {
     stdio: "inherit",
     shell: false,
     env: process.env,
@@ -29,7 +31,7 @@ const run = (cmd, cmdArgs, opts = {}) => {
   if (res.status !== 0) process.exit(res.status ?? 1);
 };
 
-run(npmCmd, [...npmPrefixArgs, "run", "verify"]);
+run(npmCmd, ["npm", "run", "verify"]);
 
 const status = spawnSync(gitCmd, ["status", "--porcelain"], {
   stdio: ["ignore", "pipe", "inherit"],

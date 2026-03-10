@@ -10,7 +10,13 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { accessSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  accessSync,
+  existsSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -52,22 +58,49 @@ function logError(step, error) {
 }
 
 function run(name, cmd, args, opts = {}) {
-  logStep(name, `Starting: ${cmd} ${args.join(" ")}`);
+  const fullCmd = [cmd, ...args].join(" ");
+  logStep(name, `Starting: ${fullCmd}`);
 
   const startTime = Date.now();
-  const result = spawnSync(cmd, args, {
-    stdio: "inherit",
-    shell: process.platform === "win32",
-    cwd: root,
-    env: {
-      ...process.env,
-      NODE_ENV: "production",
-      CI: "true",
-    },
-    ...opts,
-  });
+  const env = {
+    ...process.env,
+    NODE_ENV: "production",
+    CI: "true",
+  };
+
+  let result;
+  if (process.platform === "win32") {
+    // On Windows, run via cmd.exe so npm/node are found in PATH (same pattern as deploy-safe.mjs).
+    result = spawnSync("cmd.exe", ["/d", "/s", "/c", fullCmd], {
+      stdio: "inherit",
+      shell: false,
+      cwd: root,
+      env,
+      ...opts,
+    });
+  } else {
+    result = spawnSync(cmd, args, {
+      stdio: "inherit",
+      shell: false,
+      cwd: root,
+      env,
+      ...opts,
+    });
+  }
 
   const duration = Date.now() - startTime;
+
+  if (result.error) {
+    const error = new DeployError(
+      `Command failed to start: ${result.error.message}`,
+      name,
+      1,
+      result.error
+    );
+    error.duration = duration;
+    logError(name, error);
+    throw error;
+  }
 
   if (result.status !== 0) {
     const error = new DeployError(
@@ -137,11 +170,14 @@ function acquireLock() {
 
 function releaseLock() {
   try {
+    if (!existsSync(lockFile)) return;
     unlinkSync(lockFile);
     logStep("LOCK", "Deployment lock released");
   } catch (err) {
-    // Lock file might not exist, ignore
-    logStep("LOCK", "Warning: Could not release deployment lock");
+    logStep(
+      "LOCK",
+      `Warning: Could not release deployment lock: ${err.message || err}`
+    );
   }
 }
 function preFlightChecks() {
@@ -230,6 +266,9 @@ async function main() {
     const totalDuration = Date.now() - deployStartTime;
     logStep("FAILED", `❌ Deployment failed after ${totalDuration}ms`);
 
+    // Release lock if we're bailing (clears stale lock from interrupted runs)
+    releaseLock();
+
     // Provide helpful recovery instructions
     console.error("\n=== RECOVERY INSTRUCTIONS ===");
     console.error("1. Check the error messages above for details");
@@ -240,20 +279,28 @@ async function main() {
     console.error("6. Try running verify manually: npm run verify");
     console.error("===============================\n");
 
-    process.exit(error.code || 1);
+    const exitCode = typeof error.code === "number" ? error.code : 1;
+    process.exit(exitCode);
   }
 }
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (error) => {
   logStep("FATAL", `Uncaught exception: ${error.message}`);
+  releaseLock();
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
   logStep("FATAL", `Unhandled rejection at ${promise}: ${reason}`);
+  releaseLock();
   process.exit(1);
 });
 
-// Run the main function
-main();
+// Run the main function and handle rejection so lock is released and exit code is numeric
+main().catch((error) => {
+  logStep("FAILED", `❌ ${error.message || error}`);
+  releaseLock();
+  const exitCode = typeof error.code === "number" ? error.code : 1;
+  process.exit(exitCode);
+});

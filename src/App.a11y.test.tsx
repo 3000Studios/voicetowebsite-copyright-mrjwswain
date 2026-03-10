@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { Suspense } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
@@ -32,11 +33,16 @@ describe("App Accessibility - Use Cases", () => {
   });
 
   it("renders accessible voice flow controls", async () => {
-    render(<App />);
+    render(
+      <Suspense fallback={<div data-testid="loading">Loading...</div>}>
+        <App />
+      </Suspense>
+    );
 
-    // Mic starts only after explicit user intent.
-    const tapToCreate = await waitFor(() =>
-      screen.getByRole("button", { name: /tap to create a website/i })
+    // Mic starts only after explicit user intent (aria-label on home CTA).
+    const tapToCreate = await waitFor(
+      () => screen.getByRole("button", { name: /tap to create a website/i }),
+      { timeout: 5000 }
     );
     expect(tapToCreate).toBeInTheDocument();
 

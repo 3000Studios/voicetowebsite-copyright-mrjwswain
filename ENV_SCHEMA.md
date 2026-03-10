@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-03-10T04:10:08.708Z
+Generated: 2026-03-10T08:13:47.308Z
 
 ## Summary
 
-- Scanned files: 442
+- Scanned files: 443
 - Used keys: 142
-- Defined keys: 85
-- Missing keys: 68
+- Defined keys: 87
+- Missing keys: 67
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -34,6 +34,7 @@ Generated: 2026-03-10T04:10:08.708Z
 | ALLOW_INSECURE_ADMIN_COOKIE_SECRET       | yes     | 0             | unused  |
 | ALLOW_REMOTE_DEPLOY_TRIGGER              | yes     | 4             | ok      |
 | ANALYZE                                  | no      | 1             | missing |
+| ANTHROPIC_API                            | yes     | 0             | unused  |
 | API_BASE_URL                             | no      | 2             | missing |
 | ASSETS                                   | yes     | 3             | ok      |
 | AUDIT_LOG                                | yes     | 2             | ok      |
@@ -98,7 +99,7 @@ Generated: 2026-03-10T04:10:08.708Z
 | NEXT_PUBLIC_ADSENSE_PUBLISHER_ID         | no      | 2             | missing |
 | NODE_ENV                                 | no      | 8             | missing |
 | OPENAI_API                               | yes     | 2             | ok      |
-| OPENAI_API_KEY                           | no      | 2             | missing |
+| OPENAI_API_KEY                           | yes     | 2             | ok      |
 | OPENAI_API_KEY3                          | yes     | 2             | ok      |
 | OPENAI_MODEL                             | yes     | 2             | ok      |
 | ORCH_MAX_ALL_PAGES_FILES                 | no      | 2             | missing |

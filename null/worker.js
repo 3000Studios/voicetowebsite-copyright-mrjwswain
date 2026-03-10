@@ -15679,7 +15679,7 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor(
             })));
           }
         }
-        
+
         if (${id}.value === undefined) {
           if (${k} in input) {
             newResult[${k}] = undefined;
@@ -15687,7 +15687,7 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor(
         } else {
           newResult[${k}] = ${id}.value;
         }
-        
+
       `);
         } else {
           doc.write(`
@@ -15697,7 +15697,7 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor(
             path: iss.path ? [${k}, ...iss.path] : [${k}]
           })));
         }
-        
+
         if (${id}.value === undefined) {
           if (${k} in input) {
             newResult[${k}] = undefined;
@@ -15705,7 +15705,7 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor(
         } else {
           newResult[${k}] = ${id}.value;
         }
-        
+
       `);
         }
       }
@@ -30403,15 +30403,7 @@ We are processing your order.`;
           pragmaNoCache: true,
         });
       }
-      if (
-        url2.pathname === "/appstore" ||
-        url2.pathname === "/appstore/" ||
-        url2.pathname === "/appstore.html" ||
-        url2.pathname === "/appstore-new" ||
-        url2.pathname === "/appstore-new.html"
-      ) {
-        return Response.redirect(new URL("/store", url2.origin), 302);
-      }
+      // Serve appstore and appstore-new as their HTML pages (no redirect to store)
       if (cleanPath && !cleanPath.includes(".") && cleanPath !== "/") {
         const htmlUrl = new URL(`${cleanPath}.html`, url2.origin);
         const htmlRes = await assets.fetch(new Request(htmlUrl, request));

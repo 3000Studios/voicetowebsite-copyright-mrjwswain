@@ -15,16 +15,16 @@ const AvatarAssistant: React.FC = () => {
   >([]);
   const avatarRef = useRef<HTMLDivElement>(null);
 
-  const messages: AvatarMessage[] = [
-    { text: "Hey there! I'm your AI assistant! 👋", type: "greeting" },
-    { text: "Need help with anything? Just ask!", type: "help" },
-    { text: "Let me show you some moves! 💃", type: "dance" },
-    { text: "I love helping you build amazing websites!", type: "talk" },
-    { text: "Want to see me dance? Click me!", type: "dance" },
-    { text: "I'm here to make your experience awesome!", type: "help" },
-  ];
-
   useEffect(() => {
+    const messages: AvatarMessage[] = [
+      { text: "Hey there! I'm your AI assistant! 👋", type: "greeting" },
+      { text: "Need help with anything? Just ask!", type: "help" },
+      { text: "Let me show you some moves! 💃", type: "dance" },
+      { text: "I love helping you build amazing websites!", type: "talk" },
+      { text: "Want to see me dance? Click me!", type: "dance" },
+      { text: "I'm here to make your experience awesome!", type: "help" },
+    ];
+
     const interval = setInterval(() => {
       const randomMessage =
         messages[Math.floor(Math.random() * messages.length)];
@@ -35,7 +35,7 @@ const AvatarAssistant: React.FC = () => {
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [messages]);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
