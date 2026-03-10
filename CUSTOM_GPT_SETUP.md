@@ -8,7 +8,7 @@
 Run:
 
 ```powershell
-npm run deploy
+npm run deploy:live
 ```
 
 ## 2. Configure GPT Action Schema
@@ -20,6 +20,9 @@ In your Custom GPT settings:
 3. Under **Authentication**, select **API Key**, header name `x-orch-token`, and paste your
    `ORCH_TOKEN` secret value.
 4. The schema already points to `https://voicetowebsite.com/api` — no URL changes needed.
+5. For connectivity checks, `GET /api/health` is the canonical health endpoint. The Worker also
+   exposes `GET /status` as a compatibility alias for clients that probe a generic status URL before
+   calling `executeCommand`.
 
 ## 3. Configure Deployment Trigger (Required for voice → live deploy)
 
@@ -182,7 +185,7 @@ To see the actual status and error:
 If you added the `VTW_CACHE` KV binding or changed secrets, run:
 
 ```bash
-npm run deploy
+npm run deploy:live
 ```
 
 Then try the Custom GPT again.

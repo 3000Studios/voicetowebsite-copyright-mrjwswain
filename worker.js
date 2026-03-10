@@ -1967,10 +1967,17 @@ export default {
         }
       }
 
-      if (url.pathname === "/api/health" && request.method === "GET") {
+      if (
+        (url.pathname === "/status" ||
+          url.pathname === "/api/status" ||
+          url.pathname === "/api/health") &&
+        request.method === "GET"
+      ) {
         return jsonResponse(200, {
           status: "ok",
           orchestrator: "online",
+          endpoint:
+            url.pathname === "/api/health" ? "/api/health" : "status-alias",
           d1: !!env.D1,
           assets: !!(env.ASSETS || env.SITE_ASSETS),
           ts: new Date().toISOString(),

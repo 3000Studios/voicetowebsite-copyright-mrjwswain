@@ -38,6 +38,26 @@
         }
       }
     },
+    "/status": {
+      "get": {
+        "operationId": "statusAlias",
+        "tags": ["Orchestration"],
+        "summary": "Compatibility health alias (no auth)",
+        "description": "Compatibility alias for clients that probe /status before calling executeCommand. Returns the same lightweight Worker health payload as /health.",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/execute": {
       "post": {
         "operationId": "executeCommand",

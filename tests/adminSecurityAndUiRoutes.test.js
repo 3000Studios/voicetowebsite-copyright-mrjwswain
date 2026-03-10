@@ -31,6 +31,23 @@ const extractFirstCookie = (setCookieHeader) => {
 };
 
 describe("Admin UI route guarding + critical admin endpoints", () => {
+  it("serves the Custom GPT compatibility status alias without auth", async () => {
+    const env = {
+      ASSETS: mockAssets,
+      NODE_ENV: "test",
+    };
+
+    const res = await worker.fetch(
+      new Request("https://example.com/status"),
+      env,
+      {}
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("ok");
+    expect(body.endpoint).toBe("status-alias");
+  });
+
   it("redirects /admin/* to /admin/access.html when unauthenticated", async () => {
     const env = {
       ASSETS: mockAssets,

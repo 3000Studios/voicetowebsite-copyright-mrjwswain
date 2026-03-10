@@ -3,7 +3,7 @@
 # After changing bindings, run: npm run types
 
 name = "voicetowebsite"
-compatibility_date = "2026-03-08"
+compatibility_date = "2026-03-10"
 main = "worker.js"
 compatibility_flags = ["nodejs_compat"]
 
