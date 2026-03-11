@@ -51,12 +51,23 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "about",
     imageUrl: `${BASE_IMG}/photo-1522071820081-009f0129c71c?w=800&q=80`,
     imageAlt: "Team collaboration and innovation",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1552664730-d307ca884978?w=600&q=80`,
+      `${BASE_IMG}/photo-1600880292203-757bb62b4baf?w=600&q=80`,
+      `${BASE_IMG}/photo-1557804506-669a67965ba0?w=600&q=80`,
+    ],
+    extraImageAlts: [
+      "Collaborative team meeting",
+      "Remote team and innovation",
+      "Workspace and technology",
+    ],
     videoUrl: videoUrl(VID.about),
     videoTitle: "VoiceToWebsite overview",
     paragraphs: [
       "VoiceToWebsite turns spoken intent into performant, deployable sites. Our mission is to make autonomous engineering accessible to every creator by wrapping complex infrastructure—Cloudflare Workers, Stripe/PayPal, SEO, analytics—into a simple conversational flow.",
       "We believe the best digital work is a blend of voice, automation, and expert stewardship. Codex, Gemini, and human reviewers orchestrate design, tests, and deployment while you stay focused on the big idea.",
       "We ship updates daily, log every action, and guard production with a safety-first rollback plan so teams can experiment fearlessly.",
+      "From solo creators to agencies, our users ship landing pages, stores, and blogs without writing code. Voice commands drive structure, content, and deployment so you can iterate in minutes instead of days.",
     ],
     cards: [
       {
@@ -79,11 +90,22 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "features",
     imageUrl: `${BASE_IMG}/photo-1551434678-e076c223a692?w=800&q=80`,
     imageAlt: "Development and feature building",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1460925895917-afdab827c52f?w=600&q=80`,
+      `${BASE_IMG}/photo-1551288049-bebda4e38f71?w=600&q=80`,
+      `${BASE_IMG}/photo-1555949963-aa79dcee981c?w=600&q=80`,
+    ],
+    extraImageAlts: [
+      "Analytics and dashboards",
+      "Data and insights",
+      "Design and development",
+    ],
     videoUrl: videoUrl(VID.features),
     videoTitle: "Features walkthrough",
     paragraphs: [
       "Voice-to-page architecture maps user intent to pages, sections, metadata, and conversion targets while preserving responsive structure. Intent parsing chooses page and section strategy; preview-first publishing protects production quality.",
       "AdSense readiness is built in: we keep a clear separation between editorial content and ads, mark all ad zones, and keep navigational trust pages easy to discover. Revenue actions are evaluated alongside user experience signals.",
+      "Custom domains, SSL, and CDN delivery are included so every site is fast and secure. Use the command center to tweak copy, update sections, or roll back a release with one click.",
     ],
     cards: [
       {
@@ -106,11 +128,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "how-it-works",
     imageUrl: `${BASE_IMG}/photo-1516321318423-f06f85e504b3?w=800&q=80`,
     imageAlt: "Workflow and process",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1551434678-e076c223a692?w=600&q=80`,
+      `${BASE_IMG}/photo-1504639725590-34d0984388bd?w=600&q=80`,
+    ],
+    extraImageAlts: ["Build pipeline", "Preview and deploy"],
     videoUrl: videoUrl(VID.howItWorks),
     videoTitle: "How it works demo",
     paragraphs: [
       "You speak your intent—a landing page, a store, a blog—and our pipeline parses it, generates structure and copy, applies a design system, and runs tests. Preview first, then publish when you're ready.",
       "Cloudflare Workers run at the edge for low latency. D1, KV, and R2 power persistence and media. Every action is logged and reversible.",
+      "The command center lets you refine copy, swap sections, or roll back a release without touching code. Voice and UI work together so you stay in control.",
     ],
     cards: [
       {
@@ -133,11 +161,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "demo",
     imageUrl: `${BASE_IMG}/photo-1591115765373-5207764f72e7?w=800&q=80`,
     imageAlt: "Demo and trial",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1517694712202-14dd9538aa97?w=600&q=80`,
+      `${BASE_IMG}/photo-1551650975-87deedd944c3?w=600&q=80`,
+    ],
+    extraImageAlts: ["Demo workflow", "Build and deploy"],
     videoUrl: videoUrl(VID.demo),
     videoTitle: "Demo video",
     paragraphs: [
       "The demo lets you run a full voice build: speak a prompt, confirm, and watch the system generate a preview. You can iterate on the result or publish when satisfied.",
       "Head to the home page and use the main voice CTA to start a build. No signup required for the demo flow.",
+      "Try prompts like “a landing page for a coffee shop” or “a three-page site for a consulting firm” to see how structure and copy are generated from your words.",
     ],
   },
   pricing: {
@@ -146,11 +180,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "pricing",
     imageUrl: `${BASE_IMG}/photo-1554224155-6726b3ff858f?w=800&q=80`,
     imageAlt: "Pricing and value",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1556742049-0cfed4f6a45d?w=600&q=80`,
+      `${BASE_IMG}/photo-1556742111-a301076d664d?w=600&q=80`,
+    ],
+    extraImageAlts: ["Plans and pricing", "Value and growth"],
     videoUrl: videoUrl(VID.pricing),
     videoTitle: "Pricing overview",
     paragraphs: [
       "Solo tier gives you one page, custom domain, SSL, and basic SEO. Business adds advanced analytics, priority support, and API access. Enterprise unlocks white-label options, dedicated support, and SLA guarantees.",
       "All tiers include Cloudflare-backed deployment, preview-first workflow, and checkout so you can sell your products.",
+      "No hidden fees. Upgrade or downgrade anytime. Annual billing saves 20% and includes a free month.",
     ],
     cards: [
       { title: "Solo", body: "1 page, custom domain, SSL, basic SEO — $49." },
@@ -170,11 +210,18 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "blog",
     imageUrl: `${BASE_IMG}/photo-1499750310107-5fef28a66643?w=800&q=80`,
     imageAlt: "Blog and content",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1504711434969-e33886168f5c?w=600&q=80`,
+      `${BASE_IMG}/photo-1455390582262-044c49527745?w=600&q=80`,
+      `${BASE_IMG}/photo-1486312338219-ce68d2c6f44d?w=600&q=80`,
+    ],
+    extraImageAlts: ["Writing and ideas", "Creative process", "Workspace"],
     videoUrl: videoUrl(VID.blog),
     videoTitle: "Latest updates",
     paragraphs: [
       "We write about voice-driven development, autonomous deployment, and how to get the most out of VoiceToWebsite. New posts are added regularly.",
       "Topics include AdSense readiness, Cloudflare Workers tips, Stripe and PayPal integration, and real-world case studies.",
+      "Subscribe to our newsletter or follow the RSS feed to get new articles as they go live.",
     ],
   },
   contact: {
@@ -183,11 +230,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "contact",
     imageUrl: `${BASE_IMG}/photo-1423666639041-f56000c27a9a?w=800&q=80`,
     imageAlt: "Contact and communication",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1557804506-669a67965ba0?w=600&q=80`,
+      `${BASE_IMG}/photo-1552664730-d307ca884978?w=600&q=80`,
+    ],
+    extraImageAlts: ["Team and support", "Collaboration"],
     videoUrl: videoUrl(VID.contact),
     videoTitle: "Contact info",
     paragraphs: [
       "For general inquiries, support, or partnership opportunities, reach out via the channels listed on this page. We aim to respond within one business day.",
       "Include your use case and any relevant details so we can route your message to the right team.",
+      "We also run live Q&A sessions and office hours—check the Livestream page for the schedule.",
     ],
     cards: [
       {
@@ -210,11 +263,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "support",
     imageUrl: `${BASE_IMG}/photo-1587563871167-1a67a6733f7d?w=800&q=80`,
     imageAlt: "Support and help",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1507003211169-0a1dd7228f2d?w=600&q=80`,
+      `${BASE_IMG}/photo-1551434678-e076c223a692?w=600&q=80`,
+    ],
+    extraImageAlts: ["Support team", "Help and documentation"],
     videoUrl: videoUrl(VID.support),
     videoTitle: "Support overview",
     paragraphs: [
       "Our support team is available to help with setup, deployment, and troubleshooting. Check the documentation and FAQ first; then contact us if you're stuck.",
       "Business and Enterprise tiers include priority support and faster response times.",
+      "We maintain a knowledge base, video tutorials, and API docs so you can self-serve when it's faster.",
     ],
   },
   privacy: {
@@ -249,11 +308,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "trust",
     imageUrl: `${BASE_IMG}/photo-1563013544-824ae1b704d3?w=800&q=80`,
     imageAlt: "Trust and security",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1563986768609-322dc135aaca?w=600&q=80`,
+      `${BASE_IMG}/photo-1551288049-bebda4e38f71?w=600&q=80`,
+    ],
+    extraImageAlts: ["Security and compliance", "Uptime and reliability"],
     videoUrl: videoUrl(VID.trust),
     videoTitle: "Trust center",
     paragraphs: [
       "We take security seriously. Infrastructure runs on Cloudflare; data is encrypted in transit and at rest. We follow best practices for access control, logging, and incident response.",
       "Our trust center documents our approach to availability, privacy, and compliance so you can assess us for your use case.",
+      "SOC 2 and GDPR alignment are on our roadmap; we publish status and incident updates transparently.",
     ],
   },
   status: {
@@ -262,11 +327,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "status",
     imageUrl: `${BASE_IMG}/photo-1551288049-bebda4e38f71?w=800&q=80`,
     imageAlt: "Status and uptime",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1551288049-bebda4e38f71?w=600&q=80`,
+      `${BASE_IMG}/photo-1460925895917-afdab827c52f?w=600&q=80`,
+    ],
+    extraImageAlts: ["Uptime and monitoring", "Infrastructure"],
     videoUrl: videoUrl(VID.status),
     videoTitle: "Status overview",
     paragraphs: [
       "VoiceToWebsite runs on Cloudflare's global network for high availability. We post updates here and via status pages when there are incidents or planned maintenance.",
       "For real-time status, check Cloudflare's status page and our own status dashboard when available.",
+      "Subscribe to status updates by email or RSS so you're notified of any incidents or planned maintenance.",
     ],
   },
   gallery: {
@@ -275,11 +346,22 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "gallery",
     imageUrl: `${BASE_IMG}/photo-1467232004584-a241de8bcf5d?w=800&q=80`,
     imageAlt: "Gallery of projects",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1558655146-d09347e92766?w=600&q=80`,
+      `${BASE_IMG}/photo-1557804506-669a67965ba0?w=600&q=80`,
+      `${BASE_IMG}/photo-1547658719-da2b51169166?w=600&q=80`,
+    ],
+    extraImageAlts: [
+      "Template showcase",
+      "Landing page example",
+      "Portfolio and design",
+    ],
     videoUrl: videoUrl(VID.gallery),
     videoTitle: "Gallery showcase",
     paragraphs: [
       "Browse examples of landing pages, stores, and blogs created with VoiceToWebsite. Each example is built from voice commands and can be customized further.",
       "Use these as inspiration for your own builds or as starting templates.",
+      "New examples are added as we ship features; filter by industry or use case to find the closest match.",
     ],
   },
   templates: {
@@ -288,11 +370,17 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "templates",
     imageUrl: `${BASE_IMG}/photo-1558655146-d09347e92766?w=800&q=80`,
     imageAlt: "Templates and themes",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1561070791-2526d31fe5dc?w=600&q=80`,
+      `${BASE_IMG}/photo-1547658719-da2b51169166?w=600&q=80`,
+    ],
+    extraImageAlts: ["Layout options", "Design themes"],
     videoUrl: videoUrl(VID.templates),
     videoTitle: "Templates overview",
     paragraphs: [
       "Choose from a set of responsive templates for landing pages, portfolios, and stores. Each template is optimized for performance and AdSense-ready structure.",
       "Templates can be applied during the voice build or switched later from the command center.",
+      "New templates are added regularly; request a layout or industry-specific theme via our feedback channel.",
     ],
   },
   partners: {
@@ -562,10 +650,16 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "store",
     imageUrl: `${BASE_IMG}/photo-1556742049-0cfed4f6a45d?w=800&q=80`,
     imageAlt: "Store",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1556742111-a301076d664d?w=600&q=80`,
+      `${BASE_IMG}/photo-1557821552-17105176677c?w=600&q=80`,
+    ],
+    extraImageAlts: ["Plans and checkout", "Products and add-ons"],
     videoUrl: videoUrl(VID.store),
     videoTitle: "Store",
     paragraphs: [
       "Purchase plans, add-ons, and VoiceToWebsite-branded items. Checkout is powered by Stripe and PayPal for your security.",
+      "All plans include a free trial or money-back guarantee so you can try before you commit. Volume and education discounts are available on request.",
     ],
   },
   appstore: {
@@ -574,10 +668,16 @@ export const SITE_PAGES: Record<string, ContentPageConfig> = {
     wallpaper: "appstore",
     imageUrl: `${BASE_IMG}/photo-1512941937669-90a1b58e7e9c?w=800&q=80`,
     imageAlt: "App store",
+    extraImageUrls: [
+      `${BASE_IMG}/photo-1512941937669-90a1b58e7e9c?w=600&q=80`,
+      `${BASE_IMG}/photo-1551650975-87deedd944c3?w=600&q=80`,
+    ],
+    extraImageAlts: ["App catalog", "Extensions and integrations"],
     videoUrl: videoUrl(VID.appstore),
     videoTitle: "App store",
     paragraphs: [
       "Browse and install apps that extend VoiceToWebsite: themes, integrations, and productivity tools from our team and community.",
+      "Each app is reviewed for security and compatibility. Submit your own via our developer program.",
     ],
   },
 };

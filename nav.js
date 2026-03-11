@@ -409,6 +409,10 @@
   const hasAdminAccess = () => serverAdminAuthenticated || hasSessionUnlock();
 
   const refreshAdminAccessState = async () => {
+    if (!isAdminPage() && !hasSessionUnlock()) {
+      serverAdminAuthenticated = false;
+      return false;
+    }
     try {
       const response = await fetch("/api/config/status", {
         credentials: "include",

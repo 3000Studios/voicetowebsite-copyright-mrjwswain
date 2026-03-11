@@ -10,7 +10,6 @@
     />
     <meta name="robots" content="index, follow" />
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD&intent=capture"></script>
     <script src="https://js.stripe.com/v3"></script>
     <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
@@ -121,6 +120,40 @@
     <script>
       let currentApp = null;
       let catalog = [];
+      const PAYPAL_CLIENT_ID = (() => {
+        const injected = "__PAYPAL_CLIENT_ID__";
+        if (injected && injected !== "__PAYPAL_CLIENT_ID__") return injected;
+        try {
+          const envClient = window.__ENV && (window.__ENV.PAYPAL_CLIENT_ID_PROD || window.__ENV.PAYPAL_CLIENT_ID);
+          return envClient ? String(envClient).trim() : "";
+        } catch (_) {
+          return "";
+        }
+      })();
+
+      function ensurePayPalSdk() {
+        if (window.paypal) return Promise.resolve(true);
+        if (!PAYPAL_CLIENT_ID) return Promise.resolve(false);
+
+        const existing = document.querySelector('script[data-paypal-sdk="true"]');
+        if (existing) {
+          return new Promise((resolve) => {
+            existing.addEventListener("load", () => resolve(true), { once: true });
+            existing.addEventListener("error", () => resolve(false), { once: true });
+          });
+        }
+
+        return new Promise((resolve) => {
+          const script = document.createElement("script");
+          script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(PAYPAL_CLIENT_ID)}&currency=USD&intent=capture`;
+          script.async = true;
+          script.defer = true;
+          script.dataset.paypalSdk = "true";
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.head.appendChild(script);
+        });
+      }
 
       // Load app catalog (Worker /api/catalog or /api/products returns { products, apps })
       async function loadCatalog() {
@@ -188,7 +221,7 @@
       let paypalButtonsRendered = false;
 
       // Purchase app: show modal and render PayPal + Stripe
-      function purchaseApp(appId) {
+      async function purchaseApp(appId) {
         currentApp = (catalog.apps || []).find((a) => a.id === appId);
         if (!currentApp) return;
 
@@ -208,6 +241,11 @@
         if (container) container.innerHTML = "";
         paypalButtonsRendered = false;
         document.getElementById("purchaseModal").style.display = "block";
+
+        const paypalReady = await ensurePayPalSdk();
+        if (container && !paypalReady) {
+          container.innerHTML = '<p class="muted">PayPal is not configured yet. Use Stripe checkout for now.</p>';
+        }
 
         // Render PayPal Buttons (createOrder -> /api/checkout, onApprove -> /api/paypal/capture)
         if (window.paypal && container && !paypalButtonsRendered) {

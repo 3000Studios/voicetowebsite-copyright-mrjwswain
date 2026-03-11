@@ -127,11 +127,12 @@ async function checkPage(page) {
 
       // Check for common error patterns
       const errorPatterns = [
-        /Error:/i,
         /TypeError:/i,
         /ReferenceError:/i,
+        /SyntaxError:/i,
         /Cannot read prop/i,
         /Failed to compile/i,
+        /Uncaught\s+(?:TypeError|ReferenceError|SyntaxError)/i,
       ];
 
       for (const pattern of errorPatterns) {

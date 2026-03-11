@@ -1,5 +1,16 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { lazy, useCallback, useEffect, useRef, useState } from "react";
+import {
+  AppWindow,
+  ArrowRight,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Music3,
+  PauseCircle,
+  ShoppingBag,
+  Tv,
+} from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   BrowserRouter,
   Link,
@@ -7,10 +18,20 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
+import AudioWaveform from "./components/AudioWaveform";
 import AvatarAssistant from "./components/AvatarAssistant";
 import EnhancedHamburgerNav from "./components/EnhancedHamburgerNav";
+import ErrorBoundary from "./components/ErrorBoundary";
 import GlobalFooter from "./components/GlobalFooter";
+import ScrollReveal from "./components/ScrollReveal";
+import TectonicBackground from "./components/TectonicBackground";
 import { FALLBACK_INTRO_SONG, INTRO_SONG } from "./constants";
+import {
+  HOME_EXPERIENCES,
+  HOME_FEATURES,
+  HOME_PROCESS,
+  HOME_TESTIMONIALS,
+} from "./content/homeContent";
 import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
 import GenericContentPage from "./pages/GenericContentPage";
@@ -23,15 +44,9 @@ import { trackRevenueEvent } from "./utils/revenueTracking";
 declare global {
   interface Window {
     __VTW_REACT_NAVIGATE__?: (to: string) => void;
+    __ENV?: Record<string, unknown>;
   }
 }
-
-// Lazy load heavy components
-const AudioWaveform = lazy(() => import("./components/AudioWaveform"));
-const ErrorBoundary = lazy(() => import("./components/ErrorBoundary"));
-const TectonicBackgroundLazy = lazy(
-  () => import("./components/TectonicBackground")
-);
 
 type PricingTier = {
   name: string;
@@ -47,12 +62,6 @@ type AdSlotKey =
   | "ADSENSE_SLOT_MID"
   | "ADSENSE_SLOT_BOTTOM";
 
-type ContentGuide = {
-  title: string;
-  summary: string;
-  bullets: string[];
-};
-
 type FaqItem = {
   question: string;
   answer: string;
@@ -63,6 +72,111 @@ type RuntimeHomeConfig = {
     headline?: string;
     subheadline?: string;
   };
+};
+
+const PRICING_TIERS: PricingTier[] = [
+  {
+    name: "Solo",
+    pages: "1 page",
+    price: "$49",
+    desc: "For single landing pages, portfolios, and focused launch campaigns.",
+    features: [
+      "Custom domain and SSL",
+      "Fast launch shell",
+      "Basic SEO structure",
+      "Email support",
+    ],
+  },
+  {
+    name: "Business",
+    pages: "5 pages",
+    price: "$199",
+    desc: "For teams that need a premium public presence with stronger conversion depth.",
+    highlight: true,
+    features: [
+      "Everything in Solo",
+      "Advanced analytics",
+      "Priority support",
+      "Custom integrations",
+      "API access",
+    ],
+  },
+  {
+    name: "Enterprise",
+    pages: "Unlimited",
+    price: "$499",
+    desc: "For full ecosystems, white-label delivery, and more controlled rollout paths.",
+    features: [
+      "Everything in Business",
+      "Dedicated support",
+      "White-label options",
+      "Custom development",
+      "SLA guarantees",
+    ],
+  },
+];
+
+const AD_COMPLIANCE_LINKS = [
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+  { label: "Support", href: "/support" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Trust Center", href: "/trust" },
+  { label: "Status", href: "/status" },
+];
+
+const FAQ_ITEMS: FaqItem[] = [
+  {
+    question: "How do I activate live AdSense units?",
+    answer:
+      "Set ADSENSE_PUBLISHER and slot values in environment config. Until then, placeholders render so layout stays review-friendly.",
+  },
+  {
+    question: "Can I control ad density?",
+    answer:
+      "Yes. Placement controls keep the editorial-to-ad ratio predictable and easier to review.",
+  },
+  {
+    question: "How are metrics calculated?",
+    answer:
+      "Dashboard metrics are derived from orders, sessions, and trailing windows with consistent formulas.",
+  },
+];
+
+const readRuntimeEnvValue = (key: string): string => {
+  if (typeof window === "undefined") return "";
+  const value = window.__ENV?.[key];
+  return typeof value === "string" ? value.trim() : "";
+};
+
+const upsertMetaTag = (
+  selector: string,
+  attributes: Record<string, string>,
+  content: string
+) => {
+  let tag = document.head.querySelector(selector) as HTMLMetaElement | null;
+  if (!tag) {
+    tag = document.createElement("meta");
+    Object.entries(attributes).forEach(([key, value]) =>
+      tag?.setAttribute(key, value)
+    );
+    document.head.appendChild(tag);
+  }
+  tag.content = content;
+};
+
+const upsertJsonLd = (id: string, payload: Record<string, unknown>) => {
+  let tag = document.head.querySelector(
+    `script[data-vtw-jsonld="${id}"]`
+  ) as HTMLScriptElement | null;
+  if (!tag) {
+    tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.dataset.vtwJsonld = id;
+    document.head.appendChild(tag);
+  }
+  tag.textContent = JSON.stringify(payload);
 };
 
 const RouterNavigationBridge: React.FC = () => {
@@ -81,116 +195,6 @@ const RouterNavigationBridge: React.FC = () => {
   return null;
 };
 
-const PRICING_TIERS: PricingTier[] = [
-  {
-    name: "Solo",
-    pages: "1 Page",
-    price: "$49",
-    desc: "For single landing pages or personal brands.",
-    features: [
-      "Custom Domain",
-      "SSL Certificate",
-      "Basic SEO",
-      "Email Support",
-    ],
-  },
-  {
-    name: "Business",
-    pages: "5 Pages",
-    price: "$199",
-    desc: "A full presence for your growing company.",
-    highlight: true,
-    features: [
-      "Everything in Solo",
-      "Advanced Analytics",
-      "Priority Support",
-      "Custom Integrations",
-      "API Access",
-    ],
-  },
-  {
-    name: "Enterprise",
-    pages: "Unlimited",
-    price: "$499",
-    desc: "Maximum power and white-label options.",
-    features: [
-      "Everything in Business",
-      "White-label Options",
-      "Dedicated Support",
-      "Custom Development",
-      "SLA Guarantee",
-    ],
-  },
-];
-
-const AD_COMPLIANCE_LINKS = [
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
-  { label: "Support", href: "/support" },
-  { label: "Privacy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
-  { label: "Trust Center", href: "/trust" },
-  { label: "Status", href: "/status" },
-];
-
-const CONTENT_GUIDES: ContentGuide[] = [
-  {
-    title: "Voice-to-page architecture",
-    summary:
-      "Every build request maps user intent to pages, sections, metadata, and conversion targets while preserving responsive structure.",
-    bullets: [
-      "Intent parsing chooses page and section strategy.",
-      "Preview-first publishing protects production quality.",
-      "All generated layouts default to mobile-first blocks.",
-    ],
-  },
-  {
-    title: "AdSense readiness workflow",
-    summary:
-      "We keep a clear separation between editorial content and ads, mark all ad zones, and keep navigational trust pages easy to discover.",
-    bullets: [
-      "Ad blocks are labeled and contextual.",
-      "Content density stays higher than ad density.",
-      "Policy pages and contact surfaces remain visible.",
-    ],
-  },
-  {
-    title: "Quality controls",
-    summary:
-      "Placement and CTAs are evaluated alongside user experience so layout stays readable and trustworthy.",
-    bullets: [
-      "Measured CTA placement and low-friction funnels.",
-      "Traffic and intent alignment checks.",
-      "Analytics-backed iteration with audit trails.",
-    ],
-  },
-];
-
-const FAQ_ITEMS: FaqItem[] = [
-  {
-    question: "How do I activate live AdSense units?",
-    answer:
-      "Set ADSENSE_PUBLISHER and ADSENSE_SLOT values in environment config. Until then, placeholders render so layout remains policy-safe.",
-  },
-  {
-    question: "Can I control ad density?",
-    answer:
-      "Yes. Placement controls enforce density caps and keep layouts predictable and reviewable.",
-  },
-  {
-    question: "How are dashboard metrics calculated?",
-    answer:
-      "Dashboard metrics are computed from orders, sessions, and trailing windows with clear formulas for conversion and engagement.",
-  },
-];
-
-const readRuntimeEnvValue = (key: string): string => {
-  if (typeof window === "undefined") return "";
-  const env = (window as Window & { __ENV?: Record<string, unknown> }).__ENV;
-  const value = env?.[key];
-  return typeof value === "string" ? value.trim() : "";
-};
-
 const AdSensePlacement: React.FC<{
   slotKey: AdSlotKey;
   title: string;
@@ -203,96 +207,83 @@ const AdSensePlacement: React.FC<{
 
   useEffect(() => {
     if (!showLiveUnit) return;
-    if (typeof window === "undefined") return;
     try {
       (
         (window as Window & { adsbygoogle?: Record<string, unknown>[] })
           .adsbygoogle || []
       ).push({});
     } catch (_) {
-      // Google ad scripts can throw before hydration/network readiness.
+      // Ad script can throw before network or hydration is fully ready.
     }
-  }, [showLiveUnit, publisher, slot]);
+  }, [showLiveUnit]);
 
   return (
-    <aside className="mb-10 rounded-3xl border border-emerald-400/35 bg-emerald-500/5 p-5 md:p-6">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="font-outfit text-[0.65rem] tracking-[0.28em] text-emerald-200/85 uppercase">
-          Advertisement
+    <ScrollReveal as="aside" className="vtw-section" variant="fade">
+      <div className="vtw-glass-card" style={{ padding: "1.2rem" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1rem",
+            flexWrap: "wrap",
+            marginBottom: "0.9rem",
+          }}
+        >
+          <span className="vtw-chip">Advertisement</span>
+          <span className="vtw-chip">
+            {showLiveUnit ? "Live slot" : "Placeholder"}
+          </span>
+        </div>
+        <h3
+          style={{
+            margin: 0,
+            fontFamily: "var(--font-display)",
+            fontSize: "1.3rem",
+          }}
+        >
+          {title}
+        </h3>
+        <p className="vtw-body-text" style={{ margin: "0.6rem 0 0" }}>
+          {description}
         </p>
-        <span className="rounded-full border border-white/15 px-3 py-1 text-[0.62rem] tracking-[0.2em] text-white/60 uppercase">
-          {showLiveUnit ? "Live Slot" : "Placeholder"}
-        </span>
+        <div
+          style={{
+            minHeight: "130px",
+            marginTop: "1rem",
+            padding: "1rem",
+            border: "1px dashed rgba(255,255,255,0.18)",
+            borderRadius: "22px",
+            background: "rgba(255,255,255,0.03)",
+          }}
+        >
+          {showLiveUnit ? (
+            <ins
+              className="adsbygoogle vtw-ad-block"
+              data-ad-client={publisher}
+              data-ad-slot={slot}
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            />
+          ) : (
+            <p className="vtw-body-text" style={{ margin: 0 }}>
+              Configure <code>ADSENSE_PUBLISHER</code> and slot variables to
+              render live ads. The placeholder keeps spacing stable during
+              review.
+            </p>
+          )}
+        </div>
       </div>
-      <h3 className="font-outfit text-lg text-white">{title}</h3>
-      <p className="mt-2 font-inter text-sm leading-relaxed text-white/65">
-        {description}
-      </p>
-      <div className="mt-4 min-h-[130px] rounded-2xl border border-dashed border-white/20 bg-black/35 px-3 py-4">
-        {showLiveUnit ? (
-          <ins
-            className="adsbygoogle vtw-ad-block"
-            data-ad-client={publisher}
-            data-ad-slot={slot}
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          />
-        ) : (
-          <p className="font-inter text-sm text-white/55">
-            Configure <code>ADSENSE_PUBLISHER</code> and slot variables to
-            render live ads. This placeholder preserves layout and content
-            spacing for review.
-          </p>
-        )}
-      </div>
-    </aside>
+    </ScrollReveal>
   );
 };
-
-const EnhancedTypography = () => (
-  <section className="mt-20 space-y-12">
-    {/* Font Showcase */}
-    <div className="text-center">
-      <h2 className="text-4xl md:text-6xl font-black mb-8 bg-gradient-to-r from-white via-cyan-400 to-white bg-clip-text text-transparent">
-        Typography Excellence
-      </h2>
-      <div className="grid md:grid-cols-3 gap-8 text-left">
-        <div className="p-6 rounded-xl border border-white/10 bg-white/5">
-          <h3 className="text-3xl font-bold text-white mb-4 font-outfit">
-            Outfit
-          </h3>
-          <p className="text-white/60 leading-relaxed">
-            Modern geometric sans-serif perfect for headlines and bold
-            statements.
-          </p>
-        </div>
-        <div className="p-6 rounded-xl border border-white/10 bg-white/5">
-          <h3 className="text-3xl font-normal text-white mb-4 font-inter">
-            Inter
-          </h3>
-          <p className="text-white/60 leading-relaxed">
-            Clean, readable typeface optimized for user interfaces and body
-            text.
-          </p>
-        </div>
-        <div className="p-6 rounded-xl border border-white/10 bg-white/5">
-          <h3 className="text-3xl font-mono text-white mb-4 font-jetbrains">
-            JetBrains
-          </h3>
-          <p className="text-white/60 leading-relaxed">
-            Developer-focused monospace font for code and technical content.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-);
 
 const HomeView: React.FC = () => {
   const audioPlayingRef = useRef(false);
   const musicManuallyStoppedRef = useRef(false);
+  const recognitionRef = useRef<any>(null);
+  const flowPhaseRef = useRef("ready");
 
-  // Core State
   const [tryPrompt, setTryPrompt] = useState("");
   const [flowPhase, setFlowPhase] = useState<
     "ready" | "listening" | "confirm" | "generating" | "result"
@@ -306,10 +297,10 @@ const HomeView: React.FC = () => {
   const [activeTierIndex, setActiveTierIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const [heroClock, setHeroClock] = useState("");
   const [runtimeHomeConfig, setRuntimeHomeConfig] =
     useState<RuntimeHomeConfig | null>(null);
+
   const FALLBACK_PREVIEW_URL = "/demo";
   const heroHeadline =
     runtimeHomeConfig?.hero?.headline?.trim() ||
@@ -320,79 +311,28 @@ const HomeView: React.FC = () => {
     siteConfig?.copy?.subhead?.trim() ||
     "Voice-to-website automation that builds, tests, and deploys in minutes with no handoffs or guesswork.";
   const homeSeoCopy = getSeoCopyForPath("/");
+  const activeTier = PRICING_TIERS[activeTierIndex];
+  const resolvedPreviewUrl =
+    generatedPreviewUrl ||
+    (generatedSiteId ? `/preview/${generatedSiteId}` : "") ||
+    FALLBACK_PREVIEW_URL;
 
   useEffect(() => {
-    document.title = homeSeoCopy.title;
-
-    const description = heroSubhead.trim() || homeSeoCopy.description;
-    const upsertMeta = (
-      selector: string,
-      attributes: Record<string, string>,
-      content: string
-    ) => {
-      let meta = document.querySelector(selector) as HTMLMetaElement | null;
-      if (!meta) {
-        meta = document.createElement("meta");
-        Object.entries(attributes).forEach(([key, value]) =>
-          meta?.setAttribute(key, value)
-        );
-        document.head.appendChild(meta);
-      }
-      meta.content = content;
-    };
-
-    let canonical = document.querySelector(
-      'link[rel="canonical"]'
-    ) as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.rel = "canonical";
-      document.head.appendChild(canonical);
-    }
-    canonical.href = window.location.href;
-
-    upsertMeta(
-      'meta[name="description"]',
-      { name: "description" },
-      description
-    );
-    upsertMeta(
-      'meta[property="og:title"]',
-      { property: "og:title" },
-      homeSeoCopy.title
-    );
-    upsertMeta(
-      'meta[property="og:description"]',
-      { property: "og:description" },
-      description
-    );
-    upsertMeta(
-      'meta[name="twitter:title"]',
-      { name: "twitter:title" },
-      homeSeoCopy.title
-    );
-    upsertMeta(
-      'meta[name="twitter:description"]',
-      { name: "twitter:description" },
-      description
-    );
-  }, [heroSubhead, homeSeoCopy.description, homeSeoCopy.title]);
+    flowPhaseRef.current = flowPhase;
+  }, [flowPhase]);
 
   useEffect(() => {
-    const format = () => {
-      const now = new Date();
-      return now
-        .toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        })
-        .replace(/:/g, ":");
-    };
+    const format = () =>
+      new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+
     setHeroClock(format());
-    const id = setInterval(() => setHeroClock(format()), 1000);
-    return () => clearInterval(id);
+    const id = window.setInterval(() => setHeroClock(format()), 1000);
+    return () => window.clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -407,7 +347,7 @@ const HomeView: React.FC = () => {
         const data = (await response.json()) as RuntimeHomeConfig;
         if (active) setRuntimeHomeConfig(data);
       } catch (_) {
-        // Fallback to bundled config when runtime content is unavailable.
+        // Fall back to bundled copy.
       }
     };
 
@@ -418,61 +358,75 @@ const HomeView: React.FC = () => {
     };
   }, []);
 
-  const recognitionRef = useRef<any>(null);
-  const flowPhaseRef = useRef(flowPhase);
-  const navMenuRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    flowPhaseRef.current = flowPhase;
-  }, [flowPhase]);
-
   useEffect(() => {
     if (flowPhase !== "result" || previewLoadState !== "loading") return;
-    const t = setTimeout(() => {
-      setPreviewLoadState((s) => (s === "loading" ? "error" : s));
+    const timer = window.setTimeout(() => {
+      setPreviewLoadState((current) =>
+        current === "loading" ? "error" : current
+      );
     }, 10000);
-    return () => clearTimeout(t);
+    return () => window.clearTimeout(timer);
   }, [flowPhase, previewLoadState]);
 
   useEffect(() => {
-    const onScroll = () => {
-      // Navigation fade logic removed
-    };
+    document.title = homeSeoCopy.title;
+    const description = heroSubhead.trim() || homeSeoCopy.description;
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    upsertMetaTag(
+      'meta[name="description"]',
+      { name: "description" },
+      description
+    );
+    upsertMetaTag(
+      'meta[property="og:title"]',
+      { property: "og:title" },
+      homeSeoCopy.title
+    );
+    upsertMetaTag(
+      'meta[property="og:description"]',
+      { property: "og:description" },
+      description
+    );
+    upsertMetaTag(
+      'meta[name="twitter:title"]',
+      { name: "twitter:title" },
+      homeSeoCopy.title
+    );
+    upsertMetaTag(
+      'meta[name="twitter:description"]',
+      { name: "twitter:description" },
+      description
+    );
 
-  useEffect(() => {
-    const handleOutside = (event: MouseEvent) => {
-      if (!isNavMenuOpen) return;
-      if (navMenuRef.current?.contains(event.target as Node)) return;
-      setIsNavMenuOpen(false);
-    };
+    const canonical = document.querySelector(
+      'link[rel="canonical"]'
+    ) as HTMLLinkElement | null;
+    if (canonical) canonical.href = window.location.href;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsNavMenuOpen(false);
-    };
-
-    document.addEventListener("mousedown", handleOutside);
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleOutside);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isNavMenuOpen]);
+    upsertJsonLd("home", {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "VoiceToWebsite",
+      description,
+      url: window.location.href,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Web Browser",
+      offers: {
+        "@type": "Offer",
+        price: "49",
+        priceCurrency: "USD",
+      },
+    });
+  }, [heroSubhead, homeSeoCopy.description, homeSeoCopy.title]);
 
   const startThemeSong = useCallback(async (overrideManualStop = false) => {
     if (musicManuallyStoppedRef.current && !overrideManualStop) return false;
     await audioEngine.enable();
-    audioEngine.unmuteMusicIfNeeded();
+    audioEngine.unmuteMusicIfNeeded?.();
 
-    // Try primary track; if it fails (blocked/404), fall back to the bundled loop.
     let ok = await audioEngine.playMusic(INTRO_SONG);
-    if (!ok) {
-      ok = await audioEngine.playMusic(FALLBACK_INTRO_SONG);
-    }
+    if (!ok) ok = await audioEngine.playMusic(FALLBACK_INTRO_SONG);
+
     audioPlayingRef.current = ok;
     setIsMusicPlaying(ok);
     return ok;
@@ -484,6 +438,11 @@ const HomeView: React.FC = () => {
     audioPlayingRef.current = false;
     setIsMusicPlaying(false);
   }, []);
+
+  useEffect(() => {
+    audioEngine.setVolume(0.36);
+    startThemeSong().catch(() => {});
+  }, [startThemeSong]);
 
   const initializeSpeechRecognition = useCallback(() => {
     if (recognitionRef.current) return recognitionRef.current;
@@ -499,37 +458,31 @@ const HomeView: React.FC = () => {
     recognition.lang = "en-US";
 
     recognition.onresult = (event: any) => {
-      // Only process results if we're still in listening phase
       if (flowPhaseRef.current !== "listening") return;
-
       const transcript = Array.from(event.results)
         .map((result: any) => result[0])
         .map((result: any) => result.transcript)
         .join("");
       setTryPrompt(transcript);
     };
+
     recognition.onend = () => {
-      // Only transition to confirm if we're still in listening phase
-      if (flowPhaseRef.current === "listening") {
-        setFlowPhase("confirm");
-      }
+      if (flowPhaseRef.current === "listening") setFlowPhase("confirm");
     };
+
     recognition.onerror = (error: any) => {
-      // Only handle error if we're still in listening phase
-      if (flowPhaseRef.current === "listening") {
-        console.error("Speech recognition error:", error);
-        setFlowPhase("ready");
-        setGenerateError(
-          error?.message || "Voice recognition encountered an error"
-        );
-      }
+      if (flowPhaseRef.current !== "listening") return;
+      console.error("Speech recognition error:", error);
+      setFlowPhase("ready");
+      setGenerateError(
+        error?.message || "Voice recognition encountered an error"
+      );
     };
 
     recognitionRef.current = recognition;
     return recognition;
   }, []);
 
-  // Initialize speech recognition once; start only when user explicitly taps CTA.
   useEffect(() => {
     const recognition = initializeSpeechRecognition();
     if (!recognition) return;
@@ -541,17 +494,6 @@ const HomeView: React.FC = () => {
     };
   }, [initializeSpeechRecognition]);
 
-  // Audio Control
-  useEffect(() => {
-    audioEngine.setVolume(0.4);
-  }, []);
-
-  // Theme song on homepage load; other pages get it from nav.js
-  useEffect(() => {
-    startThemeSong().catch(() => {});
-  }, [startThemeSong]);
-
-  // Actions
   const startListening = () => {
     const recognition = initializeSpeechRecognition();
     if (!recognition) {
@@ -560,9 +502,11 @@ const HomeView: React.FC = () => {
       );
       return;
     }
+
     setGenerateError("");
     setTryPrompt("");
     setFlowPhase("listening");
+
     try {
       recognition.start();
     } catch (_) {
@@ -575,7 +519,7 @@ const HomeView: React.FC = () => {
 
   const stopMic = () => {
     try {
-      recognitionRef.current.stop();
+      recognitionRef.current?.stop();
     } catch (_) {}
     setFlowPhase("confirm");
   };
@@ -587,9 +531,6 @@ const HomeView: React.FC = () => {
     setGeneratedSiteId("");
     setGenerateError("");
     setPreviewLoadState("idle");
-    audioEngine.stopMusic();
-    audioPlayingRef.current = false;
-    setIsMusicPlaying(false);
   };
 
   const validatePrompt = (
@@ -614,16 +555,13 @@ const HomeView: React.FC = () => {
       };
     }
 
-    // Enhanced security validation using HTML sanitizer
-    const escaped = escapeHtml(trimmed);
-    if (escaped !== trimmed) {
+    if (escapeHtml(trimmed) !== trimmed) {
       return {
         valid: false,
         error: "Prompt contains invalid characters or HTML content",
       };
     }
 
-    // Additional security checks for common attack vectors
     const dangerousPatterns = [
       /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
       /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
@@ -645,12 +583,8 @@ const HomeView: React.FC = () => {
       }
     }
 
-    // Check for excessive whitespace or repeated characters (potential DoS)
     if (/\s{20,}/.test(trimmed)) {
-      return {
-        valid: false,
-        error: "Prompt contains excessive whitespace",
-      };
+      return { valid: false, error: "Prompt contains excessive whitespace" };
     }
 
     if (/(.)\1{50,}/.test(trimmed)) {
@@ -674,19 +608,23 @@ const HomeView: React.FC = () => {
     setGenerateError("");
 
     try {
-      const res = await fetch("/api/generate", {
+      const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: tryPrompt.trim(), tone: "default" }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok)
-        throw new Error(data?.error || `Generate failed (HTTP ${res.status})`);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(
+          data?.error || `Generate failed (HTTP ${response.status})`
+        );
+      }
 
       const siteId = String(data?.siteId || "");
       const previewPath =
         String(data?.previewUrl || "").trim() ||
         (siteId ? `/preview/${siteId}` : "");
+
       let previewUrl = "";
       try {
         previewUrl = previewPath
@@ -700,22 +638,16 @@ const HomeView: React.FC = () => {
       setGeneratedPreviewUrl(previewUrl || FALLBACK_PREVIEW_URL);
       setPreviewLoadState("loading");
       setFlowPhase("result");
-    } catch (err: any) {
-      setGenerateError(err?.message || "Generate failed.");
+    } catch (error: any) {
+      setGenerateError(error?.message || "Generate failed.");
       setFlowPhase("confirm");
     }
   };
 
-  const activeTier = PRICING_TIERS[activeTierIndex];
-  const resolvedPreviewUrl =
-    generatedPreviewUrl ||
-    (generatedSiteId ? `/preview/${generatedSiteId}` : "") ||
-    FALLBACK_PREVIEW_URL;
-
   const shiftTier = useCallback((direction: number) => {
-    setActiveTierIndex((prev) => {
+    setActiveTierIndex((current) => {
       const next =
-        (prev + direction + PRICING_TIERS.length) % PRICING_TIERS.length;
+        (current + direction + PRICING_TIERS.length) % PRICING_TIERS.length;
       return next;
     });
   }, []);
@@ -748,15 +680,18 @@ const HomeView: React.FC = () => {
         source,
         ...params,
       });
+
       const search = new URLSearchParams({
         utm_source: source,
         utm_medium: "website",
         utm_campaign: "website",
       });
+
       Object.entries(params).forEach(([key, value]) => {
         if (!value) return;
         search.set(key, value);
       });
+
       window.location.href = `/store.html?${search.toString()}`;
     },
     []
@@ -764,356 +699,581 @@ const HomeView: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div
-        className="relative min-h-screen text-white select-none overflow-x-hidden font-outfit"
-        style={{ background: "var(--basalt-dark, #050506)" }}
-      >
-        <div className="fixed bottom-5 right-5 z-50">
-          <button
-            type="button"
-            onClick={toggleThemeSong}
-            className="px-4 py-2 rounded-full border border-emerald-300/50 bg-black/65 backdrop-blur-md text-xs font-outfit tracking-[0.18em] uppercase hover:bg-emerald-500/15 transition-all"
-            aria-label={
-              isMusicPlaying ? "Stop background song" : "Play background song"
-            }
-          >
-            {isMusicPlaying ? "Stop Song" : "Play Song"}
-          </button>
-        </div>
-
-        <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-8 pb-32">
-          {/* Basalt hero */}
-          <section className="min-h-[70vh] flex flex-col justify-center px-2 md:px-0">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="font-mono text-[0.7rem] mb-4 text-white/50"
-              style={{ fontFamily: "var(--font-family-mono)" }}
-            >
-              TIMESTAMP:{" "}
-              <span id="vtw-hero-clock">{heroClock || "00:00:00"}</span> //
-              STATUS: NOMINAL
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-outfit font-black text-5xl sm:text-6xl md:text-8xl lg:text-9xl tracking-tight leading-[0.85] uppercase mb-6"
-              style={{
-                letterSpacing: "-0.04em",
-                color: "var(--basalt-text-main)",
-              }}
-            >
-              {heroHeadline.toUpperCase().startsWith("VOICE") ||
-              !heroHeadline.trim() ? (
-                <>
-                  VOICE TO
-                  <br />
-                  WEBSITE
-                </>
-              ) : (
-                heroHeadline
+      <div className="vtw-app-shell">
+        <div className="vtw-shell-gradient" aria-hidden="true" />
+        <main className="vtw-container-wide" style={{ paddingBottom: "4rem" }}>
+          <section className="vtw-hero-shell">
+            <ScrollReveal as="div" className="vtw-hero-copy" variant="blur">
+              <div className="vtw-inline-meta">
+                <span className="vtw-chip">
+                  Live clock {heroClock || "00:00:00"}
+                </span>
+                <span className="vtw-chip">SEO-first shell</span>
+                <span className="vtw-chip">Store-ready</span>
+              </div>
+              <p className="vtw-hero-kicker">
+                Modern voice-to-website workflow
+              </p>
+              <h1 className="vtw-hero-title">
+                <span className="glow">{heroHeadline}</span>
+              </h1>
+              <p className="vtw-hero-body">{heroSubhead}</p>
+              <div className="vtw-hero-actions">
+                <button
+                  type="button"
+                  aria-label="Tap to create a website"
+                  className="vtw-button vtw-button-primary"
+                  onClick={startListening}
+                >
+                  Tap to create a website
+                </button>
+                <button
+                  type="button"
+                  className="vtw-button vtw-button-secondary"
+                  onClick={() => routeToStore("home_primary_buy_now")}
+                >
+                  Buy and launch
+                </button>
+                <button
+                  type="button"
+                  className="vtw-button vtw-button-secondary"
+                  onClick={toggleThemeSong}
+                >
+                  {isMusicPlaying ? (
+                    <PauseCircle size={16} />
+                  ) : (
+                    <Music3 size={16} />
+                  )}
+                  {isMusicPlaying ? "Stop score" : "Play score"}
+                </button>
+              </div>
+              {generateError && (
+                <p style={{ margin: 0, color: "#f38ea3", fontWeight: 600 }}>
+                  {generateError}
+                </p>
               )}
-            </motion.h1>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="font-mono text-sm max-w-md border-l-2 pl-6"
-              style={{
-                borderColor: "var(--resonance-mag)",
-                color: "var(--resonance-cyan)",
-              }}
-            >
-              {heroSubhead}
-            </motion.div>
-          </section>
+              <div className="vtw-metric-grid">
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Launch flow</span>
+                  <span className="vtw-metric__value">Voice to live</span>
+                </div>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Content hygiene</span>
+                  <span className="vtw-metric__value">Trust pages linked</span>
+                </div>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Blog cadence</span>
+                  <span className="vtw-metric__value">3 hour refresh</span>
+                </div>
+              </div>
+            </ScrollReveal>
 
-          {/* Strata grid — theme names + VoiceToWebsite value */}
-          <section className="mt-8 mb-20">
-            <div className="strata-grid">
-              <div className="strata-card">
-                <span className="index">01/03</span>
-                <h3>Crystalline Frequency Refraction</h3>
-                <p>
-                  Sub-surface processing for voice-to-site generation. Every
-                  command is parsed and executed with precision—structured
-                  content, clear navigation, and deployment in minutes.
-                </p>
+            <ScrollReveal as="aside" className="vtw-hero-panel" delayMs={120}>
+              <div className="vtw-hero-panel__top">
+                <div className="vtw-hero-panel__window" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <span className="vtw-chip">Premium public shell</span>
               </div>
-              <div className="strata-card" style={{ transitionDelay: "0.1s" }}>
-                <span className="index">02/03</span>
-                <h3>Kinetic Acoustic Lattice</h3>
-                <p>
-                  Dynamic UI and build flows that respond to your voice. Start a
-                  build, confirm, and deploy—fluid yet reliable under load.
-                </p>
+              <div
+                className="vtw-section__heading"
+                style={{ marginBottom: "1rem" }}
+              >
+                <div className="vtw-section-label">
+                  What the system organizes
+                </div>
+                <h2
+                  className="vtw-section-title"
+                  style={{ margin: 0, fontSize: "clamp(1.7rem, 3vw, 2.7rem)" }}
+                >
+                  One command becomes a structured site map.
+                </h2>
               </div>
-              <div className="strata-card" style={{ transitionDelay: "0.2s" }}>
-                <span className="index">03/03</span>
-                <h3>Refractive Vitreous Suspension</h3>
-                <p>
-                  Natural structural optimization for pages and layouts.
-                  Ad-ready content, policy visibility, and measurable conversion
-                  paths.
-                </p>
+              <div className="vtw-code-block">
+                {[
+                  "Voice brief translated into sections and metadata",
+                  "Preview-first release keeps production safe",
+                  "Pricing, blog, support, and archive routes stay connected",
+                ].map((line) => (
+                  <div key={line} className="vtw-code-line">
+                    {line}
+                  </div>
+                ))}
               </div>
-            </div>
+              <div className="vtw-grid-auto">
+                {HOME_PROCESS.map((item) => (
+                  <article
+                    key={item.step}
+                    className="vtw-card-hover"
+                    style={{
+                      padding: "1rem",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "22px",
+                      background: "rgba(255,255,255,0.03)",
+                    }}
+                  >
+                    <div className="vtw-section-label">{item.step}</div>
+                    <h3
+                      style={{
+                        margin: "0.7rem 0 0.45rem",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "1.08rem",
+                      }}
+                    >
+                      {item.title}
+                    </h3>
+                    <p className="vtw-body-text" style={{ margin: 0 }}>
+                      {item.copy}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </ScrollReveal>
           </section>
 
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_TOP"
             title="Top placement"
-            description="Editorial content appears before and after this block to keep layout and readability aligned."
+            description="Editorial content appears before and after this area so the page remains balanced and review-ready."
           />
 
-          <section className="mb-20 grid gap-6 lg:grid-cols-[1.35fr_1fr]">
-            <article className="rounded-3xl border border-white/15 bg-black/45 p-6 md:p-8">
-              <p className="font-outfit text-[0.7rem] tracking-[0.24em] text-cyan-300/80 uppercase">
-                Publisher-grade foundation
-              </p>
-              <h2 className="mt-3 font-outfit text-3xl md:text-4xl font-black">
-                Content-rich pages designed for ad and trust compliance.
+          <ScrollReveal as="section" className="vtw-section" id="features">
+            <div className="vtw-section__heading">
+              <div className="vtw-section-label">Features</div>
+              <h2 className="vtw-section-title">
+                A cleaner, premium interface without losing the working engine
+                underneath.
               </h2>
-              <p className="mt-4 font-inter text-white/70 leading-relaxed">
-                VoiceToWebsite generates and refines structured, useful content
-                so each page can pass quality review with clear navigation,
-                policy visibility, and meaningful editorial depth. The system
-                prioritizes user intent first, then placement and structure.
+              <p className="vtw-section-copy">
+                The redesign sharpens the visual system while leaving the public
+                routes, generation flow, store CTAs, trust pages, and runtime
+                content model intact.
               </p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
-                    Quality signal
-                  </p>
-                  <p className="mt-2 font-inter text-sm text-white/80">
-                    High information density with policy-safe CTA placement.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
-                    Governance signal
-                  </p>
-                  <p className="mt-2 font-inter text-sm text-white/80">
-                    Preview-first updates and auditable command execution.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
-                    Conversion signal
-                  </p>
-                  <p className="mt-2 font-inter text-sm text-white/80">
-                    Placements and conversions are measurable and configurable.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="font-outfit text-xs tracking-[0.18em] text-white/55 uppercase">
-                    UX signal
-                  </p>
-                  <p className="mt-2 font-inter text-sm text-white/80">
-                    Mobile-first layout, readable typography, predictable
-                    navigation.
-                  </p>
-                </div>
-              </div>
-            </article>
-            <aside className="rounded-3xl border border-white/15 bg-black/55 p-6 md:p-8">
-              <p className="font-outfit text-[0.7rem] tracking-[0.24em] text-emerald-300/80 uppercase">
-                Compliance links
-              </p>
-              <h3 className="mt-3 font-outfit text-2xl font-black">
-                Trust and policy surfaces
-              </h3>
-              <p className="mt-3 font-inter text-sm text-white/70 leading-relaxed">
-                These pages stay one click away to support ad network review and
-                user transparency.
-              </p>
-              <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {AD_COMPLIANCE_LINKS.map((item) => (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 font-outfit text-xs tracking-[0.14em] text-white/70 uppercase hover:text-white hover:border-emerald-300/45 transition-colors vtw-card-hover block text-center"
+            </div>
+            <div className="vtw-grid-3">
+              {HOME_FEATURES.map((feature, index) => (
+                <article
+                  key={feature.title}
+                  className="vtw-glass-card vtw-card-hover"
+                  style={{ padding: "1.35rem" }}
+                >
+                  <div className="vtw-section-label">{feature.eyebrow}</div>
+                  <h3
+                    className="vtw-card-title"
+                    style={{
+                      margin: "0.9rem 0 0.65rem",
+                      fontSize: "1.45rem",
+                      lineHeight: 1.02,
+                    }}
                   >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </aside>
-          </section>
-
-          {/* Enhanced Flow Section */}
-          <section className="relative z-20 mb-32">
-            <AnimatePresence mode="wait">
-              {flowPhase === "ready" && (
-                <motion.div
-                  key="ready"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
-                  className="text-center py-16"
-                >
-                  <div className="mb-10">
-                    <AudioWaveform
-                      active={false}
-                      mode="opener"
-                      className="mx-auto scale-125"
-                    />
-                  </div>
-                  <div className="mt-2 flex flex-col md:flex-row items-center justify-center gap-4">
-                    <button
-                      onClick={startListening}
-                      aria-label="Tap to create a website"
-                      className="px-14 py-5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black font-outfit text-base tracking-[0.12em] shadow-[0_12px_35px_rgba(56,189,248,0.25)] hover:shadow-[0_16px_45px_rgba(56,189,248,0.35)] transition-all uppercase"
-                    >
-                      Start a build
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => routeToStore("home_primary_buy_now")}
-                      className="px-12 py-5 rounded-full border border-emerald-300/60 bg-emerald-400/15 text-emerald-100 font-black font-outfit text-sm tracking-[0.16em] shadow-[0_10px_30px_rgba(16,185,129,0.25)] hover:bg-emerald-400/25 transition-all uppercase"
-                    >
-                      Buy & Launch
-                    </button>
-                  </div>
-                  <p className="mt-6 text-white/65 font-inter">
-                    Microphone activates only after you tap the button.
+                    {feature.title}
+                  </h3>
+                  <p className="vtw-body-text" style={{ margin: 0 }}>
+                    {feature.copy}
                   </p>
-                  {generateError && (
-                    <div className="mt-6 text-red-400 font-outfit text-sm uppercase tracking-widest">
-                      {generateError}
-                    </div>
-                  )}
-                </motion.div>
-              )}
+                  <ul className="vtw-list" style={{ marginTop: "1rem" }}>
+                    {feature.points.map((point) => (
+                      <li key={`${feature.title}-${point}`}>{point}</li>
+                    ))}
+                  </ul>
+                  <div style={{ marginTop: "1rem" }} className="vtw-chip">
+                    Card {String(index + 1).padStart(2, "0")}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </ScrollReveal>
 
-              {flowPhase === "listening" && (
-                <motion.div
-                  key="listening"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.1 }}
-                  className="text-center py-16"
+          <ScrollReveal as="section" className="vtw-section">
+            <div className="vtw-grid-2">
+              <article
+                className="vtw-glass-card"
+                style={{ padding: "1.35rem" }}
+              >
+                <div
+                  className="vtw-section__heading"
+                  style={{ marginBottom: "1rem" }}
                 >
-                  <div className="mb-16">
-                    <AudioWaveform
-                      active={true}
-                      mode="opener"
-                      className="mx-auto scale-150"
-                    />
-                  </div>
-                  <div className="text-3xl font-light text-white/80 min-h-[4rem] px-4 font-inter">
-                    {tryPrompt || "Listening for your command..."}
-                  </div>
-                  <button
-                    onClick={stopMic}
-                    className="mt-16 px-12 py-6 rounded-full border border-white/20 bg-white/10 hover:bg-white hover:text-black transition-all font-outfit tracking-widest uppercase text-sm font-semibold"
+                  <div className="vtw-section-label">How it works</div>
+                  <h2
+                    className="vtw-section-title"
+                    style={{ margin: 0, fontSize: "clamp(1.9rem, 4vw, 3rem)" }}
                   >
-                    Finish Command
-                  </button>
-                </motion.div>
-              )}
-
-              {flowPhase === "confirm" && (
-                <motion.div
-                  key="confirm"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center"
-                >
-                  <div className="text-sm font-outfit tracking-[0.4em] text-cyan-400 uppercase mb-12">
-                    System Check
-                  </div>
-                  <h3 className="text-4xl md:text-5xl font-outfit mb-8 font-black">
-                    Are you ready?
-                  </h3>
-                  <div className="bg-white/5 border border-white/10 p-8 rounded-3xl max-w-3xl mx-auto mb-12 text-2xl font-light text-white/90 shadow-inner backdrop-blur-sm">
-                    "{tryPrompt}"
-                  </div>
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                    <button
-                      onClick={resetFlow}
-                      className="w-full md:w-auto px-12 py-6 rounded-full border border-white/10 hover:bg-white/5 transition-all font-outfit text-sm tracking-widest uppercase"
+                    Distinct steps, less confusion, and a clearer path to
+                    launch.
+                  </h2>
+                </div>
+                <div style={{ display: "grid", gap: "0.9rem" }}>
+                  {HOME_PROCESS.map((item) => (
+                    <article
+                      key={item.step}
+                      style={{
+                        display: "grid",
+                        gap: "0.45rem",
+                        padding: "1rem",
+                        borderRadius: "22px",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "rgba(255,255,255,0.03)",
+                      }}
                     >
-                      Try Again
-                    </button>
-                    <button
-                      onClick={generateSite}
-                      className="w-full md:w-auto px-20 py-6 rounded-full bg-white text-black font-black font-outfit text-lg tracking-[0.2em] shadow-[0_0_40px_rgba(255,255,255,0.4)] hover:shadow-[0_0_60px_rgba(255,255,255,0.6)] transition-all uppercase"
-                    >
-                      MAKE IT
-                    </button>
-                  </div>
-                  {generateError && (
-                    <div className="mt-8 text-red-400 font-outfit text-sm uppercase tracking-widest">
-                      {generateError}
-                    </div>
-                  )}
-                </motion.div>
-              )}
+                      <div className="vtw-section-label">{item.step}</div>
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.15rem",
+                        }}
+                      >
+                        {item.title}
+                      </h3>
+                      <p className="vtw-body-text" style={{ margin: 0 }}>
+                        {item.copy}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </article>
 
-              {flowPhase === "generating" && (
-                <motion.div
-                  key="generating"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center py-24"
+              <article
+                className="vtw-glass-card"
+                style={{ padding: "1.35rem" }}
+              >
+                <div
+                  className="vtw-section__heading"
+                  style={{ marginBottom: "1rem" }}
                 >
-                  <div className="relative inline-block mb-16">
-                    <div className="absolute inset-0 animate-ping bg-cyan-500/20 rounded-full" />
-                    <div className="relative w-40 h-40 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
-                  </div>
-                  <h3 className="text-4xl md:text-5xl font-outfit font-black tracking-widest uppercase animate-pulse">
-                    Forging Website...
-                  </h3>
-                  <p className="mt-6 text-white/40 font-outfit text-sm tracking-[0.3em] uppercase">
-                    Build Pipeline: Active
+                  <div className="vtw-section-label">Trust and compliance</div>
+                  <h2
+                    className="vtw-section-title"
+                    style={{ margin: 0, fontSize: "clamp(1.9rem, 4vw, 3rem)" }}
+                  >
+                    Core support pages stay one click away.
+                  </h2>
+                  <p className="vtw-section-copy">
+                    These routes remain visible for trust, SEO, and review
+                    readiness while the footer carries lower-priority pages.
                   </p>
-                </motion.div>
-              )}
+                </div>
+                <div className="vtw-grid-auto">
+                  {AD_COMPLIANCE_LINKS.map((item) => (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      className="vtw-footer__link"
+                    >
+                      <span className="vtw-footer__link-label">
+                        {item.label}
+                      </span>
+                      <span className="vtw-footer__link-copy">
+                        Keep this page discoverable from the public shell.
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </article>
+            </div>
+          </ScrollReveal>
 
-              {flowPhase === "result" && (
-                <motion.div
-                  key="result"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center"
+          <ScrollReveal as="section" className="vtw-section" id="demo">
+            <div className="vtw-section__heading">
+              <div className="vtw-section-label">Demo</div>
+              <h2 className="vtw-section-title">
+                The live voice flow still works. It just looks like it belongs
+                on a premium product now.
+              </h2>
+              <p className="vtw-section-copy">
+                Start with voice, confirm the prompt, and move into preview
+                without leaving the public experience.
+              </p>
+            </div>
+            <div className="vtw-grid-2">
+              <article
+                className="vtw-glass-card"
+                style={{ padding: "1.35rem" }}
+              >
+                <AnimatePresence mode="wait">
+                  {flowPhase === "ready" && (
+                    <motion.div
+                      key="ready"
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="vtw-section-label">
+                        Voice studio ready
+                      </div>
+                      <h3
+                        style={{
+                          margin: "0.8rem 0 0.7rem",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.7rem",
+                        }}
+                      >
+                        Tap once to start the build conversation.
+                      </h3>
+                      <AudioWaveform
+                        active={false}
+                        mode="opener"
+                        className="vt-waveform"
+                      />
+                      <div
+                        className="vtw-hero-actions"
+                        style={{ marginTop: "1rem" }}
+                      >
+                        <button
+                          type="button"
+                          aria-label="Start build demo"
+                          className="vtw-button vtw-button-primary"
+                          onClick={startListening}
+                        >
+                          Start build demo
+                        </button>
+                        <button
+                          type="button"
+                          className="vtw-button vtw-button-secondary"
+                          onClick={() => routeToStore("home_demo_buy_now")}
+                        >
+                          Continue to store
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {flowPhase === "listening" && (
+                    <motion.div
+                      key="listening"
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="vtw-section-label">Listening</div>
+                      <h3
+                        style={{
+                          margin: "0.8rem 0 0.7rem",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.7rem",
+                        }}
+                      >
+                        Speak the site you want.
+                      </h3>
+                      <AudioWaveform
+                        active={true}
+                        mode="opener"
+                        className="vt-waveform"
+                      />
+                      <p
+                        style={{
+                          minHeight: "4rem",
+                          margin: "0.8rem 0 0",
+                          color: "var(--text-soft)",
+                          fontSize: "1.15rem",
+                        }}
+                      >
+                        {tryPrompt || "Listening for your command..."}
+                      </p>
+                      <button
+                        type="button"
+                        className="vtw-button vtw-button-secondary"
+                        onClick={stopMic}
+                        style={{ marginTop: "1rem" }}
+                      >
+                        Finish command
+                      </button>
+                    </motion.div>
+                  )}
+
+                  {flowPhase === "confirm" && (
+                    <motion.div
+                      key="confirm"
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="vtw-section-label">Confirm prompt</div>
+                      <h3
+                        style={{
+                          margin: "0.8rem 0 0.7rem",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.7rem",
+                        }}
+                      >
+                        Ready to generate?
+                      </h3>
+                      <div
+                        style={{
+                          padding: "1rem",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          borderRadius: "24px",
+                          background: "rgba(255,255,255,0.03)",
+                          color: "var(--text-soft)",
+                          fontSize: "1.08rem",
+                        }}
+                      >
+                        "{tryPrompt}"
+                      </div>
+                      <div
+                        className="vtw-hero-actions"
+                        style={{ marginTop: "1rem" }}
+                      >
+                        <button
+                          type="button"
+                          className="vtw-button vtw-button-secondary"
+                          onClick={resetFlow}
+                        >
+                          Try again
+                        </button>
+                        <button
+                          type="button"
+                          className="vtw-button vtw-button-primary"
+                          onClick={generateSite}
+                        >
+                          Make it
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {flowPhase === "generating" && (
+                    <motion.div
+                      key="generating"
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="vtw-section-label">Generating</div>
+                      <h3
+                        style={{
+                          margin: "0.8rem 0 0.7rem",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.7rem",
+                        }}
+                      >
+                        Building the preview now.
+                      </h3>
+                      <AudioWaveform
+                        active={true}
+                        mode="opener"
+                        className="vt-waveform"
+                      />
+                      <p className="vtw-body-text" style={{ margin: 0 }}>
+                        Structure, copy, and preview routing are being prepared.
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {flowPhase === "result" && (
+                    <motion.div
+                      key="result"
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="vtw-section-label">Result</div>
+                      <h3
+                        style={{
+                          margin: "0.8rem 0 0.7rem",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.7rem",
+                        }}
+                      >
+                        Site identity: {generatedSiteId}
+                      </h3>
+                      <div
+                        className="vtw-inline-meta"
+                        style={{ marginBottom: "1rem" }}
+                      >
+                        <span className="vtw-chip">
+                          {previewLoadState === "loaded"
+                            ? "Preview loaded"
+                            : previewLoadState === "error"
+                              ? "Preview fallback"
+                              : "Preview loading"}
+                        </span>
+                        <span className="vtw-chip">Voice flow complete</span>
+                      </div>
+                      <div className="vtw-hero-actions">
+                        <button
+                          type="button"
+                          className="vtw-button vtw-button-secondary"
+                          onClick={resetFlow}
+                        >
+                          Build another
+                        </button>
+                        <a
+                          href="/license.html"
+                          className="vtw-button vtw-button-primary"
+                        >
+                          Claim ownership
+                        </a>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </article>
+
+              <article className="vtw-glass-card" style={{ padding: "1.1rem" }}>
+                <div
+                  className="vtw-section-label"
+                  style={{ marginBottom: "0.8rem" }}
                 >
-                  <div className="text-sm font-outfit tracking-[0.4em] text-green-400 uppercase mb-12">
-                    Success
-                  </div>
-                  <h3 className="text-4xl md:text-5xl font-outfit mb-12 font-black">
-                    Site Identity: {generatedSiteId}
-                  </h3>
-
-                  {/* Enhanced Preview Box */}
-                  <div className="relative mb-16 rounded-3xl overflow-hidden border border-white/20 bg-black shadow-2xl group">
+                  Preview surface
+                </div>
+                <div
+                  style={{
+                    overflow: "hidden",
+                    borderRadius: "26px",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(5,7,10,0.9)",
+                  }}
+                >
+                  {flowPhase === "result" ? (
                     <div
-                      className="absolute inset-0 z-20 pointer-events-none bg-transparent select-none"
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
-                    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 px-8 py-3 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-outfit tracking-widest text-white/60 uppercase pointer-events-none">
-                      Neural Shield Active
-                    </div>
-                    <div className="vt-preview-scroll relative">
+                      className="vt-preview-scroll"
+                      style={{ position: "relative" }}
+                    >
                       {previewLoadState === "loading" && (
                         <div
-                          className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 text-white/80 font-outfit text-sm uppercase tracking-widest"
                           aria-live="polite"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            display: "grid",
+                            placeItems: "center",
+                            background: "rgba(5,7,10,0.82)",
+                            zIndex: 1,
+                          }}
                         >
-                          Loading preview…
+                          Loading preview...
                         </div>
                       )}
                       {previewLoadState === "error" && (
-                        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black/90 p-8 text-center">
-                          <p className="font-outfit text-sm uppercase tracking-widest text-white/80">
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            display: "grid",
+                            placeItems: "center",
+                            gap: "0.8rem",
+                            padding: "1rem",
+                            textAlign: "center",
+                            background: "rgba(5,7,10,0.88)",
+                            zIndex: 1,
+                          }}
+                        >
+                          <p style={{ margin: 0 }}>
                             Preview could not be displayed in-frame.
                           </p>
                           <a
                             href={resolvedPreviewUrl}
                             target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-cyan-400 underline underline-offset-4"
+                            rel="noreferrer"
                           >
                             Open in new tab
                           </a>
@@ -1122,8 +1282,8 @@ const HomeView: React.FC = () => {
                       <iframe
                         key={resolvedPreviewUrl}
                         src={resolvedPreviewUrl}
-                        className="vt-preview-frame w-full border-none grayscale-[0.2]"
-                        title="Website Preview"
+                        className="vt-preview-frame"
+                        title="Website preview"
                         scrolling="yes"
                         onLoad={() => setPreviewLoadState("loaded")}
                         onError={() => {
@@ -1133,247 +1293,403 @@ const HomeView: React.FC = () => {
                         sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                       />
                     </div>
-                    <div className="absolute inset-0 z-40 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
-                  </div>
-                  <p className="mb-8 text-sm text-white/70">
-                    If preview does not load in-frame, open it directly:{" "}
-                    <a
-                      href={resolvedPreviewUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-cyan-300 underline underline-offset-4"
+                  ) : (
+                    <div
+                      className="vtw-empty-state"
+                      style={{ minHeight: "420px", padding: "1.25rem" }}
                     >
-                      {resolvedPreviewUrl}
-                    </a>
-                  </p>
-
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                    <button
-                      onClick={resetFlow}
-                      className="w-full md:w-auto px-12 py-6 rounded-full border border-white/10 hover:bg-white/5 transition-all font-outfit text-sm tracking-widest uppercase"
-                    >
-                      Build Another
-                    </button>
-                    <a
-                      href="/license.html"
-                      className="w-full md:w-auto px-20 py-6 rounded-full bg-cyan-500 text-black font-black font-outfit text-lg tracking-[0.1em] shadow-[0_0_40px_rgba(34,211,238,0.4)] hover:shadow-[0_0_60px_rgba(34,211,238,0.6)] transition-all uppercase text-center"
-                    >
-                      Claim Ownership
-                    </a>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </section>
-
-          <section className="mb-24 space-y-6">
-            <div className="text-center">
-              <p className="font-outfit text-[0.72rem] tracking-[0.26em] text-cyan-300/85 uppercase">
-                Content engine
-              </p>
-              <h2 className="mt-3 font-outfit text-4xl md:text-6xl font-black">
-                Built for readers, crawlers, and quality review.
-              </h2>
-              <p className="mt-4 max-w-3xl mx-auto font-inter text-white/70">
-                Each page module is written to be useful by itself, connected to
-                related pages, and measurable through analytics events that map
-                to conversion goals.
-              </p>
+                      <div style={{ display: "grid", gap: "0.8rem" }}>
+                        <div className="vtw-chip">Preview first</div>
+                        <h3
+                          style={{
+                            margin: 0,
+                            fontFamily: "var(--font-display)",
+                            fontSize: "1.5rem",
+                          }}
+                        >
+                          When generation completes, the preview lands here.
+                        </h3>
+                        <p className="vtw-body-text" style={{ margin: 0 }}>
+                          The flow stays in one place: capture the prompt,
+                          confirm it, review the output, then move toward
+                          launch.
+                        </p>
+                        <div style={{ display: "grid", gap: "0.55rem" }}>
+                          {[
+                            "Preview shell stays on the public page",
+                            "Fallback opens the preview in a new tab",
+                            "License CTA remains connected to the result",
+                          ].map((line) => (
+                            <div
+                              key={line}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.6rem",
+                                justifyContent: "center",
+                                color: "var(--text-soft)",
+                              }}
+                            >
+                              <CheckCircle2 size={16} />
+                              <span>{line}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </article>
             </div>
-            <div className="grid gap-5 lg:grid-cols-3">
-              {CONTENT_GUIDES.map((guide) => (
-                <article
-                  key={guide.title}
-                  className="vtw-card-hover rounded-3xl border border-white/12 bg-white/[0.03] p-6"
-                >
-                  <h3 className="font-outfit text-xl font-bold">
-                    {guide.title}
-                  </h3>
-                  <p className="mt-3 font-inter text-sm leading-relaxed text-white/70">
-                    {guide.summary}
-                  </p>
-                  <ul className="mt-4 space-y-2">
-                    {guide.bullets.map((bullet) => (
-                      <li
-                        key={bullet}
-                        className="flex items-start gap-2 font-inter text-sm text-white/75"
-                      >
-                        <span className="mt-1 h-2 w-2 rounded-full bg-cyan-300/80" />
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </section>
+          </ScrollReveal>
 
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_MID"
-            title="Mid-content placement"
-            description="Placed between substantial editorial sections to preserve a balanced layout."
+            title="Mid-page placement"
+            description="Positioned between substantial sections so the content path remains more prominent than the ad unit."
           />
 
-          {/* Enhanced Typography Section */}
-          <EnhancedTypography />
-
-          {/* Swipe Pricing */}
-          <section
-            id="pricing"
-            className="mt-24 border-t border-white/10 pt-24"
-          >
-            <div className="text-center mb-20">
-              <h2 className="font-outfit font-black text-4xl md:text-6xl uppercase mb-6 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-                Ownership Tiers
+          <ScrollReveal as="section" className="vtw-section" id="pricing">
+            <div className="vtw-section__heading">
+              <div className="vtw-section-label">Pricing</div>
+              <h2 className="vtw-section-title">
+                Swipe or step through plans without leaving the premium shell.
               </h2>
-              <p className="text-white/40 text-xl md:text-2xl font-inter">
-                Swipe left or right to view pricing.
+              <p className="vtw-section-copy">
+                The commercial path stays simple: compare tiers, select the
+                plan, and drop into the store with tracking intact.
               </p>
             </div>
 
-            <div className="max-w-5xl mx-auto px-2 md:px-8">
-              <div className="flex items-center justify-center gap-3 md:gap-8">
-                <button
-                  type="button"
-                  onClick={() => shiftTier(-1)}
-                  aria-label="Previous pricing tier"
-                  className="w-11 h-11 md:w-14 md:h-14 rounded-full border border-emerald-300/50 bg-emerald-400/10 text-2xl text-white hover:bg-emerald-400/20 transition-all"
-                >
-                  ‹
-                </button>
+            <div
+              style={{
+                display: "grid",
+                gap: "1rem",
+                gridTemplateColumns: "auto minmax(0, 1fr) auto",
+                alignItems: "center",
+              }}
+            >
+              <button
+                type="button"
+                className="vtw-icon-button"
+                aria-label="Previous pricing tier"
+                onClick={() => shiftTier(-1)}
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <div
+                onTouchStart={handleTierTouchStart}
+                onTouchEnd={handleTierTouchEnd}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.article
+                    key={activeTier.name}
+                    className="vtw-glass-card"
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -24 }}
+                    transition={{ duration: 0.22, ease: "easeOut" }}
+                    style={{
+                      padding: "1.5rem",
+                      borderColor: activeTier.highlight
+                        ? "rgba(0,242,255,0.34)"
+                        : "rgba(255,255,255,0.1)",
+                      boxShadow: activeTier.highlight
+                        ? "0 28px 90px rgba(0,242,255,0.08)"
+                        : undefined,
+                    }}
+                  >
+                    <div className="vtw-inline-meta">
+                      <span className="vtw-chip">{activeTier.pages}</span>
+                      {activeTier.highlight && (
+                        <span className="vtw-chip">Recommended</span>
+                      )}
+                    </div>
+                    <h3
+                      style={{
+                        margin: "1rem 0 0.35rem",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "clamp(2rem, 4vw, 3rem)",
+                      }}
+                    >
+                      {activeTier.name}
+                    </h3>
+                    <div
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        fontSize: "clamp(2.8rem, 6vw, 4.6rem)",
+                        letterSpacing: "-0.07em",
+                        color: "var(--accent-cyan)",
+                      }}
+                    >
+                      {activeTier.price}
+                    </div>
+                    <p
+                      className="vtw-body-text"
+                      style={{ margin: "0.7rem 0 0" }}
+                    >
+                      {activeTier.desc}
+                    </p>
+                    <ul className="vtw-list" style={{ marginTop: "1.1rem" }}>
+                      {activeTier.features.map((feature) => (
+                        <li key={feature}>{feature}</li>
+                      ))}
+                    </ul>
+                    <button
+                      type="button"
+                      className={`vtw-button ${
+                        activeTier.highlight
+                          ? "vtw-button-primary"
+                          : "vtw-button-secondary"
+                      }`}
+                      style={{ width: "100%", marginTop: "1.3rem" }}
+                      onClick={() =>
+                        routeToStore("home_pricing_tier", {
+                          plan: activeTier.name.toLowerCase(),
+                        })
+                      }
+                    >
+                      Select tier
+                    </button>
+                  </motion.article>
+                </AnimatePresence>
 
                 <div
-                  className="w-full max-w-2xl touch-pan-y"
-                  onTouchStart={handleTierTouchStart}
-                  onTouchEnd={handleTierTouchEnd}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "0.55rem",
+                    marginTop: "1rem",
+                  }}
                 >
-                  <AnimatePresence mode="wait">
-                    <motion.article
-                      key={activeTier.name}
-                      initial={{ opacity: 0, x: 40 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -40 }}
-                      transition={{ duration: 0.25 }}
-                      className={`p-8 md:p-12 rounded-[2.2rem] border backdrop-blur-sm ${activeTier.highlight ? "border-cyan-500 bg-white/10 shadow-[0_0_50px_rgba(34,211,238,0.2)]" : "border-white/10 bg-white/[0.02]"}`}
-                    >
-                      <div className="font-outfit text-sm tracking-widest text-white/40 uppercase mb-8">
-                        {activeTier.pages}
-                      </div>
-                      <h3 className="font-outfit text-3xl font-black mb-4">
-                        {activeTier.name}
-                      </h3>
-                      <div className="text-5xl font-outfit font-black mb-8 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                        {activeTier.price}
-                      </div>
-                      <p className="text-white/40 text-lg leading-relaxed mb-12 font-inter">
-                        {activeTier.desc}
-                      </p>
-
-                      <ul className="space-y-4 mb-12">
-                        {activeTier.features.map((feature) => (
-                          <li
-                            key={feature}
-                            className="flex items-center text-white/60 font-inter"
-                          >
-                            <svg
-                              className="w-5 h-5 mr-3 text-cyan-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          routeToStore("home_pricing_tier", {
-                            plan: activeTier.name.toLowerCase(),
-                          })
-                        }
-                        className={`block w-full text-center py-6 rounded-full font-outfit text-sm tracking-widest uppercase transition-all font-semibold ${activeTier.highlight ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-[0_0_30px_rgba(34,211,238,0.4)] hover:shadow-[0_0_50px_rgba(34,211,238,0.6)]" : "border border-white/20 hover:bg-white/5"}`}
-                      >
-                        Select Tier
-                      </button>
-                    </motion.article>
-                  </AnimatePresence>
+                  {PRICING_TIERS.map((tier, index) => (
+                    <button
+                      key={tier.name}
+                      type="button"
+                      aria-label={`Go to ${tier.name} tier`}
+                      onClick={() => setActiveTierIndex(index)}
+                      style={{
+                        width: index === activeTierIndex ? "34px" : "10px",
+                        height: "10px",
+                        borderRadius: "999px",
+                        border: "none",
+                        background:
+                          index === activeTierIndex
+                            ? "var(--accent-cyan)"
+                            : "rgba(255,255,255,0.24)",
+                        cursor: "pointer",
+                        transition: "all 220ms ease",
+                      }}
+                    />
+                  ))}
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => shiftTier(1)}
-                  aria-label="Next pricing tier"
-                  className="w-11 h-11 md:w-14 md:h-14 rounded-full border border-emerald-300/50 bg-emerald-400/10 text-2xl text-white hover:bg-emerald-400/20 transition-all"
-                >
-                  ›
-                </button>
               </div>
 
-              <div className="mt-7 flex items-center justify-center gap-2">
-                {PRICING_TIERS.map((tier, idx) => (
-                  <button
-                    key={tier.name}
-                    type="button"
-                    onClick={() => setActiveTierIndex(idx)}
-                    aria-label={`Go to ${tier.name} tier`}
-                    className={`h-2.5 rounded-full transition-all ${idx === activeTierIndex ? "w-9 bg-emerald-300" : "w-2.5 bg-white/30"}`}
-                  />
-                ))}
-              </div>
+              <button
+                type="button"
+                className="vtw-icon-button"
+                aria-label="Next pricing tier"
+                onClick={() => shiftTier(1)}
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
-          </section>
+          </ScrollReveal>
+
+          <ScrollReveal as="section" className="vtw-section">
+            <div className="vtw-section__heading">
+              <div className="vtw-section-label">Ecosystem</div>
+              <h2 className="vtw-section-title">
+                App store, store, and livestream surfaces are now part of the
+                same visual language.
+              </h2>
+              <p className="vtw-section-copy">
+                These supporting areas keep their functionality, but the public
+                shell no longer treats them like separate worlds.
+              </p>
+            </div>
+            <div className="vtw-grid-3">
+              {HOME_EXPERIENCES.map((experience) => {
+                const Icon =
+                  experience.title === "App Store"
+                    ? AppWindow
+                    : experience.title === "Store"
+                      ? ShoppingBag
+                      : Tv;
+
+                return (
+                  <article
+                    key={experience.title}
+                    className="vtw-glass-card vtw-card-hover"
+                    style={{ padding: "1.35rem" }}
+                  >
+                    <div className="vtw-chip">
+                      <Icon size={15} />
+                      {experience.title}
+                    </div>
+                    <h3
+                      style={{
+                        margin: "0.95rem 0 0.55rem",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "1.45rem",
+                      }}
+                    >
+                      {experience.title}
+                    </h3>
+                    <p className="vtw-body-text" style={{ margin: 0 }}>
+                      {experience.copy}
+                    </p>
+                    <Link
+                      to={experience.href}
+                      className="vtw-button vtw-button-secondary"
+                      style={{ marginTop: "1.1rem" }}
+                    >
+                      {experience.label}
+                      <ArrowRight size={16} />
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal as="section" className="vtw-section">
+            <div className="vtw-grid-2">
+              <article
+                className="vtw-glass-card"
+                style={{ padding: "1.35rem" }}
+              >
+                <div
+                  className="vtw-section__heading"
+                  style={{ marginBottom: "1rem" }}
+                >
+                  <div className="vtw-section-label">Testimonials</div>
+                  <h2
+                    className="vtw-section-title"
+                    style={{ margin: 0, fontSize: "clamp(1.9rem, 4vw, 3rem)" }}
+                  >
+                    The interface feels calmer, but the real win is clarity.
+                  </h2>
+                </div>
+                <div style={{ display: "grid", gap: "0.95rem" }}>
+                  {HOME_TESTIMONIALS.map((testimonial) => (
+                    <article
+                      key={testimonial.name}
+                      style={{
+                        padding: "1rem",
+                        borderRadius: "22px",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "rgba(255,255,255,0.03)",
+                      }}
+                    >
+                      <p style={{ margin: 0, lineHeight: 1.7 }}>
+                        “{testimonial.quote}”
+                      </p>
+                      <div
+                        style={{
+                          marginTop: "0.85rem",
+                          color: "var(--text-muted)",
+                        }}
+                      >
+                        {testimonial.name}, {testimonial.role}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </article>
+
+              <article
+                className="vtw-glass-card"
+                style={{ padding: "1.35rem" }}
+              >
+                <div
+                  className="vtw-section__heading"
+                  style={{ marginBottom: "1rem" }}
+                >
+                  <div className="vtw-section-label">FAQ</div>
+                  <h2
+                    className="vtw-section-title"
+                    style={{ margin: 0, fontSize: "clamp(1.9rem, 4vw, 3rem)" }}
+                  >
+                    Operating questions, answered clearly.
+                  </h2>
+                </div>
+                <div style={{ display: "grid", gap: "0.95rem" }}>
+                  {FAQ_ITEMS.map((item) => (
+                    <article
+                      key={item.question}
+                      style={{
+                        padding: "1rem",
+                        borderRadius: "22px",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "rgba(255,255,255,0.03)",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.05rem",
+                        }}
+                      >
+                        {item.question}
+                      </h3>
+                      <p
+                        className="vtw-body-text"
+                        style={{ margin: "0.55rem 0 0" }}
+                      >
+                        {item.answer}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </article>
+            </div>
+          </ScrollReveal>
 
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_BOTTOM"
             title="Lower-page placement"
-            description="A lower-page area for users who reviewed pricing and continue exploring content."
+            description="A lower-page area for visitors who continue exploring after reviewing the product, demo, and pricing sections."
           />
 
-          <section className="mt-16 rounded-3xl border border-white/15 bg-black/45 p-6 md:p-8">
-            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="font-outfit text-[0.72rem] tracking-[0.26em] text-emerald-300/85 uppercase">
-                  FAQ
-                </p>
-                <h2 className="mt-2 font-outfit text-3xl md:text-4xl font-black">
-                  Ad-ready operations, answered clearly.
-                </h2>
-              </div>
-              <a
-                href="/api-documentation"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2 font-outfit text-xs tracking-[0.16em] uppercase text-white/80 hover:text-white hover:border-cyan-300/60 transition-colors"
+          <ScrollReveal as="section" className="vtw-section">
+            <div className="vtw-glass-card" style={{ padding: "1.5rem" }}>
+              <div
+                className="vtw-section__heading"
+                style={{ marginBottom: "1rem" }}
               >
-                API Documentation
-              </a>
-            </div>
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              {FAQ_ITEMS.map((item) => (
-                <article
-                  key={item.question}
-                  className="vtw-card-hover rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                <div className="vtw-section-label">Call to action</div>
+                <h2
+                  className="vtw-section-title"
+                  style={{ margin: 0, maxWidth: "18ch" }}
                 >
-                  <h3 className="font-outfit text-base font-semibold">
-                    {item.question}
-                  </h3>
-                  <p className="mt-2 font-inter text-sm leading-relaxed text-white/70">
-                    {item.answer}
-                  </p>
-                </article>
-              ))}
+                  Move from curiosity to a launch-ready site path.
+                </h2>
+                <p className="vtw-section-copy">
+                  Start the voice demo, review pricing, or dive into the content
+                  layer through the blog and structured footer archive.
+                </p>
+              </div>
+              <div className="vtw-hero-actions">
+                <button
+                  type="button"
+                  className="vtw-button vtw-button-primary"
+                  onClick={startListening}
+                >
+                  Start the voice demo
+                </button>
+                <Link to="/pricing" className="vtw-button vtw-button-secondary">
+                  Review plans
+                </Link>
+                <Link to="/blog" className="vtw-button vtw-button-secondary">
+                  Browse the blog
+                </Link>
+              </div>
             </div>
-          </section>
-
-          <div className="h-24" />
+          </ScrollReveal>
         </main>
-
-        {/* Global AdSense-Approved Footer */}
         <ErrorBoundary fallback={null}>
           <GlobalFooter />
         </ErrorBoundary>
@@ -1386,9 +1702,7 @@ const App: React.FC = () => (
   <ErrorBoundary>
     <BrowserRouter>
       <RouterNavigationBridge />
-      <React.Suspense fallback={null}>
-        <TectonicBackgroundLazy />
-      </React.Suspense>
+      <TectonicBackground />
       <div className="tectonic-border" aria-hidden="true" />
       <EnhancedHamburgerNav />
       <ErrorBoundary fallback={null}>

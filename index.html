@@ -73,13 +73,14 @@
     <meta property="twitter:creator" content="@3000studios" />
     <meta property="twitter:site" content="@voicetowebsite" />
 
-    <meta name="theme-color" content="#7dd3fc" />
+    <meta name="theme-color" content="#05070A" />
+    <meta name="vtw-shell" content="off" />
     <meta name="application-name" content="VoiceToWebsite" />
     <meta name="apple-mobile-web-app-title" content="VoiceToWebsite" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="msapplication-TileColor" content="#7dd3fc" />
+    <meta name="msapplication-TileColor" content="#05070A" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
 
     <link rel="canonical" href="https://voicetowebsite.com/" />
@@ -90,27 +91,17 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@200;300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap"
-      rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
-    <link rel="stylesheet" href="/src/styles/responsive-wallpapers.css" />
-    <link rel="stylesheet" href="/src/styles/obsidian-kinetic-flow.css" />
-
     <style>
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-        background: #050505;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background: #05070a;
+        color: #f5f3ee;
       }
 
       #root {
@@ -122,32 +113,33 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
+        background:
+          radial-gradient(circle at top left, rgba(0, 242, 255, 0.15), transparent 35%),
+          radial-gradient(circle at top right, rgba(112, 0, 255, 0.16), transparent 35%), #05070a;
+      }
+
+      .loading-card {
+        padding: 24px 28px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        background: rgba(15, 20, 27, 0.82);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+        text-align: center;
+        backdrop-filter: blur(14px);
+      }
+
+      .loading-title {
+        margin: 0 0 10px;
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .loading-copy {
+        margin: 0;
+        color: rgba(245, 243, 238, 0.68);
       }
     </style>
-
-    <link rel="stylesheet" href="/phosphor-nav.css" />
-    <link rel="stylesheet" href="/styles.css" />
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;600;800&family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media = 'all'"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;600;800&family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
-
-    <script>
-      window.addEventListener("load", function () {
-        var script = document.createElement("script");
-        script.src = "https://cdn.tailwindcss.com";
-        document.head.appendChild(script);
-      });
-    </script>
 
     <script>
       window.addEventListener("load", function () {
@@ -161,32 +153,13 @@
     <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
   </head>
   <body>
-    <div class="responsive-wallpaper-container wallpaper-gradient-1"></div>
-
     <div id="initial-loader" class="loading">
-      <div style="text-align: center">
-        <div class="million-dollar-heading" style="font-size: 2rem; margin-bottom: 1rem">VoiceToWebsite</div>
-        <div class="tech-luxury-text" style="font-size: 0.9rem">Loading amazing experiences...</div>
+      <div class="loading-card">
+        <h1 class="loading-title">VoiceToWebsite</h1>
+        <p class="loading-copy">Loading the premium public experience...</p>
       </div>
-    </div>
-
-    <div id="control-lock" style="display: none">
-      <div class="control-panel">
-        <h3>Admin Controls</h3>
-        <input
-          type="password"
-          id="control-password"
-          placeholder="Enter admin password"
-          autocomplete="current-password"
-        />
-        <button id="unlock-control">Unlock</button>
-        <div id="control-lock-note"></div>
-      </div>
-      <div id="control-grid" style="display: none"></div>
     </div>
     <div id="root"></div>
-
-    <div id="avatar-assistant-root"></div>
 
     <script>
       function hideLoader() {
@@ -208,14 +181,6 @@
 
     <script defer src="/tracking.js"></script>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      window.addEventListener("load", function () {
-        var s = document.createElement("script");
-        s.type = "module";
-        s.src = "/nav.js";
-        document.body.appendChild(s);
-      });
-    </script>
     <svg
       style="visibility: hidden; position: absolute"
       width="0"

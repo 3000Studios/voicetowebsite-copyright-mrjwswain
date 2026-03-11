@@ -1,6 +1,25 @@
+import { Instagram, Twitter, Youtube } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
 import { SITE_FOOTER_GROUPS } from "../shared/siteManifest";
+
+const SOCIAL_LINKS = [
+  {
+    href: "https://x.com/voicetowebsite",
+    label: "VoiceToWebsite on X",
+    icon: Twitter,
+  },
+  {
+    href: "https://instagram.com/3000studios",
+    label: "3000 Studios on Instagram",
+    icon: Instagram,
+  },
+  {
+    href: "https://youtube.com",
+    label: "VoiceToWebsite on YouTube",
+    icon: Youtube,
+  },
+];
 
 const GlobalFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -11,118 +30,146 @@ const GlobalFooter: React.FC = () => {
     0;
 
   return (
-    <footer className="relative z-10 mt-20 border-t border-white/10 bg-slate-950/92 text-white">
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid gap-10 border-b border-white/10 pb-10 lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="space-y-5">
-            <p className="text-[0.72rem] uppercase tracking-[0.3em] text-cyan-200/80">
-              Footer Archive
-            </p>
-            <h2 className="font-outfit text-3xl font-black leading-tight text-white md:text-4xl">
-              Every extra page now has one organized place to live.
+    <footer className="vtw-footer">
+      <div className="vtw-footer__shell">
+        <section className="vtw-footer__hero">
+          <div className="vtw-glass-card" style={{ padding: "1.4rem" }}>
+            <div className="vtw-chip">Footer archive and discovery</div>
+            <h2
+              style={{
+                margin: "1rem 0 0.65rem",
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2rem, 4vw, 3.4rem)",
+                lineHeight: 0.94,
+                letterSpacing: "-0.05em",
+              }}
+            >
+              Premium shell up front. Structured page recovery underneath.
             </h2>
-            <p className="max-w-2xl text-sm leading-relaxed text-white/68 md:text-base">
-              This footer acts like a clean site directory. Core revenue pages
-              stay easy to reach, and lower-priority pages move here instead of
-              cluttering the main navigation. That also gives crawlers stronger
-              internal linking and makes missing content easier to spot.
+            <p
+              style={{
+                margin: 0,
+                maxWidth: "42rem",
+                color: "var(--text-muted)",
+                lineHeight: 1.7,
+              }}
+            >
+              Every extra page now has one organized place to live.
             </p>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">
-                  Trust pages
-                </p>
-                <p className="mt-2 text-xl font-black text-white">
-                  {trustLinks}
-                </p>
+            <p
+              style={{
+                margin: "0.7rem 0 0",
+                maxWidth: "42rem",
+                color: "var(--text-muted)",
+                lineHeight: 1.7,
+              }}
+            >
+              Core conversion pages stay in the floating navigation, while
+              lower-priority, archival, or trust-related routes remain
+              discoverable here for users, crawlers, and your own content
+              cleanup workflow.
+            </p>
+            <div className="vtw-metric-grid" style={{ marginTop: "1.4rem" }}>
+              <div className="vtw-metric">
+                <span className="vtw-metric__label">Trust pages</span>
+                <span className="vtw-metric__value">{trustLinks}</span>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">
-                  Archive pages
-                </p>
-                <p className="mt-2 text-xl font-black text-white">
-                  {archiveLinks}
-                </p>
+              <div className="vtw-metric">
+                <span className="vtw-metric__label">Archive pages</span>
+                <span className="vtw-metric__value">{archiveLinks}</span>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">
-                  Blog refresh
-                </p>
-                <p className="mt-2 text-xl font-black text-white">3 hrs</p>
+              <div className="vtw-metric">
+                <span className="vtw-metric__label">Blog refresh</span>
+                <span className="vtw-metric__value">3 hrs</span>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {SITE_FOOTER_GROUPS.map((group) => (
-              <section
-                key={group.id}
-                aria-labelledby={`footer-group-${group.id}`}
-                className="rounded-3xl border border-white/10 bg-white/[0.03] p-5"
-              >
-                <h3
-                  id={`footer-group-${group.id}`}
-                  className="font-outfit text-lg font-black text-white"
+          <div className="vtw-glass-card" style={{ padding: "1.4rem" }}>
+            <div className="vtw-chip">VoiceToWebsite</div>
+            <h3
+              style={{
+                margin: "1rem 0 0.55rem",
+                fontFamily: "var(--font-display)",
+                fontSize: "1.45rem",
+              }}
+            >
+              Sleek public UX, stable page map, and live content surfaces.
+            </h3>
+            <p
+              style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.7 }}
+            >
+              Use the footer as the directory for support, archive, and content
+              depth while the homepage and primary routes stay focused on the
+              main product narrative.
+            </p>
+            <div style={{ marginTop: "1.25rem" }} className="vtw-socials">
+              {SOCIAL_LINKS.map(({ href, icon: Icon, label }) => (
+                <a
+                  key={href}
+                  className="vtw-social"
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
                 >
-                  {group.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/60">
-                  {group.description}
-                </p>
-                <ul className="mt-5 space-y-3">
-                  {group.links.map((link) => (
-                    <li key={link.href}>
-                      {link.fullReload ? (
-                        <a
-                          href={link.href}
-                          className="block rounded-2xl border border-white/8 bg-black/20 px-4 py-3 transition-colors hover:border-cyan-300/25 hover:bg-cyan-400/6"
-                        >
-                          <span className="block text-sm font-semibold text-white">
-                            {link.label}
-                          </span>
-                          <span className="mt-1 block text-xs leading-relaxed text-white/58">
-                            {link.description}
-                          </span>
-                        </a>
-                      ) : (
-                        <Link
-                          to={link.href}
-                          className="block rounded-2xl border border-white/8 bg-black/20 px-4 py-3 transition-colors hover:border-cyan-300/25 hover:bg-cyan-400/6"
-                        >
-                          <span className="block text-sm font-semibold text-white">
-                            {link.label}
-                          </span>
-                          <span className="mt-1 block text-xs leading-relaxed text-white/58">
-                            {link.description}
-                          </span>
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="flex flex-col gap-3 pt-6 text-sm text-white/55 md:flex-row md:items-center md:justify-between">
-          <p>
-            © {currentYear} VoiceToWebsite. Structured pages, trust content, and
-            live runtime updates.
+        <section className="vtw-footer__columns">
+          {SITE_FOOTER_GROUPS.map((group) => (
+            <div key={group.id} className="vtw-footer__column">
+              <h3>{group.title}</h3>
+              <p>{group.description}</p>
+              <div className="vtw-footer__links">
+                {group.links.map((link) =>
+                  link.fullReload ? (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      className="vtw-footer__link"
+                    >
+                      <span className="vtw-footer__link-label">
+                        {link.label}
+                      </span>
+                      <span className="vtw-footer__link-copy">
+                        {link.description}
+                      </span>
+                    </a>
+                  ) : (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className="vtw-footer__link"
+                    >
+                      <span className="vtw-footer__link-label">
+                        {link.label}
+                      </span>
+                      <span className="vtw-footer__link-copy">
+                        {link.description}
+                      </span>
+                    </Link>
+                  )
+                )}
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <div className="vtw-footer__bottom">
+          <p style={{ margin: 0 }}>
+            © {currentYear} VoiceToWebsite. Clear navigation, organized archive
+            routes, and live content updates.
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/privacy" className="hover:text-white transition-colors">
-              Privacy
-            </Link>
-            <Link to="/terms" className="hover:text-white transition-colors">
-              Terms
-            </Link>
-            <Link to="/support" className="hover:text-white transition-colors">
-              Support
-            </Link>
-            <Link to="/contact" className="hover:text-white transition-colors">
-              Contact
-            </Link>
+          <div className="vtw-footer__bottom-links">
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/support">Support</Link>
+            <Link to="/contact">Contact</Link>
           </div>
         </div>
       </div>

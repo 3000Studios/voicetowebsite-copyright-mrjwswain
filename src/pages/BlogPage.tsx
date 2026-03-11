@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import PageLayout from "../components/PageLayout";
+import ScrollReveal from "../components/ScrollReveal";
 import {
   DEFAULT_BLOG_FEED,
   type BlogFeed,
@@ -40,15 +40,11 @@ const BlogPage: React.FC = () => {
         });
         if (!response.ok) return;
         const payload = await response.json();
-        if (active) {
-          setFeed(normalizeBlogFeedPayload(payload));
-        }
+        if (active) setFeed(normalizeBlogFeedPayload(payload));
       } catch (_) {
-        // Keep the bundled feed when runtime content is unavailable.
+        // Keep bundled feed when runtime content is unavailable.
       } finally {
-        if (active) {
-          setIsLoading(false);
-        }
+        if (active) setIsLoading(false);
       }
     };
 
@@ -65,39 +61,47 @@ const BlogPage: React.FC = () => {
       subtitle={feed.heroSubtitle}
       wallpaper="blog"
     >
-      <div className="space-y-16">
-        <motion.section
-          className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-        >
-          <article className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04]">
+      <div style={{ display: "grid", gap: "1.5rem" }}>
+        <ScrollReveal as="section" className="vtw-grid-2" variant="blur">
+          <article
+            className="vtw-glass-card vtw-card-hover"
+            style={{ padding: "1rem" }}
+          >
             {featuredPost && (
               <>
                 <img
                   src={featuredPost.imageUrl}
                   alt={featuredPost.imageAlt}
-                  className="h-64 w-full object-cover md:h-80"
+                  style={{
+                    width: "100%",
+                    height: "clamp(260px, 38vw, 420px)",
+                    objectFit: "cover",
+                    borderRadius: "24px",
+                  }}
                 />
-                <div className="space-y-4 p-6">
-                  <div className="flex flex-wrap gap-2 text-[0.7rem] uppercase tracking-[0.22em] text-cyan-200/80">
-                    <span>Featured article</span>
-                    <span>•</span>
-                    <span>{featuredPost.readTime}</span>
+                <div
+                  style={{ display: "grid", gap: "0.9rem", marginTop: "1rem" }}
+                >
+                  <div className="vtw-inline-meta">
+                    <span className="vtw-chip">Featured article</span>
+                    <span className="vtw-chip">{featuredPost.readTime}</span>
                   </div>
-                  <h2 className="font-outfit text-2xl font-black text-white md:text-4xl">
+                  <h2
+                    className="vtw-card-title"
+                    style={{
+                      margin: 0,
+                      fontSize: "clamp(1.8rem, 4vw, 3rem)",
+                      lineHeight: 0.98,
+                    }}
+                  >
                     {featuredPost.title}
                   </h2>
-                  <p className="max-w-3xl text-base leading-relaxed text-white/72 md:text-lg">
+                  <p className="vtw-body-text" style={{ margin: 0 }}>
                     {featuredPost.excerpt}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="vtw-inline-meta">
                     {featuredPost.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/75"
-                      >
+                      <span key={tag} className="vtw-chip">
                         {tag}
                       </span>
                     ))}
@@ -107,108 +111,126 @@ const BlogPage: React.FC = () => {
             )}
           </article>
 
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-cyan-300/20 bg-cyan-500/5 p-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full border border-emerald-300/25 bg-emerald-400/10 px-3 py-1 text-[0.7rem] uppercase tracking-[0.24em] text-emerald-200">
+          <div style={{ display: "grid", gap: "1.5rem" }}>
+            <article className="vtw-glass-card" style={{ padding: "1.25rem" }}>
+              <div className="vtw-inline-meta">
+                <span className="vtw-chip">
                   {isLoading ? "Loading feed" : "Live feed"}
                 </span>
-                <span className="text-sm text-white/55">
+                <span className="vtw-chip">
                   Refreshes every {feed.refreshHours} hours
                 </span>
               </div>
-              <h3 className="mt-4 font-outfit text-2xl font-black text-white">
+              <h3
+                style={{
+                  margin: "1rem 0 0.6rem",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "1.8rem",
+                }}
+              >
                 Search coverage that keeps updating.
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/70">
+              <p className="vtw-body-text" style={{ margin: 0 }}>
                 The blog is driven by runtime JSON so new posts can appear
-                without a full frontend rebuild. This keeps the content layer
-                active for search and easier to inspect from the admin side.
+                without a full frontend rebuild. That keeps the content layer
+                active for search and easier to inspect.
               </p>
-              <dl className="mt-5 grid gap-3 text-sm text-white/70 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <dt className="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">
-                    Last generated
-                  </dt>
-                  <dd className="mt-2 font-medium text-white">
+              <div className="vtw-metric-grid" style={{ marginTop: "1.1rem" }}>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Last generated</span>
+                  <span
+                    className="vtw-metric__value"
+                    style={{ fontSize: "1rem", letterSpacing: 0 }}
+                  >
                     {formatGeneratedTime(feed.generatedAt)}
-                  </dd>
+                  </span>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <dt className="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">
-                    Total posts
-                  </dt>
-                  <dd className="mt-2 font-medium text-white">
-                    {feed.posts.length}
-                  </dd>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Total posts</span>
+                  <span className="vtw-metric__value">{feed.posts.length}</span>
                 </div>
-              </dl>
-            </div>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Publish cycle</span>
+                  <span className="vtw-metric__value">
+                    {feed.refreshHours}h
+                  </span>
+                </div>
+              </div>
+            </article>
 
-            <div className="aspect-video overflow-hidden rounded-3xl border border-white/10 bg-black/30">
-              <iframe
-                src={YOUTUBE_EMBED}
-                title="VoiceToWebsite blog overview"
-                className="h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+            <article
+              className="vtw-glass-card vtw-card-hover"
+              style={{ padding: "1rem" }}
+            >
+              <div style={{ overflow: "hidden", borderRadius: "24px" }}>
+                <iframe
+                  src={YOUTUBE_EMBED}
+                  title="VoiceToWebsite blog overview"
+                  className="vt-preview-frame"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </article>
           </div>
-        </motion.section>
+        </ScrollReveal>
 
-        <motion.section
-          className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          {feed.posts.map((post, index) => (
-            <motion.article
+        <ScrollReveal as="section" className="vtw-grid-auto">
+          {feed.posts.map((post) => (
+            <article
               key={`${post.id}-${post.date}`}
               id={post.slug}
-              className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]"
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: index * 0.05 }}
+              className="vtw-glass-card vtw-card-hover"
+              style={{ padding: "1rem" }}
             >
               <img
                 src={post.imageUrl}
                 alt={post.imageAlt}
-                className="h-44 w-full object-cover"
+                style={{
+                  width: "100%",
+                  height: "220px",
+                  objectFit: "cover",
+                  borderRadius: "22px",
+                }}
               />
-              <div className="space-y-4 p-5">
-                <div className="flex flex-wrap gap-2 text-xs text-white/55">
-                  <span>{formatPublishedDate(post.date)}</span>
-                  <span>•</span>
-                  <span>{post.readTime}</span>
+              <div
+                style={{ display: "grid", gap: "0.8rem", marginTop: "1rem" }}
+              >
+                <div className="vtw-inline-meta">
+                  <span className="vtw-chip">
+                    {formatPublishedDate(post.date)}
+                  </span>
+                  <span className="vtw-chip">{post.readTime}</span>
                 </div>
-                <h2 className="vtw-card-title text-xl text-white">
+                <h2
+                  className="vtw-card-title"
+                  style={{ margin: 0, fontSize: "1.35rem", lineHeight: 1.04 }}
+                >
                   {post.title}
                 </h2>
-                <p className="vtw-body-text text-sm leading-relaxed text-white/72">
+                <p className="vtw-body-text" style={{ margin: 0 }}>
                   {post.excerpt}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="vtw-inline-meta">
                   {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-white/10 px-2.5 py-1 text-[0.68rem] uppercase tracking-[0.16em] text-white/80"
-                    >
+                    <span key={tag} className="vtw-chip">
                       {tag}
                     </span>
                   ))}
                 </div>
                 <a
                   href={post.url || `/blog#${post.slug}`}
-                  className="inline-flex items-center text-sm font-semibold text-cyan-200 transition-colors hover:text-cyan-100"
+                  style={{
+                    color: "var(--accent-cyan)",
+                    fontWeight: 600,
+                  }}
                 >
                   Read this update
                 </a>
               </div>
-            </motion.article>
+            </article>
           ))}
-        </motion.section>
+        </ScrollReveal>
       </div>
     </PageLayout>
   );

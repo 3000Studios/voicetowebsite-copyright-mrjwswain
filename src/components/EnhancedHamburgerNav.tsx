@@ -1,20 +1,36 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowRight,
+  Command,
+  Lock,
+  Menu,
+  Shield,
+  Sparkles,
+  X,
+} from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { SHARED_NAV_ITEMS } from "../constants/navigation";
 
-/** True if link should open in same tab as full page (admin or .html), not SPA */
+const ADMIN_CODES = new Set(["ADMIN_ACCESS_2024", "UNLOCK_ADMIN_123"]);
+const PRIMARY_LABELS = new Set([
+  "Home",
+  "Features",
+  "Demo",
+  "Pricing",
+  "Store",
+  "App Store",
+  "Blog",
+  "Support",
+]);
+
 const isAdminOrStatic = (href: string) =>
   href.startsWith("/admin") || href.includes(".html");
 
-/** Shuffled delays for letter spin (fixed order so no hydration mismatch) */
-const LETTER_DELAYS = [
-  0, 1.1, 0.3, 0.8, 1.6, 0.2, 1.4, 0.5, 1.0, 0.7, 1.3, 0.1, 1.5, 0.4, 0.9, 1.2,
-  0.6,
-];
-const LETTER_DURATIONS = [
-  2.2, 2.8, 2.5, 3.0, 2.3, 2.9, 2.4, 3.1, 2.6, 2.7, 2.1, 3.2, 2.0, 2.5, 2.8,
-  2.3, 2.6,
-];
+const isActiveRoute = (pathname: string, href: string) => {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
 
 interface EnhancedHamburgerNavProps {
   isAdminAuthenticated?: boolean;
@@ -27,141 +43,55 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
   onAdminLogin,
   onAdminLogout,
 }) => {
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const location = useLocation();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [adminCode, setAdminCode] = useState("");
+  const [adminError, setAdminError] = useState("");
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
 
-  // Close menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
+    const storedValue = window.localStorage.getItem("VTW_ADMIN_UNLOCKED");
+    setIsAdminUnlocked(storedValue === "true");
   }, []);
 
-  // Sizzle sound effect
-  const playSizzle = () => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext
-      )();
-    }
-
-    try {
-      const audioCtx = audioContextRef.current;
-      if (audioCtx.state === "suspended") {
-        audioCtx.resume();
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsDrawerOpen(false);
+        setIsAdminModalOpen(false);
       }
+    };
 
-      const bufferSize = audioCtx.sampleRate * 1.5;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
-      // Use crypto API for better randomness
-      const randomValues = new Uint8Array(bufferSize);
-      crypto.getRandomValues(randomValues);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (randomValues[i]! / 255) * 2 - 1;
-      }
-
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
-
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = "highpass";
-      filter.frequency.value = 2000;
-
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2);
-
-      noise.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      noise.start();
-
-      // Auto-cleanup after sound finishes
-      setTimeout(() => {
-        noise.stop();
-        noise.disconnect();
-        filter.disconnect();
-        gain.disconnect();
-      }, 1500);
-    } catch (error) {
-      console.warn("Sizzle sound failed:", error);
-    }
-  };
-
-  const handleNavClick = (
-    href: string,
-    requiresAuth: boolean,
-    e: React.MouseEvent,
-    isInternal: boolean
-  ) => {
-    if (requiresAuth && !isAdminAuthenticated && isAdminOrStatic(href)) {
-      e.preventDefault();
-      const code = prompt("Enter admin access code:");
-      if (code === "ADMIN_ACCESS_2024" || code === "UNLOCK_ADMIN_123") {
-        onAdminLogin?.();
-        setShowAdminPanel(true);
-      } else if (code) {
-        alert("Invalid access code");
-      }
-      return;
-    }
-
-    playSizzle();
-    const target = e?.currentTarget as HTMLElement;
-    if (target) {
-      target.classList.add("vtw-phosphor-melting");
-    }
-
-    if (isInternal) {
-      setTimeout(() => {
-        target?.classList.remove("vtw-phosphor-melting");
-        setIsOpen(false);
-        navigate(href);
-      }, 400);
-    } else {
-      setTimeout(() => {
-        target?.classList.remove("vtw-phosphor-melting");
-        window.location.href = href;
-      }, 400);
-    }
-  };
-
-  const handleAdminLogout = () => {
-    setShowAdminPanel(false);
-    onAdminLogout?.();
-    setIsOpen(false);
-  };
+  const isAdminEnabled = isAdminAuthenticated || isAdminUnlocked;
+  const primaryLinks = useMemo(
+    () =>
+      SHARED_NAV_ITEMS.filter(
+        (item) => !item.requiresAuth && PRIMARY_LABELS.has(item.label)
+      ),
+    []
+  );
+  const secondaryLinks = useMemo(
+    () =>
+      SHARED_NAV_ITEMS.filter(
+        (item) => !item.requiresAuth && !PRIMARY_LABELS.has(item.label)
+      ),
+    []
+  );
+  const adminLinks = useMemo(
+    () => SHARED_NAV_ITEMS.filter((item) => item.requiresAuth),
+    []
+  );
 
   const handleRevealEverything = () => {
-    // Reveal all hidden content
     document
       .querySelectorAll(".hidden-content, .admin-only, .developer-only")
-      .forEach((el) => {
-        const element = el as HTMLElement;
+      .forEach((node) => {
+        const element = node as HTMLElement;
         element.classList.remove(
           "hidden-content",
           "admin-only",
@@ -171,248 +101,365 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
         element.style.visibility = "visible";
       });
 
-    // Unlock all features
     window.localStorage.setItem("VTW_UNLOCKED", "true");
     window.localStorage.setItem("VTW_UNLOCK_TIME", Date.now().toString());
+    setIsDrawerOpen(false);
+    window.alert("All hidden utility surfaces were revealed.");
+  };
 
-    alert("All features revealed! 🎉");
+  const handleAdminSubmit = () => {
+    const normalized = adminCode.trim();
+    if (!ADMIN_CODES.has(normalized)) {
+      setAdminError("Access code was not recognized.");
+      return;
+    }
+
+    window.localStorage.setItem("VTW_ADMIN_UNLOCKED", "true");
+    setIsAdminUnlocked(true);
+    setAdminCode("");
+    setAdminError("");
+    setIsAdminModalOpen(false);
+    onAdminLogin?.();
+  };
+
+  const handleAdminLogout = () => {
+    window.localStorage.removeItem("VTW_ADMIN_UNLOCKED");
+    setIsAdminUnlocked(false);
+    setIsDrawerOpen(false);
+    onAdminLogout?.();
+  };
+
+  const renderLink = (
+    key: string,
+    href: string,
+    label: string,
+    className: string,
+    onClick?: () => void
+  ) => {
+    if (isAdminOrStatic(href)) {
+      return (
+        <a key={key} href={href} className={className} onClick={onClick}>
+          <span>{label}</span>
+          <ArrowRight size={16} />
+        </a>
+      );
+    }
+
+    return (
+      <Link key={key} to={href} className={className} onClick={onClick}>
+        <span>{label}</span>
+        <ArrowRight size={16} />
+      </Link>
+    );
   };
 
   return (
     <>
-      {/* CRT Overlay */}
-      <div className="fixed inset-0 w-full h-full z-[1000] pointer-events-none opacity-20 bg-gradient-to-b from-black via-transparent to-black" />
-      <div
-        className="fixed inset-0 w-full h-full z-[999] pointer-events-none opacity-5"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          backgroundSize: "100% 4px",
-        }}
-      />
+      <header className="vtw-floating-nav" aria-label="Main navigation">
+        <Link className="vtw-floating-nav__brand" to="/">
+          <span className="vtw-logo-mark">VTW</span>
+          <span>
+            <span className="vtw-floating-nav__title">VoiceToWebsite</span>
+            <span className="vtw-floating-nav__meta">
+              Premium launch system
+            </span>
+          </span>
+        </Link>
 
-      {/* Hamburger: VOICETOWEBSITE.COM (3D, letter-spin) + animated 3 lines */}
-      <div className="fixed top-6 right-6 z-[2000] flex items-center gap-3">
-        <span className="vtw-hamburger-brand" aria-hidden="true">
-          {"VOICETOWEBSITE.COM".split("").map((char, i) => (
-            <span
-              key={`${i}-${char}`}
-              className="vtw-hamburger-letter"
+        <nav className="vtw-floating-nav__links">
+          {primaryLinks.map((item) => (
+            <Link
+              key={item.href}
+              className={`vtw-floating-nav__link ${
+                isActiveRoute(location.pathname, item.href) ? "is-active" : ""
+              }`}
+              to={item.href}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="vtw-floating-nav__actions">
+          <Link className="vtw-button vtw-button-secondary" to="/pricing">
+            Plans
+          </Link>
+          <button
+            type="button"
+            className="vtw-nav-toggle"
+            aria-expanded={isDrawerOpen}
+            aria-label={isDrawerOpen ? "Close site menu" : "Open site menu"}
+            onClick={() => setIsDrawerOpen((current) => !current)}
+          >
+            {isDrawerOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </header>
+
+      <AnimatePresence>
+        {isDrawerOpen && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close navigation drawer"
+              className="vtw-nav-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDrawerOpen(false)}
+            />
+
+            <motion.aside
+              className="vtw-mobile-drawer"
+              initial={{ opacity: 0, x: 24, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 24, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+            >
+              <div className="vtw-mobile-drawer__header">
+                <div>
+                  <div className="vtw-mobile-drawer__title">
+                    Explore the site
+                  </div>
+                  <div
+                    style={{
+                      marginTop: "0.35rem",
+                      color: "rgba(245,243,238,0.78)",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Every public route in one place.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="vtw-icon-button"
+                  onClick={() => setIsDrawerOpen(false)}
+                  aria-label="Close site menu"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="vtw-mobile-drawer__section">
+                <div className="vtw-mobile-drawer__title">Primary</div>
+                {primaryLinks.map((item) =>
+                  renderLink(
+                    item.href,
+                    item.href,
+                    item.label,
+                    "vtw-mobile-drawer__link",
+                    () => setIsDrawerOpen(false)
+                  )
+                )}
+              </div>
+
+              <div className="vtw-mobile-drawer__section">
+                <div className="vtw-mobile-drawer__title">Explore</div>
+                {secondaryLinks.map((item) =>
+                  renderLink(
+                    item.href,
+                    item.href,
+                    item.label,
+                    "vtw-mobile-drawer__link",
+                    () => setIsDrawerOpen(false)
+                  )
+                )}
+              </div>
+
+              <div className="vtw-mobile-drawer__section">
+                <div className="vtw-mobile-drawer__title">Admin</div>
+                <button
+                  type="button"
+                  className="vtw-mobile-drawer__link"
+                  onClick={() => {
+                    setAdminError("");
+                    setIsAdminModalOpen(true);
+                  }}
+                >
+                  <span>
+                    {isAdminEnabled
+                      ? "Admin routes unlocked"
+                      : "Unlock admin routes"}
+                  </span>
+                  <Lock size={16} />
+                </button>
+                {isAdminEnabled &&
+                  adminLinks.map((item) =>
+                    renderLink(
+                      item.href,
+                      item.href,
+                      item.label,
+                      "vtw-mobile-drawer__link",
+                      () => setIsDrawerOpen(false)
+                    )
+                  )}
+                {isAdminEnabled && (
+                  <button
+                    type="button"
+                    className="vtw-mobile-drawer__link"
+                    onClick={handleAdminLogout}
+                  >
+                    <span>Lock admin routes</span>
+                    <Shield size={16} />
+                  </button>
+                )}
+              </div>
+
+              <div className="vtw-mobile-drawer__section">
+                <div className="vtw-mobile-drawer__title">Utilities</div>
+                <button
+                  type="button"
+                  className="vtw-mobile-drawer__link"
+                  onClick={handleRevealEverything}
+                >
+                  <span>Reveal hidden utility content</span>
+                  <Sparkles size={16} />
+                </button>
+              </div>
+
+              <div className="vtw-mobile-drawer__section">
+                <div className="vtw-mobile-drawer__title">Fast paths</div>
+                <Link
+                  to="/pricing"
+                  className="vtw-button vtw-button-primary"
+                  onClick={() => setIsDrawerOpen(false)}
+                >
+                  Launch with pricing
+                </Link>
+                <a
+                  href="/admin/login.html"
+                  className="vtw-button vtw-button-secondary"
+                  onClick={() => setIsDrawerOpen(false)}
+                >
+                  Open admin login
+                </a>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isAdminModalOpen && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close admin access dialog"
+              className="vtw-nav-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAdminModalOpen(false)}
+            />
+
+            <motion.section
+              aria-labelledby="vtw-admin-access-title"
+              className="glass-metal"
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 18, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
               style={{
-                animationDelay: `${LETTER_DELAYS[i % LETTER_DELAYS.length]}s`,
-                animationDuration: `${LETTER_DURATIONS[i % LETTER_DURATIONS.length]}s`,
+                position: "fixed",
+                top: "50%",
+                left: "50%",
+                zIndex: 78,
+                width: "min(480px, calc(100vw - 24px))",
+                padding: "1.35rem",
+                transform: "translate(-50%, -50%)",
               }}
             >
-              {char === " " ? "\u00A0" : char}
-            </span>
-          ))}
-        </span>
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative z-[2001] group vtw-hamburger-btn"
-          aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={isOpen ? true : false}
-        >
-          <div className="vtw-hamburger-lines">
-            <span className="vtw-hamburger-line vtw-hamburger-line-1" />
-            <span className="vtw-hamburger-line vtw-hamburger-line-2" />
-            <span className="vtw-hamburger-line vtw-hamburger-line-3" />
-          </div>
-        </button>
-      </div>
-
-      {/* Fullscreen Menu */}
-      <div
-        ref={menuRef}
-        className={`fixed inset-0 w-full h-full bg-black transition-all duration-700 ease-in-out ${
-          isOpen ? "opacity-100 visible z-[1500]" : "opacity-0 invisible -z-10"
-        }`}
-        style={{
-          clipPath: isOpen ? "circle(150% at 90% 5%)" : "circle(0% at 90% 5%)",
-        }}
-      >
-        <div className="flex flex-col items-center justify-center h-full">
-          {/* Three.js Canvas */}
-          <canvas
-            id="vtw-three-canvas"
-            className="absolute inset-0 w-full h-full"
-            aria-hidden="true"
-          />
-
-          {/* Navigation Links */}
-          <nav
-            className="relative z-10"
-            role="navigation"
-            aria-label="Main navigation"
-          >
-            <ul className="text-center space-y-8 p-8">
-              {/* Main Navigation */}
-              {SHARED_NAV_ITEMS.map((item, index) => {
-                const isInternal = !isAdminOrStatic(item.href);
-                const linkClass = `block text-4xl md:text-6xl font-mono tracking-wider uppercase transition-all duration-300 vtw-hamburger-link ${
-                  index % 2 === 0 ? "text-cyan-400" : "text-pink-400"
-                } hover:text-white hover:scale-125`;
-                const style = {
-                  textShadow: "0 0 20px currentColor",
-                  WebkitTextStroke: "1px rgba(255,255,255,0.3)",
-                  WebkitTextFillColor: "transparent",
-                };
-                return (
-                  <li
-                    key={`${item.href}-${item.label}`}
-                    className="transform transition-all duration-500 hover:scale-110"
-                  >
-                    {isInternal ? (
-                      <Link
-                        to={item.href}
-                        className={linkClass}
-                        style={style}
-                        data-text={item.label
-                          .toUpperCase()
-                          .replace(/\s+/g, "_")}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleNavClick(
-                            item.href,
-                            item.requiresAuth ?? false,
-                            e,
-                            true
-                          );
-                        }}
-                      >
-                        {item.label.toUpperCase().replace(/_/g, " ")}
-                      </Link>
-                    ) : (
-                      <a
-                        href={item.href}
-                        className={linkClass}
-                        style={style}
-                        data-text={item.label
-                          .toUpperCase()
-                          .replace(/\s+/g, "_")}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleNavClick(
-                            item.href,
-                            item.requiresAuth ?? false,
-                            e,
-                            false
-                          );
-                        }}
-                      >
-                        {item.label.toUpperCase().replace(/_/g, " ")}
-                      </a>
-                    )}
-                  </li>
-                );
-              })}
-
-              {/* Admin Access */}
-              <li className="pt-8 border-t border-cyan-400/30">
-                <button
-                  onClick={() =>
-                    isAdminAuthenticated
-                      ? handleAdminLogout()
-                      : setShowAdminPanel(true)
-                  }
-                  className={`w-full py-4 px-6 text-2xl font-mono tracking-wider uppercase transition-all duration-300 ${
-                    isAdminAuthenticated
-                      ? "text-red-400 hover:text-red-300 border-red-400/50 hover:border-red-400"
-                      : "text-green-400 hover:text-green-300 border-green-400/50 hover:border-green-400"
-                  }`}
-                  style={{
-                    textShadow: `0 0 15px currentColor`,
-                    WebkitTextStroke: "1px rgba(255,255,255,0.3)",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  {isAdminAuthenticated ? "LOGOUT ADMIN" : "ADMIN ACCESS"}
-                </button>
-              </li>
-
-              {/* Developer Options */}
-              <li className="pt-4">
-                <button
-                  onClick={handleRevealEverything}
-                  className="w-full py-4 px-6 text-2xl font-mono tracking-wider uppercase text-purple-400 hover:text-purple-300 border border-purple-400/50 hover:border-purple-400 transition-all duration-300"
-                  style={{
-                    textShadow: `0 0 15px currentColor`,
-                    WebkitTextStroke: "1px rgba(255,255,255,0.3)",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  REVEAL ALL
-                </button>
-              </li>
-
-              {/* Close Menu */}
-              <li className="pt-8">
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="w-full py-4 px-6 text-2xl font-mono tracking-wider uppercase text-gray-400 hover:text-gray-300 border border-gray-400/50 hover:border-gray-400 transition-all duration-300"
-                  style={{
-                    textShadow: `0 0 15px currentColor`,
-                    WebkitTextStroke: "1px rgba(255,255,255,0.3)",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  CLOSE MENU
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-
-      {/* Admin Panel Modal */}
-      {showAdminPanel && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[2000] flex items-center justify-center">
-          <div className="bg-gray-900 border border-cyan-400/50 rounded-lg p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-mono text-cyan-400 mb-6 text-center">
-              ADMIN ACCESS
-            </h2>
-            <div className="space-y-4">
-              <p className="text-gray-300 text-center mb-6">
-                Enter admin access code to unlock administrative features
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => {
-                    onAdminLogin?.();
-                    setShowAdminPanel(false);
-                  }}
-                  className="py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-mono text-sm uppercase transition-colors"
-                >
-                  ACCESS GRANTED
-                </button>
-                <a
-                  href="/admin/login.html"
-                  className="py-3 px-4 bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-sm uppercase transition-colors rounded text-center flex items-center justify-center"
-                >
-                  ADMIN LOGIN PAGE
-                </a>
-              </div>
-              <div className="mt-4 flex justify-center">
-                <a
-                  href="/admin/login.html"
-                  className="text-cyan-400 hover:text-cyan-300 text-sm underline"
-                >
-                  Open Admin Login in new tab
-                </a>
-              </div>
-              <div className="text-xs text-gray-500 text-center mt-2">
-                Access codes: ADMIN_ACCESS_2024, UNLOCK_ADMIN_123
-              </div>
-              <button
-                onClick={() => setShowAdminPanel(false)}
-                className="w-full mt-4 py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white font-mono text-sm uppercase transition-colors"
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.8rem",
+                  marginBottom: "1rem",
+                }}
               >
-                CANCEL
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                <span
+                  className="vtw-logo-mark"
+                  style={{ width: "2.5rem", height: "2.5rem" }}
+                >
+                  <Command size={16} />
+                </span>
+                <div>
+                  <h2
+                    id="vtw-admin-access-title"
+                    style={{
+                      margin: 0,
+                      fontFamily: "var(--font-display)",
+                      fontSize: "1.3rem",
+                    }}
+                  >
+                    Admin Access
+                  </h2>
+                  <p
+                    style={{
+                      margin: "0.25rem 0 0",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    Unlock protected routes or use the dedicated login page.
+                  </p>
+                </div>
+              </div>
+
+              <label htmlFor="vtw-admin-code" className="sr-only">
+                Enter admin access code
+              </label>
+              <input
+                id="vtw-admin-code"
+                type="password"
+                value={adminCode}
+                onChange={(event) => {
+                  setAdminCode(event.target.value);
+                  setAdminError("");
+                }}
+                placeholder="Enter admin access code"
+                style={{
+                  width: "100%",
+                  minHeight: "3.2rem",
+                  marginBottom: "0.9rem",
+                  padding: "0.9rem 1rem",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: "20px",
+                  background: "rgba(255,255,255,0.04)",
+                }}
+              />
+
+              {adminError && (
+                <p style={{ margin: "0 0 0.9rem", color: "#f38ea3" }}>
+                  {adminError}
+                </p>
+              )}
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "0.8rem",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                }}
+              >
+                <button
+                  type="button"
+                  className="vtw-button vtw-button-primary"
+                  onClick={handleAdminSubmit}
+                >
+                  Unlock
+                </button>
+                <a
+                  href="/admin/login.html"
+                  className="vtw-button vtw-button-secondary"
+                >
+                  Login page
+                </a>
+              </div>
+            </motion.section>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 };

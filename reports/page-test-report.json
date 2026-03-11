@@ -1,453 +1,453 @@
 {
-  "timestamp": "2026-03-10T07:09:42.663Z",
-  "baseUrl": "https://voicetowebsite.com",
+  "timestamp": "2026-03-11T04:36:54.818Z",
+  "baseUrl": "http://127.0.0.1:4173",
   "pages": [
     {
-      "url": "https://voicetowebsite.com/",
+      "url": "http://127.0.0.1:4173/",
       "name": "Home",
       "status": 200,
-      "loadTime": 258,
+      "loadTime": 37,
       "error": null,
       "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/sandbox.html",
+      "url": "http://127.0.0.1:4173/sandbox.html",
       "name": "Sandbox",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/index.html",
+      "url": "http://127.0.0.1:4173/admin/index.html",
       "name": "Admin",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/access.html",
+      "url": "http://127.0.0.1:4173/admin/access.html",
       "name": "Admin Access",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/login.html",
+      "url": "http://127.0.0.1:4173/admin/login.html",
       "name": "Admin Login",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/voice-commands.html",
+      "url": "http://127.0.0.1:4173/admin/voice-commands.html",
       "name": "Admin Voice Commands",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 4,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/analytics.html",
+      "url": "http://127.0.0.1:4173/admin/analytics.html",
       "name": "Admin Analytics",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/live-stream.html",
+      "url": "http://127.0.0.1:4173/admin/live-stream.html",
       "name": "Admin Live Stream",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/store-manager.html",
+      "url": "http://127.0.0.1:4173/admin/store-manager.html",
       "name": "Admin Store Manager",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/app-store-manager.html",
+      "url": "http://127.0.0.1:4173/admin/app-store-manager.html",
       "name": "Admin App Store",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/integrated-dashboard.html",
+      "url": "http://127.0.0.1:4173/admin/integrated-dashboard.html",
       "name": "Admin Integrated",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/admin/live-room-test.html",
+      "url": "http://127.0.0.1:4173/admin/live-room-test.html",
       "name": "Admin Live Room Test",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/about.html",
+      "url": "http://127.0.0.1:4173/about.html",
       "name": "About",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/store.html",
+      "url": "http://127.0.0.1:4173/store.html",
       "name": "Store",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 4,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/appstore.html",
+      "url": "http://127.0.0.1:4173/appstore.html",
       "name": "App Store",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/appstore-new.html",
+      "url": "http://127.0.0.1:4173/appstore-new.html",
       "name": "App Store New",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/license.html",
+      "url": "http://127.0.0.1:4173/license.html",
       "name": "License",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/how-it-works.html",
+      "url": "http://127.0.0.1:4173/how-it-works.html",
       "name": "How It Works",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/templates.html",
+      "url": "http://127.0.0.1:4173/templates.html",
       "name": "Templates",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/features.html",
+      "url": "http://127.0.0.1:4173/features.html",
       "name": "Features",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/features-enhanced.html",
+      "url": "http://127.0.0.1:4173/features-enhanced.html",
       "name": "Features Enhanced",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/pricing.html",
+      "url": "http://127.0.0.1:4173/pricing.html",
       "name": "Pricing",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/pricing-enhanced.html",
+      "url": "http://127.0.0.1:4173/pricing-enhanced.html",
       "name": "Pricing Enhanced",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/demo.html",
+      "url": "http://127.0.0.1:4173/demo.html",
       "name": "Demo",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/search.html",
+      "url": "http://127.0.0.1:4173/search.html",
       "name": "Search",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/search-enhanced.html",
+      "url": "http://127.0.0.1:4173/search-enhanced.html",
       "name": "Search Enhanced",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 4,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/support.html",
+      "url": "http://127.0.0.1:4173/support.html",
       "name": "Support",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/status.html",
+      "url": "http://127.0.0.1:4173/status.html",
       "name": "Status",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/trust.html",
+      "url": "http://127.0.0.1:4173/trust.html",
       "name": "Trust",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/partners.html",
+      "url": "http://127.0.0.1:4173/partners.html",
       "name": "Partners",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/webforge.html",
+      "url": "http://127.0.0.1:4173/webforge.html",
       "name": "WebForge",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/cursor-demo.html",
+      "url": "http://127.0.0.1:4173/cursor-demo.html",
       "name": "Cursor Demo",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/project-planning-hub.html",
+      "url": "http://127.0.0.1:4173/project-planning-hub.html",
       "name": "Project Planning Hub",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 4,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/rush-percussion.html",
+      "url": "http://127.0.0.1:4173/rush-percussion.html",
       "name": "Rush Percussion",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/blog.html",
+      "url": "http://127.0.0.1:4173/blog.html",
       "name": "Blog",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/contact.html",
+      "url": "http://127.0.0.1:4173/contact.html",
       "name": "Contact",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/contact-enhanced.html",
+      "url": "http://127.0.0.1:4173/contact-enhanced.html",
       "name": "Contact Enhanced",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/gallery.html",
+      "url": "http://127.0.0.1:4173/gallery.html",
       "name": "Gallery",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/legal.html",
+      "url": "http://127.0.0.1:4173/legal.html",
       "name": "Legal",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/copyrights.html",
+      "url": "http://127.0.0.1:4173/copyrights.html",
       "name": "Copyrights",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/livestream.html",
+      "url": "http://127.0.0.1:4173/livestream.html",
       "name": "Livestream",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/phosphor-nav.html",
+      "url": "http://127.0.0.1:4173/phosphor-nav.html",
       "name": "Phosphor Nav",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/referrals.html",
+      "url": "http://127.0.0.1:4173/referrals.html",
       "name": "Referrals",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/projects.html",
+      "url": "http://127.0.0.1:4173/projects.html",
       "name": "Projects",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/studio3000.html",
+      "url": "http://127.0.0.1:4173/studio3000.html",
       "name": "Studio 3000",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/the3000.html",
+      "url": "http://127.0.0.1:4173/the3000.html",
       "name": "The 3000",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/the3000-gallery.html",
+      "url": "http://127.0.0.1:4173/the3000-gallery.html",
       "name": "The 3000 Gallery",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/neural-engine.html",
+      "url": "http://127.0.0.1:4173/neural-engine.html",
       "name": "Neural Engine",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/strata-design-system.html",
+      "url": "http://127.0.0.1:4173/strata-design-system.html",
       "name": "Strata Design System",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/api-documentation.html",
+      "url": "http://127.0.0.1:4173/api-documentation.html",
       "name": "API Documentation",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/voice-to-json.html",
+      "url": "http://127.0.0.1:4173/voice-to-json.html",
       "name": "Voice to JSON",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/geological-studies.html",
+      "url": "http://127.0.0.1:4173/geological-studies.html",
       "name": "Geological Studies",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/privacy.html",
+      "url": "http://127.0.0.1:4173/privacy.html",
       "name": "Privacy",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 2,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/terms.html",
+      "url": "http://127.0.0.1:4173/terms.html",
       "name": "Terms",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     },
     {
-      "url": "https://voicetowebsite.com/lexicon-pro.html",
+      "url": "http://127.0.0.1:4173/lexicon-pro.html",
       "name": "Lexicon Pro",
-      "status": "unknown",
-      "loadTime": 0,
-      "error": "fetch failed",
-      "issues": ["Network error: fetch failed"]
+      "status": 200,
+      "loadTime": 3,
+      "error": null,
+      "issues": []
     }
   ],
   "links": [],
   "summary": {
     "total": 55,
-    "passed": 1,
-    "failed": 54,
+    "passed": 55,
+    "failed": 0,
     "warnings": 0
   }
 }

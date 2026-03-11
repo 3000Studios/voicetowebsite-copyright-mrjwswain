@@ -26,6 +26,7 @@ export default defineConfig({
       // Route API and preview to the local Cloudflare Worker (`wrangler dev`).
       "/api/orchestrator": "http://127.0.0.1:8787",
       "/api/analytics": "http://127.0.0.1:8787",
+      "/api/chat": "http://127.0.0.1:8787",
       "/api/generate": "http://127.0.0.1:8787",
       "/api/preview": "http://127.0.0.1:8787",
       "/api/publish": "http://127.0.0.1:8787",

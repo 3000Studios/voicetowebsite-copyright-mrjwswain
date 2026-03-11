@@ -1,10 +1,10 @@
-import { motion } from "framer-motion";
 import React from "react";
 import { useParams } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
+import ScrollReveal from "../components/ScrollReveal";
 
 const IMG =
-  "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80";
+  "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&q=80";
 const VIDEO = "https://www.youtube.com/embed/Wm6CUgyLu94?autoplay=0";
 
 const CategoryPage: React.FC = () => {
@@ -18,40 +18,57 @@ const CategoryPage: React.FC = () => {
       subtitle={`Apps and tools in the ${title} category.`}
       wallpaper="templates"
     >
-      <div className="space-y-16">
-        <motion.section
-          className="grid md:grid-cols-2 gap-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="vtw-card-hover rounded-3xl overflow-hidden border border-white/10 bg-black/30">
+      <div style={{ display: "grid", gap: "1.5rem" }}>
+        <ScrollReveal as="section" className="vtw-grid-2" variant="blur">
+          <article
+            className="vtw-glass-card vtw-card-hover"
+            style={{ padding: "1rem" }}
+          >
             <img
               src={IMG}
               alt={title}
-              className="w-full h-64 md:h-80 object-cover"
+              style={{
+                width: "100%",
+                height: "clamp(240px, 34vw, 420px)",
+                objectFit: "cover",
+                borderRadius: "24px",
+              }}
             />
-          </div>
-          <div className="vtw-card-hover rounded-3xl overflow-hidden border border-white/10 bg-black/30 aspect-video">
-            <iframe
-              src={VIDEO}
-              title={title}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </motion.section>
-        <motion.p
-          className="text-white/80 text-lg leading-relaxed vtw-body-text"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          Browse our {title.toLowerCase()} apps in the App Store. Filter by
-          category to find productivity tools, development helpers, design apps,
-          and more.
-        </motion.p>
+          </article>
+          <article
+            className="vtw-glass-card vtw-card-hover"
+            style={{ padding: "1rem" }}
+          >
+            <div style={{ overflow: "hidden", borderRadius: "24px" }}>
+              <iframe
+                src={VIDEO}
+                title={title}
+                className="vt-preview-frame"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </article>
+        </ScrollReveal>
+
+        <ScrollReveal as="section" className="vtw-grid-3">
+          {[
+            "Category pages keep app discovery cleaner than one long catalog.",
+            "Each category route can support SEO, filtering, and internal linking.",
+            "App store expansion stays organized instead of burying tools in one page.",
+          ].map((copy, index) => (
+            <article
+              key={copy}
+              className="vtw-glass-card vtw-card-hover"
+              style={{ padding: "1.25rem" }}
+            >
+              <div className="vtw-section-label">Panel {index + 1}</div>
+              <p className="vtw-body-text" style={{ margin: "0.75rem 0 0" }}>
+                {copy}
+              </p>
+            </article>
+          ))}
+        </ScrollReveal>
       </div>
     </PageLayout>
   );

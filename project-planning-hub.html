@@ -16,7 +16,6 @@
       rel="stylesheet"
     />
     <script src="https://js.stripe.com/v3"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=__PAYPAL_CLIENT_ID__&currency=USD"></script>
     <style>
       :root {
         --bg-deep: #030305;
@@ -282,14 +281,45 @@
       })();
       const STRIPE_PK = "__STRIPE_PUBLISHABLE_KEY__";
 
+      const ensurePayPalSdk = async () => {
+        if (window.paypal) return true;
+        if (!PAYPAL_CLIENT) return false;
+
+        const existing = document.querySelector('script[data-paypal-sdk="true"]');
+        if (existing) {
+          return new Promise((resolve) => {
+            existing.addEventListener("load", () => resolve(true), { once: true });
+            existing.addEventListener("error", () => resolve(false), { once: true });
+          });
+        }
+
+        return new Promise((resolve) => {
+          const script = document.createElement("script");
+          script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(PAYPAL_CLIENT)}&currency=USD`;
+          script.async = true;
+          script.defer = true;
+          script.dataset.paypalSdk = "true";
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.head.appendChild(script);
+        });
+      };
+
       // Initialize PayPal SDK Button
-      const initPayPal = () => {
+      const initPayPal = async () => {
         const link = window.__ENV && window.__ENV.PAYPAL_PAYMENT_LINK_PROJECT_PLANNING_HUB;
         if (link) {
           const container = document.getElementById("paypal-button-container");
           if (container) {
             container.innerHTML = `<button style="background:#ffc439; color:#000; font-weight:bold; border:none; border-radius:4px; padding:0 2rem; height:45px; width:100%; cursor:pointer; font-family:sans-serif;" onclick="window.location.href='${link}'">Check out with PayPal</button>`;
           }
+          return;
+        }
+
+        const paypalReady = await ensurePayPalSdk();
+        if (!paypalReady) {
+          document.getElementById("paypal-button-container").innerHTML =
+            '<p style="color:rgba(255,255,255,0.7); font-size:0.8rem;">PayPal is not configured yet. Use Stripe checkout for now.</p>';
           return;
         }
 
@@ -334,10 +364,8 @@
             })
             .render("#paypal-button-container");
         } else {
-          console.warn("PayPal SDK not loaded");
-          // If SDK failed to load (e.g. invalid client ID), show a fallback or error
           document.getElementById("paypal-button-container").innerHTML =
-            '<p style="color:red; font-size:0.8rem;">PayPal Config Missing</p>';
+            '<p style="color:rgba(255,255,255,0.7); font-size:0.8rem;">PayPal is not configured yet. Use Stripe checkout for now.</p>';
         }
       };
 

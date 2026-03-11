@@ -6,7 +6,6 @@ const repoRoot = process.cwd();
 const styleManifest = path.join(repoRoot, "styles.css");
 
 const expectedImports = [
-  "./src/design-system.css",
   "./src/layout-system.css",
   "./styles/base.css",
   "./styles/components.css",

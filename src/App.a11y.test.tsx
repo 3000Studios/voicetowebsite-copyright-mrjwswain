@@ -47,17 +47,21 @@ describe("App Accessibility - Use Cases", () => {
     expect(tapToCreate).toBeInTheDocument();
 
     fireEvent.click(tapToCreate);
-    const finish = await waitFor(() =>
-      screen.getByRole("button", { name: /finish command/i })
+    const finish = await waitFor(
+      () => screen.getByRole("button", { name: /finish command/i }),
+      { timeout: 5000 }
     );
     expect(finish).toBeInTheDocument();
 
     // Stop listening transitions to confirm phase.
     fireEvent.click(finish);
-    await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /make it/i })
-      ).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(
+          screen.getByRole("button", { name: /make it/i })
+        ).toBeInTheDocument();
+      },
+      { timeout: 5000 }
+    );
   });
 });

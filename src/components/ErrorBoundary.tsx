@@ -28,10 +28,34 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="min-h-screen flex items-center justify-center bg-black text-white">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
-              <p className="text-white/60">
+          <div
+            style={{
+              minHeight: "100vh",
+              display: "grid",
+              placeItems: "center",
+              padding: "1.5rem",
+              background: "var(--bg-base)",
+              color: "var(--text-primary)",
+            }}
+          >
+            <div
+              className="vtw-glass-card"
+              style={{
+                width: "min(560px, 100%)",
+                padding: "1.5rem",
+                textAlign: "center",
+              }}
+            >
+              <h1
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(2rem, 4vw, 3rem)",
+                }}
+              >
+                Something went wrong
+              </h1>
+              <p style={{ margin: "0.8rem 0 0", color: "var(--text-muted)" }}>
                 Please refresh the page to try again.
               </p>
             </div>

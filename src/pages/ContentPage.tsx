@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
 import React from "react";
 import PageLayout, { WallpaperVariant } from "../components/PageLayout";
+import ScrollReveal from "../components/ScrollReveal";
 
 export interface CardItem {
   title: string;
@@ -13,6 +13,9 @@ export interface ContentPageConfig {
   wallpaper: WallpaperVariant;
   imageUrl: string;
   imageAlt: string;
+  /** Optional extra images for a gallery section on the page */
+  extraImageUrls?: string[];
+  extraImageAlts?: string[];
   videoUrl: string;
   videoTitle: string;
   paragraphs: string[];
@@ -31,6 +34,8 @@ const ContentPage: React.FC<ContentPageProps> = ({ config }) => {
     wallpaper,
     imageUrl,
     imageAlt,
+    extraImageUrls = [],
+    extraImageAlts = [],
     videoUrl,
     videoTitle,
     paragraphs,
@@ -40,74 +45,163 @@ const ContentPage: React.FC<ContentPageProps> = ({ config }) => {
 
   return (
     <PageLayout title={title} subtitle={subtitle} wallpaper={wallpaper}>
-      <div className="space-y-16">
-        {/* Media block: image + video */}
-        <motion.section
-          className="grid md:grid-cols-2 gap-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <div className="vtw-card-hover rounded-3xl overflow-hidden border border-white/10 bg-black/30">
+      <div style={{ display: "grid", gap: "1.5rem" }}>
+        <ScrollReveal as="section" className="vtw-grid-2" variant="blur">
+          <article
+            className="vtw-glass-card vtw-card-hover"
+            style={{ padding: "1rem" }}
+          >
             <img
               src={imageUrl}
               alt={imageAlt}
-              className="w-full h-64 md:h-80 object-cover"
+              style={{
+                width: "100%",
+                height: "clamp(240px, 34vw, 420px)",
+                objectFit: "cover",
+                borderRadius: "24px",
+              }}
             />
-            <div className="p-4 text-center text-white/70 text-sm vtw-body-text">
+            <p style={{ margin: "0.9rem 0 0", color: "var(--text-muted)" }}>
               {imageAlt}
-            </div>
-          </div>
-          <div className="vtw-card-hover rounded-3xl overflow-hidden border border-white/10 bg-black/30 aspect-video">
-            <iframe
-              src={videoUrl}
-              title={videoTitle}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </motion.section>
-
-        {/* Paragraphs */}
-        <motion.section
-          className="space-y-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          {paragraphs.map((p, i) => (
-            <p
-              key={i}
-              className="text-white/80 text-lg md:text-xl leading-relaxed vtw-body-text vtw-scroll-reveal"
-            >
-              {p}
             </p>
-          ))}
-        </motion.section>
-
-        {/* Cards */}
-        {cards.length > 0 && (
-          <motion.section
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+          </article>
+          <article
+            className="vtw-glass-card vtw-card-hover"
+            style={{ padding: "1rem" }}
           >
-            {cards.map((card, i) => (
-              <div
-                key={i}
-                className="vtw-card-hover rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+            <div
+              style={{
+                overflow: "hidden",
+                borderRadius: "24px",
+                background: "rgba(5,7,10,0.8)",
+              }}
+            >
+              <iframe
+                src={videoUrl}
+                title={videoTitle}
+                className="vt-preview-frame"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </article>
+        </ScrollReveal>
+
+        <ScrollReveal
+          as="section"
+          className="vtw-glass-card"
+          style={{ padding: "1.4rem" }}
+        >
+          <div
+            className="vtw-section__heading"
+            style={{ marginBottom: "1rem" }}
+          >
+            <div className="vtw-section-label">Overview</div>
+            <h2
+              className="vtw-section-title"
+              style={{ fontSize: "clamp(1.9rem, 4vw, 3rem)" }}
+            >
+              A clearer explanation of this route.
+            </h2>
+          </div>
+          <div style={{ display: "grid", gap: "1rem" }}>
+            {paragraphs.map((paragraph, idx) => (
+              <p
+                key={`p-${idx}`}
+                className="vtw-body-text"
+                style={{ margin: 0, fontSize: "1.02rem" }}
               >
-                <h3 className="vtw-card-title text-xl text-white mb-2">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </ScrollReveal>
+
+        {extraImageUrls.length > 0 && (
+          <ScrollReveal
+            as="section"
+            className="vtw-glass-card"
+            style={{ padding: "1.4rem" }}
+          >
+            <div
+              className="vtw-section__heading"
+              style={{ marginBottom: "1rem" }}
+            >
+              <div className="vtw-section-label">Gallery</div>
+              <h2
+                className="vtw-section-title"
+                style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)" }}
+              >
+                More from VoiceToWebsite
+              </h2>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                gap: "1rem",
+              }}
+            >
+              {extraImageUrls.map((src, idx) => (
+                <article
+                  key={`img-${idx}`}
+                  className="vtw-card-hover"
+                  style={{
+                    overflow: "hidden",
+                    borderRadius: "16px",
+                    background: "rgba(5,7,10,0.6)",
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={extraImageAlts[idx] ?? imageAlt}
+                    style={{
+                      width: "100%",
+                      height: "200px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <p
+                    style={{
+                      margin: "0.5rem 0.75rem 0.75rem",
+                      fontSize: "0.85rem",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    {extraImageAlts[idx] ?? imageAlt}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </ScrollReveal>
+        )}
+
+        {cards.length > 0 && (
+          <ScrollReveal as="section" className="vtw-grid-3" variant="up">
+            {cards.map((card) => (
+              <article
+                key={card.title}
+                className="vtw-glass-card vtw-card-hover"
+                style={{ padding: "1.25rem" }}
+              >
+                <div
+                  className="vtw-section-label"
+                  style={{ marginBottom: "0.8rem" }}
+                >
+                  Detail
+                </div>
+                <h3
+                  className="vtw-card-title"
+                  style={{ margin: 0, fontSize: "1.3rem", lineHeight: 1.05 }}
+                >
                   {card.title}
                 </h3>
-                <p className="vtw-body-text text-white/70 text-sm leading-relaxed">
+                <p className="vtw-body-text" style={{ margin: "0.9rem 0 0" }}>
                   {card.body}
                 </p>
-              </div>
+              </article>
             ))}
-          </motion.section>
+          </ScrollReveal>
         )}
 
         {extra}
