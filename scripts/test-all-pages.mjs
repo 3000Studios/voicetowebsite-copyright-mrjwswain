@@ -113,7 +113,13 @@ async function checkPage(page) {
       const text = await response.text();
 
       // Basic checks
-      if (text.includes("404")) {
+      const notFoundPatterns = [
+        /<title>\s*404\b/i,
+        /\b404\s*(?:page|not found)\b/i,
+        /\bpage not found\b/i,
+        /\bnot found\b/i,
+      ];
+      if (notFoundPatterns.some((pattern) => pattern.test(text))) {
         results.issues.push("Page contains 404 content");
       }
 

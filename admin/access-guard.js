@@ -5,13 +5,13 @@
   } catch (_) {}
 
   const redirectToAccess = () => {
-    window.location.replace("/admin/access.html");
+    window.location.replace("/admin/access");
   };
 
   const maybeRedirectToDashboard = () => {
     const path = window.location.pathname;
     if (path === "/admin/" || path.endsWith("/admin/index.html")) {
-      window.location.replace("/admin/integrated-dashboard.html");
+      window.location.replace("/admin/mission");
       return true;
     }
     return false;

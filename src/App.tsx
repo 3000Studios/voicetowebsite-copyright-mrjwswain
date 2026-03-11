@@ -32,9 +32,13 @@ import {
   HOME_PROCESS,
   HOME_TESTIMONIALS,
 } from "./content/homeContent";
+import { FEATURED_TRY_NOW_APPS } from "./content/featuredApps";
+import { PRICING_TIERS } from "./content/pricingData";
 import BlogPage from "./pages/BlogPage";
 import CategoryPage from "./pages/CategoryPage";
 import GenericContentPage from "./pages/GenericContentPage";
+import PricingPage from "./pages/PricingPage";
+import StorePage from "./pages/StorePage";
 import { audioEngine } from "./services/audioEngine";
 import { getSeoCopyForPath } from "./shared/siteManifest";
 import siteConfig from "./site-config.json";
@@ -47,15 +51,6 @@ declare global {
     __ENV?: Record<string, unknown>;
   }
 }
-
-type PricingTier = {
-  name: string;
-  pages: string;
-  price: string;
-  desc: string;
-  highlight?: boolean;
-  features: string[];
-};
 
 type AdSlotKey =
   | "ADSENSE_SLOT_TOP"
@@ -74,48 +69,6 @@ type RuntimeHomeConfig = {
   };
 };
 
-const PRICING_TIERS: PricingTier[] = [
-  {
-    name: "Solo",
-    pages: "1 page",
-    price: "$49",
-    desc: "For single landing pages, portfolios, and focused launch campaigns.",
-    features: [
-      "Custom domain and SSL",
-      "Fast launch shell",
-      "Basic SEO structure",
-      "Email support",
-    ],
-  },
-  {
-    name: "Business",
-    pages: "5 pages",
-    price: "$199",
-    desc: "For teams that need a premium public presence with stronger conversion depth.",
-    highlight: true,
-    features: [
-      "Everything in Solo",
-      "Advanced analytics",
-      "Priority support",
-      "Custom integrations",
-      "API access",
-    ],
-  },
-  {
-    name: "Enterprise",
-    pages: "Unlimited",
-    price: "$499",
-    desc: "For full ecosystems, white-label delivery, and more controlled rollout paths.",
-    features: [
-      "Everything in Business",
-      "Dedicated support",
-      "White-label options",
-      "Custom development",
-      "SLA guarantees",
-    ],
-  },
-];
-
 const AD_COMPLIANCE_LINKS = [
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
@@ -128,19 +81,19 @@ const AD_COMPLIANCE_LINKS = [
 
 const FAQ_ITEMS: FaqItem[] = [
   {
-    question: "How do I activate live AdSense units?",
+    question: "Can I start with just one page?",
     answer:
-      "Set ADSENSE_PUBLISHER and slot values in environment config. Until then, placeholders render so layout stays review-friendly.",
+      "Yes. The Launch One package is built for a single premium page so you can validate the offer before expanding.",
   },
   {
-    question: "Can I control ad density?",
+    question: "Can I test the apps before I buy a bigger package?",
     answer:
-      "Yes. Placement controls keep the editorial-to-ad ratio predictable and easier to review.",
+      "Yes. The store now highlights live app previews so you can try the experience before moving into a fuller website build.",
   },
   {
-    question: "How are metrics calculated?",
+    question: "Do you help with domains and signup flows?",
     answer:
-      "Dashboard metrics are derived from orders, sessions, and trailing windows with consistent formulas.",
+      "Paid launch packages include domain connection guidance, and larger growth engagements can add database-backed signup flows when needed.",
   },
 ];
 
@@ -267,9 +220,8 @@ const AdSensePlacement: React.FC<{
             />
           ) : (
             <p className="vtw-body-text" style={{ margin: 0 }}>
-              Configure <code>ADSENSE_PUBLISHER</code> and slot variables to
-              render live ads. The placeholder keeps spacing stable during
-              review.
+              Sponsored placement reserved. The space stays balanced even when
+              promotions are turned off.
             </p>
           )}
         </div>
@@ -692,7 +644,7 @@ const HomeView: React.FC = () => {
         search.set(key, value);
       });
 
-      window.location.href = `/store.html?${search.toString()}`;
+      window.location.href = `/store?${search.toString()}`;
     },
     []
   );
@@ -708,11 +660,11 @@ const HomeView: React.FC = () => {
                 <span className="vtw-chip">
                   Live clock {heroClock || "00:00:00"}
                 </span>
-                <span className="vtw-chip">SEO-first shell</span>
-                <span className="vtw-chip">Store-ready</span>
+                <span className="vtw-chip">Voice-built pages</span>
+                <span className="vtw-chip">Try apps before buying</span>
               </div>
               <p className="vtw-hero-kicker">
-                Modern voice-to-website workflow
+                Voice-to-website launch platform
               </p>
               <h1 className="vtw-hero-title">
                 <span className="glow">{heroHeadline}</span>
@@ -754,16 +706,16 @@ const HomeView: React.FC = () => {
               )}
               <div className="vtw-metric-grid">
                 <div className="vtw-metric">
-                  <span className="vtw-metric__label">Launch flow</span>
-                  <span className="vtw-metric__value">Voice to live</span>
+                  <span className="vtw-metric__label">Starting price</span>
+                  <span className="vtw-metric__value">$29 launch</span>
                 </div>
                 <div className="vtw-metric">
-                  <span className="vtw-metric__label">Content hygiene</span>
-                  <span className="vtw-metric__value">Trust pages linked</span>
+                  <span className="vtw-metric__label">Experience</span>
+                  <span className="vtw-metric__value">Try the apps live</span>
                 </div>
                 <div className="vtw-metric">
-                  <span className="vtw-metric__label">Blog cadence</span>
-                  <span className="vtw-metric__value">3 hour refresh</span>
+                  <span className="vtw-metric__label">Next step</span>
+                  <span className="vtw-metric__value">Publish fast</span>
                 </div>
               </div>
             </ScrollReveal>
@@ -775,27 +727,26 @@ const HomeView: React.FC = () => {
                   <span />
                   <span />
                 </div>
-                <span className="vtw-chip">Premium public shell</span>
+                <span className="vtw-chip">Customer path</span>
               </div>
               <div
                 className="vtw-section__heading"
                 style={{ marginBottom: "1rem" }}
               >
-                <div className="vtw-section-label">
-                  What the system organizes
-                </div>
+                <div className="vtw-section-label">How it works</div>
                 <h2
                   className="vtw-section-title"
                   style={{ margin: 0, fontSize: "clamp(1.7rem, 3vw, 2.7rem)" }}
                 >
-                  One command becomes a structured site map.
+                  Speak the brief, review the result, then choose the right
+                  launch package.
                 </h2>
               </div>
               <div className="vtw-code-block">
                 {[
-                  "Voice brief translated into sections and metadata",
-                  "Preview-first release keeps production safe",
-                  "Pricing, blog, support, and archive routes stay connected",
+                  "Describe the page you want in plain language",
+                  "See the generated flow before you commit",
+                  "Open the store only when you are ready to buy",
                 ].map((line) => (
                   <div key={line} className="vtw-code-line">
                     {line}
@@ -843,13 +794,13 @@ const HomeView: React.FC = () => {
             <div className="vtw-section__heading">
               <div className="vtw-section-label">Features</div>
               <h2 className="vtw-section-title">
-                A cleaner, premium interface without losing the working engine
-                underneath.
+                A cleaner public experience built around the customer, not the
+                old technical checklist.
               </h2>
               <p className="vtw-section-copy">
-                The redesign sharpens the visual system while leaving the public
-                routes, generation flow, store CTAs, trust pages, and runtime
-                content model intact.
+                The site now puts the value up front: voice-built pages, live
+                previews, cleaner buying paths, and less internal operator
+                language leaking into the public UI.
               </p>
             </div>
             <div className="vtw-grid-3">
@@ -949,11 +900,13 @@ const HomeView: React.FC = () => {
                     className="vtw-section-title"
                     style={{ margin: 0, fontSize: "clamp(1.9rem, 4vw, 3rem)" }}
                   >
-                    Core support pages stay one click away.
+                    Trust pages stay available without hijacking the sales
+                    story.
                   </h2>
                   <p className="vtw-section-copy">
-                    These routes remain visible for trust, SEO, and review
-                    readiness while the footer carries lower-priority pages.
+                    Customers can still find the company, support, privacy, and
+                    legal pages quickly, while the footer handles lower-priority
+                    archive routes.
                   </p>
                 </div>
                 <div className="vtw-grid-auto">
@@ -1343,6 +1296,56 @@ const HomeView: React.FC = () => {
             </div>
           </ScrollReveal>
 
+          <ScrollReveal as="section" className="vtw-section">
+            <div className="vtw-section__heading">
+              <div className="vtw-section-label">Try Me Now</div>
+              <h2 className="vtw-section-title">
+                Test the feature apps before you buy a bigger website package.
+              </h2>
+              <p className="vtw-section-copy">
+                The homepage now points people toward real working experiences
+                they can open immediately.
+              </p>
+            </div>
+            <div className="vtw-grid-3">
+              {FEATURED_TRY_NOW_APPS.map((app) => (
+                <article
+                  key={app.id}
+                  className="vtw-glass-card vtw-card-hover"
+                  style={{ padding: "1.35rem" }}
+                >
+                  <div className="vtw-chip">Live app preview</div>
+                  <h3
+                    style={{
+                      margin: "0.9rem 0 0.55rem",
+                      fontFamily: "var(--font-display)",
+                      fontSize: "1.35rem",
+                    }}
+                  >
+                    {app.title}
+                  </h3>
+                  <p className="vtw-body-text" style={{ margin: 0 }}>
+                    {app.copy}
+                  </p>
+                  <div
+                    className="vtw-hero-actions"
+                    style={{ marginTop: "1rem" }}
+                  >
+                    <a
+                      href={app.previewUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="vtw-button vtw-button-secondary"
+                    >
+                      {app.cta}
+                      <ArrowRight size={16} />
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </ScrollReveal>
+
           <AdSensePlacement
             slotKey="ADSENSE_SLOT_MID"
             title="Mid-page placement"
@@ -1446,7 +1449,7 @@ const HomeView: React.FC = () => {
                       style={{ width: "100%", marginTop: "1.3rem" }}
                       onClick={() =>
                         routeToStore("home_pricing_tier", {
-                          plan: activeTier.name.toLowerCase(),
+                          plan: activeTier.id,
                         })
                       }
                     >
@@ -1711,6 +1714,8 @@ const App: React.FC = () => (
       <Routes>
         <Route path="/" element={<HomeView />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/store" element={<StorePage />} />
         <Route path="/apps/category/:name" element={<CategoryPage />} />
         <Route path="/:slug" element={<GenericContentPage />} />
       </Routes>

@@ -379,6 +379,312 @@ const escapeHtml = (value) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 
+const REDIRECT_STATUS_CODES = new Set([301, 302, 307, 308]);
+const ADMIN_SHELL_ASSET_PATH = "/admin/integrated-dashboard.html";
+
+const isRedirectStatus = (status) => REDIRECT_STATUS_CODES.has(Number(status));
+
+const buildAssetRequest = (request, origin, pathname) =>
+  new Request(new URL(pathname, origin), {
+    method: request.method,
+    headers: request.headers,
+    redirect: "manual",
+  });
+
+const renderAdminAuthPage = ({ mode = "access" } = {}) => {
+  const isLogin = mode === "login";
+  const title = isLogin ? "Admin Login" : "Admin Access";
+  const eyebrow = isLogin ? "Secure Login" : "Restricted Area";
+  const heading = isLogin
+    ? "Sign in with your admin access code."
+    : "Unlock the command center with your admin access code.";
+  const hint = isLogin
+    ? "One code unlocks the full admin dashboard."
+    : "Use the configured access code to open the admin dashboard.";
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | ${escapeHtml(title)}</title>
+    <meta
+      name="description"
+      content="Secure admin access for VoiceToWebsite."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top, rgba(0, 242, 255, 0.16), transparent 36%),
+          linear-gradient(180deg, #05070a 0%, #0f141b 100%);
+        color: #f5f3ee;
+      }
+      .vtw-admin-auth {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+      }
+      .vtw-admin-auth__shell {
+        width: min(100%, 28rem);
+        padding: 2rem;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 20, 27, 0.88);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(22px);
+      }
+      .vtw-admin-auth__eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 242, 255, 0.26);
+        color: #00f2ff;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .vtw-admin-auth__title {
+        margin: 1rem 0 0.5rem;
+        font-family: "Space Grotesk", "Sora", "Inter", sans-serif;
+        font-size: clamp(2rem, 6vw, 3rem);
+        line-height: 0.95;
+      }
+      .vtw-admin-auth__copy {
+        margin: 0;
+        color: #9aa3ad;
+        line-height: 1.65;
+      }
+      .vtw-admin-auth__form {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+      .vtw-admin-auth__label {
+        display: grid;
+        gap: 0.45rem;
+        font-size: 0.92rem;
+        color: #f5f3ee;
+      }
+      .vtw-admin-auth__input {
+        width: 100%;
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: #f5f3ee;
+        font-size: 1rem;
+      }
+      .vtw-admin-auth__input:focus {
+        outline: none;
+        border-color: rgba(0, 242, 255, 0.5);
+        box-shadow: 0 0 0 4px rgba(0, 242, 255, 0.12);
+      }
+      .vtw-admin-auth__actions {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+      .vtw-admin-auth__button {
+        flex: 1 1 12rem;
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(0, 242, 255, 0.3);
+        background: linear-gradient(135deg, rgba(0, 242, 255, 0.18), rgba(112, 0, 255, 0.22));
+        color: #f5f3ee;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .vtw-admin-auth__link {
+        flex: 1 1 10rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.95rem 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #f5f3ee;
+        text-decoration: none;
+      }
+      .vtw-admin-auth__status {
+        min-height: 1.35rem;
+        margin: 0;
+        color: #9aa3ad;
+        font-size: 0.92rem;
+      }
+      .vtw-admin-auth__status.is-error {
+        color: #ff9dbf;
+      }
+      .vtw-admin-auth__status.is-success {
+        color: #1ccf9c;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="vtw-admin-auth">
+      <section class="vtw-admin-auth__shell">
+        <div class="vtw-admin-auth__eyebrow">${escapeHtml(eyebrow)}</div>
+        <h1 class="vtw-admin-auth__title">${escapeHtml(title)}</h1>
+        <p class="vtw-admin-auth__copy">${escapeHtml(heading)}</p>
+        <p class="vtw-admin-auth__copy" style="margin-top:0.55rem;">${escapeHtml(hint)}</p>
+
+        <form id="vtw-admin-auth-form" class="vtw-admin-auth__form">
+          <label class="vtw-admin-auth__label" for="accessCode">
+            Access code
+            <input
+              id="accessCode"
+              name="accessCode"
+              class="vtw-admin-auth__input"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Enter your admin code"
+              required
+            />
+          </label>
+          <p id="vtw-admin-auth-status" class="vtw-admin-auth__status" aria-live="polite"></p>
+          <div class="vtw-admin-auth__actions">
+            <button id="vtw-admin-auth-submit" class="vtw-admin-auth__button" type="submit">
+              Open admin dashboard
+            </button>
+            <a class="vtw-admin-auth__link" href="/">Back to site</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const form = document.getElementById("vtw-admin-auth-form");
+        const input = document.getElementById("accessCode");
+        const submit = document.getElementById("vtw-admin-auth-submit");
+        const status = document.getElementById("vtw-admin-auth-status");
+
+        const setStatus = (message, tone) => {
+          status.textContent = message || "";
+          status.className = "vtw-admin-auth__status" + (tone ? " is-" + tone : "");
+        };
+
+        const redirectTarget = "/admin/mission";
+
+        fetch("/api/config/status", {
+          credentials: "include",
+          cache: "no-store",
+        })
+          .then((res) => {
+            if (res.ok) window.location.replace(redirectTarget);
+          })
+          .catch(() => {});
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const accessCode = String(input.value || "").trim();
+          if (!accessCode) {
+            setStatus("Enter your admin access code.", "error");
+            input.focus();
+            return;
+          }
+
+          submit.disabled = true;
+          setStatus("Signing in...", "");
+
+          try {
+            const response = await fetch("/api/admin/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ accessCode }),
+            });
+
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              throw new Error(payload.error || "Access denied.");
+            }
+
+            setStatus("Access granted. Opening dashboard...", "success");
+            window.setTimeout(() => {
+              window.location.replace(redirectTarget);
+            }, 220);
+          } catch (error) {
+            setStatus(error.message || "Access denied.", "error");
+            submit.disabled = false;
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>`;
+};
+
+const renderAdminShellPage = () => `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite Command Center OS</title>
+    <meta
+      name="description"
+      content="VoiceToWebsite single-brand admin command center operating shell"
+    />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+    <link rel="stylesheet" href="/admin/ccos.css" />
+    <script src="/admin/access-guard.js" type="module"></script>
+    <script src="/admin/ccos.js" type="module" defer></script>
+  </head>
+  <body class="ccos-body">
+    <div class="ccos-layout" id="ccos-root">
+      <aside id="sidebar" aria-label="Dashboard Navigation">
+        <div class="ccos-brand">
+          <strong>VoiceToWebsite</strong>
+          <span>Command Center OS</span>
+        </div>
+        <nav class="ccos-nav" id="ccos-nav">
+          <button type="button" data-route="/admin/mission" class="ccos-nav-item">Mission Control</button>
+          <button type="button" data-route="/admin/cc" class="ccos-nav-item">Command Center</button>
+          <button type="button" data-route="/admin/vcc" class="ccos-nav-item">Voice Command Center</button>
+          <button type="button" data-route="/admin/monetization" class="ccos-nav-item">Monetization</button>
+          <button type="button" data-route="/admin/analytics" class="ccos-nav-item">Analytics</button>
+          <button type="button" data-route="/admin/live" class="ccos-nav-item">Live Manager</button>
+          <button type="button" data-route="/admin/store" class="ccos-nav-item">Store Manager</button>
+          <button type="button" data-route="/admin/ui-generator" class="ccos-nav-item">UI Generator</button>
+          <button type="button" data-route="/admin/media" class="ccos-nav-item">Media Library</button>
+          <button type="button" data-route="/admin/audio" class="ccos-nav-item">Audio Library</button>
+          <button type="button" data-route="/admin/settings" class="ccos-nav-item">Settings</button>
+        </nav>
+      </aside>
+
+      <main class="ccos-main">
+        <header id="topbar">
+          <div>
+            <p class="ccos-label">Single Brand Operations</p>
+            <h1 id="ccos-title">Mission Control</h1>
+          </div>
+          <div class="ccos-top-actions">
+            <button type="button" id="deploy-button">Deploy</button>
+          </div>
+        </header>
+
+        <section id="dashboard-content" aria-live="polite"></section>
+
+        <section id="deploy-rail" aria-label="Deploy status and logs">
+          <div class="deploy-rail-header">
+            <h2>Deploy Rail</h2>
+            <button type="button" id="refresh-deploy-logs">Refresh Logs</button>
+          </div>
+          <div class="deploy-rail-status" id="deploy-rail-status">Idle</div>
+          <pre class="deploy-rail-logs" id="deploy-rail-logs">No deployment logs yet.</pre>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>`;
+
 const normalizeBlogPostId = (value) => {
   const raw = String(value || "")
     .trim()
@@ -442,7 +748,7 @@ const saveConfigOverride = async (env, path, value) => {
 
 const getPayPalPlanLinks = (env, origin) => {
   const fallback = (plan) =>
-    `${origin}/store.html?plan=${encodeURIComponent(plan)}&pay=paypal`;
+    `${origin}/store?plan=${encodeURIComponent(plan)}&pay=paypal`;
   const fromEnv = (key, plan) =>
     String(env[key] || "").trim() || fallback(plan);
   return [
@@ -2623,11 +2929,11 @@ export default {
             params.append(
               "success_url",
               payload?.successUrl ||
-                `${url.origin}/store.html?checkout=success&product=${firstItem.sku}`
+                `${url.origin}/store?checkout=success&product=${firstItem.sku}`
             );
             params.append(
               "cancel_url",
-              payload?.cancelUrl || `${url.origin}/store.html?checkout=cancel`
+              payload?.cancelUrl || `${url.origin}/store?checkout=cancel`
             );
 
             normalizedItems.forEach((item, idx) => {
@@ -3068,32 +3374,26 @@ export default {
       }
 
       const ADMIN_PUBLIC_PATHS = new Set([
-        "/admin/access.html",
-        "/admin/login.html",
         "/admin/admin.css",
         "/admin/access-guard.js",
+        "/admin/ccos.css",
+        "/admin/ccos.js",
       ]);
-      const ADMIN_PUBLIC_ROUTE_ALIASES = new Map([
-        ["/admin/access", "/admin/access.html"],
-        ["/admin/login", "/admin/login.html"],
+      const ADMIN_AUTH_PATHS = new Map([
+        ["/admin/access", "access"],
+        ["/admin/access.html", "access"],
+        ["/admin/login", "login"],
+        ["/admin/login.html", "login"],
       ]);
-      // Serve admin login/access in place for path-without-.html to avoid redirect loop
-      // (some asset handlers redirect .html -> clean URL, causing ERR_TOO_MANY_REDIRECTS)
-      const adminAliasTarget = ADMIN_PUBLIC_ROUTE_ALIASES.get(cleanPath);
-      if (adminAliasTarget && url.pathname !== adminAliasTarget) {
-        const aliasReq = new Request(new URL(adminAliasTarget, url.origin), {
-          method: request.method,
-          headers: request.headers,
-          redirect: "manual",
-        });
-        const aliasRes = await assets.fetch(aliasReq);
-        if (aliasRes.status === 200) {
-          return addSecurityHeaders(aliasRes, {
-            cacheControl: "no-store",
-            pragmaNoCache: true,
-          });
-        }
-        return Response.redirect(new URL(adminAliasTarget, url.origin), 302);
+      const adminAuthMode = ADMIN_AUTH_PATHS.get(url.pathname);
+      if (adminAuthMode) {
+        return addSecurityHeaders(
+          new Response(renderAdminAuthPage({ mode: adminAuthMode }), {
+            status: 200,
+            headers: { "Content-Type": "text/html; charset=utf-8" },
+          }),
+          { cacheControl: "no-store", pragmaNoCache: true }
+        );
       }
       const isAdminRoot =
         url.pathname === "/admin" || url.pathname === "/admin/";
@@ -3102,9 +3402,6 @@ export default {
         /^\/admin\/.+\.(?:css|js|mjs|map|svg|png|jpg|jpeg|gif|webp|ico|woff2?)$/i.test(
           url.pathname
         ) && !url.pathname.endsWith(".html");
-      const isAdminHtmlPath =
-        /^\/admin\/.+\.html$/i.test(url.pathname) &&
-        !ADMIN_PUBLIC_PATHS.has(url.pathname);
 
       if (isAdminPath) {
         const isPublic = ADMIN_PUBLIC_PATHS.has(url.pathname);
@@ -3124,10 +3421,7 @@ export default {
                 }
               );
             }
-            return Response.redirect(
-              new URL("/admin/access.html", url.origin),
-              302
-            );
+            return Response.redirect(new URL("/admin/access", url.origin), 302);
           }
         }
       }
@@ -3136,58 +3430,65 @@ export default {
         isAdminRoot ||
         (isAdminPath &&
           !ADMIN_PUBLIC_PATHS.has(url.pathname) &&
-          !isAdminStaticAsset) ||
-        isAdminHtmlPath;
+          !isAdminStaticAsset);
 
       if (shouldServeAdminShell) {
-        const shellUrl = new URL(
-          "/admin/integrated-dashboard.html",
-          url.origin
+        const adminShellRes = await assets.fetch(
+          buildAssetRequest(request, url.origin, ADMIN_SHELL_ASSET_PATH)
         );
-        const shellRes = await assets.fetch(new Request(shellUrl, request));
-        return addSecurityHeaders(shellRes, {
-          cacheControl: "no-store",
-          pragmaNoCache: true,
-        });
+        if (adminShellRes.ok) {
+          return addSecurityHeaders(adminShellRes, {
+            cacheControl: "no-store",
+            pragmaNoCache: true,
+          });
+        }
+        if (
+          adminShellRes.status !== 404 &&
+          !isRedirectStatus(adminShellRes.status)
+        ) {
+          return addSecurityHeaders(adminShellRes, {
+            cacheControl: "no-store",
+            pragmaNoCache: true,
+          });
+        }
+
+        return addSecurityHeaders(
+          new Response(renderAdminShellPage(), {
+            status: 200,
+            headers: { "Content-Type": "text/html; charset=utf-8" },
+          }),
+          {
+            cacheControl: "no-store",
+            pragmaNoCache: true,
+          }
+        );
       }
 
       if (isAdminPath) {
-        let adminRes = await assets.fetch(request);
-        if (
-          ADMIN_PUBLIC_PATHS.has(url.pathname) &&
-          (adminRes.status === 301 || adminRes.status === 302)
-        ) {
-          const noRedirectUrl = new URL(request.url);
-          noRedirectUrl.searchParams.set("_", "1");
-          const retryRes = await assets.fetch(
-            new Request(noRedirectUrl.toString(), { redirect: "manual" })
-          );
-          if (retryRes.status === 200) adminRes = retryRes;
-        }
-        if (
-          ADMIN_PUBLIC_PATHS.has(url.pathname) &&
-          (adminRes.status === 301 || adminRes.status === 302)
-        ) {
-          const body = `<!DOCTYPE html><html><head><title>Admin</title></head><body><p>Use <a href="${url.pathname}?_=1">this link</a> to open the admin login page.</p></body></html>`;
-          return addSecurityHeaders(
-            new Response(body, {
-              status: 200,
-              headers: { "Content-Type": "text/html; charset=utf-8" },
-            }),
-            { cacheControl: "no-store", pragmaNoCache: true }
-          );
-        }
+        const adminRes = await assets.fetch(request);
         return addSecurityHeaders(adminRes, {
           cacheControl: "no-store",
           pragmaNoCache: true,
         });
       }
 
-      // Serve appstore and appstore-new as their HTML pages (no redirect to store)
+      // Clean public URLs fall through to the SPA shell if the legacy asset path redirects.
       if (cleanPath && !cleanPath.includes(".") && cleanPath !== "/") {
         const htmlUrl = new URL(`${cleanPath}.html`, url.origin);
-        const htmlRes = await assets.fetch(new Request(htmlUrl, request));
-        if (htmlRes.status !== 404) {
+        const htmlRes = await assets.fetch(
+          new Request(htmlUrl, {
+            method: request.method,
+            headers: request.headers,
+            redirect: "manual",
+          })
+        );
+        if (htmlRes.ok) {
+          return addSecurityHeaders(htmlRes, {
+            pathname: htmlUrl.pathname,
+            env,
+          });
+        }
+        if (htmlRes.status !== 404 && !isRedirectStatus(htmlRes.status)) {
           return addSecurityHeaders(htmlRes, {
             pathname: htmlUrl.pathname,
             env,
@@ -3203,7 +3504,7 @@ export default {
         return /\.[a-zA-Z0-9]+$/.test(cleanPath);
       };
       const isDocumentNavigation =
-        request.method === "GET" &&
+        (request.method === "GET" || request.method === "HEAD") &&
         (/\btext\/html\b/i.test(request.headers.get("Accept") || "") ||
           request.headers.get("Sec-Fetch-Dest") === "document" ||
           request.headers.get("Purpose") === "prefetch");

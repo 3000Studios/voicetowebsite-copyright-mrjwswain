@@ -344,48 +344,24 @@
 
         <form id="loginForm">
           <div class="form-group">
-            <label class="form-label" for="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              class="form-input"
-              placeholder="admin@voicetowebsite.com"
-              required
-              autocomplete="email"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="password">Password</label>
+            <label class="form-label" for="accessCode">Admin Access Code</label>
             <input
               type="password"
-              id="password"
+              id="accessCode"
               class="form-input"
-              placeholder="Enter your secure password"
+              placeholder="Enter your access code"
               required
               autocomplete="current-password"
             />
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="2fa">Two-Factor Code</label>
-            <input
-              type="text"
-              id="2fa"
-              class="form-input"
-              placeholder="000000 (if enabled)"
-              maxlength="6"
-              autocomplete="one-time-code"
-            />
-          </div>
-
-          <button type="submit" class="login-button">🔐 Secure Login</button>
+          <button type="submit" class="login-button">🔐 Open Admin</button>
         </form>
 
         <div class="security-features">
           <div class="security-item">
             <span class="security-icon">🛡️</span>
-            <span>Enterprise-grade security with 2FA</span>
+            <span>Secure admin cookie issued by the live Worker</span>
           </div>
           <div class="security-item">
             <span class="security-icon">🔐</span>
@@ -421,24 +397,36 @@
       document.getElementById("loginForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const twoFactor = document.getElementById("2fa").value;
+        const accessCode = document.getElementById("accessCode").value;
 
-        // Simulate authentication (in production, this would be a real API call)
-        if (email && password) {
-          // Show loading state
+        if (accessCode) {
           const button = document.querySelector(".login-button");
           const originalText = button.innerHTML;
           button.innerHTML = "🔄 Authenticating...";
           button.disabled = true;
 
-          setTimeout(() => {
-            alert("Login successful! Redirecting to admin dashboard...");
-            window.location.href = "/admin/access.html";
-          }, 2000);
+          fetch("/api/admin/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ accessCode }),
+          })
+            .then(async (response) => {
+              const data = await response.json().catch(() => ({}));
+              if (!response.ok) {
+                throw new Error(data.error || "Login failed.");
+              }
+              window.location.href = "/admin/mission";
+            })
+            .catch((error) => {
+              alert(error.message || "Login failed.");
+              button.innerHTML = originalText;
+              button.disabled = false;
+            });
         } else {
-          alert("Please enter your credentials");
+          alert("Please enter your access code");
         }
       });
 

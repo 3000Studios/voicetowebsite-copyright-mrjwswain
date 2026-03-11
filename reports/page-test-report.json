@@ -1,444 +1,444 @@
 {
-  "timestamp": "2026-03-11T04:56:53.456Z",
-  "baseUrl": "http://127.0.0.1:4173",
+  "timestamp": "2026-03-11T06:36:27.116Z",
+  "baseUrl": "http://127.0.0.1:8787",
   "pages": [
     {
-      "url": "http://127.0.0.1:4173/",
+      "url": "http://127.0.0.1:8787/",
       "name": "Home",
       "status": 200,
-      "loadTime": 36,
+      "loadTime": 48,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/sandbox.html",
+      "url": "http://127.0.0.1:8787/sandbox.html",
       "name": "Sandbox",
+      "status": 200,
+      "loadTime": 13,
+      "error": null,
+      "issues": []
+    },
+    {
+      "url": "http://127.0.0.1:8787/admin/index.html",
+      "name": "Admin",
+      "status": 200,
+      "loadTime": 10,
+      "error": null,
+      "issues": []
+    },
+    {
+      "url": "http://127.0.0.1:8787/admin/access.html",
+      "name": "Admin Access",
+      "status": 200,
+      "loadTime": 4,
+      "error": null,
+      "issues": []
+    },
+    {
+      "url": "http://127.0.0.1:8787/admin/login.html",
+      "name": "Admin Login",
+      "status": 200,
+      "loadTime": 5,
+      "error": null,
+      "issues": []
+    },
+    {
+      "url": "http://127.0.0.1:8787/admin/voice-commands.html",
+      "name": "Admin Voice Commands",
+      "status": 200,
+      "loadTime": 8,
+      "error": null,
+      "issues": []
+    },
+    {
+      "url": "http://127.0.0.1:8787/admin/analytics.html",
+      "name": "Admin Analytics",
       "status": 200,
       "loadTime": 6,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/admin/index.html",
-      "name": "Admin",
-      "status": 200,
-      "loadTime": 3,
-      "error": null,
-      "issues": []
-    },
-    {
-      "url": "http://127.0.0.1:4173/admin/access.html",
-      "name": "Admin Access",
-      "status": 200,
-      "loadTime": 3,
-      "error": null,
-      "issues": []
-    },
-    {
-      "url": "http://127.0.0.1:4173/admin/login.html",
-      "name": "Admin Login",
-      "status": 200,
-      "loadTime": 3,
-      "error": null,
-      "issues": []
-    },
-    {
-      "url": "http://127.0.0.1:4173/admin/voice-commands.html",
-      "name": "Admin Voice Commands",
-      "status": 200,
-      "loadTime": 3,
-      "error": null,
-      "issues": []
-    },
-    {
-      "url": "http://127.0.0.1:4173/admin/analytics.html",
-      "name": "Admin Analytics",
-      "status": 200,
-      "loadTime": 3,
-      "error": null,
-      "issues": []
-    },
-    {
-      "url": "http://127.0.0.1:4173/admin/live-stream.html",
+      "url": "http://127.0.0.1:8787/admin/live-stream.html",
       "name": "Admin Live Stream",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 6,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/admin/store-manager.html",
+      "url": "http://127.0.0.1:8787/admin/store-manager.html",
       "name": "Admin Store Manager",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/admin/app-store-manager.html",
+      "url": "http://127.0.0.1:8787/admin/app-store-manager.html",
       "name": "Admin App Store",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/admin/integrated-dashboard.html",
+      "url": "http://127.0.0.1:8787/admin/integrated-dashboard.html",
       "name": "Admin Integrated",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 7,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/admin/live-room-test.html",
+      "url": "http://127.0.0.1:8787/admin/live-room-test.html",
       "name": "Admin Live Room Test",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/about.html",
+      "url": "http://127.0.0.1:8787/about.html",
       "name": "About",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 14,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/store.html",
+      "url": "http://127.0.0.1:8787/store.html",
       "name": "Store",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 11,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/appstore.html",
+      "url": "http://127.0.0.1:8787/appstore.html",
       "name": "App Store",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 11,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/appstore-new.html",
+      "url": "http://127.0.0.1:8787/appstore-new.html",
       "name": "App Store New",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 10,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/license.html",
+      "url": "http://127.0.0.1:8787/license.html",
       "name": "License",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 11,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/how-it-works.html",
+      "url": "http://127.0.0.1:8787/how-it-works.html",
       "name": "How It Works",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 7,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/templates.html",
+      "url": "http://127.0.0.1:8787/templates.html",
       "name": "Templates",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 10,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/features.html",
+      "url": "http://127.0.0.1:8787/features.html",
       "name": "Features",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/features-enhanced.html",
+      "url": "http://127.0.0.1:8787/features-enhanced.html",
       "name": "Features Enhanced",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 12,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/pricing.html",
+      "url": "http://127.0.0.1:8787/pricing.html",
       "name": "Pricing",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/pricing-enhanced.html",
+      "url": "http://127.0.0.1:8787/pricing-enhanced.html",
       "name": "Pricing Enhanced",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 11,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/demo.html",
+      "url": "http://127.0.0.1:8787/demo.html",
       "name": "Demo",
       "status": 200,
-      "loadTime": 1,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/search.html",
+      "url": "http://127.0.0.1:8787/search.html",
       "name": "Search",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/search-enhanced.html",
+      "url": "http://127.0.0.1:8787/search-enhanced.html",
       "name": "Search Enhanced",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 12,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/support.html",
+      "url": "http://127.0.0.1:8787/support.html",
       "name": "Support",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/status.html",
+      "url": "http://127.0.0.1:8787/status.html",
       "name": "Status",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 12,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/trust.html",
+      "url": "http://127.0.0.1:8787/trust.html",
       "name": "Trust",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/partners.html",
+      "url": "http://127.0.0.1:8787/partners.html",
       "name": "Partners",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/webforge.html",
+      "url": "http://127.0.0.1:8787/webforge.html",
       "name": "WebForge",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 7,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/cursor-demo.html",
+      "url": "http://127.0.0.1:8787/cursor-demo.html",
       "name": "Cursor Demo",
       "status": 200,
-      "loadTime": 1,
+      "loadTime": 10,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/project-planning-hub.html",
+      "url": "http://127.0.0.1:8787/project-planning-hub.html",
       "name": "Project Planning Hub",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 10,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/rush-percussion.html",
+      "url": "http://127.0.0.1:8787/rush-percussion.html",
       "name": "Rush Percussion",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/blog.html",
+      "url": "http://127.0.0.1:8787/blog.html",
       "name": "Blog",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 7,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/contact.html",
+      "url": "http://127.0.0.1:8787/contact.html",
       "name": "Contact",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/contact-enhanced.html",
+      "url": "http://127.0.0.1:8787/contact-enhanced.html",
       "name": "Contact Enhanced",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 6,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/gallery.html",
+      "url": "http://127.0.0.1:8787/gallery.html",
       "name": "Gallery",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 7,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/legal.html",
+      "url": "http://127.0.0.1:8787/legal.html",
       "name": "Legal",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 7,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/copyrights.html",
+      "url": "http://127.0.0.1:8787/copyrights.html",
       "name": "Copyrights",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/livestream.html",
+      "url": "http://127.0.0.1:8787/livestream.html",
       "name": "Livestream",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/phosphor-nav.html",
+      "url": "http://127.0.0.1:8787/phosphor-nav.html",
       "name": "Phosphor Nav",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/referrals.html",
+      "url": "http://127.0.0.1:8787/referrals.html",
       "name": "Referrals",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/projects.html",
+      "url": "http://127.0.0.1:8787/projects.html",
       "name": "Projects",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/studio3000.html",
+      "url": "http://127.0.0.1:8787/studio3000.html",
       "name": "Studio 3000",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/the3000.html",
+      "url": "http://127.0.0.1:8787/the3000.html",
       "name": "The 3000",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/the3000-gallery.html",
+      "url": "http://127.0.0.1:8787/the3000-gallery.html",
       "name": "The 3000 Gallery",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 11,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/neural-engine.html",
+      "url": "http://127.0.0.1:8787/neural-engine.html",
       "name": "Neural Engine",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/strata-design-system.html",
+      "url": "http://127.0.0.1:8787/strata-design-system.html",
       "name": "Strata Design System",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 7,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/api-documentation.html",
+      "url": "http://127.0.0.1:8787/api-documentation.html",
       "name": "API Documentation",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 10,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/voice-to-json.html",
+      "url": "http://127.0.0.1:8787/voice-to-json.html",
       "name": "Voice to JSON",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/geological-studies.html",
+      "url": "http://127.0.0.1:8787/geological-studies.html",
       "name": "Geological Studies",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 10,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/privacy.html",
+      "url": "http://127.0.0.1:8787/privacy.html",
       "name": "Privacy",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 9,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/terms.html",
+      "url": "http://127.0.0.1:8787/terms.html",
       "name": "Terms",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     },
     {
-      "url": "http://127.0.0.1:4173/lexicon-pro.html",
+      "url": "http://127.0.0.1:8787/lexicon-pro.html",
       "name": "Lexicon Pro",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 8,
       "error": null,
       "issues": []
     }

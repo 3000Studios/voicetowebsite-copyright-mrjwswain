@@ -381,7 +381,7 @@
           accessButton.disabled = true;
           accessCard?.classList.add("success");
           window.setTimeout(() => {
-            window.location.href = "/admin/integrated-dashboard.html";
+            window.location.href = "/admin/mission";
           }, 260);
         } catch (error) {
           clearAdminSession();
@@ -401,7 +401,7 @@
         .then((res) => {
           if (res.ok) {
             markAdminSession();
-            window.location.href = "/admin/integrated-dashboard.html";
+            window.location.href = "/admin/mission";
           }
         })
         .catch(() => {});

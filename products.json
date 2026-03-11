@@ -3,50 +3,55 @@
     {
       "id": "starter",
       "type": "service",
-      "title": "Starter Capsule",
-      "label": "Starter Site",
-      "desc": "Single brand, 3 live pages + contact, AI edit requests, weekly deploy window, 7-day license rotation.",
-      "price": 79.0,
+      "title": "Launch One",
+      "label": "1 Page Launch",
+      "desc": "A conversion-focused single page website created from your voice brief, ready for fast publishing and domain hookup.",
+      "price": 29.0,
       "currency": "USD",
-      "interval": "month",
-      "features": ["3 live pages", "AI edit requests", "Weekly deploy", "7-day license rotation"]
+      "interval": "one-time",
+      "features": ["1 premium page", "Voice-led revisions", "Hosting + SSL", "Basic SEO structure"]
     },
     {
       "id": "growth",
       "type": "service",
-      "title": "Growth Voice",
-      "label": "Growth Voice",
-      "desc": "Daily co-pilot for high-volume sites. Deploy cadence, Slack priority support, monthly keys, livestream pack.",
-      "price": 249.0,
+      "title": "Growth Stack",
+      "label": "5 Page Site",
+      "desc": "A multi-page business website with pricing, trust pages, lead capture, and stronger launch coverage.",
+      "price": 79.0,
       "currency": "USD",
-      "interval": "month",
-      "features": ["Daily deploy + rollback", "Slack priority", "Monthly keys", "Livestream pack"]
+      "interval": "one-time",
+      "features": ["Up to 5 pages", "Custom domain hookup", "Analytics ready", "Priority support"]
     },
     {
       "id": "enterprise",
       "type": "service",
-      "title": "Enterprise Edge",
-      "label": "Enterprise Edge",
-      "desc": "Governed automation for regulated teams. 24/7 ops desk, KV/D1/R2, SSO + custom branding, approval workflow.",
-      "price": 699.0,
+      "title": "Commerce System",
+      "label": "12 Page Launch",
+      "desc": "A fuller voice-built website with storefront structure, content architecture, and launch review support.",
+      "price": 149.0,
       "currency": "USD",
-      "interval": "month",
-      "features": ["24/7 ops desk", "KV · D1 · R2", "SSO + custom branding", "Approval workflow"]
+      "interval": "one-time",
+      "features": [
+        "Up to 12 pages",
+        "Storefront structure",
+        "Content architecture",
+        "White-glove review"
+      ]
     },
     {
       "id": "lifetime",
       "type": "service",
-      "title": "Lifetime App Buyout",
-      "label": "Lifetime App",
-      "desc": "Own the full VoiceToWebsite stack. White-label + resale rights, 12 months updates, priority onboarding.",
-      "price": 4999.0,
+      "title": "Partner License",
+      "label": "White-label License",
+      "desc": "A white-label and resale-oriented license for teams that want a deeper operational relationship.",
+      "price": 899.0,
       "currency": "USD",
       "interval": "one-time",
       "features": [
         "White-label + resale",
         "12 months updates",
-        "Priority onboarding",
-        "Opt-in retainer"
+        "Partner onboarding",
+        "Optional retainer"
       ]
     },
     {
@@ -55,7 +60,7 @@
       "title": "Solo Page",
       "label": "Instant Launch",
       "desc": "Perfect for a single landing page or personal portfolio. Includes 1 high-conversion AI page, secure hosting, and voice updates.",
-      "price": 49.0,
+      "price": 29.0,
       "currency": "USD",
       "interval": "one-time",
       "features": ["1 AI Page", "Secure Hosting", "Basic SEO", "Voice Updates"]
@@ -66,7 +71,7 @@
       "title": "Business Bundle",
       "label": "Scale Up",
       "desc": "A complete multi-page presence. Up to 5 AI-generated pages, custom domain integration, and priority support.",
-      "price": 199.0,
+      "price": 79.0,
       "currency": "USD",
       "interval": "one-time",
       "features": ["Up to 5 AI Pages", "Custom Domain", "Analytics", "Priority Support"]
@@ -77,7 +82,7 @@
       "title": "Enterprise Voice",
       "label": "Maximum Reach",
       "desc": "Unlimited pages, deep AI customization, and full white-label options.",
-      "price": 499.0,
+      "price": 149.0,
       "currency": "USD",
       "interval": "month",
       "features": ["Unlimited Pages", "Custom AI Model", "24/7 Support"]

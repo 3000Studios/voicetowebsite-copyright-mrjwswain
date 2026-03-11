@@ -23,6 +23,42 @@ const mockAssets = {
   },
 };
 
+const redirectingHtmlAssets = {
+  async fetch(request) {
+    const url = new URL(request.url);
+    const headers = new Headers();
+
+    if (url.pathname.endsWith(".js")) {
+      headers.set("Content-Type", "application/javascript; charset=utf-8");
+      return new Response("console.log('ok');", { status: 200, headers });
+    }
+
+    if (url.pathname.endsWith(".css")) {
+      headers.set("Content-Type", "text/css; charset=utf-8");
+      return new Response("body{}", { status: 200, headers });
+    }
+
+    headers.set("Content-Type", "text/html; charset=utf-8");
+
+    if (url.pathname === "/index.html") {
+      return new Response("<html><body>asset:/index.html</body></html>", {
+        status: 200,
+        headers,
+      });
+    }
+
+    if (url.pathname.endsWith(".html")) {
+      const cleanPath = url.pathname.replace(/\.html$/i, "");
+      return new Response(null, {
+        status: 307,
+        headers: { Location: cleanPath || "/" },
+      });
+    }
+
+    return new Response("not found", { status: 404, headers });
+  },
+};
+
 const extractFirstCookie = (setCookieHeader) => {
   const raw = String(setCookieHeader || "");
   if (!raw) return "";
@@ -48,7 +84,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     expect(body.endpoint).toBe("status-alias");
   });
 
-  it("redirects /admin/* to /admin/access.html when unauthenticated", async () => {
+  it("redirects /admin/* to /admin/access when unauthenticated", async () => {
     const env = {
       ASSETS: mockAssets,
       CONTROL_PASSWORD: "pw",
@@ -63,7 +99,7 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
       {}
     );
     expect(res.status).toBe(302);
-    expect(res.headers.get("Location")).toContain("/admin/access.html");
+    expect(res.headers.get("Location")).toContain("/admin/access");
   });
 
   it("serves /admin/access.html without admin cookie", async () => {
@@ -82,6 +118,25 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     );
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type") || "").toContain("text/html");
+  });
+
+  it("serves admin access inline even when the asset layer redirects html paths", async () => {
+    const env = {
+      ASSETS: redirectingHtmlAssets,
+      CONTROL_PASSWORD: "5555",
+      ADMIN_COOKIE_SECRET: "5555",
+      ADMIN_ACCESS_CODE: "5555",
+      NODE_ENV: "test",
+    };
+
+    const res = await worker.fetch(
+      new Request("https://example.com/admin/access.html"),
+      env,
+      {}
+    );
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(body).toContain("Open admin dashboard");
   });
 
   it("normalizes clean public admin auth routes", async () => {
@@ -190,6 +245,24 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
       {}
     );
     expect(statusRes.status).toBe(200);
+  });
+
+  it("falls back to the SPA shell for clean public routes when html assets redirect to clean urls", async () => {
+    const env = {
+      ASSETS: redirectingHtmlAssets,
+      NODE_ENV: "test",
+    };
+
+    const res = await worker.fetch(
+      new Request("https://example.com/store", {
+        headers: { Accept: "text/html" },
+      }),
+      env,
+      {}
+    );
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(body).toContain("asset:/index.html");
   });
 
   it("blocks critical admin APIs without an admin cookie (support admin sessions)", async () => {

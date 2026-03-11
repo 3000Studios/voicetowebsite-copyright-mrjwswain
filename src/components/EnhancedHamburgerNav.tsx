@@ -12,7 +12,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { SHARED_NAV_ITEMS } from "../constants/navigation";
 
-const ADMIN_CODES = new Set(["ADMIN_ACCESS_2024", "UNLOCK_ADMIN_123"]);
+const ADMIN_CODES = new Set(["5555"]);
 const PRIMARY_LABELS = new Set([
   "Home",
   "Features",
@@ -328,7 +328,7 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
                   Launch with pricing
                 </Link>
                 <a
-                  href="/admin/login.html"
+                  href="/admin/access"
                   className="vtw-button vtw-button-secondary"
                   onClick={() => setIsDrawerOpen(false)}
                 >
@@ -450,7 +450,7 @@ const EnhancedHamburgerNav: React.FC<EnhancedHamburgerNavProps> = ({
                   Unlock
                 </button>
                 <a
-                  href="/admin/login.html"
+                  href="/admin/access"
                   className="vtw-button vtw-button-secondary"
                 >
                   Login page

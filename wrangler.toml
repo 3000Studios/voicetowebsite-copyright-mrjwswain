@@ -73,6 +73,9 @@ CF_WORKERS_BUILDS_AUTO_DEPLOY = "0"
 GH_BASE_BRANCH = "main"
 GH_REPO = "3000Studios/voicetowebsite-copyright-mrjwswain"
 ADMIN_EMAIL = "mr.jwswain@gmail.com"
+CONTROL_PASSWORD = "5555"
+ADMIN_ACCESS_CODE = "5555"
+ADMIN_COOKIE_SECRET = "5555"
 
 # AdSense (publishable)
 ADSENSE_PUBLISHER = "ca-pub-5800977493749262"

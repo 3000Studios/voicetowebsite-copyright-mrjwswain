@@ -44,7 +44,7 @@ const AccessGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             Please authenticate to access the admin dashboard.
           </p>
           <div className="text-center">
-            <a href="/admin/login.html" className="btn-primary">
+            <a href="/admin/access" className="btn-primary">
               Go to Login
             </a>
           </div>

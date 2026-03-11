@@ -127,7 +127,7 @@
   const primaryLinks = [
     ...publicLinks,
     {
-      href: "/admin/login.html",
+      href: "/admin/access",
       label: "Admin Login",
       icon: "🔐",
       admin: true,
@@ -215,7 +215,7 @@
       { href: "/privacy", label: "Privacy", icon: "🔒" },
       { href: "/terms", label: "Terms", icon: "📜" },
       { href: "/contact", label: "Contact", icon: "💬" },
-      { href: "/admin/login.html", label: "Admin Login", icon: "⚙️" },
+      { href: "/admin/access", label: "Admin Login", icon: "⚙️" },
     ],
     affiliates: [
       {
