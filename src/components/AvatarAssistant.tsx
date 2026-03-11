@@ -25,6 +25,7 @@ const QUICK_ACTIONS = [
   { label: "Demo", path: "/demo" },
   { label: "Support", path: "/support" },
 ];
+const LOCAL_API_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
 
 const buildMessageId = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -36,6 +37,9 @@ const AvatarAssistant: React.FC = () => {
   const [draft, setDraft] = useState("");
   const [isSending, setIsSending] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const isLocalPreview =
+    typeof window !== "undefined" &&
+    LOCAL_API_HOSTS.has(window.location.hostname);
 
   const conversationHistory = useMemo(
     () =>
@@ -68,6 +72,19 @@ const AvatarAssistant: React.FC = () => {
     setIsSending(true);
 
     try {
+      if (isLocalPreview) {
+        setMessages((current) => [
+          ...current,
+          {
+            id: buildMessageId(),
+            role: "assistant",
+            content:
+              "Pricing is in the floating nav and footer core pages. Support is available from the nav, footer trust section, and quick actions in this panel.",
+          },
+        ]);
+        return;
+      }
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {

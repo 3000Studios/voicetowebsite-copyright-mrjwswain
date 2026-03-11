@@ -7,8 +7,6 @@ import {
   normalizeBlogFeedPayload,
 } from "../data/blogPosts";
 
-const YOUTUBE_EMBED = "https://www.youtube.com/embed/2DTrkD0Ffzk?autoplay=0";
-
 const formatPublishedDate = (value: string) =>
   new Date(value).toLocaleDateString("en-US", {
     year: "numeric",
@@ -160,16 +158,67 @@ const BlogPage: React.FC = () => {
 
             <article
               className="vtw-glass-card vtw-card-hover"
-              style={{ padding: "1rem" }}
+              style={{ padding: "1.2rem" }}
             >
-              <div style={{ overflow: "hidden", borderRadius: "24px" }}>
-                <iframe
-                  src={YOUTUBE_EMBED}
-                  title="VoiceToWebsite blog overview"
-                  className="vt-preview-frame"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+              <div
+                className="vtw-section-label"
+                style={{ marginBottom: "0.8rem" }}
+              >
+                Editorial spotlight
+              </div>
+              <div
+                style={{
+                  minHeight: "100%",
+                  padding: "1.2rem",
+                  borderRadius: "24px",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  background:
+                    "linear-gradient(150deg, rgba(255,0,200,0.12), rgba(0,242,255,0.08) 46%, rgba(15,20,27,0.94))",
+                  display: "grid",
+                  gap: "1rem",
+                }}
+              >
+                <div className="vtw-inline-meta">
+                  <span className="vtw-chip">Runtime content</span>
+                  <span className="vtw-chip">
+                    {feed.posts.length} posts live
+                  </span>
+                </div>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontFamily: "var(--font-display)",
+                    fontSize: "clamp(1.55rem, 3vw, 2.3rem)",
+                    lineHeight: 1,
+                  }}
+                >
+                  The blog stays active even when the frontend shell does not
+                  change.
+                </h3>
+                <p className="vtw-body-text" style={{ margin: 0 }}>
+                  Runtime JSON keeps the editorial layer easy to refresh,
+                  inspect, and recover without depending on an external media
+                  embed.
+                </p>
+                <div style={{ display: "grid", gap: "0.75rem" }}>
+                  {[
+                    `Featured story: ${featuredPost?.title || "VoiceToWebsite updates"}`,
+                    `Generated ${formatGeneratedTime(feed.generatedAt)}`,
+                    `Refresh cadence: every ${feed.refreshHours} hours`,
+                  ].map((point) => (
+                    <div
+                      key={point}
+                      style={{
+                        padding: "0.85rem 0.95rem",
+                        borderRadius: "18px",
+                        background: "rgba(255,255,255,0.04)",
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      {point}
+                    </div>
+                  ))}
+                </div>
               </div>
             </article>
           </div>

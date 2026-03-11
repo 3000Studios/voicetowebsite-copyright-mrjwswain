@@ -1,6 +1,10 @@
 (function initRevenueTracking() {
   const ENDPOINT = "/api/analytics/event";
   const SESSION_KEY = "vtw-revenue-session";
+  const LOCAL_ANALYTICS_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
+
+  const isLocalRuntime = () =>
+    LOCAL_ANALYTICS_HOSTS.has(window.location.hostname);
 
   const getSessionId = () => {
     try {
@@ -22,6 +26,7 @@
       .slice(0, 64);
 
   const sendPayload = (payload) => {
+    if (isLocalRuntime()) return;
     const body = JSON.stringify(payload);
     if (navigator.sendBeacon) {
       try {
@@ -39,6 +44,11 @@
       keepalive: true,
     }).catch(() => {});
   };
+
+  if (isLocalRuntime()) {
+    window.vtwTrackEvent = () => {};
+    return;
+  }
 
   window.vtwTrackEvent = (eventName, properties = {}, value) => {
     const normalized = normalizeEventName(eventName);

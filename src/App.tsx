@@ -440,9 +440,9 @@ const HomeView: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Keep music opt-in so production and preview do not trigger autoplay warnings.
     audioEngine.setVolume(0.36);
-    startThemeSong().catch(() => {});
-  }, [startThemeSong]);
+  }, []);
 
   const initializeSpeechRecognition = useCallback(() => {
     if (recognitionRef.current) return recognitionRef.current;

@@ -1,5 +1,6 @@
 (() => {
   const THEME_KEY = "vtw-theme";
+  const LOCAL_ANALYTICS_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
   const THEMES = [
     { id: "metallic", label: "Metallic" },
     { id: "midnight", label: "Midnight" },
@@ -81,6 +82,8 @@
       return false;
     }
   };
+  const isLocalRuntime = () =>
+    LOCAL_ANALYTICS_HOSTS.has(window.location.hostname);
   // Public pages (always visible)
   const publicLinks = [
     { href: "/", label: "Home", icon: "🏠" },
@@ -433,6 +436,7 @@
 
   const trackRevenueEvent = (eventName, properties = {}, value) => {
     try {
+      if (isLocalRuntime()) return;
       if (typeof window.vtwTrackEvent === "function") {
         window.vtwTrackEvent(eventName, properties, value);
         return;

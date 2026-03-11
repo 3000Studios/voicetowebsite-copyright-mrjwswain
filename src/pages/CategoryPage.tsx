@@ -5,7 +5,6 @@ import ScrollReveal from "../components/ScrollReveal";
 
 const IMG =
   "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&q=80";
-const VIDEO = "https://www.youtube.com/embed/Wm6CUgyLu94?autoplay=0";
 
 const CategoryPage: React.FC = () => {
   const { name } = useParams<{ name: string }>();
@@ -37,16 +36,63 @@ const CategoryPage: React.FC = () => {
           </article>
           <article
             className="vtw-glass-card vtw-card-hover"
-            style={{ padding: "1rem" }}
+            style={{ padding: "1.2rem" }}
           >
-            <div style={{ overflow: "hidden", borderRadius: "24px" }}>
-              <iframe
-                src={VIDEO}
-                title={title}
-                className="vt-preview-frame"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+            <div
+              className="vtw-section-label"
+              style={{ marginBottom: "0.8rem" }}
+            >
+              Category spotlight
+            </div>
+            <div
+              style={{
+                minHeight: "100%",
+                padding: "1.2rem",
+                borderRadius: "24px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                background:
+                  "linear-gradient(150deg, rgba(28,207,156,0.14), rgba(112,0,255,0.1) 48%, rgba(15,20,27,0.94))",
+                display: "grid",
+                gap: "1rem",
+              }}
+            >
+              <div className="vtw-inline-meta">
+                <span className="vtw-chip">Category route</span>
+                <span className="vtw-chip">{title}</span>
+              </div>
+              <h2
+                className="vtw-card-title"
+                style={{
+                  margin: 0,
+                  fontSize: "clamp(1.6rem, 3vw, 2.35rem)",
+                  lineHeight: 1,
+                }}
+              >
+                Explore this app cluster without losing the site structure.
+              </h2>
+              <p className="vtw-body-text" style={{ margin: 0 }}>
+                Category routes keep app discovery indexable, easier to scan,
+                and more organized than a single oversized catalog page.
+              </p>
+              <div style={{ display: "grid", gap: "0.75rem" }}>
+                {[
+                  "Structured discovery surfaces support SEO and cleaner browsing.",
+                  "Each category can grow with filters, descriptions, and internal links.",
+                  "The premium shell stays consistent across app pages and archive routes.",
+                ].map((point) => (
+                  <div
+                    key={point}
+                    style={{
+                      padding: "0.85rem 0.95rem",
+                      borderRadius: "18px",
+                      background: "rgba(255,255,255,0.04)",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    {point}
+                  </div>
+                ))}
+              </div>
             </div>
           </article>
         </ScrollReveal>

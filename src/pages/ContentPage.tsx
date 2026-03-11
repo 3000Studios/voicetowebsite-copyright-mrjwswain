@@ -36,12 +36,17 @@ const ContentPage: React.FC<ContentPageProps> = ({ config }) => {
     imageAlt,
     extraImageUrls = [],
     extraImageAlts = [],
-    videoUrl,
     videoTitle,
     paragraphs,
     cards = [],
     extra,
   } = config;
+  const spotlightPoints = [
+    subtitle,
+    paragraphs[0],
+    cards[0]?.body,
+    "Route-level content stays fast, indexable, and easier to review without a fragile third-party embed.",
+  ].filter(Boolean) as string[];
 
   return (
     <PageLayout title={title} subtitle={subtitle} wallpaper={wallpaper}>
@@ -67,22 +72,76 @@ const ContentPage: React.FC<ContentPageProps> = ({ config }) => {
           </article>
           <article
             className="vtw-glass-card vtw-card-hover"
-            style={{ padding: "1rem" }}
+            style={{ padding: "1.2rem" }}
           >
             <div
+              className="vtw-section-label"
+              style={{ marginBottom: "0.8rem" }}
+            >
+              Route spotlight
+            </div>
+            <div
               style={{
-                overflow: "hidden",
+                minHeight: "100%",
+                padding: "1.2rem",
                 borderRadius: "24px",
-                background: "rgba(5,7,10,0.8)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                background:
+                  "linear-gradient(160deg, rgba(0,242,255,0.08), rgba(112,0,255,0.12) 42%, rgba(15,20,27,0.94))",
+                display: "grid",
+                gap: "1rem",
               }}
             >
-              <iframe
-                src={videoUrl}
-                title={videoTitle}
-                className="vt-preview-frame"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              <div className="vtw-inline-meta">
+                <span className="vtw-chip">Live route</span>
+                <span className="vtw-chip">{title}</span>
+              </div>
+              <div>
+                <h2
+                  className="vtw-card-title"
+                  style={{
+                    margin: 0,
+                    fontSize: "clamp(1.55rem, 3vw, 2.4rem)",
+                    lineHeight: 1,
+                  }}
+                >
+                  {videoTitle}
+                </h2>
+                <p className="vtw-body-text" style={{ margin: "0.75rem 0 0" }}>
+                  Structured copy, discovery context, and route-specific detail
+                  stay inside the product shell so the page remains durable in
+                  preview and production.
+                </p>
+              </div>
+              <div className="vtw-metric-grid" style={{ marginTop: "0.2rem" }}>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Page type</span>
+                  <span className="vtw-metric__value">Content route</span>
+                </div>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Delivery</span>
+                  <span className="vtw-metric__value">Fast shell</span>
+                </div>
+                <div className="vtw-metric">
+                  <span className="vtw-metric__label">Review mode</span>
+                  <span className="vtw-metric__value">Embed-safe</span>
+                </div>
+              </div>
+              <div style={{ display: "grid", gap: "0.75rem" }}>
+                {spotlightPoints.slice(0, 3).map((point) => (
+                  <div
+                    key={point}
+                    style={{
+                      padding: "0.85rem 0.95rem",
+                      borderRadius: "18px",
+                      background: "rgba(255,255,255,0.04)",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    {point}
+                  </div>
+                ))}
+              </div>
             </div>
           </article>
         </ScrollReveal>

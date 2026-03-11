@@ -1,11 +1,16 @@
 type RevenueProperties = Record<string, unknown>;
 
 const ENDPOINT = "/api/analytics/event";
+const LOCAL_ANALYTICS_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
 
 const isTestEnvironment = () => import.meta.env.MODE === "test";
+const isLocalPreviewEnvironment = () =>
+  typeof window !== "undefined" &&
+  LOCAL_ANALYTICS_HOSTS.has(window.location.hostname);
 
 const resolveEndpoint = () => {
   if (isTestEnvironment()) return null;
+  if (isLocalPreviewEnvironment()) return null;
   if (/^https?:\/\//i.test(ENDPOINT)) return ENDPOINT;
   if (typeof window === "undefined" || !window.location?.origin) return null;
 

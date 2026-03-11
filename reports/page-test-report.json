@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-03-11T04:36:54.818Z",
+  "timestamp": "2026-03-11T04:56:53.456Z",
   "baseUrl": "http://127.0.0.1:4173",
   "pages": [
     {
       "url": "http://127.0.0.1:4173/",
       "name": "Home",
       "status": 200,
-      "loadTime": 37,
+      "loadTime": 36,
       "error": null,
       "issues": []
     },
@@ -14,7 +14,7 @@
       "url": "http://127.0.0.1:4173/sandbox.html",
       "name": "Sandbox",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 6,
       "error": null,
       "issues": []
     },
@@ -46,7 +46,7 @@
       "url": "http://127.0.0.1:4173/admin/voice-commands.html",
       "name": "Admin Voice Commands",
       "status": 200,
-      "loadTime": 4,
+      "loadTime": 3,
       "error": null,
       "issues": []
     },
@@ -54,7 +54,7 @@
       "url": "http://127.0.0.1:4173/admin/analytics.html",
       "name": "Admin Analytics",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 3,
       "error": null,
       "issues": []
     },
@@ -62,7 +62,7 @@
       "url": "http://127.0.0.1:4173/admin/live-stream.html",
       "name": "Admin Live Stream",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -78,7 +78,7 @@
       "url": "http://127.0.0.1:4173/admin/app-store-manager.html",
       "name": "Admin App Store",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -94,7 +94,7 @@
       "url": "http://127.0.0.1:4173/admin/live-room-test.html",
       "name": "Admin Live Room Test",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 3,
       "error": null,
       "issues": []
     },
@@ -102,7 +102,7 @@
       "url": "http://127.0.0.1:4173/about.html",
       "name": "About",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -110,7 +110,7 @@
       "url": "http://127.0.0.1:4173/store.html",
       "name": "Store",
       "status": 200,
-      "loadTime": 4,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -126,7 +126,7 @@
       "url": "http://127.0.0.1:4173/appstore-new.html",
       "name": "App Store New",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -134,7 +134,7 @@
       "url": "http://127.0.0.1:4173/license.html",
       "name": "License",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -142,7 +142,7 @@
       "url": "http://127.0.0.1:4173/how-it-works.html",
       "name": "How It Works",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -150,7 +150,7 @@
       "url": "http://127.0.0.1:4173/templates.html",
       "name": "Templates",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -158,7 +158,7 @@
       "url": "http://127.0.0.1:4173/features.html",
       "name": "Features",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -166,7 +166,7 @@
       "url": "http://127.0.0.1:4173/features-enhanced.html",
       "name": "Features Enhanced",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 3,
       "error": null,
       "issues": []
     },
@@ -182,7 +182,7 @@
       "url": "http://127.0.0.1:4173/pricing-enhanced.html",
       "name": "Pricing Enhanced",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -190,7 +190,7 @@
       "url": "http://127.0.0.1:4173/demo.html",
       "name": "Demo",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 1,
       "error": null,
       "issues": []
     },
@@ -206,7 +206,7 @@
       "url": "http://127.0.0.1:4173/search-enhanced.html",
       "name": "Search Enhanced",
       "status": 200,
-      "loadTime": 4,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -214,7 +214,7 @@
       "url": "http://127.0.0.1:4173/support.html",
       "name": "Support",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -222,7 +222,7 @@
       "url": "http://127.0.0.1:4173/status.html",
       "name": "Status",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -230,7 +230,7 @@
       "url": "http://127.0.0.1:4173/trust.html",
       "name": "Trust",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -238,7 +238,7 @@
       "url": "http://127.0.0.1:4173/partners.html",
       "name": "Partners",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -246,7 +246,7 @@
       "url": "http://127.0.0.1:4173/webforge.html",
       "name": "WebForge",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -254,7 +254,7 @@
       "url": "http://127.0.0.1:4173/cursor-demo.html",
       "name": "Cursor Demo",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 1,
       "error": null,
       "issues": []
     },
@@ -262,7 +262,7 @@
       "url": "http://127.0.0.1:4173/project-planning-hub.html",
       "name": "Project Planning Hub",
       "status": 200,
-      "loadTime": 4,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -302,7 +302,7 @@
       "url": "http://127.0.0.1:4173/gallery.html",
       "name": "Gallery",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -326,7 +326,7 @@
       "url": "http://127.0.0.1:4173/livestream.html",
       "name": "Livestream",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -334,7 +334,7 @@
       "url": "http://127.0.0.1:4173/phosphor-nav.html",
       "name": "Phosphor Nav",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -350,7 +350,7 @@
       "url": "http://127.0.0.1:4173/projects.html",
       "name": "Projects",
       "status": 200,
-      "loadTime": 2,
+      "loadTime": 3,
       "error": null,
       "issues": []
     },
@@ -366,7 +366,7 @@
       "url": "http://127.0.0.1:4173/the3000.html",
       "name": "The 3000",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -374,7 +374,7 @@
       "url": "http://127.0.0.1:4173/the3000-gallery.html",
       "name": "The 3000 Gallery",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -430,7 +430,7 @@
       "url": "http://127.0.0.1:4173/terms.html",
       "name": "Terms",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     },
@@ -438,7 +438,7 @@
       "url": "http://127.0.0.1:4173/lexicon-pro.html",
       "name": "Lexicon Pro",
       "status": 200,
-      "loadTime": 3,
+      "loadTime": 2,
       "error": null,
       "issues": []
     }
