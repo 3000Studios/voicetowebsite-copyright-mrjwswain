@@ -57,8 +57,17 @@ function log(msg) {
 
 function runWrangler(env, extraArgs, stdio = "pipe") {
   if (process.platform === "win32") {
-    const commandLine = ["wrangler", ...extraArgs].join(" ");
-    return spawnSync("cmd.exe", ["/d", "/s", "/c", commandLine], {
+    const wranglerCmd = path.join(root, "node_modules", ".bin", "wrangler.cmd");
+    const executable = (() => {
+      try {
+        accessSync(wranglerCmd);
+        return wranglerCmd;
+      } catch {
+        return "wrangler";
+      }
+    })();
+
+    return spawnSync(executable, extraArgs, {
       stdio,
       env,
       shell: false,
