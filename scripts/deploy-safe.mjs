@@ -72,7 +72,7 @@ function runWrangler(env, extraArgs, stdio = "pipe") {
         .map((value) => `"${String(value).replaceAll('"', '""')}"`)
         .join(" ");
 
-      return spawnSync("cmd.exe", ["/d", "/s", "/c", commandLine], {
+      return spawnSync("cmd.exe", ["/d", "/s", "/c", `call ${commandLine}`], {
         stdio,
         env,
         shell: false,
