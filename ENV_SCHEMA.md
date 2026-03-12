@@ -1,10 +1,10 @@
 # ENV Schema
 
-Generated: 2026-03-11T06:32:29.550Z
+Generated: 2026-03-12T11:56:00.802Z
 
 ## Summary
 
-- Scanned files: 462
+- Scanned files: 467
 - Used keys: 143
 - Defined keys: 87
 - Missing keys: 68
@@ -54,13 +54,13 @@ Generated: 2026-03-11T06:32:29.550Z
 | CF_API_TOKEN                             | no      | 4             | missing |
 | CF_API_TOKEN2                            | no      | 3             | missing |
 | CF_AUTO_DEPLOY_ON_PUSH                   | no      | 2             | missing |
-| CF_DEPLOY_HOOK_URL                       | yes     | 3             | ok      |
+| CF_DEPLOY_HOOK_URL                       | yes     | 4             | ok      |
 | CF_DEPLOY_WEBHOOK                        | no      | 2             | missing |
 | CF_FORCE_DEPLOY_HOOK                     | no      | 2             | missing |
 | CF_FORCE_DEPLOY_WEBHOOK                  | no      | 2             | missing |
 | CF_PAGES_DEPLOY_HOOK                     | yes     | 3             | ok      |
 | CF_USER_TOKEN                            | no      | 3             | missing |
-| CF_WORKERS_BUILDS_AUTO_DEPLOY            | yes     | 2             | ok      |
+| CF_WORKERS_BUILDS_AUTO_DEPLOY            | yes     | 3             | ok      |
 | CF_ZONE_ID                               | yes     | 3             | ok      |
 | CI                                       | no      | 1             | missing |
 | CLOUD_FLARE_API_TOKEN                    | yes     | 5             | ok      |
@@ -104,7 +104,7 @@ Generated: 2026-03-11T06:32:29.550Z
 | OPENAI_MODEL                             | yes     | 2             | ok      |
 | ORCH_MAX_ALL_PAGES_FILES                 | no      | 2             | missing |
 | ORCH_MAX_ALL_PAGES_HTML                  | no      | 2             | missing |
-| ORCH_TOKEN                               | yes     | 4             | ok      |
+| ORCH_TOKEN                               | yes     | 5             | ok      |
 | OWNER_KEY                                | no      | 2             | missing |
 | PATCH_APPLY_RATE_LIMIT                   | no      | 2             | missing |
 | PATH                                     | no      | 1             | missing |
@@ -171,5 +171,5 @@ Generated: 2026-03-11T06:32:29.550Z
 | VTW_KV                                   | no      | 2             | missing |
 | VTW_VAULT                                | no      | 2             | missing |
 | WORKER_NAME                              | no      | 3             | missing |
-| X_ORCH_TOKEN                             | no      | 3             | missing |
+| X_ORCH_TOKEN                             | no      | 4             | missing |
 | ZONE_ID                                  | no      | 1             | missing |

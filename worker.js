@@ -9,6 +9,7 @@ import {
   generateBlogFeedUpdate,
   storeBlogFeed,
 } from "./functions/blogAutomation.js";
+import { getAiWosManifest } from "./functions/aiWos.js";
 import {
   clearAdminCookieHeaders,
   hasValidAdminCookie,
@@ -50,6 +51,15 @@ import {
 
 const getAdSenseClientId = (env) =>
   String(env.ADSENSE_PUBLISHER || "").trim() || "ca-pub-demo";
+
+const hasMatchingOrchToken = (request, env) => {
+  const provided = String(request.headers.get("x-orch-token") || "").trim();
+  const orchToken = String(
+    env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || ""
+  ).trim();
+  return Boolean(provided && orchToken && provided === orchToken);
+};
+
 const SECURITY_HEADERS = {
   "Content-Security-Policy": `
     default-src 'self';
@@ -2359,13 +2369,7 @@ export default {
       // and Custom GPT clients to self-calibrate against the canonical command surface.
       if (url.pathname === "/api/capabilities" && request.method === "GET") {
         const isAdmin = await isAdminRequest(request, env);
-        const provided = String(
-          request.headers.get("x-orch-token") || ""
-        ).trim();
-        const orchToken = String(
-          env.ORCH_TOKEN || env.X_ORCH_TOKEN || env["x-orch-token"] || ""
-        ).trim();
-        const orchOk = Boolean(provided && orchToken && provided === orchToken);
+        const orchOk = hasMatchingOrchToken(request, env);
 
         if (!isAdmin && !orchOk) {
           return jsonResponse(401, { error: "Unauthorized" });
@@ -2375,6 +2379,21 @@ export default {
           ok: true,
           manifest: getCapabilityManifest(env),
         });
+      }
+
+      if (
+        (url.pathname === "/api/ai-wos/manifest" ||
+          url.pathname === "/api/admin/ai-wos/manifest") &&
+        request.method === "GET"
+      ) {
+        const isAdmin = await isAdminRequest(request, env);
+        const orchOk = hasMatchingOrchToken(request, env);
+
+        if (!isAdmin && !orchOk) {
+          return jsonResponse(401, { error: "Unauthorized" });
+        }
+
+        return jsonResponse(200, getAiWosManifest(env));
       }
 
       if (

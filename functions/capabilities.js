@@ -1,3 +1,5 @@
+import { getAiWosCapabilitySummary } from "./aiWos.js";
+
 const MANIFEST_VERSION = "1.0";
 
 export const getCapabilityManifest = (env) => {
@@ -8,6 +10,7 @@ export const getCapabilityManifest = (env) => {
       role: "Autonomous Website Commander",
       mode: "commands-only",
       manifestVersion: MANIFEST_VERSION,
+      platform: getAiWosCapabilitySummary(env),
     },
     execution: {
       testingPolicy: "always_test_and_auto_fix",

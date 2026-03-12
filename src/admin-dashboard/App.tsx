@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import AiWosPanel from "./AiWosPanel";
 import { AccessGuard } from "./AccessGuard";
 import ContentInventoryPanel from "./ContentInventoryPanel";
 
@@ -115,6 +116,7 @@ const AdminDashboard: React.FC = () => {
     { id: "agent", label: "Agent Control", icon: "🤖" },
     { id: "progress", label: "Progress", icon: "📈" },
     { id: "inventory", label: "Content Inventory", icon: "🗂️" },
+    { id: "ai-wos", label: "AI-WOS", icon: "🧠" },
   ];
 
   const renderTabContent = () => {
@@ -539,6 +541,9 @@ const AdminDashboard: React.FC = () => {
 
       case "inventory":
         return <ContentInventoryPanel />;
+
+      case "ai-wos":
+        return <AiWosPanel />;
 
       default:
         return null;

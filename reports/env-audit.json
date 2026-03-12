@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-11T06:32:29.550Z",
-  "scannedFiles": 462,
+  "generatedAt": "2026-03-12T11:56:00.802Z",
+  "scannedFiles": 467,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -403,6 +403,7 @@
     "CF_API_TOKEN2": ["functions/commandCenterApi.js", "null/worker.js", "worker.js"],
     "CF_AUTO_DEPLOY_ON_PUSH": ["functions/orchestrator.js", "null/worker.js"],
     "CF_DEPLOY_HOOK_URL": [
+      "functions/aiWos.js",
       "functions/orchestrator.js",
       "null/worker.js",
       "src/durable_objects/DeployControllerDO.js"
@@ -416,7 +417,11 @@
       "src/durable_objects/DeployControllerDO.js"
     ],
     "CF_USER_TOKEN": ["functions/commandCenterApi.js", "null/worker.js", "worker.js"],
-    "CF_WORKERS_BUILDS_AUTO_DEPLOY": ["functions/orchestrator.js", "null/worker.js"],
+    "CF_WORKERS_BUILDS_AUTO_DEPLOY": [
+      "functions/aiWos.js",
+      "functions/orchestrator.js",
+      "null/worker.js"
+    ],
     "CF_ZONE_ID": ["null/worker.js", "scripts/apply-zone-settings.mjs", "worker.js"],
     "CI": ["scripts/husky-install.mjs"],
     "CLOUD_FLARE_API_TOKEN": [
@@ -582,6 +587,7 @@
     "ORCH_MAX_ALL_PAGES_FILES": ["functions/orchestrator.js", "null/worker.js"],
     "ORCH_MAX_ALL_PAGES_HTML": ["functions/orchestrator.js", "null/worker.js"],
     "ORCH_TOKEN": [
+      "functions/aiWos.js",
       "functions/execute.js",
       "null/worker.js",
       "voicetowebsite-orchestrator/server.js",
@@ -664,7 +670,7 @@
       "null/worker.js",
       "src/durable_objects/DeployControllerDO.js"
     ],
-    "X_ORCH_TOKEN": ["functions/execute.js", "null/worker.js", "worker.js"],
+    "X_ORCH_TOKEN": ["functions/aiWos.js", "functions/execute.js", "null/worker.js", "worker.js"],
     "ZONE_ID": ["scripts/apply-zone-settings.mjs"]
   }
 }
