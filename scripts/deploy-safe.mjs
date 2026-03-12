@@ -69,7 +69,7 @@ function runWrangler(env, extraArgs, stdio = "pipe") {
 
     if (executable.toLowerCase().endsWith(".cmd")) {
       const commandLine = [executable, ...extraArgs]
-        .map((value) => `"${String(value).replaceAll('"', '\\"')}"`)
+        .map((value) => `"${String(value).replaceAll('"', '""')}"`)
         .join(" ");
 
       return spawnSync("cmd.exe", ["/d", "/s", "/c", commandLine], {

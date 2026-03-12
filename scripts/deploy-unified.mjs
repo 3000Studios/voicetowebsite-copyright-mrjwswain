@@ -153,7 +153,7 @@ function runResolvedBin(binDir, binName, args, spawnOpts) {
     executable.toLowerCase().endsWith(".cmd")
   ) {
     const cmdLine = [executable, ...args]
-      .map((value) => `"${String(value).replaceAll('"', '\\"')}"`)
+      .map((value) => `"${String(value).replaceAll('"', '""')}"`)
       .join(" ");
 
     return spawnSync("cmd.exe", ["/d", "/s", "/c", cmdLine], spawnOpts);

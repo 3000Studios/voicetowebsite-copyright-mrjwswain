@@ -137,8 +137,11 @@ describe("AiWosPanel", () => {
         name: "AI Website Operating System",
       })
     ).toBeInTheDocument();
-    expect(screen.getByText("AI Command Router")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("AI Command Router"));
+    const routerButton = screen.getByRole("button", {
+      name: /AI Command Router/i,
+    });
+    expect(routerButton).toBeInTheDocument();
+    fireEvent.click(routerButton);
     expect(
       screen.getAllByText("Routes AI commands through /api/execute.").length
     ).toBeGreaterThan(0);
