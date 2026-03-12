@@ -67,6 +67,19 @@ function runWrangler(env, extraArgs, stdio = "pipe") {
       }
     })();
 
+    if (executable.toLowerCase().endsWith(".cmd")) {
+      const commandLine = [executable, ...extraArgs]
+        .map((value) => `"${String(value).replaceAll('"', '\\"')}"`)
+        .join(" ");
+
+      return spawnSync("cmd.exe", ["/d", "/s", "/c", commandLine], {
+        stdio,
+        env,
+        shell: false,
+        cwd: root,
+      });
+    }
+
     return spawnSync(executable, extraArgs, {
       stdio,
       env,

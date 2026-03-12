@@ -145,6 +145,23 @@ function resolveLocalBin(binDir, binName) {
   return binName;
 }
 
+function runResolvedBin(binDir, binName, args, spawnOpts) {
+  const executable = resolveLocalBin(binDir, binName);
+
+  if (
+    process.platform === "win32" &&
+    executable.toLowerCase().endsWith(".cmd")
+  ) {
+    const cmdLine = [executable, ...args]
+      .map((value) => `"${String(value).replaceAll('"', '\\"')}"`)
+      .join(" ");
+
+    return spawnSync("cmd.exe", ["/d", "/s", "/c", cmdLine], spawnOpts);
+  }
+
+  return spawnSync(executable, args, spawnOpts);
+}
+
 // Run verify steps using current Node (avoids broken npm in some Windows/nvm setups)
 function runVerifySteps() {
   const node = process.execPath;
@@ -225,8 +242,7 @@ function runVerifySteps() {
   const runBin = (name, binName, args) => {
     logStep("verify", `Starting: ${name}`);
     const start = Date.now();
-    let result;
-    result = spawnSync(resolveLocalBin(binDir, binName), args, spawnOpts);
+    const result = runResolvedBin(binDir, binName, args, spawnOpts);
     if (result.error) {
       const err = new DeployError(
         `Command failed to start: ${result.error.message}`,
@@ -280,7 +296,7 @@ function runVerifySteps() {
   for (const [name, binName, args] of binStepsRest) {
     logStep("verify", `Starting: ${name}`);
     const start = Date.now();
-    const result = spawnSync(resolveLocalBin(binDir, binName), args, spawnOpts);
+    const result = runResolvedBin(binDir, binName, args, spawnOpts);
     if (result.error) {
       const err = new DeployError(
         `Command failed to start: ${result.error.message}`,
