@@ -1420,8 +1420,10 @@ const handleDeployStatus = async ({ env, assets, request }) => {
       `/workers/scripts/${encodeURIComponent(scriptName)}/builds?page=1&per_page=5`,
       `/workers/builds/scripts/${encodeURIComponent(scriptName)}/builds?page=1&per_page=5`,
     ];
-    for (const path of buildPaths) {
-      const buildMeta = await cloudflareApiFetchJson(env, path);
+    const buildResults = await Promise.all(
+      buildPaths.map((path) => cloudflareApiFetchJson(env, path))
+    );
+    for (const buildMeta of buildResults) {
       if (buildMeta.ok) {
         cloudflare.latestBuild = extractFirstRecord(buildMeta.result);
         cloudflare.error = "";
