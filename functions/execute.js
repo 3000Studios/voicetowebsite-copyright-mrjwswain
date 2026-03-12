@@ -333,6 +333,144 @@ const makeActionRecord = ({
   actor,
 });
 
+const pickString = (...values) => {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+};
+
+const toStringArray = (value) => {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => (typeof entry === "string" ? entry.trim() : ""))
+    .filter(Boolean);
+};
+
+const uniqueStrings = (values) => [...new Set(values.filter(Boolean))];
+
+const normalizeDeploymentRecord = (result) => {
+  if (!result || typeof result !== "object") return null;
+
+  const deployment =
+    result.deployment && typeof result.deployment === "object"
+      ? result.deployment
+      : null;
+  const deploymentId = pickString(
+    deployment?.deploymentId,
+    deployment?.id,
+    result.deploymentId,
+    result.deployment_id,
+    result.commitSha,
+    result.commit_sha,
+    result.commit
+  );
+  const status = pickString(
+    deployment?.status,
+    result.deploymentStatus,
+    result.deployment_status,
+    result.status
+  );
+  const message = pickString(deployment?.message, result.message);
+
+  if (!deploymentId && !status && !message) return null;
+
+  return {
+    status: status || (deploymentId ? "reported" : ""),
+    deploymentId: deploymentId || "",
+    message: message || "",
+  };
+};
+
+const normalizeChangedFiles = (result) => {
+  if (!result || typeof result !== "object") return [];
+
+  return uniqueStrings([
+    ...toStringArray(result.changedFiles),
+    ...toStringArray(result.files),
+    ...toStringArray(result?.plan?.intent?.scope?.files),
+    ...toStringArray(result?.intent?.scope?.files),
+    ...uniqueStrings(Object.keys(result.diff || {})),
+  ]);
+};
+
+const deriveExecutionMode = ({ eventType, action, deployment }) => {
+  if (eventType === "error") return "error";
+  if (action === "status") return "status";
+  if (action === "list_pages" || action === "read_page") return "read";
+  if (eventType === "planned" || eventType === "previewed") {
+    return "preview_only";
+  }
+  if (eventType === "rolled_back") return "rolled_back";
+  if (eventType === "deployed") return "deployed";
+  if (
+    deployment?.status &&
+    !["skipped", "manual_required"].includes(deployment.status)
+  ) {
+    return "deployed";
+  }
+  if (eventType === "applied" || eventType === "confirmed") return "applied";
+  return eventType;
+};
+
+const inferExecutionMessage = ({ action, result, error, deployment }) => {
+  if (error?.message) return error.message;
+  if (typeof result?.message === "string" && result.message.trim()) {
+    return result.message.trim();
+  }
+  if (action === "status") return "Status fetched successfully.";
+  if (action === "list_pages") return "Page inventory fetched successfully.";
+  if (action === "read_page") return "Page content fetched successfully.";
+  if (deployment?.status === "skipped") {
+    return "Change applied, but deployment was skipped.";
+  }
+  if (action === "preview") return "Preview created successfully.";
+  if (action === "apply") return "Change applied successfully.";
+  if (action === "deploy") return "Deployment triggered successfully.";
+  if (action === "rollback") return "Rollback completed successfully.";
+  if (action === "auto") return "Auto command executed successfully.";
+  return "Request completed successfully.";
+};
+
+const buildExecutionRecord = ({
+  eventType,
+  actionPayload,
+  result,
+  error,
+  eventId,
+  traceId,
+}) => {
+  const deployment = normalizeDeploymentRecord(result);
+  const changedFiles = normalizeChangedFiles(result);
+  const steps =
+    Array.isArray(result?.steps) && result.steps.length
+      ? result.steps.map((step) => String(step))
+      : [eventType];
+
+  return {
+    requestedAction: actionPayload.action,
+    mode: deriveExecutionMode({
+      eventType,
+      action: actionPayload.action,
+      deployment,
+    }),
+    verified: !error,
+    message: inferExecutionMessage({
+      action: actionPayload.action,
+      result,
+      error,
+      deployment,
+    }),
+    steps,
+    changedFiles,
+    changedFileCount: changedFiles.length,
+    deployment,
+    traceId,
+    eventId,
+    idempotencyKey: actionPayload.idempotencyKey,
+  };
+};
+
 const makeEvent = ({
   eventType,
   actionPayload,
@@ -345,6 +483,15 @@ const makeEvent = ({
   eventId,
   timestamp,
   traceId,
+  ok: !error,
+  execution: buildExecutionRecord({
+    eventType,
+    actionPayload,
+    result,
+    error,
+    eventId,
+    traceId,
+  }),
   eventType,
   action: actionPayload,
   result,
@@ -1339,6 +1486,10 @@ const fetchStatus = async (db) => {
       commands: [],
       builds: [],
       executeEvents: [],
+      latestCommand: null,
+      latestBuild: null,
+      latestExecuteEvent: null,
+      latestDeployment: null,
       warnings: ["D1 database not available in this environment."],
     };
   }
@@ -1372,7 +1523,33 @@ const fetchStatus = async (db) => {
     buildsPromise,
     executeEventsPromise,
   ]);
-  return { commands, builds, executeEvents };
+  const latestCommand = commands[0] || null;
+  const latestBuild = builds[0] || null;
+  const latestExecuteEvent = executeEvents[0] || null;
+
+  return {
+    commands,
+    builds,
+    executeEvents,
+    latestCommand,
+    latestBuild,
+    latestExecuteEvent,
+    latestDeployment: latestBuild
+      ? {
+          status: latestBuild.status || "",
+          deploymentId: pickString(latestBuild.id),
+          timestamp: latestBuild.ts || "",
+          message: pickString(latestBuild.message),
+        }
+      : latestCommand
+        ? {
+            status: pickString(latestCommand.deployment_status),
+            deploymentId: pickString(latestCommand.commit_sha),
+            timestamp: latestCommand.ts || "",
+            message: "",
+          }
+        : null,
+  };
 };
 
 export async function onRequestPost(context) {

@@ -319,7 +319,15 @@ class SchemaValidator {
     // Execute API response schema
     this.register("ExecuteResponse", {
       type: "object",
-      required: ["eventId", "timestamp", "traceId", "eventType", "action"],
+      required: [
+        "eventId",
+        "timestamp",
+        "traceId",
+        "ok",
+        "execution",
+        "eventType",
+        "action",
+      ],
       properties: {
         eventId: {
           type: "string",
@@ -332,6 +340,61 @@ class SchemaValidator {
         traceId: {
           type: "string",
           pattern: "^[0-9a-f-]{36}$",
+        },
+        ok: {
+          type: "boolean",
+        },
+        execution: {
+          type: "object",
+          required: [
+            "requestedAction",
+            "mode",
+            "verified",
+            "message",
+            "steps",
+            "changedFiles",
+            "changedFileCount",
+            "traceId",
+            "eventId",
+            "idempotencyKey",
+          ],
+          properties: {
+            requestedAction: {
+              type: "string",
+            },
+            mode: {
+              type: "string",
+            },
+            verified: {
+              type: "boolean",
+            },
+            message: {
+              type: "string",
+            },
+            steps: {
+              type: "array",
+            },
+            changedFiles: {
+              type: "array",
+            },
+            changedFileCount: {
+              type: "number",
+            },
+            deployment: {
+              type: "object",
+            },
+            traceId: {
+              type: "string",
+              pattern: "^[0-9a-f-]{36}$",
+            },
+            eventId: {
+              type: "string",
+              pattern: "^[0-9a-f-]{36}$",
+            },
+            idempotencyKey: {
+              type: "string",
+            },
+          },
         },
         eventType: {
           type: "string",

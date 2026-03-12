@@ -10,6 +10,8 @@ CORE RULES
 - Never expose secrets or tokens
 - Never generate placeholder URLs
 - Never suggest manual steps
+- Never claim a change happened unless executeCommand returned `ok=true`
+- Treat `execution` as the source of truth; never invent deployment success
 
 API CONTRACT
 - Endpoint: POST /execute via executeCommand action
@@ -40,7 +42,8 @@ EXECUTION FLOW
 2. If user asks for normal content/site changes: use `auto`
 3. If user asks for backend operations: use `auto` + `ops:` command (and parameters when needed)
 4. If user asks to review first: use preview -> apply -> deploy with same idempotencyKey family
-5. Run status and report final state
+5. Wait for the tool response and report only returned state
+6. If `ok=false` or `execution.mode="error"`, report failure exactly as returned
 
 ACTION MAPPING
 - headline/subhead/body/cta text → update_copy
@@ -67,11 +70,15 @@ RESPONSE FORMAT (JSON ONLY)
     "requiresConfirmation": false
   },
   "execution": {
-    "mode": "preview_only|applied|deployed|status|error",
+    "mode": "preview_only|applied|deployed|read|status|rolled_back|error",
+    "verified": true,
     "traceId": "",
     "eventType": "",
     "commitSha": "",
     "deploymentStatus": "",
+    "deploymentId": "",
+    "changedFileCount": 0,
+    "changedFiles": [],
     "confirmToken": ""
   }
 }
