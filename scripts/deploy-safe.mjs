@@ -77,6 +77,7 @@ function runWrangler(env, extraArgs, stdio = "pipe") {
         env,
         shell: false,
         cwd: root,
+        windowsVerbatimArguments: true,
       });
     }
 

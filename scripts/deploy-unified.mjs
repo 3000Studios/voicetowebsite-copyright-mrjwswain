@@ -156,7 +156,10 @@ function runResolvedBin(binDir, binName, args, spawnOpts) {
       .map((value) => `"${String(value).replaceAll('"', '""')}"`)
       .join(" ");
 
-    return spawnSync("cmd.exe", ["/d", "/s", "/c", cmdLine], spawnOpts);
+    return spawnSync("cmd.exe", ["/d", "/s", "/c", cmdLine], {
+      ...spawnOpts,
+      windowsVerbatimArguments: true,
+    });
   }
 
   return spawnSync(executable, args, spawnOpts);
