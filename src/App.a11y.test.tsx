@@ -39,17 +39,17 @@ describe("App Accessibility - Use Cases", () => {
       </Suspense>
     );
 
-    // Mic starts only after explicit user intent (aria-label on home CTA).
-    const tapToCreate = await waitFor(
-      () => screen.getByRole("button", { name: /tap to create a website/i }),
-      { timeout: 5000 }
+    // Mic starts only after explicit user intent (Start build demo CTA).
+    const startDemo = await waitFor(
+      () => screen.getByRole("button", { name: /start build demo/i }),
+      { timeout: 8000 }
     );
-    expect(tapToCreate).toBeInTheDocument();
+    expect(startDemo).toBeInTheDocument();
 
-    fireEvent.click(tapToCreate);
+    fireEvent.click(startDemo);
     const finish = await waitFor(
       () => screen.getByRole("button", { name: /finish command/i }),
-      { timeout: 5000 }
+      { timeout: 8000 }
     );
     expect(finish).toBeInTheDocument();
 

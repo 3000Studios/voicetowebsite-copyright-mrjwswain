@@ -432,6 +432,106 @@ const StorePage: React.FC = () => {
           </div>
         </ScrollReveal>
 
+        <ScrollReveal as="section" className="vtw-section">
+          <div className="vtw-section__heading">
+            <div className="vtw-section-label">All apps</div>
+            <h2 className="vtw-section-title">
+              Every app available to buy. Preview, then pay with Stripe or
+              PayPal.
+            </h2>
+            <p className="vtw-section-copy">
+              Each card includes the price and direct checkout. Try the preview
+              link first when available.
+            </p>
+          </div>
+          <div className="vtw-app-cards-grid">
+            {(catalog.apps || []).map((app) => {
+              const price = Number(app.price ?? 0);
+              const previewUrl = String(app.previewUrl || "").trim();
+              const downloadUrl = String(app.downloadUrl || "").trim();
+              return (
+                <article
+                  key={app.id}
+                  className="vtw-glass-card vtw-card-hover vtw-app-card"
+                  style={{ padding: "1.35rem" }}
+                >
+                  <div className="vtw-inline-meta">
+                    <span className="vtw-chip">
+                      {app.label || app.type || "App"}
+                    </span>
+                    <span className="vtw-chip vtw-app-price">
+                      ${price.toFixed(2)}{" "}
+                      {app.interval === "month" ? "/mo" : ""}
+                    </span>
+                  </div>
+                  <h3
+                    style={{
+                      margin: "0.9rem 0 0.4rem",
+                      fontFamily: "var(--font-display)",
+                      fontSize: "1.35rem",
+                    }}
+                  >
+                    {app.title}
+                  </h3>
+                  <p className="vtw-body-text" style={{ margin: 0 }}>
+                    {app.desc}
+                  </p>
+                  <div
+                    className="vtw-hero-actions"
+                    style={{
+                      marginTop: "1rem",
+                      flexWrap: "wrap",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    {previewUrl && (
+                      <a
+                        className="vtw-button vtw-button-secondary"
+                        href={previewUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Preview
+                        <ExternalLink size={14} />
+                      </a>
+                    )}
+                    {downloadUrl && !previewUrl && (
+                      <a
+                        className="vtw-button vtw-button-secondary"
+                        href={downloadUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Download
+                        <ExternalLink size={14} />
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      className="vtw-button vtw-button-primary"
+                      onClick={() =>
+                        void beginCheckout(app as CatalogItem, "stripe")
+                      }
+                      disabled={!stripeReady}
+                    >
+                      {stripeReady ? "Stripe" : "…"}
+                    </button>
+                    <button
+                      type="button"
+                      className="vtw-button vtw-button-secondary"
+                      onClick={() =>
+                        void beginCheckout(app as CatalogItem, "paypal")
+                      }
+                    >
+                      PayPal
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </ScrollReveal>
+
         <ScrollReveal as="section" className="vtw-grid-2">
           <article className="vtw-glass-card" style={{ padding: "1.35rem" }}>
             <div className="vtw-section-label">One-stop-shop direction</div>
