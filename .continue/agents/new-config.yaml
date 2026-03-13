@@ -1,171 +1,89 @@
-# This is a Continue agent configuration file.
-# To learn more, see the config reference: https://docs.continue.dev/reference
-
 name: Workspace Autonomous Agent
-version: 1.1.0
+version: 1.2.0
 schema: v1
 
-# Models available to Continue
 models:
-  - name: openai-gpt-5
+  - name: local-fast-code
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://localhost:11434
+
+  - name: local-chat
+    provider: ollama
+    model: llama3.2:3b
+    apiBase: http://localhost:11434
+
+  - name: local-deep-code
+    provider: ollama
+    model: qwen2.5-coder:14b
+    apiBase: http://localhost:11434
+
+  - name: openai-fallback
     provider: openai
-    model: gpt-5
-    apiKey: ${{ secrets.OPENAI_API }}
+    model: gpt-4o-mini
+    apiKey: ${OPENAI_API}
 
-  - name: gemini
-    provider: google
-    model: gemini
-    apiKey: ${{ secrets.GEMINI_API_KEY }}
-
-  # Ollama local models (preferred for cost-free runs when available)
-  - uses: ollama/qwen2.5-coder-7b
-    name: qwen2.5-coder-7b
-    with:
-      OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
-
-  - uses: ollama/vicuna-13b
-    name: vicuna-13b
-    with:
-      OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
-
-  - uses: ollama/llama-2-13b-chat
-    name: llama2-13b-chat
-    with:
-      OLLAMA_API_KEY: ${{ secrets.OLLAMA }}
-
-  # Optional hosted fallback models
-  - uses: huggingface/gpt-j-6b
-    name: gpt-j-6b
-    with:
-      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_TOKEN }}
-
-  - uses: huggingface/falcon-7b-instruct
-    name: falcon-7b-instruct
-    with:
-      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_TOKEN }}
-
-  # Optional local GGML model (llama.cpp runtime)
-  - name: local-ggml-vicuna
-    provider: local
-    model: ggml-vicuna-13b
-    runtime: llama.cpp
-    path: ./models/ggml-vicuna-13b.bin
-
-# MCP servers
-mcpServers:
-  - uses: anthropic/memory-mcp
-
-# Workspace agent configuration
 agent:
   id: workspace-agent
-  name: Workspace Auto Agent
-  description: "Autonomous workspace agent for fix/test/build/deploy tasks. Review allowedCommands before enabling in production."
-
-  # Primary model (cloud-first for max quality)
-  model: openai-gpt-5
-
-  # Autonomy controls
+  name: Workspace Autonomous Agent
+  description: "VoiceToWebsite repo autopilot. Must follow verify -> ship -> push -> deploy:live."
+  model: local-fast-code
   continuous: true
-  maxIterations: 500
-  confidenceThreshold: 0.03
+  maxIterations: 60
+  confidenceThreshold: 0.1
   continueUntilObjectiveComplete: true
   autoFindAndFix: true
   autoCreateFiles: true
   autoFix: true
   autoHeal: true
   autoTest: true
-
-  # Safety + operational policy (aligned with repo constraints)
-  # Ensure verify is run before deploys; keep allowedCommands explicit.
-  allowDeploy: true
-  deployCommand: npm run deploy
-  deploySecret: CLOUDFLARE_API_TOKEN
-
-  # If you truly want fully autonomous operation, keep confirmationMode to 'never'.
-  # For safer operation, change to 'low' or 'always'.
   confirmationMode: never
-
-  # Permissions: powerful, only enable what you want the agent to do.
   permissions:
     filesystem: true
     run: true
     network: true
     git: true
     allowFileCreate: true
-    allowFileDelete: true
-
-  # Workspace scope
+    allowFileDelete: false
   workspaceRoots:
     - .
-
-  # Avoid auto-loading secret files; rely on OS env or secret store.
   envFiles: []
-
-  # Concurrency and timeouts
-  concurrency: 6
+  concurrency: 4
   timeouts:
     modelCallSeconds: 180
-    commandSeconds: 900
+    commandSeconds: 1800
   retryPolicy:
-    retries: 5
-    backoffSeconds: 8
-    maxBackoffSeconds: 90
-
-  # Explicit command allowlist (include verify + deploy pipeline)
+    retries: 4
+    backoffSeconds: 5
+    maxBackoffSeconds: 45
   allowedCommands:
-    - chrome
-    - code
     - pwsh
     - powershell
+    - node
+    - npm
+    - npx
+    - git
+    - wrangler
     - npm run verify
     - npm run test
     - npm run build
-    - npm run lint
+    - npm run type-check
+    - npm run types:check
+    - npm run env:audit
+    - npm run ship
+    - npm run ship:push
+    - npm run deploy:live
+    - npm run dev
+    - npm run dev:worker
     - npm run dev:all
-    - npm run auto:ship
-    - npm run deploy
-    - npx wrangler deploy
-    - npx wrangler tail
-    - scripts/*.ps1
-    - scripts/open-youtube.ps1
-    - scripts/open-facebook.ps1
-    - scripts/open-snapchat.ps1
-    - scripts/open-voicetowebsite.ps1
-    - scripts/open-vtw-admin.ps1
-    - scripts/open-vtw-voice-commands.ps1
-    - autofix.ps1
-    - whatever.ps1
-
-  # Fallback model order
+    - npm run test:pages
   fallbackModels:
-    - gemini
-    - anthropic/claude-4-sonnet
-    - qwen2.5-coder-7b
-
-  # Prefer local models when present
-  preferLocalModels: false
-
-  # Autonomy helpers
-  autoCommit: true
-  autoDeploy: true
-
-  # Secrets that the agent may reference
-  secrets:
-    - OPENAI_API
-    - GEMINI_API_KEY
-    - OLLAMA
-    - HUGGINGFACE_TOKEN
-
-  # Logging and telemetry
+    - local-deep-code
+    - openai-fallback
+  preferLocalModels: true
+  autoCommit: false
+  autoDeploy: false
   logging:
     level: info
     persist: true
   telemetry: false
-
-  # Response preferences
-  responsePreferences:
-    naturalLanguage: true
-    avoidCodeOnlyResponses: true
-    showCodeBlocks: false
-    preferActionableSteps: true
-    language: auto

@@ -45,3 +45,4 @@ scripts/test-runner.mjs
 *.njsproj
 *.sln
 *.sw?
+.continue/memory.json

@@ -14,5 +14,7 @@
     "codeium.enableConfig": {
       "*": false,
     },
+    "codepal-vscode.api.CloudflareApiToken": "bJ4mSvb4gY9CN_yNiW7XMbRIOTtxKLYhEO0LKxzG",
+    "codepal-vscode.api.CloudflareAccountID": "d6ec056b27a57bcf807a46b2e3379d60",
   },
 }

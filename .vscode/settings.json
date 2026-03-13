@@ -17,7 +17,7 @@
     "NPM_CONFIG_AUDIT": "false"
   },
   "vitest.enable": true,
-  "vitest.nodeExecutable": "node",
+  "vitest.nodeExecutable": "C:\\nvm4w\\nodejs\\node.exe",
   "vitest.commandLine": "npx vitest",
   "vitest.configFile": "vitest.config.ts",
   "vitest.rootPath": ".",

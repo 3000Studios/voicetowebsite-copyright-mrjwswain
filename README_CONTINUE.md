@@ -1,61 +1,59 @@
-**Workspace Continue Agent — Changes & Next Steps**
+**VoiceToWebsite Continue Setup**
 
-- Files modified:
-  - `.continue/agents/new-config.yaml` — agent tuned for aggressive automation, fallback models,
-    concurrency, retries, and timeouts.
-  - `.env.local` — previously added (contains API keys). Keep this file private; it's git-ignored.
-  - `scripts/install-bots.ps1` — helper script with commands to install/pull local models and
-    runtimes.
+The workspace Continue setup is now local-first, repo-aware, and aligned with the deployment lock in
+`AGENTS.md`.
 
-What I changed (summary):
+**What changed**
 
-- Increased `maxIterations` to 200 and lowered `confidenceThreshold` to 0.2 to allow broader
-  exploration.
-- Enabled `autoDeploy` and `allowDeploy` with `deployCommand: npm run deploy` (deploys use
-  `CLOUDFLARE_API_TOKEN`).
-- Added `concurrency`, `timeouts`, and a `retryPolicy` to make long-running tasks more robust.
-- Added `fallbackModels` and `preferLocalModels: true` to use faster/local runtimes when available.
+- Removed the broken placeholder OpenAI agent profile.
+- Kept Ollama as the primary fast path for chat, edit, and autocomplete.
+- Added a local memory MCP server instead of the failing remote `memory-mcp` dependency.
+- Routed MCP servers through PowerShell launchers so Continue does not depend on brittle PATH
+  resolution.
+- Updated the workspace agent to use the repo-safe command flow: `npm run verify` -> `npm run ship`
+  -> `npm run ship:push` -> `npm run deploy:live`
+- Pinned VS Code Vitest to the current `node.exe` path used by this machine.
 
-Added recommended free/local models to the config:
+**Recommended Continue UI settings**
 
-- `ollama/qwen2.5-coder-7b` (already present)
-- `ollama/vicuna-13b`
-- `ollama/llama-2-13b-chat`
-- `huggingface/gpt-j-6b` (requires `HUGGINGFACE_TOKEN`)
-- `huggingface/falcon-7b-instruct` (requires `HUGGINGFACE_TOKEN`)
-- `local-ggml-vicuna` (llama.cpp ggml weights; requires local download)
+- `Multiline Autocompletions`: `Auto`
+- `Autocomplete Timeout (ms)`: `150`
+- `Autocomplete Debounce (ms)`: `250`
+- `Disable autocomplete in files`: `**/*.{txt,md,log}`
+- `Add Current File by Default`: `On`
+- `Enable experimental tools`: `On`
+- `Only use system message tools`: `Off`
+- `@Codebase: use tool calling only`: `Off`
+- `Stream after tool rejection`: `Off`
 
-Follow the `scripts/install-bots.ps1` guidance to pull or download these models. If you want me to
-add other specific open models (Falcon 40B, MPT, etc.), say which and I will add entries and pull
-instructions.
+**Profiles**
 
-Important limitations and safety notes:
+- `Workspace Autonomous Agent`: heavier repo work, verification, and release-safe operations
+- `VoiceToWebsite Fast Edit`: faster day-to-day code and UI edits
 
-- I cannot download or install model weights from external providers in this environment. The
-  `scripts/install-bots.ps1` lists the commands you should run locally to pull models (Ollama, HF,
-  ggml).
-- "Free with no limits" models do not practically exist — free/open models are limited by hardware
-  or hosting agreements.
-- Automatic deploys are enabled; ensure `CLOUDFLARE_API_TOKEN` is set to a limited-scope token and
-  verify `npm run verify` and `npm run test` pass before allowing production deploys.
+**Local MCP servers**
 
-To finish setup locally (recommended):
+- `memory`
+- `project-context`
+- `ui-commands`
 
-1. Install a local model runtime if you want cheaper and faster ops (Ollama is recommended).
-2. Run `scripts/install-bots.ps1` or follow its suggestions to pull models.
-3. Ensure `.env.local` contains the secrets needed, or set them as user environment variables (e.g.,
-   `setx CLOUDFLARE_API_TOKEN "token"`).
-4. Reload VS Code / Restart the Continue extension.
-5. Start the agent (example CLI command — replace with your Continue CLI if needed):
+They are launched from:
+
+- `scripts/continue-mcp-memory.ps1`
+- `scripts/continue-mcp-project.ps1`
+- `scripts/continue-mcp-ui-commands.ps1`
+
+**Quick start**
+
+1. Make sure Ollama is running on `http://localhost:11434`.
+2. Pull the local models you actually want to use.
+3. Set `OPENAI_API` only if you want the hosted fallback profile.
+4. Reload Continue so it re-reads `.continue/config.yaml`, `.continue/agents`, and
+   `.continue/mcpServers`.
+5. Run the doctor script:
 
 ```powershell
-continue agent start --config .continue/agents/new-config.yaml
+pwsh -NoLogo -NoProfile -File .\scripts\continue-doctor.ps1
 ```
 
-If you'd like, I can:
-
-- Add `CLOUDFLARE_API_TOKEN` to `.env.local` for you (you must paste the token), or
-- Produce a short checklist to audit the agent's first run and rollback plan, or
-- Keep `autoDeploy` off and instead produce a `deploy:approve` interactive step.
-
-Tell me which of these you prefer.
+If the doctor script is green, the Continue side of this workspace is ready.

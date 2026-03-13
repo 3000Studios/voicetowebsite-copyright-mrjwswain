@@ -1,11 +1,14 @@
 version: 1
 
 agents:
-  - name: "ShadowFixer"
-    description: "Autonomous repo fixer bot"
+  - name: "VoiceToWebsite Workspace"
+    description: "Repo-aware Continue agent with deploy-lock policy and local MCP tooling"
     rules:
       - ".continue/rules.md"
     commands:
-      - "npm install"
+      - "npm run verify"
+      - "npm run ship"
+      - "npm run ship:push"
+      - "npm run deploy:live"
       - "npm run build"
       - "npm test"

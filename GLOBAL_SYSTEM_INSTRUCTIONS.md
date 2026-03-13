@@ -200,6 +200,10 @@ Scripts available:
 - `scripts/bundle-size-analyzer.mjs`
 - `scripts/check-css-governance.mjs`
 - `scripts/commit-push-deploy.bat`
+- `scripts/continue-doctor.ps1`
+- `scripts/continue-mcp-memory.ps1`
+- `scripts/continue-mcp-project.ps1`
+- `scripts/continue-mcp-ui-commands.ps1`
 - `scripts/continuous-integration.mjs`
 - `scripts/css-budget-validator.mjs`
 - `scripts/cursor-session-init.ps1`

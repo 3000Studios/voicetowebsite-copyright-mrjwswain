@@ -1,23 +1,67 @@
-# This is an example configuration file
-# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
-
-name: Example Config
-version: 1.0.0
+name: VoiceToWebsite Fast Edit
+version: 1.2.0
 schema: v1
 
-# Define which models can be used
-# https://docs.continue.dev/customization/models
 models:
-  - name: my gpt-5
-    provider: openai
-    model: gpt-5
-    apiKey: YOUR_OPENAI_API_KEY_HERE
-  - uses: ollama/qwen2.5-coder-7b
-  - uses: anthropic/claude-4-sonnet
-    with:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  - name: local-fast-code
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://localhost:11434
 
-# MCP Servers that Continue can access
-# https://docs.continue.dev/customization/mcp-tools
-mcpServers:
-  - uses: anthropic/memory-mcp
+  - name: local-chat
+    provider: ollama
+    model: llama3.2:3b
+    apiBase: http://localhost:11434
+
+  - name: openai-fallback
+    provider: openai
+    model: gpt-4o-mini
+    apiKey: ${OPENAI_API}
+
+agent:
+  id: fast-edit
+  name: VoiceToWebsite Fast Edit
+  description: "Low-latency code and UI edits for daily work in this repo."
+  model: local-fast-code
+  continuous: false
+  maxIterations: 12
+  confidenceThreshold: 0.2
+  continueUntilObjectiveComplete: false
+  autoFindAndFix: true
+  autoCreateFiles: true
+  autoFix: true
+  autoHeal: false
+  autoTest: false
+  confirmationMode: low
+  permissions:
+    filesystem: true
+    run: true
+    network: true
+    git: false
+    allowFileCreate: true
+    allowFileDelete: false
+  workspaceRoots:
+    - .
+  envFiles: []
+  concurrency: 2
+  timeouts:
+    modelCallSeconds: 120
+    commandSeconds: 900
+  allowedCommands:
+    - pwsh
+    - powershell
+    - node
+    - npm
+    - npx
+    - npm run test
+    - npm run build
+    - npm run verify
+  fallbackModels:
+    - openai-fallback
+  preferLocalModels: true
+  autoCommit: false
+  autoDeploy: false
+  logging:
+    level: info
+    persist: true
+  telemetry: false
