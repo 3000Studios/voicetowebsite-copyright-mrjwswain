@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-03-12T20:07:46.336Z",
-  "scannedFiles": 468,
+  "generatedAt": "2026-03-13T07:05:43.942Z",
+  "scannedFiles": 469,
   "usedKeys": [
     "ADMIN_ACCESS_CODE",
     "ADMIN_BEARER_TOKEN",
@@ -141,6 +141,7 @@
     "VTW_BASE_URL",
     "VTW_CACHE",
     "VTW_KV",
+    "VTW_SITE_ORIGIN",
     "VTW_VAULT",
     "WORKER_NAME",
     "X_ORCH_TOKEN",
@@ -300,6 +301,7 @@
     "VOICETOWEBSITE_HOOK",
     "VTW_BASE_URL",
     "VTW_KV",
+    "VTW_SITE_ORIGIN",
     "VTW_VAULT",
     "WORKER_NAME",
     "X_ORCH_TOKEN",
@@ -664,6 +666,7 @@
     "VTW_BASE_URL": ["scripts/test-all-pages.mjs"],
     "VTW_CACHE": ["null/worker.js", "src/functions/uiCommand.js", "src/utils/imageDiscovery.js"],
     "VTW_KV": ["null/worker.js", "src/utils/vaultLogger.js"],
+    "VTW_SITE_ORIGIN": ["mcp-server-ui-commands.mjs"],
     "VTW_VAULT": ["null/worker.js", "src/utils/vaultLogger.js"],
     "WORKER_NAME": [
       "functions/commandCenterApi.js",

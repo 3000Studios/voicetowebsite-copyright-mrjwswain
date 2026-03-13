@@ -1,13 +1,13 @@
 # ENV Schema
 
-Generated: 2026-03-12T20:07:46.336Z
+Generated: 2026-03-13T07:05:43.942Z
 
 ## Summary
 
-- Scanned files: 468
-- Used keys: 143
+- Scanned files: 469
+- Used keys: 144
 - Defined keys: 87
-- Missing keys: 68
+- Missing keys: 69
 - Critical missing keys: 0
 
 ## Key Matrix
@@ -169,6 +169,7 @@ Generated: 2026-03-12T20:07:46.336Z
 | VTW_BASE_URL                             | no      | 1             | missing |
 | VTW_CACHE                                | yes     | 3             | ok      |
 | VTW_KV                                   | no      | 2             | missing |
+| VTW_SITE_ORIGIN                          | no      | 1             | missing |
 | VTW_VAULT                                | no      | 2             | missing |
 | WORKER_NAME                              | no      | 3             | missing |
 | X_ORCH_TOKEN                             | no      | 4             | missing |
