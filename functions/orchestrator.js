@@ -1225,12 +1225,18 @@ Rules:
 
       if (type === "update_copy") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = updateElementById(html, action.field, action.value || "");
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = updateElementById(
+            html,
+            action.field,
+            action.value || ""
+          );
+          saveHtml(htmlPath, updatedHtml);
+        });
         if (
           target !== "sandbox" &&
           action.field &&
@@ -1256,23 +1262,27 @@ Rules:
           expandToAllPagesByCommand
         ) {
           const htmlTargets = await resolveActionHtmlTargets(action);
-          await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-          for (const htmlPath of htmlTargets) {
-            let html = await loadHtml(htmlPath);
-            html = updateHtmlTheme(html, action.theme);
-            saveHtml(htmlPath, html);
-          }
+          const htmlResults = await Promise.all(
+            htmlTargets.map((path) => loadHtml(path))
+          );
+          htmlResults.forEach((html, idx) => {
+            const htmlPath = htmlTargets[idx];
+            const updatedHtml = updateHtmlTheme(html, action.theme);
+            saveHtml(htmlPath, updatedHtml);
+          });
         }
       }
 
       if (type === "update_meta") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = updateMeta(html, action.title, action.description);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = updateMeta(html, action.title, action.description);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "add_page") {
@@ -1290,30 +1300,34 @@ Rules:
         });
 
         const navTargets = await listAllSiteHtmlFiles();
-        await Promise.all(navTargets.map((path) => loadHtml(path)));
-        for (const navTarget of navTargets) {
-          if (navTarget === pagePath) continue;
-          let html = await loadHtml(navTarget);
-          html = addNavLink(html, slug, title);
-          html = addFooterLink(html, slug, title);
-          saveHtml(navTarget, html);
-        }
+        const navResults = await Promise.all(
+          navTargets.map((path) => loadHtml(path))
+        );
+        navResults.forEach((html, idx) => {
+          const navTarget = navTargets[idx];
+          if (navTarget === pagePath) return;
+          let updatedHtml = addNavLink(html, slug, title);
+          updatedHtml = addFooterLink(updatedHtml, slug, title);
+          saveHtml(navTarget, updatedHtml);
+        });
       }
 
       if (type === "insert_monetization") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = insertMonetization(
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = insertMonetization(
             html,
             action.headline || "Monetize this page",
             action.description ||
               "Add a revenue block to capture leads or offers.",
             action.cta || "Get the offer"
           );
-          saveHtml(htmlPath, html);
-        }
+          saveHtml(htmlPath, updatedHtml);
+        });
         if (target !== "sandbox") {
           const cssPath = resolveActionCssPath(action);
           let css = await loadStyles(cssPath);
@@ -1324,12 +1338,14 @@ Rules:
 
       if (type === "update_background_video") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = updateBackgroundVideo(html, action.src);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = updateBackgroundVideo(html, action.src);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "update_wallpaper" && target !== "sandbox") {
@@ -1341,74 +1357,88 @@ Rules:
 
       if (type === "update_avatar") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = updateAvatar(html, action.src);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = updateAvatar(html, action.src);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "insert_section") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = insertSection(html, action);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = insertSection(html, action);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "add_product") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = ensureStoreSection(html);
-          html = addProductCard(html, action);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          let updatedHtml = ensureStoreSection(html);
+          updatedHtml = addProductCard(updatedHtml, action);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "insert_video") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = insertVideoSection(html, action);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = insertVideoSection(html, action);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "insert_image") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = insertImageSection(html, action);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = insertImageSection(html, action);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "insert_stream") {
         const htmlTargets = await resolveActionHtmlTargets(action);
-        await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-        for (const htmlPath of htmlTargets) {
-          let html = await loadHtml(htmlPath);
-          html = insertStreamSection(html, action);
-          saveHtml(htmlPath, html);
-        }
+        const htmlResults = await Promise.all(
+          htmlTargets.map((path) => loadHtml(path))
+        );
+        htmlResults.forEach((html, idx) => {
+          const htmlPath = htmlTargets[idx];
+          const updatedHtml = insertStreamSection(html, action);
+          saveHtml(htmlPath, updatedHtml);
+        });
       }
 
       if (type === "inject_css") {
         if (target === "sandbox") {
           const htmlTargets = await resolveActionHtmlTargets(action);
-          await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-          for (const htmlPath of htmlTargets) {
-            let html = await loadHtml(htmlPath);
-            html = injectCssIntoHtml(html, action.css);
-            saveHtml(htmlPath, html);
-          }
+          const htmlResults = await Promise.all(
+            htmlTargets.map((path) => loadHtml(path))
+          );
+          htmlResults.forEach((html, idx) => {
+            const htmlPath = htmlTargets[idx];
+            const updatedHtml = injectCssIntoHtml(html, action.css);
+            saveHtml(htmlPath, updatedHtml);
+          });
         } else {
           const explicitCssFile = sanitizeStylePath(
             action?.file || action?.styleFile || ""
@@ -1421,12 +1451,14 @@ Rules:
               expandToAllPagesByCommand);
           if (pageScoped) {
             const htmlTargets = await resolveActionHtmlTargets(action);
-            await Promise.all(htmlTargets.map((path) => loadHtml(path)));
-            for (const htmlPath of htmlTargets) {
-              let html = await loadHtml(htmlPath);
-              html = injectCssIntoHtml(html, action.css);
-              saveHtml(htmlPath, html);
-            }
+            const htmlResults = await Promise.all(
+              htmlTargets.map((path) => loadHtml(path))
+            );
+            htmlResults.forEach((html, idx) => {
+              const htmlPath = htmlTargets[idx];
+              const updatedHtml = injectCssIntoHtml(html, action.css);
+              saveHtml(htmlPath, updatedHtml);
+            });
           } else {
             const cssPath = explicitCssFile || DEFAULT_STYLE_FILE;
             let css = await loadStyles(cssPath);
