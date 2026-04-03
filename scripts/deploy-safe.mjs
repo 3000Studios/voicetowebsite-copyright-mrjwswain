@@ -147,12 +147,7 @@ function main() {
 
     if (result.status !== 0) {
       log(`Wrangler exited with code ${result.status}`);
-      // Fix: Only use fallback if result.status is null/undefined, not if it's 0
-      process.exit(
-        result.status !== null && result.status !== undefined
-          ? result.status
-          : 5
-      );
+      process.exit(result.status ?? 5);
     }
   } catch (err) {
     log(err instanceof Error ? err.message : String(err));
