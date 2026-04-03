@@ -1,10 +1,12 @@
+import { timingSafeEqual } from "../../functions/adminAuth.js";
+
 export async function handleExecuteRequest({ request, env }) {
   const url = new URL(request.url);
   const body = await request.json();
   const { action, params } = body;
 
   const ownerKey = request.headers.get("X-VTW-OWNER-KEY");
-  const isValidOwner = ownerKey && ownerKey === env.OWNER_KEY; // Hash comparison recommended for production
+  const isValidOwner = ownerKey && timingSafeEqual(ownerKey, env.OWNER_KEY);
 
   if (!isValidOwner) {
     // Check for admin session/cookie if not owner
