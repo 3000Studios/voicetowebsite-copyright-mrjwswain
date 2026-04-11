@@ -45,13 +45,19 @@ export async function recordDeploymentActivity() {
 }
 
 export async function recordSiteEvent(eventPayload) {
-  const events = await readSystemDocument('events.json', DEFAULT_EVENTS)
-  const nextEvent = {
-    id: `${eventPayload.type ?? 'event'}-${Date.now()}`,
-    type: eventPayload.type ?? 'page_view',
+  return recordOperationalEvent(eventPayload.type ?? 'page_view', {
     path: eventPayload.path ?? '/',
     sessionId: eventPayload.sessionId ?? 'anonymous',
-    referrer: eventPayload.referrer ?? '',
+    referrer: eventPayload.referrer ?? ''
+  })
+}
+
+export async function recordOperationalEvent(type, metadata = {}) {
+  const events = await readSystemDocument('events.json', DEFAULT_EVENTS)
+  const nextEvent = {
+    id: `${type ?? 'event'}-${Date.now()}`,
+    type: type ?? 'event',
+    ...metadata,
     createdAt: nowIso()
   }
 
@@ -73,7 +79,8 @@ export async function recordLead(leadPayload) {
     email: String(leadPayload.email ?? '').trim().toLowerCase(),
     company: String(leadPayload.company ?? '').trim(),
     interest: String(leadPayload.interest ?? '').trim(),
-    notes: String(leadPayload.notes ?? '').trim(),
+    notes: String(leadPayload.notes ?? leadPayload.message ?? '').trim(),
+    source: String(leadPayload.source ?? 'contact_form').trim(),
     createdAt: nowIso()
   }
 
@@ -101,18 +108,24 @@ export async function getAnalyticsSnapshot() {
   const visitors = visitorIds.size
   const purchases = completedPayments.length
   const leadCount = (leads.leads ?? []).length
+  const newsletterCount = (leads.leads ?? []).filter((entry) => entry.source === 'newsletter').length
+  const publishedBlog = bundle.blog.filter((entry) => entry.slug !== 'index' && entry.data?.status === 'published').length
+  const draftBlog = bundle.blog.filter((entry) => entry.slug !== 'index' && entry.data?.status !== 'published').length
 
   return {
     ...analytics,
     visitors,
     pageViews: pageViewEvents.length,
     leads: leadCount,
+    newsletterSubscribers: newsletterCount,
     purchases,
     conversionRate: visitors > 0 ? purchases / visitors : 0,
     revenue,
     contentCounts: {
       pages: bundle.pages.length,
       blog: bundle.blog.length,
+      publishedBlog,
+      draftBlog,
       products: bundle.products.length
     },
     traffic: {

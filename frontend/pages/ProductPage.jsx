@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import MediaShowcase from '../components/MediaShowcase.jsx'
 import OfferCheckoutCard from '../components/OfferCheckoutCard.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import RichBlocks from '../components/RichBlocks.jsx'
@@ -27,6 +28,8 @@ export default function ProductPage() {
           {product.idealFor ? <span className="tag">{product.idealFor}</span> : null}
         </div>
       </section>
+
+      <MediaShowcase media={product.media} />
 
       {product.bullets ? (
         <section className="section-card">

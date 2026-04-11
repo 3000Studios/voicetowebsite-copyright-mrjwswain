@@ -5,10 +5,13 @@ export const publicNavItems = [
   { label: 'Solutions', to: '/solutions' },
   { label: 'Products', to: '/products' },
   { label: 'Pricing', to: '/pricing' },
+  { label: 'Newsletter', to: '/newsletter' },
   { label: 'About', to: '/about' },
   { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' },
-  { label: 'Admin', to: '/admin' }
+  { label: 'Legal', to: '/legal' },
+  { label: 'Privacy', to: '/privacy' },
+  { label: 'Terms', to: '/terms' }
 ]
 
 export const publicStatusLines = [

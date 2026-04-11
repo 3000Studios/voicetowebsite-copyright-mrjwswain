@@ -48,6 +48,19 @@
       }
     ]
   },
+  "media": {
+    "eyebrow": "Hero video",
+    "title": "Watch the operator surface in motion",
+    "body": "The site now leads with a lightweight demo loop that shows command routing, content operations, and checkout readiness without forcing a heavy product tour.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/operator-preview.svg",
+    "imageUrl": "/media/operator-preview.svg",
+    "badges": [
+      "Command center",
+      "Revenue ready",
+      "Cloudflare deploy"
+    ]
+  },
   "workflowHeadline": "A successful customer flow should feel simple from the outside and powerful underneath.",
   "workflowSteps": [
     {

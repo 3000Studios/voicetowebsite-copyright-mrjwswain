@@ -1,13 +1,29 @@
-const DEFAULT_ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'mr.jwswain@gmail.com'
-const DEFAULT_ADMIN_CODE = process.env.ADMIN_PASSCODE ?? '5555'
+import crypto from 'node:crypto'
+import { getAdminSessionFromRequest, validateAdminCredentials } from '../services/adminAuthService.js'
+
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY ?? process.env.X_ADMIN_KEY ?? ''
+
+function matchesAdminApiKey(candidate) {
+  if (!ADMIN_API_KEY || !candidate) {
+    return false
+  }
+
+  const expectedBuffer = Buffer.from(ADMIN_API_KEY, 'utf8')
+  const candidateBuffer = Buffer.from(String(candidate), 'utf8')
+  if (expectedBuffer.length !== candidateBuffer.length) {
+    return false
+  }
+
+  return crypto.timingSafeEqual(expectedBuffer, candidateBuffer)
+}
 
 export function adminAuth(request, response, next) {
   const adminKey = request.headers['x-admin-key']
   const email = request.headers['x-admin-email']
   const code = request.headers['x-admin-code']
+  const session = getAdminSessionFromRequest(request)
 
-  if (ADMIN_API_KEY && adminKey === ADMIN_API_KEY) {
+  if (matchesAdminApiKey(adminKey)) {
     request.admin = {
       authMode: 'api-key'
     }
@@ -15,17 +31,23 @@ export function adminAuth(request, response, next) {
     return
   }
 
-  if (email !== DEFAULT_ADMIN_EMAIL || code !== DEFAULT_ADMIN_CODE) {
+  if (session) {
+    request.admin = session
+    next()
+    return
+  }
+
+  if (!validateAdminCredentials(email, code)) {
     response.status(403).json({
       error: 'Admin access required',
-      message: 'Valid admin credentials or x-admin-key are required for this route.'
+      message: 'A valid admin session or admin API key is required for this route.'
     })
     return
   }
 
   request.admin = {
-    authMode: 'email-passcode',
-    email
+    authMode: 'legacy-email-passcode',
+    adminEmail: String(email).trim().toLowerCase()
   }
   next()
 }

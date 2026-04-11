@@ -2,15 +2,35 @@ import cors from "cors";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import adminSessionRoutes from "./routes/adminSessionRoutes.js";
 import commandRoutes from "./routes/commandRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
+import { postStripeWebhook } from "./controllers/publicController.js";
 import { bootstrapContent } from "./services/contentService.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 8787);
 const __filename = fileURLToPath(import.meta.url);
 
-app.use(cors());
+app.disable('x-powered-by')
+app.set('trust proxy', true)
+app.use(
+  cors({
+    origin: true,
+    credentials: true
+  }),
+)
+app.use((request, response, next) => {
+  response.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.setHeader('X-Content-Type-Options', 'nosniff')
+  response.setHeader('X-Frame-Options', 'DENY')
+  response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  if (request.path.startsWith('/api/')) {
+    response.setHeader('Cache-Control', 'no-store')
+  }
+  next()
+})
+app.post('/api/public/stripe/webhook', express.raw({ type: 'application/json' }), postStripeWebhook)
 app.use(express.json({ limit: "2mb" }));
 
 app.get("/api/health", async (_request, response) => {
@@ -22,6 +42,7 @@ app.get("/api/health", async (_request, response) => {
   });
 });
 
+app.use("/api/admin", adminSessionRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api", commandRoutes);
 

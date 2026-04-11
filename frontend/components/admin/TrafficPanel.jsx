@@ -50,7 +50,7 @@ export default function TrafficPanel({ analytics, contentBundle, onDiscoverTopic
           {recentPosts.map((post) => (
             <div key={post.slug} className="commit-row">
               <strong>{post.slug}</strong>
-              <span>{post.data?.title ?? post.slug}</span>
+              <span>{`${post.data?.title ?? post.slug} · ${post.data?.status ?? 'draft'}`}</span>
             </div>
           ))}
         </div>

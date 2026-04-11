@@ -20,6 +20,15 @@ const presets = [
     }
   },
   {
+    label: 'Publish draft',
+    command: {
+      action: 'publish_blog_post',
+      slug: 'ai-powered-conversion-optimization',
+      notes: 'Approved for public release.',
+      autoDeploy: false
+    }
+  },
+  {
     label: 'Feature section',
     command: {
       action: 'generate_feature_section',

@@ -1,13 +1,11 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
 
-async function request(path, { adminEmail, adminCode, adminKey, method = 'GET', body } = {}) {
+async function request(path, { method = 'GET', body } = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     method,
+    credentials: 'include',
     headers: {
-      'content-type': 'application/json',
-      'x-admin-email': adminEmail,
-      'x-admin-code': adminCode,
-      'x-admin-key': adminKey ?? ''
+      'content-type': 'application/json'
     },
     body: body ? JSON.stringify(body) : undefined
   })
@@ -21,21 +19,35 @@ async function request(path, { adminEmail, adminCode, adminKey, method = 'GET', 
   return payload
 }
 
-export function getAnalytics(adminSession) {
-  return request('/api/analytics', adminSession)
+export function createAdminSession(email, passcode) {
+  return request('/api/admin/session', {
+    method: 'POST',
+    body: { email, passcode }
+  })
 }
 
-export function getDeployments(adminSession) {
-  return request('/api/deployments', adminSession)
+export function getAdminSessionStatus() {
+  return request('/api/admin/session')
 }
 
-export function getContent(adminSession) {
-  return request('/api/content', adminSession)
+export function deleteAdminSession() {
+  return request('/api/admin/session', { method: 'DELETE' })
 }
 
-export function sendCommand(adminSession, command) {
+export function getAnalytics() {
+  return request('/api/analytics')
+}
+
+export function getDeployments() {
+  return request('/api/deployments')
+}
+
+export function getContent() {
+  return request('/api/content')
+}
+
+export function sendCommand(command) {
   return request('/api/command', {
-    ...adminSession,
     method: 'POST',
     body: command
   })

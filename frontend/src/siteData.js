@@ -26,9 +26,11 @@ export const homepage = pages.homepage ?? { sections: [], heroStats: [] }
 export const featurePage = pages.features ?? { items: [] }
 export const pricingPage = pages.pricing ?? { tiers: [] }
 export const pageLookup = pages
-export const blogIndex = blog.index ?? { posts: [] }
+export const blogIndex = {
+  posts: (blog.index?.posts ?? []).filter((entry) => (entry.status ?? 'published') === 'published')
+}
 export const blogPosts = Object.values(blog)
-  .filter((entry) => entry.slug)
+  .filter((entry) => entry.slug && (entry.status ?? 'published') === 'published')
   .sort((left, right) => String(right.publishedAt).localeCompare(String(left.publishedAt)))
 export const blogLookup = Object.fromEntries(blogPosts.map((entry) => [entry.slug, entry]))
 export const productCatalog = products.catalog?.products ?? []

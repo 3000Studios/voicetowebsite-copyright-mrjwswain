@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import MediaShowcase from '../components/MediaShowcase.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import { blogLookup } from '../src/siteData.js'
 
@@ -18,6 +19,8 @@ export default function BlogPostPage() {
         <PrismHeadline text={post.title} />
         <p className="section-intro">{post.excerpt}</p>
       </section>
+
+      <MediaShowcase media={post.media} />
 
       <section className="stack-lg">
         {post.sections.map((section) => (

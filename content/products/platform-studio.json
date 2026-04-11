@@ -3,6 +3,9 @@
   "name": "Operator OS",
   "headline": "Turn Voicetowebsite into the recurring software product at the center of the business",
   "priceAnchor": "$99 / month",
+  "stripeMode": "subscription",
+  "stripePriceId": "price_1TL50RGejm3JMan43e8cZkJY",
+  "stripePaymentLink": "https://buy.stripe.com/dRm4gzbh3bL89BugUqbAs02",
   "idealFor": "Best for founders, agency owners, and technical operators",
   "description": "Operator OS is the clearest recurring offer for Voicetowebsite. It gives users a command-driven platform for planning, execution, content operations, and release-ready workflows.",
   "bullets": [
@@ -30,5 +33,13 @@
     "body": "It is the offer with the clearest story, the best compounding value, and the most room for expansion revenue.",
     "primaryLabel": "Review pricing",
     "primaryHref": "/pricing"
+  },
+  "media": {
+    "eyebrow": "Subscription demo",
+    "title": "Operator OS is sold as a recurring command center",
+    "body": "The monthly plan now has a live Stripe payment link wired into the site content model so the checkout flow can survive expired backend credentials.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/operator-preview.svg",
+    "imageUrl": "/media/operator-preview.svg"
   }
 }

@@ -1,94 +1,88 @@
 import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { fadeUp, staggerParent } from '../animations/variants.js'
+import { useNavigate } from 'react-router-dom'
+import PrismHeadline from '../components/PrismHeadline.jsx'
+import AdminChrome from '../components/admin/AdminChrome.jsx'
+import { saveAdminSession } from '../src/adminSession.js'
+import { createAdminSession } from '../src/adminApi.js'
+import { COPYRIGHT_HOLDER, SITE_DISPLAY_NAME, SITE_DOMAIN } from '../src/siteMeta.js'
 
-const ADMIN_CODE = '5555'
+export default function AdminLoginPage() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [code, setCode] = useState('')
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
 
-export default function AdminLoginPage({ onLogin }) {
-const [code, setCode] = useState('')
-const [error, setError] = useState('')
-const [loading, setLoading] = useState(false)
+  async function handleSubmit(event) {
+    event.preventDefault()
 
-function handleSubmit(e) {
-  e.preventDefault()
-  setLoading(true)
-  setError('')
-  setTimeout(() => {
-    if (code === ADMIN_CODE) {
-      onLogin && onLogin()
-    } else {
-      setError('Invalid access code. Try again.')
-      setCode('')
+    if (!email.trim() || !code.trim()) {
+      setError('Enter the admin email and passcode to continue.')
+      return
     }
-    setLoading(false)
-  }, 600)
-}
 
-return (
-  <div className="admin-app admin-app--login" style={{ minHeight: '100vh', paddingTop: '6rem' }}>
-    <motion.div
-      className="admin-login"
-      initial="hidden"
-      animate="visible"
-      variants={staggerParent}
-    >
-      <motion.div className="admin-login__card" variants={fadeUp}>
-        {/* Brand */}
-        <div className="admin-login__brand">
-          <span className="admin-login__mark" />
-          <div>
-            <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: '1rem', color: 'var(--ink)' }}>
-              VoiceToWebsite
+    try {
+      setBusy(true)
+      setError('')
+      const payload = await createAdminSession(email.trim(), code.trim())
+      saveAdminSession(payload.session)
+      navigate('/admin/overview')
+    } catch (nextError) {
+      setError(nextError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="admin-app admin-app--login">
+      <AdminChrome />
+      <main className="admin-login">
+        <section className="auth-card admin-login__card">
+          <div className="admin-login__brand">
+            <span className="admin-sidebar__mark admin-login__mark" aria-hidden="true" />
+            <div>
+              <span className="eyebrow">{SITE_DISPLAY_NAME}</span>
+              <p className="admin-login__tagline">Admin access · {SITE_DOMAIN}</p>
             </div>
-            <div className="admin-login__tagline">Admin Dashboard</div>
           </div>
-        </div>
-
-        {/* Heading */}
-        <motion.div variants={fadeUp} style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.25rem' }}>
-            Secure Access
-          </h1>
-          <p style={{ fontSize: '0.85rem', color: 'var(--ink-muted)' }}>
-            Enter your admin passcode to continue.
+          <PrismHeadline text="Sign in to operations" />
+          <p className="section-intro">
+            Use your admin email and passcode for analytics, deployments, content edits, and AI commands.
           </p>
-        </motion.div>
-
-        {/* Form */}
-        <motion.form onSubmit={handleSubmit} variants={fadeUp} className="stack-md">
-          <div className="field">
-            <span>Access Code</span>
-            <input
-              type="password"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={8}
-              placeholder="••••"
-              value={code}
-              onChange={e => setCode(e.target.value)}
-              autoFocus
-              required
-              style={{ letterSpacing: '0.3em', fontSize: '1.2rem', textAlign: 'center' }}
-            />
-          </div>
-
-          {error && <div className="error-banner">{error}</div>}
-
-          <button
-            type="submit"
-            className="button button--primary"
-            style={{ width: '100%', justifyContent: 'center' }}
-            disabled={loading || !code}
-          >
-            {loading ? 'Verifying...' : 'Enter Dashboard →'}
-          </button>
-        </motion.form>
-
-        <p className="admin-login__copyright">
-          © {new Date().getFullYear()} VoiceToWebsite · 3000 Studios
-        </p>
-      </motion.div>
-    </motion.div>
-  </div>
-)
+          <form className="stack-md" onSubmit={handleSubmit}>
+            <label className="field">
+              <span>Admin email</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="username"
+                placeholder="you@company.com"
+              />
+            </label>
+            <label className="field">
+              <span>Passcode</span>
+              <input
+                type="password"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                autoComplete="current-password"
+                placeholder="••••••••"
+              />
+            </label>
+            <div className="admin-actions">
+              <button className="button button--primary" type="submit" disabled={busy}>
+                {busy ? 'Signing in...' : 'Continue to dashboard'}
+              </button>
+            </div>
+          </form>
+          {error ? <div className="error-banner">{error}</div> : null}
+          <p className="admin-login__copyright">
+            © {new Date().getFullYear()} {COPYRIGHT_HOLDER}
+          </p>
+        </section>
+      </main>
+    </div>
+  )
 }

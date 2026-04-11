@@ -22,7 +22,7 @@ function getSessionId() {
     return existing
   }
 
-  const nextId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  const nextId = `session-${crypto.randomUUID()}`
   window.localStorage.setItem(VISITOR_SESSION_KEY, nextId)
   return nextId
 }

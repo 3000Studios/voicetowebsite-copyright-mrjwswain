@@ -1,0 +1,32 @@
+{
+  "eyebrow": "Terms",
+  "headline": "Terms of service",
+  "subheadline": "These terms are written to support a real commercial website, not a placeholder page. They set expectations for access, acceptable use, payments, and operational limits.",
+  "sections": [
+    {
+      "title": "Service access",
+      "description": "Access to products, services, and admin-controlled deliverables may be suspended or limited if misuse, security risk, non-payment, or abusive activity is detected."
+    },
+    {
+      "title": "Payments and subscriptions",
+      "description": "Paid services, subscriptions, and implementation offers are billed through approved payment providers. Fees are generally non-refundable except where required by law or expressly stated otherwise in writing."
+    },
+    {
+      "title": "Customer responsibilities",
+      "description": "Customers remain responsible for the legality of their content, the accuracy of submitted information, and the decisions they make using generated outputs, analytics, or automation workflows."
+    },
+    {
+      "title": "Reasonable limits",
+      "description": "The platform is provided on an as-available basis. Liability is limited to the maximum extent permitted by applicable law, but nothing on this page removes rights that cannot legally be waived."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Questions before purchase",
+    "heading": "Review pricing and contact support before committing to a plan.",
+    "body": "This keeps the buying path transparent and reduces disputes by aligning offers, expectations, and support scope before payment.",
+    "primaryLabel": "View pricing",
+    "primaryHref": "/pricing",
+    "secondaryLabel": "Contact support",
+    "secondaryHref": "/contact"
+  }
+}

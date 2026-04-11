@@ -1,6 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAnalytics, getContent, getDeployments, sendCommand } from '../src/adminApi.js'
+import {
+  deleteAdminSession,
+  getAdminSessionStatus,
+  getAnalytics,
+  getContent,
+  getDeployments,
+  sendCommand
+} from '../src/adminApi.js'
 import { clearAdminSession, getAdminSession } from '../src/adminSession.js'
 
 const defaultCommand = JSON.stringify(
@@ -18,7 +25,8 @@ const AdminDashboardContext = createContext(null)
 
 export function AdminDashboardProvider({ children }) {
   const navigate = useNavigate()
-  const [adminSession] = useState(() => getAdminSession())
+  const [adminSession, setAdminSession] = useState(() => getAdminSession())
+  const [authResolved, setAuthResolved] = useState(false)
   const [commandText, setCommandText] = useState(defaultCommand)
   const [analytics, setAnalytics] = useState(null)
   const [deployments, setDeployments] = useState(null)
@@ -32,36 +40,44 @@ export function AdminDashboardProvider({ children }) {
   const [initialLoadDone, setInitialLoadDone] = useState(false)
 
   const refreshDashboard = useCallback(
-    async (activeSession = adminSession) => {
-      if (!activeSession?.adminEmail || !activeSession?.adminCode) {
+    async (activeSession) => {
+      if (!activeSession?.adminEmail) {
         return
       }
       const [nextAnalytics, nextDeployments, nextContent] = await Promise.all([
-        getAnalytics(activeSession),
-        getDeployments(activeSession),
-        getContent(activeSession)
+        getAnalytics(),
+        getDeployments(),
+        getContent()
       ])
       setAnalytics(nextAnalytics)
       setDeployments(nextDeployments)
       setContentBundle(nextContent)
     },
-    [adminSession]
+    []
   )
 
   useEffect(() => {
-    if (!adminSession?.adminEmail || !adminSession?.adminCode) {
-      return
-    }
-    refreshDashboard(adminSession)
-      .catch((loadError) => setError(loadError.message))
-      .finally(() => setInitialLoadDone(true))
-  }, [adminSession, refreshDashboard])
+    getAdminSessionStatus()
+      .then((payload) => {
+        setAdminSession(payload.session)
+        setError('')
+        return refreshDashboard(payload.session)
+      })
+      .catch(() => {
+        clearAdminSession()
+        setAdminSession(null)
+      })
+      .finally(() => {
+        setAuthResolved(true)
+        setInitialLoadDone(true)
+      })
+  }, [refreshDashboard])
 
   const handleRunCommand = useCallback(async () => {
     try {
       setError('')
       setCommandBusy(true)
-      const result = await sendCommand(adminSession, JSON.parse(commandText))
+      const result = await sendCommand(JSON.parse(commandText))
       setLastResult(result)
       await refreshDashboard(adminSession)
     } catch (runError) {
@@ -76,7 +92,7 @@ export function AdminDashboardProvider({ children }) {
       try {
         setError('')
         setEditorBusy(true)
-        const result = await sendCommand(adminSession, {
+        const result = await sendCommand({
           action: 'edit_workspace_file',
           targetPath,
           contents,
@@ -97,7 +113,7 @@ export function AdminDashboardProvider({ children }) {
     try {
       setError('')
       setDeployBusy(true)
-      const result = await sendCommand(adminSession, {
+      const result = await sendCommand({
         action: 'deploy_site',
         message: 'Admin-triggered deploy'
       })
@@ -123,7 +139,7 @@ export function AdminDashboardProvider({ children }) {
     try {
       setError('')
       setTrafficBusy(true)
-      const result = await sendCommand(adminSession, {
+      const result = await sendCommand({
         action: 'discover_topics',
         limit: 6
       })
@@ -140,7 +156,7 @@ export function AdminDashboardProvider({ children }) {
     try {
       setError('')
       setTrafficBusy(true)
-      const result = await sendCommand(adminSession, {
+      const result = await sendCommand({
         action: 'run_traffic_cycle',
         count: 2,
         includeImages: true,
@@ -155,14 +171,19 @@ export function AdminDashboardProvider({ children }) {
     }
   }, [adminSession, refreshDashboard])
 
-  const handleSignOut = useCallback(() => {
+  const handleSignOut = useCallback(async () => {
+    try {
+      await deleteAdminSession()
+    } catch {}
     clearAdminSession()
+    setAdminSession(null)
     navigate('/admin/login', { replace: true })
   }, [navigate])
 
   const value = useMemo(
     () => ({
       adminSession,
+      authResolved,
       initialLoadDone,
       commandText,
       setCommandText,
@@ -186,6 +207,7 @@ export function AdminDashboardProvider({ children }) {
     }),
     [
       adminSession,
+      authResolved,
       initialLoadDone,
       commandText,
       analytics,

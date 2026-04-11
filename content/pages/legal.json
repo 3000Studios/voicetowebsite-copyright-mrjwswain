@@ -1,0 +1,28 @@
+{
+  "eyebrow": "Legal",
+  "headline": "Legal and compliance overview",
+  "subheadline": "Use this page as the plain-language bridge between privacy, terms, payments, advertising readiness, and customer-facing operational expectations.",
+  "sections": [
+    {
+      "title": "Ad and content readiness",
+      "description": "The website is designed around original content, clear navigation, contact information, and legal disclosures so it can support advertising review and long-term search trust."
+    },
+    {
+      "title": "Payments and disputes",
+      "description": "Transactions are handled through approved payment providers. Support questions, billing clarifications, and service scope issues should be raised through the contact channel before disputes escalate."
+    },
+    {
+      "title": "Generated content",
+      "description": "AI-assisted outputs are reviewed as part of the publishing workflow. Draft content, media, and automation outputs may be revised, held, or rejected before publication."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Read the source pages",
+    "heading": "Use privacy and terms for the detailed policy language.",
+    "body": "This overview page exists for clarity, while the policy pages carry the actionable legal language customers and reviewers need.",
+    "primaryLabel": "Privacy policy",
+    "primaryHref": "/privacy",
+    "secondaryLabel": "Terms of service",
+    "secondaryHref": "/terms"
+  }
+}

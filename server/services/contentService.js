@@ -463,32 +463,75 @@ export async function saveBlogPost(postPayload) {
   await bootstrapContent()
   const slug = slugify(postPayload.slug ?? postPayload.title ?? postPayload.topic ?? `post-${Date.now()}`)
   const filePath = path.join(blogRoot, `${slug}.json`)
+  const publishedAt =
+    postPayload.status === 'published'
+      ? postPayload.publishedAt ?? nowIso().slice(0, 10)
+      : postPayload.publishedAt ?? null
   const post = {
     ...postPayload,
     slug,
+    status: postPayload.status ?? 'draft',
+    publishedAt,
     updatedAt: nowIso()
   }
 
   await writeJson(filePath, post)
-
-  const indexPath = path.join(blogRoot, 'index.json')
-  const indexData = await readJson(indexPath, { posts: [] })
-  const summary = {
-    slug,
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt ?? nowIso().slice(0, 10),
-    tags: post.tags ?? []
-  }
-
-  indexData.posts = [summary, ...indexData.posts.filter((entry) => entry.slug !== slug)]
-  await writeJson(indexPath, indexData)
+  await rebuildBlogIndex()
 
   return {
     slug,
     filePath: normalize(path.relative(repoRoot, filePath)),
     data: post
   }
+}
+
+export async function updateBlogPostStatus(slug, status, statusPatch = {}) {
+  await bootstrapContent()
+  const filePath = path.join(blogRoot, `${slugify(slug)}.json`)
+  const post = await readJson(filePath)
+  const nextStatus = String(status)
+  const publishedAt =
+    nextStatus === 'published'
+      ? post.publishedAt ?? statusPatch.publishedAt ?? nowIso().slice(0, 10)
+      : null
+
+  const nextPost = {
+    ...post,
+    ...statusPatch,
+    status: nextStatus,
+    publishedAt,
+    updatedAt: nowIso()
+  }
+
+  await writeJson(filePath, nextPost)
+  await rebuildBlogIndex()
+
+  return {
+    slug: nextPost.slug,
+    filePath: normalize(path.relative(repoRoot, filePath)),
+    data: nextPost
+  }
+}
+
+export async function rebuildBlogIndex() {
+  await bootstrapContent()
+  const indexPath = path.join(blogRoot, 'index.json')
+  const entries = await listJsonDirectory(blogRoot)
+  const publishedPosts = entries
+    .filter((entry) => entry.slug !== 'index' && entry.data?.status === 'published')
+    .map((entry) => ({
+      slug: entry.slug,
+      title: entry.data?.title,
+      excerpt: entry.data?.excerpt,
+      publishedAt:
+        entry.data?.publishedAt ?? entry.data?.updatedAt?.slice(0, 10) ?? nowIso().slice(0, 10),
+      tags: entry.data?.tags ?? [],
+      status: entry.data?.status ?? 'draft'
+    }))
+    .sort((left, right) => String(right.publishedAt).localeCompare(String(left.publishedAt)))
+
+  await writeJson(indexPath, { posts: publishedPosts })
+  return publishedPosts
 }
 
 export async function upsertFeatureSection(featureSection) {

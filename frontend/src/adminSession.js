@@ -17,7 +17,7 @@ export function getAdminSession() {
       return null
     }
     const parsed = JSON.parse(raw)
-    if (!parsed?.adminEmail || !parsed?.adminCode) {
+    if (!parsed?.adminEmail) {
       return null
     }
     return parsed

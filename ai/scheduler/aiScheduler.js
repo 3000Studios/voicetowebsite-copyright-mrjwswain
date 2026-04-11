@@ -13,9 +13,9 @@ const STATE_FILE = path.join(systemRoot, 'state.json')
 const QUEUE_FILE = path.join(systemRoot, 'task-queue.json')
 
 const TASK_POLICY = {
-  create_blog_post: { cooldownMs: 30 * 60_000 },
+  create_blog_post: { cooldownMs: 60 * 60_000 },
   create_page: { cooldownMs: 45 * 60_000 },
-  run_traffic_cycle: { cooldownMs: 20 * 60_000 },
+  run_traffic_cycle: { cooldownMs: 60 * 60_000 },
   discover_topics: { cooldownMs: 15 * 60_000 },
   deploy_site: { cooldownMs: 20 * 60_000 }
 }

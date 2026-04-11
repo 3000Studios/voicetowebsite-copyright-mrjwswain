@@ -2,7 +2,6 @@ import React from 'react'
 import { NavLink, Navigate, Outlet } from 'react-router-dom'
 import AdminChrome from './AdminChrome.jsx'
 import { AdminDashboardProvider, useAdminDashboard } from '../../context/AdminDashboardContext.jsx'
-import { getAdminSession } from '../../src/adminSession.js'
 import { SITE_DISPLAY_NAME } from '../../src/siteMeta.js'
 
 const nav = [
@@ -14,7 +13,25 @@ const nav = [
 ]
 
 function AdminLayoutInner() {
-  const { adminSession, error, handleRefresh, handleSignOut } = useAdminDashboard()
+  const { adminSession, authResolved, error, handleRefresh, handleSignOut } = useAdminDashboard()
+
+  if (!authResolved) {
+    return (
+      <div className="admin-app admin-app--login">
+        <AdminChrome />
+        <main className="admin-login">
+          <section className="auth-card admin-login__card">
+            <span className="eyebrow">Admin session</span>
+            <h2>Checking access…</h2>
+          </section>
+        </main>
+      </div>
+    )
+  }
+
+  if (!adminSession?.adminEmail) {
+    return <Navigate to="/admin/login" replace />
+  }
 
   return (
     <div className="admin-app">
@@ -77,18 +94,10 @@ function AdminLayoutInner() {
   )
 }
 
-function AdminGate() {
-  const session = getAdminSession()
-  if (!session?.adminEmail || !session?.adminCode) {
-    return <Navigate to="/admin/login" replace />
-  }
+export default function AdminLayout() {
   return (
     <AdminDashboardProvider>
       <AdminLayoutInner />
     </AdminDashboardProvider>
   )
-}
-
-export default function AdminLayout() {
-  return <AdminGate />
 }

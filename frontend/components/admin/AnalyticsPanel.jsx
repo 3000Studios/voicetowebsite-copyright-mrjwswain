@@ -23,6 +23,10 @@ export default function AnalyticsPanel({ analytics }) {
           <span>Leads</span>
         </article>
         <article className="content-card">
+          <strong>{analytics?.newsletterSubscribers ?? 0}</strong>
+          <span>Newsletter</span>
+        </article>
+        <article className="content-card">
           <strong>{analytics?.purchases ?? 0}</strong>
           <span>Purchases</span>
         </article>
@@ -62,6 +66,8 @@ export default function AnalyticsPanel({ analytics }) {
         <div className="tag-row">
           <span className="tag">Queued: {analytics?.traffic?.queuedTopics ?? 0}</span>
           <span className="tag">Published: {analytics?.traffic?.publishedPages ?? 0}</span>
+          <span className="tag">Drafts: {analytics?.contentCounts?.draftBlog ?? 0}</span>
+          <span className="tag">Published stories: {analytics?.contentCounts?.publishedBlog ?? 0}</span>
         </div>
       </div>
     </section>

@@ -1,7 +1,9 @@
 import React from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import ContactLeadForm from '../components/ContactLeadForm.jsx'
+import MediaShowcase from '../components/MediaShowcase.jsx'
 import MetricStrip from '../components/MetricStrip.jsx'
+import NewsletterSignupForm from '../components/NewsletterSignupForm.jsx'
 import OfferCheckoutCard from '../components/OfferCheckoutCard.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import RichBlocks from '../components/RichBlocks.jsx'
@@ -39,6 +41,7 @@ export default function GenericPage() {
       </section>
 
       {page.heroStats ? <MetricStrip items={page.heroStats} /> : null}
+      <MediaShowcase media={page.media} />
       {page.steps ? (
         <section className="section-card">
           <span className="eyebrow">{page.stepsEyebrow ?? 'Workflow'}</span>
@@ -131,6 +134,7 @@ export default function GenericPage() {
         </section>
       ) : null}
       {slug === 'contact' ? <ContactLeadForm /> : null}
+      {slug === 'newsletter' ? <NewsletterSignupForm /> : null}
     </div>
   )
 }

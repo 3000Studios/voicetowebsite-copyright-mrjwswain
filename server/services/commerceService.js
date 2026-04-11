@@ -27,6 +27,10 @@ function parseAmountToCents(value) {
   return Math.round(normalized * 100)
 }
 
+function getCheckoutAmount(product) {
+  return parseAmountToCents(product.priceAnchor ?? product.price ?? product.amount)
+}
+
 function getStripeClient() {
   const secretKey = process.env.STRIPE_SECRET_KEY
   if (!secretKey || secretKey.startsWith('replace-with-')) {
@@ -71,9 +75,12 @@ async function getProduct(slug) {
 
 function getStripeConfig(slug, product) {
   const suffix = slugToEnvSuffix(slug)
-  const paymentLink = process.env[`STRIPE_PAYMENT_LINK_${suffix}`]
-  const priceId = process.env[`STRIPE_PRICE_${suffix}`]
-  const mode = process.env[`STRIPE_MODE_${suffix}`] ?? (/month|mo/i.test(product.priceAnchor ?? '') ? 'subscription' : 'payment')
+  const paymentLink = process.env[`STRIPE_PAYMENT_LINK_${suffix}`] ?? product.stripePaymentLink ?? null
+  const priceId = process.env[`STRIPE_PRICE_${suffix}`] ?? product.stripePriceId ?? null
+  const mode =
+    process.env[`STRIPE_MODE_${suffix}`] ??
+    product.stripeMode ??
+    (/month|mo/i.test(product.priceAnchor ?? '') ? 'subscription' : 'payment')
 
   return {
     paymentLink,
@@ -156,7 +163,10 @@ export async function getCommerceSnapshot() {
       idealFor: product.idealFor ?? null,
       contactOnly: product.slug === 'enterprise-deployment',
       providers: {
-        stripe: Boolean(stripeConfig.paymentLink || (stripeClient && stripeConfig.priceId)),
+        stripe: Boolean(
+          stripeConfig.paymentLink ||
+            (stripeClient && (stripeConfig.priceId || getCheckoutAmount(product))),
+        ),
         paypal: Boolean(hasPayPalCredentials() && paypalConfig.amountCents)
       }
     }
@@ -185,18 +195,45 @@ export async function createStripeCheckout({ slug, origin }) {
   }
 
   const stripe = getStripeClient()
-  if (!stripe || !stripeConfig.priceId) {
+  if (!stripe) {
+    throw new Error('Stripe checkout is not configured for this offer.')
+  }
+
+  const amountCents = getCheckoutAmount(product)
+  const lineItem =
+    stripeConfig.priceId
+      ? {
+          price: stripeConfig.priceId,
+          quantity: 1
+        }
+      : amountCents
+        ? {
+            price_data: {
+              currency: 'usd',
+              unit_amount: amountCents,
+              product_data: {
+                name: product.name,
+                description: product.description ?? product.summary ?? product.headline ?? product.name
+              },
+              ...(stripeConfig.mode === 'subscription'
+                ? {
+                    recurring: {
+                      interval: 'month'
+                    }
+                  }
+                : {})
+            },
+            quantity: 1
+          }
+        : null
+
+  if (!lineItem) {
     throw new Error('Stripe checkout is not configured for this offer.')
   }
 
   const session = await stripe.checkout.sessions.create({
     mode: stripeConfig.mode,
-    line_items: [
-      {
-        price: stripeConfig.priceId,
-        quantity: 1
-      }
-    ],
+    line_items: [lineItem],
     success_url: `${origin}/checkout/success?provider=stripe&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/checkout/cancel?provider=stripe&offer=${slug}`,
     metadata: {
@@ -250,6 +287,40 @@ export async function verifyStripeCheckoutSession(sessionId) {
     amountCents,
     currency: session.currency ?? 'usd',
     offerSlug: session.metadata?.offerSlug ?? null
+  }
+}
+
+export async function handleStripeWebhook(rawBody, signature) {
+  const stripe = getStripeClient()
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!stripe || !webhookSecret || webhookSecret.startsWith('replace-with-')) {
+    throw new Error('Stripe webhook is not configured.')
+  }
+
+  const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object
+    await recordPayment({
+      provider: 'stripe',
+      transactionId: session.payment_intent ?? session.id,
+      checkoutSessionId: session.id,
+      customerEmail: session.customer_details?.email ?? null,
+      offerSlug: session.metadata?.offerSlug ?? null,
+      status: 'completed',
+      amountCents: session.amount_total ?? 0,
+      currency: session.currency ?? 'usd',
+      raw: {
+        id: session.id,
+        payment_status: session.payment_status,
+        amount_total: session.amount_total
+      }
+    })
+  }
+
+  return {
+    received: true,
+    type: event.type
   }
 }
 

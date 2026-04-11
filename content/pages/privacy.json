@@ -1,0 +1,32 @@
+{
+  "eyebrow": "Privacy",
+  "headline": "Privacy and data handling",
+  "subheadline": "This page exists to support a compliant customer experience, ad network review, and transparent handling of leads, analytics, and payment-related records.",
+  "sections": [
+    {
+      "title": "What information is collected",
+      "description": "The site may collect contact details, newsletter signups, analytics events, checkout metadata, and operational logs needed to run the platform and respond to customer requests."
+    },
+    {
+      "title": "How information is used",
+      "description": "Information is used to deliver services, improve the website, process transactions, communicate updates, and protect the platform against abuse or unauthorized access."
+    },
+    {
+      "title": "Third-party services",
+      "description": "Payment processing, analytics, hosting, and media delivery may rely on third-party providers such as Stripe, PayPal, Cloudflare, and related infrastructure vendors."
+    },
+    {
+      "title": "Retention and requests",
+      "description": "Data is retained only for operational, legal, security, and business purposes. Requests about access, correction, or deletion can be directed through the contact page."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Need a human answer?",
+    "heading": "Use the contact page for data requests or privacy questions.",
+    "body": "This keeps privacy operations visible and gives customers a clear route when they need a correction, export, or follow-up.",
+    "primaryLabel": "Contact us",
+    "primaryHref": "/contact",
+    "secondaryLabel": "Read terms",
+    "secondaryHref": "/terms"
+  }
+}

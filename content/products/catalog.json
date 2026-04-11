@@ -7,6 +7,9 @@
       "idealFor": "Founders, small teams, and technical operators",
       "outcome": "Create subscription revenue from a product that helps work actually get shipped.",
       "priceAnchor": "$99 / month",
+      "stripeMode": "subscription",
+      "stripePriceId": "price_1TL50RGejm3JMan43e8cZkJY",
+      "stripePaymentLink": "https://buy.stripe.com/dRm4gzbh3bL89BugUqbAs02",
       "ctaLabel": "View offer",
       "ctaHref": "/products/operator-os"
     },
@@ -17,6 +20,9 @@
       "idealFor": "Buyers who want speed over self-setup",
       "outcome": "Generate service revenue while increasing product adoption and customer success.",
       "priceAnchor": "$2,500+",
+      "stripeMode": "payment",
+      "stripePriceId": "price_1TL50QGejm3JMan4FSEsFRFs",
+      "stripePaymentLink": "https://buy.stripe.com/6oU6oHfxj3eCbJC7jQbAs03",
       "ctaLabel": "View offer",
       "ctaHref": "/products/launch-sprint"
     },

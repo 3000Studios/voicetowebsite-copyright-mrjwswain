@@ -3,6 +3,7 @@ import {
   createPayPalCheckout,
   createStripeCheckout,
   getCommerceSnapshot,
+  handleStripeWebhook,
   verifyStripeCheckoutSession
 } from '../services/commerceService.js'
 import { getAnalyticsSnapshot, recordLead, recordSiteEvent } from '../services/analyticsService.js'
@@ -90,6 +91,16 @@ export async function getPayPalCheckoutSuccess(request, response, next) {
   try {
     const orderId = typeof request.query.token === 'string' ? request.query.token : ''
     const result = await capturePayPalOrder(orderId)
+    response.json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function postStripeWebhook(request, response, next) {
+  try {
+    const signature = request.headers['stripe-signature']
+    const result = await handleStripeWebhook(request.body, signature)
     response.json(result)
   } catch (error) {
     next(error)

@@ -3,6 +3,9 @@
   "name": "Launch Sprint",
   "headline": "Use a high-touch offer to create early cash flow and faster customer wins",
   "priceAnchor": "$2,500+",
+  "stripeMode": "payment",
+  "stripePriceId": "price_1TL50QGejm3JMan4FSEsFRFs",
+  "stripePaymentLink": "https://buy.stripe.com/6oU6oHfxj3eCbJC7jQbAs03",
   "idealFor": "Best for buyers who want implementation, not just software access",
   "description": "Launch Sprint is the practical bridge between product ambition and paid outcomes. It packages setup, strategy, implementation, and workflow creation into a fast-start offer.",
   "bullets": [
@@ -30,5 +33,13 @@
     "body": "This offer helps monetize expertise immediately while improving product adoption and case-study quality.",
     "primaryLabel": "Talk through implementation",
     "primaryHref": "/contact"
+  },
+  "media": {
+    "eyebrow": "Implementation offer",
+    "title": "Launch Sprint closes as a one-time Stripe purchase",
+    "body": "This offer now has a dedicated payment link for buyers who want a guided implementation path instead of a subscription-first decision.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/operator-preview.svg",
+    "imageUrl": "/media/operator-preview.svg"
   }
 }

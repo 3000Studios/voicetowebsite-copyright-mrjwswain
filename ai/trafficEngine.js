@@ -67,7 +67,15 @@ export async function runTrafficCycle({ seedTopics = [], count = 2, includeImage
     const mediaAssets = includeImages ? await generateImages({ query: topic.topic, count: 1 }) : []
     const internalLinks = makeInternalLinks(existingPosts, generatedPost.payload.slug)
     const enrichedPost = enrichPost(generatedPost.payload, topic, internalLinks, mediaAssets[0])
-    const savedPost = await saveBlogPost(enrichedPost)
+    const savedPost = await saveBlogPost({
+      ...enrichedPost,
+      status: 'draft',
+      workflow: {
+        generatedBy: generatedPost.provider,
+        model: generatedPost.model,
+        reviewState: 'pending'
+      }
+    })
     generated.push({
       topic,
       post: savedPost,
@@ -78,16 +86,17 @@ export async function runTrafficCycle({ seedTopics = [], count = 2, includeImage
   }
 
   const nextTraffic = await updateTrafficState((state) => {
-    const publishedEntries = generated.map((entry) => ({
+    const draftEntries = generated.map((entry) => ({
       slug: entry.post.slug,
       topic: entry.topic.topic,
       score: entry.topic.score,
       conversions: 0,
-      status: 'published',
-      publishedAt: new Date().toISOString()
+      status: 'draft',
+      createdAt: new Date().toISOString()
     }))
 
     state.queue = [
+      ...draftEntries,
       ...discovered
         .slice(count)
         .map((entry) => ({
@@ -99,10 +108,14 @@ export async function runTrafficCycle({ seedTopics = [], count = 2, includeImage
           funnel: entry.funnel,
           createdAt: entry.createdAt
         })),
-      ...(state.queue ?? []).filter((entry) => !generated.find((item) => item.topic.topic === entry.topic))
+      ...(state.queue ?? []).filter(
+        (entry) =>
+          !generated.find((item) => item.topic.topic === entry.topic) &&
+          !generated.find((item) => item.post.slug === entry.slug),
+      )
     ].slice(0, 20)
 
-    state.published = [...publishedEntries, ...(state.published ?? [])].slice(0, 30)
+    state.published = state.published ?? []
     return state
   })
 

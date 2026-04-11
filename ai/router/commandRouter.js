@@ -6,6 +6,7 @@ import {
   createPage,
   editWorkspaceFile,
   saveBlogPost,
+  updateBlogPostStatus,
   updatePageContent,
   updateTheme,
   upsertFeatureSection
@@ -17,6 +18,8 @@ const SUPPORTED_ACTIONS = new Set([
   'create_landing_page',
   'update_content',
   'create_blog_post',
+  'publish_blog_post',
+  'reject_blog_post',
   'generate_images',
   'generate_background',
   'deploy_site',
@@ -76,6 +79,14 @@ export function validateCommand(input) {
         action,
         topic: assertString(input.topic, 'topic'),
         length: typeof input.length === 'string' ? input.length : 'medium',
+        autoDeploy: parseAutoDeploy(input)
+      }
+    case 'publish_blog_post':
+    case 'reject_blog_post':
+      return {
+        action,
+        slug: assertString(input.slug, 'slug'),
+        notes: typeof input.notes === 'string' ? input.notes : '',
         autoDeploy: parseAutoDeploy(input)
       }
     case 'generate_images':
@@ -167,9 +178,38 @@ export async function routeCommand(input) {
     }
     case 'create_blog_post': {
       const generated = await generateBlogPost(command)
-      const post = await saveBlogPost(generated.payload)
+      const post = await saveBlogPost({
+        ...generated.payload,
+        status: 'draft',
+        workflow: {
+          generatedBy: generated.provider,
+          model: generated.model,
+          reviewState: 'pending'
+        }
+      })
       const deployment = await maybeDeploy(command, `AI blog: ${generated.payload.title ?? command.topic}`)
       return { success: true, action: command.action, model: generated.model, provider: generated.provider, post, deployment }
+    }
+    case 'publish_blog_post': {
+      const post = await updateBlogPostStatus(command.slug, 'published', {
+        reviewNotes: command.notes,
+        approvedAt: new Date().toISOString(),
+        workflow: {
+          reviewState: 'approved'
+        }
+      })
+      const deployment = await maybeDeploy(command, `Publish blog post: ${command.slug}`)
+      return { success: true, action: command.action, post, deployment }
+    }
+    case 'reject_blog_post': {
+      const post = await updateBlogPostStatus(command.slug, 'rejected', {
+        reviewNotes: command.notes,
+        rejectedAt: new Date().toISOString(),
+        workflow: {
+          reviewState: 'rejected'
+        }
+      })
+      return { success: true, action: command.action, post }
     }
     case 'generate_images': {
       const assets = await generateImages(command)

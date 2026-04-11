@@ -47,7 +47,9 @@ export default function OfferCheckoutCard({ offer }) {
         ) : null}
       </div>
       {!offer.providers.stripe && !offer.providers.paypal && !offer.contactOnly ? (
-        <p className="field-note">Live checkout appears here automatically when the corresponding Stripe or PayPal env vars are configured.</p>
+        <p className="field-note">
+          Live checkout appears here automatically when Stripe or PayPal credentials are configured. Stripe can now fall back to dynamic Checkout Sessions even without pre-created price IDs.
+        </p>
       ) : null}
       {error ? <p className="form-error">{error}</p> : null}
     </article>
