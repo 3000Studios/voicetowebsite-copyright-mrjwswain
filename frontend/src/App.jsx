@@ -6,6 +6,7 @@ import BlogPage from '../pages/BlogPage.jsx'
 import BlogPostPage from '../pages/BlogPostPage.jsx'
 import ProductsPage from '../pages/ProductsPage.jsx'
 import ProductPage from '../pages/ProductPage.jsx'
+import ContactPage from '../pages/ContactPage.jsx'
 import CheckoutSuccessPage from '../pages/CheckoutSuccessPage.jsx'
 import GenericPage from '../pages/GenericPage.jsx'
 import AdminLoginPage from '../pages/AdminLoginPage.jsx'
@@ -15,6 +16,7 @@ import PrismCursor from '../components/PrismCursor.jsx'
 import { SiteRuntimeProvider } from './SiteRuntimeContext.jsx'
 import { theme } from './siteData.js'
 import '../styles/app.css'
+import '../styles/admin.css'
 
 const ADMIN_SESSION_KEY = 'vtw_admin_authed'
 
@@ -63,6 +65,7 @@ return (
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/:slug" element={<ProductPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
         <Route path="/checkout/cancel" element={<NotFoundPage />} />
         <Route path="/:slug" element={<GenericPage />} />
