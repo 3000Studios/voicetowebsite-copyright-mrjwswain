@@ -1,0 +1,34 @@
+{
+  "products": [
+    {
+      "slug": "operator-os",
+      "name": "Operator OS",
+      "summary": "The recurring software offer for teams that want an AI-managed system for execution, automation, and release workflows.",
+      "idealFor": "Founders, small teams, and technical operators",
+      "outcome": "Create subscription revenue from a product that helps work actually get shipped.",
+      "priceAnchor": "$99 / month",
+      "ctaLabel": "View offer",
+      "ctaHref": "/products/operator-os"
+    },
+    {
+      "slug": "launch-sprint",
+      "name": "Launch Sprint",
+      "summary": "A done-with-you implementation package that sets up messaging, pages, workflows, and the first operating system for delivery.",
+      "idealFor": "Buyers who want speed over self-setup",
+      "outcome": "Generate service revenue while increasing product adoption and customer success.",
+      "priceAnchor": "$2,500+",
+      "ctaLabel": "View offer",
+      "ctaHref": "/products/launch-sprint"
+    },
+    {
+      "slug": "enterprise-deployment",
+      "name": "Enterprise Deployment",
+      "summary": "A high-trust self-hosted and customization path for organizations that need governance, control, and rollout support.",
+      "idealFor": "Internal platform teams and compliance-sensitive buyers",
+      "outcome": "Create larger contracts with lower churn and deeper integration.",
+      "priceAnchor": "Custom",
+      "ctaLabel": "View offer",
+      "ctaHref": "/products/enterprise-deployment"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "eyebrow": "Contact",
+  "headline": "Start with the revenue path that fits your situation",
+  "subheadline": "Use this page as the close of the funnel for buyers who want help selecting the right implementation and growth path.",
+  "sections": [
+    {
+      "title": "Best for self-serve buyers",
+      "description": "If you already know you want the product, move into Operator OS and begin with the pricing page."
+    },
+    {
+      "title": "Best for buyers who need implementation",
+      "description": "If you want help with positioning, pages, automations, or operational setup, Launch Sprint is the strongest first conversation."
+    },
+    {
+      "title": "Best for enterprise buyers",
+      "description": "If you need self-hosting, governance, or a customized rollout, the enterprise path should be the center of the discussion."
+    }
+  ],
+  "faq": [
+    {
+      "question": "What should happen on this page later?",
+      "answer": "This should eventually connect to a real contact form, calendar booking flow, or lead-routing system. For now it acts as a directional close page in the funnel."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Suggested sales flow",
+    "heading": "Use this page to route people into the right next step.",
+    "body": "Pair it with email capture, booking, or CRM workflows once the backend sales flow is ready.",
+    "primaryLabel": "Email hello@myappai.net",
+    "primaryHref": "mailto:hello@myappai.net",
+    "secondaryLabel": "Review products",
+    "secondaryHref": "/products"
+  }
+}

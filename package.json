@@ -1,0 +1,67 @@
+{
+  "name": "voicetowebsite",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:frontend\"",
+    "dev:frontend": "vite",
+    "dev:server": "node --watch server/index.js",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "deploy": "node scripts/deploy-site.js",
+    "pages:deploy": "wrangler pages deploy dist",
+    "pages:dev": "wrangler pages dev",
+    "command": "node scripts/run-command.js",
+    "scheduler": "node ai/scheduler/aiScheduler.js",
+    "traffic": "node scripts/run-traffic-cycle.js",
+    "test": "node scripts/verify-platform.js"
+  },
+  "keywords": [
+    "voicetowebsite",
+    "voicetowebsite.com"
+  ],
+  "homepage": "https://voicetowebsite.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/3000Studios/voicetowebsite-copyright-mrjwswain.git"
+  },
+  "bugs": {
+    "url": "https://github.com/3000Studios/voicetowebsite-copyright-mrjwswain/issues"
+  },
+  "author": "Mr. jwswain",
+  "license": "UNLICENSED",
+  "description": "VoiceToWebsite — voicetowebsite.com (proprietary; see GitHub repo README)",
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20260313.1",
+    "axios": "^1.13.6",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "framer-motion": "^12.36.0",
+    "openai": "^6.29.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.9.5",
+    "socket.io": "^4.8.3",
+    "stripe": "^20.4.1",
+    "three": "^0.183.2",
+    "vite": "^8.0.0",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.0.3",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.75.0"
+  }
+}

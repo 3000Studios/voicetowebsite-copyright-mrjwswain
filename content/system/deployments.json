@@ -1,0 +1,29 @@
+{
+  "history": [
+    {
+      "id": "deploy-1773563553580",
+      "status": "pushed",
+      "message": "AI planner deployment",
+      "branch": "main",
+      "commitSha": "ecb94b6",
+      "startedAt": "2026-03-15T08:32:31.573Z",
+      "finishedAt": "2026-03-15T08:32:33.580Z",
+      "git": {
+        "status": "pushed",
+        "branch": "main",
+        "commitOutput": "[main ecb94b6] AI planner deployment\n 14 files changed, 515 insertions(+), 40 deletions(-)\n create mode 100644 ai/planner/aiPlanner.js\n create mode 100644 ai/scheduler/aiScheduler.js\n create mode 100644 content/blog/how-to-automate-marketing-with-ai.json\n create mode 100644 content/pages/growth-system-08-29.json\n create mode 100644 content/system/state.json\n create mode 100644 content/system/task-queue.json\n create mode 100644 frontend/assets/ai-marketing-automation-for-startups-1773563371495.svg\n create mode 100644 frontend/assets/how-to-automate-marketing-with-ai-1773563371503.svg\n",
+        "pushOutput": "remote: \nremote: GitHub found 6 vulnerabilities on 3000Studios/voicetowebsite-copyright-mrjwswain's default branch (3 high, 3 moderate). To find out more, visit:        \nremote:      https://github.com/3000Studios/voicetowebsite-copyright-mrjwswain/security/dependabot        \nremote: \nTo https://github.com/3000Studios/voicetowebsite-copyright-mrjwswain.git\n   408d2a3..ecb94b6  main -> main\n",
+        "pushFailed": false
+      }
+    },
+    {
+      "id": "bootstrap-20260314",
+      "status": "idle",
+      "message": "Platform bootstrap ready for first AI-managed deploy.",
+      "branch": "main",
+      "commitSha": null,
+      "startedAt": "2026-03-14T00:00:00.000Z",
+      "finishedAt": "2026-03-14T00:00:00.000Z"
+    }
+  ]
+}

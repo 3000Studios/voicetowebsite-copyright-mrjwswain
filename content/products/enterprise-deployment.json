@@ -1,0 +1,34 @@
+{
+  "slug": "enterprise-deployment",
+  "name": "Enterprise Deployment",
+  "headline": "Create a high-trust path for teams that need self-hosting, governance, and rollout support",
+  "priceAnchor": "Custom",
+  "idealFor": "Best for internal platform teams, agencies with strict clients, and compliance-minded buyers",
+  "description": "Enterprise Deployment gives Voicetowebsite a credible higher-ticket lane. It focuses on self-hosting, controlled rollout, support, and deeper integration for organizations that need more than a standard SaaS experience.",
+  "bullets": [
+    "Offer self-hosted deployment and infrastructure control",
+    "Support security, governance, and operational review",
+    "Create larger contract sizes and longer retention"
+  ],
+  "sections": [
+    {
+      "title": "Control and governance",
+      "description": "Enterprise buyers care about where the system runs, who can approve actions, and how changes are tracked."
+    },
+    {
+      "title": "Customization and onboarding",
+      "description": "More complex teams need help connecting the platform to their processes, repos, and ways of working."
+    },
+    {
+      "title": "Strategic value",
+      "description": "A credible enterprise path raises the value of the whole business, even for buyers who start on smaller plans."
+    }
+  ],
+  "cta": {
+    "eyebrow": "High-trust lane",
+    "heading": "Use enterprise deployment to win larger and more durable deals.",
+    "body": "Self-hosting, support, and customization create a serious offer for organizations that need more control.",
+    "primaryLabel": "Contact us",
+    "primaryHref": "/contact"
+  }
+}

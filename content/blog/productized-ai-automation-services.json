@@ -1,0 +1,32 @@
+{
+  "slug": "productized-ai-automation-services",
+  "title": "How productized AI automation services can fund a software business early",
+  "excerpt": "A hybrid model often beats pure SaaS in the early stage. Services fund growth, improve implementation, and generate better product insight.",
+  "publishedAt": "2026-03-20",
+  "tags": [
+    "services",
+    "revenue",
+    "automation"
+  ],
+  "sections": [
+    {
+      "heading": "Services create early cash flow",
+      "body": "When a product is still sharpening its repeatable value, implementation revenue can stabilize the business and buy time to improve the core software."
+    },
+    {
+      "heading": "Services improve the product faster",
+      "body": "Guided launches and setup projects reveal what customers struggle with, which workflows matter most, and which features should become standardized."
+    },
+    {
+      "heading": "A hybrid model builds trust",
+      "body": "A buyer who is not ready to self-serve may still be willing to pay for a sprint, a setup package, or a self-hosted rollout if the outcome is clear."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Turn strategy into offers",
+    "heading": "See how Voicetowebsite packages implementation revenue.",
+    "body": "The product pages now include a Launch Sprint offer designed to monetize setup and accelerate customer success.",
+    "primaryLabel": "View products",
+    "primaryHref": "/products"
+  }
+}

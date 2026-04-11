@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voicetowebsite.com — dashboard</title>
+<meta name="description" content="AI automation platform for building, deploying, and controlling software with natural language commands.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+--bg:#060912;
+--panel:rgba(11,18,34,.72);
+--panel-border:rgba(139,222,255,.16);
+--text:#f6fbff;
+--muted:#b8c7da;
+--accent:#1af7ff;
+--accent-strong:#3a7bff;
+--glow:0 0 30px rgba(26,247,255,.18);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+font-family:"Inter",sans-serif;
+background:var(--bg);
+color:var(--text);
+overflow-x:hidden;
+line-height:1.5;
+}
+
+body::before,
+body::after{
+content:"";
+position:fixed;
+inset:0;
+pointer-events:none;
+z-index:-2;
+}
+
+body::before{
+background:
+radial-gradient(circle at 20% 15%,rgba(58,123,255,.28),transparent 34%),
+radial-gradient(circle at 80% 0%,rgba(26,247,255,.24),transparent 28%),
+radial-gradient(circle at 50% 100%,rgba(126,107,255,.16),transparent 34%),
+linear-gradient(180deg,#07101e 0%,#03050b 100%);
+}
+
+body::after{
+z-index:-1;
+opacity:.2;
+background-image:
+linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
+background-size:44px 44px;
+mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent 85%);
+}
+
+a{color:inherit}
+
+nav{
+position:sticky;
+top:0;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:16px 20px;
+background:rgba(4,8,18,.7);
+backdrop-filter:blur(16px);
+border-bottom:1px solid rgba(255,255,255,.06);
+z-index:50;
+}
+
+.logo{
+font-family:"Orbitron",sans-serif;
+font-size:20px;
+letter-spacing:.18em;
+color:var(--accent);
+text-decoration:none;
+text-shadow:0 0 18px rgba(26,247,255,.5);
+}
+
+.menu{
+display:none;
+gap:18px;
+align-items:center;
+}
+
+.menu a{
+text-decoration:none;
+font-size:14px;
+color:var(--muted);
+transition:color .25s ease;
+}
+
+.menu a:hover,
+.menu a:focus-visible{color:var(--text)}
+
+main{
+width:min(1120px,100% - 32px);
+margin:0 auto;
+}
+
+.hero{
+padding:72px 0 48px;
+text-align:center;
+}
+
+.eyebrow{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:8px 12px;
+border:1px solid rgba(255,255,255,.08);
+border-radius:999px;
+background:rgba(255,255,255,.04);
+color:var(--muted);
+font-size:13px;
+letter-spacing:.05em;
+}
+
+.hero h1{
+margin-top:22px;
+font-family:"Orbitron",sans-serif;
+font-size:clamp(2.3rem,8vw,4.5rem);
+line-height:1.02;
+background:linear-gradient(90deg,#ffffff 0%,#5cebff 50%,#7c7cff 100%);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.hero p{
+max-width:660px;
+margin:18px auto 0;
+font-size:16px;
+color:var(--muted);
+}
+
+.cta{
+margin-top:28px;
+display:flex;
+justify-content:center;
+gap:14px;
+flex-wrap:wrap;
+}
+
+.btn{
+display:inline-flex;
+justify-content:center;
+align-items:center;
+min-width:152px;
+padding:14px 22px;
+border:none;
+border-radius:14px;
+font-weight:600;
+font-size:15px;
+text-decoration:none;
+cursor:pointer;
+transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease,background .25s ease;
+}
+
+.btn:hover,
+.btn:focus-visible{
+transform:translateY(-2px);
+}
+
+.primary{
+color:#02121a;
+background:linear-gradient(135deg,var(--accent),#7ef8ff);
+box-shadow:var(--glow);
+}
+
+.secondary{
+color:var(--text);
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.08);
+}
+
+.hero-grid{
+margin-top:34px;
+display:grid;
+gap:14px;
+grid-template-columns:1fr;
+}
+
+.hero-stat{
+padding:18px;
+border-radius:18px;
+background:var(--panel);
+border:1px solid var(--panel-border);
+box-shadow:var(--glow);
+text-align:left;
+}
+
+.hero-stat strong{
+display:block;
+font-family:"Orbitron",sans-serif;
+font-size:22px;
+margin-bottom:6px;
+}
+
+.section-title{
+font-family:"Orbitron",sans-serif;
+font-size:28px;
+margin-bottom:10px;
+}
+
+.section-copy{
+max-width:640px;
+color:var(--muted);
+}
+
+.ad-slot{
+margin:26px auto 0;
+max-width:728px;
+min-height:90px;
+padding:14px;
+border-radius:18px;
+background:var(--panel);
+border:1px solid rgba(255,255,255,.06);
+}
+
+.content-section{
+padding:44px 0;
+}
+
+.features{
+display:grid;
+grid-template-columns:1fr;
+gap:18px;
+margin-top:28px;
+}
+
+.card{
+padding:22px;
+border-radius:18px;
+background:var(--panel);
+border:1px solid rgba(255,255,255,.08);
+box-shadow:0 18px 40px rgba(0,0,0,.22);
+transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease;
+}
+
+.card:hover,
+.card:focus-within{
+transform:translateY(-6px);
+border-color:var(--accent);
+box-shadow:0 22px 54px rgba(0,0,0,.36);
+}
+
+.card h3{
+font-family:"Orbitron",sans-serif;
+font-size:17px;
+margin-bottom:10px;
+}
+
+.card p{
+color:var(--muted);
+font-size:14px;
+}
+
+.pricing{
+display:grid;
+grid-template-columns:1fr;
+gap:18px;
+margin-top:28px;
+}
+
+.plan{
+padding:26px;
+border-radius:20px;
+background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+border:1px solid rgba(255,255,255,.08);
+box-shadow:0 18px 40px rgba(0,0,0,.22);
+}
+
+.plan h3{
+font-family:"Orbitron",sans-serif;
+font-size:19px;
+}
+
+.price{
+margin:12px 0 6px;
+font-size:30px;
+font-weight:700;
+color:var(--accent);
+}
+
+.plan p{
+color:var(--muted);
+}
+
+.checkout{
+display:grid;
+gap:10px;
+margin-top:18px;
+}
+
+.checkout-note{
+margin-top:18px;
+font-size:13px;
+color:var(--muted);
+}
+
+.reveal{
+opacity:0;
+transform:translateY(28px);
+transition:opacity .8s ease,transform .8s ease;
+}
+
+.reveal.visible{
+opacity:1;
+transform:none;
+}
+
+footer{
+padding:36px 0 54px;
+text-align:center;
+color:var(--muted);
+font-size:13px;
+}
+
+@media (min-width:700px){
+.menu{display:flex}
+.hero{padding-top:92px}
+.hero-grid{grid-template-columns:repeat(3,1fr)}
+.features{grid-template-columns:repeat(2,1fr)}
+.pricing{grid-template-columns:repeat(2,1fr)}
+}
+
+@media (min-width:1024px){
+nav{padding-inline:32px}
+.features{grid-template-columns:repeat(4,1fr)}
+.pricing{grid-template-columns:repeat(3,1fr)}
+}
+
+@media (prefers-reduced-motion:reduce){
+html{scroll-behavior:auto}
+*{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<nav>
+<a class="logo" href="#top">MYAPPAI</a>
+<div class="menu" aria-label="Primary">
+<a href="#features">Features</a>
+<a href="#pricing">Pricing</a>
+<a href="toolkit.html">Toolkit</a>
+<a href="../admin/jarvis.html">Control Center</a>
+</div>
+</nav>
+
+<main id="top">
+<section class="hero">
+<div class="eyebrow">AI-powered software operations for modern teams</div>
+<h1>Build, deploy, and control software systems with AI.</h1>
+<p>Voicetowebsite turns natural-language intent into automation workflows, deployment steps, and operator-grade visibility without burying the experience under clutter.</p>
+<div class="cta">
+<a class="btn primary" href="toolkit.html">Explore the Toolkit</a>
+<a class="btn secondary" href="../admin/jarvis.html">Admin Control Center</a>
+</div>
+<div class="hero-grid reveal">
+<div class="hero-stat">
+<strong>24/7</strong>
+<span>Autonomous workflows, agents, and command routing.</span>
+</div>
+<div class="hero-stat">
+<strong>Fast</strong>
+<span>Optimized for low-latency actions across your build and deploy loop.</span>
+</div>
+<div class="hero-stat">
+<strong>Cloud-ready</strong>
+<span>Structured for GitHub, Cloudflare Pages, and AI-assisted operations.</span>
+</div>
+</div>
+<div class="ad-slot reveal" aria-label="Advertisement">
+<ins class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-xxxxxxxx"
+data-ad-slot="xxxxxxxx"
+data-ad-format="auto"></ins>
+</div>
+</section>
+
+<section class="content-section" id="features">
+<h2 class="section-title">Automation that feels like an operating layer</h2>
+<p class="section-copy">A mobile-first control surface for command interpretation, script generation, system monitoring, and autonomous delivery workflows.</p>
+<div class="features">
+<article class="card reveal">
+<h3>AI Command Engine</h3>
+<p>Convert plain-language instructions into structured development and automation tasks.</p>
+</article>
+<article class="card reveal">
+<h3>Script Automation</h3>
+<p>Generate deployment, maintenance, and build scripts quickly without losing control.</p>
+</article>
+<article class="card reveal">
+<h3>DevOps Control</h3>
+<p>Monitor environments, deployments, and system health from one focused interface.</p>
+</article>
+<article class="card reveal">
+<h3>AI Agents</h3>
+<p>Run autonomous workers that can triage issues, improve code quality, and keep builds green.</p>
+</article>
+<article class="card reveal">
+<h3>Voice-Ready Ops</h3>
+<p>Extend the platform with voice commands and a secure broker for repository-safe actions.</p>
+</article>
+<article class="card reveal">
+<h3>Cloudflare Delivery</h3>
+<p>Ship static updates to Pages with a reproducible build and deployment-friendly structure.</p>
+</article>
+<article class="card reveal">
+<h3>Revenue Paths</h3>
+<p>Support SaaS subscriptions, ad placements, and service-led offers in one coherent layout.</p>
+</article>
+<article class="card reveal">
+<h3>Operator Clarity</h3>
+<p>High-contrast panels, consistent hierarchy, and clean navigation built for real work.</p>
+</article>
+</div>
+</section>
+
+<section class="content-section" id="pricing">
+<h2 class="section-title">Platform Pricing</h2>
+<p class="section-copy">Structured for early-stage SaaS monetization with clear upgrade paths and room for payment integrations.</p>
+<div class="pricing">
+<article class="plan reveal">
+<h3>Starter</h3>
+<div class="price">$9/mo</div>
+<p>Basic AI automation for solo operators and experimentation.</p>
+<div class="checkout">
+<a class="btn primary" href="https://buy.stripe.com/test_123">Pay with Stripe</a>
+<div id="paypal-button-starter"></div>
+</div>
+</article>
+<article class="plan reveal">
+<h3>Pro</h3>
+<div class="price">$29/mo</div>
+<p>Advanced automation workflows for active product and developer teams.</p>
+<div class="checkout">
+<a class="btn primary" href="https://buy.stripe.com/test_456">Pay with Stripe</a>
+<div id="paypal-button-pro"></div>
+</div>
+</article>
+<article class="plan reveal">
+<h3>Enterprise</h3>
+<div class="price">$99/mo</div>
+<p>Unlimited workflow orchestration, premium support, and higher-volume operations.</p>
+<div class="checkout">
+<a class="btn secondary" href="mailto:sales@myappai.net">Talk to Sales</a>
+</div>
+<p class="checkout-note">Replace placeholder Stripe, PayPal, and AdSense identifiers with your production values before launch.</p>
+</article>
+</div>
+</section>
+
+<section class="content-section" id="product">
+<h2 class="section-title">Customer Product: AI Automation Toolkit</h2>
+<p class="section-copy">A customer-facing digital product built for founders, agencies, and technical operators who want proven automation assets without building the whole stack from scratch.</p>
+<div class="pricing">
+<article class="plan reveal">
+<h3>Toolkit Bundle</h3>
+<div class="price">$49 one-time</div>
+<p>Deployment templates, automation starter scripts, content workflow examples, and operator checklists for shipping AI-assisted systems faster.</p>
+<div class="checkout">
+<a class="btn primary" href="toolkit.html">View Product Details</a>
+</div>
+</article>
+<article class="plan reveal">
+<h3>What Customers Get</h3>
+<div class="price">Ready to use</div>
+<p>Landing page assets, workflow blueprints, launch checklists, and monetization-friendly SaaS structure that can be adapted to real projects.</p>
+<div class="checkout">
+<a class="btn secondary" href="toolkit.html#deliverables">See Deliverables</a>
+</div>
+</article>
+</div>
+</section>
+</main>
+
+<footer>Voicetowebsite.com &copy; 2026 mr.jwswain</footer>
+
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+<script>
+const revealNodes=document.querySelectorAll(".reveal")
+
+const revealObserver=new IntersectionObserver((entries,observer)=>{
+entries.forEach((entry)=>{
+if(!entry.isIntersecting)return
+entry.target.classList.add("visible")
+observer.unobserve(entry.target)
+})
+},{threshold:.2})
+
+revealNodes.forEach((node)=>revealObserver.observe(node))
+
+const adQueue=window.adsbygoogle||[]
+adQueue.push({})
+
+if(window.paypal&&window.paypal.Buttons){
+window.paypal.Buttons({
+createOrder(_data,actions){
+return actions.order.create({purchase_units:[{amount:{value:"9.00"}}]})
+},
+onApprove(_data,actions){
+return actions.order.capture().then(()=>window.alert("Payment completed"))
+}
+}).render("#paypal-button-starter")
+
+window.paypal.Buttons({
+createOrder(_data,actions){
+return actions.order.create({purchase_units:[{amount:{value:"29.00"}}]})
+},
+onApprove(_data,actions){
+return actions.order.capture().then(()=>window.alert("Payment completed"))
+}
+}).render("#paypal-button-pro")
+}
+</script>
+</body>
+</html>

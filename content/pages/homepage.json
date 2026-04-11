@@ -1,0 +1,143 @@
+{
+  "eyebrow": "AI System Manager for builders",
+  "headline": "Run delivery, automation, and growth from one command center",
+  "subheadline": "Voicetowebsite helps founders and technical teams turn natural language into approved tasks, generated assets, scripts, and release-ready execution flows.",
+  "primaryCta": {
+    "label": "Explore solutions",
+    "to": "/solutions"
+  },
+  "secondaryCta": {
+    "label": "See pricing",
+    "to": "/pricing"
+  },
+  "operatorSignals": [
+    "prompt -> plan",
+    "task routing",
+    "content + scripts",
+    "deploy-ready output"
+  ],
+  "heroStats": [
+    {
+      "label": "Revenue lanes",
+      "value": "SaaS + Services + Enterprise"
+    },
+    {
+      "label": "Best first buyers",
+      "value": "Founders, agencies, technical ops"
+    },
+    {
+      "label": "Core promise",
+      "value": "Prompts become usable work"
+    }
+  ],
+  "heroPanel": {
+    "heading": "One platform, three revenue engines.",
+    "body": "The strongest version of Voicetowebsite is not a generic AI site. It is a business that combines recurring software, implementation services, and higher-ticket self-hosted deployments for teams that need control.",
+    "points": [
+      {
+        "label": "Subscription",
+        "value": "Software access for operators, founders, and internal teams."
+      },
+      {
+        "label": "Implementation",
+        "value": "Launch sprints, workflow setup, and done-with-you delivery."
+      },
+      {
+        "label": "Enterprise",
+        "value": "Self-hosted deployments, governance, support, and customization."
+      }
+    ]
+  },
+  "workflowHeadline": "A successful customer flow should feel simple from the outside and powerful underneath.",
+  "workflowSteps": [
+    {
+      "title": "Describe the work",
+      "description": "A user explains a goal in plain English, whether that is building a page, launching a campaign, or automating an internal workflow."
+    },
+    {
+      "title": "Route the execution plan",
+      "description": "Voicetowebsite turns that request into a structured plan with the right content, scripts, agents, and approvals before anything is changed."
+    },
+    {
+      "title": "Ship and monitor",
+      "description": "The system executes work, records results, and keeps the team moving with a dashboard that can support marketing, delivery, and operations."
+    }
+  ],
+  "audienceIntro": "The public site now speaks directly to the most valuable buyers instead of trying to appeal to everyone.",
+  "audiences": [
+    {
+      "title": "Solo founders",
+      "description": "Ship more without hiring a full team too early.",
+      "bullets": [
+        "Generate landing pages and offer pages faster",
+        "Organize work across product, content, and launch tasks",
+        "Create a practical path from idea to revenue"
+      ]
+    },
+    {
+      "title": "Small agencies",
+      "description": "Productize delivery and make execution less dependent on manual coordination.",
+      "bullets": [
+        "Standardize client workflows",
+        "Turn prompts into repeatable operating procedures",
+        "Sell setup, automation, and retained management"
+      ]
+    },
+    {
+      "title": "Technical teams",
+      "description": "Manage approvals, deployable assets, and automation from one system.",
+      "bullets": [
+        "Keep repo-based control over generated work",
+        "Support self-hosted and governed environments",
+        "Reduce bottlenecks across operations and release workflows"
+      ]
+    }
+  ],
+  "proofHeadline": "The site should make the business model obvious.",
+  "proofCards": [
+    {
+      "eyebrow": "Recurring revenue",
+      "title": "Subscription software",
+      "description": "Use the platform itself as the recurring core offer for founders and teams that need AI-managed delivery.",
+      "outcome": "Monthly revenue with expansion into seats, usage, and support."
+    },
+    {
+      "eyebrow": "Cash flow",
+      "title": "Launch and automation sprints",
+      "description": "Sell implementation packages to help customers set up workflows, pages, automations, and internal operating systems.",
+      "outcome": "Higher-ticket service revenue while the product matures."
+    },
+    {
+      "eyebrow": "High-trust deals",
+      "title": "Enterprise deployment",
+      "description": "Offer self-hosted deployments, security review, onboarding, and customization for teams that cannot rely on pure SaaS.",
+      "outcome": "Larger contracts and lower churn."
+    }
+  ],
+  "productsIntro": "These are the clearest monetization paths for the current product and market position.",
+  "faqHeadline": "Questions that matter before a buyer commits",
+  "faq": [
+    {
+      "question": "Is this a website builder or an operations platform?",
+      "answer": "It is best positioned as an AI system manager that can also generate and manage website assets. That creates a stronger business and a more differentiated offer."
+    },
+    {
+      "question": "How does the site make money early?",
+      "answer": "Early revenue should come from launch sprints and implementation packages, with software subscriptions growing as the platform becomes more productized."
+    },
+    {
+      "question": "Who is the best first customer?",
+      "answer": "The best first customers are founders, agencies, and technical operators who already understand the value of automation and are willing to pay for speed."
+    }
+  ],
+  "finalCta": {
+    "eyebrow": "Start with the strongest path",
+    "heading": "Position Voicetowebsite as the AI system manager that turns intent into execution.",
+    "body": "That message is easier to trust, easier to sell, and much more likely to become a real business than a generic AI website builder pitch.",
+    "primaryLabel": "Review pricing",
+    "primaryHref": "/pricing",
+    "secondaryLabel": "Talk through implementation",
+    "secondaryHref": "/contact"
+  },
+  "updatedAt": "2026-03-20T00:00:00.000Z"
+}

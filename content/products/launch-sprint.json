@@ -1,0 +1,34 @@
+{
+  "slug": "launch-sprint",
+  "name": "Launch Sprint",
+  "headline": "Use a high-touch offer to create early cash flow and faster customer wins",
+  "priceAnchor": "$2,500+",
+  "idealFor": "Best for buyers who want implementation, not just software access",
+  "description": "Launch Sprint is the practical bridge between product ambition and paid outcomes. It packages setup, strategy, implementation, and workflow creation into a fast-start offer.",
+  "bullets": [
+    "Set up core pages, messaging, and the first workflow system",
+    "Reduce time to value for new customers",
+    "Create premium service revenue while the software matures"
+  ],
+  "sections": [
+    {
+      "title": "Done-with-you setup",
+      "description": "Guide the buyer through positioning, offer design, workflow mapping, and execution structure."
+    },
+    {
+      "title": "Faster activation",
+      "description": "A guided sprint lowers friction for customers who would otherwise stall out after signup."
+    },
+    {
+      "title": "Stronger customer outcomes",
+      "description": "Better implementation creates better retention, testimonials, and expansion opportunities."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Fastest route to value",
+    "heading": "Sell Launch Sprint when the buyer needs traction now.",
+    "body": "This offer helps monetize expertise immediately while improving product adoption and case-study quality.",
+    "primaryLabel": "Talk through implementation",
+    "primaryHref": "/contact"
+  }
+}

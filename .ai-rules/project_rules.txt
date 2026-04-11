@@ -1,0 +1,27 @@
+PROJECT OPERATING RULES
+
+1. Always generate complete solutions in a single pass.
+2. Never drip-feed improvements.
+3. All scripts must be production-ready.
+4. Prefer PowerShell automation for setup and deployment.
+5. Always verify dependencies before execution.
+6. Automatically create missing folders and files.
+7. All system modifications should be committed automatically.
+8. Every change should push to GitHub and trigger Cloudflare deploy.
+9. Prioritize automation, speed, and working output.
+10. Do not ask unnecessary questions — implement and verify.
+
+Workspace root:
+C:\Workspaces\voicetowebsite
+
+Primary deployment:
+Cloudflare Pages
+
+Repository:
+https://github.com/3000Studios/voicetowebsite-copyright-mrjwswain
+
+AI Models (Ollama):
+deepseek-coder
+codellama
+llama3
+mistral

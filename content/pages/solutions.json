@@ -1,0 +1,68 @@
+{
+  "eyebrow": "Solutions",
+  "headline": "Design the business around execution, not generic AI claims",
+  "subheadline": "The strongest version of Voicetowebsite is a platform that helps people plan, run, and ship meaningful work with a clear path to monetization.",
+  "heroStats": [
+    {
+      "label": "Positioning",
+      "value": "AI System Manager"
+    },
+    {
+      "label": "Core value",
+      "value": "Prompt -> approved work"
+    },
+    {
+      "label": "Revenue path",
+      "value": "Software + Services + Enterprise"
+    }
+  ],
+  "stepsEyebrow": "Buying journey",
+  "stepsHeadline": "A clean path from first impression to paid engagement",
+  "steps": [
+    {
+      "title": "Educate",
+      "description": "Use the homepage and blog to explain what Voicetowebsite does and why execution matters more than generic AI novelty."
+    },
+    {
+      "title": "Segment",
+      "description": "Use solutions and pricing pages to help founders, agencies, and technical teams understand which offer fits them."
+    },
+    {
+      "title": "Convert",
+      "description": "Move buyers into the right product lane: subscription, launch sprint, or enterprise deployment."
+    }
+  ],
+  "sections": [
+    {
+      "title": "For founders",
+      "description": "Build a lean operating system that helps plan launches, publish assets, and keep delivery moving without a large team."
+    },
+    {
+      "title": "For agencies",
+      "description": "Turn repeated client work into productized workflows, clearer offers, and higher-margin delivery."
+    },
+    {
+      "title": "For technical teams",
+      "description": "Keep more control over generated work with repo-backed execution and release-aware operations."
+    }
+  ],
+  "faq": [
+    {
+      "question": "Why not sell every possible AI use case?",
+      "answer": "Because a focused promise converts better. Execution, workflow, and system management create a more believable and valuable market position."
+    },
+    {
+      "question": "Which page matters most for conversion?",
+      "answer": "The homepage matters most first, but pricing and product pages usually determine whether serious buyers take the next step."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Move to offers",
+    "heading": "Use the product pages and pricing to convert the right buyers.",
+    "body": "Positioning opens the conversation, but clear offers are what make revenue happen.",
+    "primaryLabel": "See products",
+    "primaryHref": "/products",
+    "secondaryLabel": "Review pricing",
+    "secondaryHref": "/pricing"
+  }
+}

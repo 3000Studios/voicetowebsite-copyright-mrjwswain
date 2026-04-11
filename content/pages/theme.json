@@ -1,0 +1,23 @@
+{
+  "name": "Voicetowebsite",
+  "palette": {
+    "bg": "#08111f",
+    "canvas": "#08111f",
+    "surface": "rgba(255,255,255,0.78)",
+    "surface-strong": "rgba(10,24,43,0.78)",
+    "ink": "#e5eefb",
+    "chrome": "#f8fafc",
+    "muted": "rgba(226,232,240,0.75)",
+    "accent": "#ff7a18",
+    "highlight": "#3dd9b4",
+    "prism-1": "#ff7a18",
+    "prism-2": "#3dd9b4",
+    "prism-3": "#38bdf8",
+    "line": "rgba(148,163,184,0.22)"
+  },
+  "motion": {
+    "hero": "orbital-rise",
+    "sections": "signal-slide"
+  },
+  "updatedAt": "2026-03-20T00:00:00.000Z"
+}

@@ -1,0 +1,17 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
+name = "voicetowebsite"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-03-15"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NODE_ENV="production"
+APP_NAME="voicetowebsite"
+SITE_ORIGIN="https://voicetowebsite.com"
+API_MODE="repo-local"
+
+[[r2_buckets]]
+binding = "ASSETS_BUCKET"
+bucket_name = "voicetowebsite"
+preview_bucket_name = "voicetowebsite"
+

@@ -1,0 +1,32 @@
+{
+  "slug": "ai-automation-platform",
+  "title": "Building an AI execution platform with repo-backed control",
+  "excerpt": "A blueprint for pairing AI command routing with versioned content, workflow automation, and deploy-ready release operations.",
+  "publishedAt": "2026-03-19",
+  "tags": [
+    "automation",
+    "operations",
+    "platform"
+  ],
+  "sections": [
+    {
+      "heading": "Start with execution, not chat",
+      "body": "The real value of an AI platform shows up when requests become accountable work. Structured routing is what turns a prompt into something a business can trust."
+    },
+    {
+      "heading": "Keep business assets in versioned files",
+      "body": "Pages, pricing, offers, and supporting content should live in the repository when speed and control both matter. That keeps marketing and operations close to the delivery system."
+    },
+    {
+      "heading": "Use deployment flow as part of the product trust story",
+      "body": "Git-backed release operations give customers confidence that the work can be reviewed, tracked, rolled back, and shipped in a disciplined way."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Apply the model",
+    "heading": "See how Voicetowebsite packages this into a sellable offer.",
+    "body": "The strategy pages and pricing are now aligned around execution, services, and enterprise control.",
+    "primaryLabel": "Explore solutions",
+    "primaryHref": "/solutions"
+  }
+}
