@@ -1,5 +1,11 @@
 import Stripe from 'stripe'
 import { getContentBundle, readSystemDocument, writeSystemDocument } from './contentService.js'
+import {
+  createPreviewRequest,
+  fulfillPreviewSourceDelivery,
+  getSourceBundleByToken,
+  recordPreviewCheckoutIntent
+} from './previewStudioService.js'
 
 const DEFAULT_PAYMENTS = {
   payments: [],
@@ -161,6 +167,10 @@ export async function getCommerceSnapshot() {
       summary: product.description ?? product.summary ?? '',
       priceAnchor: product.priceAnchor ?? 'Custom',
       idealFor: product.idealFor ?? null,
+      badge: product.badge ?? null,
+      category: product.category ?? 'offer',
+      deliveryType: product.deliveryType ?? null,
+      deliveryCopy: product.deliveryCopy ?? null,
       contactOnly: product.slug === 'enterprise-deployment',
       providers: {
         stripe: Boolean(
@@ -186,11 +196,34 @@ export async function getCommerceSnapshot() {
   }
 }
 
-export async function createStripeCheckout({ slug, origin }) {
+export async function createPreviewCheckoutIntent({ requestId, offerSlug, email }) {
+  return recordPreviewCheckoutIntent({
+    requestId,
+    offerSlug,
+    email
+  })
+}
+
+export async function createWebsitePreview(payload) {
+  return createPreviewRequest(payload)
+}
+
+export async function downloadSourceBundle(token) {
+  return getSourceBundleByToken(token)
+}
+
+export async function createStripeCheckout({ slug, origin, customerEmail, previewRequestId }) {
   const product = await getProduct(slug)
   const stripeConfig = getStripeConfig(slug, product)
 
   if (stripeConfig.paymentLink) {
+    if (previewRequestId) {
+      await recordPreviewCheckoutIntent({
+        requestId: previewRequestId,
+        offerSlug: slug,
+        email: customerEmail
+      })
+    }
     return { url: stripeConfig.paymentLink, provider: 'stripe' }
   }
 
@@ -234,10 +267,12 @@ export async function createStripeCheckout({ slug, origin }) {
   const session = await stripe.checkout.sessions.create({
     mode: stripeConfig.mode,
     line_items: [lineItem],
-    success_url: `${origin}/checkout/success?provider=stripe&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${origin}/checkout/success?provider=stripe&session_id={CHECKOUT_SESSION_ID}${previewRequestId ? `&preview_request_id=${encodeURIComponent(previewRequestId)}` : ''}`,
     cancel_url: `${origin}/checkout/cancel?provider=stripe&offer=${slug}`,
+    customer_email: customerEmail || undefined,
     metadata: {
-      offerSlug: slug
+      offerSlug: slug,
+      ...(previewRequestId ? { previewRequestId } : {})
     }
   })
 
@@ -281,6 +316,14 @@ export async function verifyStripeCheckoutSession(sessionId) {
     }
   })
 
+  await fulfillPreviewSourceDelivery({
+    requestId: session.metadata?.previewRequestId ?? null,
+    customerEmail: session.customer_details?.email ?? null,
+    transactionId: session.payment_intent ?? session.id,
+    provider: 'stripe',
+    offerSlug: session.metadata?.offerSlug ?? null
+  })
+
   return {
     status: session.status,
     completed: true,
@@ -315,6 +358,13 @@ export async function handleStripeWebhook(rawBody, signature) {
         payment_status: session.payment_status,
         amount_total: session.amount_total
       }
+    })
+    await fulfillPreviewSourceDelivery({
+      requestId: session.metadata?.previewRequestId ?? null,
+      customerEmail: session.customer_details?.email ?? null,
+      transactionId: session.payment_intent ?? session.id,
+      provider: 'stripe',
+      offerSlug: session.metadata?.offerSlug ?? null
     })
   }
 

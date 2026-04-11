@@ -25,10 +25,14 @@ export default function OfferCheckoutCard({ offer }) {
 
   return (
     <article className={`content-card pricing-card${offer.providers.stripe ? ' pricing-card--featured' : ''}`}>
-      <span className="meta-line">{offer.priceAnchor}</span>
+      <div className="content-card__row">
+        <span className="meta-line">{offer.priceAnchor}</span>
+        {offer.badge ? <span className="tag">{offer.badge}</span> : null}
+      </div>
       <h3>{offer.name}</h3>
       <p>{offer.summary}</p>
       {offer.idealFor ? <p className="content-card__outcome">{offer.idealFor}</p> : null}
+      {offer.deliveryCopy ? <p className="field-note">{offer.deliveryCopy}</p> : null}
       <div className="checkout-actions">
         {offer.providers.stripe ? (
           <button className="button button--primary" type="button" onClick={() => beginCheckout('stripe')} disabled={busyProvider !== ''}>

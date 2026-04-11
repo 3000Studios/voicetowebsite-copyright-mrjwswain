@@ -21,6 +21,11 @@ const DEFAULT_LEADS = {
   updatedAt: null
 }
 
+const DEFAULT_PREVIEWS = {
+  requests: [],
+  updatedAt: null
+}
+
 function nowIso() {
   return new Date().toISOString()
 }
@@ -91,14 +96,15 @@ export async function recordLead(leadPayload) {
 }
 
 export async function getAnalyticsSnapshot() {
-  const [analytics, bundle, models, traffic, events, leads, payments] = await Promise.all([
+  const [analytics, bundle, models, traffic, events, leads, payments, previews] = await Promise.all([
     readSystemDocument('analytics.json', DEFAULT_ANALYTICS),
     getContentBundle(),
     listAvailableModels(),
     readSystemDocument('traffic.json', getSystemDefault('traffic.json')),
     readSystemDocument('events.json', DEFAULT_EVENTS),
     readSystemDocument('leads.json', DEFAULT_LEADS),
-    getPaymentsSnapshot()
+    getPaymentsSnapshot(),
+    readSystemDocument('preview-requests.json', DEFAULT_PREVIEWS)
   ])
 
   const pageViewEvents = (events.events ?? []).filter((entry) => entry.type === 'page_view')
@@ -109,6 +115,8 @@ export async function getAnalyticsSnapshot() {
   const purchases = completedPayments.length
   const leadCount = (leads.leads ?? []).length
   const newsletterCount = (leads.leads ?? []).filter((entry) => entry.source === 'newsletter').length
+  const previewCount = (previews.requests ?? []).length
+  const sourceReadyCount = (previews.requests ?? []).filter((entry) => entry.delivery?.status === 'source_ready').length
   const publishedBlog = bundle.blog.filter((entry) => entry.slug !== 'index' && entry.data?.status === 'published').length
   const draftBlog = bundle.blog.filter((entry) => entry.slug !== 'index' && entry.data?.status !== 'published').length
 
@@ -118,6 +126,8 @@ export async function getAnalyticsSnapshot() {
     pageViews: pageViewEvents.length,
     leads: leadCount,
     newsletterSubscribers: newsletterCount,
+    previews: previewCount,
+    sourceDeliveries: sourceReadyCount,
     purchases,
     conversionRate: visitors > 0 ? purchases / visitors : 0,
     revenue,

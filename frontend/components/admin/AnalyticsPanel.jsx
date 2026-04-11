@@ -39,6 +39,14 @@ export default function AnalyticsPanel({ analytics }) {
           <span>Revenue</span>
         </article>
         <article className="content-card">
+          <strong>{analytics?.previews ?? 0}</strong>
+          <span>Preview requests</span>
+        </article>
+        <article className="content-card">
+          <strong>{analytics?.sourceDeliveries ?? 0}</strong>
+          <span>Source deliveries</span>
+        </article>
+        <article className="content-card">
           <strong>{analytics?.aiActivity?.commandsToday ?? 0}</strong>
           <span>AI commands today</span>
         </article>

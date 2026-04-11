@@ -7,9 +7,21 @@ import NewsletterSignupForm from '../components/NewsletterSignupForm.jsx'
 import OfferCheckoutCard from '../components/OfferCheckoutCard.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import RichBlocks from '../components/RichBlocks.jsx'
+import WebsitePreviewStudio from '../components/WebsitePreviewStudio.jsx'
 import { fadeUp, staggerParent } from '../animations/variants.js'
 import { useSiteRuntime } from '../src/SiteRuntimeContext.jsx'
 import { featurePage, homepage, pricingPage, productCatalog } from '../src/siteData.js'
+
+function getStoreArtwork(slug) {
+  const assetMap = {
+    'voice-to-website-builder': '/media/store-voice-builder.svg',
+    'local-leads-launchpad': '/media/store-local-leads.svg',
+    'bookings-engine': '/media/store-bookings.svg',
+    'creator-course-kit': '/media/store-creator-course.svg'
+  }
+
+  return assetMap[slug] ?? '/media/operator-preview.svg'
+}
 
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-US', {
@@ -21,6 +33,8 @@ function formatCurrency(amount) {
 
 export default function HomePage() {
   const { snapshot } = useSiteRuntime()
+  const appStoreItems = productCatalog.filter((product) => product.category === 'app')
+  const featuredStoreItems = appStoreItems.slice(0, 4)
   const liveMetrics = [
     { label: 'Visitors tracked', value: String(snapshot?.analytics?.visitors ?? 0) },
     { label: 'Leads captured', value: String(snapshot?.analytics?.leads ?? 0) },
@@ -35,6 +49,10 @@ export default function HomePage() {
           <span className="eyebrow">{homepage.eyebrow}</span>
           <PrismHeadline text={homepage.headline} />
           <p>{homepage.subheadline}</p>
+          <div className="hero__price-callout">
+            <strong>VoiceToWebsite Builder</strong>
+            <span>Source-ready offer from $49</span>
+          </div>
           <div className="tag-row">
             {homepage.operatorSignals.map((signal) => (
               <span key={signal} className="tag">
@@ -71,6 +89,53 @@ export default function HomePage() {
       </motion.section>
 
       <MetricStrip items={liveMetrics} />
+
+      <WebsitePreviewStudio />
+
+      <section className="section-card">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">App store</span>
+            <h2>High-demand website products to sell right now</h2>
+            <p className="section-intro">
+              The product catalog now includes ready-to-sell website packs for lead generation, bookings, creator launches, and the builder itself.
+            </p>
+          </div>
+          <Link className="button button--ghost" to="/products">
+            Browse every app
+          </Link>
+        </div>
+        <div className="store-grid">
+          {featuredStoreItems.map((product) => (
+            <article key={product.slug} className="store-card">
+              <div className="store-card__media">
+                <img src={getStoreArtwork(product.slug)} alt={product.name} />
+              </div>
+              <div className="store-card__body">
+                <div className="store-card__head">
+                  <div>
+                    <span className="meta-line">{product.badge ?? 'App'}</span>
+                    <h3>{product.name}</h3>
+                  </div>
+                  <span className="store-card__price">{product.priceAnchor}</span>
+                </div>
+                <p>{product.summary}</p>
+                <p className="content-card__outcome">{product.outcome}</p>
+                <div className="hero__actions">
+                  <Link className="button button--primary" to={product.ctaHref ?? `/products/${product.slug}`}>
+                    {product.ctaLabel ?? 'View app'}
+                  </Link>
+                  <Link className="button button--ghost" to={`/products/${product.slug}`}>
+                    Details
+                  </Link>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <MediaShowcase media={homepage.media} />
 
       <section className="section-card">
         <span className="eyebrow">How it works</span>

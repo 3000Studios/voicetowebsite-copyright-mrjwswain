@@ -25,7 +25,18 @@ export const AdminLoginSchema = z.object({
 })
 
 export const CheckoutSchema = z.object({
-  offerSlug: z.string().min(1).max(100)
+  offerSlug: z.string().min(1).max(100),
+  customerEmail: z.string().email().optional(),
+  previewRequestId: z.string().min(1).max(200).optional()
+})
+
+export const PreviewStudioSchema = z.object({
+  email: z.string().email(),
+  brief: z.string().min(20).max(3000),
+  audience: z.string().min(2).max(200).optional(),
+  websiteType: z.enum(['saas', 'local_service', 'creator', 'ecommerce']).optional(),
+  styleTone: z.string().min(2).max(100).optional(),
+  primaryCta: z.string().min(2).max(120).optional()
 })
 
 export const CommandSchema = z.object({

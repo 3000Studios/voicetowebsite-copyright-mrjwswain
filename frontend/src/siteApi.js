@@ -36,10 +36,20 @@ export function submitLead(lead) {
   })
 }
 
-export function startStripeCheckout(offerSlug) {
+export function createWebsitePreview(previewPayload) {
+  return request('/api/public/previews', {
+    method: 'POST',
+    body: previewPayload
+  })
+}
+
+export function startStripeCheckout(offerSlug, checkoutContext = {}) {
   return request('/api/public/checkout/stripe', {
     method: 'POST',
-    body: { offerSlug }
+    body: {
+      offerSlug,
+      ...checkoutContext
+    }
   })
 }
 

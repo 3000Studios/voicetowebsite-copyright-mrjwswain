@@ -1,7 +1,10 @@
 import {
   capturePayPalOrder,
+  createPreviewCheckoutIntent,
   createPayPalCheckout,
   createStripeCheckout,
+  createWebsitePreview,
+  downloadSourceBundle,
   getCommerceSnapshot,
   handleStripeWebhook,
   verifyStripeCheckoutSession
@@ -53,11 +56,37 @@ export async function postLeadCapture(request, response, next) {
   }
 }
 
+export async function postWebsitePreview(request, response, next) {
+  try {
+    const lead = await recordLead({
+      email: request.body?.email,
+      interest: request.body?.websiteType ?? 'preview_studio',
+      notes: request.body?.brief,
+      source: 'preview_studio'
+    })
+    const preview = await createWebsitePreview(request.body ?? {})
+    response.status(201).json({
+      ok: true,
+      leadId: lead.id,
+      preview
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export async function postStripeCheckout(request, response, next) {
   try {
+    await createPreviewCheckoutIntent({
+      requestId: request.body?.previewRequestId,
+      offerSlug: request.body?.offerSlug,
+      email: request.body?.customerEmail
+    })
     const checkout = await createStripeCheckout({
       slug: request.body?.offerSlug,
-      origin: getOrigin(request)
+      origin: getOrigin(request),
+      customerEmail: request.body?.customerEmail,
+      previewRequestId: request.body?.previewRequestId
     })
     response.json(checkout)
   } catch (error) {
@@ -102,6 +131,17 @@ export async function postStripeWebhook(request, response, next) {
     const signature = request.headers['stripe-signature']
     const result = await handleStripeWebhook(request.body, signature)
     response.json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function getSourceBundleDownload(request, response, next) {
+  try {
+    const source = await downloadSourceBundle(request.params.token)
+    response.setHeader('Content-Type', 'application/json')
+    response.setHeader('Content-Disposition', `attachment; filename="${source.fileName}"`)
+    response.send(JSON.stringify(source.payload, null, 2))
   } catch (error) {
     next(error)
   }

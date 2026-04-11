@@ -1,12 +1,61 @@
 {
   "products": [
     {
+      "slug": "voice-to-website-builder",
+      "name": "VoiceToWebsite Builder",
+      "summary": "Generate a website preview from a prompt, inspect it, and buy the source pack.",
+      "idealFor": "Founders, agencies, and fast-turn launch work",
+      "outcome": "A low-friction productized offer that converts interest into a paid source bundle.",
+      "priceAnchor": "$49",
+      "category": "app",
+      "badge": "Featured",
+      "ctaLabel": "Generate preview",
+      "ctaHref": "/"
+    },
+    {
+      "slug": "local-leads-launchpad",
+      "name": "Local Leads Launchpad",
+      "summary": "A source-ready lead generation site system for service businesses.",
+      "idealFor": "Home services, clinics, legal, and local operators",
+      "outcome": "Sell a higher-demand website package tied to direct call and quote capture.",
+      "priceAnchor": "$129",
+      "category": "app",
+      "badge": "High demand",
+      "ctaLabel": "View app",
+      "ctaHref": "/products/local-leads-launchpad"
+    },
+    {
+      "slug": "bookings-engine",
+      "name": "Bookings Engine",
+      "summary": "A booking-focused website pack for appointment and session businesses.",
+      "idealFor": "Consultants, studios, clinics, and paid-session businesses",
+      "outcome": "Turn a premium appointment funnel into a repeatable app-store offer.",
+      "priceAnchor": "$149",
+      "category": "app",
+      "badge": "Popular",
+      "ctaLabel": "View app",
+      "ctaHref": "/products/bookings-engine"
+    },
+    {
+      "slug": "creator-course-kit",
+      "name": "Creator Course Kit",
+      "summary": "A digital-product sales page system for creators and educators.",
+      "idealFor": "Creators, coaches, course sellers, and membership offers",
+      "outcome": "Ship a better digital-product storefront without starting from a blank page.",
+      "priceAnchor": "$99",
+      "category": "app",
+      "badge": "Creator",
+      "ctaLabel": "View app",
+      "ctaHref": "/products/creator-course-kit"
+    },
+    {
       "slug": "operator-os",
       "name": "Operator OS",
       "summary": "The recurring software offer for teams that want an AI-managed system for execution, automation, and release workflows.",
       "idealFor": "Founders, small teams, and technical operators",
       "outcome": "Create subscription revenue from a product that helps work actually get shipped.",
       "priceAnchor": "$99 / month",
+      "category": "platform",
       "stripeMode": "subscription",
       "stripePriceId": "price_1TL50RGejm3JMan43e8cZkJY",
       "stripePaymentLink": "https://buy.stripe.com/dRm4gzbh3bL89BugUqbAs02",
@@ -20,6 +69,7 @@
       "idealFor": "Buyers who want speed over self-setup",
       "outcome": "Generate service revenue while increasing product adoption and customer success.",
       "priceAnchor": "$2,500+",
+      "category": "service",
       "stripeMode": "payment",
       "stripePriceId": "price_1TL50QGejm3JMan4FSEsFRFs",
       "stripePaymentLink": "https://buy.stripe.com/6oU6oHfxj3eCbJC7jQbAs03",
@@ -33,6 +83,7 @@
       "idealFor": "Internal platform teams and compliance-sensitive buyers",
       "outcome": "Create larger contracts with lower churn and deeper integration.",
       "priceAnchor": "Custom",
+      "category": "enterprise",
       "ctaLabel": "View offer",
       "ctaHref": "/products/enterprise-deployment"
     }

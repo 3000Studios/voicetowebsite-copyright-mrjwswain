@@ -1,0 +1,42 @@
+{
+  "slug": "local-leads-launchpad",
+  "name": "Local Leads Launchpad",
+  "headline": "A lead-generation website system for local service businesses",
+  "priceAnchor": "$129",
+  "stripeMode": "payment",
+  "stripePriceId": "price_1TL8WzGejm3JMan4HSCNK6nr",
+  "stripePaymentLink": "https://buy.stripe.com/4gM14n4SF5mKcNGdIebAs05",
+  "idealFor": "Roofers, med spas, home services, legal, and local operators",
+  "description": "A revenue-focused site package with quote capture, proof sections, and mobile-first calls to action designed for high-intent local traffic.",
+  "category": "app",
+  "badge": "High demand",
+  "deliveryType": "source_bundle",
+  "deliveryCopy": "Source pack includes landing page structure, lead form content, and call-first CTA sections.",
+  "bullets": [
+    "Built for search, calls, and quote requests",
+    "Trust blocks, reviews, and service-area layout included",
+    "Designed to turn paid and organic traffic into leads"
+  ],
+  "sections": [
+    {
+      "title": "Lead capture first",
+      "description": "This pack prioritizes contact forms, calls, and service-area trust instead of generic brochure content."
+    },
+    {
+      "title": "Local SEO structure",
+      "description": "The page layout supports service pages, proof, and FAQ blocks that can expand into location-driven content."
+    },
+    {
+      "title": "Mobile conversion",
+      "description": "Tap targets, contact rows, and form hierarchy are built around users who are ready to act from their phone."
+    }
+  ],
+  "media": {
+    "eyebrow": "Lead-gen demo",
+    "title": "A local business site package with stronger conversion structure",
+    "body": "Use it to sell a fast website build for service businesses that need leads more than brand theatre.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/store-local-leads.svg",
+    "imageUrl": "/media/store-local-leads.svg"
+  }
+}
