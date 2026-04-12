@@ -43,12 +43,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  * {
-    cursor: none !important;
-  }
-}
-
 a {
   color: inherit;
   text-decoration: none;
