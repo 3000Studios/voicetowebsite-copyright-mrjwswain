@@ -122,3 +122,22 @@ Codex should:
 - maintain working builds
 
 The goal is a continuously improving autonomous development workflow without leaving partial implementations behind.
+
+## Cursor Cloud specific instructions
+
+### Services overview
+
+| Service | Command | Port | Notes |
+|---|---|---|---|
+| Vite frontend (React SPA) | `npm run dev:frontend` | 5173 | HMR enabled; proxies `/api` to the Express server |
+| Express API server | `npm run dev:server` | 3000 (or `PORT` env var) | Uses `node --watch` for auto-reload |
+| Both (recommended) | `npm run dev` | 5173 + 3000 | Runs via `concurrently` |
+
+### Gotchas
+
+- The `.env.example` sets `PORT=3000`, but `vite.config.js` defaults the proxy target to port **8787** when `PORT` is unset. Always ensure `.env` is present so the proxy and server agree on the same port.
+- `npm run test` runs `scripts/verify-platform.js` which validates content bootstrapping, AI model routing, and traffic discovery. It does **not** require a running server; it imports modules directly.
+- ESLint uses flat config (`eslint.config.js`) and only lints `.js`/`.ts` files (not `.jsx`). This is intentional per the repo's current config.
+- The `.node-version` file specifies Node.js **22**. Ensure `node --version` matches before running commands.
+- External API keys (OpenAI, Stripe, etc.) are optional for basic dev; the app boots and serves content without them. AI and payment features will be non-functional without valid keys.
+- `npm run build` produces `dist/` for Cloudflare Pages. A chunk-size warning is expected and not a build failure.
