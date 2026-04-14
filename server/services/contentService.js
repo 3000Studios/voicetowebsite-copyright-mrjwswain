@@ -230,11 +230,7 @@ const DEFAULT_FILES = {
   }
 }
 
-const LEGACY_MIRROR_MAP = {
-  homepage: path.join(contentRoot, 'homepage.json'),
-  features: path.join(contentRoot, 'features.json'),
-  pricing: path.join(contentRoot, 'pricing.json')
-}
+const LEGACY_MIRROR_MAP = {}
 
 function normalize(value) {
   return value.replace(/\\/g, '/')

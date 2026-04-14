@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Starting myappai development environment"
+echo "Starting voicetowebsite development environment"
 
-cd /workspace/myappai
+cd /workspace
 
 npm install
 

@@ -3,7 +3,7 @@ set -e
 
 echo "Initializing voicetowebsite environment..."
 
-cd /workspace/voicetowebsite
+cd /workspace
 
 echo "Updating container..."
 apt-get update -y

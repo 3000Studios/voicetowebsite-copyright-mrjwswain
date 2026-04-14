@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Deploying myappai..."
+echo "Deploying voicetowebsite..."
 
-cd /workspace/myappai
+cd /workspace
 
 npm run build
 
