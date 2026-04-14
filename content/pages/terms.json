@@ -1,32 +1,60 @@
 {
-  "eyebrow": "Terms",
+  "eyebrow": "Terms of Service",
   "headline": "Terms of service",
-  "subheadline": "These terms are written to support a real commercial website, not a placeholder page. They set expectations for access, acceptable use, payments, and operational limits.",
+  "subheadline": "Last updated April 2026. By accessing or using VoiceToWebsite, you agree to be bound by these terms. Please read them carefully before using our services.",
   "sections": [
     {
-      "title": "Service access",
-      "description": "Access to products, services, and admin-controlled deliverables may be suspended or limited if misuse, security risk, non-payment, or abusive activity is detected."
+      "title": "Acceptance of terms",
+      "description": "By accessing and using VoiceToWebsite (voicetowebsite.com), you accept and agree to be bound by these terms and conditions. If you do not agree to these terms, you must not use our website or services. These terms apply to all visitors, users, and others who access or use our platform."
     },
     {
-      "title": "Payments and subscriptions",
-      "description": "Paid services, subscriptions, and implementation offers are billed through approved payment providers. Fees are generally non-refundable except where required by law or expressly stated otherwise in writing."
+      "title": "Description of services",
+      "description": "VoiceToWebsite provides an AI-powered platform for generating websites from voice and text briefs, content automation, SEO tools, and related digital products. Our services include but are not limited to website preview generation, source bundle delivery, subscription-based tools, and implementation services. We reserve the right to modify, suspend, or discontinue any part of our services at any time."
     },
     {
-      "title": "Customer responsibilities",
-      "description": "Customers remain responsible for the legality of their content, the accuracy of submitted information, and the decisions they make using generated outputs, analytics, or automation workflows."
+      "title": "User accounts and registration",
+      "description": "Certain features of our services may require registration or a paid subscription. You agree to provide accurate, current, and complete information during registration. You are responsible for safeguarding your account credentials and for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account."
     },
     {
-      "title": "Reasonable limits",
-      "description": "The platform is provided on an as-available basis. Liability is limited to the maximum extent permitted by applicable law, but nothing on this page removes rights that cannot legally be waived."
+      "title": "Payments, billing, and refunds",
+      "description": "Paid services and subscriptions are billed through our authorized payment processors, Stripe and PayPal. All fees are quoted in US dollars. Subscription fees are billed in advance on a recurring basis. One-time purchases are billed at the time of purchase. Refunds are handled on a case-by-case basis and may be issued at our discretion. You agree to pay all applicable fees and authorize us to charge your selected payment method."
+    },
+    {
+      "title": "Acceptable use policy",
+      "description": "You agree not to use our services to violate any applicable law or regulation; infringe on the intellectual property rights of others; transmit harmful, offensive, or illegal content; attempt to gain unauthorized access to our systems or other users' accounts; interfere with or disrupt the integrity of our services; use automated tools to scrape, harvest, or extract data without our express permission; or engage in any activity that could damage, disable, or impair our services."
+    },
+    {
+      "title": "Intellectual property",
+      "description": "All content, features, and functionality of VoiceToWebsite — including but not limited to text, graphics, logos, icons, software, and source code — are the exclusive property of VoiceToWebsite and its owner, Mr. jwswain, and are protected by copyright, trademark, and other intellectual property laws. Source bundles purchased through our platform are licensed for the buyer's use as specified in the relevant product documentation."
+    },
+    {
+      "title": "User-generated content",
+      "description": "When you submit content through our platform (such as voice briefs, text inputs, or form submissions), you retain ownership of your original content. However, you grant us a non-exclusive, worldwide, royalty-free license to use, process, and store such content as necessary to provide our services. You are solely responsible for the content you submit and its compliance with applicable laws."
+    },
+    {
+      "title": "Disclaimer of warranties",
+      "description": "Our services are provided on an 'as is' and 'as available' basis without warranties of any kind, whether express or implied. We do not warrant that our services will be uninterrupted, error-free, or completely secure. We disclaim all warranties, including implied warranties of merchantability, fitness for a particular purpose, and non-infringement, to the fullest extent permitted by law."
+    },
+    {
+      "title": "Limitation of liability",
+      "description": "To the maximum extent permitted by applicable law, VoiceToWebsite and its owner shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses resulting from your use of our services."
+    },
+    {
+      "title": "Changes to terms",
+      "description": "We reserve the right to modify these terms at any time. We will provide notice of material changes by updating the 'last updated' date at the top of this page. Your continued use of our services after any changes constitutes your acceptance of the updated terms. We encourage you to review these terms periodically."
+    },
+    {
+      "title": "Governing law",
+      "description": "These terms shall be governed by and construed in accordance with the laws of the United States. Any disputes arising from these terms or your use of our services shall be resolved through good-faith negotiation, and if necessary, binding arbitration."
     }
   ],
   "cta": {
-    "eyebrow": "Questions before purchase",
-    "heading": "Review pricing and contact support before committing to a plan.",
-    "body": "This keeps the buying path transparent and reduces disputes by aligning offers, expectations, and support scope before payment.",
+    "eyebrow": "Questions about our terms?",
+    "heading": "Review pricing or contact our team before making a purchase.",
+    "body": "We believe in transparency. If anything in these terms is unclear, reach out through our contact page and we will be happy to clarify.",
     "primaryLabel": "View pricing",
     "primaryHref": "/pricing",
-    "secondaryLabel": "Contact support",
+    "secondaryLabel": "Contact us",
     "secondaryHref": "/contact"
   }
 }

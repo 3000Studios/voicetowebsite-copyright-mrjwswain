@@ -1,4 +1,15 @@
 {
-  "leads": [],
-  "updatedAt": null
+  "leads": [
+    {
+      "id": "lead-1776203840448",
+      "name": "",
+      "email": "test@example.com",
+      "company": "",
+      "interest": "saas",
+      "notes": "A tech startup SaaS landing page",
+      "source": "preview_studio",
+      "createdAt": "2026-04-14T21:57:20.448Z"
+    }
+  ],
+  "updatedAt": "2026-04-14T21:57:20.448Z"
 }

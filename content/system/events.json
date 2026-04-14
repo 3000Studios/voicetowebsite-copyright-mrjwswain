@@ -1,6 +1,62 @@
 {
   "events": [
     {
+      "id": "page_view-1776204793589",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-2dd8049f-1b20-49db-a70a-4e904eb06bfc",
+      "referrer": "",
+      "createdAt": "2026-04-14T22:13:13.589Z"
+    },
+    {
+      "id": "page_view-1776204690171",
+      "type": "page_view",
+      "path": "/contact",
+      "sessionId": "session-2dd8049f-1b20-49db-a70a-4e904eb06bfc",
+      "referrer": "",
+      "createdAt": "2026-04-14T22:11:30.171Z"
+    },
+    {
+      "id": "page_view-1776204588812",
+      "type": "page_view",
+      "path": "/terms",
+      "sessionId": "session-2dd8049f-1b20-49db-a70a-4e904eb06bfc",
+      "referrer": "",
+      "createdAt": "2026-04-14T22:09:48.812Z"
+    },
+    {
+      "id": "page_view-1776204511332",
+      "type": "page_view",
+      "path": "/privacy",
+      "sessionId": "session-2dd8049f-1b20-49db-a70a-4e904eb06bfc",
+      "referrer": "",
+      "createdAt": "2026-04-14T22:08:31.332Z"
+    },
+    {
+      "id": "page_view-1776204333917",
+      "type": "page_view",
+      "path": "/about",
+      "sessionId": "session-2dd8049f-1b20-49db-a70a-4e904eb06bfc",
+      "referrer": "",
+      "createdAt": "2026-04-14T22:05:33.917Z"
+    },
+    {
+      "id": "page_view-1776203797063",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-2dd8049f-1b20-49db-a70a-4e904eb06bfc",
+      "referrer": "http://localhost:5173/",
+      "createdAt": "2026-04-14T21:56:37.063Z"
+    },
+    {
+      "id": "page_view-1776203746175",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-2dd8049f-1b20-49db-a70a-4e904eb06bfc",
+      "referrer": "http://localhost:5173/",
+      "createdAt": "2026-04-14T21:55:46.175Z"
+    },
+    {
       "id": "admin_login_success-1775927214216",
       "type": "admin_login_success",
       "adminEmail": "mr.jwswain@gmail.com",
@@ -8,5 +64,5 @@
       "createdAt": "2026-04-11T17:06:54.216Z"
     }
   ],
-  "updatedAt": "2026-04-11T17:06:54.216Z"
+  "updatedAt": "2026-04-14T22:13:13.589Z"
 }

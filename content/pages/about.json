@@ -1,25 +1,37 @@
 {
-  "eyebrow": "About",
-  "headline": "Voicetowebsite exists to turn intent into operational momentum",
-  "subheadline": "The platform is being shaped as an AI system manager for work that needs structure, visibility, and execution quality.",
+  "eyebrow": "About Us",
+  "headline": "About VoiceToWebsite",
+  "subheadline": "VoiceToWebsite is an AI-powered platform that transforms spoken and written briefs into fully structured, deploy-ready websites — built for founders, agencies, and product teams who value speed and quality.",
   "sections": [
     {
-      "title": "What makes it different",
-      "description": "Voicetowebsite is not being positioned as another generic AI wrapper. It is being built as a control layer for planning, automating, and shipping meaningful technical and business work."
+      "title": "Our mission",
+      "description": "We exist to eliminate the friction between having an idea and having a live website. VoiceToWebsite turns natural language into structured pages, SEO-optimized content, and automated deployments — so you can go from concept to published site in minutes, not weeks."
     },
     {
-      "title": "How it should grow",
-      "description": "The business should grow through a hybrid model: software subscriptions for recurring value, implementation services for immediate cash flow, and enterprise deployment for higher-trust buyers."
+      "title": "Who we serve",
+      "description": "VoiceToWebsite is designed for founders launching new products, agencies managing multiple client sites, creators building their online presence, and small businesses that need professional web presence without the overhead of traditional development. Our platform adapts to your workflow, whether you prefer voice commands, text briefs, or a combination of both."
     },
     {
-      "title": "What success looks like",
-      "description": "A successful Voicetowebsite becomes the operating system teams rely on when they need prompts to become useful, tracked, and repeatable execution."
+      "title": "How it works",
+      "description": "Our AI engine interprets your brief — spoken or typed — and generates a complete website structure including homepage, content pages, SEO metadata, and call-to-action flows. You preview the result in a live, scrollable window, make adjustments, and deploy to production with a single action. The entire process is designed for speed without sacrificing structure or quality."
+    },
+    {
+      "title": "Our technology",
+      "description": "Built on modern web standards with React, Vite, and Cloudflare infrastructure, VoiceToWebsite delivers fast, secure, and globally distributed websites. Our AI pipeline leverages multiple language models for content generation, SEO analysis, and traffic optimization. Every generated site is production-ready with responsive design, proper semantic markup, and performance best practices baked in."
+    },
+    {
+      "title": "Our commitment to quality",
+      "description": "We believe AI-generated content should meet the same quality standards as human-crafted work. Every output goes through structured review, SEO validation, and performance checks before it reaches production. Our platform is continuously improved based on user feedback, search engine guidelines, and evolving best practices in web development."
+    },
+    {
+      "title": "Contact and support",
+      "description": "We are committed to providing responsive, helpful support for all our users. Whether you have questions about our products, need technical assistance, or want to explore enterprise solutions, our team is ready to help. Reach out through our contact page or email us directly at hello@voicetowebsite.com."
     }
   ],
   "cta": {
-    "eyebrow": "See the strategy in action",
-    "heading": "The public site is now organized around that business model.",
-    "body": "Explore solutions, offers, and pricing to see how the narrative supports real monetization.",
+    "eyebrow": "Ready to get started?",
+    "heading": "Explore our solutions and see VoiceToWebsite in action.",
+    "body": "From free previews to enterprise deployment, we have a path that fits your needs and budget.",
     "primaryLabel": "Explore solutions",
     "primaryHref": "/solutions",
     "secondaryLabel": "View pricing",

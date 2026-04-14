@@ -26,8 +26,8 @@
     "eyebrow": "Suggested sales flow",
     "heading": "Use this page to route people into the right next step.",
     "body": "Pair it with email capture, booking, or CRM workflows once the backend sales flow is ready.",
-    "primaryLabel": "Email hello@myappai.net",
-    "primaryHref": "mailto:hello@myappai.net",
+    "primaryLabel": "Email hello@voicetowebsite.com",
+    "primaryHref": "mailto:hello@voicetowebsite.com",
     "secondaryLabel": "Review products",
     "secondaryHref": "/products"
   }
