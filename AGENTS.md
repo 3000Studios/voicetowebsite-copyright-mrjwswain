@@ -122,3 +122,29 @@ Codex should:
 - maintain working builds
 
 The goal is a continuously improving autonomous development workflow without leaving partial implementations behind.
+
+## Cursor Cloud specific instructions
+
+### Environment overview
+
+Node.js 22 is required (matches `.node-version`). The project is a single-`package.json` monorepo — no workspaces, no sub-installs.
+
+### Quick start
+
+After `npm install`, copy `.env.example` to `.env` if it does not already exist. The default values are sufficient for running the frontend, backend, lint, test, and build without any external API keys.
+
+### Services
+
+| Service | Command | Port | Notes |
+|---|---|---|---|
+| Full dev (frontend + backend) | `npm run dev` | 5173 (Vite) + 8787 (Express) | Uses `concurrently`; Vite proxies `/api` to Express |
+| Frontend only | `npm run dev:frontend` | 5173 | Vite + React with HMR |
+| Backend only | `npm run dev:server` | 8787 | Express with `--watch` for hot reload |
+
+### Gotchas
+
+- The Express server port defaults to `8787` unless `PORT` is set in `.env`. The Vite proxy target reads `process.env.PORT` at startup, so both must agree. With the default `.env.example` (`PORT=3000`), update the `.env` to `PORT=8787` or leave it unset so the default 8787 is used consistently.
+- `npm run test` runs `scripts/verify-platform.js` which validates content bootstrapping, AI router, and traffic engine — it does not require any running server or external API key.
+- The ESLint config is flat-config format (`eslint.config.js`); ESLint 10+ is used.
+- The `dist/` directory is the production build output; it is also the Cloudflare Pages deploy source.
+- Directories `logs/`, `temp/`, and `build/` are expected to exist at the repo root (created by `mkdir -p logs temp build` in the update script).
