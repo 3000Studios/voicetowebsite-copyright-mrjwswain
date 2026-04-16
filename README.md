@@ -16,6 +16,7 @@ Production website and AI system manager for `voicetowebsite.com`.
    - `npm install`
 2. Start local app:
    - `npm run dev`
+   - for browser live preview + hot reload on your local machine: `npm run dev:live`
 3. Verify project:
    - `npm run lint`
    - `npm run test`
@@ -35,12 +36,13 @@ Required GitHub Action secrets:
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 
-## Dev container
+## AdSense Auto Ads setup
 
-A dev container is included at `.devcontainer/devcontainer.json`.
+The site loads Google Auto Ads from `frontend/index.html` using:
 
-Use it when you want a reproducible environment (same tools/versions on every machine).  
-If local Node/Docker setup already works and you prefer native speed, local development is also supported.
+- `VITE_ADSENSE_PUBLISHER` (example: `ca-pub-1234567890123456`)
+
+Before production, set `VITE_ADSENSE_PUBLISHER` in your environment so the built HTML contains your real publisher ID.
 
 ## Notes for branch strategy
 
