@@ -104,12 +104,18 @@ The system must prioritize:
 - Production builds must use `npm run build`
 - Production output should be generated in `dist/`
 - This project is configured for a single production branch workflow, so changes pushed to `main` may go live immediately
+- After each successful commit, push to `origin/main` to keep production current
+- Use direct Wrangler deploy commands when GitHub Actions is unavailable:
+  - `npm run pages:deploy`
+  - `npm run workers:deploy`
 
 ## Commit Rules
 
 - Always run lint before committing
 - Always run tests before suggesting a pull request or pushing a release candidate
 - Verify the application still boots when the change affects runtime behavior
+- Commit all related workspace changes for the task (do not leave partial tracked changes behind)
+- Push immediately after each commit unless explicitly told not to
 
 ## Autonomous Behavior
 

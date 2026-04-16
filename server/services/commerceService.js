@@ -6,6 +6,7 @@ import {
   getSourceBundleByToken,
   recordPreviewCheckoutIntent
 } from './previewStudioService.js'
+import { provisionCustomerAccountFromPayment } from './customerAccountService.js'
 
 const DEFAULT_PAYMENTS = {
   payments: [],
@@ -88,8 +89,11 @@ function getStripeConfig(slug, product) {
     product.stripeMode ??
     (/month|mo/i.test(product.priceAnchor ?? '') ? 'subscription' : 'payment')
 
+  const normalizedPaymentLink =
+    typeof paymentLink === 'string' && /^https:\/\/buy\.stripe\.com\//i.test(paymentLink) ? paymentLink : null
+
   return {
-    paymentLink,
+    paymentLink: normalizedPaymentLink,
     priceId,
     mode
   }
@@ -315,6 +319,14 @@ export async function verifyStripeCheckoutSession(sessionId) {
       amount_total: session.amount_total
     }
   })
+  await provisionCustomerAccountFromPayment({
+    provider: 'stripe',
+    transactionId: session.payment_intent ?? session.id,
+    customerEmail: session.customer_details?.email ?? null,
+    offerSlug: session.metadata?.offerSlug ?? null,
+    amountCents,
+    currency: session.currency ?? 'usd'
+  })
 
   await fulfillPreviewSourceDelivery({
     requestId: session.metadata?.previewRequestId ?? null,
@@ -358,6 +370,14 @@ export async function handleStripeWebhook(rawBody, signature) {
         payment_status: session.payment_status,
         amount_total: session.amount_total
       }
+    })
+    await provisionCustomerAccountFromPayment({
+      provider: 'stripe',
+      transactionId: session.payment_intent ?? session.id,
+      customerEmail: session.customer_details?.email ?? null,
+      offerSlug: session.metadata?.offerSlug ?? null,
+      amountCents: session.amount_total ?? 0,
+      currency: session.currency ?? 'usd'
     })
     await fulfillPreviewSourceDelivery({
       requestId: session.metadata?.previewRequestId ?? null,
@@ -498,6 +518,14 @@ export async function capturePayPalOrder(orderId) {
       id: payload.id,
       status: payload.status
     }
+  })
+  await provisionCustomerAccountFromPayment({
+    provider: 'paypal',
+    transactionId: capture.id,
+    customerEmail: payload.payer?.email_address ?? null,
+    offerSlug: purchaseUnit?.reference_id ?? null,
+    amountCents,
+    currency: String(capture.amount?.currency_code ?? 'USD').toLowerCase()
   })
 
   return {

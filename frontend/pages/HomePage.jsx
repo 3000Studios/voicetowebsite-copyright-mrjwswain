@@ -47,7 +47,7 @@ export default function HomePage() {
       <motion.section className="hero" variants={staggerParent} initial="hidden" animate="visible">
         <motion.div className="hero__copy" variants={fadeUp}>
           <span className="eyebrow">{homepage.eyebrow}</span>
-          <PrismHeadline text={`${homepage.headline} test`} />
+          <PrismHeadline text={homepage.headline} />
           <p>{homepage.subheadline}</p>
           <div className="hero__price-callout">
             <strong>VoiceToWebsite Builder</strong>

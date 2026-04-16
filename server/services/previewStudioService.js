@@ -8,6 +8,8 @@ const DEFAULT_PREVIEW_REQUESTS = {
 
 const DELIVERY_FROM_EMAIL = process.env.SOURCE_DELIVERY_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? ''
 const RESEND_API_KEY = process.env.RESEND_API_KEY ?? ''
+const SOURCE_DOWNLOAD_TTL_MS = Number(process.env.SOURCE_DOWNLOAD_TTL_MS ?? 1000 * 60 * 60 * 24 * 2)
+const SOURCE_DOWNLOAD_MAX_COUNT = Number(process.env.SOURCE_DOWNLOAD_MAX_COUNT ?? 3)
 
 function nowIso() {
   return new Date().toISOString()
@@ -15,6 +17,10 @@ function nowIso() {
 
 function buildId(prefix) {
   return `${prefix}-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`
+}
+
+function createSecureToken() {
+  return crypto.randomBytes(32).toString('base64url')
 }
 
 function escapeHtml(value) {
@@ -559,7 +565,11 @@ export async function fulfillPreviewSourceDelivery({ requestId, customerEmail, t
     provider: provider ?? 'stripe',
     offerSlug: offerSlug ?? request.delivery?.reservedOfferSlug ?? request.recommendedOfferSlug,
     transactionId: transactionId ?? null,
-    downloadToken: request.delivery?.downloadToken ?? buildId('source')
+    downloadToken: request.delivery?.downloadToken ?? createSecureToken(),
+    downloadIssuedAt: request.delivery?.downloadIssuedAt ?? nowIso(),
+    downloadExpiresAt:
+      request.delivery?.downloadExpiresAt ?? new Date(Date.now() + SOURCE_DOWNLOAD_TTL_MS).toISOString(),
+    downloadCount: request.delivery?.downloadCount ?? 0
   }
 
   const emailResult = await sendSourceDeliveryEmail(request)
@@ -571,13 +581,29 @@ export async function fulfillPreviewSourceDelivery({ requestId, customerEmail, t
 
 export async function getSourceBundleByToken(token) {
   const previewRequests = await readPreviewRequests()
-  const request = (previewRequests.requests ?? []).find(
+  const index = (previewRequests.requests ?? []).findIndex(
     (entry) => entry.delivery?.downloadToken === token && entry.delivery?.status === 'source_ready'
   )
 
-  if (!request) {
+  if (index < 0) {
     throw new Error('Source bundle not found.')
   }
+
+  const request = previewRequests.requests[index]
+  const expiresAt = new Date(request.delivery?.downloadExpiresAt ?? 0).getTime()
+  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+    throw new Error('Source bundle link expired.')
+  }
+
+  const downloadCount = Number(request.delivery?.downloadCount ?? 0)
+  if (downloadCount >= SOURCE_DOWNLOAD_MAX_COUNT) {
+    throw new Error('Source bundle download limit reached.')
+  }
+
+  request.delivery.downloadCount = downloadCount + 1
+  request.delivery.lastDownloadedAt = nowIso()
+  previewRequests.requests[index] = request
+  await writePreviewRequests(previewRequests)
 
   return {
     fileName: `${request.slug || 'source-pack'}-source.json`,

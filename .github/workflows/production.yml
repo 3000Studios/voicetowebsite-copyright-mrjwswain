@@ -64,7 +64,7 @@ jobs:
         run: npm run build
 
       - name: Deploy preview to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name voicetowebsite --branch ${{ github.head_ref }}
+        run: npx wrangler pages deploy . --project-name voicetowebsite --branch ${{ github.head_ref }} --cwd dist
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -92,7 +92,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist --project-name voicetowebsite --branch main
+        run: npx wrangler pages deploy . --project-name voicetowebsite --branch main --cwd dist
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
