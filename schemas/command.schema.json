@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voicetowebsite.com/schemas/command.schema.json",
+  "title": "VoiceToWebsite AI Command",
+  "description": "Structured command envelope accepted by ai/router/commandRouter.js.",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "create_page",
+        "create_landing_page",
+        "update_content",
+        "create_blog_post",
+        "publish_blog_post",
+        "reject_blog_post",
+        "generate_images",
+        "generate_background",
+        "deploy_site",
+        "update_theme",
+        "generate_feature_section",
+        "edit_workspace_file",
+        "run_traffic_cycle",
+        "discover_topics"
+      ]
+    },
+    "autoDeploy": { "type": "boolean" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "action": { "const": "create_page" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "page": { "type": "string", "minLength": 1 },
+          "topic": { "type": "string", "minLength": 1 },
+          "goal": { "type": "string" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "create_landing_page" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "page": { "type": "string", "minLength": 1 },
+          "topic": { "type": "string", "minLength": 1 },
+          "goal": { "type": "string" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "update_content" } }, "required": ["action"] },
+      "then": {
+        "required": ["page", "field"],
+        "properties": {
+          "page": { "type": "string", "minLength": 1 },
+          "field": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9_]+(\\.[A-Za-z0-9_]+)*$" },
+          "value": {}
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "create_blog_post" } }, "required": ["action"] },
+      "then": {
+        "required": ["topic"],
+        "properties": {
+          "topic": { "type": "string", "minLength": 1 },
+          "length": { "type": "string", "enum": ["short", "medium", "long"] }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "publish_blog_post" } }, "required": ["action"] },
+      "then": {
+        "required": ["slug"],
+        "properties": {
+          "slug": { "type": "string", "minLength": 1 },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "reject_blog_post" } }, "required": ["action"] },
+      "then": {
+        "required": ["slug"],
+        "properties": {
+          "slug": { "type": "string", "minLength": 1 },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "generate_images" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "query": { "type": "string", "minLength": 1 },
+          "topic": { "type": "string", "minLength": 1 },
+          "count": { "type": "integer", "minimum": 1, "maximum": 12 },
+          "provider": { "type": "string", "enum": ["unsplash", "pexels", "pixabay"] }
+        },
+        "anyOf": [{ "required": ["query"] }, { "required": ["topic"] }]
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "generate_background" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "query": { "type": "string", "minLength": 1 },
+          "topic": { "type": "string", "minLength": 1 },
+          "palette": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$" }
+          }
+        },
+        "anyOf": [{ "required": ["query"] }, { "required": ["topic"] }]
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "deploy_site" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "message": { "type": "string", "minLength": 1, "maxLength": 240 }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "update_theme" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "theme": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "palette": { "type": "object", "additionalProperties": { "type": "string" } },
+              "motion": { "type": "object", "additionalProperties": { "type": "string" } }
+            }
+          },
+          "palette": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "generate_feature_section" } }, "required": ["action"] },
+      "then": {
+        "required": ["product"],
+        "properties": {
+          "product": { "type": "string", "minLength": 1 },
+          "topic": { "type": "string" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "edit_workspace_file" } }, "required": ["action"] },
+      "then": {
+        "required": ["targetPath", "contents"],
+        "properties": {
+          "targetPath": { "type": "string", "minLength": 1, "pattern": "^(?!\\/)(?!\\.\\.).+" },
+          "contents": { "type": "string" },
+          "append": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "run_traffic_cycle" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "seedTopics": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "count": { "type": "integer", "minimum": 1, "maximum": 25 },
+          "includeImages": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "action": { "const": "discover_topics" } }, "required": ["action"] },
+      "then": {
+        "properties": {
+          "seedTopics": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 50 }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

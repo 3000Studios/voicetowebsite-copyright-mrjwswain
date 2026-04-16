@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voicetowebsite.com/schemas/deployment-history.schema.json",
+  "title": "VoiceToWebsite Deployment History",
+  "description": "Deployment ledger at /content/system/deployments.json.",
+  "type": "object",
+  "required": ["history"],
+  "properties": {
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "message", "branch", "startedAt"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "status": {
+            "type": "string",
+            "enum": ["idle", "queued", "running", "pushed", "failed", "skipped"]
+          },
+          "message": { "type": "string" },
+          "branch": { "type": "string", "minLength": 1 },
+          "commitSha": {
+            "anyOf": [
+              { "type": "null" },
+              { "type": "string", "pattern": "^[0-9a-f]{7,40}$" }
+            ]
+          },
+          "startedAt": { "type": "string", "format": "date-time" },
+          "finishedAt": {
+            "anyOf": [
+              { "type": "null" },
+              { "type": "string", "format": "date-time" }
+            ]
+          },
+          "git": {
+            "type": "object",
+            "properties": {
+              "status": { "type": "string" },
+              "branch": { "type": "string" },
+              "commitOutput": { "type": "string" },
+              "pushOutput": { "type": "string" },
+              "pushFailed": { "type": "boolean" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "updatedAt": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": true
+}

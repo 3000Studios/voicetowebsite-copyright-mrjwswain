@@ -12,6 +12,7 @@ import {
   upsertFeatureSection
 } from '../../server/services/contentService.js'
 import { recordAiActivity } from '../../server/services/analyticsService.js'
+import { isValid } from '../../server/services/schemaValidator.js'
 
 const SUPPORTED_ACTIONS = new Set([
   'create_page',
@@ -161,6 +162,18 @@ async function maybeDeploy(command, fallbackMessage) {
 }
 
 export async function routeCommand(input) {
+  const schemaCheck = await isValid('command', input)
+  if (!schemaCheck.valid) {
+    const error = new Error(
+      `Command failed schema validation: ${schemaCheck.errors
+        .map((err) => `${err.instancePath || '(root)'} ${err.message ?? ''}`.trim())
+        .join('; ')}`
+    )
+    error.code = 'COMMAND_SCHEMA_INVALID'
+    error.errors = schemaCheck.errors
+    throw error
+  }
+
   const command = validateCommand(input)
   await recordAiActivity(command.action)
 

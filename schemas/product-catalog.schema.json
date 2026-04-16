@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voicetowebsite.com/schemas/product-catalog.schema.json",
+  "title": "VoiceToWebsite Product Catalog",
+  "description": "Aggregate product index stored at /content/products/catalog.json.",
+  "type": "object",
+  "required": ["products"],
+  "properties": {
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slug", "name"],
+        "properties": {
+          "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "name": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string" },
+          "outcome": { "type": "string" },
+          "priceAnchor": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "updatedAt": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": true
+}

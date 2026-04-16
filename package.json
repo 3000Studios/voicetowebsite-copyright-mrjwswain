@@ -22,7 +22,8 @@
     "command": "node scripts/run-command.js",
     "scheduler": "node ai/scheduler/aiScheduler.js",
     "traffic": "node scripts/run-traffic-cycle.js",
-    "test": "node scripts/verify-platform.js"
+    "validate:schemas": "node scripts/validate-schemas.js",
+    "test": "node scripts/validate-schemas.js && node scripts/verify-platform.js"
   },
   "keywords": [
     "voicetowebsite",
@@ -62,6 +63,8 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.0",
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1",
     "concurrently": "^9.2.1",
     "eslint": "^10.0.3",
     "prettier": "^3.8.1",

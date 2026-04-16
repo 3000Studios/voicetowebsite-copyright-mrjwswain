@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voicetowebsite.com/schemas/page.schema.json",
+  "title": "VoiceToWebsite Page",
+  "description": "Structured marketing/landing page stored under /content/pages/*.json.",
+  "type": "object",
+  "$defs": {
+    "cta": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "href": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "enum": ["_self", "_blank"] },
+        "eyebrow": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "mediaBlock": {
+      "type": "object",
+      "properties": {
+        "eyebrow": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "posterUrl": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "badges": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "labeledStat": {
+      "type": "object",
+      "required": ["label", "value"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "value": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "section": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "heading": { "type": "string" },
+        "description": { "type": "string" },
+        "body": { "type": "string" },
+        "bullets": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    }
+  },
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "title": { "type": "string" },
+    "eyebrow": { "type": "string" },
+    "headline": { "type": "string" },
+    "subheadline": { "type": "string" },
+    "intro": { "type": "string" },
+    "cta": {
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/cta" }
+      ]
+    },
+    "primaryCta": {
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/cta" }
+      ]
+    },
+    "secondaryCta": {
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/cta" }
+      ]
+    },
+    "finalCta": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "operatorSignals": { "type": "array", "items": { "type": "string" } },
+    "heroStats": { "type": "array", "items": { "$ref": "#/$defs/labeledStat" } },
+    "heroPanel": { "type": "object", "additionalProperties": true },
+    "media": { "$ref": "#/$defs/mediaBlock" },
+    "sections": { "type": "array", "items": { "$ref": "#/$defs/section" } },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/section" } },
+    "workflowHeadline": { "type": "string" },
+    "workflowSteps": { "type": "array", "items": { "$ref": "#/$defs/section" } },
+    "audienceIntro": { "type": "string" },
+    "audiences": { "type": "array", "items": { "$ref": "#/$defs/section" } },
+    "proofHeadline": { "type": "string" },
+    "proofCards": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "productsIntro": { "type": "string" },
+    "faqHeadline": { "type": "string" },
+    "faq": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["question", "answer"],
+        "properties": {
+          "question": { "type": "string", "minLength": 1 },
+          "answer": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "tiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "price": { "type": "string" },
+          "description": { "type": "string" },
+          "features": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "palette": { "type": "object", "additionalProperties": { "type": "string" } },
+    "motion": { "type": "object", "additionalProperties": { "type": "string" } },
+    "updatedAt": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": true
+}
