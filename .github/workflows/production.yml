@@ -40,7 +40,7 @@ jobs:
         run: npm run test
 
       - name: Build
-        run: npm run build
+        run: npm run build:uploads
 
   deploy-preview:
     if: github.event_name == 'pull_request'
@@ -61,10 +61,10 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        run: npm run build:uploads
 
       - name: Deploy preview to Cloudflare Pages
-        run: npx wrangler pages deploy --branch ${{ github.head_ref }}
+        run: npx wrangler pages deploy uploads/dist --project-name voicetowebsite --branch ${{ github.head_ref }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -89,10 +89,10 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        run: npm run build:uploads
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy --branch main
+        run: npx wrangler pages deploy uploads/dist --project-name voicetowebsite --branch main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
