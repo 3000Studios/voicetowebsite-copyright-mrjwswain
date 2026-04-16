@@ -14,6 +14,7 @@
     "server": "node server/index.js",
     "deploy": "node scripts/deploy-site.js",
     "pages:deploy": "wrangler pages deploy dist",
+    "workers:deploy": "wrangler deploy",
     "pages:dev": "wrangler pages dev",
     "command": "node scripts/run-command.js",
     "scheduler": "node ai/scheduler/aiScheduler.js",
