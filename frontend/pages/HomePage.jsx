@@ -2,25 +2,22 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import MetricStrip from '../components/MetricStrip.jsx'
-import MediaShowcase from '../components/MediaShowcase.jsx'
-import NewsletterSignupForm from '../components/NewsletterSignupForm.jsx'
 import OfferCheckoutCard from '../components/OfferCheckoutCard.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
-import RichBlocks from '../components/RichBlocks.jsx'
 import WebsitePreviewStudio from '../components/WebsitePreviewStudio.jsx'
 import { fadeUp, staggerParent } from '../animations/variants.js'
 import { useSiteRuntime } from '../src/SiteRuntimeContext.jsx'
-import { featurePage, homepage, pricingPage, productCatalog } from '../src/siteData.js'
+import { homepage, pricingPage, productCatalog } from '../src/siteData.js'
 
-function getStoreArtwork(slug) {
-  const assetMap = {
-    'voice-to-website-builder': '/media/store-voice-builder.svg',
-    'local-leads-launchpad': '/media/store-local-leads.svg',
-    'bookings-engine': '/media/store-bookings.svg',
-    'creator-course-kit': '/media/store-creator-course.svg'
-  }
+const STORE_ARTWORK = {
+  'voice-to-website-builder': '/media/store-voice-builder.svg',
+  'local-leads-launchpad': '/media/store-local-leads.svg',
+  'bookings-engine': '/media/store-bookings.svg',
+  'creator-course-kit': '/media/store-creator-course.svg'
+}
 
-  return assetMap[slug] ?? '/media/operator-preview.svg'
+function storeArtwork(slug) {
+  return STORE_ARTWORK[slug] ?? '/media/operator-preview.svg'
 }
 
 function formatCurrency(amount) {
@@ -31,11 +28,37 @@ function formatCurrency(amount) {
   }).format(amount)
 }
 
+function isInternal(href) {
+  return typeof href === 'string' && href.startsWith('/') && !href.startsWith('//')
+}
+
+function PricingCta({ tier }) {
+  const label = tier.ctaLabel ?? (tier.featured ? 'Buy now' : 'Choose plan')
+  const href = tier.ctaHref ?? '/contact'
+  const className = `button ${tier.featured ? 'button--primary' : 'button--ghost'} pricing-card__cta`
+
+  if (isInternal(href) && !href.includes('#')) {
+    return (
+      <Link className={className} to={href}>
+        {label}
+      </Link>
+    )
+  }
+
+  return (
+    <a className={className} href={href}>
+      {label}
+    </a>
+  )
+}
+
 export default function HomePage() {
   const { snapshot } = useSiteRuntime()
   const appStoreItems = productCatalog.filter((product) => product.category === 'app')
   const featuredStoreItems = appStoreItems.slice(0, 4)
-  const spotlightOffers = pricingPage.tiers.slice(0, 3)
+  const workflowSteps = homepage.workflowSteps ?? []
+  const pricingTiers = pricingPage.tiers ?? []
+
   const liveMetrics = [
     { label: 'Visitors tracked', value: String(snapshot?.analytics?.visitors ?? 0) },
     { label: 'Leads captured', value: String(snapshot?.analytics?.leads ?? 0) },
@@ -44,201 +67,229 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="stack-xl home-remix">
-      <motion.section className="hero hero--remix" variants={staggerParent} initial="hidden" animate="visible">
+    <div className="stack-xl home">
+      <motion.section
+        className="hero hero--focused"
+        variants={staggerParent}
+        initial="hidden"
+        animate="visible"
+      >
         <motion.div className="hero__copy" variants={fadeUp}>
-          <span className="eyebrow">Award-style digital experience</span>
+          <span className="eyebrow">{homepage.eyebrow ?? 'Voice → Website'}</span>
           <PrismHeadline text={homepage.headline} />
-          <p>{homepage.subheadline}</p>
-          <div className="home-remix__signal-grid">
-            {homepage.operatorSignals.map((signal) => (
+          <p className="hero__lede">{homepage.subheadline}</p>
+          <div className="hero__signals">
+            {(homepage.operatorSignals ?? []).map((signal) => (
               <span key={signal} className="tag">
                 {signal}
               </span>
             ))}
           </div>
           <div className="hero__actions">
-            <Link className="button button--primary" to={homepage.primaryCta.to}>
-              {homepage.primaryCta.label}
-            </Link>
-            <Link className="button button--ghost" to={homepage.secondaryCta.to}>
-              {homepage.secondaryCta.label}
+            <a className="button button--primary" href="#website-generator">
+              Try the generator
+            </a>
+            <Link className="button button--ghost" to="/pricing">
+              See pricing
             </Link>
           </div>
         </motion.div>
-        <motion.aside className="hero__panel hero__panel--media" variants={fadeUp}>
-          <MediaShowcase
-            compact
-            media={{
-              ...(homepage.media ?? {}),
-              badges: homepage.media?.badges ?? homepage.operatorSignals
-            }}
-          />
-          <div className="home-remix__float-panel">
-            {homepage.heroPanel.points.map((point) => (
-              <div key={point.label} className="commit-row">
-                <strong>{point.label}</strong>
-                <span>{point.value}</span>
+
+        <motion.aside className="hero__panel hero__panel--stats" variants={fadeUp}>
+          <div className="hero__stat-grid">
+            {(homepage.heroStats ?? []).slice(0, 3).map((stat) => (
+              <div key={stat.label} className="hero__stat">
+                <span className="eyebrow">{stat.label}</span>
+                <strong>{stat.value}</strong>
               </div>
             ))}
+          </div>
+          <div className="hero__pulse">
+            <span className="hero__pulse-dot" aria-hidden="true" />
+            <div>
+              <strong>Generator online</strong>
+              <p>Runs in your browser. No sign-up required.</p>
+            </div>
           </div>
         </motion.aside>
       </motion.section>
 
       <MetricStrip items={liveMetrics} />
 
-      <section className="section-card home-remix__workflow">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">Launch flow</span>
-            <h2>{homepage.workflowHeadline}</h2>
-            <p className="section-intro">
-              Completely redesigned flow: strategy-first messaging, motion-rich visuals, conversion checkpoints, and checkout-ready execution.
-            </p>
-          </div>
-        </div>
-        <div className="home-remix__timeline">
-          {homepage.workflowSteps.map((step, index) => (
-            <article key={step.title} className="content-card home-remix__timeline-card">
-              <span className="step-number">0{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <WebsitePreviewStudio />
 
-      <section className="section-card">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">Featured builds</span>
-            <h2>New product-first visual marketplace</h2>
-            <p className="section-intro">
-              A cleaner storefront with faster scanning, better hover behavior, and stronger path-to-checkout layout for mobile and desktop.
-            </p>
+      {workflowSteps.length ? (
+        <section className="section-card home__workflow">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">How it works</span>
+              <h2>{homepage.workflowHeadline ?? 'From voice to website in three moves'}</h2>
+              <p className="section-intro">
+                Describe the site, render the preview, and ship the source. The whole loop is designed to keep
+                you one click away from a real artifact.
+              </p>
+            </div>
           </div>
-          <Link className="button button--ghost" to="/products">
-            View all products
-          </Link>
-        </div>
-        <div className="store-grid">
-          {featuredStoreItems.map((product) => (
-            <article key={product.slug} className="store-card">
-              <div className="store-card__media">
-                <img
-                  src={getStoreArtwork(product.slug)}
-                  alt={product.name}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div className="store-card__body">
-                <div className="store-card__head">
-                  <div>
-                    <span className="meta-line">{product.badge ?? 'App'}</span>
-                    <h3>{product.name}</h3>
+          <div className="home__workflow-grid">
+            {workflowSteps.map((step, index) => (
+              <article key={step.title} className="content-card home__workflow-card">
+                <span className="step-number">0{index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {pricingTiers.length ? (
+        <section className="section-card home__pricing" id="pricing">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">Pricing</span>
+              <h2>{pricingPage.headline ?? 'Pay only when you ship'}</h2>
+              <p className="section-intro">
+                {pricingPage.subheadline ?? 'Unlimited free previews. Upgrade only when you want the source.'}
+              </p>
+            </div>
+            <Link className="button button--ghost" to="/pricing">
+              Full pricing page
+            </Link>
+          </div>
+          <div className="pricing-ladder">
+            {pricingTiers.map((tier) => (
+              <article
+                key={tier.name}
+                className={`pricing-card${tier.featured ? ' pricing-card--featured' : ''}`}
+              >
+                {tier.featured ? <span className="pricing-card__badge">Most popular</span> : null}
+                <header className="pricing-card__head">
+                  <span className="eyebrow">{tier.name}</span>
+                  <div className="pricing-card__price">
+                    <strong>{tier.price}</strong>
+                    {tier.priceDetail ? <span>{tier.priceDetail}</span> : null}
                   </div>
-                  <span className="store-card__price">{product.priceAnchor}</span>
-                </div>
-                <p>{product.summary}</p>
-                <p className="content-card__outcome">{product.outcome}</p>
-                <div className="hero__actions">
-                  <Link className="button button--primary" to={product.ctaHref ?? `/products/${product.slug}`}>
-                    {product.ctaLabel ?? 'View app'}
-                  </Link>
-                  <Link className="button button--ghost" to={`/products/${product.slug}`}>
-                    Details
-                  </Link>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section-card home-remix__pricing-highlight">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">Monetization stack</span>
-            <h2>Revenue architecture redesigned</h2>
-            <p className="section-intro">
-              Tiered offer path with immediate CTA entry points and stronger conversion framing.
-            </p>
+                  <p>{tier.description}</p>
+                </header>
+                <ul className="bullet-list pricing-card__features">
+                  {(tier.features ?? []).map((feature) => (
+                    <li key={feature}>{feature}</li>
+                  ))}
+                </ul>
+                <PricingCta tier={tier} />
+              </article>
+            ))}
           </div>
-          <Link className="button button--ghost" to="/pricing">
-            Open full pricing
-          </Link>
-        </div>
-        <div className="card-grid">
-          {spotlightOffers.map((tier) => (
-            <article key={tier.name} className={`content-card pricing-card${tier.featured ? ' pricing-card--featured' : ''}`}>
-              <span className="meta-line">{tier.price}</span>
-              <h3>{tier.name}</h3>
-              <p>{tier.description}</p>
-              <ul className="bullet-list">
-                {tier.features.slice(0, 4).map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      <RichBlocks title={featurePage.headline} intro={featurePage.intro} items={featurePage.items} />
-      <RichBlocks title="Who it is built for" intro={homepage.audienceIntro} items={homepage.audiences} />
+      {featuredStoreItems.length ? (
+        <section className="section-card">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">Ready-made builds</span>
+              <h2>Source packs you can buy and ship today</h2>
+              <p className="section-intro">
+                Curated website templates with checkout-ready copy, SEO defaults, and a clear primary offer for
+                each vertical.
+              </p>
+            </div>
+            <Link className="button button--ghost" to="/products">
+              View all products
+            </Link>
+          </div>
+          <div className="store-grid">
+            {featuredStoreItems.map((product) => (
+              <article key={product.slug} className="store-card">
+                <div className="store-card__media">
+                  <img
+                    src={storeArtwork(product.slug)}
+                    alt={product.name}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div className="store-card__body">
+                  <div className="store-card__head">
+                    <div>
+                      <span className="meta-line">{product.badge ?? 'App'}</span>
+                      <h3>{product.name}</h3>
+                    </div>
+                    <span className="store-card__price">{product.priceAnchor}</span>
+                  </div>
+                  <p>{product.summary}</p>
+                  <div className="hero__actions">
+                    <Link
+                      className="button button--primary"
+                      to={product.ctaHref ?? `/products/${product.slug}`}
+                    >
+                      {product.ctaLabel ?? 'View app'}
+                    </Link>
+                    <Link className="button button--ghost" to={`/products/${product.slug}`}>
+                      Details
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {snapshot?.commerce?.offers?.length ? (
         <section className="section-card">
           <div className="section-heading">
             <div>
               <span className="eyebrow">Live checkout</span>
-              <h2>Direct buy experience</h2>
+              <h2>Direct buy from the homepage</h2>
               <p className="section-intro">
-                Every offer card is optimized for immediate checkout and tracks real conversion data from your active integrations.
+                Every offer card is tied to a real Stripe or PayPal flow. Conversions record back to the admin
+                dashboard automatically.
               </p>
             </div>
           </div>
           <div className="card-grid">
-            {snapshot.commerce.offers.filter((offer) => offer.slug !== 'enterprise-deployment').map((offer) => (
-              <OfferCheckoutCard key={offer.slug} offer={offer} />
+            {snapshot.commerce.offers
+              .filter((offer) => offer.slug !== 'enterprise-deployment')
+              .map((offer) => (
+                <OfferCheckoutCard key={offer.slug} offer={offer} />
+              ))}
+          </div>
+        </section>
+      ) : null}
+
+      {homepage.faq?.length ? (
+        <section className="section-card">
+          <span className="eyebrow">FAQ</span>
+          <h2>{homepage.faqHeadline ?? 'Questions buyers ask first'}</h2>
+          <div className="card-grid card-grid--compact">
+            {homepage.faq.map((item) => (
+              <article key={item.question} className="content-card">
+                <h3>{item.question}</h3>
+                <p>{item.answer}</p>
+              </article>
             ))}
           </div>
         </section>
       ) : null}
 
-      <NewsletterSignupForm />
-
-      <section className="section-card">
-        <span className="eyebrow">Frequently asked</span>
-        <h2>{homepage.faqHeadline}</h2>
-        <div className="card-grid card-grid--compact">
-          {homepage.faq.map((item) => (
-            <article key={item.question} className="content-card">
-              <h3>{item.question}</h3>
-              <p>{item.answer}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section-card cta-band">
-        <div>
-          <span className="eyebrow">{homepage.finalCta.eyebrow}</span>
-          <h2>{homepage.finalCta.heading}</h2>
-          <p className="section-intro">{homepage.finalCta.body}</p>
-        </div>
-        <div className="hero__actions">
-          <Link className="button button--primary" to={homepage.finalCta.primaryHref}>
-            {homepage.finalCta.primaryLabel}
-          </Link>
-          <Link className="button button--ghost" to={homepage.finalCta.secondaryHref}>
-            {homepage.finalCta.secondaryLabel}
-          </Link>
-        </div>
-      </section>
+      {homepage.finalCta ? (
+        <section className="section-card cta-band">
+          <div>
+            <span className="eyebrow">{homepage.finalCta.eyebrow}</span>
+            <h2>{homepage.finalCta.heading}</h2>
+            <p className="section-intro">{homepage.finalCta.body}</p>
+          </div>
+          <div className="hero__actions">
+            <a className="button button--primary" href="#website-generator">
+              {homepage.finalCta.primaryLabel ?? 'Open the generator'}
+            </a>
+            <Link className="button button--ghost" to={homepage.finalCta.secondaryHref ?? '/contact'}>
+              {homepage.finalCta.secondaryLabel ?? 'Talk to sales'}
+            </Link>
+          </div>
+        </section>
+      ) : null}
     </div>
   )
 }
