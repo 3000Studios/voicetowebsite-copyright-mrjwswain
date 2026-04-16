@@ -94,6 +94,82 @@ function extractTitle(brief, websiteType) {
     .join(' ')
 }
 
+function extractKeywords(brief, websiteType, audience) {
+  const normalized = `${brief} ${websiteType} ${audience}`
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+  const stopWords = new Set([
+    'the',
+    'and',
+    'for',
+    'with',
+    'that',
+    'this',
+    'your',
+    'from',
+    'into',
+    'have',
+    'will',
+    'are',
+    'you',
+    'our',
+    'about',
+    'site',
+    'website'
+  ])
+  const ranked = new Map()
+
+  for (const token of normalized.split(/\s+/)) {
+    if (!token || token.length < 4 || stopWords.has(token)) {
+      continue
+    }
+    ranked.set(token, (ranked.get(token) ?? 0) + 1)
+  }
+
+  return Array.from(ranked.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([word]) => word)
+}
+
+function buildFaqEntries(primaryCta, audience, websiteType) {
+  return [
+    {
+      question: 'How fast can this website concept go live?',
+      answer:
+        'Most teams can launch a production-ready first version in one to two days because the preview already maps hero, proof, offer, and conversion flow.'
+    },
+    {
+      question: `Can this be customized for ${audience}?`,
+      answer:
+        'Yes. Messaging, visuals, and calls to action are designed to be edited quickly so the final build matches your real audience and sales process.'
+    },
+    {
+      question: 'What happens after checkout?',
+      answer:
+        'After purchase, the source bundle is assigned to your checkout email so your team can deploy, extend, and optimize the experience immediately.'
+    },
+    {
+      question: `Is this suitable for a ${websiteType.replace('_', ' ')} launch?`,
+      answer: `Yes. The layout intentionally prioritizes conversion copy, trust signals, and a direct "${primaryCta}" path for high-intent traffic.`
+    }
+  ]
+}
+
+function estimateQualityScore({ brief, audience, primaryCta }) {
+  const briefLength = String(brief ?? '').trim().length
+  const audienceLength = String(audience ?? '').trim().length
+  const ctaLength = String(primaryCta ?? '').trim().length
+
+  let score = 55
+  if (briefLength >= 70) score += 12
+  if (briefLength >= 140) score += 10
+  if (audienceLength >= 8) score += 8
+  if (ctaLength >= 6) score += 7
+  if (/buy|book|start|get|launch|build/i.test(primaryCta)) score += 8
+  return Math.min(100, score)
+}
+
 function buildSectionData({ brief, audience, websiteType, primaryCta }) {
   const siteTypeLabel = {
     saas: 'Software product',
@@ -125,18 +201,43 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
   const theme = getThemePreset(websiteType, styleTone)
   const [canvas, surface, accent, ink] = theme.palette
   const sections = buildSectionData({ brief, audience, websiteType, primaryCta })
+  const seoKeywords = extractKeywords(brief, websiteType, audience)
+  const faqEntries = buildFaqEntries(primaryCta, audience, websiteType)
+  const qualityScore = estimateQualityScore({ brief, audience, primaryCta })
+  const seoDescription = `${title}. ${brief}`.slice(0, 158)
   const bulletPoints = [
     'Hero video or motion-ready media slot',
     'Offer stack with direct checkout hooks',
+    'SEO baseline: metadata, FAQ, and semantic structure',
+    'Affiliate CTA lane and sponsor-ready ad placement',
     'Source-ready files that can be exported after purchase'
   ]
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqEntries.map((entry) => ({
+      '@type': 'Question',
+      name: entry.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: entry.answer
+      }
+    }))
+  }
 
   const html = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeHtml(seoDescription)}" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="keywords" content="${escapeHtml(seoKeywords.join(', '))}" />
+    <meta property="og:title" content="${escapeHtml(title)}" />
+    <meta property="og:description" content="${escapeHtml(seoDescription)}" />
+    <meta property="og:type" content="website" />
     <title>${escapeHtml(title)}</title>
+    <script type="application/ld+json">${JSON.stringify(faqSchema)}</script>
     <style>
       :root {
         color-scheme: dark;
@@ -320,6 +421,18 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
       .quote p {
         font-size: 1.05rem;
       }
+      .monetization-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .ad-slot {
+        min-height: 130px;
+        border: 1px dashed var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        background: rgba(255,255,255,0.03);
+      }
       .cta {
         padding: 18px 20px;
         display: flex;
@@ -352,6 +465,9 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         .story-strip {
           grid-template-columns: 1fr;
         }
+        .monetization-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
@@ -381,7 +497,7 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
             <div class="metrics">
               <div class="card">
                 <span class="eyebrow">Source bundle</span>
-                <h2>Files included</h2>
+                <h2>Files included • Quality ${qualityScore}/100</h2>
                 <ul class="list">${bulletPoints.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
               </div>
               <div class="quote">
@@ -408,6 +524,31 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         <article class="card"><span class="eyebrow">Conversion lane</span><h2>Video, proof, offer, source delivery</h2><p>The generated build is arranged so the user can watch, inspect, and then buy the underlying source code from a productized checkout step.</p></article>
         <article class="card"><span class="eyebrow">Delivery path</span><h2>Reserved to the checkout email</h2><p>Each preview is linked to an email address so the generated package can be assigned to the correct buyer after checkout.</p></article>
       </section>
+      <section class="section">
+        <div class="monetization-grid">
+          <article class="card">
+            <span class="eyebrow">Affiliate monetization</span>
+            <h2>Partner CTA strip</h2>
+            <p>Embed partner links with UTM parameters and a clear recommendation block to monetize intent that does not convert on first session.</p>
+            <p><a class="button" href="https://voicetowebsite.com/pricing?utm_source=preview&utm_medium=affiliate&utm_campaign=${escapeHtml(slugify(title))}">See partner offer</a></p>
+          </article>
+          <article class="card ad-slot">
+            <span class="eyebrow">Sponsor inventory</span>
+            <h2>Ad placement placeholder</h2>
+            <p>Reserved placement for ethical sponsorships or direct ad sales. Keep one premium slot above the fold and rotate by campaign.</p>
+          </article>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-grid">
+          ${faqEntries
+            .map(
+              (item) =>
+                `<article class="card"><span class="eyebrow">FAQ</span><h2>${escapeHtml(item.question)}</h2><p>${escapeHtml(item.answer)}</p></article>`
+            )
+            .join('')}
+        </div>
+      </section>
     </div>
   </body>
 </html>`
@@ -416,7 +557,7 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
     { path: 'index.html', content: html },
     {
       path: 'content.json',
-      content: JSON.stringify({ title, brief, audience, websiteType, styleTone, primaryCta, sections }, null, 2)
+      content: JSON.stringify({ title, brief, audience, websiteType, styleTone, primaryCta, sections, seoKeywords, qualityScore, faqEntries }, null, 2)
     },
     {
       path: 'README.md',
@@ -428,7 +569,9 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
     title,
     summary: `${title} preview created for ${audience}.`,
     html,
-    files
+    files,
+    qualityScore,
+    seoKeywords
   }
 }
 
@@ -450,6 +593,8 @@ function summarizeRequest(request) {
     summary: request.summary,
     previewHtml: request.previewHtml,
     sourceFiles: request.sourceBundle.files.map((file) => file.path),
+    qualityScore: request.qualityScore ?? null,
+    seoKeywords: request.seoKeywords ?? [],
     recommendedOfferSlug: request.recommendedOfferSlug,
     email: request.email,
     status: request.status,
@@ -481,6 +626,8 @@ export async function createPreviewRequest(payload) {
     summary: preview.summary,
     previewHtml: preview.html,
     sourceBundle: { files: preview.files },
+    qualityScore: preview.qualityScore,
+    seoKeywords: preview.seoKeywords,
     recommendedOfferSlug: 'voice-to-website-builder',
     status: 'preview_ready',
     delivery: {

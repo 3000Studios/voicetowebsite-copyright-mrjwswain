@@ -29,12 +29,40 @@ export default function WebsitePreviewStudio() {
   const [busy, setBusy] = useState(false)
   const [checkoutBusy, setCheckoutBusy] = useState(false)
   const [error, setError] = useState('')
+  const [soundEnabled, setSoundEnabled] = useState(true)
 
   function updateField(field, value) {
     setForm((current) => ({
       ...current,
       [field]: value
     }))
+  }
+
+  function playUiTone(kind = 'success') {
+    if (!soundEnabled || typeof window === 'undefined') {
+      return
+    }
+
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext
+    if (!AudioContextCtor) {
+      return
+    }
+
+    const context = new AudioContextCtor()
+    const oscillator = context.createOscillator()
+    const gain = context.createGain()
+    const frequency = kind === 'success' ? 560 : 220
+
+    oscillator.type = 'sine'
+    oscillator.frequency.value = frequency
+    gain.gain.value = 0.0001
+    oscillator.connect(gain)
+    gain.connect(context.destination)
+    const now = context.currentTime
+    gain.gain.exponentialRampToValueAtTime(0.03, now + 0.01)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14)
+    oscillator.start(now)
+    oscillator.stop(now + 0.16)
   }
 
   async function handleGenerate(event) {
@@ -45,8 +73,10 @@ export default function WebsitePreviewStudio() {
       setError('')
       const response = await createWebsitePreview(form)
       setPreview(response.preview)
+      playUiTone('success')
     } catch (nextError) {
       setError(nextError.message)
+      playUiTone('error')
     } finally {
       setBusy(false)
     }
@@ -79,6 +109,10 @@ export default function WebsitePreviewStudio() {
         <p className="section-intro">
           Enter the idea, audience, and tone. The homepage preview renders in a scrollable window so buyers can inspect the outcome before they purchase the source bundle.
         </p>
+        <label className="preview-sound-toggle">
+          <input type="checkbox" checked={soundEnabled} onChange={(event) => setSoundEnabled(event.target.checked)} />
+          <span>{soundEnabled ? 'Sound effects enabled' : 'Sound effects muted'}</span>
+        </label>
       </div>
 
       <div className="preview-studio__layout">
@@ -168,7 +202,14 @@ export default function WebsitePreviewStudio() {
 
           <div className="preview-device">
             {preview ? (
-              <iframe className="preview-device__frame" title={preview.title} srcDoc={preview.previewHtml} />
+              <iframe
+                className="preview-device__frame"
+                title={preview.title}
+                srcDoc={preview.previewHtml}
+                loading="lazy"
+                sandbox="allow-same-origin"
+                referrerPolicy="no-referrer"
+              />
             ) : (
               <div className="preview-device__placeholder">
                 <strong>Scroll-ready preview window</strong>

@@ -643,6 +643,23 @@ button:disabled {
   gap: 0.7rem;
 }
 
+.preview-sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.preview-sound-toggle input {
+  accent-color: var(--prism-2);
+}
+
 .preview-studio__layout,
 .preview-form__grid,
 .store-grid {
