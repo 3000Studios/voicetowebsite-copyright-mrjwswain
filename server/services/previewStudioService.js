@@ -197,10 +197,50 @@ function buildSectionData({ brief, audience, websiteType, primaryCta }) {
   ]
 }
 
+function getMediaSet(websiteType) {
+  const sets = {
+    saas: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-man-working-on-a-laptop-1579/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'
+      ]
+    },
+    local_service: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-smiling-electrician-2209/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1200&q=80'
+      ]
+    },
+    creator: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-video-production-team-discussing-1578/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80'
+      ]
+    },
+    ecommerce: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-online-shopping-1572/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1607082350899-7e105aa886ae?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80'
+      ]
+    }
+  }
+
+  return sets[websiteType] ?? sets.saas
+}
+
 function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta }) {
   const theme = getThemePreset(websiteType, styleTone)
   const [canvas, surface, accent, ink] = theme.palette
   const sections = buildSectionData({ brief, audience, websiteType, primaryCta })
+  const mediaSet = getMediaSet(websiteType)
   const seoKeywords = extractKeywords(brief, websiteType, audience)
   const faqEntries = buildFaqEntries(primaryCta, audience, websiteType)
   const qualityScore = estimateQualityScore({ brief, audience, primaryCta })
@@ -261,13 +301,13 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         background-image: ${theme.texture};
       }
       .hero {
-        padding: 72px 24px 56px;
+        padding: 64px 24px 46px;
         border-bottom: 1px solid var(--line);
       }
       .hero__inner,
       .section,
       .story-strip {
-        width: min(1040px, calc(100% - 32px));
+        width: min(1120px, calc(100% - 32px));
         margin: 0 auto;
       }
       .eyebrow {
@@ -294,8 +334,21 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
       .hero__grid {
         margin-top: 30px;
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
+        grid-template-columns: 1fr 1fr;
         gap: 18px;
+      }
+      .hero__video {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        min-height: 310px;
+        background: rgba(0,0,0,0.24);
+      }
+      .hero__video video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
       }
       .panel,
       .card,
@@ -306,7 +359,7 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         backdrop-filter: blur(14px);
       }
       .panel {
-        min-height: 420px;
+        min-height: 300px;
         padding: 26px;
         position: relative;
         overflow: hidden;
@@ -415,6 +468,19 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         gap: 18px;
         padding-bottom: 56px;
       }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .gallery-grid img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+      }
       .quote {
         padding: 24px;
       }
@@ -462,7 +528,8 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         }
         .hero__grid,
         .section-grid,
-        .story-strip {
+        .story-strip,
+        .gallery-grid {
           grid-template-columns: 1fr;
         }
         .monetization-grid {
@@ -479,6 +546,16 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
           <h1>${escapeHtml(title)}</h1>
           <p class="hero__lede">${escapeHtml(brief)}</p>
           <div class="hero__grid">
+            <div>
+              <div class="hero__video">
+                <video autoplay muted loop playsinline preload="metadata" poster="${escapeHtml(mediaSet.gallery[0])}">
+                  <source src="${escapeHtml(mediaSet.heroVideo)}" type="video/mp4" />
+                </video>
+              </div>
+              <div class="gallery-grid">
+                ${mediaSet.gallery.map((image) => `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)} preview image" loading="lazy" decoding="async" />`).join('')}
+              </div>
+            </div>
             <div class="panel">
               <div class="panel__screen">
                 <div class="dot-row"><span></span><span></span><span></span></div>
@@ -521,8 +598,8 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         </div>
       </section>
       <section class="story-strip">
-        <article class="card"><span class="eyebrow">Conversion lane</span><h2>Video, proof, offer, source delivery</h2><p>The generated build is arranged so the user can watch, inspect, and then buy the underlying source code from a productized checkout step.</p></article>
-        <article class="card"><span class="eyebrow">Delivery path</span><h2>Reserved to the checkout email</h2><p>Each preview is linked to an email address so the generated package can be assigned to the correct buyer after checkout.</p></article>
+        <article class="card"><span class="eyebrow">Conversion lane</span><h2>Premium hero, social proof, and monetization flow</h2><p>This generated preview is structured as a real high-converting landing page: rich visual media, trust sections, offer narrative, and clear CTA hierarchy.</p></article>
+        <article class="card"><span class="eyebrow">Delivery path</span><h2>Production-ready handoff for customer preview</h2><p>The generated files include a full landing page that your customer can scroll and inspect before purchase, with structure ready for final production adaptation.</p></article>
       </section>
       <section class="section">
         <div class="monetization-grid">

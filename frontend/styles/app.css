@@ -2165,3 +2165,59 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* 3D star cluster + synth wave backdrop */
+.star-cluster {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  contain: strict;
+  will-change: opacity;
+}
+
+.star-cluster__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.star-cluster__vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 45%, transparent 35%, rgba(5, 8, 18, 0.55) 100%),
+    linear-gradient(180deg, rgba(5, 8, 18, 0.35) 0%, transparent 28%, transparent 72%, rgba(5, 8, 18, 0.45) 100%);
+}
+
+.shell > .page,
+.admin-shell > .admin-app {
+  position: relative;
+  z-index: 3;
+}
+
+.site-header {
+  z-index: 40;
+}
+
+.site-footer {
+  position: relative;
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-cluster {
+    opacity: 0.32;
+  }
+}
+
+@media (max-width: 640px) {
+  .star-cluster {
+    opacity: 0.42;
+  }
+}

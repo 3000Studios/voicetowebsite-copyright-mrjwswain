@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import PrismEnvironment from './PrismEnvironment.jsx'
+import StarClusterSynth from '../backgrounds/StarClusterSynth.jsx'
 import SiteFooter from './SiteFooter.jsx'
 import { publicNavItems, publicStatusLines, publicTickerItems } from '../src/siteChrome.js'
 import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
@@ -52,6 +53,7 @@ export default function SiteFrame() {
   return (
     <div className="shell">
       <PrismEnvironment navItems={[]} statusLines={publicStatusLines} tickerItems={publicTickerItems} />
+      <StarClusterSynth />
       <header className="site-header">
         <div className="site-header__inner">
           <NavLink className="brand" to="/">

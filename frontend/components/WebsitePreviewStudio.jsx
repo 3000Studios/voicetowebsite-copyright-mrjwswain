@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
+import { generatePreview } from '../src/previewEngine.js'
 import { createWebsitePreview, startStripeCheckout } from '../src/siteApi.js'
 
 const WEBSITE_TYPES = [
@@ -23,6 +24,10 @@ const DEFAULT_FORM = {
   primaryCta: 'Start building now'
 }
 
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value ?? '').trim())
+}
+
 export default function WebsitePreviewStudio() {
   const [form, setForm] = useState(DEFAULT_FORM)
   const [preview, setPreview] = useState(null)
@@ -30,12 +35,12 @@ export default function WebsitePreviewStudio() {
   const [checkoutBusy, setCheckoutBusy] = useState(false)
   const [error, setError] = useState('')
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [voiceBusy, setVoiceBusy] = useState(false)
+  const [generationCount, setGenerationCount] = useState(0)
+  const audioContextRef = useRef(null)
 
   function updateField(field, value) {
-    setForm((current) => ({
-      ...current,
-      [field]: value
-    }))
+    setForm((current) => ({ ...current, [field]: value }))
   }
 
   function playUiTone(kind = 'success') {
@@ -48,7 +53,15 @@ export default function WebsitePreviewStudio() {
       return
     }
 
-    const context = new AudioContextCtor()
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContextCtor()
+    }
+
+    const context = audioContextRef.current
+    if (context.state === 'suspended') {
+      context.resume().catch(() => {})
+    }
+
     const oscillator = context.createOscillator()
     const gain = context.createGain()
     const frequency = kind === 'success' ? 560 : 220
@@ -65,17 +78,49 @@ export default function WebsitePreviewStudio() {
     oscillator.stop(now + 0.16)
   }
 
-  async function handleGenerate(event) {
-    event.preventDefault()
+  function recordLeadInBackground(payload, clientPreview) {
+    createWebsitePreview(payload)
+      .then((response) => {
+        if (response?.preview?.requestId) {
+          setPreview((current) =>
+            current && current.requestId === clientPreview.requestId
+              ? { ...current, requestId: response.preview.requestId, serverRecorded: true }
+              : current
+          )
+        }
+      })
+      .catch(() => {
+        // Silent: preview is already rendered from the local engine.
+      })
+  }
 
+  function handleGenerate(event) {
+    event.preventDefault()
+    setError('')
+
+    const email = form.email.trim()
+    const brief = form.brief.trim()
+
+    if (!isValidEmail(email)) {
+      setError('Enter a valid email so we can reserve the source pack for your build.')
+      playUiTone('error')
+      return
+    }
+    if (brief.length < 20) {
+      setError('Describe the website in at least 20 characters so the engine has something to render.')
+      playUiTone('error')
+      return
+    }
+
+    setBusy(true)
     try {
-      setBusy(true)
-      setError('')
-      const response = await createWebsitePreview(form)
-      setPreview(response.preview)
+      const clientPreview = generatePreview({ ...form, email, brief })
+      setPreview(clientPreview)
+      setGenerationCount((n) => n + 1)
       playUiTone('success')
+      recordLeadInBackground({ ...form, email, brief }, clientPreview)
     } catch (nextError) {
-      setError(nextError.message)
+      setError(nextError?.message ?? 'The generator could not build a preview.')
       playUiTone('error')
     } finally {
       setBusy(false)
@@ -94,29 +139,94 @@ export default function WebsitePreviewStudio() {
         customerEmail: preview.email,
         previewRequestId: preview.requestId
       })
-      window.location.assign(response.url)
+      if (response?.url) {
+        window.location.assign(response.url)
+      } else {
+        throw new Error('Checkout URL is not available yet. Try again in a moment.')
+      }
     } catch (nextError) {
       setError(nextError.message)
       setCheckoutBusy(false)
     }
   }
 
+  function handleVoicePrompt() {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!Recognition) {
+      setError('Voice input is not available in this browser.')
+      return
+    }
+
+    const recognition = new Recognition()
+    recognition.lang = 'en-US'
+    recognition.interimResults = false
+    recognition.maxAlternatives = 1
+
+    setVoiceBusy(true)
+    setError('')
+    recognition.onresult = (event) => {
+      const transcript = event.results?.[0]?.[0]?.transcript?.trim()
+      if (transcript) {
+        updateField('brief', transcript)
+      }
+      setVoiceBusy(false)
+      playUiTone('success')
+    }
+    recognition.onerror = () => {
+      setVoiceBusy(false)
+      setError('Voice capture failed. Please try again or type your website request.')
+      playUiTone('error')
+    }
+    recognition.onend = () => {
+      setVoiceBusy(false)
+    }
+    recognition.start()
+  }
+
+  function handleOpenInNewTab() {
+    if (!preview || typeof window === 'undefined') {
+      return
+    }
+    const blob = new Blob([preview.previewHtml], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const win = window.open(url, '_blank', 'noopener')
+    if (win) {
+      setTimeout(() => URL.revokeObjectURL(url), 30_000)
+    } else {
+      URL.revokeObjectURL(url)
+    }
+  }
+
   return (
-    <section className="preview-studio section-card">
+    <section className="preview-studio section-card" id="website-generator">
       <div className="preview-studio__intro">
-        <span className="eyebrow">Preview studio</span>
-        <h2>Generate a sellable homepage, inspect it, then buy the source pack</h2>
+        <span className="eyebrow">Live website generator</span>
+        <h2>Describe the site, see the preview, then buy the source pack</h2>
         <p className="section-intro">
-          Enter the idea, audience, and tone. The homepage preview renders in a scrollable window so buyers can inspect the outcome before they purchase the source bundle.
+          The engine runs in your browser, so the preview appears instantly — no server round-trip. Fill in the
+          brief, generate, and inspect a full scrollable homepage mockup before checkout.
         </p>
-        <label className="preview-sound-toggle">
-          <input type="checkbox" checked={soundEnabled} onChange={(event) => setSoundEnabled(event.target.checked)} />
-          <span>{soundEnabled ? 'Sound effects enabled' : 'Sound effects muted'}</span>
-        </label>
+        <div className="preview-studio__toolbar">
+          <label className="preview-sound-toggle">
+            <input
+              type="checkbox"
+              checked={soundEnabled}
+              onChange={(event) => setSoundEnabled(event.target.checked)}
+            />
+            <span>{soundEnabled ? 'Sound on' : 'Sound muted'}</span>
+          </label>
+          {generationCount > 0 ? (
+            <span className="tag">Builds this session: {generationCount}</span>
+          ) : null}
+        </div>
       </div>
 
       <div className="preview-studio__layout">
-        <form className="preview-form" onSubmit={handleGenerate}>
+        <form className="preview-form" onSubmit={handleGenerate} noValidate>
           <label className="field">
             <span>Email for source delivery</span>
             <input
@@ -124,6 +234,7 @@ export default function WebsitePreviewStudio() {
               value={form.email}
               onChange={(event) => updateField('email', event.target.value)}
               placeholder="you@example.com"
+              autoComplete="email"
               required
             />
           </label>
@@ -136,11 +247,19 @@ export default function WebsitePreviewStudio() {
               placeholder="Describe the website, offer, and what you want the first page to do."
               required
             />
+            <div className="hero__actions">
+              <button className="button button--ghost" type="button" onClick={handleVoicePrompt} disabled={voiceBusy}>
+                {voiceBusy ? 'Listening...' : 'Speak your website idea'}
+              </button>
+            </div>
           </label>
           <div className="preview-form__grid">
             <label className="field">
               <span>Website type</span>
-              <select value={form.websiteType} onChange={(event) => updateField('websiteType', event.target.value)}>
+              <select
+                value={form.websiteType}
+                onChange={(event) => updateField('websiteType', event.target.value)}
+              >
                 {WEBSITE_TYPES.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -150,7 +269,10 @@ export default function WebsitePreviewStudio() {
             </label>
             <label className="field">
               <span>Art direction</span>
-              <select value={form.styleTone} onChange={(event) => updateField('styleTone', event.target.value)}>
+              <select
+                value={form.styleTone}
+                onChange={(event) => updateField('styleTone', event.target.value)}
+              >
                 {STYLE_TONES.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -182,13 +304,18 @@ export default function WebsitePreviewStudio() {
 
           <div className="preview-form__actions">
             <button className="button button--primary" type="submit" disabled={busy}>
-              {busy ? 'Generating preview...' : 'Generate preview'}
+              {busy ? 'Generating…' : preview ? 'Regenerate preview' : 'Generate preview'}
             </button>
             <p className="field-note">
-              The source pack is reserved to the email above. When checkout automation is configured, delivery can be emailed automatically from the same purchase flow.
+              The source pack is reserved to the email above. Preview rendering works offline and does not share
+              your brief with any external service.
             </p>
           </div>
-          {error ? <p className="form-error">{error}</p> : null}
+          {error ? (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          ) : null}
         </form>
 
         <div className="preview-stage">
@@ -197,23 +324,38 @@ export default function WebsitePreviewStudio() {
               <span className="eyebrow">Inspectable output</span>
               <h3>{preview?.title ?? 'Your generated preview appears here'}</h3>
             </div>
-            {preview ? <span className="tag">{preview.requestId}</span> : null}
+            {preview ? (
+              <div className="preview-stage__meta">
+                <span className="tag">Quality {preview.qualityScore}/100</span>
+                <button
+                  type="button"
+                  className="button button--ghost button--compact"
+                  onClick={handleOpenInNewTab}
+                >
+                  Open in new tab
+                </button>
+              </div>
+            ) : null}
           </div>
 
           <div className="preview-device">
             {preview ? (
               <iframe
+                key={preview.requestId}
                 className="preview-device__frame"
                 title={preview.title}
                 srcDoc={preview.previewHtml}
                 loading="lazy"
-                sandbox="allow-same-origin"
+                sandbox=""
                 referrerPolicy="no-referrer"
               />
             ) : (
               <div className="preview-device__placeholder">
                 <strong>Scroll-ready preview window</strong>
-                <p>Generate a concept and this area becomes a live, scrollable website mockup.</p>
+                <p>
+                  Fill in the brief and press <em>Generate preview</em>. A full scrollable homepage mockup renders
+                  inside this window instantly.
+                </p>
               </div>
             )}
           </div>
@@ -225,8 +367,13 @@ export default function WebsitePreviewStudio() {
                 <p>{preview.summary}</p>
                 <p className="field-note">Includes: {preview.sourceFiles.join(', ')}</p>
               </div>
-              <button className="button button--primary" type="button" onClick={handlePurchase} disabled={checkoutBusy}>
-                {checkoutBusy ? 'Opening checkout...' : 'Buy source pack'}
+              <button
+                className="button button--primary"
+                type="button"
+                onClick={handlePurchase}
+                disabled={checkoutBusy}
+              >
+                {checkoutBusy ? 'Opening checkout…' : 'Buy source pack'}
               </button>
             </div>
           ) : null}
