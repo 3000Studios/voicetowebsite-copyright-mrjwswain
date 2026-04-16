@@ -216,7 +216,7 @@ router.get('/admin/stats', async (_request, response, next) => {
 })
 
 // Checkout: /api/create-checkout-session (compat)
-router.post('/create-checkout-session', async (_request, response, next) => {
+router.post('/create-checkout-session', async (_request, response) => {
   try {
     const stripeKey = process.env.STRIPE_SECRET_KEY ?? ''
     const appUrl = (process.env.APP_URL || process.env.SITE_ORIGIN || 'http://localhost:3000').trim()
@@ -258,7 +258,7 @@ router.post('/create-checkout-session', async (_request, response, next) => {
     }
 
     response.json({ id: session.id, url: session.url })
-  } catch (error) {
+  } catch {
     // Fallback: prevent UI crashes when compat checkout isn't configured.
     const appUrl = (process.env.APP_URL || process.env.SITE_ORIGIN || 'http://localhost:3000').trim()
     response.json({ id: 'local-dummy-session', url: `${appUrl}/dashboard?success=true` })
