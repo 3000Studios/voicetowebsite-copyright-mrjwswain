@@ -14,4 +14,3 @@ API_MODE="repo-local"
 binding = "ASSETS_BUCKET"
 bucket_name = "voicetowebsite"
 preview_bucket_name = "voicetowebsite"
-
