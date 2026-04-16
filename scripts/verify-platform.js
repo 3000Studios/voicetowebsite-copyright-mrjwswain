@@ -1,8 +1,12 @@
+import dotenv from 'dotenv'
 import { validateCommand } from '../ai/router/commandRouter.js'
 import { bootstrapContent, getContentBundle } from '../server/services/contentService.js'
 import { getAnalyticsSnapshot } from '../server/services/analyticsService.js'
 import { resolveModelRoute } from '../ai/router/modelRouter.js'
 import { previewTrafficTopics } from '../ai/trafficEngine.js'
+
+dotenv.config({ path: '.env.local' })
+dotenv.config()
 
 await bootstrapContent()
 

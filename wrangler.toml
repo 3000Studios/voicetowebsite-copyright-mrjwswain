@@ -1,8 +1,8 @@
 "$schema" = "./node_modules/wrangler/config-schema.json"
 name = "voicetowebsite"
+main = "worker/worker.js"
 compatibility_date = "2026-04-11"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "dist"
 
 [vars]
 NODE_ENV="production"

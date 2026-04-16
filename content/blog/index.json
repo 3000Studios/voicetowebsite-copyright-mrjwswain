@@ -1,37 +1,3 @@
 {
-  "posts": [
-    {
-      "slug": "ai-system-manager-positioning",
-      "title": "Why AI System Manager is a stronger market position than AI website builder",
-      "excerpt": "The difference between a vague AI product and a sellable offer is usually positioning. Here is the case for leading with execution, not novelty.",
-      "publishedAt": "2026-03-20",
-      "tags": [
-        "positioning",
-        "strategy",
-        "saas"
-      ]
-    },
-    {
-      "slug": "productized-ai-automation-services",
-      "title": "How productized AI automation services can fund a software business early",
-      "excerpt": "The fastest path to revenue is often a hybrid model: software at the center, services around the edges, and enterprise expansion behind it.",
-      "publishedAt": "2026-03-20",
-      "tags": [
-        "services",
-        "revenue",
-        "automation"
-      ]
-    },
-    {
-      "slug": "ai-automation-platform",
-      "title": "Building an AI execution platform with repo-backed control",
-      "excerpt": "How to combine command routing, versioned content, and deploy-ready workflows into a trustworthy operating system.",
-      "publishedAt": "2026-03-19",
-      "tags": [
-        "automation",
-        "operations",
-        "platform"
-      ]
-    }
-  ]
+  "posts": []
 }

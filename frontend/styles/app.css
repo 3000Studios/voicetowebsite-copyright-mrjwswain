@@ -761,6 +761,80 @@ button:disabled {
   accent-color: var(--prism-2);
 }
 
+.adsense-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.adsense-wrap ins.adsbygoogle {
+  width: 100%;
+  max-width: 980px;
+}
+
+.adsense-placeholder {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+}
+
+.home-remix .hero--remix {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 1.2rem;
+}
+
+.home-remix__signal-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.home-remix__float-panel {
+  margin-top: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.1rem;
+  padding: 0.75rem 0.9rem;
+  background: rgba(8, 15, 28, 0.58);
+}
+
+.home-remix__workflow {
+  background:
+    radial-gradient(circle at top left, rgba(255, 122, 24, 0.16), transparent 38%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    var(--surface-strong);
+}
+
+.home-remix__timeline {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.home-remix__timeline-card {
+  min-height: 100%;
+  transform-style: preserve-3d;
+}
+
+.home-remix__pricing-highlight {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.16), transparent 35%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    var(--surface-strong);
+}
+
+.page-remix__hero {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(61, 217, 180, 0.14), transparent 42%),
+    radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.14), transparent 36%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    var(--surface-strong);
+}
+
+.page-remix__surface {
+  border-radius: 1.4rem;
+}
+
 .preview-studio__layout,
 .preview-form__grid,
 .store-grid {
@@ -1661,7 +1735,8 @@ button:disabled {
   .site-footer__grid,
   .newsletter-form,
   .preview-studio__layout,
-  .preview-form__grid {
+  .preview-form__grid,
+  .home-remix__timeline {
     grid-template-columns: 1fr;
   }
 
@@ -1797,5 +1872,27 @@ button:disabled {
   .prism-nav {
     top: 1.2rem;
     right: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .ticker-move {
+    animation: none !important;
+  }
+
+  .brand__pulse {
+    animation: none !important;
+  }
+
+  .aurora {
+    display: none !important;
+  }
+
+  .cursor-blob {
+    display: none !important;
   }
 }

@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
 import path from "node:path";
@@ -5,8 +6,12 @@ import { fileURLToPath } from "node:url";
 import adminSessionRoutes from "./routes/adminSessionRoutes.js";
 import commandRoutes from "./routes/commandRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
+import compatApiRoutes from "./routes/compatApiRoutes.js";
 import { postStripeWebhook } from "./controllers/publicController.js";
 import { bootstrapContent } from "./services/contentService.js";
+
+dotenv.config({ path: ".env.local" });
+dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 8787);
@@ -61,6 +66,7 @@ app.get("/api/health", async (_request, response) => {
 
 app.use("/api/admin", adminSessionRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api", compatApiRoutes);
 app.use("/api", commandRoutes);
 
 app.use((error, _request, response, _next) => {

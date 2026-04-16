@@ -15,7 +15,7 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "deploy": "node scripts/deploy-site.js",
-    "pages:deploy": "wrangler pages deploy --branch main",
+    "pages:deploy": "wrangler pages deploy dist --branch main",
     "workers:deploy": "wrangler deploy --config wrangler.worker.toml",
     "pages:dev": "wrangler pages dev dist",
     "command": "node scripts/run-command.js",

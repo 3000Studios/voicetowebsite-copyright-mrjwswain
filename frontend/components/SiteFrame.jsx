@@ -4,6 +4,7 @@ import PrismEnvironment from './PrismEnvironment.jsx'
 import { publicNavItems, publicStatusLines, publicTickerItems } from '../src/siteChrome.js'
 import { REPOSITORY_URL, SITE_DISPLAY_NAME, SITE_URL, getCopyrightLine } from '../src/siteMeta.js'
 import { trackSiteEvent } from '../src/siteApi.js'
+import AdSlot from './AdSlot.jsx'
 
 const VISITOR_SESSION_KEY = 'voicetowebsite_session_id'
 const LEGACY_VISITOR_SESSION_KEY = 'myappai_session_id'
@@ -49,7 +50,7 @@ export default function SiteFrame() {
 
   return (
     <div className="shell">
-      <PrismEnvironment navItems={publicNavItems} statusLines={publicStatusLines} tickerItems={publicTickerItems} />
+      <PrismEnvironment navItems={[]} statusLines={publicStatusLines} tickerItems={publicTickerItems} />
       <header className="site-header">
         <div className="site-header__inner">
           <NavLink className="brand" to="/">
@@ -95,7 +96,13 @@ export default function SiteFrame() {
         </div>
       </header>
       <main className="page">
+        <div className="adsense-wrap adsense-wrap--leaderboard">
+          <AdSlot variant="leaderboard" />
+        </div>
         <Outlet />
+        <div className="adsense-wrap adsense-wrap--rectangle">
+          <AdSlot variant="rectangle" />
+        </div>
       </main>
       <footer className="site-footer">
         <div className="site-footer__grid">

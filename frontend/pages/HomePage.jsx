@@ -35,6 +35,7 @@ export default function HomePage() {
   const { snapshot } = useSiteRuntime()
   const appStoreItems = productCatalog.filter((product) => product.category === 'app')
   const featuredStoreItems = appStoreItems.slice(0, 4)
+  const spotlightOffers = pricingPage.tiers.slice(0, 3)
   const liveMetrics = [
     { label: 'Visitors tracked', value: String(snapshot?.analytics?.visitors ?? 0) },
     { label: 'Leads captured', value: String(snapshot?.analytics?.leads ?? 0) },
@@ -43,17 +44,13 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="stack-xl">
-      <motion.section className="hero" variants={staggerParent} initial="hidden" animate="visible">
+    <div className="stack-xl home-remix">
+      <motion.section className="hero hero--remix" variants={staggerParent} initial="hidden" animate="visible">
         <motion.div className="hero__copy" variants={fadeUp}>
-          <span className="eyebrow">{homepage.eyebrow}</span>
+          <span className="eyebrow">Award-style digital experience</span>
           <PrismHeadline text={homepage.headline} />
           <p>{homepage.subheadline}</p>
-          <div className="hero__price-callout">
-            <strong>VoiceToWebsite Builder</strong>
-            <span>Source-ready offer from $49</span>
-          </div>
-          <div className="tag-row">
+          <div className="home-remix__signal-grid">
             {homepage.operatorSignals.map((signal) => (
               <span key={signal} className="tag">
                 {signal}
@@ -77,7 +74,7 @@ export default function HomePage() {
               badges: homepage.media?.badges ?? homepage.operatorSignals
             }}
           />
-          <div className="stack-sm hero__signals">
+          <div className="home-remix__float-panel">
             {homepage.heroPanel.points.map((point) => (
               <div key={point.label} className="commit-row">
                 <strong>{point.label}</strong>
@@ -90,26 +87,52 @@ export default function HomePage() {
 
       <MetricStrip items={liveMetrics} />
 
+      <section className="section-card home-remix__workflow">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Launch flow</span>
+            <h2>{homepage.workflowHeadline}</h2>
+            <p className="section-intro">
+              Completely redesigned flow: strategy-first messaging, motion-rich visuals, conversion checkpoints, and checkout-ready execution.
+            </p>
+          </div>
+        </div>
+        <div className="home-remix__timeline">
+          {homepage.workflowSteps.map((step, index) => (
+            <article key={step.title} className="content-card home-remix__timeline-card">
+              <span className="step-number">0{index + 1}</span>
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <WebsitePreviewStudio />
 
       <section className="section-card">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">App store</span>
-            <h2>High-demand website products to sell right now</h2>
+            <span className="eyebrow">Featured builds</span>
+            <h2>New product-first visual marketplace</h2>
             <p className="section-intro">
-              The product catalog now includes ready-to-sell website packs for lead generation, bookings, creator launches, and the builder itself.
+              A cleaner storefront with faster scanning, better hover behavior, and stronger path-to-checkout layout for mobile and desktop.
             </p>
           </div>
           <Link className="button button--ghost" to="/products">
-            Browse every app
+            View all products
           </Link>
         </div>
         <div className="store-grid">
           {featuredStoreItems.map((product) => (
             <article key={product.slug} className="store-card">
               <div className="store-card__media">
-                <img src={getStoreArtwork(product.slug)} alt={product.name} />
+                <img
+                  src={getStoreArtwork(product.slug)}
+                  alt={product.name}
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div className="store-card__body">
                 <div className="store-card__head">
@@ -135,17 +158,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      <MediaShowcase media={homepage.media} />
-
-      <section className="section-card">
-        <span className="eyebrow">How it works</span>
-        <h2>{homepage.workflowHeadline}</h2>
-        <div className="card-grid card-grid--compact">
-          {homepage.workflowSteps.map((step, index) => (
-            <article key={step.title} className="content-card content-card--step">
-              <span className="step-number">0{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.description}</p>
+      <section className="section-card home-remix__pricing-highlight">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Monetization stack</span>
+            <h2>Revenue architecture redesigned</h2>
+            <p className="section-intro">
+              Tiered offer path with immediate CTA entry points and stronger conversion framing.
+            </p>
+          </div>
+          <Link className="button button--ghost" to="/pricing">
+            Open full pricing
+          </Link>
+        </div>
+        <div className="card-grid">
+          {spotlightOffers.map((tier) => (
+            <article key={tier.name} className={`content-card pricing-card${tier.featured ? ' pricing-card--featured' : ''}`}>
+              <span className="meta-line">{tier.price}</span>
+              <h3>{tier.name}</h3>
+              <p>{tier.description}</p>
+              <ul className="bullet-list">
+                {tier.features.slice(0, 4).map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
             </article>
           ))}
         </div>
@@ -154,34 +190,16 @@ export default function HomePage() {
       <RichBlocks title={featurePage.headline} intro={featurePage.intro} items={featurePage.items} />
       <RichBlocks title="Who it is built for" intro={homepage.audienceIntro} items={homepage.audiences} />
 
-      <section className="section-card">
-        <span className="eyebrow">Proof of value</span>
-        <h2>{homepage.proofHeadline}</h2>
-        <div className="card-grid card-grid--compact">
-          {homepage.proofCards.map((item) => (
-            <article key={item.title} className="content-card">
-              <span className="meta-line">{item.eyebrow}</span>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-              <p className="content-card__outcome">{item.outcome}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
       {snapshot?.commerce?.offers?.length ? (
         <section className="section-card">
           <div className="section-heading">
             <div>
               <span className="eyebrow">Live checkout</span>
-              <h2>Sell directly from the site</h2>
+              <h2>Direct buy experience</h2>
               <p className="section-intro">
-                Stripe and PayPal buttons only appear when live configuration exists. Revenue totals update from recorded transactions, not seeded numbers.
+                Every offer card is optimized for immediate checkout and tracks real conversion data from your active integrations.
               </p>
             </div>
-            <Link className="button button--ghost" to="/pricing">
-              Open pricing
-            </Link>
           </div>
           <div className="card-grid">
             {snapshot.commerce.offers.filter((offer) => offer.slug !== 'enterprise-deployment').map((offer) => (
@@ -192,35 +210,6 @@ export default function HomePage() {
       ) : null}
 
       <NewsletterSignupForm />
-
-      <section className="section-card">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">Offers</span>
-            <h2>{pricingPage.headline}</h2>
-            <p className="section-intro">{pricingPage.subheadline}</p>
-          </div>
-          <Link className="button button--ghost" to="/pricing">
-            Full pricing
-          </Link>
-        </div>
-        <div className="card-grid">
-          {pricingPage.tiers.map((tier) => (
-            <article key={tier.name} className={`content-card pricing-card${tier.featured ? ' pricing-card--featured' : ''}`}>
-              <span className="meta-line">{tier.price}</span>
-              <h3>{tier.name}</h3>
-              <p>{tier.description}</p>
-              <ul className="bullet-list">
-                {tier.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <RichBlocks title="Ways to buy" intro={homepage.productsIntro} items={productCatalog} />
 
       <section className="section-card">
         <span className="eyebrow">Frequently asked</span>

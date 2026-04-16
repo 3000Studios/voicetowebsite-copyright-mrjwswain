@@ -52,8 +52,8 @@ export default function CheckoutSuccessPage() {
   }, [refresh, searchParams])
 
   return (
-    <div className="stack-xl">
-      <section className="section-card centered-card">
+    <div className="stack-xl page-remix">
+      <section className="section-card centered-card page-remix__hero">
         <span className="eyebrow">Checkout</span>
         <h1>{state.loading ? 'Confirming payment...' : state.error ? 'Checkout needs attention' : 'Payment received'}</h1>
         {state.error ? (

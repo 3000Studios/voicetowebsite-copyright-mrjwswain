@@ -7,18 +7,18 @@ import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
 
 export default function BlogPage() {
   return (
-    <div className="stack-xl">
-      <section className="section-card">
+    <div className="stack-xl page-remix">
+      <section className="section-card page-remix__hero">
         <span className="eyebrow">Insights</span>
         <PrismHeadline text="Strategy for AI-run operations" />
         <p className="section-intro">
-          These articles support SEO, buyer education, and trust for the categories {SITE_DISPLAY_NAME} wants to own:
+          Long-form content redesigned for readability, authority, and conversion support across SEO entry pages.
         </p>
       </section>
 
-      <MediaShowcase />
+      <MediaShowcase media={{ title: `${SITE_DISPLAY_NAME} editorial system`, description: 'Trust-building content that supports product conversion.' }} />
 
-      <section className="card-grid">
+      <section className="card-grid page-remix__surface">
         {blogIndex.posts.map((post) => (
           <article key={post.slug} className="content-card">
             <span className="meta-line">{post.publishedAt}</span>
