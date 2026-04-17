@@ -13,6 +13,8 @@ const DEFAULT_PAYMENTS = {
   updatedAt: null
 }
 
+let cachedLedger = null
+
 function nowIso() {
   return new Date().toISOString()
 }
@@ -109,14 +111,22 @@ function getPayPalConfig(slug) {
 }
 
 async function readPayments() {
-  return readSystemDocument('payments.json', DEFAULT_PAYMENTS)
+  if (cachedLedger) {
+    return cachedLedger
+  }
+
+  cachedLedger = await readSystemDocument('payments.json', DEFAULT_PAYMENTS)
+  return cachedLedger
 }
 
 async function writePayments(payload) {
-  await writeSystemDocument('payments.json', {
+  const nextLedger = {
     ...payload,
     updatedAt: nowIso()
-  })
+  }
+
+  cachedLedger = nextLedger
+  await writeSystemDocument('payments.json', nextLedger)
 }
 
 export async function recordPayment(payment) {
