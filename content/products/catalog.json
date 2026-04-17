@@ -49,6 +49,42 @@
       "ctaHref": "/products/creator-course-kit"
     },
     {
+      "slug": "starter",
+      "name": "Starter",
+      "summary": "Entry subscription for voice-driven website generation.",
+      "idealFor": "Solo founders and first-time launches",
+      "outcome": "Launch quickly with a lower monthly commitment.",
+      "priceAnchor": "$9.99 / month",
+      "category": "platform",
+      "stripeMode": "subscription",
+      "ctaLabel": "Subscribe",
+      "ctaHref": "/store"
+    },
+    {
+      "slug": "pro-starter",
+      "name": "Pro Starter",
+      "summary": "Primary growth subscription with stronger throughput and support.",
+      "idealFor": "Small teams shipping customer-facing websites weekly",
+      "outcome": "Faster output, richer generation control, and conversion tuning.",
+      "priceAnchor": "$19.99 / month",
+      "category": "platform",
+      "stripeMode": "subscription",
+      "ctaLabel": "Subscribe",
+      "ctaHref": "/store"
+    },
+    {
+      "slug": "ultimate",
+      "name": "Ultimate",
+      "summary": "Full premium subscription tier for high-volume generation and operations.",
+      "idealFor": "Agencies and operators managing multiple brands",
+      "outcome": "Higher throughput and premium production workflow support.",
+      "priceAnchor": "$29.99 / month",
+      "category": "platform",
+      "stripeMode": "subscription",
+      "ctaLabel": "Subscribe",
+      "ctaHref": "/store"
+    },
+    {
       "slug": "operator-os",
       "name": "Operator OS",
       "summary": "The recurring software offer for teams that want an AI-managed system for execution, automation, and release workflows.",

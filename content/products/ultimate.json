@@ -1,0 +1,12 @@
+{
+  "slug": "ultimate",
+  "name": "Ultimate",
+  "headline": "Ultimate subscription for premium multi-brand operations",
+  "priceAnchor": "$29.99",
+  "stripeMode": "subscription",
+  "idealFor": "Agencies and operators managing multiple brands",
+  "description": "Ultimate provides the highest monthly tier for premium generation volume and workflow operations.",
+  "category": "platform",
+  "deliveryType": "subscription",
+  "deliveryCopy": "Monthly subscription access."
+}

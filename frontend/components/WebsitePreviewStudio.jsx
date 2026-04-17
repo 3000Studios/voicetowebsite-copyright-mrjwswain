@@ -187,20 +187,6 @@ export default function WebsitePreviewStudio() {
     recognition.start()
   }
 
-  function handleOpenInNewTab() {
-    if (!preview || typeof window === 'undefined') {
-      return
-    }
-    const blob = new Blob([preview.previewHtml], { type: 'text/html' })
-    const url = URL.createObjectURL(blob)
-    const win = window.open(url, '_blank', 'noopener')
-    if (win) {
-      setTimeout(() => URL.revokeObjectURL(url), 30_000)
-    } else {
-      URL.revokeObjectURL(url)
-    }
-  }
-
   return (
     <section className="preview-studio section-card" id="website-generator">
       <div className="preview-studio__intro">
@@ -321,19 +307,12 @@ export default function WebsitePreviewStudio() {
         <div className="preview-stage">
           <div className="preview-stage__header">
             <div>
-              <span className="eyebrow">Inspectable output</span>
+              <span className="eyebrow">Protected preview output</span>
               <h3>{preview?.title ?? 'Your generated preview appears here'}</h3>
             </div>
             {preview ? (
               <div className="preview-stage__meta">
                 <span className="tag">Quality {preview.qualityScore}/100</span>
-                <button
-                  type="button"
-                  className="button button--ghost button--compact"
-                  onClick={handleOpenInNewTab}
-                >
-                  Open in new tab
-                </button>
               </div>
             ) : null}
           </div>

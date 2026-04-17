@@ -1,0 +1,12 @@
+{
+  "slug": "pro-starter",
+  "name": "Pro Starter",
+  "headline": "Pro Starter subscription for growth-stage website operations",
+  "priceAnchor": "$19.99",
+  "stripeMode": "subscription",
+  "idealFor": "Small teams shipping customer-facing websites weekly",
+  "description": "Pro Starter expands generation throughput and supports ongoing conversion-focused production output.",
+  "category": "platform",
+  "deliveryType": "subscription",
+  "deliveryCopy": "Monthly subscription access."
+}

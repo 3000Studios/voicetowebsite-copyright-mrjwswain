@@ -44,6 +44,24 @@ const TYPE_LABELS = {
   ecommerce: 'Ecommerce launch'
 }
 
+const FONT_LIBRARY = [
+  { name: 'Inter', family: '"Inter", "Segoe UI", sans-serif', query: 'family=Inter:wght@400;500;700;800' },
+  { name: 'Poppins', family: '"Poppins", "Segoe UI", sans-serif', query: 'family=Poppins:wght@400;500;700;800' },
+  { name: 'Montserrat', family: '"Montserrat", "Segoe UI", sans-serif', query: 'family=Montserrat:wght@400;500;700;800' },
+  { name: 'Playfair Display', family: '"Playfair Display", Georgia, serif', query: 'family=Playfair+Display:wght@500;700;800' },
+  { name: 'Space Grotesk', family: '"Space Grotesk", "Segoe UI", sans-serif', query: 'family=Space+Grotesk:wght@400;500;700' }
+]
+
+const MEDIA_LIBRARY = {
+  defaultVideo: 'https://cdn.coverr.co/videos/coverr-man-working-on-a-laptop-1579/1080p.mp4',
+  byKeyword: [
+    { test: /(gym|fitness|workout|health)/i, video: 'https://cdn.coverr.co/videos/coverr-woman-doing-yoga-at-home-1577/1080p.mp4' },
+    { test: /(restaurant|food|chef|cafe)/i, video: 'https://cdn.coverr.co/videos/coverr-pouring-fresh-coffee-1574/1080p.mp4' },
+    { test: /(real estate|home|property)/i, video: 'https://cdn.coverr.co/videos/coverr-modern-living-room-5142/1080p.mp4' },
+    { test: /(fashion|beauty|salon)/i, video: 'https://cdn.coverr.co/videos/coverr-a-young-woman-standing-in-the-city-1576/1080p.mp4' }
+  ]
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -51,6 +69,44 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;')
+}
+
+function pickFont(brief) {
+  const lower = String(brief ?? '').toLowerCase()
+  const requested = FONT_LIBRARY.find((font) => lower.includes(font.name.toLowerCase()))
+  if (requested) return requested
+  if (/luxury|elegant|premium|editorial/i.test(lower)) return FONT_LIBRARY.find((font) => font.name === 'Playfair Display')
+  if (/modern|minimal|tech|saas/i.test(lower)) return FONT_LIBRARY.find((font) => font.name === 'Inter')
+  if (/bold|energetic|startup/i.test(lower)) return FONT_LIBRARY.find((font) => font.name === 'Montserrat')
+  return FONT_LIBRARY[0]
+}
+
+function extractDirective(brief, label) {
+  const expression = new RegExp(`${label}\\s*[:=]\\s*([^\\n.,;]+)`, 'i')
+  const match = String(brief ?? '').match(expression)
+  return match?.[1]?.trim() ?? ''
+}
+
+function resolveMediaPlan(brief, websiteType) {
+  const prompt = String(brief ?? '')
+  const explicitVideo = extractDirective(prompt, 'video') || extractDirective(prompt, 'hero video')
+  const imageDirective = extractDirective(prompt, 'image') || extractDirective(prompt, 'hero image')
+  const keywordVideo =
+    MEDIA_LIBRARY.byKeyword.find((entry) => entry.test.test(prompt))?.video ??
+    (websiteType === 'ecommerce'
+      ? 'https://cdn.coverr.co/videos/coverr-online-shopping-1572/1080p.mp4'
+      : MEDIA_LIBRARY.defaultVideo)
+
+  const slug = slugify(prompt || websiteType || 'preview')
+  return {
+    heroVideo: /^https?:\/\//i.test(explicitVideo) ? explicitVideo : keywordVideo,
+    heroImage: /^https?:\/\//i.test(imageDirective)
+      ? imageDirective
+      : `https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80&sig=${slug}`,
+    gallery: ['a', 'b', 'c'].map(
+      (suffix) => `https://picsum.photos/seed/${slug}-${suffix}/1200/800`
+    )
+  }
 }
 
 function slugify(value) {
@@ -175,6 +231,8 @@ function buildSectionData({ brief, audience, websiteType, primaryCta }) {
 
 function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta }) {
   const theme = getThemePreset(websiteType, styleTone)
+  const font = pickFont(brief)
+  const media = resolveMediaPlan(brief, websiteType)
   const [canvas, surface, accent, ink] = theme.palette
   const sections = buildSectionData({ brief, audience, websiteType, primaryCta })
   const seoKeywords = extractKeywords(brief, websiteType, audience)
@@ -210,7 +268,18 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
     <meta property="og:description" content="${escapeHtml(seoDescription)}" />
     <meta property="og:type" content="website" />
     <title>${escapeHtml(title)}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?${font.query}&display=swap" rel="stylesheet" />
     <script type="application/ld+json">${JSON.stringify(faqSchema)}</script>
+    <script>
+      document.addEventListener('contextmenu', (event) => event.preventDefault());
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && ['I','J','C'].includes(event.key.toUpperCase()))) {
+          event.preventDefault();
+        }
+      });
+    </script>
     <style>
       :root {
         color-scheme: dark;
@@ -224,7 +293,7 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        font-family: "Segoe UI", Inter, sans-serif;
+        font-family: ${font.family};
         background: var(--canvas);
         color: var(--ink);
         line-height: 1.6;
@@ -244,6 +313,8 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
       h1 { font-size: clamp(2.3rem, 7vw, 4.8rem); line-height: 0.95; margin-top: 18px; max-width: 10ch; }
       .hero__lede { max-width: 58ch; margin-top: 18px; color: var(--muted); }
       .hero__grid { margin-top: 30px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 18px; }
+      .hero__media { border-radius: 24px; overflow: hidden; border: 1px solid var(--line); background: rgba(0,0,0,.35); }
+      .hero__media video, .hero__media img { width: 100%; height: 100%; min-height: 380px; object-fit: cover; display: block; }
       .panel, .card, .quote {
         border-radius: 24px;
         border: 1px solid var(--line);
@@ -313,6 +384,11 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
           <h1>${escapeHtml(title)}</h1>
           <p class="hero__lede">${escapeHtml(brief)}</p>
           <div class="hero__grid">
+            <div class="hero__media">
+              <video autoplay muted loop playsinline poster="${escapeHtml(media.heroImage)}">
+                <source src="${escapeHtml(media.heroVideo)}" type="video/mp4" />
+              </video>
+            </div>
             <div class="panel">
               <div class="panel__screen">
                 <div class="dot-row"><span></span><span></span><span></span></div>
@@ -343,6 +419,13 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
               </div>
             </div>
           </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-grid">
+          ${media.gallery
+            .map((image, index) => `<article class="card"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} image ${index + 1}" style="width:100%;height:220px;object-fit:cover;border-radius:14px;border:1px solid var(--line)" loading="lazy" decoding="async" /><p style="margin-top:14px">Prompt-driven image slot ${index + 1} ready for final asset replacement.</p></article>`)
+            .join('')}
         </div>
       </section>
       <section class="section">
