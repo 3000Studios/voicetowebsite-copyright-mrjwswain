@@ -1,19 +1,19 @@
 {
   "name": "Voicetowebsite",
   "palette": {
-    "bg": "#08111f",
-    "canvas": "#08111f",
+    "bg": "#071826",
+    "canvas": "#071826",
     "surface": "rgba(255,255,255,0.78)",
-    "surface-strong": "rgba(10,24,43,0.78)",
-    "ink": "#e5eefb",
-    "chrome": "#f8fafc",
-    "muted": "rgba(226,232,240,0.75)",
-    "accent": "#ff7a18",
-    "highlight": "#3dd9b4",
-    "prism-1": "#ff7a18",
-    "prism-2": "#3dd9b4",
-    "prism-3": "#38bdf8",
-    "line": "rgba(148,163,184,0.22)"
+    "surface-strong": "rgba(8,24,36,0.78)",
+    "ink": "#e8f2fb",
+    "chrome": "#f8fbff",
+    "muted": "rgba(232,242,251,0.72)",
+    "accent": "#69b7d6",
+    "highlight": "#b8d6e4",
+    "prism-1": "#69b7d6",
+    "prism-2": "#b8d6e4",
+    "prism-3": "#1c4f68",
+    "line": "rgba(105,183,214,0.18)"
   },
   "motion": {
     "hero": "orbital-rise",

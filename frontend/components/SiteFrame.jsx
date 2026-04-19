@@ -57,8 +57,9 @@ export default function SiteFrame() {
       <header className="site-header">
         <div className="site-header__inner">
           <NavLink className="brand" to="/">
-            <span className="brand__pulse" />
-            <span className="brand__wordmark">{SITE_DISPLAY_NAME}</span>
+            <span className="brand__pulse" aria-hidden="true" />
+            <img className="brand__logo" src="/media/voicetowebsite-logo.jpg" alt="Voicetowebsite.com" />
+            <span className="brand__wordmark sr-only">{SITE_DISPLAY_NAME}</span>
           </NavLink>
 
           <button

@@ -8,7 +8,8 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <div className="site-footer__grid">
         <div className="site-footer__brand">
-          <span className="eyebrow">{SITE_DISPLAY_NAME}</span>
+          <img className="site-footer__logo" src="/media/voicetowebsite-logo.jpg" alt="Voicetowebsite.com" />
+          <span className="eyebrow sr-only">{SITE_DISPLAY_NAME}</span>
           <h2>Ship marketing sites from voice and text without losing structure or speed.</h2>
           <p>
             {SITE_DISPLAY_NAME} turns spoken or written briefs into structured pages, SEO content, and deployments
