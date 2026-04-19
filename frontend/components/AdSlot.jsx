@@ -1,23 +1,29 @@
 import React, { useEffect, useMemo } from 'react'
 
-const slotIds = {
-  leaderboard: '1234567890',
-  rectangle: '0987654321'
-}
+const DEFAULT_ADSENSE_PUBLISHER = 'ca-pub-5800977493749262'
 
 function getAdsEnabled() {
   const raw = import.meta.env.VITE_ENABLE_ADS
-  return String(raw ?? '').toLowerCase() === 'true'
+  const normalized = String(raw ?? '').toLowerCase()
+  if (normalized === 'true') return true
+  if (normalized === 'false') return false
+  return Boolean(import.meta.env.PROD)
+}
+
+function getSlotId(variant) {
+  if (variant === 'rectangle') return import.meta.env.VITE_ADSENSE_SLOT_RECTANGLE
+  return import.meta.env.VITE_ADSENSE_SLOT_LEADERBOARD
 }
 
 export default function AdSlot({ variant = 'leaderboard' }) {
   const adsEnabled = useMemo(() => getAdsEnabled(), [])
-  const publisher = import.meta.env.VITE_ADSENSE_PUBLISHER
+  const publisher = import.meta.env.VITE_ADSENSE_PUBLISHER || DEFAULT_ADSENSE_PUBLISHER
   const hasPublisher = typeof publisher === 'string' && publisher.startsWith('ca-pub-')
-  const slotId = slotIds[variant] ?? slotIds.leaderboard
+  const slotId = getSlotId(variant)
+  const hasSlotId = typeof slotId === 'string' && /^\d+$/.test(slotId)
 
   useEffect(() => {
-    if (!adsEnabled || !hasPublisher || typeof window === 'undefined') {
+    if (!adsEnabled || !hasPublisher || !hasSlotId || typeof window === 'undefined') {
       return
     }
 
@@ -50,19 +56,7 @@ export default function AdSlot({ variant = 'leaderboard' }) {
     return () => window.clearInterval(handle)
   }, [adsEnabled, hasPublisher, variant])
 
-  // Always reserve space to prevent layout shift (even if AdSense is not yet enabled).
-  const reservedHeight = variant === 'rectangle' ? 250 : 90
-  const reservedWidth = variant === 'rectangle' ? 300 : 728
-
-  if (!adsEnabled || !hasPublisher) {
-    return (
-      <div
-        className="adsense-placeholder"
-        aria-hidden="true"
-        style={{ minHeight: reservedHeight, width: '100%', maxWidth: reservedWidth }}
-      />
-    )
-  }
+  if (!adsEnabled || !hasPublisher || !hasSlotId) return null
 
   return (
     <ins

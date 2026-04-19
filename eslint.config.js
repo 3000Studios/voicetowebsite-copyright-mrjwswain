@@ -1,6 +1,6 @@
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "uploads/**"]
+    ignores: ["dist/**", "node_modules/**", "uploads/**", "continue-voice-mod/**", ".continue/**", ".cursor/**", ".vscode/**"]
   },
   {
     files: ["**/*.js", "**/*.ts"],

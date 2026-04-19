@@ -41,7 +41,6 @@ return (
         {[
           { action: 'Auto-generated blog post', detail: '"Voice AI Trends 2026"', time: '2 min ago' },
           { action: 'New visitor session', detail: 'San Francisco, CA', time: '5 min ago' },
-          { action: 'AdSense impression', detail: 'Slot #1234567890', time: '8 min ago' },
           { action: 'Auto-generated page', detail: 'Landing page: AI Tools', time: '1 hr ago' }
         ].map((item, i) => (
           <div key={i} className="commit-row">
