@@ -1,5 +1,11 @@
 import crypto from 'node:crypto'
 import { readSystemDocument, writeSystemDocument } from './contentService.js'
+import {
+  recordGeneratedPage,
+  recordGenerationRequest,
+  recordMediaAssets,
+  recordQualityMetrics
+} from './generatorStore.js'
 
 const DEFAULT_PREVIEW_REQUESTS = {
   requests: [],
@@ -161,13 +167,38 @@ function estimateQualityScore({ brief, audience, primaryCta }) {
   const audienceLength = String(audience ?? '').trim().length
   const ctaLength = String(primaryCta ?? '').trim().length
 
+  const metrics = {
+    promptClarity: 0,
+    audienceSpecificity: 0,
+    ctaStrength: 0
+  }
+
   let score = 55
-  if (briefLength >= 70) score += 12
-  if (briefLength >= 140) score += 10
-  if (audienceLength >= 8) score += 8
-  if (ctaLength >= 6) score += 7
-  if (/buy|book|start|get|launch|build/i.test(primaryCta)) score += 8
-  return Math.min(100, score)
+  if (briefLength >= 70) {
+    score += 12
+    metrics.promptClarity += 12
+  }
+  if (briefLength >= 140) {
+    score += 10
+    metrics.promptClarity += 10
+  }
+  if (audienceLength >= 8) {
+    score += 8
+    metrics.audienceSpecificity += 8
+  }
+  if (ctaLength >= 6) {
+    score += 7
+    metrics.ctaStrength += 7
+  }
+  if (/buy|book|start|get|launch|build/i.test(primaryCta)) {
+    score += 8
+    metrics.ctaStrength += 8
+  }
+
+  return {
+    total: Math.min(100, score),
+    metrics
+  }
 }
 
 function buildSectionData({ brief, audience, websiteType, primaryCta }) {
@@ -243,7 +274,8 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
   const mediaSet = getMediaSet(websiteType)
   const seoKeywords = extractKeywords(brief, websiteType, audience)
   const faqEntries = buildFaqEntries(primaryCta, audience, websiteType)
-  const qualityScore = estimateQualityScore({ brief, audience, primaryCta })
+  const quality = estimateQualityScore({ brief, audience, primaryCta })
+  const qualityScore = quality.total
   const seoDescription = `${title}. ${brief}`.slice(0, 158)
   const bulletPoints = [
     'Hero video or motion-ready media slot',
@@ -648,7 +680,15 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
     html,
     files,
     qualityScore,
-    seoKeywords
+    seoKeywords,
+    media: {
+      ...mediaSet,
+      attribution: [
+        { provider: 'Coverr', scope: 'heroVideo', url: mediaSet.heroVideo },
+        ...mediaSet.gallery.map((url) => ({ provider: 'Unsplash', scope: 'image', url }))
+      ]
+    },
+    quality
   }
 }
 
@@ -671,7 +711,9 @@ function summarizeRequest(request) {
     previewHtml: request.previewHtml,
     sourceFiles: request.sourceBundle.files.map((file) => file.path),
     qualityScore: request.qualityScore ?? null,
+    qualityMetrics: request.qualityMetrics ?? null,
     seoKeywords: request.seoKeywords ?? [],
+    media: request.media ?? null,
     recommendedOfferSlug: request.recommendedOfferSlug,
     email: request.email,
     status: request.status,
@@ -680,6 +722,7 @@ function summarizeRequest(request) {
 }
 
 export async function createPreviewRequest(payload) {
+  const dryRun = Boolean(payload?.dryRun)
   const websiteType = String(payload.websiteType ?? 'saas').trim().toLowerCase()
   const styleTone = String(payload.styleTone ?? 'cinematic').trim().toLowerCase()
   const audience = String(payload.audience ?? 'buyers who need a fast launch').trim() || 'buyers who need a fast launch'
@@ -688,10 +731,9 @@ export async function createPreviewRequest(payload) {
   const email = String(payload.email ?? '').trim().toLowerCase()
   const title = extractTitle(brief, websiteType)
   const preview = buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta })
-  const previewRequests = await readPreviewRequests()
 
   const request = {
-    id: buildId('preview'),
+    id: dryRun ? buildId('preview-dryrun') : buildId('preview'),
     slug: slugify(title),
     title,
     email,
@@ -704,7 +746,9 @@ export async function createPreviewRequest(payload) {
     previewHtml: preview.html,
     sourceBundle: { files: preview.files },
     qualityScore: preview.qualityScore,
+    qualityMetrics: preview.quality,
     seoKeywords: preview.seoKeywords,
+    media: preview.media,
     recommendedOfferSlug: 'voice-to-website-builder',
     status: 'preview_ready',
     delivery: {
@@ -715,8 +759,18 @@ export async function createPreviewRequest(payload) {
     createdAt: nowIso()
   }
 
-  previewRequests.requests = [request, ...(previewRequests.requests ?? [])].slice(0, 400)
-  await writePreviewRequests(previewRequests)
+  if (!dryRun) {
+    const previewRequests = await readPreviewRequests()
+    previewRequests.requests = [request, ...(previewRequests.requests ?? [])].slice(0, 400)
+    await writePreviewRequests(previewRequests)
+
+    await Promise.allSettled([
+      recordGenerationRequest(request),
+      recordGeneratedPage(request, preview),
+      recordMediaAssets(request, preview.media),
+      recordQualityMetrics(request, preview.quality)
+    ])
+  }
   return summarizeRequest(request)
 }
 

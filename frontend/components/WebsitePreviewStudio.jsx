@@ -78,20 +78,12 @@ export default function WebsitePreviewStudio() {
     oscillator.stop(now + 0.16)
   }
 
-  function recordLeadInBackground(payload, clientPreview) {
-    createWebsitePreview(payload)
-      .then((response) => {
-        if (response?.preview?.requestId) {
-          setPreview((current) =>
-            current && current.requestId === clientPreview.requestId
-              ? { ...current, requestId: response.preview.requestId, serverRecorded: true }
-              : current
-          )
-        }
-      })
-      .catch(() => {
-        // Silent: preview is already rendered from the local engine.
-      })
+  async function generateViaServer(payload) {
+    const response = await createWebsitePreview(payload)
+    if (!response?.preview?.previewHtml) {
+      throw new Error('Generator response was incomplete.')
+    }
+    return response.preview
   }
 
   function handleGenerate(event) {
@@ -113,18 +105,23 @@ export default function WebsitePreviewStudio() {
     }
 
     setBusy(true)
-    try {
-      const clientPreview = generatePreview({ ...form, email, brief })
-      setPreview(clientPreview)
-      setGenerationCount((n) => n + 1)
-      playUiTone('success')
-      recordLeadInBackground({ ...form, email, brief }, clientPreview)
-    } catch (nextError) {
-      setError(nextError?.message ?? 'The generator could not build a preview.')
-      playUiTone('error')
-    } finally {
-      setBusy(false)
-    }
+    const payload = { ...form, email, brief }
+    const clientPreview = generatePreview(payload)
+    setPreview(clientPreview)
+
+    generateViaServer(payload)
+      .then((serverPreview) => {
+        setPreview({ ...clientPreview, ...serverPreview, serverRecorded: true })
+        setGenerationCount((n) => n + 1)
+        playUiTone('success')
+      })
+      .catch((nextError) => {
+        setError(nextError?.message ?? 'The generator could not build a preview.')
+        playUiTone('error')
+      })
+      .finally(() => {
+        setBusy(false)
+      })
   }
 
   async function handlePurchase() {
@@ -325,7 +322,7 @@ export default function WebsitePreviewStudio() {
                 title={preview.title}
                 srcDoc={preview.previewHtml}
                 loading="lazy"
-                sandbox=""
+                sandbox="allow-same-origin"
                 referrerPolicy="no-referrer"
               />
             ) : (

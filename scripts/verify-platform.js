@@ -4,6 +4,7 @@ import { bootstrapContent, getContentBundle } from '../server/services/contentSe
 import { getAnalyticsSnapshot } from '../server/services/analyticsService.js'
 import { resolveModelRoute } from '../ai/router/modelRouter.js'
 import { previewTrafficTopics } from '../ai/trafficEngine.js'
+import { createPreviewRequest } from '../server/services/previewStudioService.js'
 
 dotenv.config({ path: '.env.local' })
 dotenv.config()
@@ -19,6 +20,15 @@ const command = validateCommand({
 })
 const modelRoute = await resolveModelRoute({ action: 'create_blog_post' })
 const discovery = await previewTrafficTopics({ limit: 3 })
+const generatorCheck = await createPreviewRequest({
+  dryRun: true,
+  email: 'test@example.com',
+  brief: 'A voice-first website that sells a launch sprint and shows the product in motion, with a clear CTA and FAQ.',
+  audience: 'founders and small teams',
+  websiteType: 'saas',
+  styleTone: 'cinematic',
+  primaryCta: 'Start building now'
+})
 
 console.log(
   JSON.stringify(
@@ -28,6 +38,12 @@ console.log(
         pages: content.pages.length,
         blog: content.blog.length,
         products: content.products.length
+      },
+      generator: {
+        requestId: generatorCheck.requestId,
+        qualityScore: generatorCheck.qualityScore,
+        hasHtml: Boolean(generatorCheck.previewHtml),
+        hasMedia: Boolean(generatorCheck.media?.heroVideo)
       },
       analyticsSummary: {
         visitors: analytics.visitors,
