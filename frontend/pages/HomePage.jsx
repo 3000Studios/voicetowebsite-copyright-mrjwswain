@@ -29,7 +29,29 @@ function formatCurrency(amount) {
 }
 
 function isInternal(href) {
-  return typeof href === 'string' && href.startsWith('/') && !href.startsWith('//')
+  return typeof href === 'string' && (href.startsWith('/') || href.startsWith('#')) && !href.startsWith('//')
+}
+
+function ActionLink({ cta, primary = false }) {
+  const className = `button ${primary ? 'button--primary' : 'button--ghost'}`
+  const href = cta.to ?? cta.href
+  if (!href) {
+    return null
+  }
+
+  if (isInternal(href) && !href.includes('#')) {
+    return (
+      <Link className={className} to={href}>
+        {cta.label}
+      </Link>
+    )
+  }
+
+  return (
+    <a className={className} href={href}>
+      {cta.label}
+    </a>
+  )
 }
 
 function PricingCta({ tier }) {
@@ -58,6 +80,9 @@ export default function HomePage() {
   const featuredStoreItems = appStoreItems.slice(0, 4)
   const workflowSteps = homepage.workflowSteps ?? []
   const pricingTiers = pricingPage.tiers ?? []
+  const primaryCta = homepage.primaryCta ?? { label: 'Generate preview', to: '#website-generator' }
+  const secondaryCta = homepage.secondaryCta ?? { label: 'See pricing', to: '/pricing' }
+  const heroPanel = homepage.heroPanel ?? null
 
   const liveMetrics = [
     { label: 'Visitors tracked', value: String(snapshot?.analytics?.visitors ?? 0) },
@@ -86,16 +111,34 @@ export default function HomePage() {
             ))}
           </div>
           <div className="hero__actions">
-            <a className="button button--primary" href="#website-generator">
-              Try the generator
-            </a>
-            <Link className="button button--ghost" to="/pricing">
-              See pricing
-            </Link>
+            <ActionLink cta={primaryCta} primary />
+            <ActionLink cta={secondaryCta} />
           </div>
         </motion.div>
 
         <motion.aside className="hero__panel hero__panel--stats" variants={fadeUp}>
+          {heroPanel ? (
+            <div className="hero__panel-card">
+              <div className="hero__brand-row">
+                <img
+                  className="hero__brand-logo"
+                  src="/media/voicetowebsite-logo.jpg"
+                  alt="Voicetowebsite.com logo"
+                />
+                <span className="eyebrow">Live voice engine</span>
+              </div>
+              <h3>{heroPanel.heading}</h3>
+              <p>{heroPanel.body}</p>
+              <div className="hero__panel-points">
+                {(heroPanel.points ?? []).map((point) => (
+                  <div key={point.label} className="hero__panel-point">
+                    <strong>{point.label}</strong>
+                    <span>{point.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <div className="hero__stat-grid">
             {(homepage.heroStats ?? []).slice(0, 3).map((stat) => (
               <div key={stat.label} className="hero__stat">

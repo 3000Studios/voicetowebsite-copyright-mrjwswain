@@ -1,108 +1,108 @@
 {
-  "eyebrow": "Voice-first website builder and app store",
-  "headline": "Generate the website, inspect the preview, then buy the source",
-  "subheadline": "Voicetowebsite now leads with a scrollable preview studio, a builder offer priced for impulse buys, and an app store full of source-ready website products you can sell immediately.",
+  "eyebrow": "Voice-powered website engine",
+  "headline": "Speak your concept. Preview a full homepage. Reserve the source.",
+  "subheadline": "The homepage now leads with a live builder experience and a buyable source pack you can generate from voice or a typed brief.",
   "primaryCta": {
-    "label": "Explore solutions",
-    "to": "/products"
+    "label": "Generate preview",
+    "to": "#website-generator"
   },
   "secondaryCta": {
-    "label": "Open the app store",
+    "label": "Browse source packs",
     "to": "/products"
   },
   "operatorSignals": [
-    "scrollable preview",
-    "source delivery lane",
-    "app store inventory",
-    "mobile-first checkout"
+    "voice-first builder",
+    "live preview engine",
+    "source delivery",
+    "checkout-ready"
   ],
   "heroStats": [
     {
-      "label": "Entry offer",
-      "value": "VoiceToWebsite Builder for $49"
+      "label": "Voice builder",
+      "value": "Live on the homepage"
     },
     {
-      "label": "High-demand apps",
-      "value": "Lead gen, bookings, creator sales"
+      "label": "Preview studio",
+      "value": "Scroll-ready homepage mockup"
     },
     {
-      "label": "Core promise",
-      "value": "Generate, inspect, then buy the source"
+      "label": "Source delivery",
+      "value": "Reserved by email"
     }
   ],
   "heroPanel": {
-    "heading": "The homepage now sells the build itself.",
-    "body": "The strongest public experience is no longer just an abstract product story. It lets a buyer generate a concept, inspect the full result in a preview window, and then purchase the underlying source pack.",
+    "heading": "A live voice-to-website engine sits here",
+    "body": "Generate a scrollable homepage preview, inspect the offer, and reserve the underlying source bundle without leaving the public site.",
     "points": [
       {
-        "label": "Builder",
-        "value": "A low-friction $49 entry product that turns prompts into source-ready previews."
+        "label": "Instant preview",
+        "value": "Client-side rendering makes the experience fast and tactile."
       },
       {
-        "label": "App store",
-        "value": "High-demand website packs for leads, bookings, and creator offers."
+        "label": "Voice capture",
+        "value": "Speak your brief or type a conversion-focused offer."
       },
       {
-        "label": "Expansion",
-        "value": "Recurring software and services for buyers who need more than a one-off site."
+        "label": "Source bundle",
+        "value": "Reserve the generated website package for fast checkout."
       }
     ]
   },
   "media": {
-    "eyebrow": "Hero video",
-    "title": "Watch the builder workflow in motion",
-    "body": "The hero now supports a stronger visual story: a motion loop, a visible builder offer, and a preview studio that makes the product feel buyable instead of theoretical.",
+    "eyebrow": "Hero engine demo",
+    "title": "Watch the builder and source delivery flow in motion",
+    "body": "The public site now uses motion and visual polish to make the product feel real and high-value.",
     "videoUrl": "/media/hero-operator.mp4",
     "posterUrl": "/media/operator-preview.svg",
     "imageUrl": "/media/operator-preview.svg",
     "badges": [
-      "Command center",
-      "Revenue ready",
-      "Cloudflare deploy"
+      "Voice input",
+      "Preview engine",
+      "Source checkout"
     ]
   },
   "workflowHeadline": "A successful customer flow should feel simple from the outside and powerful underneath.",
   "workflowSteps": [
     {
-      "title": "Describe the work",
-      "description": "A user explains a goal in plain English, whether that is building a page, launching a campaign, or automating an internal workflow."
+      "title": "Speak the idea",
+      "description": "Share the website goal in your own words, from the audience to the offer and the desired action."
     },
     {
-      "title": "Route the execution plan",
-      "description": "Voicetowebsite turns that request into a structured plan with the right content, scripts, agents, and approvals before anything is changed."
+      "title": "Generate the preview",
+      "description": "The engine turns that intent into a visual homepage concept, complete with hero media and an offer lane."
     },
     {
-      "title": "Ship and monitor",
-      "description": "The system executes work, records results, and keeps the team moving with a dashboard that can support marketing, delivery, and operations."
+      "title": "Reserve the source",
+      "description": "Buy a source bundle or open the app store and use the generated preview as a product-ready starting point."
     }
   ],
-  "audienceIntro": "The public site now speaks directly to the most valuable buyers instead of trying to appeal to everyone.",
+  "audienceIntro": "The homepage now speaks directly to the buyers who want speed, clarity, and a usable launch asset.",
   "audiences": [
     {
-      "title": "Solo founders",
-      "description": "Ship more without hiring a full team too early.",
+      "title": "Founders",
+      "description": "Get a launch-ready page faster without hiring a full web team.",
       "bullets": [
-        "Generate landing pages and offer pages faster",
-        "Organize work across product, content, and launch tasks",
-        "Create a practical path from idea to revenue"
+        "Convert ideas into a visible homepage instantly",
+        "Keep the experience focused on offer and action",
+        "Reserve a source bundle for quick deployment"
       ]
     },
     {
-      "title": "Small agencies",
-      "description": "Productize delivery and make execution less dependent on manual coordination.",
+      "title": "Agencies",
+      "description": "Standardize delivery with a preview-first intake flow and sell source packs confidently.",
       "bullets": [
-        "Standardize client workflows",
-        "Turn prompts into repeatable operating procedures",
-        "Sell setup, automation, and retained management"
+        "Use preview builds to close more proposals",
+        "Offer a tangible source package to clients",
+        "Save time on initial page design and copy"
       ]
     },
     {
       "title": "Technical teams",
-      "description": "Manage approvals, deployable assets, and automation from one system.",
+      "description": "Manage generated assets, approvals, and checkout-ready delivery from one system.",
       "bullets": [
-        "Keep repo-based control over generated work",
-        "Support self-hosted and governed environments",
-        "Reduce bottlenecks across operations and release workflows"
+        "Keep generated builds in a repository-friendly format",
+        "Support self-hosted and governed launch paths",
+        "Reduce manual handoffs between marketing and engineering"
       ]
     }
   ],
@@ -152,5 +152,5 @@
     "secondaryLabel": "Browse the app store",
     "secondaryHref": "/products"
   },
-  "updatedAt": "2026-03-20T00:00:00.000Z"
+  "updatedAt": "2026-04-19T00:00:00.000Z"
 }

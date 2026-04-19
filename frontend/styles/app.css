@@ -1,17 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
-  --bg: #071826;
-  --chrome: #f8fbff;
-  --prism-1: #69b7d6;
-  --prism-2: #b8d6e4;
-  --prism-3: #1c4f68;
+  --bg: #031323;
+  --chrome: #eef8ff;
+  --prism-1: #5ad2ff;
+  --prism-2: #8ae6ff;
+  --prism-3: #1d3f68;
   --surface: rgba(255, 255, 255, 0.08);
-  --surface-strong: rgba(8, 24, 36, 0.78);
-  --ink: #e8f2fb;
-  --muted: rgba(232, 242, 251, 0.72);
-  --line: rgba(105, 183, 214, 0.18);
-  --shadow: 0 30px 80px rgba(1, 8, 20, 0.4);
+  --surface-strong: rgba(8, 22, 36, 0.88);
+  --ink: #eef8ff;
+  --muted: rgba(222, 238, 251, 0.72);
+  --line: rgba(90, 210, 255, 0.18);
+  --shadow: 0 30px 80px rgba(0, 8, 24, 0.38);
   --viscous-ease: cubic-bezier(0.9, 0, 0.1, 1);
 }
 
@@ -384,11 +384,55 @@ button:disabled {
   line-height: 1.8;
 }
 
-.hero__panel {
+..hero__panel {
   display: grid;
   align-content: start;
   gap: 1rem;
   margin-top: 4rem;
+}
+
+.hero__panel-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1.5rem;
+  background: rgba(6, 14, 24, 0.76);
+  border: 1px solid rgba(90, 210, 255, 0.18);
+}
+
+.hero__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.hero__brand-logo {
+  height: 36px;
+  width: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.3rem;
+}
+
+.hero__panel-points {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.hero__panel-point {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(90, 210, 255, 0.12);
+}
+
+.hero__panel-point strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
 }
 
 .hero__panel--media {

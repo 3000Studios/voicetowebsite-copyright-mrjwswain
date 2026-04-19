@@ -1,23 +1,23 @@
 {
   "name": "Voicetowebsite",
   "palette": {
-    "bg": "#071826",
-    "canvas": "#071826",
-    "surface": "rgba(255,255,255,0.78)",
-    "surface-strong": "rgba(8,24,36,0.78)",
-    "ink": "#e8f2fb",
-    "chrome": "#f8fbff",
-    "muted": "rgba(232,242,251,0.72)",
-    "accent": "#69b7d6",
-    "highlight": "#b8d6e4",
-    "prism-1": "#69b7d6",
-    "prism-2": "#b8d6e4",
-    "prism-3": "#1c4f68",
-    "line": "rgba(105,183,214,0.18)"
+    "bg": "#031323",
+    "canvas": "#031323",
+    "surface": "rgba(255,255,255,0.08)",
+    "surface-strong": "rgba(8,22,36,0.88)",
+    "ink": "#eef8ff",
+    "chrome": "#eef8ff",
+    "muted": "rgba(222,238,251,0.72)",
+    "accent": "#5ad2ff",
+    "highlight": "#98f3ff",
+    "prism-1": "#5ad2ff",
+    "prism-2": "#8ae6ff",
+    "prism-3": "#1d3f68",
+    "line": "rgba(90,210,255,0.18)"
   },
   "motion": {
     "hero": "orbital-rise",
     "sections": "signal-slide"
   },
-  "updatedAt": "2026-03-20T00:00:00.000Z"
+  "updatedAt": "2026-04-19T00:00:00.000Z"
 }
