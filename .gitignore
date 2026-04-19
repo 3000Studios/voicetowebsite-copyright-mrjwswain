@@ -11,3 +11,5 @@ dist
 .DS_Store
 uploads/*
 !/uploads/.gitkeep
+continue-voice-mod/
+voicetowebsite-copyright-mrjwswain/
