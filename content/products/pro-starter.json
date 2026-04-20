@@ -4,6 +4,7 @@
   "headline": "Pro Starter subscription for growth-stage website operations",
   "priceAnchor": "$19.99",
   "stripeMode": "subscription",
+  "stripePaymentLink": "https://buy.stripe.com/cNi14nfxj5mKeVOcEa",
   "idealFor": "Small teams shipping customer-facing websites weekly",
   "description": "Pro Starter expands generation throughput and supports ongoing conversion-focused production output.",
   "category": "platform",

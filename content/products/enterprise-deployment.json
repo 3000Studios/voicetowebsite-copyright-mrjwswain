@@ -1,8 +1,10 @@
 {
   "slug": "enterprise-deployment",
   "name": "Enterprise Deployment",
-  "headline": "Create a high-trust path for teams that need self-hosting, governance, and rollout support",
-  "priceAnchor": "Custom",
+  "headline": "Enterprise subscription for teams that need governance, rollout support, and a higher-trust operating model",
+  "priceAnchor": "$49.99 / month",
+  "stripeMode": "subscription",
+  "stripePaymentLink": "https://buy.stripe.com/3cs03Mfxj8yZ8uQ9B0",
   "idealFor": "Best for internal platform teams, agencies with strict clients, and compliance-minded buyers",
   "description": "Enterprise Deployment gives Voicetowebsite a credible higher-ticket lane. It focuses on self-hosting, controlled rollout, support, and deeper integration for organizations that need more than a standard SaaS experience.",
   "bullets": [

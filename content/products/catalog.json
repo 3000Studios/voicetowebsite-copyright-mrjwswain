@@ -57,6 +57,7 @@
       "priceAnchor": "$9.99 / month",
       "category": "platform",
       "stripeMode": "subscription",
+      "stripePaymentLink": "https://buy.stripe.com/7sI7sade7aNh6mS5kp",
       "ctaLabel": "Subscribe",
       "ctaHref": "/store"
     },
@@ -69,6 +70,7 @@
       "priceAnchor": "$19.99 / month",
       "category": "platform",
       "stripeMode": "subscription",
+      "stripePaymentLink": "https://buy.stripe.com/cNi14nfxj5mKeVOcEa",
       "ctaLabel": "Subscribe",
       "ctaHref": "/store"
     },
@@ -118,8 +120,10 @@
       "summary": "A high-trust self-hosted and customization path for organizations that need governance, control, and rollout support.",
       "idealFor": "Internal platform teams and compliance-sensitive buyers",
       "outcome": "Create larger contracts with lower churn and deeper integration.",
-      "priceAnchor": "Custom",
+      "priceAnchor": "$49.99 / month",
       "category": "enterprise",
+      "stripeMode": "subscription",
+      "stripePaymentLink": "https://buy.stripe.com/3cs03Mfxj8yZ8uQ9B0",
       "ctaLabel": "View offer",
       "ctaHref": "/products/enterprise-deployment"
     }
