@@ -342,6 +342,22 @@ export default function WebsitePreviewStudio() {
                 <strong>VoiceToWebsite Builder source pack</strong>
                 <p>{preview.summary}</p>
                 <p className="field-note">Includes: {preview.sourceFiles.join(', ')}</p>
+                {preview.media?.attribution?.length ? (
+                  <p className="field-note">
+                    Media credits:{' '}
+                    {preview.media.attribution
+                      .filter((entry) => entry?.url)
+                      .slice(0, 4)
+                      .map((entry, index) => (
+                        <React.Fragment key={`${entry.url}-${index}`}>
+                          {index ? ', ' : ''}
+                          <a href={entry.pageUrl ?? entry.url} target="_blank" rel="noreferrer">
+                            {entry.provider}
+                          </a>
+                        </React.Fragment>
+                      ))}
+                  </p>
+                ) : null}
               </div>
               <button
                 className="button button--primary"

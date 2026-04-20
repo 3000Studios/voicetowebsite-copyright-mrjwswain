@@ -7,6 +7,7 @@ import { publicNavItems, publicStatusLines, publicTickerItems } from '../src/sit
 import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
 import { trackSiteEvent } from '../src/siteApi.js'
 import AdSlot from './AdSlot.jsx'
+import BrandWireframe from './BrandWireframe.jsx'
 
 const VISITOR_SESSION_KEY = 'voicetowebsite_session_id'
 const LEGACY_VISITOR_SESSION_KEY = 'myappai_session_id'
@@ -57,6 +58,7 @@ export default function SiteFrame() {
       <header className="site-header">
         <div className="site-header__inner">
           <NavLink className="brand" to="/">
+            <BrandWireframe size={34} />
             <span className="brand__pulse" aria-hidden="true" />
             <img className="brand__logo" src="/media/voicetowebsite-logo.jpg" alt="Voicetowebsite.com" />
             <span className="brand__wordmark sr-only">{SITE_DISPLAY_NAME}</span>
