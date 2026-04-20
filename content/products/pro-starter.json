@@ -5,6 +5,7 @@
   "priceAnchor": "$19.99",
   "stripeMode": "subscription",
   "stripePaymentLink": "https://buy.stripe.com/cNi14nfxj5mKeVOcEa",
+  "paypalPaymentLink": "https://www.paypal.com/ncp/payment/BJ6M6F7Y8X3W2",
   "idealFor": "Small teams shipping customer-facing websites weekly",
   "description": "Pro Starter expands generation throughput and supports ongoing conversion-focused production output.",
   "category": "platform",

@@ -5,6 +5,7 @@
   "priceAnchor": "$49.99 / month",
   "stripeMode": "subscription",
   "stripePaymentLink": "https://buy.stripe.com/3cs03Mfxj8yZ8uQ9B0",
+  "paypalPaymentLink": "https://www.paypal.com/ncp/payment/K9L5M4N3P2R1S",
   "idealFor": "Best for internal platform teams, agencies with strict clients, and compliance-minded buyers",
   "description": "Enterprise Deployment gives Voicetowebsite a credible higher-ticket lane. It focuses on self-hosting, controlled rollout, support, and deeper integration for organizations that need more than a standard SaaS experience.",
   "bullets": [

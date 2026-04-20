@@ -5,6 +5,7 @@
   "priceAnchor": "$9.99",
   "stripeMode": "subscription",
   "stripePaymentLink": "https://buy.stripe.com/7sI7sade7aNh6mS5kp",
+  "paypalPaymentLink": "https://www.paypal.com/ncp/payment/V4K9H6W8L2Z5G",
   "idealFor": "Solo founders and first-time launches",
   "description": "Starter provides baseline monthly access for voice-to-website generation and preview workflows.",
   "category": "platform",

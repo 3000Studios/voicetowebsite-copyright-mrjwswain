@@ -58,6 +58,7 @@
       "category": "platform",
       "stripeMode": "subscription",
       "stripePaymentLink": "https://buy.stripe.com/7sI7sade7aNh6mS5kp",
+      "paypalPaymentLink": "https://www.paypal.com/ncp/payment/V4K9H6W8L2Z5G",
       "ctaLabel": "Subscribe",
       "ctaHref": "/store"
     },
@@ -71,6 +72,7 @@
       "category": "platform",
       "stripeMode": "subscription",
       "stripePaymentLink": "https://buy.stripe.com/cNi14nfxj5mKeVOcEa",
+      "paypalPaymentLink": "https://www.paypal.com/ncp/payment/BJ6M6F7Y8X3W2",
       "ctaLabel": "Subscribe",
       "ctaHref": "/store"
     },
@@ -124,6 +126,7 @@
       "category": "enterprise",
       "stripeMode": "subscription",
       "stripePaymentLink": "https://buy.stripe.com/3cs03Mfxj8yZ8uQ9B0",
+      "paypalPaymentLink": "https://www.paypal.com/ncp/payment/K9L5M4N3P2R1S",
       "ctaLabel": "View offer",
       "ctaHref": "/products/enterprise-deployment"
     }
