@@ -1,9 +1,9 @@
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "uploads/**", "continue-voice-mod/**", ".continue/**", ".cursor/**", ".vscode/**"]
+    ignores: ["dist/**", "node_modules/**", "uploads/**", "continue-voice-mod/**", ".continue/**", ".cursor/**", ".vscode/**", "api/**"]
   },
   {
-    files: ["**/*.js", "**/*.ts"],
+    files: ["**/*.js"],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: "module"
