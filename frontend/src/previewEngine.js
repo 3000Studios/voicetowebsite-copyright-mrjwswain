@@ -123,12 +123,21 @@ function getThemePreset(websiteType, styleTone) {
 }
 
 function extractTitle(brief, websiteType) {
+  const source = String(brief ?? '')
+  const directMatch = source.match(
+    /\bfor\s+([A-Z][\w&'.-]*(?:\s+[A-Z][\w&'.-]*){0,5})(?=\s+(?:with|that|who|targeting|focused|offering)\b|[,.!?\n]|$)/
+  )
+  if (directMatch) {
+    return directMatch[1].trim()
+  }
+
   const fragments = String(brief ?? '')
     .split(/[.!?]/)
     .map((entry) => entry.trim())
     .filter(Boolean)
 
-  const first = fragments[0] ?? `${websiteType} launch site`
+  const first = (fragments[0] ?? `${websiteType} launch site`)
+    .replace(/^(build|create|design|make)\s+(a|an|the)?\s*/i, '')
   const words = first.split(/\s+/).slice(0, 6)
   return words
     .map((word, index) => (index === 0 ? (word[0] ?? '').toUpperCase() + word.slice(1) : word))
@@ -564,17 +573,18 @@ export function generatePreview(input) {
   const primaryCta = String(input.primaryCta ?? 'Buy now').trim() || 'Buy now'
   const brief = String(input.brief ?? '').trim()
   const email = String(input.email ?? '').trim().toLowerCase()
+  const focusPhrases = extractFocusPhrases(brief)
 
   const title = extractTitle(brief, websiteType)
   const previewHtml = buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta, media: input.media })
 
   const seoKeywords = extractKeywords(brief, websiteType, audience)
-  const qualityScore = estimateQualityScore({ brief, audience, primaryCta, focusPhrases: extractFocusPhrases(brief) })
+  const qualityScore = estimateQualityScore({ brief, audience, primaryCta, focusPhrases })
 
   return {
     requestId: randomId('preview'),
     title,
-    summary: `${title} preview created for ${audience}.`,
+    summary: `${title} now highlights ${focusPhrases.slice(0, 2).join(' and ') || primaryCta} for ${audience}.`,
     previewHtml,
     sourceFiles: ['index.html', 'content.json', 'README.md'],
     seoKeywords,
