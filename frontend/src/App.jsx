@@ -9,6 +9,7 @@ import ProductPage from '../pages/ProductPage.jsx'
 import ContactPage from '../pages/ContactPage.jsx'
 import CheckoutSuccessPage from '../pages/CheckoutSuccessPage.jsx'
 import CheckoutCancelPage from '../pages/CheckoutCancelPage.jsx'
+import CustomerDashboardPage from '../pages/CustomerDashboardPage.jsx'
 import GenericPage from '../pages/GenericPage.jsx'
 import AdminLayout from '../components/admin/AdminLayout.jsx'
 import AdminLoginPage from '../pages/AdminLoginPage.jsx'
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:slug" element={<ProductPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/dashboard" element={<CustomerDashboardPage />} />
           <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
           <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
           <Route path="/:slug" element={<GenericPage />} />

@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { generatePreview } from '../src/previewEngine.js'
 import { createWebsitePreview, startStripeCheckout } from '../src/siteApi.js'
+import { saveCustomerSession } from '../src/customerSession.js'
 
 const WEBSITE_TYPES = [
   { value: 'saas', label: 'SaaS' },
@@ -28,8 +29,8 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value ?? '').trim())
 }
 
-export default function WebsitePreviewStudio() {
-  const [form, setForm] = useState(DEFAULT_FORM)
+export default function WebsitePreviewStudio({ accountEmail = '', unrestricted = false }) {
+  const [form, setForm] = useState(() => ({ ...DEFAULT_FORM, email: accountEmail || DEFAULT_FORM.email }))
   const [preview, setPreview] = useState(null)
   const [busy, setBusy] = useState(false)
   const [checkoutBusy, setCheckoutBusy] = useState(false)
@@ -38,6 +39,12 @@ export default function WebsitePreviewStudio() {
   const [voiceBusy, setVoiceBusy] = useState(false)
   const [generationCount, setGenerationCount] = useState(0)
   const audioContextRef = useRef(null)
+
+  useEffect(() => {
+    if (accountEmail) {
+      setForm((current) => ({ ...current, email: accountEmail }))
+    }
+  }, [accountEmail])
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
@@ -136,6 +143,14 @@ export default function WebsitePreviewStudio() {
         customerEmail: preview.email,
         previewRequestId: preview.requestId
       })
+      if (response?.accessToken) {
+        saveCustomerSession({
+          accessToken: response.accessToken,
+          email: preview.email,
+          dashboardUrl: response.dashboardUrl,
+          account: response.account ?? null
+        })
+      }
       if (response?.url) {
         window.location.assign(response.url)
       } else {
@@ -188,10 +203,11 @@ export default function WebsitePreviewStudio() {
     <section className="preview-studio section-card" id="website-generator">
       <div className="preview-studio__intro">
         <span className="eyebrow">Live website generator</span>
-        <h2>Describe the site, see the preview, then buy the source pack</h2>
+        <h2>{unrestricted ? 'Your customer generator dashboard' : 'Describe the site, see the preview, then buy the source pack'}</h2>
         <p className="section-intro">
-          A draft appears instantly in the browser, then the saved preview updates from the live generator with
-          prompt-matched structure and media. Fill in the brief, generate, and inspect the full homepage before checkout.
+          {unrestricted
+            ? 'Your account email is already attached. Generate as many live previews as you want, with prompt-matched structure and media saved to your customer record.'
+            : 'A draft appears instantly in the browser, then the saved preview updates from the live generator with prompt-matched structure and media. Fill in the brief, generate, and inspect the full homepage before checkout.'}
         </p>
         <div className="preview-studio__toolbar">
           <label className="preview-sound-toggle">
@@ -210,17 +226,24 @@ export default function WebsitePreviewStudio() {
 
       <div className="preview-studio__layout">
         <form className="preview-form" onSubmit={handleGenerate} noValidate>
-          <label className="field">
-            <span>Email for source delivery</span>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(event) => updateField('email', event.target.value)}
-              placeholder="you@example.com"
-              autoComplete="email"
-              required
-            />
-          </label>
+          {unrestricted ? (
+            <div className="field">
+              <span>Customer account email</span>
+              <div className="tag">{form.email}</div>
+            </div>
+          ) : (
+            <label className="field">
+              <span>Email for source delivery</span>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(event) => updateField('email', event.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+                required
+              />
+            </label>
+          )}
           <label className="field">
             <span>What should the site sell?</span>
             <textarea
@@ -290,8 +313,9 @@ export default function WebsitePreviewStudio() {
               {busy ? 'Generating…' : preview ? 'Regenerate preview' : 'Generate preview'}
             </button>
             <p className="field-note">
-              The source pack is reserved to the email above. The live preview may use your brief to fetch matching
-              media and store the generated page.
+              {unrestricted
+                ? 'This dashboard keeps your previews tied to your customer email and entitlement record.'
+                : 'The source pack is reserved to the email above. The live preview may use your brief to fetch matching media and store the generated page.'}
             </p>
           </div>
           {error ? (

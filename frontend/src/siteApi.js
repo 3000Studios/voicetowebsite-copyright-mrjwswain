@@ -68,11 +68,25 @@ export function startStripeCheckout(offerSlug, checkoutContext = {}) {
   })
 }
 
-export function startPayPalCheckout(offerSlug) {
+export function startPayPalCheckout(offerSlug, checkoutContext = {}) {
   return request('/api/public/checkout/paypal', {
     method: 'POST',
-    body: { offerSlug }
+    body: {
+      offerSlug,
+      ...checkoutContext
+    }
   })
+}
+
+export function requestCustomerDashboardAccess(email) {
+  return request('/api/public/customer/access', {
+    method: 'POST',
+    body: { email }
+  })
+}
+
+export function getCustomerSession(token) {
+  return request(`/api/public/customer/session?token=${encodeURIComponent(token)}`)
 }
 
 export function verifyStripeCheckout(sessionId) {

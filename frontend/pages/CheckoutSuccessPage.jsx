@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { capturePayPalCheckout, verifyStripeCheckout } from '../src/siteApi.js'
+import { readCustomerSession } from '../src/customerSession.js'
 import { useSiteRuntime } from '../src/SiteRuntimeContext.jsx'
 
 function formatCurrency(amount) {
@@ -13,11 +14,13 @@ function formatCurrency(amount) {
 export default function CheckoutSuccessPage() {
   const [searchParams] = useSearchParams()
   const { refresh } = useSiteRuntime()
+  const savedSession = readCustomerSession()
   const [state, setState] = useState({
     loading: true,
     error: '',
     amountCents: 0,
-    offerSlug: ''
+    offerSlug: '',
+    dashboardUrl: savedSession?.dashboardUrl ?? '/dashboard'
   })
 
   useEffect(() => {
@@ -35,7 +38,8 @@ export default function CheckoutSuccessPage() {
           loading: false,
           error: result.completed ? '' : 'Payment is not marked complete yet.',
           amountCents: result.amountCents ?? 0,
-          offerSlug: result.offerSlug ?? ''
+          offerSlug: result.offerSlug ?? '',
+          dashboardUrl: savedSession?.dashboardUrl ?? '/dashboard'
         })
         await refresh()
       } catch (error) {
@@ -43,13 +47,14 @@ export default function CheckoutSuccessPage() {
           loading: false,
           error: error.message,
           amountCents: 0,
-          offerSlug: ''
+          offerSlug: '',
+          dashboardUrl: savedSession?.dashboardUrl ?? '/dashboard'
         })
       }
     }
 
     confirm()
-  }, [refresh, searchParams])
+  }, [refresh, savedSession?.dashboardUrl, searchParams])
 
   return (
     <div className="stack-xl page-remix">
@@ -64,11 +69,11 @@ export default function CheckoutSuccessPage() {
           </p>
         )}
         <div className="hero__actions">
-          <Link className="button button--primary" to="/products">
-            View offers
+          <Link className="button button--primary" to={state.dashboardUrl}>
+            Open dashboard
           </Link>
-          <Link className="button button--ghost" to="/contact">
-            Continue to delivery
+          <Link className="button button--ghost" to="/products">
+            View offers
           </Link>
         </div>
       </section>

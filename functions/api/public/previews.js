@@ -1,4 +1,5 @@
 import { errorJson, json, readJsonBody } from '../../_lib/http.js'
+import { touchCustomerPreview } from '../../_lib/customers.js'
 import { generatePreview } from '../../../frontend/src/previewEngine.js'
 import { getMediaForGeneration } from '../../../server/services/mediaEngine.js'
 import { hash, putJson } from '../../_lib/storage.js'
@@ -83,6 +84,8 @@ export async function onRequest(context) {
       attribution: media?.attribution ?? [],
       createdAt: new Date().toISOString()
     })
+
+    await touchCustomerPreview(bucket, email, preview.requestId)
   }
 
   return json(

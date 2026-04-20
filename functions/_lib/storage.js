@@ -18,6 +18,24 @@ export async function putJson(bucket, key, value) {
   })
 }
 
+export async function getJson(bucket, key) {
+  const object = await bucket.get(key)
+  if (!object) {
+    return null
+  }
+
+  const text = await object.text()
+  if (!text) {
+    return null
+  }
+
+  try {
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
 export async function listCount(bucket, prefix) {
   let cursor = undefined
   let count = 0
@@ -31,4 +49,3 @@ export async function listCount(bucket, prefix) {
 
   return count
 }
-

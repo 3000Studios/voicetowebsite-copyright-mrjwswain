@@ -5,6 +5,11 @@ function normalizePaymentLink(value) {
   return /^https:\/\/buy\.stripe\.com\//i.test(link) ? link : null
 }
 
+function normalizePayPalLink(value) {
+  const link = String(value ?? '').trim()
+  return /^https:\/\/www\.paypal\.com\/ncp\/payment\//i.test(link) ? link : null
+}
+
 function getCatalogProducts() {
   return Array.isArray(catalog?.products) ? catalog.products : []
 }
@@ -25,9 +30,26 @@ function resolveStripePaymentLink(product, env = {}) {
   )
 }
 
+function resolvePayPalPaymentLink(product, env = {}) {
+  const slug = String(product?.slug ?? '')
+  const suffix = slug.replace(/[^a-z0-9]+/gi, '_').toUpperCase()
+  const aliases = {
+    starter: ['VITE_PAYPAL_STARTER_LINK'],
+    'pro-starter': ['VITE_PAYPAL_PRO_LINK', 'VITE_PAYPAL_PRO_STARTER_LINK'],
+    'enterprise-deployment': ['VITE_PAYPAL_ENTERPRISE_LINK', 'VITE_PAYPAL_ENTERPRISE_DEPLOYMENT_LINK']
+  }
+
+  return normalizePayPalLink(
+    env[`PAYPAL_PAYMENT_LINK_${suffix}`] ??
+      aliases[slug]?.map((key) => env[key]).find(Boolean) ??
+      product?.paypalPaymentLink
+  )
+}
+
 export function getOffersSnapshot(env = {}) {
   return getCatalogProducts().map((product) => {
     const paymentLink = resolveStripePaymentLink(product, env)
+    const paypalPaymentLink = resolvePayPalPaymentLink(product, env)
     return {
       slug: product.slug,
       name: product.name,
@@ -39,10 +61,10 @@ export function getOffersSnapshot(env = {}) {
       category: product.category ?? 'offer',
       deliveryType: product.deliveryType ?? null,
       deliveryCopy: product.deliveryCopy ?? null,
-      contactOnly: product.slug === 'enterprise-deployment' && !paymentLink,
+      contactOnly: product.slug === 'enterprise-deployment' && !paymentLink && !paypalPaymentLink,
       providers: {
         stripe: Boolean(paymentLink),
-        paypal: false
+        paypal: Boolean(paypalPaymentLink)
       }
     }
   })
@@ -58,6 +80,7 @@ export function getOfferBySlug(slug, env = {}) {
 
   return {
     ...product,
-    stripePaymentLink: paymentLink
+    stripePaymentLink: paymentLink,
+    paypalPaymentLink: resolvePayPalPaymentLink(product, env)
   }
 }
