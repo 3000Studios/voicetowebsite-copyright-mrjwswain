@@ -6,6 +6,7 @@ import {
   recordMediaAssets,
   recordQualityMetrics
 } from './generatorStore.js'
+import { getMediaForGeneration } from './mediaEngine.js'
 
 const DEFAULT_PREVIEW_REQUESTS = {
   requests: [],
@@ -228,7 +229,7 @@ function buildSectionData({ brief, audience, websiteType, primaryCta }) {
   ]
 }
 
-function getMediaSet(websiteType) {
+async function getMediaSet({ brief, websiteType }) {
   const sets = {
     saas: {
       heroVideo: 'https://cdn.coverr.co/videos/coverr-man-working-on-a-laptop-1579/1080p.mp4',
@@ -236,7 +237,8 @@ function getMediaSet(websiteType) {
         'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'
-      ]
+      ],
+      attribution: []
     },
     local_service: {
       heroVideo: 'https://cdn.coverr.co/videos/coverr-smiling-electrician-2209/1080p.mp4',
@@ -244,7 +246,8 @@ function getMediaSet(websiteType) {
         'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1200&q=80'
-      ]
+      ],
+      attribution: []
     },
     creator: {
       heroVideo: 'https://cdn.coverr.co/videos/coverr-video-production-team-discussing-1578/1080p.mp4',
@@ -252,7 +255,8 @@ function getMediaSet(websiteType) {
         'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80'
-      ]
+      ],
+      attribution: []
     },
     ecommerce: {
       heroVideo: 'https://cdn.coverr.co/videos/coverr-online-shopping-1572/1080p.mp4',
@@ -260,18 +264,28 @@ function getMediaSet(websiteType) {
         'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1607082350899-7e105aa886ae?auto=format&fit=crop&w=1200&q=80',
         'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80'
-      ]
+      ],
+      attribution: []
     }
+  }
+
+  try {
+    const dynamic = await getMediaForGeneration({ brief, websiteType })
+    if (dynamic?.heroVideo && Array.isArray(dynamic?.gallery)) {
+      return dynamic
+    }
+  } catch {
+    // ignore
   }
 
   return sets[websiteType] ?? sets.saas
 }
 
-function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta }) {
+function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta, mediaSet }) {
   const theme = getThemePreset(websiteType, styleTone)
   const [canvas, surface, accent, ink] = theme.palette
   const sections = buildSectionData({ brief, audience, websiteType, primaryCta })
-  const mediaSet = getMediaSet(websiteType)
+  const media = mediaSet ?? { heroVideo: '', gallery: [], attribution: [] }
   const seoKeywords = extractKeywords(brief, websiteType, audience)
   const faqEntries = buildFaqEntries(primaryCta, audience, websiteType)
   const quality = estimateQualityScore({ brief, audience, primaryCta })
@@ -580,12 +594,12 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
           <div class="hero__grid">
             <div>
               <div class="hero__video">
-                <video autoplay muted loop playsinline preload="metadata" poster="${escapeHtml(mediaSet.gallery[0])}">
-                  <source src="${escapeHtml(mediaSet.heroVideo)}" type="video/mp4" />
+                <video autoplay muted loop playsinline preload="metadata" poster="${escapeHtml(media.gallery[0] ?? '')}">
+                  <source src="${escapeHtml(media.heroVideo)}" type="video/mp4" />
                 </video>
               </div>
               <div class="gallery-grid">
-                ${mediaSet.gallery.map((image) => `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)} preview image" loading="lazy" decoding="async" />`).join('')}
+                ${media.gallery.map((image) => `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)} preview image" loading="lazy" decoding="async" />`).join('')}
               </div>
             </div>
             <div class="panel">
@@ -681,13 +695,7 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
     files,
     qualityScore,
     seoKeywords,
-    media: {
-      ...mediaSet,
-      attribution: [
-        { provider: 'Coverr', scope: 'heroVideo', url: mediaSet.heroVideo },
-        ...mediaSet.gallery.map((url) => ({ provider: 'Unsplash', scope: 'image', url }))
-      ]
-    },
+    media,
     quality
   }
 }
@@ -730,7 +738,8 @@ export async function createPreviewRequest(payload) {
   const brief = String(payload.brief ?? '').trim()
   const email = String(payload.email ?? '').trim().toLowerCase()
   const title = extractTitle(brief, websiteType)
-  const preview = buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta })
+  const mediaSet = await getMediaSet({ brief, websiteType })
+  const preview = buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta, mediaSet })
 
   const request = {
     id: dryRun ? buildId('preview-dryrun') : buildId('preview'),

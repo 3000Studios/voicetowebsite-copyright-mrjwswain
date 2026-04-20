@@ -384,7 +384,7 @@ button:disabled {
   line-height: 1.8;
 }
 
-..hero__panel {
+.hero__panel {
   display: grid;
   align-content: start;
   gap: 1rem;
