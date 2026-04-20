@@ -27,8 +27,6 @@ export async function onRequest(context) {
     return errorJson('Describe the website in at least 20 characters.', 400)
   }
 
-  const preview = generatePreview({ ...payload, email, brief })
-
   let media = null
   try {
     const fetched = await getMediaForGeneration(
@@ -41,6 +39,8 @@ export async function onRequest(context) {
   } catch {
     media = null
   }
+
+  const preview = generatePreview({ ...payload, email, brief, media })
 
   const bucket = context.env?.DATA_BUCKET
   if (bucket) {
@@ -72,8 +72,8 @@ export async function onRequest(context) {
     })
     await putJson(bucket, `quality_metrics/${preview.requestId}.json`, {
       requestId: preview.requestId,
-      total: preview.qualityScore,
-      metrics: {},
+      total: preview.qualityMetrics?.total ?? preview.qualityScore,
+      metrics: preview.qualityMetrics?.metrics ?? {},
       createdAt: new Date().toISOString()
     })
     await putJson(bucket, `media_assets/${preview.requestId}.json`, {

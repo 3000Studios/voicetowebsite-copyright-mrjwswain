@@ -87,35 +87,24 @@ function extractDirective(brief, label) {
   return match?.[1]?.trim() ?? ''
 }
 
-function resolveMediaPlan(brief, websiteType) {
+function resolveMediaPlan(brief, websiteType, providedMedia) {
   const prompt = String(brief ?? '')
   const explicitVideo = extractDirective(prompt, 'video') || extractDirective(prompt, 'hero video')
   const imageDirective = extractDirective(prompt, 'image') || extractDirective(prompt, 'hero image')
+  const media = providedMedia && typeof providedMedia === 'object' ? providedMedia : null
   const keywordVideo =
     MEDIA_LIBRARY.byKeyword.find((entry) => entry.test.test(prompt))?.video ??
     (websiteType === 'ecommerce'
       ? 'https://cdn.coverr.co/videos/coverr-online-shopping-1572/1080p.mp4'
       : MEDIA_LIBRARY.defaultVideo)
-
-  const slug = slugify(prompt || websiteType || 'preview')
   return {
-    heroVideo: /^https?:\/\//i.test(explicitVideo) ? explicitVideo : keywordVideo,
-    heroImage: /^https?:\/\//i.test(imageDirective)
-      ? imageDirective
-      : `https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80&sig=${slug}`,
-    gallery: ['a', 'b', 'c'].map(
-      (suffix) => `https://picsum.photos/seed/${slug}-${suffix}/1200/800`
-    )
+    heroVideo: media?.heroVideo ?? (/^https?:\/\//i.test(explicitVideo) ? explicitVideo : keywordVideo),
+    heroImage:
+      media?.gallery?.[0] ??
+      (/^https?:\/\//i.test(imageDirective) ? imageDirective : null),
+    gallery: Array.isArray(media?.gallery) ? media.gallery.slice(0, 3) : [],
+    attribution: Array.isArray(media?.attribution) ? media.attribution : []
   }
-}
-
-function slugify(value) {
-  return String(value ?? 'preview')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 48)
 }
 
 function randomId(prefix) {
@@ -166,85 +155,161 @@ function extractKeywords(brief, websiteType, audience) {
     .map(([word]) => word)
 }
 
-function buildFaqEntries(primaryCta, audience, websiteType) {
+function splitPromptPhrases(brief) {
+  return String(brief ?? '')
+    .replace(/\r/g, '\n')
+    .split(/[\n]+|[.!?]+|;+/)
+    .flatMap((entry) => entry.split(/\s[-–—]\s/))
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length >= 8)
+}
+
+function extractFocusPhrases(brief) {
+  const explicit = []
+  const source = String(brief ?? '')
+  const patterns = [
+    /(?:include|including|with|featuring|feature|focus on|focused on|highlight|showcase|showcasing|must have|need|needs|offer|offering)\s+([^.!?\n]+)/gi,
+    /(?:built around|centered on|designed around)\s+([^.!?\n]+)/gi
+  ]
+
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) {
+      explicit.push(
+        ...String(match[1] ?? '')
+          .split(/,|\/|\band\b|\bplus\b|&/i)
+          .map((entry) => entry.trim())
+      )
+    }
+  }
+
+  return Array.from(
+    new Set(
+      [...explicit, ...splitPromptPhrases(brief)]
+        .map((entry) =>
+          entry
+            .replace(/^(build|create|design|make|need|want|please)\s+/i, '')
+            .replace(/^(a|an|the)\s+/i, '')
+            .replace(/\s+/g, ' ')
+            .replace(/[,:-]+$/g, '')
+            .trim()
+        )
+        .filter((entry) => entry.length >= 4)
+    )
+  ).slice(0, 8)
+}
+
+function classifyPhrase(phrase, index) {
+  const lower = String(phrase ?? '').toLowerCase()
+  if (/pricing|package|tier|membership|subscription|offer/.test(lower)) return 'Offer'
+  if (/booking|call|consult|schedule|demo|checkout|cta/.test(lower)) return 'Conversion'
+  if (/review|testimonial|proof|case study|results/.test(lower)) return 'Trust'
+  if (/gallery|video|photo|visual|motion|image/.test(lower)) return 'Showcase'
+  if (/service|workflow|process|delivery|onboarding/.test(lower)) return 'Experience'
+  return ['Priority', 'Focus', 'Feature', 'Message'][index % 4]
+}
+
+function buildFaqEntries(primaryCta, audience, websiteType, focusPhrases) {
   const typeLabel = String(websiteType ?? 'launch').replace('_', ' ')
+  const phrases = focusPhrases.length ? focusPhrases.slice(0, 3) : ['the main offer', 'the visual direction', primaryCta]
   return [
+    ...phrases.map((phrase) => ({
+      question: `How does the site handle ${phrase}?`,
+      answer: `It gives ${phrase} a dedicated section so ${audience} can understand it as a core part of the ${typeLabel} experience rather than generic filler.`
+    })),
     {
-      question: 'How fast can this go live?',
-      answer:
-        'Most teams can ship a production-ready first version in one to two days because the preview already maps hero, proof, offer, and conversion flow.'
-    },
-    {
-      question: `Can this be customized for ${audience}?`,
-      answer:
-        'Yes. Messaging, visuals, and calls to action are designed to be edited quickly so the final build matches your real audience and sales process.'
-    },
-    {
-      question: 'What happens after checkout?',
-      answer:
-        'After purchase, the source bundle is assigned to your checkout email so your team can deploy, extend, and optimize the experience immediately.'
-    },
-    {
-      question: `Is this suitable for a ${typeLabel} launch?`,
-      answer: `Yes. The layout intentionally prioritizes conversion copy, trust signals, and a direct "${primaryCta}" path for high-intent traffic.`
+      question: 'What should the main call to action be?',
+      answer: `The page is structured around "${primaryCta}" so visitors always have a clear next step after the hero, content sections, and FAQ.`
     }
   ]
 }
 
-function estimateQualityScore({ brief, audience, primaryCta }) {
+function estimateQualityScore({ brief, audience, primaryCta, focusPhrases }) {
   const briefLength = String(brief ?? '').trim().length
   const audienceLength = String(audience ?? '').trim().length
   const ctaLength = String(primaryCta ?? '').trim().length
+  const focusCount = Array.isArray(focusPhrases) ? focusPhrases.length : 0
 
   let score = 55
   if (briefLength >= 70) score += 12
   if (briefLength >= 140) score += 10
   if (audienceLength >= 8) score += 8
   if (ctaLength >= 6) score += 7
+  if (focusCount >= 2) score += 6
+  if (focusCount >= 4) score += 4
   if (/buy|book|start|get|launch|build/i.test(primaryCta)) score += 8
   return Math.min(100, score)
 }
 
-function buildSectionData({ brief, audience, websiteType, primaryCta }) {
+function buildSectionData({ brief, audience, websiteType, primaryCta, focusPhrases }) {
   const siteTypeLabel = TYPE_LABELS[websiteType] ?? 'Digital offer'
-  const audienceText = String(audience ?? '').toLowerCase() || 'your audience'
+  const phrases = focusPhrases.length ? focusPhrases.slice(0, 4) : splitPromptPhrases(brief).slice(0, 4)
 
-  return [
-    {
-      eyebrow: 'Positioning',
-      heading: `${siteTypeLabel} with a cleaner pitch`,
-      body: `This preview turns "${brief}" into a concrete homepage structure that is easier to scan, easier to trust, and easier to buy from on mobile.`
-    },
-    {
-      eyebrow: 'Audience',
-      heading: `Built for ${audience}`,
-      body: `The sections, calls to action, and benefit framing are tuned for ${audienceText} so the page reads like a live offer instead of a draft concept.`
-    },
-    {
-      eyebrow: 'Conversion',
-      heading: `Primary CTA: ${primaryCta}`,
-      body:
-        'The preview includes a visible offer stack, proof sections, and a direct next step so the site can sell instead of just explain.'
-    }
-  ]
+  return phrases.map((phrase, index) => ({
+    eyebrow: classifyPhrase(phrase, index),
+    heading: phrase
+      .split(/\s+/)
+      .slice(0, 5)
+      .map((word, wordIndex) =>
+        wordIndex === 0 ? (word[0] ?? '').toUpperCase() + word.slice(1) : word
+      )
+      .join(' '),
+    body:
+      index === 0
+        ? `Keep ${phrase} prominent so ${audience} understand what makes this ${siteTypeLabel.toLowerCase()} different right away.`
+        : index === 1
+          ? `Use ${phrase} to keep the first scroll anchored to the original prompt instead of a broad template.`
+          : index === 2
+            ? `Support ${phrase} with clear proof, hierarchy, and a direct "${primaryCta}" action path.`
+            : `Repeat ${phrase} as a visual and copy cue so the page stays cohesive from hero through CTA.`
+  }))
 }
 
-function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta }) {
+function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta, media }) {
   const theme = getThemePreset(websiteType, styleTone)
   const font = pickFont(brief)
-  const media = resolveMediaPlan(brief, websiteType)
+  const focusPhrases = extractFocusPhrases(brief)
+  const mediaPlan = resolveMediaPlan(brief, websiteType, media)
   const [canvas, surface, accent, ink] = theme.palette
-  const sections = buildSectionData({ brief, audience, websiteType, primaryCta })
+  const sections = buildSectionData({ brief, audience, websiteType, primaryCta, focusPhrases })
   const seoKeywords = extractKeywords(brief, websiteType, audience)
-  const faqEntries = buildFaqEntries(primaryCta, audience, websiteType)
-  const qualityScore = estimateQualityScore({ brief, audience, primaryCta })
+  const faqEntries = buildFaqEntries(primaryCta, audience, websiteType, focusPhrases)
+  const qualityScore = estimateQualityScore({ brief, audience, primaryCta, focusPhrases })
   const seoDescription = `${title}. ${brief}`.slice(0, 158)
   const bulletPoints = [
-    'Hero video or motion-ready media slot',
-    'Offer stack with direct checkout hooks',
-    'SEO baseline: metadata, FAQ, and semantic structure',
-    'Affiliate CTA lane and sponsor-ready ad placement',
-    'Source-ready files that can be exported after purchase'
+    `Audience: ${audience}`,
+    `Primary action: ${primaryCta}`,
+    `Style: ${styleTone}`,
+    ...(focusPhrases.length ? focusPhrases.slice(0, 2) : [`Prompt focus: ${brief}`])
+  ]
+  const visualCards = mediaPlan.gallery.length
+    ? mediaPlan.gallery
+        .map(
+          (image, index) =>
+            `<article class="card"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} visual ${index + 1}" style="width:100%;height:220px;object-fit:cover;border-radius:14px;border:1px solid var(--line)" loading="lazy" decoding="async" /><p style="margin-top:14px">${escapeHtml(
+              focusPhrases[index] ?? seoKeywords[index] ?? 'Prompt-aligned visual direction'
+            )}</p></article>`
+        )
+        .join('')
+    : sections
+        .slice(0, 3)
+        .map(
+          (section, index) =>
+            `<article class="card" style="min-height:220px;background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));position:relative;overflow:hidden"><div style="position:absolute;inset:auto auto 16px 16px;width:${120 + index * 24}px;height:${120 + index * 24}px;border-radius:999px;background:rgba(255,255,255,0.08);filter:blur(2px)"></div><span class="eyebrow">${escapeHtml(
+              section.eyebrow
+            )}</span><h2>${escapeHtml(section.heading)}</h2><p>${escapeHtml(section.body)}</p></article>`
+        )
+        .join('')
+  const detailCards = [
+    {
+      eyebrow: 'Audience',
+      heading: audience,
+      body: `The page is written for ${audience}, so the offer stays specific to the intended buyer.`
+    },
+    {
+      eyebrow: 'CTA',
+      heading: primaryCta,
+      body: `The conversion flow keeps "${primaryCta}" visible after the hero, mid-page, and in the final section.`
+    }
   ]
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -385,8 +450,8 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
           <p class="hero__lede">${escapeHtml(brief)}</p>
           <div class="hero__grid">
             <div class="hero__media">
-              <video autoplay muted loop playsinline poster="${escapeHtml(media.heroImage)}">
-                <source src="${escapeHtml(media.heroVideo)}" type="video/mp4" />
+              <video autoplay muted loop playsinline ${mediaPlan.heroImage ? `poster="${escapeHtml(mediaPlan.heroImage)}"` : ''}>
+                <source src="${escapeHtml(mediaPlan.heroVideo)}" type="video/mp4" />
               </video>
             </div>
             <div class="panel">
@@ -397,10 +462,18 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
                   <span class="chip">${escapeHtml(primaryCta)}</span>
                 </div>
                 <div class="screen-grid">
-                  <div class="screen-block"><strong>Offer direction</strong><p>${escapeHtml(title)} now reads like a sellable offer instead of a draft build note.</p></div>
-                  <div class="screen-block"><strong>Mobile behavior</strong><p>Hero, CTA, and proof stack cleanly so buyers can scroll and inspect before purchase.</p></div>
-                  <div class="screen-block"><strong>Story flow</strong><p>Media, trust, and conversion content are arranged to reduce drop-off in the first 20 seconds.</p></div>
-                  <div class="screen-block"><strong>Monetization</strong><p>Checkout-ready placement leaves space for a direct source-code purchase path.</p></div>
+                  <div class="screen-block"><strong>Offer direction</strong><p>${escapeHtml(
+                    focusPhrases[0] ?? brief
+                  )}</p></div>
+                  <div class="screen-block"><strong>Audience fit</strong><p>${escapeHtml(
+                    `The copy is tuned for ${audience} so the page does not drift into broad template language.`
+                  )}</p></div>
+                  <div class="screen-block"><strong>Story flow</strong><p>${escapeHtml(
+                    focusPhrases[1] ?? 'The first scroll reinforces the main offer, proof, and next step.'
+                  )}</p></div>
+                  <div class="screen-block"><strong>Primary action</strong><p>${escapeHtml(
+                    `Every major section supports "${primaryCta}" instead of competing with it.`
+                  )}</p></div>
                 </div>
               </div>
             </div>
@@ -423,9 +496,7 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
       </section>
       <section class="section">
         <div class="section-grid">
-          ${media.gallery
-            .map((image, index) => `<article class="card"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} image ${index + 1}" style="width:100%;height:220px;object-fit:cover;border-radius:14px;border:1px solid var(--line)" loading="lazy" decoding="async" /><p style="margin-top:14px">Prompt-driven image slot ${index + 1} ready for final asset replacement.</p></article>`)
-            .join('')}
+          ${visualCards}
         </div>
       </section>
       <section class="section">
@@ -439,21 +510,35 @@ function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta 
         </div>
       </section>
       <section class="story-strip">
-        <article class="card"><span class="eyebrow">Conversion lane</span><h2>Video, proof, offer, source delivery</h2><p>The generated build is arranged so the user can watch, inspect, and then buy the underlying source code from a productized checkout step.</p></article>
-        <article class="card"><span class="eyebrow">Delivery path</span><h2>Reserved to the checkout email</h2><p>Each preview is linked to an email address so the generated package can be assigned to the correct buyer after checkout.</p></article>
+        ${detailCards
+          .map(
+            (item) =>
+              `<article class="card"><span class="eyebrow">${escapeHtml(item.eyebrow)}</span><h2>${escapeHtml(
+                item.heading
+              )}</h2><p>${escapeHtml(item.body)}</p></article>`
+          )
+          .join('')}
       </section>
       <section class="section">
         <div class="monetization-grid">
           <article class="card">
-            <span class="eyebrow">Affiliate monetization</span>
-            <h2>Partner CTA strip</h2>
-            <p>Embed partner links with UTM parameters and a clear recommendation block to monetize intent that does not convert on first session.</p>
-            <p><a class="button" href="https://voicetowebsite.com/pricing?utm_source=preview&amp;utm_medium=affiliate&amp;utm_campaign=${escapeHtml(slugify(title))}">See partner offer</a></p>
+            <span class="eyebrow">Prompt brief</span>
+            <h2>${escapeHtml(title)}</h2>
+            <p>${escapeHtml(brief)}</p>
+            <p><a class="button" href="#top">${escapeHtml(primaryCta)}</a></p>
           </article>
-          <article class="card ad-slot">
-            <span class="eyebrow">Sponsor inventory</span>
-            <h2>Ad placement placeholder</h2>
-            <p>Reserved placement for ethical sponsorships or direct ad sales. Keep one premium slot above the fold and rotate by campaign.</p>
+          <article class="card">
+            <span class="eyebrow">Media</span>
+            <h2>${escapeHtml(mediaPlan.attribution?.length ? 'Live media credits' : 'Branded visual treatment')}</h2>
+            <p>${escapeHtml(
+              mediaPlan.attribution?.length
+                ? mediaPlan.attribution
+                    .map((entry) => entry.provider)
+                    .filter(Boolean)
+                    .filter((value, index, array) => array.indexOf(value) === index)
+                    .join(' • ')
+                : 'The preview keeps the visual direction branded until prompt-matched media is available.'
+            )}</p>
           </article>
         </div>
       </section>
@@ -481,10 +566,10 @@ export function generatePreview(input) {
   const email = String(input.email ?? '').trim().toLowerCase()
 
   const title = extractTitle(brief, websiteType)
-  const previewHtml = buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta })
+  const previewHtml = buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta, media: input.media })
 
   const seoKeywords = extractKeywords(brief, websiteType, audience)
-  const qualityScore = estimateQualityScore({ brief, audience, primaryCta })
+  const qualityScore = estimateQualityScore({ brief, audience, primaryCta, focusPhrases: extractFocusPhrases(brief) })
 
   return {
     requestId: randomId('preview'),

@@ -190,8 +190,8 @@ export default function WebsitePreviewStudio() {
         <span className="eyebrow">Live website generator</span>
         <h2>Describe the site, see the preview, then buy the source pack</h2>
         <p className="section-intro">
-          The engine runs in your browser, so the preview appears instantly — no server round-trip. Fill in the
-          brief, generate, and inspect a full scrollable homepage mockup before checkout.
+          A draft appears instantly in the browser, then the saved preview updates from the live generator with
+          prompt-matched structure and media. Fill in the brief, generate, and inspect the full homepage before checkout.
         </p>
         <div className="preview-studio__toolbar">
           <label className="preview-sound-toggle">
@@ -290,8 +290,8 @@ export default function WebsitePreviewStudio() {
               {busy ? 'Generating…' : preview ? 'Regenerate preview' : 'Generate preview'}
             </button>
             <p className="field-note">
-              The source pack is reserved to the email above. Preview rendering works offline and does not share
-              your brief with any external service.
+              The source pack is reserved to the email above. The live preview may use your brief to fetch matching
+              media and store the generated page.
             </p>
           </div>
           {error ? (
