@@ -13,10 +13,10 @@ const NAV = [
 
 function OverviewPanel() {
 const stats = [
-  { label: 'Total Visitors', value: '2,847', delta: '+12%' },
-  { label: 'Blog Posts', value: '48', delta: '+6 today' },
-  { label: 'Products', value: '12', delta: 'active' },
-  { label: 'Est. Revenue', value: '$89.4K', delta: '+8%' }
+  { label: 'Total Visitors', value: '0', delta: 'live' },
+  { label: 'Blog Posts', value: '0', delta: 'published' },
+  { label: 'Products', value: '0', delta: 'active' },
+  { label: 'Revenue', value: '—', delta: 'connect payments' }
 ]
 return (
   <div className="stack-lg">
@@ -38,19 +38,12 @@ return (
         <span style={{ fontWeight: 600, color: 'var(--ink)' }}>Recent Activity</span>
       </div>
       <div style={{ padding: '1rem 1.5rem' }}>
-        {[
-          { action: 'Auto-generated blog post', detail: '"Voice AI Trends 2026"', time: '2 min ago' },
-          { action: 'New visitor session', detail: 'San Francisco, CA', time: '5 min ago' },
-          { action: 'Auto-generated page', detail: 'Landing page: AI Tools', time: '1 hr ago' }
-        ].map((item, i) => (
-          <div key={i} className="commit-row">
-            <div>
-              <strong>{item.action}</strong>
-              <span style={{ marginLeft: '0.5rem', color: 'var(--ink-faint)', fontSize: '0.8rem' }}>{item.detail}</span>
-            </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--ink-faint)', flexShrink: 0 }}>{item.time}</span>
+        <div className="commit-row">
+          <div>
+            <strong>No activity yet</strong>
+            <span style={{ marginLeft: '0.5rem', color: 'var(--ink-faint)', fontSize: '0.8rem' }}>Generate content or run traffic to populate analytics.</span>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   </div>
