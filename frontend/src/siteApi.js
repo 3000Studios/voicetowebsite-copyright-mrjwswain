@@ -4,15 +4,30 @@ async function request(path, { method = 'GET', body } = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     method,
     headers: {
+      accept: 'application/json',
       'content-type': 'application/json'
     },
     body: body ? JSON.stringify(body) : undefined
   })
 
-  const payload = await response.json()
+  const text = await response.text()
+  const payload = text ? (() => {
+    try {
+      return JSON.parse(text)
+    } catch {
+      return null
+    }
+  })() : null
 
   if (!response.ok) {
-    throw new Error(payload.message ?? 'Request failed.')
+    if (payload?.message) {
+      throw new Error(payload.message)
+    }
+    throw new Error('Request failed.')
+  }
+
+  if (!payload) {
+    throw new Error('API returned an empty response.')
   }
 
   return payload

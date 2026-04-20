@@ -85,7 +85,7 @@ export default function HomePage() {
   const heroPanel = homepage.heroPanel ?? null
 
   const liveMetrics = [
-    { label: 'Visitors tracked', value: String(snapshot?.analytics?.visitors ?? 0) },
+    { label: 'Previews generated', value: String(snapshot?.analytics?.previews ?? 0) },
     { label: 'Leads captured', value: String(snapshot?.analytics?.leads ?? 0) },
     { label: 'Payments closed', value: String(snapshot?.analytics?.purchases ?? 0) },
     { label: 'Revenue recorded', value: formatCurrency(snapshot?.analytics?.revenue ?? 0) }

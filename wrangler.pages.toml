@@ -1,4 +1,11 @@
 $schema = "./node_modules/wrangler/config-schema.json"
 name = "voicetowebsite"
 pages_build_output_dir = "dist"
+compatibility_date = "2026-04-11"
+compatibility_flags = ["nodejs_compat"]
+
+[[r2_buckets]]
+binding = "DATA_BUCKET"
+bucket_name = "voicetowebsite"
+preview_bucket_name = "voicetowebsite"
 

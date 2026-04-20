@@ -20,8 +20,12 @@ function getCoverrHeroVideo(websiteType) {
   return videos[String(websiteType ?? '').toLowerCase()] ?? videos.saas
 }
 
-async function fetchUnsplashImages(query, count) {
-  const key = process.env.UNSPLASH_API_KEY
+function getEnvValue(runtimeEnv, key) {
+  return runtimeEnv?.[key] ?? process.env?.[key]
+}
+
+async function fetchUnsplashImages(query, count, runtimeEnv) {
+  const key = getEnvValue(runtimeEnv, 'UNSPLASH_API_KEY')
   if (!key || key.startsWith('replace-with-')) return []
 
   const response = await fetch(
@@ -51,8 +55,8 @@ async function fetchUnsplashImages(query, count) {
     .filter((item) => item.url)
 }
 
-async function fetchPexelsImages(query, count) {
-  const key = process.env.PEXELS_API_KEY
+async function fetchPexelsImages(query, count, runtimeEnv) {
+  const key = getEnvValue(runtimeEnv, 'PEXELS_API_KEY')
   if (!key || key.startsWith('replace-with-')) return []
 
   const response = await fetch(
@@ -82,13 +86,13 @@ async function fetchPexelsImages(query, count) {
     .filter((item) => item.url)
 }
 
-export async function getMediaForGeneration({ brief, websiteType }) {
+export async function getMediaForGeneration({ brief, websiteType }, runtimeEnv = undefined) {
   const query = normalizeQuery(brief || websiteType || 'website')
   const heroVideo = getCoverrHeroVideo(websiteType)
 
   const [unsplash, pexels] = await Promise.allSettled([
-    fetchUnsplashImages(query, 3),
-    fetchPexelsImages(query, 3)
+    fetchUnsplashImages(query, 3, runtimeEnv),
+    fetchPexelsImages(query, 3, runtimeEnv)
   ])
 
   const unsplashImages = unsplash.status === 'fulfilled' ? unsplash.value : []
@@ -140,4 +144,3 @@ export async function getMediaForGeneration({ brief, websiteType }) {
     attribution
   }
 }
-
