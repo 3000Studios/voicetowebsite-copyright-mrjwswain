@@ -1,0 +1,13 @@
+name = "voice-to-website"
+compatibility_date = "2024-04-12"
+pages_build_output_dir = "dist"
+
+[vars]
+NODE_VERSION = "20"
+
+# Environment variables for production
+# These should be set in the Cloudflare Dashboard
+# GEMINI_API_KEY = ""
+# STRIPE_SECRET_KEY = ""
+# STRIPE_PUBLISHABLE_KEY = ""
+# APP_URL = ""

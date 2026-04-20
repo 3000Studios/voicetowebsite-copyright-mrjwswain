@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Georgia", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+    font-family: "Georgia", serif;
+  }
+  body {
+    @apply bg-slate-950 text-slate-200 overflow-x-hidden;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050505;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #6366f1, #a855f7, #ec4899);
+    border-radius: 20px;
+    border: 3px solid #050505;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #fff;
+  }
+}
+
+@layer utilities {
+  .lusion-text {
+    @apply font-black tracking-tighter uppercase italic leading-[0.8] mix-blend-difference;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1);
+  }
+
+  /* 3D Text Effect */
+  .text-3d {
+    color: #fff;
+  }
+
+  /* Oval Beveled Button */
+  .btn-oval {
+    @apply relative px-12 py-5 rounded-full font-black uppercase tracking-widest transition-all duration-500 overflow-hidden flex items-center justify-center gap-3;
+    background: linear-gradient(145deg, #1e1e1e, #0a0a0a);
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 
+      inset 4px 4px 8px rgba(255,255,255,0.05),
+      inset -4px -4px 8px rgba(0,0,0,0.6),
+      8px 8px 20px rgba(0,0,0,0.5);
+  }
+
+  .btn-oval:hover {
+    @apply -translate-y-3;
+    background: linear-gradient(145deg, #2a2a2a, #151515);
+    box-shadow: 
+      0 20px 40px rgba(255,255,255,0.1),
+      inset 4px 4px 8px rgba(255,255,255,0.1),
+      inset -4px -4px 8px rgba(0,0,0,0.6);
+  }
+
+  /* Sound Wave Synth Background */
+  .synth-wave-3d {
+    @apply absolute rounded-full opacity-30 pointer-events-none;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.6) 0%, transparent 80%);
+    filter: blur(60px);
+    animation: wave-float-3d 15s infinite alternate ease-in-out;
+    transform-style: preserve-3d;
+  }
+
+  @keyframes wave-float-3d {
+    0% { transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); opacity: 0.2; }
+    50% { transform: translate3d(200px, -100px, 100px) scale(1.8) rotateX(180deg); opacity: 0.5; }
+    100% { transform: translate3d(-100px, 200px, -100px) scale(0.7) rotateX(360deg); opacity: 0.2; }
+  }
+
+  /* Exploding Link Effect */
+  .link-explode {
+    @apply relative inline-block transition-all duration-500 cursor-pointer;
+  }
+  .link-explode:hover {
+    @apply scale-125 brightness-150;
+    color: #fff;
+  }
+  .link-explode:active {
+    animation: explode 0.6s forwards;
+  }
+
+  @keyframes explode {
+    0% { transform: scale(1); opacity: 1; filter: blur(0); }
+    50% { transform: scale(2.5); opacity: 0.6; filter: blur(15px); }
+    100% { transform: scale(4); opacity: 0; filter: blur(30px); }
+  }
+
+  /* Nav Link Pop Up */
+  .nav-pop {
+    @apply transition-all duration-500 hover:scale-150 hover:-translate-y-4 hover:brightness-200;
+  }
+  .nav-pop:hover {
+    animation: color-cycle 2s infinite linear;
+  }
+
+  @keyframes color-cycle {
+    0% { color: #6366f1; }
+    33% { color: #a855f7; }
+    66% { color: #ec4899; }
+    100% { color: #6366f1; }
+  }
+
+  /* Hamburger Animation */
+  .hamburger-line {
+    @apply w-8 h-1 bg-white transition-all duration-500 rounded-full;
+  }
+  .hamburger-active .line-1 { transform: translateY(10px) rotate(45deg); }
+  .hamburger-active .line-2 { opacity: 0; }
+  .hamburger-active .line-3 { transform: translateY(-10px) rotate(-45deg); }
+
+  /* Bust Out Animation */
+  @keyframes bust-out {
+    0% { transform: scale(0); opacity: 0; border-radius: 100%; }
+    100% { transform: scale(1); opacity: 1; border-radius: 0; }
+  }
+  .bust-out-menu {
+    animation: bust-out 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Pulse Ring */
+  .pulse-ring {
+    @apply absolute inset-0 rounded-full border-2 border-indigo-500/50 animate-ping;
+  }
+
+  /* Sound Bar Animation */
+  @keyframes sound-wave {
+    0%, 100% { height: 10px; }
+    50% { height: 40px; }
+  }
+
+  .sound-bar {
+    @apply w-1 bg-indigo-500 rounded-full;
+    animation: sound-wave 0.5s ease-in-out infinite;
+  }
+
+  /* Remove all boxes */
+  .glass-card, .bento-item, .lifted-section, .sharp-card {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
