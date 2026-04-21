@@ -29,7 +29,11 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value ?? '').trim())
 }
 
-export default function WebsitePreviewStudio({ accountEmail = '', unrestricted = false }) {
+export default function WebsitePreviewStudio({
+  accountEmail = '',
+  unrestricted = false,
+  onPreviewReady = null
+}) {
   const [form, setForm] = useState(() => ({ ...DEFAULT_FORM, email: accountEmail || DEFAULT_FORM.email }))
   const [preview, setPreview] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -120,6 +124,9 @@ export default function WebsitePreviewStudio({ accountEmail = '', unrestricted =
       .then((serverPreview) => {
         setPreview({ ...clientPreview, ...serverPreview, serverRecorded: true })
         setGenerationCount((n) => n + 1)
+        if (typeof onPreviewReady === 'function') {
+          onPreviewReady({ ...clientPreview, ...serverPreview, serverRecorded: true })
+        }
         playUiTone('success')
       })
       .catch((nextError) => {
