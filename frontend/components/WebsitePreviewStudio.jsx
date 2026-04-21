@@ -18,7 +18,7 @@ const STYLE_TONES = [
 
 const DEFAULT_FORM = {
   email: '',
-  brief: 'A voice-first website that sells a launch sprint and shows off the product in motion.',
+  brief: 'Build a premium voice-first website for startup founders that sells a launch sprint, shows the main offer above the fold, uses deep blue and cyan lighting, and drives visitors to book a strategy call.',
   audience: 'founders and small teams',
   websiteType: 'saas',
   styleTone: 'cinematic',
@@ -226,6 +226,17 @@ export default function WebsitePreviewStudio({ accountEmail = '', unrestricted =
 
       <div className="preview-studio__layout">
         <form className="preview-form" onSubmit={handleGenerate} noValidate>
+          <div className="preview-form__prompt-guide">
+            <span className="eyebrow">What to include in your prompt</span>
+            <ul className="bullet-list preview-form__prompt-list">
+              <li>What the business does and what the homepage should sell</li>
+              <li>Who the buyer is and the main action they should take</li>
+              <li>The visual style, tone, and any brand colors or words that matter</li>
+            </ul>
+            <p className="field-note">
+              Speak naturally. One good sentence is enough if it includes the offer, audience, and desired outcome.
+            </p>
+          </div>
           {unrestricted ? (
             <div className="field">
               <span>Customer account email</span>
@@ -245,18 +256,19 @@ export default function WebsitePreviewStudio({ accountEmail = '', unrestricted =
             </label>
           )}
           <label className="field">
-            <span>What should the site sell?</span>
+            <span>Speak or type the website brief</span>
             <textarea
               value={form.brief}
               onChange={(event) => updateField('brief', event.target.value)}
-              rows={5}
-              placeholder="Describe the website, offer, and what you want the first page to do."
+              rows={7}
+              placeholder="Example: Create a luxury AI website for roof repair leads in Miami. Use a dark navy and cyan theme, show trust badges, explain the offer clearly, and make the main CTA Book a free estimate."
               required
             />
-            <div className="hero__actions">
+            <div className="hero__actions preview-form__voice-actions">
               <button className="button button--ghost" type="button" onClick={handleVoicePrompt} disabled={voiceBusy}>
-                {voiceBusy ? 'Listening...' : 'Speak your website idea'}
+                {voiceBusy ? 'Listening...' : 'Tap to speak your website idea'}
               </button>
+              <span className="field-note">Say the business, audience, style, and main call to action.</span>
             </div>
           </label>
           <div className="preview-form__grid">

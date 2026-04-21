@@ -34,6 +34,27 @@ function getSessionId() {
 export default function SiteFrame() {
   const location = useLocation()
   const [menuOpen, setMenuOpen] = React.useState(false)
+  const pageClass = React.useMemo(() => {
+    if (location.pathname === '/') {
+      return 'page--home'
+    }
+    if (location.pathname.startsWith('/pricing')) {
+      return 'page--pricing'
+    }
+    if (location.pathname.startsWith('/products')) {
+      return 'page--products'
+    }
+    if (location.pathname.startsWith('/blog')) {
+      return 'page--blog'
+    }
+    if (location.pathname.startsWith('/contact')) {
+      return 'page--contact'
+    }
+    if (location.pathname.startsWith('/dashboard')) {
+      return 'page--dashboard'
+    }
+    return 'page--default'
+  }, [location.pathname])
   const topNavItems = publicNavItems.filter((item) =>
     ['/', '/products', '/pricing', '/blog', '/contact'].includes(item.to)
   )
@@ -101,7 +122,7 @@ export default function SiteFrame() {
           </div>
         </div>
       </header>
-      <main className="page">
+      <main className={`page ${pageClass}`}>
         <div className="adsense-wrap adsense-wrap--leaderboard">
           <AdSlot variant="leaderboard" />
         </div>

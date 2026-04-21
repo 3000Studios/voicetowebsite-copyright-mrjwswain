@@ -33,8 +33,8 @@ export default function GenericPage() {
   }
 
   return (
-    <div className="stack-xl">
-      <section className="section-card">
+    <div className={`stack-xl generic-page generic-page--${slug}`}>
+      <section className="generic-page__hero">
         <span className="eyebrow">{page.eyebrow ?? SITE_DISPLAY_NAME}</span>
         <PrismHeadline text={page.headline ?? page.title ?? slug} />
         <p className="section-intro">{page.subheadline ?? page.intro ?? 'Generated from the repo content layer.'}</p>
@@ -43,12 +43,12 @@ export default function GenericPage() {
       {page.heroStats ? <MetricStrip items={page.heroStats} /> : null}
       <MediaShowcase media={page.media} />
       {page.steps ? (
-        <section className="section-card">
+        <section className="generic-page__steps">
           <span className="eyebrow">{page.stepsEyebrow ?? 'Workflow'}</span>
           <h2>{page.stepsHeadline ?? 'How the flow works'}</h2>
-          <div className="card-grid card-grid--compact">
+          <div className="generic-page__steps-grid">
             {page.steps.map((step, index) => (
-              <article key={step.title} className="content-card content-card--step">
+              <article key={step.title} className="generic-page__step">
                 <span className="step-number">0{index + 1}</span>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
@@ -60,7 +60,14 @@ export default function GenericPage() {
       {page.sections ? <RichBlocks items={page.sections} /> : null}
       {page.items ? <RichBlocks items={page.items} /> : null}
       {page.tiers ? (
-        <section className="pricing-ladder pricing-ladder--page">
+        <section className="generic-page__pricing">
+          <div className="section-heading section-heading--open">
+            <div>
+              <span className="eyebrow">Plans</span>
+              <h2>Choose the path that matches how you want to buy</h2>
+            </div>
+          </div>
+          <div className="pricing-ladder pricing-ladder--page">
           {page.tiers.map((tier) => {
             const ctaLabel = tier.ctaLabel ?? (tier.featured ? 'Buy now' : 'Choose plan')
             const ctaHref = tier.ctaHref ?? '/contact'
@@ -99,12 +106,16 @@ export default function GenericPage() {
               </article>
             )
           })}
+          </div>
         </section>
       ) : null}
       {slug === 'pricing' && snapshot?.commerce?.offers?.length ? (
-        <section className="section-card">
-          <span className="eyebrow">Checkout</span>
-          <h2>Accept live payments from the offers page</h2>
+        <section className="generic-page__checkout">
+          <span className="eyebrow">Buy the product</span>
+          <h2>Choose a live checkout and unlock your dashboard access</h2>
+          <p className="section-intro">
+            Every purchase path below saves the customer email, issues dashboard access, and routes to the real live payment link.
+          </p>
           <div className="card-grid">
             {snapshot.commerce.offers.map((offer) => (
               <OfferCheckoutCard key={offer.slug} offer={offer} />
@@ -113,12 +124,12 @@ export default function GenericPage() {
         </section>
       ) : null}
       {page.faq ? (
-        <section className="section-card">
+        <section className="generic-page__faq">
           <span className="eyebrow">FAQ</span>
           <h2>{page.faqHeadline ?? 'Questions buyers usually ask before they commit'}</h2>
-          <div className="card-grid card-grid--compact">
+          <div className="generic-page__faq-grid">
             {page.faq.map((entry) => (
-              <article key={entry.question} className="content-card">
+              <article key={entry.question} className="generic-page__faq-item">
                 <h3>{entry.question}</h3>
                 <p>{entry.answer}</p>
               </article>
@@ -127,7 +138,7 @@ export default function GenericPage() {
         </section>
       ) : null}
       {page.cta ? (
-        <section className="section-card cta-band">
+        <section className="cta-band cta-band--open">
           <div>
             <span className="eyebrow">{page.cta.eyebrow}</span>
             <h2>{page.cta.heading}</h2>
