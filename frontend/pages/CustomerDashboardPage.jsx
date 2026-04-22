@@ -209,12 +209,16 @@ export default function CustomerDashboardPage() {
   }
 
   return (
-    <div className="customer-dashboard">
+    <div className="customer-dashboard customer-dashboard--premium">
       <Toast state={toast} />
       <aside className="customer-dashboard__sidebar">
         <div className="customer-dashboard__brand">
           <div className="customer-dashboard__brand-mark"><BrandWireframe size={28} /></div>
-          <div><strong>Site Studio</strong><span>{SITE_DISPLAY_NAME}</span></div>
+          <div>
+            <strong>Site Studio</strong>
+            <span>{SITE_DISPLAY_NAME}</span>
+            <small>Voice synthesis terminal</small>
+          </div>
         </div>
         <nav className="customer-dashboard__nav" aria-label="Dashboard navigation">
           {PANEL_ORDER.map((panel) => (
@@ -228,11 +232,16 @@ export default function CustomerDashboardPage() {
       </aside>
 
       <div className="customer-dashboard__content">
-        <header className="customer-dashboard__header">
+        <header className="customer-dashboard__header customer-dashboard__header--premium">
           <div>
-            <span className="eyebrow">Customer dashboard</span>
+            <span className="eyebrow">Voice builder command</span>
             <h1>{PANEL_LABELS[activePanel]}</h1>
             <p className="section-intro">{activePanel === 'dashboard' ? 'Manage your VoiceToWebsite workspace, customer access, and generated assets.' : `Control your ${PANEL_LABELS[activePanel].toLowerCase()} without leaving the live site.`}</p>
+            <div className="customer-dashboard__protocols">
+              <span>Operator: {account.email}</span>
+              <span>Entitlements: {account.entitlements?.length ?? 0}</span>
+              <span>Site: {SITE_DOMAIN}</span>
+            </div>
           </div>
           <div className="hero__actions">
             <button className="button button--ghost" type="button" onClick={openSitePreview}>Preview site</button>
@@ -253,11 +262,11 @@ export default function CustomerDashboardPage() {
             </div>
           </section>
           <section className="customer-dashboard__section customer-dashboard__section--split">
-            <div className="customer-dashboard__surface">
+            <div className="customer-dashboard__surface customer-dashboard__surface--accent">
               <span className="eyebrow">Recent workspace activity</span><h2>Pages, previews, and live routes</h2>
               <div className="customer-dashboard__rows">{recentEntries.map((entry) => <div key={entry.id} className="customer-dashboard__row"><div><strong>{entry.title}</strong><span>{entry.status}</span></div><div className="customer-dashboard__row-meta"><span>{formatRelative(entry.updatedAt)}</span>{entry.href ? <Link className="button button--ghost" to={entry.href}>Open</Link> : <button type="button" className="button button--ghost" onClick={() => setActivePanel('generator')}>{entry.action}</button>}</div></div>)}</div>
             </div>
-            <div className="customer-dashboard__surface">
+            <div className="customer-dashboard__surface customer-dashboard__surface--accent">
               <span className="eyebrow">Account record</span><h2>Entitlements and purchase log</h2>
               <div className="tag-row">{(account.entitlements ?? []).map((item) => <span key={item} className="tag">{titleCase(item)}</span>)}</div>
               <div className="customer-dashboard__purchase-list">{(account.purchases ?? []).slice(0, 6).map((purchase) => <div key={purchase.transactionRef} className="customer-dashboard__purchase"><div><strong>{titleCase(purchase.offerSlug)}</strong><span>{purchase.provider.toUpperCase()} · {purchase.status.replaceAll('_', ' ')}</span></div><span>{formatDate(purchase.purchasedAt)}</span></div>)}</div>

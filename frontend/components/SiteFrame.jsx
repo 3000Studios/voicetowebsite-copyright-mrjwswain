@@ -9,6 +9,7 @@ import { trackSiteEvent } from '../src/siteApi.js'
 import AdSlot from './AdSlot.jsx'
 import BrandWireframe from './BrandWireframe.jsx'
 import StudioOpsBridge from './StudioOpsBridge.jsx'
+import PremiumAICompanion from './PremiumAICompanion.jsx'
 
 const VISITOR_SESSION_KEY = 'voicetowebsite_session_id'
 const LEGACY_VISITOR_SESSION_KEY = 'myappai_session_id'
@@ -81,9 +82,17 @@ export default function SiteFrame() {
       <header className="site-header">
         <div className="site-header__inner">
           <NavLink className="brand" to="/">
+            <div className="brand__signal" aria-hidden="true">
+              {[20, 44, 72, 36, 92, 58, 84, 46, 64, 28, 52].map((height, index) => (
+                <span key={`${height}-${index}`} style={{ '--signal-height': `${height}%`, '--signal-delay': `${index * 0.08}s` }} />
+              ))}
+            </div>
             <BrandWireframe size={34} />
             <span className="brand__pulse" aria-hidden="true" />
-            <img className="brand__logo" src="/media/voicetowebsite-logo.jpg" alt="Voicetowebsite.com" />
+            <div className="brand__copy">
+              <img className="brand__logo" src="/media/voicetowebsite-logo.jpg" alt="Voicetowebsite.com" />
+              <span className="brand__meta">Neural manifestation engine</span>
+            </div>
             <span className="brand__wordmark sr-only">{SITE_DISPLAY_NAME}</span>
           </NavLink>
 
@@ -134,6 +143,7 @@ export default function SiteFrame() {
         </div>
       </main>
       <SiteFooter />
+      <PremiumAICompanion />
     </div>
   )
 }
