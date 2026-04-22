@@ -5,16 +5,27 @@ import { applyPatch } from "./patchEngine.js";
 import { deployUpdate } from "./gitDeploy.js";
 import { validate } from "../server/middleware/validate.js";
 import { CommandSchema } from "../server/validation/schemas.js";
+import { buildProductSectionHtml, enforceLimit } from "./paywall.js";
 
 const router = express.Router();
 
 export async function executeRepositoryCommand(payload) {
+  const normalizedCommand =
+    typeof payload?.command === "string" ? payload.command.trim() : "";
+
+  if (normalizedCommand.toLowerCase().includes("create product")) {
+    return {
+      success: true,
+      action: "create_product",
+      productSectionHtml: buildProductSectionHtml()
+    };
+  }
+
   if (payload && typeof payload.action === "string") {
     return routeCommand(payload);
   }
 
-  const command =
-    typeof payload?.command === "string" ? payload.command.trim() : "";
+  const command = normalizedCommand;
 
   if (!command) {
     const error = new Error("Missing command");
@@ -37,9 +48,23 @@ export async function executeRepositoryCommand(payload) {
   };
 }
 
+export async function executeCommandWithPaywall(payload) {
+  const gate = enforceLimit(payload)
+  if (gate.blocked) {
+    return gate
+  }
+
+  const result = await executeRepositoryCommand(payload)
+  return {
+    ...result,
+    commandsUsed: gate.nextCommandsUsed,
+    plan: gate.plan
+  }
+}
+
 router.post("/", validate(CommandSchema), async (request, response, next) => {
   try {
-    const result = await executeRepositoryCommand(request.validated);
+    const result = await executeCommandWithPaywall(request.validated);
     response.json(result);
   } catch (error) {
     if (error.statusCode) {

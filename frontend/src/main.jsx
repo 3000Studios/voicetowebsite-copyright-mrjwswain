@@ -20,6 +20,40 @@ if (adsEnabled && adsensePublisher && adsensePublisher.startsWith('ca-pub-')) {
   document.head.appendChild(adSenseScript)
 }
 
+window.sendCommand = async function sendCommand(command) {
+  const used = Number(window.localStorage.getItem('cmdCount') || 0)
+  const plan = window.localStorage.getItem('plan') || 'free'
+
+  const res = await fetch('/api/orchestrator', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      command,
+      mode: 'apply',
+      commandsUsed: used,
+      plan
+    })
+  })
+
+  const data = await res.json()
+
+  if (data?.error === 'PAYWALL_TRIGGERED' || data?.blocked) {
+    const paywall = document.getElementById('paywall')
+    if (paywall) {
+      paywall.style.display = 'flex'
+    }
+    return data
+  }
+
+  window.localStorage.setItem('cmdCount', String(data.commandsUsed ?? used + 1))
+
+  if (data?.productSectionHtml) {
+    document.body.insertAdjacentHTML('beforeend', data.productSectionHtml)
+  }
+
+  return data
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
 <BrowserRouter>
   <App />

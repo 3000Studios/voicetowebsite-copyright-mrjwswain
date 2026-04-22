@@ -1,8 +1,17 @@
-"$schema" = "./node_modules/wrangler/config-schema.json"
 name = "voicetowebsite"
-pages_build_output_dir = "uploads/dist"
-compatibility_date = "2026-04-11"
+main = "worker.js"
+compatibility_date = "2026-01-01"
 compatibility_flags = ["nodejs_compat"]
+
+[vars]
+OPENAI_MODEL = "gpt-4o-mini"
+# Stripe secrets must be set with:
+# wrangler secret put STRIPE_SECRET
+# wrangler secret put STRIPE_WEBHOOK_SECRET
+# GitHub secrets remain secret-backed:
+# GITHUB_TOKEN
+# GITHUB_REPO
+# GITHUB_BASE_BRANCH
 
 [[r2_buckets]]
 binding = "DATA_BUCKET"

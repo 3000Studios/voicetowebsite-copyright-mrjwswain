@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Complete your VoiceToWebsite subscription checkout.">
+  <title>Checkout | VoiceToWebsite</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #06111d;
+      --card: rgba(10, 28, 42, 0.88);
+      --line: rgba(121, 212, 255, 0.2);
+      --text: #eaf6ff;
+      --muted: #9dc7df;
+      --brand: #79d4ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(121, 212, 255, 0.18), transparent 30%),
+        linear-gradient(180deg, #020a12, var(--bg));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    main {
+      width: min(560px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--card);
+      padding: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.34);
+    }
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 6vw, 3rem); }
+    p { color: var(--muted); }
+    .actions { display: grid; gap: 12px; margin-top: 24px; }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font: inherit;
+      font-weight: 700;
+      color: #03101b;
+      background: linear-gradient(135deg, #79d4ff, #53bfff);
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+      box-shadow: 0 12px 30px rgba(83, 191, 255, 0.35);
+    }
+    button:hover { transform: translateY(-2px); }
+    button[disabled] { opacity: 0.55; cursor: progress; transform: none; }
+    #status { min-height: 24px; font-size: 0.95rem; }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main>
+    <div style="text-transform:uppercase;letter-spacing:.22em;font-size:.72rem;color:#79d4ff">Secure upgrade</div>
+    <h1 id="title">Upgrade your plan</h1>
+    <p id="copy">Choose the subscription that matches your command volume and continue building without the free limit.</p>
+    <div class="actions">
+      <button id="pro-button" type="button">Pro — $49/mo</button>
+      <button id="elite-button" type="button">Elite — $149/mo</button>
+    </div>
+    <p id="status" aria-live="polite"></p>
+    <p><a href="/pricing.html">Compare plans</a></p>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search)
+    const requestedPlan = (params.get('plan') || 'pro').toLowerCase()
+    const plans = {
+      pro: {
+        title: 'Upgrade to Pro',
+        copy: 'Unlock 100 commands per billing cycle and keep the builder monetization-ready.',
+        envKey: 'STRIPE_PRICE_PRO'
+      },
+      elite: {
+        title: 'Upgrade to Elite',
+        copy: 'Unlock unlimited commands for agencies, operators, and high-volume launch teams.',
+        envKey: 'STRIPE_PRICE_ELITE'
+      }
+    }
+
+    const currentPlan = plans[requestedPlan] ? requestedPlan : 'pro'
+    document.getElementById('title').textContent = plans[currentPlan].title
+    document.getElementById('copy').textContent = plans[currentPlan].copy
+
+    const statusEl = document.getElementById('status')
+    const buttons = {
+      pro: document.getElementById('pro-button'),
+      elite: document.getElementById('elite-button')
+    }
+
+    async function fetchStripeConfig() {
+      const response = await fetch('/api/stripe-config')
+      if (!response.ok) return {}
+      return response.json()
+    }
+
+    async function go(plan) {
+      const button = buttons[plan]
+      const original = button.textContent
+      button.disabled = true
+      statusEl.textContent = 'Starting secure checkout…'
+
+      try {
+        const priceId = window[plans[plan].envKey]
+          || plans[plan].fallbackPriceId
+          || (plan === 'elite' ? 'price_elite' : 'price_pro')
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priceId })
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data?.message || data?.error || 'Checkout failed.')
+        }
+
+        const config = await fetchStripeConfig()
+        if (config?.publishableKey) {
+          const stripe = window.Stripe(config.publishableKey)
+          const result = await stripe.redirectToCheckout({ sessionId: data.id })
+          if (result?.error) {
+            throw new Error(result.error.message)
+          }
+          return
+        }
+
+        if (data?.url) {
+          window.location.assign(data.url)
+          return
+        }
+
+        throw new Error('Checkout session was created without a redirect target.')
+      } catch (error) {
+        statusEl.textContent = error.message
+        button.disabled = false
+        button.textContent = original
+      }
+    }
+
+    buttons.pro.addEventListener('click', () => go('pro'))
+    buttons.elite.addEventListener('click', () => go('elite'))
+  </script>
+</body>
+</html>

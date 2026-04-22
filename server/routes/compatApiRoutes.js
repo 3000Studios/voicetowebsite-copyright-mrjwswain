@@ -1,4 +1,7 @@
 import { Router } from 'express'
+import { executeCommandWithPaywall } from '../../api/command.js'
+import { validate } from '../middleware/validate.js'
+import { CheckoutPriceSchema, CommandSchema } from '../validation/schemas.js'
 import {
   readSystemDocument,
   writeSystemDocument
@@ -263,6 +266,53 @@ router.post('/create-checkout-session', async (_request, response) => {
     const appUrl = (process.env.APP_URL || process.env.SITE_ORIGIN || 'http://localhost:3000').trim()
     response.json({ id: 'local-dummy-session', url: `${appUrl}/dashboard?success=true` })
   }
+})
+
+router.post('/orchestrator', validate(CommandSchema), async (request, response, next) => {
+  try {
+    const result = await executeCommandWithPaywall(request.validated)
+    if (result?.blocked) {
+      response.status(402).json(result)
+      return
+    }
+    response.json(result)
+  } catch (error) {
+    next(error)
+  }
+})
+
+router.post('/checkout', validate(CheckoutPriceSchema), async (request, response) => {
+  try {
+    const stripeKey = process.env.STRIPE_SECRET ?? process.env.STRIPE_SECRET_KEY ?? ''
+    if (!stripeKey) {
+      response.status(501).json({ error: 'Stripe is not configured.' })
+      return
+    }
+
+    const { default: Stripe } = await import('stripe')
+    const stripe = new Stripe(stripeKey)
+    const priceId = String(request.validated.priceId)
+    const origin = (process.env.APP_URL || process.env.SITE_ORIGIN || 'https://voicetowebsite.com').trim()
+    const plan = priceId.toLowerCase().includes('elite') ? 'elite' : 'pro'
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${origin}/success.html?plan=${encodeURIComponent(plan)}`,
+      cancel_url: `${origin}/pricing.html`,
+      metadata: { plan }
+    })
+
+    response.json({ id: session.id, url: session.url, plan })
+  } catch (error) {
+    response.status(500).json({ error: error.message })
+  }
+})
+
+router.get('/stripe-config', (_request, response) => {
+  response.json({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? ''
+  })
 })
 
 export default router

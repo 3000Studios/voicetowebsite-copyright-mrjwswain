@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan Activated | VoiceToWebsite</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #020a12, #071523);
+      color: #eaf6ff;
+      font-family: Inter, system-ui, sans-serif;
+      padding: 24px;
+      text-align: center;
+    }
+    main {
+      width: min(520px, 100%);
+      border: 1px solid rgba(121, 212, 255, 0.22);
+      border-radius: 28px;
+      background: rgba(10, 28, 42, 0.92);
+      padding: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.34);
+    }
+    a {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      color: #03101b;
+      text-decoration: none;
+      font-weight: 700;
+      background: linear-gradient(135deg, #79d4ff, #53bfff);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div style="text-transform:uppercase;letter-spacing:.22em;font-size:.72rem;color:#79d4ff">Subscription active</div>
+    <h1 id="heading">Your upgrade is live.</h1>
+    <p id="copy">Your command access has been updated. Return to the builder and continue generating production-ready sites.</p>
+    <a href="/">Return to builder</a>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search)
+    const plan = (params.get('plan') || 'pro').toLowerCase()
+    localStorage.setItem('plan', plan)
+    localStorage.setItem('cmdCount', '0')
+    document.getElementById('heading').textContent = `${plan.charAt(0).toUpperCase() + plan.slice(1)} plan activated.`
+  </script>
+</body>
+</html>

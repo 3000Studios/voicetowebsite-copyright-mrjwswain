@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VoiceToWebsite pricing for command access and monetization-ready website generation.">
+  <title>Pricing | VoiceToWebsite</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071523;
+      --bg-alt: #0c2233;
+      --line: rgba(120, 207, 255, 0.2);
+      --text: #eaf6ff;
+      --muted: #9dc7df;
+      --brand: #79d4ff;
+      --brand-strong: #53bfff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(83, 191, 255, 0.22), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(33, 87, 140, 0.42), transparent 28%),
+        linear-gradient(160deg, #03101b, var(--bg) 45%, var(--bg-alt));
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+    }
+    main {
+      width: min(1120px, 100%);
+      display: grid;
+      gap: 28px;
+    }
+    .hero {
+      display: grid;
+      gap: 12px;
+      text-align: center;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.25rem, 5vw, 4.6rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+    .hero p {
+      margin: 0 auto;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .plan {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(14, 31, 47, 0.94), rgba(7, 18, 30, 0.9));
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(121, 212, 255, 0.06);
+    }
+    .plan::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -42% -20%;
+      height: 160px;
+      background: radial-gradient(circle, rgba(121, 212, 255, 0.18), transparent 65%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      color: var(--brand);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.72rem;
+    }
+    .price {
+      margin: 12px 0 6px;
+      font-size: 2.4rem;
+      font-weight: 800;
+    }
+    .plan p, .plan li { color: var(--muted); }
+    .plan ul {
+      margin: 18px 0 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+    }
+    .cta-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    a.button {
+      text-decoration: none;
+      color: #02111d;
+      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(83, 191, 255, 0.35);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+    a.button:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(83, 191, 255, 0.42); }
+    a.link {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(234, 246, 255, 0.25);
+      padding-bottom: 2px;
+    }
+    a.link:hover { border-color: var(--brand); color: var(--brand); }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">VoiceToWebsite pricing</div>
+      <h1>Unlock more commands, more output, and faster revenue paths.</h1>
+      <p>Every plan keeps the builder live, ad-ready, and checkout-ready. Upgrade when you need more production command volume.</p>
+    </section>
+
+    <section class="plans" aria-label="Pricing plans">
+      <article class="plan">
+        <div class="eyebrow">Free</div>
+        <div class="price">5 commands</div>
+        <p>Try the voice-to-website engine and validate the output before committing to a subscription.</p>
+        <ul>
+          <li>Voice and typed commands</li>
+          <li>Preview generation</li>
+          <li>Starter monetization flow</li>
+        </ul>
+      </article>
+      <article class="plan">
+        <div class="eyebrow">Pro</div>
+        <div class="price">$49<span style="font-size:1rem;font-weight:600;color:#9dc7df">/mo</span></div>
+        <p>For founders and operators who need ongoing command access and production website generation.</p>
+        <ul>
+          <li>100 commands each cycle</li>
+          <li>Checkout-enabled product sections</li>
+          <li>Priority monetization workflow</li>
+        </ul>
+      </article>
+      <article class="plan">
+        <div class="eyebrow">Elite</div>
+        <div class="price">$149<span style="font-size:1rem;font-weight:600;color:#9dc7df">/mo</span></div>
+        <p>For agencies and high-volume teams that want unrestricted command execution and launch throughput.</p>
+        <ul>
+          <li>Unlimited commands</li>
+          <li>Fastest upgrade path</li>
+          <li>Built for revenue operations</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="cta-row">
+      <a class="button" href="/checkout.html?plan=pro">Upgrade to Pro</a>
+      <a class="button" href="/checkout.html?plan=elite">Upgrade to Elite</a>
+      <a class="link" href="/">Back to builder</a>
+    </div>
+  </main>
+</body>
+</html>

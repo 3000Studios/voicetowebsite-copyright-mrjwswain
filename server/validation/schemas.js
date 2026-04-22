@@ -41,9 +41,16 @@ export const PreviewStudioSchema = z.object({
 
 export const CommandSchema = z.object({
   command: z.string().min(1).max(5000).optional(),
-  action: z.string().min(1).max(100).optional()
+  action: z.string().min(1).max(100).optional(),
+  commandsUsed: z.number().int().min(0).max(100000).optional(),
+  plan: z.enum(['free', 'pro', 'elite']).optional(),
+  mode: z.string().min(1).max(50).optional()
 }).refine(data => data.command || data.action, {
   message: 'Either command or action must be provided'
+})
+
+export const CheckoutPriceSchema = z.object({
+  priceId: z.string().min(1).max(200)
 })
 
 export const StripeSuccessSchema = z.object({

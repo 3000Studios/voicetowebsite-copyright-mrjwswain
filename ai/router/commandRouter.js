@@ -28,7 +28,8 @@ const SUPPORTED_ACTIONS = new Set([
   'generate_feature_section',
   'edit_workspace_file',
   'run_traffic_cycle',
-  'discover_topics'
+  'discover_topics',
+  'create_product'
 ])
 
 function assertObject(value, name) {
@@ -145,6 +146,13 @@ export function validateCommand(input) {
         seedTopics: Array.isArray(input.seedTopics) ? input.seedTopics : [],
         limit: Number.isInteger(input.limit) ? input.limit : 6,
         autoDeploy: false
+      }
+    case 'create_product':
+      return {
+        action,
+        productName: assertString(input.productName ?? input.title ?? 'Product', 'productName'),
+        price: typeof input.price === 'string' ? input.price : '$49',
+        autoDeploy: parseAutoDeploy(input)
       }
     default:
       throw new Error(`Unhandled action "${action}".`)
@@ -269,6 +277,17 @@ export async function routeCommand(input) {
     case 'discover_topics': {
       const discovery = await previewTrafficTopics(command)
       return { success: true, action: command.action, discovery }
+    }
+    case 'create_product': {
+      const productSectionHtml = `
+        <section>
+          <h2>${command.productName}</h2>
+          <p>${command.price}</p>
+          <a href="/checkout.html"><button>Buy Now</button></a>
+        </section>
+      `.trim()
+      const deployment = await maybeDeploy(command, `AI product section: ${command.productName}`)
+      return { success: true, action: command.action, productSectionHtml, deployment }
     }
     default:
       throw new Error(`Unhandled action "${command.action}".`)

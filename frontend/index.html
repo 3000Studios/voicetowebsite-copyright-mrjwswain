@@ -40,6 +40,14 @@
 </head>
 <body>
 <div id="root"></div>
+<div id="paywall" style="display:none;position:fixed;inset:0;background:rgba(0,8,16,.8);backdrop-filter:blur(14px);z-index:999;align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:460px;width:100%;background:linear-gradient(180deg,rgba(8,24,38,.98),rgba(3,13,23,.98));padding:32px;border-radius:28px;text-align:center;border:1px solid rgba(121,212,255,.22);box-shadow:0 24px 60px rgba(0,0,0,.35)">
+    <div style="text-transform:uppercase;letter-spacing:.22em;font-size:.72rem;color:#79d4ff;margin-bottom:10px">VoiceToWebsite</div>
+    <h2 style="margin:0 0 10px;color:#eaf6ff;font-family:'Space Grotesk',sans-serif;font-size:clamp(1.75rem,5vw,2.4rem)">Limit reached</h2>
+    <p style="margin:0 0 18px;color:#9dc7df;line-height:1.6">Upgrade to continue building and unlock monetization features.</p>
+    <a href="/pricing.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:999px;background:linear-gradient(135deg,#79d4ff,#53bfff);color:#03101b;text-decoration:none;font-weight:800;box-shadow:0 12px 30px rgba(83,191,255,.35)">Upgrade</a>
+  </div>
+</div>
 <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
