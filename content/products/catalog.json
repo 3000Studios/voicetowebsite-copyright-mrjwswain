@@ -60,11 +60,11 @@
       "stripePaymentLink": "https://buy.stripe.com/7sI7sade7aNh6mS5kp",
       "paypalPaymentLink": "https://www.paypal.com/ncp/payment/V4K9H6W8L2Z5G",
       "ctaLabel": "Subscribe",
-      "ctaHref": "/store"
+      "ctaHref": "/pricing"
     },
     {
       "slug": "pro-starter",
-      "name": "Pro Starter",
+      "name": "Pro",
       "summary": "Primary growth subscription with stronger throughput and support.",
       "idealFor": "Small teams shipping customer-facing websites weekly",
       "outcome": "Faster output, richer generation control, and conversion tuning.",
@@ -74,19 +74,7 @@
       "stripePaymentLink": "https://buy.stripe.com/cNi14nfxj5mKeVOcEa",
       "paypalPaymentLink": "https://www.paypal.com/ncp/payment/BJ6M6F7Y8X3W2",
       "ctaLabel": "Subscribe",
-      "ctaHref": "/store"
-    },
-    {
-      "slug": "ultimate",
-      "name": "Ultimate",
-      "summary": "Full premium subscription tier for high-volume generation and operations.",
-      "idealFor": "Agencies and operators managing multiple brands",
-      "outcome": "Higher throughput and premium production workflow support.",
-      "priceAnchor": "$29.99 / month",
-      "category": "platform",
-      "stripeMode": "subscription",
-      "ctaLabel": "Subscribe",
-      "ctaHref": "/store"
+      "ctaHref": "/pricing"
     },
     {
       "slug": "operator-os",
@@ -128,7 +116,7 @@
       "stripePaymentLink": "https://buy.stripe.com/3cs03Mfxj8yZ8uQ9B0",
       "paypalPaymentLink": "https://www.paypal.com/ncp/payment/K9L5M4N3P2R1S",
       "ctaLabel": "View offer",
-      "ctaHref": "/products/enterprise-deployment"
+      "ctaHref": "/pricing"
     }
   ]
 }

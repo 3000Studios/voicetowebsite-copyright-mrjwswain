@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { readSystemDocument, writeSystemDocument } from './contentService.js'
+import { generatePreview as buildPromptPreview } from '../../frontend/src/previewEngine.js'
 import {
   recordGeneratedPage,
   recordGenerationRequest,
@@ -28,6 +29,13 @@ function buildId(prefix) {
 
 function createSecureToken() {
   return crypto.randomBytes(32).toString('base64url')
+}
+
+function protectAdSlots(html) {
+  return String(html ?? '')
+    .replace(/<script[^>]*adsbygoogle[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<ins[^>]*class=["'][^"']*adsbygoogle[^"']*["'][^>]*>[\s\S]*?<\/ins>/gi, '')
+    .replace(/google_ad_client/gi, 'data-google-ad-client')
 }
 
 function escapeHtml(value) {
@@ -271,8 +279,13 @@ async function getMediaSet({ brief, websiteType }) {
 
   try {
     const dynamic = await getMediaForGeneration({ brief, websiteType })
-    if (dynamic?.heroVideo && Array.isArray(dynamic?.gallery)) {
-      return dynamic
+    if (dynamic?.heroVideo) {
+      const fallback = sets[websiteType] ?? sets.saas
+      return {
+        heroVideo: dynamic.heroVideo,
+        gallery: Array.isArray(dynamic?.gallery) && dynamic.gallery.length ? dynamic.gallery : fallback.gallery,
+        attribution: Array.isArray(dynamic?.attribution) ? dynamic.attribution : fallback.attribution
+      }
     }
   } catch {
     // ignore
@@ -281,7 +294,7 @@ async function getMediaSet({ brief, websiteType }) {
   return sets[websiteType] ?? sets.saas
 }
 
-function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta, mediaSet }) {
+export function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta, mediaSet }) {
   const theme = getThemePreset(websiteType, styleTone)
   const [canvas, surface, accent, ink] = theme.palette
   const sections = buildSectionData({ brief, audience, websiteType, primaryCta })
@@ -737,9 +750,62 @@ export async function createPreviewRequest(payload) {
   const primaryCta = String(payload.primaryCta ?? 'Buy now').trim() || 'Buy now'
   const brief = String(payload.brief ?? '').trim()
   const email = String(payload.email ?? '').trim().toLowerCase()
-  const title = extractTitle(brief, websiteType)
   const mediaSet = await getMediaSet({ brief, websiteType })
-  const preview = buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta, mediaSet })
+  const generatedPreview = buildPromptPreview({
+    ...payload,
+    email,
+    brief,
+    audience,
+    websiteType,
+    styleTone,
+    primaryCta,
+    media: mediaSet
+  })
+  const title = generatedPreview.title || extractTitle(brief, websiteType)
+  const quality = {
+    total: generatedPreview.qualityScore ?? estimateQualityScore({ brief, audience, primaryCta }).total,
+    metrics: {
+      promptClarity: Math.min(40, Math.round(Math.max(brief.length, 20) / 5)),
+      audienceSpecificity: audience.length >= 8 ? 20 : 8,
+      ctaStrength: /buy|book|start|get|launch|build/i.test(primaryCta) ? 24 : 12,
+      mediaRelevance: Array.isArray(mediaSet.gallery) && mediaSet.gallery.length ? 16 : 8
+    }
+  }
+  const previewHtml = protectAdSlots(generatedPreview.previewHtml)
+  const preview = {
+    title,
+    summary: generatedPreview.summary,
+    html: previewHtml,
+    files: [
+      { path: 'index.html', content: previewHtml },
+      {
+        path: 'content.json',
+        content: JSON.stringify(
+          {
+            title,
+            brief,
+            audience,
+            websiteType,
+            styleTone,
+            primaryCta,
+            seoKeywords: generatedPreview.seoKeywords ?? [],
+            qualityScore: generatedPreview.qualityScore ?? quality.total,
+            media: mediaSet
+          },
+          null,
+          2
+        )
+      },
+      {
+        path: 'README.md',
+        content: `# ${title}\n\nAudience: ${audience}\n\nPrimary CTA: ${primaryCta}\n\nThis source pack is generated from the live VoiceToWebsite engine and keeps ad slots outside the generated page sandbox.\n`
+      }
+    ],
+    qualityScore: generatedPreview.qualityScore ?? quality.total,
+    seoKeywords: generatedPreview.seoKeywords ?? extractKeywords(brief, websiteType, audience),
+    media: mediaSet,
+    quality
+  }
 
   const request = {
     id: dryRun ? buildId('preview-dryrun') : buildId('preview'),

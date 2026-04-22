@@ -39,7 +39,7 @@ function getCheckoutAmount(product) {
 }
 
 function getStripeClient() {
-  const secretKey = process.env.STRIPE_SECRET_KEY
+  const secretKey = process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_SECRET
   if (!secretKey || secretKey.startsWith('replace-with-')) {
     return null
   }

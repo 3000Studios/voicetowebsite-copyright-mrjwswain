@@ -1815,7 +1815,10 @@ button:disabled {
   .newsletter-form,
   .preview-studio__layout,
   .preview-form__grid,
-  .home-remix__timeline {
+  .home-remix__timeline,
+  .home-page__poster,
+  .home-page__systems-grid,
+  .home-page__plan-strip {
     grid-template-columns: 1fr;
   }
 
@@ -2323,6 +2326,103 @@ a:hover,
 .page--home .hero__panel {
   margin-top: 0;
   align-content: center;
+}
+
+.home-page__poster {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: 1.4rem;
+  align-items: stretch;
+}
+
+.home-page__poster-copy {
+  padding-right: 2rem;
+}
+
+.home-page__logo-row {
+  margin: 0.35rem 0 0.95rem;
+}
+
+.home-page__poster-logo {
+  width: min(460px, 100%);
+  display: block;
+  filter: drop-shadow(0 22px 40px rgba(4, 18, 36, 0.4));
+}
+
+.home-page__ops-rail {
+  position: relative;
+}
+
+.home-page__ops-screen {
+  min-height: 100%;
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+  border-radius: 1.85rem;
+  border: 1px solid rgba(118, 210, 255, 0.16);
+  background:
+    radial-gradient(circle at top right, rgba(110, 216, 255, 0.12), transparent 32%),
+    linear-gradient(180deg, rgba(10, 22, 39, 0.94), rgba(3, 10, 18, 0.92));
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+}
+
+.hero__panel-card--open {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.home-page__plan-strip,
+.home-page__systems-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.home-page__plan-strip {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.home-page__plan-pill,
+.home-page__systems-item {
+  border: 1px solid rgba(118, 210, 255, 0.14);
+  border-radius: 1.15rem;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  padding: 1rem;
+}
+
+.home-page__plan-pill span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.home-page__plan-pill strong {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--chrome);
+}
+
+.home-page__systems {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.home-page__systems-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.home-page__systems-item h3 {
+  margin: 0.55rem 0 0.65rem;
+  color: var(--chrome);
+}
+
+.home-page__systems-item p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 .hero__panel-card,

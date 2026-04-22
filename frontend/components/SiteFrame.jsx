@@ -8,6 +8,7 @@ import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
 import { trackSiteEvent } from '../src/siteApi.js'
 import AdSlot from './AdSlot.jsx'
 import BrandWireframe from './BrandWireframe.jsx'
+import StudioOpsBridge from './StudioOpsBridge.jsx'
 
 const VISITOR_SESSION_KEY = 'voicetowebsite_session_id'
 const LEGACY_VISITOR_SESSION_KEY = 'myappai_session_id'
@@ -74,6 +75,7 @@ export default function SiteFrame() {
 
   return (
     <div className="shell">
+      <StudioOpsBridge />
       <PrismEnvironment navItems={[]} statusLines={publicStatusLines} tickerItems={publicTickerItems} />
       <StarClusterSynth />
       <header className="site-header">
@@ -123,11 +125,11 @@ export default function SiteFrame() {
         </div>
       </header>
       <main className={`page ${pageClass}`}>
-        <div className="adsense-wrap adsense-wrap--leaderboard">
+        <div className="adsense-wrap adsense-wrap--leaderboard" data-ads-lock="leaderboard">
           <AdSlot variant="leaderboard" />
         </div>
         <Outlet />
-        <div className="adsense-wrap adsense-wrap--rectangle">
+        <div className="adsense-wrap adsense-wrap--rectangle" data-ads-lock="rectangle">
           <AdSlot variant="rectangle" />
         </div>
       </main>

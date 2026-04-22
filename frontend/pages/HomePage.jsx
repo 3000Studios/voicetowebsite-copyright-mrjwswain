@@ -78,6 +78,7 @@ export default function HomePage() {
   const { snapshot } = useSiteRuntime()
   const appStoreItems = productCatalog.filter((product) => product.category === 'app')
   const featuredStoreItems = appStoreItems.slice(0, 4)
+  const paidPlans = productCatalog.filter((product) => ['starter', 'pro-starter', 'enterprise-deployment'].includes(product.slug))
   const workflowSteps = homepage.workflowSteps ?? []
   const pricingTiers = pricingPage.tiers ?? []
   const primaryCta = homepage.primaryCta ?? { label: 'Generate preview', to: '#website-generator' }
@@ -94,13 +95,16 @@ export default function HomePage() {
   return (
     <div className="stack-xl home home-page">
       <motion.section
-        className="hero hero--focused"
+        className="hero hero--focused home-page__poster"
         variants={staggerParent}
         initial="hidden"
         animate="visible"
       >
-        <motion.div className="hero__copy" variants={fadeUp}>
+        <motion.div className="hero__copy home-page__poster-copy" variants={fadeUp}>
           <span className="eyebrow">{homepage.eyebrow ?? 'Voice → Website'}</span>
+          <div className="home-page__logo-row">
+            <img className="home-page__poster-logo" src="/media/voicetowebsite-logo.jpg" alt="Voicetowebsite.com logo" />
+          </div>
           <PrismHeadline text={homepage.headline} />
           <p className="hero__lede">{homepage.subheadline}</p>
           <div className="hero__signals">
@@ -116,15 +120,11 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        <motion.aside className="hero__panel hero__panel--stats" variants={fadeUp}>
+        <motion.aside className="home-page__ops-rail" variants={fadeUp}>
+          <div className="home-page__ops-screen">
           {heroPanel ? (
-            <div className="hero__panel-card">
+            <div className="hero__panel-card hero__panel-card--open">
               <div className="hero__brand-row">
-                <img
-                  className="hero__brand-logo"
-                  src="/media/voicetowebsite-logo.jpg"
-                  alt="Voicetowebsite.com logo"
-                />
                 <span className="eyebrow">Live voice engine</span>
               </div>
               <h3>{heroPanel.heading}</h3>
@@ -147,12 +147,21 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+          <div className="home-page__plan-strip">
+            {paidPlans.map((plan) => (
+              <div key={plan.slug} className="home-page__plan-pill">
+                <span>{plan.name}</span>
+                <strong>{plan.priceAnchor}</strong>
+              </div>
+            ))}
+          </div>
           <div className="hero__pulse">
             <span className="hero__pulse-dot" aria-hidden="true" />
             <div>
               <strong>Generator online</strong>
-              <p>Runs in your browser. No sign-up required.</p>
+              <p>Live previews stay sandboxed so production ads and checkout paths do not get overwritten.</p>
             </div>
+          </div>
           </div>
         </motion.aside>
       </motion.section>
@@ -160,6 +169,35 @@ export default function HomePage() {
       <MetricStrip items={liveMetrics} />
 
       <WebsitePreviewStudio />
+
+      <section className="home-page__systems">
+        <div className="section-heading section-heading--open">
+          <div>
+            <span className="eyebrow">Integrated system</span>
+            <h2>Uploaded UI, live generator, paid checkout, and monitored production flow</h2>
+            <p className="section-intro">
+              The public website now keeps the generator, dashboard, pricing links, and production monitoring tied to the same live system.
+            </p>
+          </div>
+        </div>
+        <div className="home-page__systems-grid">
+          <article className="home-page__systems-item">
+            <span className="eyebrow">Generator fidelity</span>
+            <h3>Prompt-specific structure</h3>
+            <p>The server now uses the same prompt extraction flow as the browser preview so the generated homepage follows the real brief instead of falling back to generic filler.</p>
+          </article>
+          <article className="home-page__systems-item">
+            <span className="eyebrow">Revenue routing</span>
+            <h3>Stripe and PayPal stay wired</h3>
+            <p>Starter, Pro, and Enterprise now map directly to the live checkout links and keep dashboard access tied to the customer email.</p>
+          </article>
+          <article className="home-page__systems-item">
+            <span className="eyebrow">Studio monitoring</span>
+            <h3>3000studios.VIP bridge</h3>
+            <p>A monitor bridge now exposes telemetry, edit surfaces, and ads-protected selectors so the production site can be watched from outside this repo.</p>
+          </article>
+        </div>
+      </section>
 
       <MediaShowcase media={homepage.media} />
 
