@@ -1,0 +1,5 @@
+{
+  "name": "VoiceToWebsite.com",
+  "description": "The world's first AI-powered voice-to-website engine. Build professional, high-conversion landing pages in seconds using just your voice.",
+  "requestFramePermissions": ["microphone"]
+}

@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      // In a real app, you'd check a dedicated admins collection or a custom claim
+      // For this app, we'll check if the user's email is the owner's email from instructions
+      return isSignedIn() && request.auth.token.email == 'mr.jwswain@gmail.com' && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.keys().hasAll(['username', 'email', 'tokens', 'createdAt']) &&
+               data.keys().size() == 5 && // Including optional or system fields if any
+               data.username is string && data.username.size() <= 50 &&
+               data.email == request.auth.token.email &&
+               data.tokens is number &&
+               data.createdAt == request.time;
+      }
+
+      allow get: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && (
+        // Only allow updating username for now
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['username']) &&
+        request.resource.data.username is string && request.resource.data.username.size() <= 50
+      ) || (isAdmin());
+    }
+
+    // 2. Sites Collection
+    match /sites/{siteId} {
+      function isValidSite(data) {
+        return data.keys().hasAll(['html', 'ownerId', 'timestamp']) &&
+               data.html is string && data.html.size() <= 1048576 && // 1MB limit
+               data.ownerId == request.auth.uid &&
+               data.timestamp == request.time;
+      }
+
+      allow list: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+      
+      allow create: if isSignedIn() && isValidId(siteId) && isValidSite(request.resource.data);
+      
+      allow update: if isSignedIn() && (
+        (resource.data.ownerId == request.auth.uid && 
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['html', 'title', 'description', 'isDraft']) &&
+         request.resource.data.html is string && request.resource.data.html.size() <= 1048576) ||
+        isAdmin()
+      );
+
+      allow delete: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    // 3. Stories Collection (Public Feed)
+    match /stories/{storyId} {
+      function isValidStory(data) {
+        return data.keys().hasAll(['title', 'content', 'author', 'timestamp']) &&
+               data.title is string && data.title.size() <= 200 &&
+               data.content is string && data.content.size() <= 10000 &&
+               data.timestamp == request.time;
+      }
+
+      allow read: if true; // Publicly accessible
+      allow create, update, delete: if isAdmin() && isValidStory(request.resource.data);
+    }
+  }
+}

@@ -11,5 +11,11 @@ dist
 .DS_Store
 uploads/*
 !/uploads/.gitkeep
+!/uploads/voicetowebsite.com/
+!/uploads/voicetowebsite.com/**
+uploads/voicetowebsite.com/node_modules/
+uploads/voicetowebsite.com/dist/
+uploads/voicetowebsite.com/.wrangler/
+uploads/voicetowebsite.com/.env*
 continue-voice-mod/
 voicetowebsite-copyright-mrjwswain/
