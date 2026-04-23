@@ -1,0 +1,175 @@
+{
+  "[cline]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  "cline.enabled": true,
+  "cline.autoApprovalEnabled": true,
+  "cline.autoApprovalMaxRequests": 100,
+  "cline.autoApprovalActions": [
+    "readFiles",
+    "editFiles",
+    "createFiles",
+    "deleteFiles",
+    "runCommands",
+    "browserControl",
+    "systemAccess"
+  ],
+  "cline.mcpServers": {
+    "filesystem": true,
+    "git": true,
+    "github": true,
+    "memory": true,
+    "web-browser": true,
+
+    "cloudflare": true,
+    "docker": false,
+    "npm-modules": false,
+    "stripe": false
+  },
+  "cline.environment": {
+    "CLOUDFLARE_API_TOKEN": "${CLOUDFLARE_API_TOKEN}",
+    "GH_TOKEN": "${GH_TOKEN}",
+    "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+    "GEMINI_API_KEY": "${GEMINI_API_KEY}",
+    "GH_REPO": "3000Studios/voicetowebsite-copyright-mrjwswain"
+  },
+  "cline.browserControl": {
+    "enabled": true,
+    "autoLaunch": true,
+    "headless": true,
+    "width": 900,
+    "height": 600
+  },
+  "cline.systemAccess": {
+    "readAccess": true,
+    "writeAccess": true,
+    "executeAccess": true,
+    "deleteAccess": true,
+    "processManagement": true
+  },
+  "cline.llm.modelOverrides": {
+    "codeGeneration": "ollama/qwen2.5-coder:7b",
+    "planning": "ollama/qwen2.5-coder:7b",
+    "webBrowsing": "ollama/qwen2.5-coder:7b",
+    "imageAnalysis": "ollama/qwen2.5-coder:7b"
+  },
+  "cline.shortcuts": {
+    "deployProduction": "npm run deploy && npm run pages:deploy",
+    "lintAndTest": "npm run lint && npm run test",
+    "buildAndTest": "npm run build && npm run test",
+    "gitSync": "git pull origin main && git push origin main",
+    "installDeps": "npm install && pip install -r requirements.txt"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "jsx",
+    "tsx"
+  ],
+  "eslint.autoFixOnSave": true,
+  "prettier.semi": true,
+  "prettier.singleQuote": false,
+  "prettier.trailingComma": "es5",
+  "prettier.printWidth": 100,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.turbo": true,
+    "**/coverage": true,
+    "**/.venv": true,
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/dist": true,
+    "**/.next": true
+  },
+  "editor.wordWrap": "on",
+  "editor.guides.bracketPairs": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.fontFamily": "Fira Code, Consolas, monospace",
+  "editor.fontSize": 13,
+  "editor.lineHeight": 1.6,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.trimAutoWhitespace": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "workbench.colorTheme": "One Dark Pro",
+  "workbench.iconTheme": "material-icon-theme",
+  "git.autofetch": true,
+  "git.autorefresh": true,
+  "git.enableSmartCommit": true,
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    },
+    "pwsh": {
+      "path": "pwsh.exe",
+      "icon": "terminal-powershell"
+    },
+    "bash": {
+      "path": "bash.exe",
+      "icon": "terminal-bash"
+    },
+    "node": {
+      "path": "node.exe",
+      "icon": "terminal-node"
+    }
+  },
+  "terminal.integrated.fontSize": 12,
+  "extensions.recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode-remote.remote-wsl",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode.remote-repositories",
+    "github.copilot",
+    "saecki.cline",
+    "zhuangtongfa.material-theme",
+    "pkief.material-icon-theme",
+    "ms-vscode.makefile-tools",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "github.github-vscode-theme",
+    "streetsidesoftware.code-spell-checker",
+    "sonarsource.sonarlint-vscode"
+  ],
+  "security.workspace.trust.untrustedFiles": "prompt",
+  "security.workspace.trust.enabled": false
+}

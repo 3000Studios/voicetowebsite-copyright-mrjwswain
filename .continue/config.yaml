@@ -1,21 +1,35 @@
 name: voicetowebsite-continue
-version: 1.2.0
+version: 1.3.0
 schema: v1
 
-# Free-first and reliable:
-# 1) Ollama local models (fully free, works offline)
-# 2) Optional free-tier cloud fallbacks (if keys exist)
+# Free-first and fast:
+# - Defaults are LOCAL (Ollama) to avoid paid tokens and rate limits.
+# - Cloud models are included only as OPTIONAL fallbacks and are inert unless you set env keys.
 #
 # Required local default:
-#   OLLAMA_API_URL=http://127.0.0.1:11434
+#   Ollama running at http://127.0.0.1:11434
 #
-# Helpful install/pull commands:
+# Recommended pulls:
+#   ollama pull qwen2.5-coder:7b
 #   ollama pull deepseek-coder:latest
 #   ollama pull llama3.2:3b
 #   ollama pull nomic-embed-text
 
 models:
-  # Primary local coding model (best free default)
+  # === PRIMARY (LOCAL / FREE) ===
+  # Best balance of quality/speed for most repo work.
+  - name: Qwen 2.5 Coder Local (Default)
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://127.0.0.1:11434
+    capabilities:
+      - tool_use
+    roles:
+      - chat
+      - edit
+      - apply
+
+  # Stronger local coder (often higher quality, can be slower).
   - name: DeepSeek Coder Local
     provider: ollama
     model: deepseek-coder:latest
@@ -27,15 +41,22 @@ models:
       - edit
       - apply
 
-  # Lightweight local general fallback
-  - name: Llama 3.2 Local
+  # Lightweight local general fallback (fast)
+  - name: Llama 3.2 Local (Fast)
     provider: ollama
     model: llama3.2:3b
     apiBase: http://127.0.0.1:11434
     roles:
       - chat
 
-  # Local autocomplete for speed and no API cost
+  # === AUTOCOMPLETE (LOCAL / FREE) ===
+  - name: Qwen 2.5 Coder Local Autocomplete
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://127.0.0.1:11434
+    roles:
+      - autocomplete
+
   - name: DeepSeek Coder Local Autocomplete
     provider: ollama
     model: deepseek-coder:latest
@@ -43,7 +64,8 @@ models:
     roles:
       - autocomplete
 
-  # Local embeddings keep codebase indexing fully free/offline
+  # === EMBEDDINGS (LOCAL / FREE) ===
+  # Keep codebase indexing fully free/offline.
   - name: Nomic Embed Local
     provider: ollama
     model: nomic-embed-text
@@ -51,7 +73,9 @@ models:
     roles:
       - embed
 
-  # Optional free-tier cloud fallbacks (safe to keep; only used if key exists)
+  # === OPTIONAL CLOUD FALLBACKS (ONLY USED IF YOU ADD KEYS) ===
+  # If you want “free-tier” cloud speed boosts, set the keys in your environment.
+  # Otherwise these do nothing.
   - name: Gemini 2.5 Flash
     provider: gemini
     model: gemini-2.5-flash
