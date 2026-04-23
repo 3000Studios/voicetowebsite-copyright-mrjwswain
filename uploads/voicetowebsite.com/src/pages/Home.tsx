@@ -410,7 +410,7 @@ export const Home = () => {
                 </motion.p>
                 <motion.div variants={dirtGrow} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-8">
                   <Link to="/#pricing" className="btn-minimal bg-indigo-600 text-white hover:bg-white hover:text-black transition-all border-none">
-                    <SplitLink>Create Account (Subscriber Only)</SplitLink>
+                    <SplitLink>Create Account</SplitLink>
                   </Link>
                   <button onClick={() => window.scrollTo({ top: document.getElementById('pricing')?.offsetTop, behavior: 'smooth' })} className="text-[10px] items-center gap-2 flex font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">
                     <SplitLink>Acquire Credits</SplitLink> <ChevronRight size={14} />

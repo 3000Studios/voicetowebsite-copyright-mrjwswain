@@ -112,9 +112,9 @@ const NavLink = ({ link, onClick, location }: any) => {
         to={link.path}
         onClick={handleLinkClick}
         onMouseEnter={playTick}
-        className="block relative"
+        className="block relative max-w-full"
       >
-        <SplitLink className={`text-[4vw] lg:text-[3vw] font-black tracking-tighter uppercase leading-none transition-all duration-500 italic inline-block animate-lights ${
+        <SplitLink className={`navlink-fit font-black tracking-tighter uppercase leading-none transition-all duration-500 italic inline-block animate-lights ${
           location.pathname === link.path ? 'opacity-100' : 'opacity-60'
         } hover:opacity-100`}>
           {link.name}

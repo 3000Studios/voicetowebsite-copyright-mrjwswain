@@ -205,6 +205,15 @@
 }
 
 @layer utilities {
+  .navlink-fit {
+    font-size: clamp(2rem, 5vw, 4rem);
+    white-space: nowrap;
+    width: max-content;
+    max-width: min(92vw, 18ch);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .noise-overlay {
     position: fixed;
     top: 0;
