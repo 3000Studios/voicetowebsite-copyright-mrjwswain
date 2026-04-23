@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@300;500;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;600;900&family=JetBrains+Mono:wght@300;500;700&family=Playfair+Display:ital,wght@1,900&family=Space+Grotesk:wght@300;400;700&family=Syncopate:wght@400;700&display=swap');
 
 :root {
   --bg: #031323;
@@ -98,6 +98,13 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+.studio-menu-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 252, 0.55);
 }
 
 .studio-pill {
@@ -229,6 +236,7 @@ body {
   text-transform: uppercase;
   transition: color 0.35s ease, transform 0.35s ease, -webkit-text-stroke-color 0.35s ease;
   width: fit-content;
+  position: relative;
 }
 
 .studio-menu__link:hover,
@@ -236,6 +244,51 @@ body {
   color: #ffffff;
   -webkit-text-stroke-color: rgba(255, 255, 255, 0.92);
   transform: translateX(2rem);
+}
+
+.split-link__text {
+  position: relative;
+  display: inline-block;
+}
+
+.studio-menu__link::after {
+  content: '';
+  position: absolute;
+  top: 55%;
+  left: -5%;
+  width: 110%;
+  height: 2px;
+  background: rgba(99, 102, 241, 0.9);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5), 0 0 30px rgba(99, 102, 241, 0.25);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.studio-menu__link:hover::after,
+.studio-menu__link--active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+}
+
+.grid-structure {
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  background-size: 60px 60px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 .studio-menu__footer {
@@ -3609,6 +3662,10 @@ a:hover,
   .brand__signal,
   .brand__meta,
   .studio-pill {
+    display: none;
+  }
+
+  .studio-menu-label {
     display: none;
   }
 

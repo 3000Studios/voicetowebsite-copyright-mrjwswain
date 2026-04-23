@@ -102,6 +102,9 @@ export default function SiteFrame() {
             <Link className="studio-pill studio-pill--primary" to="/contact">
               Start build
             </Link>
+            <span className="studio-menu-label" aria-hidden="true">
+              {menuOpen ? 'TERMINATE' : 'INITIALIZE'}
+            </span>
             <button
               className={`studio-menu-trigger${menuOpen ? ' studio-menu-trigger--active' : ''}`}
               type="button"
@@ -125,6 +128,8 @@ export default function SiteFrame() {
           <video className="studio-menu__video" src="/media/hero-operator.mp4" autoPlay muted loop playsInline />
           <div className="studio-menu__scrim" />
         </div>
+        <div className="noise-overlay" aria-hidden="true" />
+        <div className="grid-structure" aria-hidden="true" />
         <nav className="studio-menu__nav" aria-label="Menu">
           {topNavItems.map((item) => (
             <NavLink
@@ -133,11 +138,11 @@ export default function SiteFrame() {
               onClick={() => setMenuOpen(false)}
               className={({ isActive }) => `studio-menu__link${isActive ? ' studio-menu__link--active' : ''}`}
             >
-              {item.label}
+              <span className="split-link__text">{item.label}</span>
             </NavLink>
           ))}
           <NavLink to="/dashboard" onClick={() => setMenuOpen(false)} className="studio-menu__link">
-            Dashboard
+            <span className="split-link__text">Dashboard</span>
           </NavLink>
         </nav>
         <div className="studio-menu__footer">
