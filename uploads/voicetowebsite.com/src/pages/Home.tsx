@@ -600,117 +600,90 @@ export const Home = () => {
               <motion.p variants={skyDrop} className="text-2xl text-slate-400 font-light italic leading-relaxed opacity-60">Elite tools for scaling your digital dominance. Manifest with premium precision and maximum ROI.</motion.p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-white/5 border border-white/5 brutal-shadow moon-light">
-              <motion.div 
-                whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
-                className="p-16 lg:p-24 space-y-16 group/card phase-driven relative overflow-hidden opacity-60 hover:opacity-100 transition-opacity"
-              >
-                <div className="space-y-8">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-4xl font-bold uppercase tracking-tight italic">Free Access</h3>
-                    <div className="text-right">
-                      <span className="text-5xl font-display italic text-white ultra-glow">$0</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border border-white/5 brutal-shadow moon-light">
+              {[
+                {
+                  key: 'starter' as const,
+                  title: 'Neural Starter',
+                  price: '$9.99',
+                  sub: 'Billed every 31 days',
+                  features: ['25 commands / cycle', '3 websites you can build', '30 days of access', 'Watermark enabled'],
+                  accent: 'text-white',
+                },
+                {
+                  key: 'pro' as const,
+                  title: 'Neural Pro',
+                  price: '$19.99',
+                  sub: 'Billed every 31 days',
+                  features: ['100 commands / cycle', '10 websites you can build', 'Export to GitHub', 'No watermark'],
+                  accent: 'text-indigo-400',
+                  highlight: true,
+                },
+                {
+                  key: 'boss' as const,
+                  title: 'BOSS Mode',
+                  price: '$49.99',
+                  sub: 'Billed every 31 days',
+                  features: ['Unlimited commands', 'Unlimited websites', 'Maximum limits', 'Priority support'],
+                  accent: 'text-rose-400',
+                },
+                {
+                  key: 'commands' as const,
+                  title: 'Extra Commands Pack',
+                  price: '$2.99',
+                  sub: 'One-time (repeatable)',
+                  features: ['Adds 5 more commands', 'Instant unlock', 'Repeat anytime', 'No subscription'],
+                  accent: 'text-cyan-300',
+                },
+              ].map((card) => (
+                <motion.div
+                  key={card.key}
+                  whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
+                  className={`p-16 lg:p-20 space-y-12 group/card phase-driven relative overflow-hidden ${
+                    card.highlight ? 'bg-indigo-600/5 ring-4 ring-indigo-500/20' : ''
+                  }`}
+                >
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-start gap-6">
+                      <h3 className="text-3xl font-bold uppercase tracking-tight italic leading-none">{card.title}</h3>
+                      <div className="text-right">
+                        <span className={`text-5xl font-display italic ultra-glow ${card.accent}`}>{card.price}</span>
+                        <span className="block text-[8px] uppercase tracking-widest opacity-40 italic">{card.sub}</span>
+                      </div>
                     </div>
+                    <ul className="space-y-4 opacity-90">
+                      {card.features.map((f) => (
+                        <li key={f} className="text-[10px] font-black uppercase tracking-widest italic flex items-center gap-3">
+                          <Zap size={10} className={card.highlight ? 'text-indigo-500 ultra-glow' : 'text-white/40'} /> {f}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="space-y-6 opacity-80">
-                    {['5 Neural Commands', '1 Saved Site', 'Neural Watermark', 'Standard Sync'].map((f) => (
-                      <li key={f} className="text-[10px] font-black uppercase tracking-widest italic flex items-center gap-3">
-                        <Zap size={10} className="text-slate-500" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <Link to="/dashboard" className="btn-minimal w-full border-white/5 py-8 text-lg font-black italic text-center block">
-                  Initialize Free
-                </Link>
-              </motion.div>
 
-              {/* Neural Pro */}
-              <motion.div 
-                whileHover={{ backgroundColor: 'rgba(99,102,241,0.05)' }}
-                className="p-16 lg:p-24 space-y-16 group/card bg-indigo-600/5 phase-driven relative overflow-hidden ring-4 ring-indigo-500/20"
-              >
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover/card:opacity-20 transition-opacity">
-                   <Star size={80} className="text-indigo-500" />
-                </div>
-                <div className="space-y-8">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-4xl font-bold uppercase tracking-tight italic">Neural Pro</h3>
-                    <div className="text-right">
-                      <span className="text-5xl font-display italic text-white ultra-glow">$19.99</span>
-                      <span className="block text-[8px] uppercase tracking-widest opacity-40 italic">Monthly Protocol</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-6 opacity-80 group-hover/card:opacity-100 transition-opacity">
-                    {[
-                      '100 Neural Commands', 
-                      '10 Saved Sites', 
-                      'Remove Watermarks', 
-                      'Priority Neural Link',
-                      'Stripe Integration Ready'
-                    ].map((f) => (
-                      <li key={f} className="text-[10px] font-black uppercase tracking-widest italic flex items-center gap-3">
-                        <Zap size={10} className="text-indigo-500 ultra-glow" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <button 
-                  onClick={() => handleCheckout('pro', 'stripe')} 
-                  className="btn-minimal w-full border-indigo-500/50 bg-indigo-600 hover:bg-indigo-500 text-white py-8 text-lg font-black italic"
-                >
-                  Acquire Pro (Stripe)
-                </button>
-                <button 
-                  onClick={() => handleCheckout('pro', 'paypal')} 
-                  className="btn-minimal w-full border-white/10 hover:border-white py-4 text-[10px] font-black italic mt-4"
-                >
-                  Initialize Pro (PayPal)
-                </button>
-              </motion.div>
+                  <button
+                    onClick={() => handleCheckout(card.key, 'stripe')}
+                    className={`btn-minimal w-full py-8 text-lg font-black italic ${
+                      card.highlight
+                        ? 'border-indigo-500/50 bg-indigo-600 hover:bg-indigo-500 text-white'
+                        : 'border-white/10 hover:border-white'
+                    }`}
+                  >
+                    {card.key === 'commands' ? 'Buy Pack (Stripe)' : 'Subscribe (Stripe)'}
+                  </button>
+                  <button
+                    onClick={() => handleCheckout(card.key, 'paypal')}
+                    className="btn-minimal w-full border-white/10 hover:border-white py-4 text-[10px] font-black italic mt-4"
+                  >
+                    Pay with PayPal
+                  </button>
+                </motion.div>
+              ))}
+            </div>
 
-              {/* Empire Elite */}
-              <motion.div 
-                whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
-                className="p-16 lg:p-24 space-y-16 group/card border-l border-white/5 phase-driven relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover/card:opacity-20 transition-opacity">
-                   <CreditCard size={80} className="text-indigo-500" />
-                </div>
-                <div className="space-y-8">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-4xl font-bold uppercase tracking-tight italic">Empire Elite</h3>
-                    <div className="text-right">
-                      <span className="text-5xl font-display italic text-white ultra-glow">$49.99</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-6 opacity-80 group-hover/card:opacity-100 transition-opacity">
-                    {[
-                      'Unlimited Everything', 
-                      'High-Ticket Templates', 
-                      'White-Label Manifests', 
-                      'Neural API Access',
-                      'Concierge Deployment'
-                    ].map((f) => (
-                      <li key={f} className="text-[10px] font-black uppercase tracking-widest italic flex items-center gap-3">
-                        <Zap size={10} className="text-emerald-500 ultra-glow" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <button 
-                  onClick={() => handleCheckout('boss', 'stripe')} 
-                  className="btn-minimal w-full border-white/5 py-8 text-lg font-black italic hover:bg-indigo-600 hover:text-white transition-all"
-                >
-                  Initialize Elite (Stripe)
-                </button>
-                <button 
-                  onClick={() => handleCheckout('boss', 'paypal')} 
-                  className="btn-minimal w-full border-white/5 text-[10px] py-4 font-black italic mt-4"
-                >
-                  Acquire Elite (PayPal)
-                </button>
-              </motion.div>
+            <div className="pt-16 text-center">
+              <Link to="/pricing/" className="btn-minimal inline-flex">
+                View full pricing page
+              </Link>
             </div>
           </motion.div>
         </section>
