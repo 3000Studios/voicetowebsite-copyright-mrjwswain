@@ -105,7 +105,11 @@ export default function HomePage() {
           <div className="home-page__logo-row">
             <img className="home-page__poster-logo" src="/media/voicetowebsite-logo.jpg" alt="Voicetowebsite.com logo" />
           </div>
-          <PrismHeadline text={homepage.headline} />
+          <h1 className="hero__headline">
+            <span className="hero__headline-top">Build a</span>
+            <span className="hero__headline-main">Money-making</span>
+            <span className="hero__headline-bottom">Website in 60s.</span>
+          </h1>
           <p className="hero__lede">{homepage.subheadline}</p>
           <div className="hero__signals">
             {(homepage.operatorSignals ?? []).map((signal) => (

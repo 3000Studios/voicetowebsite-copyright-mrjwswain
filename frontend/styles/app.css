@@ -2532,6 +2532,40 @@ a:hover,
   padding-bottom: 0;
 }
 
+.page--home .hero__copy .eyebrow {
+  letter-spacing: 0.45em;
+}
+
+.hero__headline {
+  margin: 0;
+  font-family: 'Anton', 'Space Grotesk', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.82;
+}
+
+.hero__headline-top {
+  display: block;
+  font-size: clamp(3.6rem, 7.4vw, 6.2rem);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.hero__headline-main {
+  display: block;
+  font-size: clamp(4.2rem, 8.6vw, 7.4rem);
+  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 42px rgba(99, 102, 241, 0.26);
+}
+
+.hero__headline-bottom {
+  display: block;
+  font-size: clamp(3.4rem, 7vw, 6rem);
+  color: rgba(255, 255, 255, 0.22);
+}
+
 .page--home .hero__panel {
   margin-top: 0;
   align-content: center;
