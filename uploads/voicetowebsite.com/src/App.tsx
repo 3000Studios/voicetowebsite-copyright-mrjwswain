@@ -10,6 +10,8 @@ import { Stories } from '@/pages/Stories';
 import { StoryDetail } from '@/pages/StoryDetail';
 import { About } from '@/pages/About';
 import { Legal } from '@/pages/Legal';
+import { AINews } from '@/pages/AINews';
+import { AINewsStory } from '@/pages/AINewsStory';
 import { Admin } from '@/pages/Admin';
 import { Dashboard } from '@/pages/Dashboard';
 import { Pricing } from '@/pages/Pricing';
@@ -175,8 +177,8 @@ export default function App() {
           <SynthWaves />
           <Navbar />
           
-          <div className="relative z-10 w-full overflow-x-hidden pt-32">
-            <main className="relative w-full">
+          <div className="relative z-10 w-full overflow-x-hidden pt-32 flex flex-col min-h-screen">
+            <main className="relative w-full flex-1">
               <AnimatePresence mode="wait">
                 <Routes>
                   <Route path="/" element={<PageTransition><Home /></PageTransition>} />
@@ -185,6 +187,8 @@ export default function App() {
                   <Route path="/stories/:id" element={<PageTransition><StoryDetail /></PageTransition>} />
                   <Route path="/about" element={<PageTransition><About /></PageTransition>} />
                   <Route path="/legal" element={<PageTransition><Legal /></PageTransition>} />
+                  <Route path="/ai-news" element={<PageTransition><AINews /></PageTransition>} />
+                  <Route path="/ai-news/:slug" element={<PageTransition><AINewsStory /></PageTransition>} />
                   <Route path="/store" element={
                     <Suspense fallback={
                       <div className="min-h-screen flex items-center justify-center">

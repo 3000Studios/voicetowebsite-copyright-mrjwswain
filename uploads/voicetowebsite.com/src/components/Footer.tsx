@@ -7,7 +7,7 @@ import { SplitLink } from './ui/SplitLink';
 
 export const Footer = () => {
   return (
-    <footer className="relative bg-transparent py-40 px-6 lg:px-24 overflow-hidden group">
+    <footer className="relative bg-transparent py-40 px-6 lg:px-24 overflow-hidden group w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
       {/* Fading Divider */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       
@@ -16,7 +16,6 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-24">
           {/* Main Visual Call */}
           <div className="md:col-span-6 space-y-12">
-            <Logo className="scale-150 origin-left" />
             <h2 className="text-6xl md:text-8xl font-bold tracking-tighter uppercase leading-none italic">
               Speak. <br /> Manifest. <span className="text-white/20">Dominate.</span>
             </h2>
@@ -32,7 +31,7 @@ export const Footer = () => {
           <div className="md:col-span-2 space-y-8">
             <span className="block text-[10px] font-black uppercase tracking-[0.4em] opacity-20">Navigation</span>
             <div className="flex flex-col gap-4">
-              {['Home', 'About', 'Archives', 'Command'].map(link => (
+              {['Home', 'About', 'AI News', 'Pricing'].map(link => (
                 <Link key={link} to={link === 'Home' ? '/' : `/${link.toLowerCase()}`} className="text-sm font-light italic hover:opacity-100 transition-opacity">
                   <SplitLink className="animate-lights">{link}</SplitLink>
                 </Link>
