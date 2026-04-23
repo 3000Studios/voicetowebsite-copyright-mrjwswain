@@ -23,7 +23,8 @@
     "scheduler": "node ai/scheduler/aiScheduler.js",
     "traffic": "node scripts/run-traffic-cycle.js",
     "validate:schemas": "node scripts/validate-schemas.js",
-    "test": "node scripts/validate-schemas.js && node scripts/verify-platform.js"
+    "test": "node scripts/validate-schemas.js && node scripts/verify-platform.js",
+    "ops": "node scripts/ops.js"
   },
   "keywords": [
     "voicetowebsite",

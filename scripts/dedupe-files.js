@@ -112,7 +112,6 @@ Options:
   --follow-symlinks         Follow symlinks (default: false)
   -h, --help                Show help
 `;
-  // eslint-disable-next-line no-console
   console.log(msg);
   process.exit(code);
 }
@@ -256,7 +255,6 @@ async function main() {
     }
   }
 
-  // eslint-disable-next-line no-console
   console.log(JSON.stringify({
     folder,
     algo: opts.algo,
@@ -277,33 +275,27 @@ async function main() {
   let acted = 0;
   for (const d of duplicates) {
     if (opts.dryRun) {
-      // eslint-disable-next-line no-console
       console.log(`[DRY] ${opts.action.toUpperCase()} ${d.dup} (keep ${d.keep})`);
       continue;
     }
     try {
       if (opts.action === "delete") {
         await fsp.unlink(d.dup);
-        // eslint-disable-next-line no-console
         console.log(`[DEL] ${d.dup} (keep ${d.keep})`);
       } else {
         const movedTo = await moveToQuarantine(d.dup, quarantineDir, folder);
-        // eslint-disable-next-line no-console
         console.log(`[MOVE] ${d.dup} -> ${movedTo} (keep ${d.keep})`);
       }
       acted++;
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(`[ERR] Failed to ${opts.action} ${d.dup}: ${e?.message ?? String(e)}`);
     }
   }
 
-  // eslint-disable-next-line no-console
   console.log(JSON.stringify({ acted }, null, 2));
 }
 
 main().catch((e) => {
-  // eslint-disable-next-line no-console
   console.error(e);
   process.exit(1);
 });

@@ -48,6 +48,18 @@
       "problemMatcher": []
     },
     {
+      "label": "ops: init env (free-first)",
+      "type": "shell",
+      "command": "npm run ops -- env:init",
+      "problemMatcher": []
+    },
+    {
+      "label": "ops: help",
+      "type": "shell",
+      "command": "npm run ops -- help",
+      "problemMatcher": []
+    },
+    {
       "label": "npm: dev",
       "type": "shell",
       "command": "npm run dev",
