@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { publicNavItems } from '../src/siteChrome.js'
 import { REPOSITORY_URL, SITE_DISPLAY_NAME, SITE_URL, getCopyrightLine } from '../src/siteMeta.js'
+import SecretAdminGateModal from './admin/SecretAdminGateModal.jsx'
 
 export default function SiteFooter() {
   const navItems = publicNavItems.filter((item) => item.to !== '/admin')
+  const [secretOpen, setSecretOpen] = useState(false)
 
   return (
     <footer className="site-footer site-footer--premium">
@@ -76,7 +78,17 @@ export default function SiteFooter() {
         <a href={SITE_URL} rel="noreferrer">
           {SITE_URL.replace(/^https:\/\//, '')}
         </a>
+        <button
+          type="button"
+          className="site-footer__secret"
+          aria-label="Admin login"
+          onClick={() => setSecretOpen(true)}
+        >
+          ©
+        </button>
       </div>
+
+      <SecretAdminGateModal open={secretOpen} onClose={() => setSecretOpen(false)} />
     </footer>
   )
 }
