@@ -2,6 +2,7 @@ import React from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import PrismEnvironment from './PrismEnvironment.jsx'
 import StarClusterSynth from '../backgrounds/StarClusterSynth.jsx'
+import SynthWaveWallpaper from '../backgrounds/SynthWaveWallpaper.jsx'
 import SiteFooter from './SiteFooter.jsx'
 import { publicNavItems, publicStatusLines, publicTickerItems } from '../src/siteChrome.js'
 import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
@@ -78,6 +79,7 @@ export default function SiteFrame() {
     <div className="shell">
       <StudioOpsBridge />
       <PrismEnvironment navItems={[]} statusLines={publicStatusLines} tickerItems={publicTickerItems} />
+      {pageClass === 'page--home' ? <SynthWaveWallpaper opacity={0.5} /> : null}
       <StarClusterSynth />
       <header className="studio-header">
         <div className="studio-header__inner">
