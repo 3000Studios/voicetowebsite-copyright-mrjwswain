@@ -164,7 +164,7 @@ export const Navbar = () => {
     };
   }, []);
 
-  const handleCheckout = async (plan: 'starter' | 'pro' | 'boss' | 'commands', method: 'stripe' | 'paypal' = 'stripe') => {
+  const handleCheckout = async (plan: 'starter' | 'pro' | 'enterprise' | 'commands', method: 'stripe' | 'paypal' = 'stripe') => {
     try {
       const endpoint = method === 'stripe' ? '/api/create-checkout-session' : '/api/create-paypal-order';
       const response = await fetch(endpoint, {

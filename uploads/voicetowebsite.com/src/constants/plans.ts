@@ -1,39 +1,39 @@
 export const PLAN_LIMITS = {
   free: {
     name: 'Free Access',
-    commands: 5,
+    commands: 1,
     sites: 1,
     export: false,
     watermark: true,
     price: 0,
-    description: 'Initial access for testing neural vocal frequencies.'
+    description: 'Try the demo with 1 free build. Upgrade to publish and connect a custom domain.'
   },
   starter: {
-    name: 'Neural Starter',
-    commands: 25,
+    name: 'Starter',
+    commands: 10,
     sites: 3,
     export: false,
     watermark: true,
-    price: 9.99,
-    description: 'Subscription — 30 days of access. Billed every 31 days. Build and publish up to 3 sites.'
+    price: 15,
+    description: 'For individuals. 3 sites, watermarked, standard support. Monthly or annual billing.'
   },
   pro: {
-    name: 'Neural Pro',
-    commands: 100,
-    sites: 10,
+    name: 'Pro',
+    commands: 50,
+    sites: 15,
     export: true,
     watermark: false,
-    price: 19.99,
-    description: 'Subscription — 30 days of access. Billed every 31 days. Build, export, and publish up to 10 sites.'
+    price: 39,
+    description: 'For professionals. 15 sites, custom domains, GitHub export, no watermark.'
   },
-  boss: {
-    name: 'Boss Package',
+  enterprise: {
+    name: 'Enterprise',
     commands: Number.MAX_SAFE_INTEGER,
     sites: Number.MAX_SAFE_INTEGER,
     export: true,
     watermark: false,
-    price: 49.99,
-    description: 'Subscription — 30 days of access. Billed every 31 days. Unlimited builds + unlimited sites.'
+    price: 99,
+    description: 'For agencies. Unlimited sites, white-label, priority support.'
   },
   commands: {
     name: 'Extra Commands Pack',

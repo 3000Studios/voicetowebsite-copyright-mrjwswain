@@ -5,7 +5,7 @@ export interface Env {
   APP_URL: string;
   PAYPAL_PLAN_STARTER?: string;
   PAYPAL_PLAN_PRO?: string;
-  PAYPAL_PLAN_BOSS?: string;
+  PAYPAL_PLAN_ENTERPRISE?: string;
 }
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
@@ -52,13 +52,13 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
 
     const token = await getPayPalAccessToken(context.env);
 
-    if (plan === "starter" || plan === "pro" || plan === "boss") {
+    if (plan === "starter" || plan === "pro" || plan === "enterprise") {
       const planId =
         plan === "starter"
           ? context.env.PAYPAL_PLAN_STARTER
           : plan === "pro"
             ? context.env.PAYPAL_PLAN_PRO
-            : context.env.PAYPAL_PLAN_BOSS;
+            : context.env.PAYPAL_PLAN_ENTERPRISE;
 
       if (!planId) {
         return jsonResponse(

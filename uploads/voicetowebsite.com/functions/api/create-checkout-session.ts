@@ -1,9 +1,12 @@
 export interface Env {
   STRIPE_SECRET_KEY: string;
   APP_URL: string;
-  STRIPE_PRICE_STARTER: string;
-  STRIPE_PRICE_PRO: string;
-  STRIPE_PRICE_BOSS: string;
+  STRIPE_PRICE_STARTER_MONTH: string;
+  STRIPE_PRICE_STARTER_YEAR: string;
+  STRIPE_PRICE_PRO_MONTH: string;
+  STRIPE_PRICE_PRO_YEAR: string;
+  STRIPE_PRICE_ENTERPRISE_MONTH: string;
+  STRIPE_PRICE_ENTERPRISE_YEAR: string;
   STRIPE_PRICE_COMMANDS: string;
 }
 
@@ -19,14 +22,14 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
   });
 }
 
-function getStripePriceForPlan(env: Env, plan: string) {
+function getStripePriceForPlan(env: Env, plan: string, cadence: "month" | "year") {
   switch (plan) {
     case "starter":
-      return env.STRIPE_PRICE_STARTER;
+      return cadence === "year" ? env.STRIPE_PRICE_STARTER_YEAR : env.STRIPE_PRICE_STARTER_MONTH;
     case "pro":
-      return env.STRIPE_PRICE_PRO;
-    case "boss":
-      return env.STRIPE_PRICE_BOSS;
+      return cadence === "year" ? env.STRIPE_PRICE_PRO_YEAR : env.STRIPE_PRICE_PRO_MONTH;
+    case "enterprise":
+      return cadence === "year" ? env.STRIPE_PRICE_ENTERPRISE_YEAR : env.STRIPE_PRICE_ENTERPRISE_MONTH;
     case "commands":
       return env.STRIPE_PRICE_COMMANDS;
     default:
@@ -36,11 +39,12 @@ function getStripePriceForPlan(env: Env, plan: string) {
 
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
   try {
-    const body = (await context.request.json()) as { plan?: string };
+    const body = (await context.request.json()) as { plan?: string; cadence?: string };
     const plan = body.plan?.toLowerCase();
     if (!plan) return jsonResponse({ error: "Missing plan" }, { status: 400 });
+    const cadence = body.cadence?.toLowerCase() === "year" ? "year" : "month";
 
-    const priceId = getStripePriceForPlan(context.env, plan);
+    const priceId = getStripePriceForPlan(context.env, plan, cadence);
     if (!priceId) return jsonResponse({ error: "Invalid plan" }, { status: 400 });
 
     const appUrl = (context.env.APP_URL || "").trim().replace(/\/+$/, "");
@@ -58,6 +62,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     form.set("line_items[0][quantity]", "1");
     form.set("client_reference_id", `voice2website_${plan}_${Date.now()}`);
     form.set("metadata[plan]", plan);
+    form.set("metadata[cadence]", cadence);
 
     const res = await fetch(STRIPE_SESSIONS_URL, {
       method: "POST",

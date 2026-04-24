@@ -347,7 +347,7 @@ const EngineTester = () => {
 };
 
 export const Home = () => {
-  const handleCheckout = async (plan: 'starter' | 'pro' | 'boss' | 'commands', method: 'stripe' | 'paypal' = 'stripe') => {
+  const handleCheckout = async (plan: 'starter' | 'pro' | 'enterprise' | 'commands', method: 'stripe' | 'paypal' = 'stripe') => {
     try {
       const endpoint = method === 'stripe' ? '/api/create-checkout-session' : '/api/create-paypal-order';
       const response = await fetch(endpoint, {
@@ -437,7 +437,7 @@ export const Home = () => {
         {/* Neural Marquee - Conversion Pressure */}
         <div className="py-4 border-y border-white/10 bg-indigo-950/20 marquee-container relative z-20 backdrop-blur-md">
           <div className="marquee-content text-[10px] font-black uppercase tracking-[1em] text-indigo-400 py-2">
-            URGENCY PROTOCOL: REVENUE READY IN 60s • NO CODE REQUIRED • NEURAL VOX SYNC ACTIVE • $19.99 PROTOCOL ENGAGED • WORLDWIDE DEPLOYMENT • SUBSCRIBE NOW FOR DASHBOARD AUTHORIZATION • DON'T BE LEFT OUT • THE FUTURE IS VOCAL • UNLIMITED MANIFESTATIONS FOR BOSS MEMBERS • 
+            BUILD A WEBSITE JUST BY TALKING • NO CODE REQUIRED • FAST DEPLOYMENTS • SUBSCRIBE TO UNLOCK PUBLISHING • PRO + ENTERPRISE SUPPORT CUSTOM DOMAINS • GROW TRAFFIC • GAIN SUBSCRIBERS • 
           </div>
         </div>
 
