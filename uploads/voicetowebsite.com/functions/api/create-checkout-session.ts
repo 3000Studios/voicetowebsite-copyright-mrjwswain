@@ -49,7 +49,10 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     const mode = plan === "commands" ? "payment" : "subscription";
     const form = new URLSearchParams();
     form.set("mode", mode);
-    form.set("success_url", `${appUrl}/dashboard?success=1&plan=${encodeURIComponent(plan)}`);
+    form.set(
+      "success_url",
+      `${appUrl}/success?provider=stripe&plan=${encodeURIComponent(plan)}&session_id={CHECKOUT_SESSION_ID}`
+    );
     form.set("cancel_url", `${appUrl}/pricing?canceled=1`);
     form.set("line_items[0][price]", priceId);
     form.set("line_items[0][quantity]", "1");

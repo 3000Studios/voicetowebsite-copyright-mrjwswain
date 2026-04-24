@@ -1,11 +1,17 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FizzyButton } from '@/components/ui/FizzyButton';
 import { Zap, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export const Success = () => {
+  const [params] = useSearchParams();
+  const provider = (params.get('provider') || 'stripe').toLowerCase();
+  const plan = (params.get('plan') || '').toLowerCase();
+  const sessionId = params.get('session_id') || '';
+  const tx = sessionId ? sessionId.slice(-12) : '';
+
   useEffect(() => {
     confetti({
       particleCount: 200,
@@ -36,8 +42,8 @@ export const Success = () => {
       </div>
 
       <div className="pt-12">
-        <Link to="/dashboard">
-          <FizzyButton label="RETURN TO COMMAND CENTER" />
+        <Link to={`/setup?provider=${encodeURIComponent(provider)}&plan=${encodeURIComponent(plan)}&session_id=${encodeURIComponent(sessionId)}`}>
+          <FizzyButton label="SETUP ACCESS + ENTER DASHBOARD" />
         </Link>
       </div>
 
@@ -46,7 +52,7 @@ export const Success = () => {
             <Zap size={14} className="text-indigo-500" />
             Empowered by AI3KBOT
         </div>
-        <span>Transaction ID: {(Math.random() * 1000000).toString(16).toUpperCase().slice(0, 10)}</span>
+        {tx ? <span>Transaction ID: {tx.toUpperCase()}</span> : null}
       </div>
     </div>
   );

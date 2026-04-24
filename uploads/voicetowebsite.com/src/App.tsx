@@ -16,6 +16,7 @@ import { Admin } from '@/pages/Admin';
 import { Dashboard } from '@/pages/Dashboard';
 import { Pricing } from '@/pages/Pricing';
 import { Success } from '@/pages/Success';
+import { Setup } from '@/pages/Setup';
 import { Login } from '@/pages/Login';
 import { SiteViewer } from '@/components/SiteViewer';
 import { LiquidLoader } from '@/components/LiquidLoader';
@@ -205,6 +206,7 @@ export default function App() {
                   <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
                   <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
                   <Route path="/success" element={<PageTransition><Success /></PageTransition>} />
+                  <Route path="/setup" element={<PageTransition><Setup /></PageTransition>} />
                   <Route path="/:id" element={<SiteViewer />} />
                 </Routes>
               </AnimatePresence>

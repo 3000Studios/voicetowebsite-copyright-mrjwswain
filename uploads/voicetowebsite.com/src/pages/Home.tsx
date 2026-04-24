@@ -409,12 +409,12 @@ export const Home = () => {
                   No coding. No design. Just speak — and your site is live, monetized, and ready to dominate. <span className="text-white opacity-100 font-medium italic underline decoration-indigo-500 underline-offset-8">Neural Speed. Professional ROI.</span>
                 </motion.p>
                 <motion.div variants={dirtGrow} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-8">
-                  <Link to="/#pricing" className="btn-minimal bg-indigo-600 text-white hover:bg-white hover:text-black transition-all border-none">
+                  <Link to="/pricing/" className="btn-minimal bg-indigo-600 text-white hover:bg-white hover:text-black transition-all border-none">
                     <SplitLink>Create Account</SplitLink>
                   </Link>
-                  <button onClick={() => window.scrollTo({ top: document.getElementById('pricing')?.offsetTop, behavior: 'smooth' })} className="text-[10px] items-center gap-2 flex font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">
-                    <SplitLink>Acquire Credits</SplitLink> <ChevronRight size={14} />
-                  </button>
+                  <Link to="/pricing/" className="text-[10px] items-center gap-2 flex font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">
+                    <SplitLink>View Plans</SplitLink> <ChevronRight size={14} />
+                  </Link>
                 </motion.div>
               </div>
               
@@ -590,103 +590,7 @@ export const Home = () => {
           </div>
         </section>
 
-        {/* Monetization / Investment Protocols */}
-        <section id="pricing" className="py-60 px-6 lg:px-24 bg-transparent relative overflow-hidden group">
-          <div className="sansara-fluid absolute inset-0 opacity-[0.03] pointer-events-none" />
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-7xl mx-auto relative z-10">
-            <div className="max-w-4xl space-y-8 mb-32">
-              <motion.span variants={skyDrop} className="subheading text-indigo-500 font-bold glass-premium px-4 py-1 inline-block phase-driven sun-light italic">Investment Protocols</motion.span>
-              <motion.h2 variants={dirtGrow} className="text-7xl md:text-9xl font-bold tracking-tighter uppercase leading-[0.8] italic phase-driven text-white">Own Your <br /> <span className="text-indigo-500 ultra-glow">Empire.</span></motion.h2>
-              <motion.p variants={skyDrop} className="text-2xl text-slate-400 font-light italic leading-relaxed opacity-60">Elite tools for scaling your digital dominance. Manifest with premium precision and maximum ROI.</motion.p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border border-white/5 brutal-shadow moon-light">
-              {[
-                {
-                  key: 'starter' as const,
-                  title: 'Neural Starter',
-                  price: '$9.99',
-                  sub: 'Billed every 31 days',
-                  features: ['25 commands / cycle', '3 websites you can build', '30 days of access', 'Watermark enabled'],
-                  accent: 'text-white',
-                },
-                {
-                  key: 'pro' as const,
-                  title: 'Neural Pro',
-                  price: '$19.99',
-                  sub: 'Billed every 31 days',
-                  features: ['100 commands / cycle', '10 websites you can build', 'Export to GitHub', 'No watermark'],
-                  accent: 'text-indigo-400',
-                  highlight: true,
-                },
-                {
-                  key: 'boss' as const,
-                  title: 'BOSS Mode',
-                  price: '$49.99',
-                  sub: 'Billed every 31 days',
-                  features: ['Unlimited commands', 'Unlimited websites', 'Maximum limits', 'Priority support'],
-                  accent: 'text-rose-400',
-                },
-                {
-                  key: 'commands' as const,
-                  title: 'Extra Commands Pack',
-                  price: '$2.99',
-                  sub: 'One-time (repeatable)',
-                  features: ['Adds 5 more commands', 'Instant unlock', 'Repeat anytime', 'No subscription'],
-                  accent: 'text-cyan-300',
-                },
-              ].map((card) => (
-                <motion.div
-                  key={card.key}
-                  whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
-                  className={`p-16 lg:p-20 space-y-12 group/card phase-driven relative overflow-hidden ${
-                    card.highlight ? 'bg-indigo-600/5 ring-4 ring-indigo-500/20' : ''
-                  }`}
-                >
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-start gap-6">
-                      <h3 className="text-3xl font-bold uppercase tracking-tight italic leading-none">{card.title}</h3>
-                      <div className="text-right">
-                        <span className={`text-5xl font-display italic ultra-glow ${card.accent}`}>{card.price}</span>
-                        <span className="block text-[8px] uppercase tracking-widest opacity-40 italic">{card.sub}</span>
-                      </div>
-                    </div>
-                    <ul className="space-y-4 opacity-90">
-                      {card.features.map((f) => (
-                        <li key={f} className="text-[10px] font-black uppercase tracking-widest italic flex items-center gap-3">
-                          <Zap size={10} className={card.highlight ? 'text-indigo-500 ultra-glow' : 'text-white/40'} /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <button
-                    onClick={() => handleCheckout(card.key, 'stripe')}
-                    className={`btn-minimal w-full py-8 text-lg font-black italic ${
-                      card.highlight
-                        ? 'border-indigo-500/50 bg-indigo-600 hover:bg-indigo-500 text-white'
-                        : 'border-white/10 hover:border-white'
-                    }`}
-                  >
-                    {card.key === 'commands' ? 'Buy Pack (Stripe)' : 'Subscribe (Stripe)'}
-                  </button>
-                  <button
-                    onClick={() => handleCheckout(card.key, 'paypal')}
-                    className="btn-minimal w-full border-white/10 hover:border-white py-4 text-[10px] font-black italic mt-4"
-                  >
-                    Pay with PayPal
-                  </button>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="pt-16 text-center">
-              <Link to="/pricing/" className="btn-minimal inline-flex">
-                View full pricing page
-              </Link>
-            </div>
-          </motion.div>
-        </section>
+        {/* Pricing is on its own page now. */}
 
         {/* AdSense Slot */}
         <div className="max-w-7xl mx-auto px-6 lg:px-24 py-32 border-b border-white/5 bg-transparent moon-light">
