@@ -172,10 +172,8 @@ export default function App() {
         </AnimatePresence>
         <SVGFilters />
         <BackgroundLayers />
-        <div className="noise-overlay" />
-        <div className="relative min-h-screen text-white selection:bg-white selection:text-black antialiased-premium transition-all duration-700 phase-driven">
+        <div className="relative min-h-screen text-[#111827] selection:bg-indigo-600 selection:text-white antialiased-premium transition-all duration-700 phase-driven bg-[#F9FAFB]">
           <Global3DBackground />
-          <SynthWaves />
           <Navbar />
           
           <div className="relative z-10 w-full overflow-x-hidden pt-32 flex flex-col min-h-screen">

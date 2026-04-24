@@ -95,7 +95,7 @@ const Scene = () => {
       <pointLight position={[10, 10, 10]} intensity={1} color="#6366f1" />
       <spotLight position={[-10, 10, 10]} angle={0.2} penumbra={1} intensity={1} color="#a855f7" />
       
-      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+      <Stars radius={120} depth={40} count={1200} factor={3} saturation={0} fade speed={0.5} />
       <SynthGrid />
       <Waves />
       

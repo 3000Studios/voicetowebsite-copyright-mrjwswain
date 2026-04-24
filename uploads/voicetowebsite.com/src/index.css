@@ -20,25 +20,25 @@
 
 @layer base {
   :root {
-    --background: 240 50% 1%; /* Near-black color(srgb 0.0039 0.0039 0.0118) */
-    --foreground: 0 0% 100%;
-    --card: 0 0% 3%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 2%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 9%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 63%;
+    --background: 210 40% 98%; /* #F9FAFB */
+    --foreground: 222 47% 11%; /* #111827 */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 245 58% 51%; /* #4F46E5 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
     --accent: 263 70% 50.4%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 12%;
-    --input: 0 0% 12%;
-    --ring: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 245 58% 51%;
     --radius: 0rem;
 
     /* New Premium Variables */
@@ -51,7 +51,7 @@
   }
 
   html, body {
-    @apply bg-[#010103] text-white selection:bg-white selection:text-black antialiased;
+    @apply bg-[#F9FAFB] text-[#111827] selection:bg-indigo-600 selection:text-white antialiased;
     font-family: var(--font-sans);
     overflow-x: hidden;
     max-width: 100vw;
@@ -68,11 +68,11 @@
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #010103;
+    background: #F9FAFB;
   }
   ::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border: 2px solid #010103;
+    border: 2px solid #F9FAFB;
     border-radius: 5px;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -251,8 +251,8 @@
 
   /* Glassmorphism Refined */
   .glass-premium {
-    background: rgba(0, 0, 0, var(--surface-alpha));
-    @apply backdrop-blur-xl border border-white/5;
+    background: rgba(255, 255, 255, 0.7);
+    @apply backdrop-blur-xl border border-black/5;
   }
 
   /* Dynamic Interactive Lighting Hook */
@@ -301,7 +301,7 @@
   }
 
   .glass-blur {
-    @apply backdrop-blur-3xl bg-black/40 border border-white/5;
+    @apply backdrop-blur-3xl bg-white/70 border border-black/5;
   }
 
   /* --- Premium Design System Additions --- */

@@ -364,70 +364,72 @@ export const Home = () => {
   };
 
   return (
-    <div className="min-h-screen text-white selection:bg-white selection:text-black sm:smooth-scroll antialiased-premium relative scroll-smooth overflow-x-hidden">
-      <SynthWaveBackground />
+    <div className="min-h-screen text-[#111827] selection:bg-indigo-600 selection:text-white sm:smooth-scroll antialiased-premium relative scroll-smooth overflow-x-hidden bg-[#F9FAFB]">
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-[#F9FAFB] to-white pointer-events-none" />
       
       <main className="relative z-10 w-full overflow-hidden">
-        {/* Elite Hero - Neural Intro with Video Background */}
-        <section className="min-h-screen flex flex-col justify-center px-6 lg:px-24 bg-transparent relative overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              className="w-full h-full object-cover opacity-10 grayscale brightness-30"
-            >
-              <source src="/input_file_0.mp4" type="video/mp4" />
-            </video>
-            <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+        {/* Enterprise Hero */}
+        <section className="min-h-[calc(100vh-96px)] flex flex-col justify-center px-6 lg:px-24 bg-transparent relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-48 -right-48 w-[520px] h-[520px] rounded-full bg-indigo-600/10 blur-3xl" />
+            <div className="absolute -bottom-64 -left-64 w-[640px] h-[640px] rounded-full bg-indigo-600/10 blur-3xl" />
           </div>
 
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="max-w-7xl relative z-10"
-          >
-            <div className="space-y-6 mb-12 text-center lg:text-left">
-              <motion.div variants={skyDrop} className="flex items-center justify-center lg:justify-start gap-6 mb-8">
-                 <div className="h-px w-12 bg-indigo-500 hidden lg:block" />
-                 <span className="text-[10px] font-black tracking-[0.8em] text-indigo-500 uppercase italic scale-110">World's First Voice-To-Website Engine</span>
-                 <SoundWave />
-              </motion.div>
-              <motion.h1 
-                variants={slideLeft}
-                className="text-[10vw] lg:text-[8vw] font-black uppercase italic tracking-tighter leading-[0.8] phase-driven break-words px-4 text-white"
-              >
-                Build a <br /> <span className="text-indigo-500">Money-Making</span> <br /> Website <span className="text-white/20">in 60s.</span>
-              </motion.h1>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-              <div className="lg:col-span-4 space-y-8 text-center lg:text-left">
-                <motion.p variants={skyDrop} className="text-lg md:text-2xl text-slate-400 font-light italic leading-relaxed opacity-60 phase-driven mx-auto lg:mx-0 break-words px-4">
-                  No coding. No design. Just speak — and your site is live, monetized, and ready to dominate. <span className="text-white opacity-100 font-medium italic underline decoration-indigo-500 underline-offset-8">Neural Speed. Professional ROI.</span>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="max-w-7xl relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <div className="lg:col-span-6 space-y-8">
+                <motion.div variants={skyDrop} className="flex items-center gap-4">
+                  <div className="h-px w-12 bg-indigo-600" />
+                  <span className="text-[11px] font-semibold tracking-[0.3em] text-indigo-600 uppercase">
+                    Voice to Website Platform
+                  </span>
+                </motion.div>
+
+                <motion.h1
+                  variants={slideLeft}
+                  className="text-[12vw] sm:text-[64px] lg:text-[84px] font-black tracking-[-0.04em] leading-[0.95]"
+                >
+                  Build a Website <br /> Just by Talking.
+                </motion.h1>
+
+                <motion.p variants={skyDrop} className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-xl">
+                  The frictionless way to go from voice to a stunning, live website in seconds. No coding. No complicated interfaces.
                 </motion.p>
-                <motion.div variants={dirtGrow} className="flex flex-col sm:flex-row justify-center lg:justify-start gap-8">
-                  <Link to="/pricing/" className="btn-minimal bg-indigo-600 text-white hover:bg-white hover:text-black transition-all border-none">
-                    <SplitLink>Create Account</SplitLink>
+
+                <motion.div variants={dirtGrow} className="flex flex-col sm:flex-row gap-4 items-start">
+                  <Link
+                    to="/dashboard"
+                    className="btn-minimal bg-indigo-600 text-white hover:bg-indigo-700 border-none"
+                  >
+                    Start Building
                   </Link>
-                  <Link to="/pricing/" className="text-[10px] items-center gap-2 flex font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">
-                    <SplitLink>View Plans</SplitLink> <ChevronRight size={14} />
+                  <Link to="/pricing/" className="btn-minimal border-black/10 hover:border-indigo-600 hover:text-indigo-700">
+                    Get Started Free
                   </Link>
                 </motion.div>
               </div>
-              
-              <div className="lg:col-span-8 flex justify-end">
-                <motion.div variants={dirtGrow} className="w-full max-w-2xl border-t border-r border-white/5 pt-8 pr-8 flex justify-between items-start phase-driven">
-                   <div className="space-y-4">
-                      <span className="text-[8px] font-black uppercase tracking-[0.5em] opacity-20">Voice Sync Engine</span>
-                      <Logo className="opacity-80 translate-x-[-10%]" />
-                   </div>
-                   <div className="text-right space-y-4">
-                      <span className="text-[8px] font-black uppercase tracking-[0.5em] opacity-20">Synchronization</span>
-                      <span className="block text-sm font-mono opacity-80 text-emerald-500 italic">99.8% Neural Match</span>
-                   </div>
+
+              <div className="lg:col-span-6">
+                <motion.div variants={dirtGrow} className="relative">
+                  <div className="glass-premium border border-black/5 rounded-3xl p-6 md:p-10 shadow-[0_30px_90px_rgba(17,24,39,0.12)]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                      <div className="space-y-4">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">You talk</div>
+                        <div className="h-24 rounded-2xl bg-gradient-to-br from-indigo-600/15 to-indigo-600/5 border border-black/5 flex items-center justify-center overflow-hidden">
+                          <SoundWave />
+                        </div>
+                        <div className="text-xs text-slate-500">Voice input → intent</div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">We build</div>
+                        <div className="h-24 rounded-2xl bg-white border border-black/5 shadow-inner flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-2xl bg-indigo-600/10 border border-indigo-600/20" />
+                        </div>
+                        <div className="text-xs text-slate-500">Website generated → live</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -z-10 -inset-6 rounded-[2rem] bg-indigo-600/10 blur-2xl" />
                 </motion.div>
               </div>
             </div>
@@ -435,8 +437,8 @@ export const Home = () => {
         </section>
 
         {/* Neural Marquee - Conversion Pressure */}
-        <div className="py-4 border-y border-white/10 bg-indigo-950/20 marquee-container relative z-20 backdrop-blur-md">
-          <div className="marquee-content text-[10px] font-black uppercase tracking-[1em] text-indigo-400 py-2">
+        <div className="py-4 border-y border-black/10 bg-white/50 marquee-container relative z-20 backdrop-blur-md">
+          <div className="marquee-content text-[10px] font-black uppercase tracking-[0.6em] text-indigo-700 py-2">
             BUILD A WEBSITE JUST BY TALKING • NO CODE REQUIRED • FAST DEPLOYMENTS • SUBSCRIBE TO UNLOCK PUBLISHING • PRO + ENTERPRISE SUPPORT CUSTOM DOMAINS • GROW TRAFFIC • GAIN SUBSCRIBERS • 
           </div>
         </div>
