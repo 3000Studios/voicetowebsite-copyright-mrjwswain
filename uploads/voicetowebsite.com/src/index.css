@@ -278,7 +278,7 @@
   }
 
   .subheading {
-    @apply text-sm uppercase tracking-[0.2em] font-medium opacity-60;
+    @apply text-sm uppercase tracking-[0.2em] font-medium opacity-85;
   }
 
   .luxury-card {

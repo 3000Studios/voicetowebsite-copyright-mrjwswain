@@ -72,14 +72,14 @@ const FeatureProject = ({ number, title, description, video, link }: any) => (
     className="group relative border-t border-white/5 py-24 flex flex-col md:flex-row gap-12 items-start phase-driven"
   >
     <div className="flex-shrink-0 w-24">
-      <motion.span variants={skyDrop} className="text-[10px] font-black tracking-[0.4em] opacity-20 uppercase font-mono group-hover:opacity-100 group-hover:text-indigo-500 group-hover:ultra-glow transition-all">{number}</motion.span>
+      <motion.span variants={skyDrop} className="text-[10px] font-black tracking-[0.4em] opacity-60 uppercase font-mono group-hover:opacity-100 group-hover:text-indigo-500 group-hover:ultra-glow transition-all">{number}</motion.span>
     </div>
     <div className="flex-grow space-y-8 w-full overflow-hidden">
       <div className="space-y-4">
         <motion.h3 variants={dirtGrow} className="text-5xl md:text-7xl font-bold tracking-tighter uppercase leading-none group-hover:text-indigo-500 transition-colors uppercase font-display italic phase-driven">
           {title}
         </motion.h3>
-        <motion.p variants={skyDrop} className="max-w-xl text-xl text-slate-400 font-light italic leading-relaxed opacity-60 group-hover:opacity-100 transition-opacity phase-driven">
+        <motion.p variants={skyDrop} className="max-w-xl text-xl text-slate-300 font-light italic leading-relaxed opacity-90 group-hover:opacity-100 transition-opacity phase-driven">
           {description}
         </motion.p>
       </div>
@@ -452,12 +452,12 @@ export const Home = () => {
           <div className="max-w-7xl mx-auto space-y-32">
              <div className="max-w-3xl space-y-8 text-center lg:text-left mx-auto lg:mx-0">
                 <span className="subheading italic text-indigo-400">Live Manifestation Generator</span>
-                <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter italic leading-none phase-driven lights-header">
-                  Interface <span className="text-white/20">Impenetrable.</span> <br /> Architecture <span className="ultra-glow">Elite.</span>
-                </h2>
-                <p className="text-xl text-slate-500 font-light italic leading-relaxed">
-                  Our websites are built with proprietary neural defensive layers. Non-inspectable by default, optimized for pure speed and conversion.
-                </p>
+                   <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter italic leading-none phase-driven lights-header">
+                   Interface <span className="text-white/70">Impenetrable.</span> <br /> Architecture <span className="ultra-glow">Elite.</span>
+                 </h2>
+                 <p className="text-xl text-slate-300 font-light italic leading-relaxed">
+                   Our websites are built with proprietary neural defensive layers. Non-inspectable by default, optimized for pure speed and conversion.
+                 </p>
              </div>
              
              <div className="space-y-12">
@@ -497,7 +497,7 @@ export const Home = () => {
                     Your Command <br /> <span className="text-indigo-500 ultra-glow">Is Our Code.</span>
                   </motion.h2>
                 </div>
-                <motion.p variants={skyDrop} className="text-2xl text-slate-400 font-light italic leading-relaxed opacity-60 max-w-xl phase-driven">
+                <motion.p variants={skyDrop} className="text-2xl text-slate-200 font-light italic leading-relaxed opacity-90 max-w-xl phase-driven">
                   The VoiceToWebsite engine translates vocal cadence into visual hierarchy. It doesn't just build sites; it launches digital authority.
                 </motion.p>
                 <div className="grid grid-cols-2 gap-12 pt-8">
@@ -506,14 +506,14 @@ export const Home = () => {
                         <Mic2 className="text-indigo-500" size={16} />
                         <div className="text-xl font-display italic text-white ultra-glow">REAL-TIME</div>
                      </div>
-                    <div className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 uppercase">Vocal Latency</div>
-                  </div>
-                  <div className="phase-driven hover:translate-y-[-4px] transition-transform">
-                    <div className="flex items-center gap-4 mb-2">
-                        <Monitor className="text-indigo-500" size={16} />
-                        <div className="text-xl font-display italic text-white ultra-glow">1-PUSH</div>
-                     </div>
-                    <div className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 uppercase">Domain Hookup</div>
+                     <div className="text-[8px] font-black uppercase tracking-[0.4em] opacity-75 uppercase">Vocal Latency</div>
+                   </div>
+                   <div className="phase-driven hover:translate-y-[-4px] transition-transform">
+                     <div className="flex items-center gap-4 mb-2">
+                         <Monitor className="text-indigo-500" size={16} />
+                         <div className="text-xl font-display italic text-white ultra-glow">1-PUSH</div>
+                      </div>
+                     <div className="text-[8px] font-black uppercase tracking-[0.4em] opacity-75 uppercase">Domain Hookup</div>
                   </div>
                 </div>
               </motion.div>
@@ -532,9 +532,9 @@ export const Home = () => {
             <div className="mb-32 flex flex-col md:flex-row justify-between items-center md:items-end gap-12 text-center md:text-left">
               <div className="space-y-4">
                 <motion.span variants={skyDrop} className="subheading italic">Engine Showcase</motion.span>
-                <motion.h2 variants={dirtGrow} className="text-6xl font-bold tracking-tighter uppercase italic phase-driven text-white/50">Neural <br /> <span className="text-white">Case Studies</span></motion.h2>
+                <motion.h2 variants={dirtGrow} className="text-6xl font-bold tracking-tighter uppercase italic phase-driven text-white/80">Neural <br /> <span className="text-white">Case Studies</span></motion.h2>
               </div>
-              <motion.span variants={skyDrop} className="text-[10px] font-black tracking-widest opacity-20 uppercase font-mono italic underline decoration-indigo-500 underline-offset-4">Project History 2026</motion.span>
+              <motion.span variants={skyDrop} className="text-[10px] font-black tracking-widest opacity-70 uppercase font-mono italic underline decoration-indigo-500 underline-offset-4">Project History 2026</motion.span>
             </div>
 
             <div className="space-y-0 w-full max-w-5xl mx-auto">
@@ -571,7 +571,7 @@ export const Home = () => {
           <div className="max-w-4xl mx-auto space-y-16">
             <div className="text-center space-y-4">
               <span className="subheading text-indigo-400 font-bold italic">Common Inquiries</span>
-              <h2 className="text-5xl font-black uppercase italic tracking-tighter">Building <span className="text-white/20">Protocols</span></h2>
+              <h2 className="text-5xl font-black uppercase italic tracking-tighter">Building <span className="text-white/70">Protocols</span></h2>
             </div>
             
             <div className="space-y-4">
@@ -585,7 +585,7 @@ export const Home = () => {
                   <h4 className="text-indigo-400 font-black uppercase tracking-widest text-xs mb-4 italic flex items-center gap-4">
                     <Zap size={14} className="animate-pulse" /> {faq.q}
                   </h4>
-                  <p className="text-slate-400 text-sm font-medium leading-relaxed italic">{faq.a}</p>
+                  <p className="text-slate-200 text-sm font-medium leading-relaxed italic">{faq.a}</p>
                 </div>
               ))}
             </div>
@@ -611,7 +611,7 @@ export const Home = () => {
             <Logo className="mb-12 opacity-80" />
             <motion.span variants={skyDrop} className="text-[10px] font-black uppercase tracking-[0.8em] opacity-40 italic">The Final Recognition</motion.span>
             <motion.h2 variants={dirtGrow} className="text-[14vw] lg:text-[12vw] font-bold tracking-tighter uppercase leading-[0.8] italic">Build Your <br /> <span className="text-indigo-500">Reality.</span></motion.h2>
-            <motion.p variants={skyDrop} className="text-2xl font-light italic leading-relaxed text-white/60 max-w-2xl mx-auto tracking-tight">
+            <motion.p variants={skyDrop} className="text-2xl font-light italic leading-relaxed text-white/90 max-w-2xl mx-auto tracking-tight">
                Your thoughts are vibrating. Capture the frequency. Speak your empire into existence with VoiceToWebsite.com.
             </motion.p>
             <motion.div variants={dirtGrow} className="flex justify-center pt-12">

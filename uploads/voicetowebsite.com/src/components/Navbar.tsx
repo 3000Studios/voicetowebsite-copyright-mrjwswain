@@ -115,7 +115,7 @@ const NavLink = ({ link, onClick, location }: any) => {
         className="block relative max-w-full"
       >
         <SplitLink className={`navlink-fit font-black tracking-tighter uppercase leading-none transition-all duration-500 italic inline-block animate-lights ${
-          location.pathname === link.path ? 'opacity-100' : 'opacity-60'
+          location.pathname === link.path ? 'opacity-100' : 'opacity-85'
         } hover:opacity-100`}>
           {link.name}
         </SplitLink>
@@ -209,7 +209,7 @@ export const Navbar = () => {
                   to={link.path}
                   onMouseEnter={playTick}
                   className={`text-[14px] font-black uppercase tracking-[0.4em] transition-all duration-300 relative group/link animate-lights ${
-                    location.pathname === link.path ? 'opacity-100' : 'opacity-40'
+                    location.pathname === link.path ? 'opacity-100' : 'opacity-75'
                   } hover:opacity-100`}
                 >
                   <SplitLink>{link.name}</SplitLink>
@@ -221,7 +221,7 @@ export const Navbar = () => {
               onClick={() => { playClick(); setIsMenuOpen(!isMenuOpen); }}
               className="flex items-center gap-6 group relative"
             >
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 group-hover:opacity-100 transition-opacity hidden sm:block">
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">
                 {isMenuOpen ? 'TERMINATE' : 'INITIALIZE'}
               </span>
               <HamburgerIcon isOpen={isMenuOpen} />
@@ -282,7 +282,7 @@ export const Navbar = () => {
             <div className="noise-overlay" />
             <div className="grid-structure absolute inset-0 opacity-10" />
             
-            <div className="w-full flex justify-between items-start opacity-20 relative z-10">
+            <div className="w-full flex justify-between items-start opacity-70 relative z-10">
               <h2 className="text-[10px] font-black uppercase tracking-[0.5em] lights-header">Neural Interface active</h2>
               <span className="text-[10px] font-black uppercase tracking-[0.5em]">Monetization Engine Online</span>
             </div>
@@ -302,7 +302,7 @@ export const Navbar = () => {
 
             <div className="w-full flex flex-col lg:flex-row justify-between items-end gap-12 relative z-10 pt-12 border-t border-white/5">
               <div className="space-y-6">
-                <span className="block text-[8px] uppercase tracking-[0.5em] opacity-20 font-black">Strategic Protocols</span>
+                <span className="block text-[8px] uppercase tracking-[0.5em] opacity-70 font-black">Strategic Protocols</span>
                 <div className="flex flex-wrap gap-8">
                    {['Twitter', 'Instagram', 'Github', 'Stripe', 'PayPal'].map(s => (
                      <button 
