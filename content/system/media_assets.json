@@ -1,0 +1,96 @@
+{
+  "rows": [
+    {
+      "id": "media-1777250761922-0982bd",
+      "requestId": "preview-1777250761911-f777bf",
+      "heroVideo": "https://cdn.coverr.co/videos/coverr-cafe-owner-preparing-orders-1332/1080p.mp4",
+      "gallery": [
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "attribution": [
+        {
+          "provider": "Coverr",
+          "scope": "heroVideo",
+          "url": "https://cdn.coverr.co/videos/coverr-cafe-owner-preparing-orders-1332/1080p.mp4"
+        }
+      ],
+      "createdAt": "2026-04-27T00:46:01.911Z"
+    },
+    {
+      "id": "media-1777250665811-eab781",
+      "requestId": "preview-1777250665803-144aeb",
+      "heroVideo": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4",
+      "gallery": [
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "attribution": [
+        {
+          "provider": "Coverr",
+          "scope": "heroVideo",
+          "url": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4"
+        }
+      ],
+      "createdAt": "2026-04-27T00:44:25.803Z"
+    },
+    {
+      "id": "media-1777250644458-1ba8f4",
+      "requestId": "preview-1777250644447-ed023b",
+      "heroVideo": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4",
+      "gallery": [
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "attribution": [
+        {
+          "provider": "Coverr",
+          "scope": "heroVideo",
+          "url": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4"
+        }
+      ],
+      "createdAt": "2026-04-27T00:44:04.448Z"
+    },
+    {
+      "id": "media-1777200522199-b35a94",
+      "requestId": "preview-1777200522184-f4db88",
+      "heroVideo": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4",
+      "gallery": [
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "attribution": [
+        {
+          "provider": "Coverr",
+          "scope": "heroVideo",
+          "url": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4"
+        }
+      ],
+      "createdAt": "2026-04-26T10:48:42.184Z"
+    },
+    {
+      "id": "media-1777200166648-eb7420",
+      "requestId": "preview-1777200166632-b98486",
+      "heroVideo": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4",
+      "gallery": [
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "attribution": [
+        {
+          "provider": "Coverr",
+          "scope": "heroVideo",
+          "url": "https://cdn.coverr.co/videos/coverr-working-on-the-laptop-4242/1080p.mp4"
+        }
+      ],
+      "createdAt": "2026-04-26T10:42:46.633Z"
+    }
+  ],
+  "updatedAt": "2026-04-27T00:46:01.922Z",
+  "schemaVersion": 1
+}

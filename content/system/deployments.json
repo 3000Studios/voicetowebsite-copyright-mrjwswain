@@ -1,6 +1,22 @@
 {
   "history": [
     {
+      "id": "deploy-1777202451029",
+      "status": "push_failed",
+      "message": "AI update",
+      "branch": "main",
+      "commitSha": "64e9025",
+      "startedAt": "2026-04-26T11:20:50.128Z",
+      "finishedAt": "2026-04-26T11:20:51.029Z",
+      "git": {
+        "status": "push_failed",
+        "branch": "main",
+        "commitOutput": "[main 64e9025] AI update\n 4 files changed, 92 insertions(+), 130 deletions(-)\n delete mode 100644 AGENTS.md\n create mode 100644 launchBrowser.js\n create mode 100644 list_files.cjs\n create mode 100644 list_files.js\n",
+        "pushOutput": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/3000Studios/voicetowebsite-copyright-mrjwswain.git/'\n",
+        "pushFailed": true
+      }
+    },
+    {
       "id": "deploy-1773563553580",
       "status": "pushed",
       "message": "AI planner deployment",

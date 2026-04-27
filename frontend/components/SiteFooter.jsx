@@ -33,21 +33,22 @@ export default function SiteFooter() {
         <section className="site-footer__premium-column">
           <span className="eyebrow">Navigation</span>
           <div className="site-footer__premium-links">
-            {navItems.map((item) => (
-              <Link key={item.to} to={item.to}>
-                {item.label}
-              </Link>
-            ))}
+            <Link to="/">Home</Link>
+            <Link to="/products">Products</Link>
+            <Link to="/pricing">Pricing</Link>
+            <Link to="/blog">Blog</Link>
+            <Link to="/about">About</Link>
           </div>
         </section>
 
         <section className="site-footer__premium-column">
-          <span className="eyebrow">Protocol</span>
+          <span className="eyebrow">Legal & Support</span>
           <div className="site-footer__premium-links">
-            <Link to="/pricing">Pricing</Link>
-            <Link to="/dashboard">Dashboard</Link>
             <Link to="/contact">Contact</Link>
-            <a href={REPOSITORY_URL} rel="noreferrer">
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/terms">Terms of Service</Link>
+            <Link to="/legal">Disclosure</Link>
+            <a href={REPOSITORY_URL} rel="noreferrer" target="_blank">
               GitHub
             </a>
           </div>

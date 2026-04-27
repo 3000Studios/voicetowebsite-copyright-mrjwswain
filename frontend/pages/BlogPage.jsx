@@ -4,6 +4,7 @@ import MediaShowcase from '../components/MediaShowcase.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import { blogIndex } from '../src/siteData.js'
 import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
+import AdSlot from '../components/AdSlot.jsx'
 
 export default function BlogPage() {
   return (
@@ -15,6 +16,10 @@ export default function BlogPage() {
           Long-form content redesigned for readability, authority, and conversion support across SEO entry pages.
         </p>
       </section>
+
+      <div className="adsense-wrap adsense-wrap--mid ads-locked" data-ads-lock="mid-blog">
+        <AdSlot variant="leaderboard" />
+      </div>
 
       <MediaShowcase media={{ title: `${SITE_DISPLAY_NAME} editorial system`, description: 'Trust-building content that supports product conversion.' }} />
 

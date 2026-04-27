@@ -1,4 +1,4 @@
-import crypto from 'node:crypto'
+// Web Crypto API is global in Cloudflare Workers
 
 function nowIso() {
   return new Date().toISOString()
@@ -8,8 +8,11 @@ function safeJson(value) {
   return JSON.stringify(value, null, 2)
 }
 
-export function hash(value) {
-  return crypto.createHash('sha256').update(String(value ?? ''), 'utf8').digest('hex').slice(0, 16)
+export async function hash(value) {
+  const msgUint8 = new TextEncoder().encode(String(value ?? ''))
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16)
 }
 
 export async function putJson(bucket, key, value) {

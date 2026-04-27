@@ -52,6 +52,32 @@ const FONT_LIBRARY = [
   { name: 'Space Grotesk', family: '"Space Grotesk", "Segoe UI", sans-serif', query: 'family=Space+Grotesk:wght@400;500;700' }
 ]
 
+const COLOR_KEYWORDS = {
+  purple: '#a855f7',
+  pink: '#ec4899',
+  blue: '#3b82f6',
+  cyan: '#06b6d4',
+  green: '#22c55e',
+  emerald: '#10b981',
+  red: '#ef4444',
+  orange: '#f97316',
+  yellow: '#eab308',
+  white: '#ffffff',
+  gold: '#fbbf24',
+  silver: '#94a3b8'
+}
+
+function detectColors(brief) {
+  const lower = String(brief ?? '').toLowerCase()
+  const found = []
+  for (const [name, hex] of Object.entries(COLOR_KEYWORDS)) {
+    if (lower.includes(name)) {
+      found.push(hex)
+    }
+  }
+  return found.length > 0 ? found : null
+}
+
 const MEDIA_LIBRARY = {
   defaultVideo: 'https://cdn.coverr.co/videos/coverr-man-working-on-a-laptop-1579/1080p.mp4',
   byKeyword: [
@@ -276,9 +302,17 @@ function buildSectionData({ brief, audience, websiteType, primaryCta, focusPhras
 function buildHtml({ title, brief, audience, websiteType, styleTone, primaryCta, media }) {
   const theme = getThemePreset(websiteType, styleTone)
   const font = pickFont(brief)
+  const detectedColors = detectColors(brief)
   const focusPhrases = extractFocusPhrases(brief)
   const mediaPlan = resolveMediaPlan(brief, websiteType, media)
-  const [canvas, surface, accent, ink] = theme.palette
+  
+  let [canvas, surface, accent, ink] = theme.palette
+  if (detectedColors) {
+    accent = detectedColors[0]
+    if (detectedColors[1]) {
+      surface = detectedColors[1] + '1A' // 10% opacity
+    }
+  }
   const sections = buildSectionData({ brief, audience, websiteType, primaryCta, focusPhrases })
   const seoKeywords = extractKeywords(brief, websiteType, audience)
   const faqEntries = buildFaqEntries(primaryCta, audience, websiteType, focusPhrases)

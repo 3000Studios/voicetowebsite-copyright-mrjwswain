@@ -5,9 +5,12 @@ import MetricStrip from '../components/MetricStrip.jsx'
 import MediaShowcase from '../components/MediaShowcase.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import WebsitePreviewStudio from '../components/WebsitePreviewStudio.jsx'
+import InstantDemo from '../components/InstantDemo.jsx'
 import { fadeUp, staggerParent } from '../animations/variants.js'
 import { useSiteRuntime } from '../src/SiteRuntimeContext.jsx'
 import { homepage, pricingPage, productCatalog } from '../src/siteData.js'
+import AdSlot from '../components/AdSlot.jsx'
+import TrustStrip from '../components/TrustStrip.jsx'
 
 const STORE_ARTWORK = {
   'voice-to-website-builder': '/media/store-voice-builder.svg',
@@ -172,6 +175,21 @@ export default function HomePage() {
 
       <MetricStrip items={liveMetrics} />
 
+      <section className="adsense-wrap adsense-wrap--mid ads-locked" data-ads-lock="mid-home">
+        <AdSlot variant="rectangle" />
+      </section>
+
+      <section className="home-page__trust section-card">
+        <span className="eyebrow">Social Proof</span>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>Trusted by Industry Leaders</h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3rem', opacity: 0.5, filter: 'grayscale(1)', justifyContent: 'center' }}>
+          {['Stripe', 'PayPal', 'OpenAI', 'Google Adsense', 'Cloudflare'].map((brand) => (
+            <strong key={brand} style={{ fontSize: '1.2rem', letterSpacing: '0.1em' }}>{brand.toUpperCase()}</strong>
+          ))}
+        </div>
+      </section>
+
+      <InstantDemo />
       <WebsitePreviewStudio />
 
       <section className="home-page__systems">

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import PrismEnvironment from './PrismEnvironment.jsx'
-import StarClusterSynth from '../backgrounds/StarClusterSynth.jsx'
+import GlobalVoiceWaveWallpaper from '../backgrounds/GlobalVoiceWaveWallpaper.jsx'
 import SiteFooter from './SiteFooter.jsx'
 import { publicNavItems, publicStatusLines, publicTickerItems } from '../src/siteChrome.js'
 import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
@@ -78,7 +78,7 @@ export default function SiteFrame() {
     <div className="shell">
       <StudioOpsBridge />
       <PrismEnvironment navItems={[]} statusLines={publicStatusLines} tickerItems={publicTickerItems} />
-      <StarClusterSynth />
+      <GlobalVoiceWaveWallpaper />
       <header className="studio-header">
         <div className="studio-header__inner">
           <NavLink className="studio-brand" to="/" aria-label={SITE_DISPLAY_NAME}>
@@ -96,9 +96,15 @@ export default function SiteFrame() {
           </NavLink>
 
           <div className="studio-header__actions">
+            <Link className="studio-pill" to="/products">
+              Products
+            </Link>
             <Link className="studio-pill" to="/pricing">
               Pricing
             </Link>
+            <a className="studio-pill" href="https://referrals.live/login">
+              Login
+            </a>
             <Link className="studio-pill studio-pill--primary" to="/contact">
               Start build
             </Link>
@@ -141,9 +147,9 @@ export default function SiteFrame() {
               <span className="split-link__text">{item.label}</span>
             </NavLink>
           ))}
-          <NavLink to="/dashboard" onClick={() => setMenuOpen(false)} className="studio-menu__link">
-            <span className="split-link__text">Dashboard</span>
-          </NavLink>
+          <a href="https://referrals.live/login" onClick={() => setMenuOpen(false)} className="studio-menu__link">
+            <span className="split-link__text">Login</span>
+          </a>
         </nav>
         <div className="studio-menu__footer">
           <span className="studio-menu__status">Monetization engine online</span>
@@ -158,11 +164,11 @@ export default function SiteFrame() {
         </div>
       </div>
       <main className={`page ${pageClass}`}>
-        <div className="adsense-wrap adsense-wrap--leaderboard" data-ads-lock="leaderboard">
+        <div className="adsense-wrap adsense-wrap--leaderboard ads-locked" data-ads-lock="leaderboard">
           <AdSlot variant="leaderboard" />
         </div>
         <Outlet />
-        <div className="adsense-wrap adsense-wrap--rectangle" data-ads-lock="rectangle">
+        <div className="adsense-wrap adsense-wrap--rectangle ads-locked" data-ads-lock="rectangle">
           <AdSlot variant="rectangle" />
         </div>
       </main>

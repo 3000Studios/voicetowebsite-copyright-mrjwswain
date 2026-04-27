@@ -1,6 +1,238 @@
 {
   "events": [
     {
+      "id": "page_view-1777250680410",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-861bbc80-a11a-4ac4-8b80-dfc62427fef2",
+      "referrer": "",
+      "createdAt": "2026-04-27T00:44:40.410Z"
+    },
+    {
+      "id": "page_view-1777250574043",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-861bbc80-a11a-4ac4-8b80-dfc62427fef2",
+      "referrer": "",
+      "createdAt": "2026-04-27T00:42:54.043Z"
+    },
+    {
+      "id": "page_view-1777203986093",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/",
+      "createdAt": "2026-04-26T11:46:26.093Z"
+    },
+    {
+      "id": "page_view-1777203986037",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/",
+      "createdAt": "2026-04-26T11:46:26.037Z"
+    },
+    {
+      "id": "page_view-1777202411950",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/pricing",
+      "createdAt": "2026-04-26T11:20:11.950Z"
+    },
+    {
+      "id": "page_view-1777202405211",
+      "type": "page_view",
+      "path": "/pricing",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/blog",
+      "createdAt": "2026-04-26T11:20:05.211Z"
+    },
+    {
+      "id": "page_view-1777202400028",
+      "type": "page_view",
+      "path": "/blog",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/products",
+      "createdAt": "2026-04-26T11:20:00.028Z"
+    },
+    {
+      "id": "page_view-1777202386032",
+      "type": "page_view",
+      "path": "/products",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/blog",
+      "createdAt": "2026-04-26T11:19:46.032Z"
+    },
+    {
+      "id": "page_view-1777202380694",
+      "type": "page_view",
+      "path": "/blog",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/pricing",
+      "createdAt": "2026-04-26T11:19:40.694Z"
+    },
+    {
+      "id": "page_view-1777202374963",
+      "type": "page_view",
+      "path": "/pricing",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "http://localhost:5173/",
+      "createdAt": "2026-04-26T11:19:34.963Z"
+    },
+    {
+      "id": "page_view-1777202365519",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:19:25.519Z"
+    },
+    {
+      "id": "page_view-1777201907522",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:11:47.522Z"
+    },
+    {
+      "id": "page_view-1777201897749",
+      "type": "page_view",
+      "path": "/products",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:11:37.749Z"
+    },
+    {
+      "id": "page_view-1777201875726",
+      "type": "page_view",
+      "path": "/blog",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:11:15.726Z"
+    },
+    {
+      "id": "page_view-1777201784482",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:09:44.482Z"
+    },
+    {
+      "id": "page_view-1777201718328",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:08:38.328Z"
+    },
+    {
+      "id": "page_view-1777201696060",
+      "type": "page_view",
+      "path": "/products/voice-to-website-builder",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:08:16.060Z"
+    },
+    {
+      "id": "page_view-1777201658631",
+      "type": "page_view",
+      "path": "/products/voice-to-website-builder",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:07:38.631Z"
+    },
+    {
+      "id": "page_view-1777201640817",
+      "type": "page_view",
+      "path": "/products",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:07:20.817Z"
+    },
+    {
+      "id": "page_view-1777201626702",
+      "type": "page_view",
+      "path": "/contact",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:07:06.702Z"
+    },
+    {
+      "id": "page_view-1777201595611",
+      "type": "page_view",
+      "path": "/products",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:06:35.611Z"
+    },
+    {
+      "id": "page_view-1777201578658",
+      "type": "page_view",
+      "path": "/pricing",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:06:18.658Z"
+    },
+    {
+      "id": "page_view-1777201560429",
+      "type": "page_view",
+      "path": "/blog",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:06:00.429Z"
+    },
+    {
+      "id": "page_view-1777201502780",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T11:05:02.780Z"
+    },
+    {
+      "id": "page_view-1777200377023",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T10:46:17.023Z"
+    },
+    {
+      "id": "page_view-1777200368738",
+      "type": "page_view",
+      "path": "/studio",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T10:46:08.738Z"
+    },
+    {
+      "id": "page_view-1777200215138",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T10:43:35.138Z"
+    },
+    {
+      "id": "page_view-1777199981874",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-9e8ff0da-62e1-4c00-b21a-55bb86086013",
+      "referrer": "",
+      "createdAt": "2026-04-26T10:39:41.874Z"
+    },
+    {
+      "id": "page_view-1777181786456",
+      "type": "page_view",
+      "path": "/",
+      "sessionId": "session-861bbc80-a11a-4ac4-8b80-dfc62427fef2",
+      "referrer": "",
+      "createdAt": "2026-04-26T05:36:26.456Z"
+    },
+    {
       "id": "admin_login_success-1775927214216",
       "type": "admin_login_success",
       "adminEmail": "mr.jwswain@gmail.com",
@@ -8,5 +240,5 @@
       "createdAt": "2026-04-11T17:06:54.216Z"
     }
   ],
-  "updatedAt": "2026-04-11T17:06:54.216Z"
+  "updatedAt": "2026-04-27T00:44:40.410Z"
 }

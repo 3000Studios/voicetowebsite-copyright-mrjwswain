@@ -4,6 +4,8 @@ import MediaShowcase from '../components/MediaShowcase.jsx'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import { productCatalog } from '../src/siteData.js'
 import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
+import AdSlot from '../components/AdSlot.jsx'
+import TrustStrip from '../components/TrustStrip.jsx'
 
 function getStoreArtwork(slug) {
   const assetMap = {
@@ -29,6 +31,10 @@ export default function ProductsPage() {
           Browse a fully redesigned storefront with faster product scanning, cleaner conversion layout, and stronger checkout intent across devices.
         </p>
       </section>
+
+      <div className="adsense-wrap adsense-wrap--mid ads-locked" data-ads-lock="mid-products">
+        <AdSlot variant="rectangle" />
+      </div>
 
       <MediaShowcase media={{ title: 'Product showcase', description: 'Designed to convert from first scroll.', ...(appStoreItems[0]?.media ?? {}) }} />
 
@@ -87,6 +93,7 @@ export default function ProductsPage() {
           </article>
         ))}
       </section>
+      <TrustStrip />
     </div>
   )
 }

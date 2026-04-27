@@ -104,8 +104,8 @@ export default function WebsitePreviewStudio({
     const email = form.email.trim()
     const brief = form.brief.trim()
 
-    if (!isValidEmail(email)) {
-      setError('Enter a valid email so we can reserve the source pack for your build.')
+    if (email && !isValidEmail(email)) {
+      setError('Enter a valid email if you want to reserve the source pack for your build.')
       playUiTone('error')
       return
     }
@@ -251,14 +251,13 @@ export default function WebsitePreviewStudio({
             </div>
           ) : (
             <label className="field">
-              <span>Email for source delivery</span>
+              <span>Email (Optional for preview)</span>
               <input
                 type="email"
                 value={form.email}
                 onChange={(event) => updateField('email', event.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
-                required
               />
             </label>
           )}
@@ -365,7 +364,7 @@ export default function WebsitePreviewStudio({
                 title={preview.title}
                 srcDoc={preview.previewHtml}
                 loading="lazy"
-                sandbox="allow-same-origin"
+                sandbox="allow-same-origin allow-scripts"
                 referrerPolicy="no-referrer"
               />
             ) : (

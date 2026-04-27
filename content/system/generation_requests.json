@@ -1,0 +1,66 @@
+{
+  "rows": [
+    {
+      "id": "genreq-1777250761921-7de049",
+      "requestId": "preview-1777250761911-f777bf",
+      "email": "test@example.com",
+      "brief": "Build a high-converting landing page for a premium coffee subscription service. Use warm brown and gold colors, target coffee enthusiasts, and use 'Start my subscription' as the primary CTA.",
+      "websiteType": "local_service",
+      "styleTone": "cinematic",
+      "audience": "founders and small teams",
+      "primaryCta": "Start building now",
+      "status": "preview_ready",
+      "createdAt": "2026-04-27T00:46:01.911Z"
+    },
+    {
+      "id": "genreq-1777250665811-46cd50",
+      "requestId": "preview-1777250665803-144aeb",
+      "email": "test@example.com",
+      "brief": "Build a premium voice-first website for startup founders that sells a launch sprint, shows the main offer above the fold, uses deep blue and cyan lighting, and drives visitorBuild a high-converting landing page for a premium coffee subscription service. Use warm brown and gold colors, target coffee enthusiasts, and use 'Start my subscription' as the primary CTA.s to book a strategy call.",
+      "websiteType": "saas",
+      "styleTone": "cinematic",
+      "audience": "founders and small teams",
+      "primaryCta": "Start building now",
+      "status": "preview_ready",
+      "createdAt": "2026-04-27T00:44:25.803Z"
+    },
+    {
+      "id": "genreq-1777250644458-27e152",
+      "requestId": "preview-1777250644447-ed023b",
+      "email": "test@example.com",
+      "brief": "Build a premium voice-first website for startup founders that sells a launch sprint, shows the main offer above the fold, uses deep blue and cyan lighting, and drives visitorBuild a high-converting landing page for a premium coffee subscription service. Use warm brown and gold colors, target coffee enthusiasts, and use 'Start my subscription' as the primary CTA.s to book a strategy call.",
+      "websiteType": "saas",
+      "styleTone": "cinematic",
+      "audience": "founders and small teams",
+      "primaryCta": "Start building now",
+      "status": "preview_ready",
+      "createdAt": "2026-04-27T00:44:04.448Z"
+    },
+    {
+      "id": "genreq-1777200522197-33a6ec",
+      "requestId": "preview-1777200522184-f4db88",
+      "email": "test@example.com",
+      "brief": "Create a vibrant neon purple and cyan website for a synthwave music producer",
+      "websiteType": "saas",
+      "styleTone": "cinematic",
+      "audience": "founders and small teams",
+      "primaryCta": "Start building now",
+      "status": "preview_ready",
+      "createdAt": "2026-04-26T10:48:42.184Z"
+    },
+    {
+      "id": "genreq-1777200166646-c6ca37",
+      "requestId": "preview-1777200166632-b98486",
+      "email": "test@example.com",
+      "brief": "Create a futuristic cyberpunk coffee shop website with neon purple and green accents",
+      "websiteType": "saas",
+      "styleTone": "cinematic",
+      "audience": "founders and small teams",
+      "primaryCta": "Start building now",
+      "status": "preview_ready",
+      "createdAt": "2026-04-26T10:42:46.633Z"
+    }
+  ],
+  "updatedAt": "2026-04-27T00:46:01.921Z",
+  "schemaVersion": 1
+}

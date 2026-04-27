@@ -56,7 +56,7 @@ export async function onRequest(context) {
   const email = String(payload.email ?? '').trim().toLowerCase()
   const brief = String(payload.brief ?? '').trim()
 
-  if (!isValidEmail(email)) {
+  if (email && !isValidEmail(email)) {
     return errorJson('Enter a valid email.', 400)
   }
   if (brief.length < 20) {

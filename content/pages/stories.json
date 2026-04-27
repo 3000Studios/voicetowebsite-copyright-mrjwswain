@@ -1,0 +1,38 @@
+{
+  "eyebrow": "Showcase",
+  "headline": "Customer Stories and Successful Builds",
+  "subheadline": "See how founders and agencies are using VoiceToWebsite to launch conversion-focused pages in record time.",
+  "sections": [
+    {
+      "type": "richText",
+      "heading": "From Voice to Revenue",
+      "body": "Every story below started with a single voice prompt. Our engine turned those ideas into live websites that now process payments, capture leads, and sell products."
+    }
+  ],
+  "items": [
+    {
+      "title": "Local Service Launch",
+      "description": "A roofing company in Miami used VoiceToWebsite to generate a lead-gen page that converted 4% of traffic in its first week.",
+      "link": {
+        "label": "View build",
+        "href": "/products/local-leads-launchpad"
+      }
+    },
+    {
+      "title": "SaaS MVP in 60s",
+      "description": "An AI startup founder generated their landing page, connected Stripe, and launched to Product Hunt in a single afternoon.",
+      "link": {
+        "label": "View build",
+        "href": "/products/voice-to-website-builder"
+      }
+    }
+  ],
+  "cta": {
+    "eyebrow": "Your turn",
+    "heading": "Ready to build your own success story?",
+    "body": "Start with a free preview and see the power of voice-first web design.",
+    "primaryLabel": "Open the generator",
+    "primaryHref": "/#website-generator"
+  },
+  "updatedAt": "2026-04-26T12:00:00.000Z"
+}

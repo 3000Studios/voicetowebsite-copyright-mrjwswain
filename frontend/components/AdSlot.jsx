@@ -5,6 +5,11 @@ const DEFAULT_ADSENSE_PUBLISHER = 'ca-pub-5800977493749262'
 function getAdsEnabled() {
   const raw = import.meta.env.VITE_ENABLE_ADS
   const normalized = String(raw ?? '').toLowerCase()
+  const hasSession = Boolean(window.localStorage.getItem('customerSession'))
+
+  // Disable ads for logged-in customers to keep the experience premium
+  if (hasSession) return false
+  
   if (normalized === 'true') return true
   if (normalized === 'false') return false
   return Boolean(import.meta.env.PROD)

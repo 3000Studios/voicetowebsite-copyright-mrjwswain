@@ -1,0 +1,51 @@
+# CLINE GLOBAL RULES — LEGION 5 i9-14900HX / 64GB RAM OPTIMIZED
+# Auto-applied to every session. No exceptions.
+
+## CORE BEHAVIOR
+- NEVER ask permission to proceed. Always take the best scientific/statistical path forward.
+- NEVER display file contents unless explicitly asked. Just fix it.
+- NEVER list files you're reading. Just read and act.
+- Acknowledge task with ONE bullet: what you're doing. Report done when complete.
+- Zero errors policy. Validate before writing. Test before reporting done.
+- Always use free models only (no paid API calls without explicit user approval).
+
+## SPEED & EFFICIENCY
+- Batch all independent operations in parallel (read multiple files, write multiple files simultaneously).
+- Use subagents for broad exploration to preserve main context window.
+- Keep context usage minimal — summarize, don't dump raw file contents.
+- Prefer CLI commands over file-by-file operations when bulk changes needed.
+- Use ripgrep/grep for search, not recursive file reads.
+
+## DECISION MAKING
+- When multiple options exist: choose the statistically best, most performant, most maintainable option automatically.
+- Never stop mid-task to ask clarifying questions. Make the best choice and continue.
+- If ambiguous: choose the option that maximizes speed + reliability + zero-error outcome.
+
+## CODE STANDARDS
+- All JS in this repo uses ES modules ("type": "module" in package.json). Use import/export, NOT require().
+- TypeScript preferred for new server/API files.
+- Always validate against existing schemas before writing content files.
+- Never break existing functionality when adding features.
+
+## AUTO-IMPROVEMENT PROTOCOL
+- After completing any task, scan for: unused files, broken imports, security weaknesses, performance bottlenecks.
+- If found: fix them silently, report summary at end.
+- Generate roadmap updates in AUTO_DEV.md after significant work sessions.
+- When idle context allows: propose new features as additions to CODEX_TASKS.md.
+
+## HARDWARE OPTIMIZATION (i9-14900HX / 64GB / 2TB)
+- Use parallel processing wherever possible (Node worker threads, Promise.all, batch operations).
+- Leverage all 32 logical processors for build/test tasks via --max-old-space-size=8192 and parallel flags.
+- Never throttle operations — this machine can handle maximum concurrency.
+- Prefer in-memory operations over disk I/O when data fits in RAM.
+
+## FILE HYGIENE
+- Temp/test files (list_files.js, launchBrowser.js, *.cjs test files) should be cleaned up after use.
+- Never commit .env files, secrets, or API keys.
+- Keep root directory clean — scripts go in /scripts, utilities in appropriate subdirs.
+
+## WORKFLOW TRIGGERS
+- On any new feature request → update CODEX_TASKS.md first, then implement.
+- On any deploy → validate schemas, run lint, check for broken imports first.
+- On any error → fix root cause, not symptoms. Never patch over broken code.
+- Weekly (or when prompted) → scan all repos for security weaknesses, outdated deps, dead code.

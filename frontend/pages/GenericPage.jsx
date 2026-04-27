@@ -11,6 +11,8 @@ import { useSiteRuntime } from '../src/SiteRuntimeContext.jsx'
 import { pageLookup } from '../src/siteData.js'
 import { SITE_DISPLAY_NAME } from '../src/siteMeta.js'
 import NotFoundPage from './NotFoundPage.jsx'
+import AdSlot from '../components/AdSlot.jsx'
+import TrustStrip from '../components/TrustStrip.jsx'
 
 const reserved = new Set(['admin', 'blog', 'products'])
 
@@ -41,6 +43,11 @@ export default function GenericPage() {
       </section>
 
       {page.heroStats ? <MetricStrip items={page.heroStats} /> : null}
+      
+      <div className="adsense-wrap adsense-wrap--mid ads-locked" data-ads-lock="mid-generic">
+        <AdSlot variant="rectangle" />
+      </div>
+
       <MediaShowcase media={page.media} />
       {page.steps ? (
         <section className="generic-page__steps">
@@ -110,7 +117,7 @@ export default function GenericPage() {
         </section>
       ) : null}
       {slug === 'pricing' && snapshot?.commerce?.offers?.length ? (
-        <section className="generic-page__checkout">
+        <section className="generic-page__checkout" id="checkout">
           <span className="eyebrow">Buy the product</span>
           <h2>Choose a live checkout and unlock your dashboard access</h2>
           <p className="section-intro">
@@ -172,6 +179,7 @@ export default function GenericPage() {
       ) : null}
       {slug === 'contact' ? <ContactLeadForm /> : null}
       {slug === 'newsletter' ? <NewsletterSignupForm /> : null}
+      <TrustStrip />
     </div>
   )
 }

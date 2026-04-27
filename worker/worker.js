@@ -129,6 +129,49 @@ async function handleOrchestrator(request) {
   })
 }
 
+async function handleDemo(request, env) {
+  const blob = await request.arrayBuffer();
+  
+  try {
+    // 1. Whisper Transcription
+    const whisperRes = await env.AI.run("@cf/openai/whisper", {
+      audio: [...new Uint8Array(blob)]
+    });
+    const transcript = whisperRes.text;
+
+    // 2. Llama 3 Site Skeleton Generation
+    const prompt = `Based on this voice request: "${transcript}", generate a website skeleton.
+    Return a JSON object with: 
+    - title: A catchy site title
+    - sections: Array of 3 objects with {heading, body}
+    - imagePrompt: A descriptive prompt for a hero image
+    Keep it professional and high-converting.`;
+
+    const llamaRes = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
+      prompt,
+      stream: false
+    });
+    
+    // Attempt to parse JSON from Llama response (it might include markdown)
+    let skeleton = llamaRes.response;
+    try {
+      const match = skeleton.match(/\{[\s\S]*\}/);
+      if (match) skeleton = JSON.parse(match[0]);
+    } catch {
+      // Fallback
+      skeleton = { title: "Custom AI Site", sections: [], imagePrompt: transcript };
+    }
+
+    return jsonResponse({
+      success: true,
+      transcript,
+      skeleton
+    });
+  } catch (err) {
+    return jsonResponse({ error: err.message }, 500);
+  }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
@@ -158,6 +201,10 @@ export default {
 
       if (url.pathname === '/api/orchestrator' && request.method === 'POST') {
         return handleOrchestrator(request)
+      }
+
+      if (url.pathname === '/api/demo' && request.method === 'POST') {
+        return handleDemo(request, env)
       }
 
       if (url.pathname === '/api/stripe-config') {

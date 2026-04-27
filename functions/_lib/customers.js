@@ -1,4 +1,4 @@
-import crypto from 'node:crypto'
+// Web Crypto API is global in Cloudflare Workers
 import { getJson, hash, putJson } from './storage.js'
 
 function nowIso() {
@@ -14,7 +14,12 @@ export function isValidEmail(value) {
 }
 
 function buildAccessToken() {
-  return crypto.randomBytes(24).toString('base64url')
+  const array = new Uint8Array(24)
+  crypto.getRandomValues(array)
+  return btoa(String.fromCharCode(...array))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
 }
 
 function buildPurchaseRef(provider, offerSlug, source = 'checkout_started') {
@@ -38,8 +43,9 @@ function sanitizeAccount(account) {
   }
 }
 
-function emailKey(email) {
-  return `customers/by-email/${hash(email)}.json`
+async function emailKey(email) {
+  const emailHash = await hash(email)
+  return `customers/by-email/${emailHash}.json`
 }
 
 function tokenKey(token) {
@@ -52,7 +58,8 @@ export async function findCustomerByEmail(bucket, email) {
     return null
   }
 
-  return getJson(bucket, emailKey(normalized))
+  const key = await emailKey(normalized)
+  return getJson(bucket, key)
 }
 
 export async function findCustomerByToken(bucket, token) {
@@ -110,7 +117,8 @@ export async function upsertCustomerAccess(
     updatedAt: nowIso()
   }
 
-  await putJson(bucket, emailKey(normalized), account)
+  const key = await emailKey(normalized)
+  await putJson(bucket, key, account)
   await putJson(bucket, tokenKey(accessToken), {
     email: normalized,
     updatedAt: nowIso()
@@ -137,7 +145,8 @@ export async function touchCustomerPreview(bucket, email, previewRequestId) {
     updatedAt: nowIso()
   }
 
-  await putJson(bucket, emailKey(existing.email), next)
+  const key = await emailKey(existing.email)
+  await putJson(bucket, key, next)
   await putJson(bucket, tokenKey(existing.accessToken), {
     email: existing.email,
     updatedAt: nowIso()

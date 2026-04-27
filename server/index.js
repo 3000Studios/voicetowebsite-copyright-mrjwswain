@@ -16,7 +16,7 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT ?? 8787);
 const __filename = fileURLToPath(import.meta.url);
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173,http://127.0.0.1:5173,https://voicetowebsite.com')
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173,http://127.0.0.1:5173,https://voicetowebsite.com,https://3000studios.vip')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean)
@@ -32,7 +32,11 @@ app.use(
         return
       }
 
-      if (allowedOriginSet.has(origin)) {
+      const isAllowed = allowedOriginSet.has(origin) || 
+                       origin.endsWith('.voicetowebsite.com') || 
+                       origin.endsWith('.3000studios.vip');
+      
+      if (isAllowed) {
         callback(null, true)
         return
       }

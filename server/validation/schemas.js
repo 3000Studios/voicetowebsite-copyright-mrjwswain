@@ -31,7 +31,7 @@ export const CheckoutSchema = z.object({
 })
 
 export const PreviewStudioSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().optional().or(z.literal('')),
   brief: z.string().min(20).max(3000),
   audience: z.string().min(2).max(200).optional(),
   websiteType: z.enum(['saas', 'local_service', 'creator', 'ecommerce']).optional(),

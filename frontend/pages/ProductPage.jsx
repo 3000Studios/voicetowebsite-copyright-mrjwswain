@@ -6,6 +6,8 @@ import PrismHeadline from '../components/PrismHeadline.jsx'
 import RichBlocks from '../components/RichBlocks.jsx'
 import { useSiteRuntime } from '../src/SiteRuntimeContext.jsx'
 import { productLookup } from '../src/siteData.js'
+import AdSlot from '../components/AdSlot.jsx'
+import TrustStrip from '../components/TrustStrip.jsx'
 
 export default function ProductPage() {
   const { slug } = useParams()
@@ -28,6 +30,10 @@ export default function ProductPage() {
           {product.idealFor ? <span className="tag">{product.idealFor}</span> : null}
         </div>
       </section>
+
+      <div className="adsense-wrap adsense-wrap--mid ads-locked" data-ads-lock="mid-product">
+        <AdSlot variant="rectangle" />
+      </div>
 
       <MediaShowcase media={product.media} />
 
@@ -57,6 +63,7 @@ export default function ProductPage() {
           </div>
         </section>
       ) : null}
+      <TrustStrip />
     </div>
   )
 }

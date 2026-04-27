@@ -69,6 +69,7 @@
     "concurrently": "^9.2.1",
     "eslint": "^10.0.3",
     "prettier": "^3.8.1",
+    "puppeteer": "^24.42.0",
     "typescript": "^5.9.3",
     "wrangler": "^4.75.0"
   }
