@@ -2,6 +2,7 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { SiteViewer } from "@/components/SiteViewer";
 import { AuthProvider } from "@/context/AuthContext";
+import { ScrollToTop } from "@/hooks/useScrollToTop";
 import { Home } from "@/pages/Home";
 import { Pricing } from "@/pages/Pricing";
 import { Success } from "@/pages/Success";

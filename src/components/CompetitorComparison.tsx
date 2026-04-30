@@ -1,3 +1,4 @@
+import type React from "react";
 import { motion } from "framer-motion";
 import { Check, Code2, Globe, Mic, Sparkles, X, Zap } from "lucide-react";
 
@@ -16,6 +17,13 @@ interface Competitor {
     whiteLabel: boolean;
   };
 }
+
+type FeatureKey = keyof Competitor["features"];
+type FeatureMeta = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+type OurOffering = Pick<Competitor, "name" | "logo" | "price" | "features">;
 
 const competitors: Competitor[] = [
   {
@@ -88,7 +96,7 @@ const competitors: Competitor[] = [
   },
 ];
 
-const ourFeatures = {
+const ourFeatures: OurOffering = {
   name: "VoiceToWebsite",
   logo: "V",
   price: "$15/mo",
@@ -102,8 +110,8 @@ const ourFeatures = {
   },
 };
 
-const featureLabels: Record<string, { label: string; icon: any }> = {
-  voiceInput: { label: "Voice Input", icon: Mic },
+  const featureLabels: Record<FeatureKey, FeatureMeta> = {
+    voiceInput: { label: "Voice Input", icon: Mic },
   codeExport: { label: "Full Code Export", icon: Code2 },
   customDomain: { label: "Custom Domain", icon: Globe },
   aiContent: { label: "AI Content Generation", icon: Sparkles },
@@ -112,6 +120,8 @@ const featureLabels: Record<string, { label: string; icon: any }> = {
 };
 
 export function CompetitorComparison() {
+  const featureKeys = Object.keys(featureLabels) as FeatureKey[];
+
   return (
     <section className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -179,8 +189,9 @@ export function CompetitorComparison() {
           </div>
 
           {/* Feature Rows */}
-          {Object.entries(featureLabels).map(([key, value], index) => {
-            const Icon = value.icon;
+          {featureKeys.map((key, index) => {
+            const { label, icon: Icon } = featureLabels[key];
+
             return (
               <motion.div
                 key={key}
@@ -192,12 +203,10 @@ export function CompetitorComparison() {
               >
                 <div className="flex items-center gap-3">
                   <Icon className="w-5 h-5 text-white/40" />
-                  <span className="text-white/80 text-sm">{value.label}</span>
+                  <span className="text-white/80 text-sm">{label}</span>
                 </div>
                 <div className="flex justify-center">
-                  {ourFeatures.features[
-                    key as keyof typeof ourFeatures.features
-                  ] ? (
+                  {ourFeatures.features[key] ? (
                     <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
                       <Check className="w-4 h-4 text-emerald-400" />
                     </div>
@@ -209,7 +218,7 @@ export function CompetitorComparison() {
                 </div>
                 {competitors.slice(0, 4).map((comp) => (
                   <div key={comp.name} className="flex justify-center">
-                    {comp.features[key as keyof typeof comp.features] ? (
+                    {comp.features[key] ? (
                       <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
                         <Check className="w-4 h-4 text-white/40" />
                       </div>

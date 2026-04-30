@@ -280,7 +280,7 @@ export const Home = () => {
             })}
           </div>
 
-          <div className="comparison-shell bg-white/2! border-white/5">
+              <div className="comparison-shell bg-white/2! border-white/5">
             <div className="comparison-row comparison-row-header bg-white/5! border-b! border-white/10">
               <span className="text-indigo-400">Platform fit</span>
               <span>VoiceToWebsite</span>
