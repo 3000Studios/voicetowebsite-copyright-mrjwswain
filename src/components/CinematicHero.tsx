@@ -146,7 +146,7 @@ export function CinematicHero() {
       >
         {/* Badge */}
         <motion.div variants={itemVariants} className="mb-8">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-indigo-400">
+          <span className="relative aspect-video rounded-2xl bg-linear-to-br from-indigo-500/20 to-transparent border border-white/10 overflow-hidden text-medium text-indigo-400">
             <Sparkles className="w-4 h-4" />
             AI-Powered Site Builder
           </span>
@@ -177,7 +177,7 @@ export function CinematicHero() {
                 className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all ${
                   isRecording
                     ? "bg-red-500/20 text-red-400 animate-pulse"
-                    : "bg-gradient-to-br from-indigo-500 to-purple-600 text-white hover:shadow-lg hover:shadow-indigo-500/30"
+                    : "bg-linear-to-br from-indigo-500 to-purple-600 text-white hover:shadow-lg hover:shadow-indigo-500/30"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -214,7 +214,7 @@ export function CinematicHero() {
                 {[...Array(20)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="w-1 bg-gradient-to-t from-indigo-500 to-purple-500 rounded-full"
+                    className="w-1 h-3 bg-linear-to-t from-indigo-500 to-purple-500 rounded-full"
                     animate={{
                       height: [10, Math.random() * 40 + 10, 10],
                     }}
