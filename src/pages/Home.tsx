@@ -115,8 +115,9 @@ export const Home = () => {
         <title>VoiceToWebsite.com — Speak. Build. Launch.</title>
         <meta
           name="description"
-          content="Tell VoiceToWebsite what you do, choose a design direction, and get a hosted starter site built for your business."
+          content="Transform your voice into a stunning, professional website in minutes. No coding required."
         />
+        {/* Build timestamp: 2026-04-29-2200 */}
       </Helmet>
 
       <CinematicHero />
