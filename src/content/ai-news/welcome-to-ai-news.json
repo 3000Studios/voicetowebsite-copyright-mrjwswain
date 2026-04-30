@@ -1,0 +1,30 @@
+{
+  "slug": "welcome-to-ai-news",
+  "title": "AI News: Welcome to Voice2Website",
+  "description": "Daily-style AI briefings designed for builders — optimized for search, fast to skim, and built to convert.",
+  "keywords": [
+    "AI news",
+    "voice to website",
+    "AI website builder",
+    "SaaS",
+    "subscriptions"
+  ],
+  "publishedAt": "2026-04-23T00:00:00.000Z",
+  "heroVideo": "/input_file_0.mp4",
+  "heroImage": "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1600&auto=format&fit=crop",
+  "sections": [
+    {
+      "heading": "What This Is",
+      "body": "This page is a continuously-updated AI briefing hub for builders who want to ship faster. Every post is written to be SEO-friendly, readable, and action-oriented — with clear takeaways for monetization, conversion, and automation."
+    },
+    {
+      "heading": "Why It Matters",
+      "body": "Search engines reward consistent, relevant publishing. By pairing clean information architecture (index + per-story pages) with fast performance and ad-ready placements, Voice2Website is built to compound traffic into subscribers."
+    },
+    {
+      "heading": "How Subscriptions Help You Build",
+      "body": "Starter, Pro, and BOSS subscriptions unlock a 30‑day access window per cycle (billed every 31 days). If you need more capacity on demand, the Extra Commands Pack adds five more commands instantly."
+    }
+  ]
+}
+

@@ -1,0 +1,39 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "saoudrizwan.claude-dev",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "usernamehw.errorlens",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "streetsidesoftware.code-spell-checker",
+    "wayou.vscode-todo-highlight",
+    "pkief.material-icon-theme",
+    "zhuangtongfa.material-theme",
+    "ms-vscode.makefile-tools",
+    "prisma.prisma",
+    "GitHub.vscode-pull-request-github",
+    "github.vscode-github-actions",
+    "redhat.vscode-yaml",
+    "tamasfe.even-better-toml",
+    "mikestead.dotenv",
+    "quicktype.quicktype",
+    "kisstkondoros.vscode-gutter-preview",
+    "antfu.vite",
+    "vitest.explorer",
+    "orta.vscode-jest"
+  ],
+  "unwantedRecommendations": [
+    "continue.continue",
+    "tabnine.tabnine-vscode",
+    "github.copilot",
+    "github.copilot-chat",
+    "kiteco.kite",
+    "codeium.codeium",
+    "replit.replit",
+    "amazonwebservices.aws-toolkit-vscode"
+  ]
+}

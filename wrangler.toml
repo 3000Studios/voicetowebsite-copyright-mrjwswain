@@ -1,0 +1,35 @@
+name = "voicetowebsite"
+compatibility_date = "2024-04-12"
+pages_build_output_dir = "dist"
+
+# Production environment - deploys to voicetowebsite.com
+[env.production]
+name = "voicetowebsite"
+
+[vars]
+NODE_VERSION = "20"
+
+#
+# Cloudflare bindings
+# - These IDs are safe to commit (not secrets).
+# - Pages also has bindings configured in the dashboard, but wrangler.toml keeps
+#   local + direct-upload deployments consistent.
+#
+[[d1_databases]]
+binding = "DB"
+database_id = "ca8260b3-d2e6-4fd3-933e-fd71ab52c71d"
+
+[[r2_buckets]]
+binding = "SITES_BUCKET"
+bucket_name = "voicetowebsite"
+
+[[kv_namespaces]]
+binding = "ORDERS_KV"
+id = "62e1beaaf1e54d09bd2dad0c81036c8a"
+
+# Environment variables for production
+# These should be set in the Cloudflare Dashboard
+# GEMINI_API_KEY = ""
+# STRIPE_SECRET_KEY = ""
+# STRIPE_PUBLISHABLE_KEY = ""
+# APP_URL = ""

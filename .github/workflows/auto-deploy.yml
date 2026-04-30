@@ -1,0 +1,63 @@
+name: Auto Commit and Push
+
+on:
+  schedule:
+    # Run every 5 minutes to check for uncommitted changes
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'Auto Deploy Bot'
+          git config --global user.email 'deploy@voicetowebsite.com'
+          git config --global pull.rebase false
+
+      - name: Check for changes and auto-commit
+        id: check-changes
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected, committing..."
+            git commit -m "Auto-commit: Update build $(date -u +%Y-%m-%d_%H:%M:%S) UTC"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Pull latest changes (auto-resolve conflicts)
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git pull origin main --strategy-option=theirs || true
+          # Push to main
+          git push origin main
+
+      - name: Delete other branches
+        run: |
+          # Delete all branches except main
+          git fetch --prune
+          for branch in $(git branch -r | grep -v 'main' | sed 's/origin\///'); do
+            if [ -n "$branch" ]; then
+              git push origin --delete "$branch" || true
+            fi
+          done
+
+      - name: Summary
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "✅ Changes committed and pushed to main"
+          echo "Production deployment will be handled by the production-deploy.yml workflow"
