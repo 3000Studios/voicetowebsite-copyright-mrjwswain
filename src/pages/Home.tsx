@@ -1,15 +1,18 @@
 import { GoogleAdSense } from "@/components/GoogleAdSense";
+import { PlaygroundGenerator } from "@/components/PlaygroundGenerator";
 import {
   ArrowRight,
   CheckCircle2,
   Code2,
   Globe,
+  Heart,
   LayoutTemplate,
   Mic2,
   MonitorSmartphone,
-  PlayCircle,
   ShieldCheck,
   Sparkles,
+  Target,
+  Users,
   Workflow,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -112,122 +115,9 @@ export const Home = () => {
         />
       </Helmet>
 
-      <section className="section-shell relative min-h-[90vh] overflow-hidden pt-20 flex items-center">
-        {/* Cinematic Background Layer */}
-        <div className="absolute inset-0 -z-10 animate-mesh mesh-gradient opacity-60" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.1),transparent_35%)]" />
+      <CinematicHero />
 
-        <div className="content-grid relative items-center gap-16 lg:grid-cols-[1.2fr_0.8fr]">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="space-y-10"
-          >
-            <div className="space-y-4">
-              <motion.span
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="eyebrow glow-bloom"
-              >
-                The Future of Business Launch
-              </motion.span>
-              <h1 className="hero-headline text-gradient leading-[0.85]">
-                Speak your site <br />
-                <span className="text-indigo-400/90">into existence.</span>
-              </h1>
-              <p className="max-w-2xl text-lg text-slate-300/90 sm:text-xl lg:text-2xl leading-relaxed">
-                Transform a simple voice brief into a premium, hosted business
-                website in seconds. No code, no complex editors—just
-                high-clarity delivery.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-5 sm:flex-row">
-              <Link
-                to="/pricing"
-                className="hero-primary-button px-8 py-4 text-base group"
-              >
-                Launch your site
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <a
-                href="#how-it-works"
-                className="hero-secondary-button px-8 py-4 text-base"
-              >
-                <PlayCircle className="h-5 w-5 text-indigo-400" />
-                View Workflow
-              </a>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3 pt-4">
-              {[
-                { val: "3 Steps", label: "Brief to Live" },
-                { val: "Hosted", label: "Edge Delivery" },
-                { val: "Modern", label: "React Architecture" },
-              ].map((m, i) => (
-                <motion.div
-                  key={m.val}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + i * 0.1 }}
-                  className="luxury-card !p-5 !rounded-2xl border-white/5"
-                >
-                  <span className="block text-xl font-bold text-white">
-                    {m.val}
-                  </span>
-                  <span className="text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                    {m.label}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, rotateY: 10 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-            transition={{ delay: 0.3, duration: 1, ease: "easeOut" }}
-            className="perspective-1000 hidden lg:block"
-          >
-            <div className="hero-frame premium-shadow ultra-glow border-white/10 overflow-hidden">
-              <div className="hero-browser-bar !bg-white/5 border-white/10">
-                <div className="flex gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
-                </div>
-                <div className="mx-auto rounded-full bg-white/5 px-4 py-1 text-[10px] font-mono text-slate-400">
-                  terminal.voicetowebsite.com
-                </div>
-              </div>
-              <div className="space-y-6 p-4">
-                <div className="space-y-3 rounded-2xl bg-white/[0.03] p-5 border border-white/5">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-indigo-400">
-                    <Mic2 className="h-3 w-3" /> System Listening
-                  </div>
-                  <div className="text-sm italic text-slate-300 leading-relaxed">
-                    "I need a premium landing page for my high-ticket consulting
-                    business. Deep navy theme, glassmorphism, and a clear 'Book
-                    Strategy Call' CTA."
-                  </div>
-                </div>
-                <div className="relative aspect-video rounded-2xl bg-gradient-to-br from-indigo-500/20 to-transparent border border-white/10 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-1/2 h-1/2 rounded-full bg-indigo-500/20 blur-3xl animate-pulse" />
-                  </div>
-                  <div className="absolute bottom-4 left-4 right-4 h-1/3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md p-3 space-y-2">
-                    <div className="h-2 w-1/3 rounded-full bg-white/20" />
-                    <div className="h-4 w-2/3 rounded-full bg-white/10" />
-                    <div className="h-2 w-full rounded-full bg-white/5" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <FeaturesV2 />
 
       {/* AI Playground Demo Section */}
       <section className="section-shell !py-24">
@@ -235,6 +125,10 @@ export const Home = () => {
           <PlaygroundGenerator />
         </div>
       </section>
+
+      <PricingV2 />
+
+      <CompetitorComparison />
 
       <section id="how-it-works" className="section-shell">
         <div className="content-grid gap-16">
