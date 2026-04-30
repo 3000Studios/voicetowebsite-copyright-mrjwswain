@@ -1,77 +1,77 @@
-import { motion } from 'framer-motion';
-import { Check, Sparkles, Zap, Building2, Crown } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Building2, Check, Crown, Sparkles, Zap } from "lucide-react";
 
 const plans = [
   {
-    name: 'Free',
+    name: "Free",
     icon: Sparkles,
     price: 0,
-    description: 'Perfect for trying out VoiceToWebsite',
+    description: "Perfect for trying out VoiceToWebsite",
     features: [
-      'Unlimited preview generations',
-      'Subdomain hosting (yoursite.voicetowebsite.com)',
-      '5 AI-generated pages per month',
-      'Community support',
-      'Basic templates',
-      'Voice & text input',
+      "Unlimited preview generations",
+      "Subdomain hosting (yoursite.voicetowebsite.com)",
+      "5 AI-generated pages per month",
+      "Community support",
+      "Basic templates",
+      "Voice & text input",
     ],
-    cta: 'Start Free',
+    cta: "Start Free",
     popular: false,
   },
   {
-    name: 'Pro',
+    name: "Pro",
     icon: Zap,
     price: 15,
-    description: 'For creators and small businesses',
+    description: "For creators and small businesses",
     features: [
-      'Everything in Free, plus:',
-      'Custom domain connection',
-      '50 AI-generated pages per month',
-      'Remove VoiceToWebsite branding',
-      'Analytics dashboard',
-      'A/B testing tools',
-      'Premium templates',
-      'Priority support',
+      "Everything in Free, plus:",
+      "Custom domain connection",
+      "50 AI-generated pages per month",
+      "Remove VoiceToWebsite branding",
+      "Analytics dashboard",
+      "A/B testing tools",
+      "Premium templates",
+      "Priority support",
     ],
-    cta: 'Get Pro',
+    cta: "Get Pro",
     popular: true,
   },
   {
-    name: 'Agency',
+    name: "Agency",
     icon: Building2,
     price: 40,
-    description: 'For agencies and power users',
+    description: "For agencies and power users",
     features: [
-      'Everything in Pro, plus:',
-      'Unlimited sites & domains',
-      'Unlimited AI-generated pages',
-      'White-label option',
-      'API access',
-      'Team collaboration (5 members)',
-      'Advanced analytics',
-      'Custom integrations',
-      'Dedicated support',
+      "Everything in Pro, plus:",
+      "Unlimited sites & domains",
+      "Unlimited AI-generated pages",
+      "White-label option",
+      "API access",
+      "Team collaboration (5 members)",
+      "Advanced analytics",
+      "Custom integrations",
+      "Dedicated support",
     ],
-    cta: 'Get Agency',
+    cta: "Get Agency",
     popular: false,
   },
   {
-    name: 'Enterprise',
+    name: "Enterprise",
     icon: Crown,
     price: null,
-    description: 'Custom solutions for large organizations',
+    description: "Custom solutions for large organizations",
     features: [
-      'Everything in Agency, plus:',
-      'Dedicated infrastructure',
-      'SLA guarantee',
-      'Custom AI model training',
-      'Unlimited team members',
-      'SSO & advanced security',
-      'Custom contracts',
-      '24/7 phone support',
-      'Account manager',
+      "Everything in Agency, plus:",
+      "Dedicated infrastructure",
+      "SLA guarantee",
+      "Custom AI model training",
+      "Unlimited team members",
+      "SSO & advanced security",
+      "Custom contracts",
+      "24/7 phone support",
+      "Account manager",
     ],
-    cta: 'Contact Sales',
+    cta: "Contact Sales",
     popular: false,
   },
 ];
@@ -80,7 +80,7 @@ export function PricingV2() {
   return (
     <section className="py-24 relative">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-indigo-500/5 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
@@ -112,7 +112,8 @@ export function PricingV2() {
             transition={{ delay: 0.2 }}
             className="text-body max-w-2xl mx-auto"
           >
-            Start free, upgrade when you're ready. No hidden fees. Cancel anytime.
+            Start free, upgrade when you're ready. No hidden fees. Cancel
+            anytime.
           </motion.p>
         </div>
 
@@ -125,13 +126,13 @@ export function PricingV2() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className={`relative ${plan.popular ? 'lg:-mt-4 lg:mb-4' : ''}`}
+              className={`relative ${plan.popular ? "lg:-mt-4 lg:mb-4" : ""}`}
             >
               <div
                 className={`h-full rounded-2xl p-6 ${
                   plan.popular
-                    ? 'bg-gradient-to-br from-indigo-600 to-purple-600 border-0'
-                    : 'glass-card'
+                    ? "bg-linear-to-br from-indigo-600 to-purple-600 border-0"
+                    : "glass-card"
                 }`}
               >
                 {/* Popular Badge */}
@@ -146,12 +147,12 @@ export function PricingV2() {
                 {/* Icon */}
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
-                    plan.popular ? 'bg-white/20' : 'bg-indigo-500/20'
+                    plan.popular ? "bg-white/20" : "bg-indigo-500/20"
                   }`}
                 >
                   <plan.icon
                     className={`w-6 h-6 ${
-                      plan.popular ? 'text-white' : 'text-indigo-400'
+                      plan.popular ? "text-white" : "text-indigo-400"
                     }`}
                   />
                 </div>
@@ -159,7 +160,7 @@ export function PricingV2() {
                 {/* Plan Name */}
                 <h3
                   className={`text-xl font-bold mb-2 ${
-                    plan.popular ? 'text-white' : 'text-white'
+                    plan.popular ? "text-white" : "text-white"
                   }`}
                 >
                   {plan.name}
@@ -171,14 +172,14 @@ export function PricingV2() {
                     <div className="flex items-baseline gap-1">
                       <span
                         className={`text-4xl font-bold ${
-                          plan.popular ? 'text-white' : 'text-white'
+                          plan.popular ? "text-white" : "text-white"
                         }`}
                       >
                         ${plan.price}
                       </span>
                       <span
                         className={`text-sm ${
-                          plan.popular ? 'text-white/80' : 'text-white/50'
+                          plan.popular ? "text-white/80" : "text-white/50"
                         }`}
                       >
                         /month
@@ -187,7 +188,7 @@ export function PricingV2() {
                   ) : (
                     <span
                       className={`text-2xl font-bold ${
-                        plan.popular ? 'text-white' : 'text-white'
+                        plan.popular ? "text-white" : "text-white"
                       }`}
                     >
                       Custom
@@ -198,7 +199,7 @@ export function PricingV2() {
                 {/* Description */}
                 <p
                   className={`text-sm mb-6 ${
-                    plan.popular ? 'text-white/80' : 'text-white/50'
+                    plan.popular ? "text-white/80" : "text-white/50"
                   }`}
                 >
                   {plan.description}
@@ -210,8 +211,8 @@ export function PricingV2() {
                   whileTap={{ scale: 0.98 }}
                   className={`w-full py-3 rounded-xl font-semibold mb-6 transition-all ${
                     plan.popular
-                      ? 'bg-white text-indigo-600 hover:shadow-lg'
-                      : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                      ? "bg-white text-indigo-600 hover:shadow-lg"
+                      : "bg-white/10 text-white border border-white/20 hover:bg-white/20"
                   }`}
                 >
                   {plan.cta}
@@ -222,13 +223,13 @@ export function PricingV2() {
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check
-                        className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                          plan.popular ? 'text-white/80' : 'text-indigo-400'
+                        className={`w-5 h-5 shrink-0 mt-0.5 ${
+                          plan.popular ? "text-white/80" : "text-indigo-400"
                         }`}
                       />
                       <span
                         className={`text-sm ${
-                          plan.popular ? 'text-white/80' : 'text-white/60'
+                          plan.popular ? "text-white/80" : "text-white/60"
                         }`}
                       >
                         {feature}
