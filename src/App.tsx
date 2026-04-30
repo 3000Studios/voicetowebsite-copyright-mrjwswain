@@ -7,21 +7,8 @@ import { Home } from "@/pages/Home";
 import { Pricing } from "@/pages/Pricing";
 import { Success } from "@/pages/Success";
 import { AnimatePresence } from "motion/react";
-import React, { Suspense, lazy, useEffect } from "react";
-import {
-  Route,
-  BrowserRouter as Router,
-  Routes,
-  useLocation,
-} from "react-router-dom";
-
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
-};
+import React, { Suspense, lazy } from "react";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
 const Features = lazy(() =>
   import("@/pages/Features").then((module) => ({ default: module.Features })),
