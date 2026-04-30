@@ -102,10 +102,7 @@ const ourFeatures = {
   },
 };
 
-const featureLabels: Record<
-  string,
-  { label: string; icon: React.ElementType }
-> = {
+const featureLabels: Record<string, { label: string; icon: any }> = {
   voiceInput: { label: "Voice Input", icon: Mic },
   codeExport: { label: "Full Code Export", icon: Code2 },
   customDomain: { label: "Custom Domain", icon: Globe },
@@ -182,8 +179,9 @@ export function CompetitorComparison() {
           </div>
 
           {/* Feature Rows */}
-          {Object.entries(featureLabels).map(
-            ([key, { label, icon: Icon }], index) => (
+          {Object.entries(featureLabels).map(([key, value], index) => {
+            const Icon = value.icon;
+            return (
               <motion.div
                 key={key}
                 initial={{ opacity: 0, x: -20 }}
@@ -194,7 +192,7 @@ export function CompetitorComparison() {
               >
                 <div className="flex items-center gap-3">
                   <Icon className="w-5 h-5 text-white/40" />
-                  <span className="text-white/80 text-sm">{label}</span>
+                  <span className="text-white/80 text-sm">{value.label}</span>
                 </div>
                 <div className="flex justify-center">
                   {ourFeatures.features[
@@ -223,8 +221,8 @@ export function CompetitorComparison() {
                   </div>
                 ))}
               </motion.div>
-            ),
-          )}
+            );
+          })}
         </motion.div>
 
         {/* Kill Switch Advantages */}
