@@ -1,9 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { motion } from 'motion/react';
+import { motion } from "motion/react";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 
-import index from '@/content/ai-news/index.json';
+import index from "@/content/ai-news/index.json";
 
 export const AINews = () => {
   const items = (index as any).items || [];
@@ -16,7 +15,10 @@ export const AINews = () => {
           name="description"
           content="AI News for builders: monetization, automation, product strategy, and practical playbooks — indexed and SEO-ready."
         />
-        <meta name="keywords" content="AI news, AI website builder, voice to website, SaaS, subscriptions" />
+        <meta
+          name="keywords"
+          content="AI news, AI website builder, voice to website, SaaS, subscriptions"
+        />
         <link rel="canonical" href="https://voice2website.com/ai-news" />
         <meta property="og:title" content="AI News | Voice2Website" />
         <meta
@@ -39,7 +41,8 @@ export const AINews = () => {
           transition={{ delay: 0.1 }}
           className="text-slate-400 font-light italic max-w-3xl mx-auto"
         >
-          Indexed briefings designed to rank, convert, and compound traffic into subscribers.
+          Indexed briefings designed to rank, convert, and compound traffic into
+          subscribers.
         </motion.p>
       </div>
 
@@ -63,7 +66,9 @@ export const AINews = () => {
               <h2 className="text-3xl md:text-4xl font-black uppercase italic tracking-tighter leading-tight">
                 {item.title}
               </h2>
-              <p className="text-sm text-slate-400 italic leading-relaxed">{item.description}</p>
+              <p className="text-sm text-slate-400 italic leading-relaxed">
+                {item.description}
+              </p>
               <div className="pt-6">
                 <Link
                   to={`/ai-news/${item.slug}`}
@@ -76,7 +81,7 @@ export const AINews = () => {
                 {(item.keywords || []).slice(0, 6).map((k: string) => (
                   <span
                     key={k}
-                    className="text-[9px] font-black uppercase tracking-widest border border-white/10 px-3 py-1 bg-white/[0.02]"
+                    className="text-[9px] font-black uppercase tracking-widest border border-white/10 px-3 py-1 bg-white/2"
                   >
                     {k}
                   </span>
@@ -89,4 +94,3 @@ export const AINews = () => {
     </div>
   );
 };
-

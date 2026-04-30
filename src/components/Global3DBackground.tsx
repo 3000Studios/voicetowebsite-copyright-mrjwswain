@@ -1,7 +1,11 @@
-import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Float, MeshDistortMaterial, Sphere, PerspectiveCamera, Stars } from '@react-three/drei';
-import * as THREE from 'three';
+import {
+  MeshDistortMaterial,
+  PerspectiveCamera,
+  Stars,
+} from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
+import * as THREE from "three";
 
 const SynthGrid = () => {
   const gridRef = useRef<THREE.Mesh>(null);
@@ -23,7 +27,7 @@ const SynthGrid = () => {
 
 const FloatingMicrophone = ({ position, speed, rotationSpeed }: any) => {
   const meshRef = useRef<THREE.Group>(null);
-  
+
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (meshRef.current) {
@@ -42,7 +46,12 @@ const FloatingMicrophone = ({ position, speed, rotationSpeed }: any) => {
       </mesh>
       <mesh position={[0, 0.7, 0]}>
         <sphereGeometry args={[0.4, 32, 32]} />
-        <meshStandardMaterial color="#888" roughness={0} metalness={1} wireframe />
+        <meshStandardMaterial
+          color="#888"
+          roughness={0}
+          metalness={1}
+          wireframe
+        />
       </mesh>
       {/* Light glow */}
       <pointLight color="#6366f1" intensity={0.5} distance={3} />
@@ -52,7 +61,7 @@ const FloatingMicrophone = ({ position, speed, rotationSpeed }: any) => {
 
 const Waves = () => {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (meshRef.current) {
@@ -64,12 +73,7 @@ const Waves = () => {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.5, -10]}>
       <planeGeometry args={[100, 100, 64, 64]} />
-      <MeshDistortMaterial
-        color="#0a0a0a"
-        speed={1}
-        distort={0.4}
-        radius={1}
-      />
+      <MeshDistortMaterial color="#0a0a0a" speed={1} distort={0.4} radius={1} />
     </mesh>
   );
 };
@@ -80,10 +84,10 @@ const Scene = () => {
       position: [
         (Math.random() - 0.5) * 20,
         Math.random() * 5 + 2,
-        -Math.random() * 15 - 5
+        -Math.random() * 15 - 5,
       ] as [number, number, number],
       speed: 0.5 + Math.random() * 1,
-      rotationSpeed: 0.005 + Math.random() * 0.01
+      rotationSpeed: 0.005 + Math.random() * 0.01,
     }));
   }, []);
 
@@ -93,12 +97,26 @@ const Scene = () => {
       <fog attach="fog" args={["#000000", 5, 25]} />
       <ambientLight intensity={0.2} />
       <pointLight position={[10, 10, 10]} intensity={1} color="#6366f1" />
-      <spotLight position={[-10, 10, 10]} angle={0.2} penumbra={1} intensity={1} color="#a855f7" />
-      
-      <Stars radius={120} depth={40} count={1200} factor={3} saturation={0} fade speed={0.5} />
+      <spotLight
+        position={[-10, 10, 10]}
+        angle={0.2}
+        penumbra={1}
+        intensity={1}
+        color="#a855f7"
+      />
+
+      <Stars
+        radius={120}
+        depth={40}
+        count={1200}
+        factor={3}
+        saturation={0}
+        fade
+        speed={0.5}
+      />
       <SynthGrid />
       <Waves />
-      
+
       {mics.map((mic, i) => (
         <FloatingMicrophone key={i} {...mic} />
       ))}
@@ -114,7 +132,7 @@ export const Global3DBackground = () => {
         <Scene />
       </Canvas>
       {/* Overlay gradient for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-60" />
+      <div className="absolute inset-0 bg-linear-to-b from-black via-transparent to-black opacity-60" />
     </div>
   );
 };

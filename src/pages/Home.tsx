@@ -125,7 +125,7 @@ export const Home = () => {
       <FeaturesV2 />
 
       {/* AI Playground Demo Section */}
-      <section className="section-shell !py-24">
+      <section className="section-shell py-24!">
         <div className="content-grid">
           <PlaygroundGenerator />
         </div>
@@ -159,7 +159,7 @@ export const Home = () => {
                   transition={{ delay: index * 0.1, duration: 0.6 }}
                   className="luxury-card group"
                 >
-                  <div className="feature-card-icon !bg-indigo-500/10 !border-indigo-500/20 group-hover:scale-110 transition-transform duration-500">
+                  <div className="feature-card-icon bg-indigo-500/10! border-indigo-500/20! group-hover:scale-110 transition-transform duration-500">
                     <Icon className="h-5 w-5 text-indigo-400" />
                   </div>
                   <div className="space-y-4">
@@ -221,7 +221,7 @@ export const Home = () => {
               </Link>
             </div>
           </div>
-          <div className="video-shell premium-shadow ultra-glow !rounded-[40px] border-white/10">
+          <div className="video-shell premium-shadow ultra-glow rounded-[40px]! border-white/10">
             <video
               autoPlay
               loop
@@ -264,9 +264,9 @@ export const Home = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
-                  className="luxury-card !p-7 group"
+                  className="luxury-card p-7! group"
                 >
-                  <div className="feature-card-icon !bg-white/5 !border-white/10 group-hover:border-indigo-500/30 transition-colors">
+                  <div className="feature-card-icon bg-white/5! border-white/10! group-hover:border-indigo-500/30 transition-colors">
                     <Icon className="h-5 w-5 text-indigo-300" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-3">
@@ -280,8 +280,8 @@ export const Home = () => {
             })}
           </div>
 
-          <div className="comparison-shell !bg-white/[0.02] border-white/5">
-            <div className="comparison-row comparison-row-header !bg-white/[0.05] !border-b border-white/10">
+          <div className="comparison-shell bg-white/2! border-white/5">
+            <div className="comparison-row comparison-row-header bg-white/5! border-b! border-white/10">
               <span className="text-indigo-400">Platform fit</span>
               <span>VoiceToWebsite</span>
               <span>Manual builders</span>
@@ -309,7 +309,7 @@ export const Home = () => {
             ].map(([label, v1, v2, v3]) => (
               <div
                 key={label}
-                className="comparison-row !border-white/5 hover:bg-white/[0.02] transition-colors"
+                className="comparison-row border-white/5! hover:bg-white/2 transition-colors"
               >
                 <span className="font-semibold text-slate-200">{label}</span>
                 <span className="text-white font-medium">{v1}</span>
@@ -343,10 +343,10 @@ export const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="luxury-card group !p-0 overflow-hidden"
+                className="luxury-card group p-0! overflow-hidden"
               >
                 <div
-                  className={`example-card-visual !rounded-none !h-48 bg-gradient-to-br ${item.accent} relative`}
+                  className={`example-card-visual rounded-none! h-48! bg-linear-to-br ${item.accent} relative`}
                 >
                   <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors duration-500" />
                 </div>
@@ -379,7 +379,7 @@ export const Home = () => {
               complex subscriptions.
             </p>
           </div>
-          <div className="luxury-card !bg-white/[0.02] border-white/5 !p-8">
+          <div className="luxury-card bg-white/2! border-white/5 p-8!">
             <div className="grid gap-6 md:grid-cols-3">
               {[
                 {
@@ -415,7 +415,7 @@ export const Home = () => {
               ))}
             </div>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Link to="/pricing" className="hero-primary-button !px-10">
+              <Link to="/pricing" className="hero-primary-button px-10!">
                 View detailed plans
                 <ArrowRight className="h-5 w-5" />
               </Link>
@@ -516,7 +516,7 @@ export const Home = () => {
             {faqs.map((faq, index) => (
               <motion.details
                 key={faq.question}
-                className="faq-card group !bg-white/[0.03] !border-white/5 !p-6"
+                className="faq-card group bg-white/3! border-white/5! p-6!"
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-lg font-bold text-white">
                   <span>{faq.question}</span>
@@ -533,14 +533,14 @@ export const Home = () => {
 
       <section className="section-shell pb-32">
         <div className="content-grid">
-          <div className="cta-shell !bg-gradient-to-br from-indigo-500/10 via-transparent to-cyan-500/5 premium-shadow ultra-glow !p-12 lg:!p-16">
+          <div className="cta-shell bg-linear-to-br! from-indigo-500/10 via-transparent to-cyan-500/5 premium-shadow ultra-glow p-12! lg:p-16!">
             <div className="max-w-3xl space-y-6">
               <span className="eyebrow glow-bloom">Ready to Launch?</span>
-              <h2 className="hero-headline !text-5xl lg:!text-6xl text-gradient">
+              <h2 className="hero-headline text-5xl! lg:text-6xl! text-gradient">
                 Get your business site <br />
                 online today.
               </h2>
-              <p className="section-copy !text-xl">
+              <p className="section-copy text-xl!">
                 The shortest path from an idea to a hosted, conversion-ready
                 starter site.
               </p>
@@ -548,7 +548,7 @@ export const Home = () => {
             <div className="flex flex-col gap-4 sm:flex-row pt-4 lg:pt-0">
               <Link
                 to="/pricing"
-                className="hero-primary-button !px-12 !py-5 text-lg"
+                className="hero-primary-button px-12! py-5! text-lg"
               >
                 Get Started
                 <ArrowRight className="h-5 w-5" />

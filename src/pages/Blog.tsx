@@ -1,11 +1,18 @@
-import { GlassCard } from '@/components/GlassCard';
-import { GoogleAdSense } from '@/components/GoogleAdSense';
-import { ScrollReveal } from '@/components/ScrollReveal';
-import { ArrowRight, Calendar, Clock, RefreshCw, Sparkles, Tag } from 'lucide-react';
-import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { GlassCard } from "@/components/GlassCard";
+import { GoogleAdSense } from "@/components/GoogleAdSense";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import {
+  ArrowRight,
+  Calendar,
+  Clock,
+  RefreshCw,
+  Sparkles,
+  Tag,
+} from "lucide-react";
+import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 
 interface BlogPost {
   id: string;
@@ -21,17 +28,17 @@ interface BlogPost {
 }
 
 const categories = [
-  'All',
-  'AI & Technology',
-  'Website Building',
-  'Business Growth',
-  'SEO & Marketing',
-  'Tutorials',
+  "All",
+  "AI & Technology",
+  "Website Building",
+  "Business Growth",
+  "SEO & Marketing",
+  "Tutorials",
 ];
 
 export const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,7 +47,7 @@ export const Blog = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('/api/blog/posts');
+      const response = await fetch("/api/blog/posts");
       if (response.ok) {
         const data = (await response.json()) as { posts?: BlogPost[] };
         setPosts(data.posts || []);
@@ -57,91 +64,93 @@ export const Blog = () => {
 
   const getSamplePosts = (): BlogPost[] => [
     {
-      id: '1',
-      title: 'The Future of AI Website Building: Voice Commands Take Over',
+      id: "1",
+      title: "The Future of AI Website Building: Voice Commands Take Over",
       excerpt:
-        'Discover how voice-to-website technology is revolutionizing the way businesses create their online presence. No coding required.',
-      content: '',
-      category: 'AI & Technology',
-      tags: ['AI', 'Voice Technology', 'Future'],
+        "Discover how voice-to-website technology is revolutionizing the way businesses create their online presence. No coding required.",
+      content: "",
+      category: "AI & Technology",
+      tags: ["AI", "Voice Technology", "Future"],
       publishedAt: new Date().toISOString(),
-      readTime: '5 min',
-      slug: 'future-of-ai-website-building',
+      readTime: "5 min",
+      slug: "future-of-ai-website-building",
       featured: true,
     },
     {
-      id: '2',
-      title: 'How to Launch Your Business Website in Under 5 Minutes',
+      id: "2",
+      title: "How to Launch Your Business Website in Under 5 Minutes",
       excerpt:
-        'A step-by-step guide to using VoiceToWebsite for rapid website deployment. Perfect for entrepreneurs and small businesses.',
-      content: '',
-      category: 'Tutorials',
-      tags: ['Tutorial', 'Quick Start', 'Business'],
+        "A step-by-step guide to using VoiceToWebsite for rapid website deployment. Perfect for entrepreneurs and small businesses.",
+      content: "",
+      category: "Tutorials",
+      tags: ["Tutorial", "Quick Start", "Business"],
       publishedAt: new Date(Date.now() - 86400000).toISOString(),
-      readTime: '3 min',
-      slug: 'launch-website-in-5-minutes',
+      readTime: "3 min",
+      slug: "launch-website-in-5-minutes",
     },
     {
-      id: '3',
-      title: '10 AI Tools Every Business Owner Should Know in 2024',
+      id: "3",
+      title: "10 AI Tools Every Business Owner Should Know in 2024",
       excerpt:
-        'From content creation to customer service, these AI tools will transform how you run your business.',
-      content: '',
-      category: 'Business Growth',
-      tags: ['AI Tools', 'Productivity', '2024'],
+        "From content creation to customer service, these AI tools will transform how you run your business.",
+      content: "",
+      category: "Business Growth",
+      tags: ["AI Tools", "Productivity", "2024"],
       publishedAt: new Date(Date.now() - 172800000).toISOString(),
-      readTime: '8 min',
-      slug: 'ai-tools-2024',
+      readTime: "8 min",
+      slug: "ai-tools-2024",
     },
     {
-      id: '4',
-      title: 'SEO Best Practices for AI-Generated Websites',
+      id: "4",
+      title: "SEO Best Practices for AI-Generated Websites",
       excerpt:
-        'Learn how to optimize your AI-generated website for search engines and drive organic traffic.',
-      content: '',
-      category: 'SEO & Marketing',
-      tags: ['SEO', 'Marketing', 'Traffic'],
+        "Learn how to optimize your AI-generated website for search engines and drive organic traffic.",
+      content: "",
+      category: "SEO & Marketing",
+      tags: ["SEO", "Marketing", "Traffic"],
       publishedAt: new Date(Date.now() - 259200000).toISOString(),
-      readTime: '6 min',
-      slug: 'seo-for-ai-websites',
+      readTime: "6 min",
+      slug: "seo-for-ai-websites",
     },
     {
-      id: '5',
-      title: 'Why Your Small Business Needs a Professional Website',
+      id: "5",
+      title: "Why Your Small Business Needs a Professional Website",
       excerpt:
-        'The impact of having a professional online presence on customer trust and business growth.',
-      content: '',
-      category: 'Business Growth',
-      tags: ['Small Business', 'Website', 'Growth'],
+        "The impact of having a professional online presence on customer trust and business growth.",
+      content: "",
+      category: "Business Growth",
+      tags: ["Small Business", "Website", "Growth"],
       publishedAt: new Date(Date.now() - 345600000).toISOString(),
-      readTime: '4 min',
-      slug: 'small-business-website-importance',
+      readTime: "4 min",
+      slug: "small-business-website-importance",
     },
     {
-      id: '6',
-      title: 'Comparing VoiceToWebsite vs Traditional Builders',
+      id: "6",
+      title: "Comparing VoiceToWebsite vs Traditional Builders",
       excerpt:
-        'A detailed comparison of speed, cost, and quality between AI voice builders and traditional website builders.',
-      content: '',
-      category: 'Website Building',
-      tags: ['Comparison', 'Review', 'Builders'],
+        "A detailed comparison of speed, cost, and quality between AI voice builders and traditional website builders.",
+      content: "",
+      category: "Website Building",
+      tags: ["Comparison", "Review", "Builders"],
       publishedAt: new Date(Date.now() - 432000000).toISOString(),
-      readTime: '7 min',
-      slug: 'voicetowebsite-vs-builders',
+      readTime: "7 min",
+      slug: "voicetowebsite-vs-builders",
     },
   ];
 
   const filteredPosts =
-    selectedCategory === 'All' ? posts : posts.filter((p) => p.category === selectedCategory);
+    selectedCategory === "All"
+      ? posts
+      : posts.filter((p) => p.category === selectedCategory);
 
   const featuredPost = posts.find((p) => p.featured);
   const regularPosts = filteredPosts.filter((p) => p.id !== featuredPost?.id);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -165,12 +174,16 @@ export const Blog = () => {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6"
             >
               <Sparkles className="w-4 h-4 text-indigo-400" />
-              <span className="text-sm font-medium text-indigo-300">AI-Powered Blog</span>
+              <span className="text-sm font-medium text-indigo-300">
+                AI-Powered Blog
+              </span>
             </motion.div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">Latest Insights</h1>
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
+              Latest Insights
+            </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Stay ahead with AI-generated insights on website building, business growth, and
-              digital innovation.
+              Stay ahead with AI-generated insights on website building,
+              business growth, and digital innovation.
             </p>
           </ScrollReveal>
 
@@ -182,8 +195,8 @@ export const Blog = () => {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-5 py-2.5 rounded-full font-medium transition-all text-sm ${
                   selectedCategory === category
-                    ? 'bg-indigo-500 text-white'
-                    : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/10'
+                    ? "bg-indigo-500 text-white"
+                    : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/10"
                 }`}
               >
                 {category}
@@ -197,14 +210,14 @@ export const Blog = () => {
       </section>
 
       {/* Featured Post */}
-      {featuredPost && selectedCategory === 'All' && (
+      {featuredPost && selectedCategory === "All" && (
         <section className="section-shell py-0 pb-12">
           <div className="content-grid">
             <ScrollReveal>
               <Link to={`/blog/${featuredPost.slug}`}>
                 <GlassCard className="group cursor-pointer overflow-hidden p-0">
                   <div className="grid md:grid-cols-2">
-                    <div className="h-64 md:h-auto bg-gradient-to-br from-indigo-500/20 to-purple-500/10 relative">
+                    <div className="h-64 md:h-auto bg-linear-to-br from-indigo-500/20 to-purple-500/10 relative">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-24 h-24 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-500">
                           <Sparkles className="w-10 h-10 text-white" />
@@ -218,7 +231,9 @@ export const Blog = () => {
                     </div>
                     <div className="p-8 md:p-12 flex flex-col justify-center">
                       <div className="flex items-center gap-4 text-sm text-slate-400 mb-4">
-                        <span className="text-indigo-400 font-medium">{featuredPost.category}</span>
+                        <span className="text-indigo-400 font-medium">
+                          {featuredPost.category}
+                        </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
@@ -232,7 +247,9 @@ export const Blog = () => {
                       <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-indigo-400 transition-colors">
                         {featuredPost.title}
                       </h2>
-                      <p className="text-slate-400 mb-6">{featuredPost.excerpt}</p>
+                      <p className="text-slate-400 mb-6">
+                        {featuredPost.excerpt}
+                      </p>
                       <div className="flex items-center gap-2 text-indigo-400 font-medium group-hover:gap-4 transition-all">
                         Read Article <ArrowRight className="w-4 h-4" />
                       </div>
@@ -258,14 +275,14 @@ export const Blog = () => {
                 <ScrollReveal key={post.id} delay={index * 0.1}>
                   <Link to={`/blog/${post.slug}`}>
                     <GlassCard className="group cursor-pointer h-full flex flex-col p-0 overflow-hidden">
-                      <div className="h-48 bg-gradient-to-br from-cyan-500/10 to-blue-500/5 relative">
+                      <div className="h-48 bg-linear-to-br from-cyan-500/10 to-blue-500/5 relative">
                         <div className="absolute top-4 left-4">
                           <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-medium">
                             {post.category}
                           </span>
                         </div>
                       </div>
-                      <div className="p-6 flex flex-col flex-grow">
+                      <div className="p-6 flex flex-col grow">
                         <div className="flex items-center gap-3 text-xs text-slate-400 mb-3">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -279,7 +296,7 @@ export const Blog = () => {
                         <h3 className="text-xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors line-clamp-2">
                           {post.title}
                         </h3>
-                        <p className="text-slate-400 text-sm mb-4 line-clamp-3 flex-grow">
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-3 grow">
                           {post.excerpt}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -303,9 +320,11 @@ export const Blog = () => {
 
           {!loading && filteredPosts.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-slate-400 text-lg">No posts found in this category.</p>
+              <p className="text-slate-400 text-lg">
+                No posts found in this category.
+              </p>
               <button
-                onClick={() => setSelectedCategory('All')}
+                onClick={() => setSelectedCategory("All")}
                 className="mt-4 text-indigo-400 hover:text-indigo-300 transition-colors"
               >
                 View all posts
@@ -319,10 +338,13 @@ export const Blog = () => {
       <section className="section-shell pb-32">
         <div className="content-grid">
           <ScrollReveal>
-            <div className="rounded-[32px] border border-white/10 bg-gradient-to-br from-indigo-500/10 via-white/[0.05] to-cyan-500/10 backdrop-blur-2xl p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Stay Updated</h2>
+            <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-indigo-500/10 via-white/5 to-cyan-500/10 backdrop-blur-2xl p-12 text-center">
+              <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
+                Stay Updated
+              </h2>
               <p className="text-slate-400 mb-8 max-w-lg mx-auto">
-                Get the latest AI website building tips and insights delivered to your inbox.
+                Get the latest AI website building tips and insights delivered
+                to your inbox.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
                 <input

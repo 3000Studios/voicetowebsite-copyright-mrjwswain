@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import React, { useEffect, useState } from "react";
 
 interface Testimonial {
   id: string;
@@ -14,35 +14,39 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    id: '1',
-    name: 'Sarah Mitchell',
-    role: 'Business Coach',
-    company: 'Elevate Coaching',
-    content: 'I described my coaching business and within minutes had a professional website that actually converts. The voice feature is incredible - I literally spoke my site into existence.',
+    id: "1",
+    name: "Sarah Mitchell",
+    role: "Business Coach",
+    company: "Elevate Coaching",
+    content:
+      "I described my coaching business and within minutes had a professional website that actually converts. The voice feature is incredible - I literally spoke my site into existence.",
     rating: 5,
   },
   {
-    id: '2',
-    name: 'Marcus Chen',
-    role: 'Startup Founder',
-    company: 'TechFlow Solutions',
-    content: 'We needed a landing page for our product launch ASAP. VoiceToWebsite delivered in under 5 minutes. The quality exceeded our expectations and the monetization features are built right in.',
+    id: "2",
+    name: "Marcus Chen",
+    role: "Startup Founder",
+    company: "TechFlow Solutions",
+    content:
+      "We needed a landing page for our product launch ASAP. VoiceToWebsite delivered in under 5 minutes. The quality exceeded our expectations and the monetization features are built right in.",
     rating: 5,
   },
   {
-    id: '3',
-    name: 'Jennifer Rodriguez',
-    role: 'Real Estate Agent',
-    company: 'Premier Properties',
-    content: 'As someone who is not tech-savvy, this platform is a game-changer. I just said what I needed and got a stunning site with lead capture forms. My first client came through the site within a week.',
+    id: "3",
+    name: "Jennifer Rodriguez",
+    role: "Real Estate Agent",
+    company: "Premier Properties",
+    content:
+      "As someone who is not tech-savvy, this platform is a game-changer. I just said what I needed and got a stunning site with lead capture forms. My first client came through the site within a week.",
     rating: 5,
   },
   {
-    id: '4',
-    name: 'David Park',
-    role: 'Consultant',
-    company: 'Strategic Growth Advisors',
-    content: 'The premium design quality is what sold me. Every site looks like it cost thousands to build. I have generated 3 different sites for various aspects of my business.',
+    id: "4",
+    name: "David Park",
+    role: "Consultant",
+    company: "Strategic Growth Advisors",
+    content:
+      "The premium design quality is what sold me. Every site looks like it cost thousands to build. I have generated 3 different sites for various aspects of my business.",
     rating: 5,
   },
 ];
@@ -84,7 +88,9 @@ export const TestimonialCarousel: React.FC = () => {
 
   const prev = () => {
     setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    setCurrentIndex(
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
+    );
   };
 
   const current = testimonials[currentIndex];
@@ -92,7 +98,7 @@ export const TestimonialCarousel: React.FC = () => {
   return (
     <div className="relative w-full max-w-4xl mx-auto">
       {/* Quote Icon */}
-      <div className="absolute -top-8 left-0 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500/20 to-cyan-500/10 border border-indigo-500/20 flex items-center justify-center">
+      <div className="absolute -top-8 left-0 w-16 h-16 rounded-full bg-linear-to-br from-indigo-500/20 to-cyan-500/10 border border-indigo-500/20 flex items-center justify-center">
         <Quote className="w-8 h-8 text-indigo-400" />
       </div>
 
@@ -107,16 +113,19 @@ export const TestimonialCarousel: React.FC = () => {
             animate="center"
             exit="exit"
             transition={{
-              x: { type: 'spring', stiffness: 300, damping: 30 },
+              x: { type: "spring", stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
             }}
             className="absolute inset-0"
           >
-            <div className="rounded-[32px] border border-white/10 bg-gradient-to-br from-white/[0.08] to-transparent backdrop-blur-2xl p-10 md:p-12">
+            <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-white/8 to-transparent backdrop-blur-2xl p-10 md:p-12">
               {/* Stars */}
               <div className="flex gap-1 mb-6">
                 {Array.from({ length: current.rating }).map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                  <Star
+                    key={i}
+                    className="w-5 h-5 fill-amber-400 text-amber-400"
+                  />
                 ))}
               </div>
 
@@ -127,7 +136,7 @@ export const TestimonialCarousel: React.FC = () => {
 
               {/* Author */}
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-14 h-14 rounded-full bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-xl">
                   {current.name.charAt(0)}
                 </div>
                 <div>
@@ -162,8 +171,8 @@ export const TestimonialCarousel: React.FC = () => {
               }}
               className={`w-2 h-2 rounded-full transition-all ${
                 i === currentIndex
-                  ? 'w-8 bg-indigo-500'
-                  : 'bg-white/20 hover:bg-white/40'
+                  ? "w-8 bg-indigo-500"
+                  : "bg-white/20 hover:bg-white/40"
               }`}
             />
           ))}

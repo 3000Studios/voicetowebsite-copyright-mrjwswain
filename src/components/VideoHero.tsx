@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'motion/react';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { motion } from "motion/react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface VideoHeroProps {
   videoSrc: string;
@@ -66,7 +66,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
 
       {/* Gradient Overlay */}
       <div
-        className="absolute inset-0 bg-gradient-to-b from-[#0d0d1f]/60 via-[#0d0d1f]/40 to-[#0d0d1f]"
+        className="absolute inset-0 bg-linear-to-b from-[#0d0d1f]/60 via-[#0d0d1f]/40 to-[#0d0d1f]"
         style={{ opacity: overlayOpacity }}
       />
 
@@ -83,7 +83,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[120px]"
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -96,7 +96,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/15 rounded-full blur-[100px]"
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -108,7 +108,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-1/2 right-1/3 w-64 h-64 bg-violet-500/10 rounded-full blur-[80px]"
+          className="absolute top-1/2 right-1/3 w-64 h-64 bg-violet-500/10 rounded-full blur-2xl"
         />
       </div>
 

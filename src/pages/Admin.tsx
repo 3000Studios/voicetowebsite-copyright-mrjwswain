@@ -93,7 +93,7 @@ export const Admin = () => {
       <Navbar />
 
       {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none z-[-1] opacity-5">
+      <div className="fixed inset-0 pointer-events-none -z-1 opacity-5">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#4f46e5_0,transparent_50%)]" />
       </div>
 
@@ -139,7 +139,7 @@ export const Admin = () => {
 
         {/* Real-time Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10 mb-20">
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/[0.02] transition-colors group">
+          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
             <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
               <DollarSign size={12} className="text-indigo-500" /> Revenue_Flow
             </div>
@@ -151,7 +151,7 @@ export const Admin = () => {
             </div>
           </div>
 
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/[0.02] transition-colors group">
+          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
             <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
               <Users size={12} className="text-indigo-500" /> Active_Architects
             </div>
@@ -163,7 +163,7 @@ export const Admin = () => {
             </div>
           </div>
 
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/[0.02] transition-colors group">
+          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
             <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
               <Database size={12} className="text-indigo-500" /> Storage_Index
             </div>
@@ -175,7 +175,7 @@ export const Admin = () => {
             </div>
           </div>
 
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/[0.02] transition-colors group">
+          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
             <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
               <RefreshCcw size={12} className="text-indigo-500" /> System_Health
             </div>
@@ -216,7 +216,7 @@ export const Admin = () => {
                 {sites.map((site, i) => (
                   <div
                     key={site.id}
-                    className="group flex items-center justify-between p-8 bg-white/[0.01] border border-white/5 hover:bg-indigo-600/5 hover:border-indigo-500/50 transition-all"
+                    className="group flex items-center justify-between p-8 bg-white/1 border border-white/5 hover:bg-indigo-600/5 hover:border-indigo-500/50 transition-all"
                   >
                     <div className="flex items-center gap-8">
                       <span className="text-slate-800 font-black text-xs w-8">

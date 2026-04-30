@@ -222,7 +222,7 @@ export const Examples = () => {
 
                       {/* Preview Image Area */}
                       <div
-                        className={`h-48 bg-gradient-to-br ${example.color} relative overflow-hidden`}
+                        className={`h-48 bg-linear-to-br ${example.color} relative overflow-hidden`}
                       >
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-500">
@@ -280,7 +280,7 @@ export const Examples = () => {
         </section>
 
         {/* Testimonials */}
-        <section className="section-shell bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
+        <section className="section-shell bg-linear-to-b from-transparent via-white/2 to-transparent">
           <div className="content-grid">
             <ScrollReveal className="text-center mb-16">
               <span className="eyebrow mb-4">Success Stories</span>
@@ -339,7 +339,7 @@ export const Examples = () => {
         <section className="section-shell pb-32">
           <div className="content-grid">
             <ScrollReveal>
-              <div className="rounded-[40px] border border-white/10 bg-gradient-to-br from-indigo-500/10 via-white/[0.05] to-cyan-500/10 backdrop-blur-2xl p-12 md:p-20 text-center">
+              <div className="rounded-[40px] border border-white/10 bg-linear-to-br from-indigo-500/10 via-white/5 to-cyan-500/10 backdrop-blur-2xl p-12 md:p-20 text-center">
                 <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
                   Build Yours Today
                 </h2>

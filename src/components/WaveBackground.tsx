@@ -1,6 +1,6 @@
-import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import * as THREE from 'three';
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
+import * as THREE from "three";
 
 const Wave = () => {
   const meshRef = useRef<THREE.Points>(null);
@@ -31,19 +31,22 @@ const Wave = () => {
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (meshRef.current) {
-      const pos = meshRef.current.geometry.attributes.position.array as Float32Array;
+      const pos = meshRef.current.geometry.attributes.position
+        .array as Float32Array;
       for (let x = 0; x < count; x++) {
         for (let z = 0; z < count; z++) {
           const i = (x * count + z) * 3;
           const xPos = pos[i];
           const zPos = pos[i + 2];
-          
+
           // Wave logic + mouse reaction
           const dist = Math.sqrt(xPos * xPos + zPos * zPos);
-          const mouseDist = Math.sqrt(Math.pow(xPos - mouse.x * 15, 2) + Math.pow(zPos + mouse.y * 15, 2));
+          const mouseDist = Math.sqrt(
+            Math.pow(xPos - mouse.x * 15, 2) + Math.pow(zPos + mouse.y * 15, 2),
+          );
           const wave = Math.sin(dist * 0.5 - t * 2) * 0.5;
           const mouseWave = Math.exp(-mouseDist * 0.3) * 3;
-          
+
           pos[i + 1] = wave + mouseWave;
         }
       }
@@ -81,12 +84,12 @@ const Wave = () => {
 
 export const WaveBackground = () => {
   return (
-    <div className="fixed inset-0 -z-[30] pointer-events-none">
+    <div className="fixed inset-0 -z-30 pointer-events-none">
       <Canvas camera={{ position: [0, 15, 25], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <Wave />
       </Canvas>
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/20 to-slate-950" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-950/20 to-slate-950" />
     </div>
   );
 };

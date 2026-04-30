@@ -6,8 +6,21 @@ import { Home } from "@/pages/Home";
 import { Pricing } from "@/pages/Pricing";
 import { Success } from "@/pages/Success";
 import { AnimatePresence } from "motion/react";
-import React, { Suspense, lazy } from "react";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import React, { Suspense, lazy, useEffect } from "react";
+import {
+  Route,
+  BrowserRouter as Router,
+  Routes,
+  useLocation,
+} from "react-router-dom";
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 const Features = lazy(() =>
   import("@/pages/Features").then((module) => ({ default: module.Features })),
@@ -37,12 +50,12 @@ const Login = lazy(() =>
 const BackgroundLayers = () => (
   <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#1f2a44_0%,#09111f_42%,#05070b_100%)]" />
-    <div className="absolute left-[-10%] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-indigo-500/18 blur-[120px]" />
-    <div className="absolute right-[-12%] top-[18%] h-[24rem] w-[24rem] rounded-full bg-cyan-400/14 blur-[120px]" />
-    <div className="absolute bottom-[-10rem] left-[18%] h-[22rem] w-[22rem] rounded-full bg-fuchsia-500/12 blur-[120px]" />
+    <div className="absolute left-[-10%] -top-32 h-112 w-112 rounded-full bg-indigo-500/18 blur-3xl" />
+    <div className="absolute right-[-12%] top-[18%] h-96 w-96 rounded-full bg-cyan-400/14 blur-3xl" />
+    <div className="absolute -bottom-40 left-[18%] h-88 w-88 rounded-full bg-fuchsia-500/12 blur-3xl" />
     <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
     <div className="absolute bottom-0 inset-x-0 h-px bg-white/10" />
-    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:72px_72px] opacity-[0.08]" />
+    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[72px_72px] opacity-[0.08]" />
   </div>
 );
 
@@ -59,7 +72,7 @@ const AppFrame = ({ children }: { children: React.ReactNode }) => (
 
 const RouteFallback = () => (
   <div className="content-grid section-shell">
-    <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-10 text-center text-slate-300 backdrop-blur-xl">
+    <div className="rounded-[32px] border border-white/10 bg-white/4 p-10 text-center text-slate-300 backdrop-blur-xl">
       Loading…
     </div>
   </div>

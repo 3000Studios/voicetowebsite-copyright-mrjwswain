@@ -1,7 +1,6 @@
-import React from 'react';
-import { motion } from 'motion/react';
+import { motion } from "motion/react";
 
-export const Logo = ({ className = '' }: { className?: string }) => {
+export const Logo = ({ className = "" }: { className?: string }) => {
   const bars = [18, 36, 54, 72, 48, 84, 60, 42];
 
   return (
@@ -10,9 +9,15 @@ export const Logo = ({ className = '' }: { className?: string }) => {
         {bars.map((height, index) => (
           <motion.span
             key={index}
-            className="w-1 rounded-full bg-gradient-to-t from-cyan-400 via-indigo-400 to-fuchsia-400 shadow-[0_0_16px_rgba(99,102,241,0.55)]"
-            animate={{ height: [`${height * 0.55}%`, `${height}%`, `${height * 0.72}%`] }}
-            transition={{ duration: 1.4 + index * 0.08, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-1 rounded-full bg-linear-to-t from-cyan-400 via-indigo-400 to-fuchsia-400 shadow-[0_0_16px_rgba(99,102,241,0.55)]"
+            animate={{
+              height: [`${height * 0.55}%`, `${height}%`, `${height * 0.72}%`],
+            }}
+            transition={{
+              duration: 1.4 + index * 0.08,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           />
         ))}
       </div>

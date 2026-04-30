@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-const AD_CLIENT = 'ca-pub-5800977493749262';
+const AD_CLIENT = "ca-pub-5800977493749262";
 
 export const GoogleAdSense = ({ slot }: { slot?: string }) => {
   const adRef = useRef<HTMLDivElement>(null);
@@ -15,24 +15,29 @@ export const GoogleAdSense = ({ slot }: { slot?: string }) => {
     if (!slot) return;
 
     try {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         window.adsbygoogle = window.adsbygoogle || [];
         window.adsbygoogle.push({});
       }
     } catch (error) {
-      console.error('AdSense push error', error);
+      console.error("AdSense push error", error);
     }
   }, [slot]);
 
   return (
     <div className="content-grid py-6">
-      <div ref={adRef} className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 text-center backdrop-blur-xl">
-        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">Secure ad zone</div>
+      <div
+        ref={adRef}
+        className="rounded-[28px] border border-white/10 bg-white/4 p-6 text-center backdrop-blur-xl"
+      >
+        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+          Secure ad zone
+        </div>
         <ins
           className="adsbygoogle"
-          style={{ display: 'block', minHeight: '100px', width: '100%' }}
+          style={{ display: "block", minHeight: "100px", width: "100%" }}
           data-ad-client={AD_CLIENT}
-          data-ad-slot={slot || 'default-slot'}
+          data-ad-slot={slot || "default-slot"}
           data-ad-format="auto"
           data-full-width-responsive="true"
         />

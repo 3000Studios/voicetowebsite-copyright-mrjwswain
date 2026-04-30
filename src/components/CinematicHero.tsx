@@ -125,7 +125,7 @@ export function CinematicHero() {
       />
 
       {/* Gradient Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-radial from-indigo-500/20 via-purple-500/10 to-transparent blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-indigo-500/20 via-purple-500/10 to-transparent blur-3xl pointer-events-none" />
 
       {/* Grid Pattern */}
       <div
@@ -146,7 +146,7 @@ export function CinematicHero() {
       >
         {/* Badge */}
         <motion.div variants={itemVariants} className="mb-8">
-          <span className="relative aspect-video rounded-2xl bg-linear-to-br from-indigo-500/20 to-transparent border border-white/10 overflow-hidden text-medium text-indigo-400">
+          <span className="relative inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-br from-indigo-500/20 to-transparent border border-white/10 text-sm font-medium text-indigo-400">
             <Sparkles className="w-4 h-4" />
             AI-Powered Site Builder
           </span>
