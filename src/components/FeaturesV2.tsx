@@ -47,6 +47,9 @@ const features = [
 ];
 
 export function FeaturesV2() {
+  const marqueeTop = [features[0], features[1], features[2]];
+  const marqueeBottom = [features[3], features[4], features[5]];
+
   return (
     <section className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,43 +88,54 @@ export function FeaturesV2() {
           </motion.p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
-              className="group"
-            >
-              <div className="glass-card h-full p-6 transition-all duration-300 group-hover:bg-white/5">
-                {/* Icon */}
-                <div
-                  className={`w-12 h-12 rounded-xl bg-linear-to-br ${feature.color} flex items-center justify-center mb-4`}
+        <div className="space-y-6 overflow-hidden">
+          <div className="feature-marquee feature-marquee-left">
+            <div className="feature-marquee-track">
+              {[...marqueeTop, ...marqueeTop].map((feature, index) => (
+                <motion.div
+                  key={`${feature.title}-top-${index}`}
+                  whileHover={{ y: -4 }}
+                  className="feature-marquee-card"
                 >
-                  <feature.icon className="w-6 h-6 text-white" />
-                </div>
+                  <div
+                    className={`w-12 h-12 rounded-xl bg-linear-to-br ${feature.color} flex items-center justify-center mb-4`}
+                  >
+                    <feature.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
 
-                {/* Title */}
-                <h3 className="text-lg font-bold text-white mb-2">
-                  {feature.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-white/60 text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-
-                {/* Hover Glow */}
-                <div
-                  className={`absolute inset-0 rounded-2xl bg-linear-to-br ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300 -z-10`}
-                />
-              </div>
-            </motion.div>
-          ))}
+          <div className="feature-marquee feature-marquee-right">
+            <div className="feature-marquee-track">
+              {[...marqueeBottom, ...marqueeBottom].map((feature, index) => (
+                <motion.div
+                  key={`${feature.title}-bottom-${index}`}
+                  whileHover={{ y: -4 }}
+                  className="feature-marquee-card"
+                >
+                  <div
+                    className={`w-12 h-12 rounded-xl bg-linear-to-br ${feature.color} flex items-center justify-center mb-4`}
+                  >
+                    <feature.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <motion.div

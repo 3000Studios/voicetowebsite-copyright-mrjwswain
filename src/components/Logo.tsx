@@ -12,8 +12,9 @@ export const Logo = ({ className = "" }: { className?: string }) => {
     <div className={`group flex items-center gap-4 ${className}`}>
       <div className="relative h-12 w-12 shrink-0 rounded-2xl border border-cyan-200/20 bg-white/[0.06] shadow-[0_0_34px_rgba(53,226,255,0.22)] backdrop-blur-xl">
         <motion.div
-          className="absolute inset-2 rounded-xl border border-indigo-200/25"
-          animate={{ rotateX: [0, 12, 0], rotateY: [0, -18, 0] }}
+          className="absolute inset-2 rounded-xl border border-indigo-200/25 bg-[radial-gradient(circle_at_top,rgba(53,226,255,0.2),transparent_55%)]"
+          animate={{ rotateZ: [0, 8, -6, 0], scale: [1, 1.03, 0.98, 1] }}
+          whileHover={{ scale: 1.06, rotateZ: 10 }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           style={{ transformStyle: "preserve-3d" }}
         />
@@ -27,7 +28,7 @@ export const Logo = ({ className = "" }: { className?: string }) => {
               cy={cy}
               r="4"
               fill={index % 2 ? "#a5b4fc" : "#67e8f9"}
-              animate={{ opacity: [0.55, 1, 0.55], r: [3.2, 4.8, 3.2] }}
+              animate={{ opacity: [0.55, 1, 0.55], r: [3.2, 5.2, 3.2], y: [0, -1, 0] }}
               transition={{ duration: 1.8 + index * 0.2, repeat: Infinity, ease: "easeInOut" }}
             />
           ))}

@@ -176,6 +176,23 @@
     @apply rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-indigo-300/30 hover:bg-white/7;
   }
 
+  .feature-marquee {
+    @apply overflow-hidden rounded-[30px] border border-white/10 bg-white/4 backdrop-blur-xl;
+  }
+
+  .feature-marquee-track {
+    @apply flex w-max gap-4 px-4 py-4;
+    animation: marquee-left 28s linear infinite;
+  }
+
+  .feature-marquee-right .feature-marquee-track {
+    animation: marquee-right 30s linear infinite;
+  }
+
+  .feature-marquee-card {
+    @apply w-[18rem] shrink-0 rounded-[24px] border border-white/10 bg-black/20 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.18)];
+  }
+
   .feature-card-icon {
     @apply mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-indigo-400/10 text-indigo-200 shadow-[0_0_24px_rgba(99,102,241,0.18)];
   }
@@ -324,6 +341,16 @@
 
   .text-gradient {
     @apply bg-linear-to-r from-white via-indigo-200 to-white bg-clip-text text-transparent;
+  }
+
+  @keyframes marquee-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes marquee-right {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
   }
 }
 
