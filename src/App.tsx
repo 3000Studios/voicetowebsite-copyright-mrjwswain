@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ScrollToTop } from "@/hooks/useScrollToTop";
 import { Home } from "@/pages/Home";
 import { Pricing } from "@/pages/Pricing";
+import { Setup } from "@/pages/Setup";
 import { Success } from "@/pages/Success";
 import { AnimatePresence } from "motion/react";
 import React, { Suspense, lazy } from "react";
@@ -85,6 +86,7 @@ export default function App() {
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/setup" element={<Setup />} />
                 <Route path="/success" element={<Success />} />
                 <Route path="/:id" element={<SiteViewer />} />
               </Routes>

@@ -1,6 +1,6 @@
 import type { FirebaseOptions } from "firebase/app";
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import { doc, getDocFromServer, getFirestore } from "firebase/firestore";
 
 type FirebaseConfigWithDb = FirebaseOptions & { firestoreDatabaseId?: string };
@@ -23,12 +23,14 @@ let app: ReturnType<typeof initializeApp> | null = null;
 let auth: ReturnType<typeof getAuth> | null = null;
 let db: ReturnType<typeof getFirestore> | null = null;
 let googleProvider: GoogleAuthProvider | null = null;
+let githubProvider: GithubAuthProvider | null = null;
 
 if (isFirebaseConfigured) {
   try {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     googleProvider = new GoogleAuthProvider();
+    githubProvider = new GithubAuthProvider();
     db = firebaseConfig.firestoreDatabaseId
       ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
       : getFirestore(app);
@@ -41,7 +43,7 @@ if (isFirebaseConfigured) {
   );
 }
 
-export { auth, db, googleProvider };
+export { auth, db, googleProvider, githubProvider };
 
 /**
  * Validates connection to Firestore as per instructions

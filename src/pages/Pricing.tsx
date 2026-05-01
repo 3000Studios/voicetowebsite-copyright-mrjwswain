@@ -1,4 +1,4 @@
-import { PLAN_LIMITS, PlanType, STRIPE_PAYMENT_LINKS } from "@/constants/plans";
+import { PLAN_LIMITS, PlanType } from "@/constants/plans";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
 import React from "react";
@@ -14,6 +14,7 @@ const cadenceCopy = {
 export const Pricing = () => {
   const [cadence, setCadence] = React.useState<"month" | "year">("month");
   const [submitting, setSubmitting] = React.useState<PlanType | null>(null);
+  const [provider, setProvider] = React.useState<"stripe" | "paypal">("stripe");
 
   const handleUpgrade = async (plan: PlanType) => {
     setSubmitting(plan);
@@ -23,16 +24,22 @@ export const Pricing = () => {
         return;
       }
 
-      const paymentLink =
-        plan === "commands"
-          ? STRIPE_PAYMENT_LINKS.commands.month
-          : STRIPE_PAYMENT_LINKS[plan][cadence];
-
-      if (!paymentLink) {
-        throw new Error("Checkout link is not configured for this plan.");
+      const endpoint =
+        provider === "stripe"
+          ? "/api/create-checkout-session"
+          : "/api/create-paypal-order";
+      const query = new URLSearchParams({
+        plan,
+        cadence,
+      }).toString();
+      const response = await fetch(`${endpoint}?${query}`, {
+        method: "POST",
+      });
+      const data = (await response.json()) as { url?: string; error?: string };
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || "Checkout initialization failed.");
       }
-
-      window.location.href = paymentLink;
+      window.location.href = data.url;
     } catch (error) {
       console.error(error);
       setSubmitting(null);
@@ -81,6 +88,23 @@ export const Pricing = () => {
               }`}
             >
               {option === "month" ? "Monthly" : "Annual"}
+            </button>
+          ))}
+        </div>
+
+        <div className="mx-auto inline-flex rounded-full border border-white/10 bg-white/4 p-2 backdrop-blur-xl">
+          {(["stripe", "paypal"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setProvider(option)}
+              className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+                provider === option
+                  ? "bg-cyan-500 text-white shadow-[0_0_24px_rgba(34,211,238,0.45)]"
+                  : "text-slate-300 hover:text-white"
+              }`}
+            >
+              {option === "stripe" ? "Stripe" : "PayPal"}
             </button>
           ))}
         </div>
@@ -157,9 +181,9 @@ export const Pricing = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <button
-                    type="button"
+              <div className="space-y-4">
+                <button
+                  type="button"
                     onClick={() => handleUpgrade(plan)}
                     disabled={submitting === plan}
                     className="hero-primary-button w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
@@ -167,7 +191,7 @@ export const Pricing = () => {
                     {submitting === plan
                       ? "Redirecting…"
                       : plan === "commands"
-                        ? "Buy command pack"
+                        ? `Buy command pack (${provider})`
                         : `Choose ${config.name}`}
                     <ArrowRight className="h-4 w-4" />
                   </button>

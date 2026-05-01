@@ -54,7 +54,9 @@ export const VoiceApp = ({
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY || "",
+  });
 
   // Get plan type (default to free)
   const planType: PlanType = (user as any)?.plan || "free";
@@ -134,6 +136,10 @@ export const VoiceApp = ({
 
   const handleGenerate = async (text: string = input) => {
     if (!text.trim()) return;
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
+      setGenError("Generator is not configured. Missing VITE_GEMINI_API_KEY.");
+      return;
+    }
 
     // Enforce limits
     if (generationCount >= limits.commands) {

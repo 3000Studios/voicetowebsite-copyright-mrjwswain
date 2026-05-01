@@ -10,13 +10,11 @@ export const SiteViewer = () => {
   useEffect(() => {
     const fetchSite = async () => {
       try {
-        const response = await fetch(`/api/sites/${id}`);
-        const data = (await response.json()) as any;
-        if (data.html) {
-          setHtml(data.html);
-        } else {
-          setError("Site not found");
-        }
+        const response = await fetch(`/api/site/${id}`);
+        if (!response.ok) throw new Error("Site not found");
+        const rawHtml = await response.text();
+        if (!rawHtml?.trim()) throw new Error("Site content empty");
+        setHtml(rawHtml);
       } catch (err) {
         setError("Failed to load site");
       }

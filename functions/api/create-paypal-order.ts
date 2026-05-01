@@ -43,7 +43,13 @@ async function getPayPalAccessToken(env: Env) {
 
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
   try {
-    const body = (await context.request.json()) as { plan?: string };
+    const url = new URL(context.request.url);
+    let body: { plan?: string } = {};
+    if (url.searchParams.get("plan")) {
+      body.plan = url.searchParams.get("plan") || "";
+    } else {
+      body = (await context.request.json()) as { plan?: string };
+    }
     const plan = body.plan?.toLowerCase();
     if (!plan) return jsonResponse({ error: "Missing plan" }, { status: 400 });
 
@@ -79,7 +85,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
             brand_name: "Voice2Website",
             locale: "en-US",
             user_action: "SUBSCRIBE_NOW",
-            return_url: `${appUrl}/dashboard?success=1&plan=${encodeURIComponent(plan)}&provider=paypal`,
+            return_url: `${appUrl}/setup?provider=paypal&plan=${encodeURIComponent(plan)}`,
             cancel_url: `${appUrl}/pricing?canceled=1&provider=paypal`,
           },
         }),
@@ -113,7 +119,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
           brand_name: "Voice2Website",
           shipping_preference: "NO_SHIPPING",
           user_action: "PAY_NOW",
-          return_url: `${appUrl}/dashboard?success=1&plan=commands&provider=paypal`,
+          return_url: `${appUrl}/setup?provider=paypal&plan=commands`,
           cancel_url: `${appUrl}/pricing?canceled=1&provider=paypal`,
         },
       }),

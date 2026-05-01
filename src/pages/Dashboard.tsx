@@ -20,7 +20,9 @@ import { useNavigate } from "react-router-dom";
 
 import { db, handleFirestoreError } from "@/lib/firebase";
 import {
+  doc,
   addDoc,
+  updateDoc,
   collection,
   getDocs,
   orderBy,
@@ -41,6 +43,7 @@ export const Dashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showAccessModal, setShowAccessModal] = useState(false);
+  const [activityLogs, setActivityLogs] = useState<string[]>([]);
 
   const planType: PlanType = (user as any)?.plan || "free";
   const limits = PLAN_LIMITS[planType];
@@ -69,6 +72,10 @@ export const Dashboard = () => {
         ...doc.data(),
       }));
       setUserSites(sites);
+      setActivityLogs((prev) => [
+        `Synced ${sites.length} site(s) at ${new Date().toLocaleTimeString()}`,
+        ...prev,
+      ]);
     } catch (err) {
       handleFirestoreError(err, "list", "sites");
     }
@@ -95,16 +102,35 @@ export const Dashboard = () => {
         html: currentHtml,
         ownerId: user.uid,
         timestamp: serverTimestamp(),
+        updatedAt: serverTimestamp(),
         isDraft: false,
         title: `Site_${Date.now()}`,
       });
       fetchUserSites();
+      setActivityLogs((prev) => [
+        `Saved website at ${new Date().toLocaleTimeString()}`,
+        ...prev,
+      ]);
       setActiveTab("sites");
     } catch (err) {
       handleFirestoreError(err, "create", "sites");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleRenameSite = async (siteId: string, currentTitle: string) => {
+    const nextTitle = window.prompt("Rename website", currentTitle || "My Site");
+    if (!nextTitle?.trim()) return;
+    await updateDoc(doc(db, "sites", siteId), {
+      title: nextTitle.trim(),
+      updatedAt: serverTimestamp(),
+    });
+    setActivityLogs((prev) => [
+      `Renamed site to "${nextTitle.trim()}"`,
+      ...prev,
+    ]);
+    fetchUserSites();
   };
 
   if (!isReady || !user)
@@ -349,7 +375,8 @@ export const Dashboard = () => {
             )}
 
             {activeTab === "sites" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              <div className="space-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                 <motion.div
                   whileHover={{ y: -8 }}
                   onClick={() => setActiveTab("builder")}
@@ -392,6 +419,14 @@ export const Dashboard = () => {
                         >
                           Modify Protocol
                         </button>
+                        <a
+                          href={`/${site.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-6 py-2 bg-indigo-600 text-white font-black uppercase tracking-widest text-[9px] italic"
+                        >
+                          View Live
+                        </a>
                       </div>
                     </div>
 
@@ -413,9 +448,43 @@ export const Dashboard = () => {
                           Sync Correct
                         </span>
                       </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleRenameSite(site.id, site.title || "")}
+                          className="px-3 py-2 bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest hover:border-indigo-500 hover:text-white"
+                        >
+                          Rename
+                        </button>
+                        <a
+                          href={`https://voicetowebsite.com/${site.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3 py-2 bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest hover:border-indigo-500 hover:text-white"
+                        >
+                          Share Link
+                        </a>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
+                </div>
+
+                <div className="glass-blur p-8 border border-white/10">
+                  <h4 className="text-xs font-black uppercase tracking-[0.3em] text-indigo-400 mb-4">
+                    History & Logs
+                  </h4>
+                  <div className="space-y-2 text-sm text-slate-300 max-h-48 overflow-y-auto">
+                    {activityLogs.length === 0 ? (
+                      <div>No activity yet.</div>
+                    ) : (
+                      activityLogs.slice(0, 20).map((line, index) => (
+                        <div key={`${line}-${index}`} className="border-b border-white/5 pb-2">
+                          {line}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

@@ -15,7 +15,7 @@ async function sha256Hex(input: string) {
 }
 
 export const Setup = () => {
-  const { user, loginWithGoogle, isReady, isLoggedIn } = useAuth();
+  const { user, isReady, isLoggedIn } = useAuth();
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
@@ -62,8 +62,13 @@ export const Setup = () => {
         if (verified.plan !== plan) {
           throw new Error('Plan mismatch. Please retry checkout from Pricing.');
         }
+      } else if (provider === 'paypal') {
+        const paypalToken = params.get('token') || params.get('subscription_id');
+        if (!paypalToken) {
+          throw new Error('PayPal return token missing. Please retry checkout from Pricing.');
+        }
       } else {
-        throw new Error('PayPal setup is not enabled yet. Use Stripe for now.');
+        throw new Error('Unknown provider. Please retry checkout from Pricing.');
       }
 
       const accessKey = (await sha256Hex(`${user.uid}:${provider}:${sessionId}:${plan}`)).slice(0, 24).toUpperCase();
@@ -101,12 +106,9 @@ export const Setup = () => {
         <p className="max-w-xl text-slate-400 italic">
           Sign in so we can attach your subscription to your account and unlock your dashboard.
         </p>
-        <button
-          onClick={() => loginWithGoogle()}
-          className="btn-minimal bg-indigo-600 text-white hover:bg-white hover:text-black border-none"
-        >
-          Sign in with Google
-        </button>
+        <Link className="btn-minimal bg-indigo-600 text-white hover:bg-white hover:text-black border-none" to="/login">
+          Continue to Sign In
+        </Link>
         <Link className="btn-minimal" to="/pricing/">
           Back to Pricing
         </Link>
