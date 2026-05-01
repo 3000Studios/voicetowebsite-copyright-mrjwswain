@@ -90,17 +90,7 @@ export function CinematicHero() {
           <motion.div variants={item}>
             <SectionHeader
               title={<>Speak your site into existence.</>}
-              copy="Turn a voice brief into a polished hosted site with clean structure, focused copy, and instant launch."
             />
-          </motion.div>
-          <motion.div variants={item} className="flex flex-col items-center gap-4 sm:flex-row lg:items-start">
-            <Link to="/pricing" className="hero-primary-button px-8 py-4 text-base" onClick={() => trackEvent("hero_cta_clicked", { location: "cinematic_hero" })}>
-              Start building
-              <Sparkles className="h-4 w-4" />
-            </Link>
-            <Link to="/examples" className="hero-secondary-button px-8 py-4 text-base" onClick={() => trackEvent("demo_watched", { location: "cinematic_hero" })}>
-              View examples
-            </Link>
           </motion.div>
           <motion.div variants={item} className="grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
             {[{ icon: Zap, text: "Fast generation" }, { icon: Globe, text: "Cloudflare delivery" }, { icon: Sparkles, text: "SEO-ready output" }].map(({ icon: Icon, text }) => (
@@ -122,6 +112,23 @@ export function CinematicHero() {
             </div>
             <PlaygroundGenerator variant="hero" />
           </MediaFrame>
+          <div className="mt-4 flex flex-col items-center gap-3">
+            <Link
+              to="/pricing"
+              className="hero-primary-button px-8 py-4 text-base"
+              onClick={() => trackEvent("hero_cta_clicked", { location: "cinematic_hero" })}
+            >
+              Start building
+              <Sparkles className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/examples"
+              className="hero-secondary-button px-8 py-4 text-base"
+              onClick={() => trackEvent("demo_watched", { location: "cinematic_hero" })}
+            >
+              View examples
+            </Link>
+          </div>
         </motion.div>
       </motion.div>
     </section>

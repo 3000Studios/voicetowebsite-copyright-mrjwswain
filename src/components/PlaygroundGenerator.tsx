@@ -11,6 +11,7 @@ import {
   Wand2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface GeneratedPreview {
   siteName: string;
@@ -537,6 +538,11 @@ export function PlaygroundGenerator({
                     {feature}
                   </div>
                 ))}
+              </div>
+              <div className="mt-5 flex flex-col items-center gap-3">
+                <Link to="/examples" className="hero-secondary-button">
+                  View examples
+                </Link>
               </div>
             </div>
           </motion.div>
