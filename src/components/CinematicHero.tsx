@@ -74,14 +74,6 @@ export function CinematicHero() {
   return (
     <section className="relative -mt-24 min-h-screen overflow-hidden pt-24">
       <canvas ref={canvasRef} className="absolute inset-0 z-0 opacity-70" />
-      <video
-        src="/videos/voice-to-website-demo.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 z-[1] h-full w-full object-cover opacity-35 mix-blend-screen"
-      />
       <div className="absolute inset-0 responsive-wallpaper opacity-80" />
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#03040a] to-transparent" />
 
