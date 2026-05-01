@@ -24,6 +24,7 @@ interface GeneratedPreview {
   heroImageUrl: string;
   industry: string;
   cta: string;
+  gallery?: string[];
 }
 
 const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
@@ -210,16 +211,12 @@ export function PlaygroundGenerator() {
       preview = DEMO_RESPONSES.restaurant;
     }
 
-    const searchQuery = encodeURIComponent(
-      transcript
-        .split(" ")
-        .filter((word) => word.length > 3)
-        .slice(0, 4)
-        .join(",") || preview.industry,
-    );
+    const media = await fetchDynamicMedia(transcript || preview.industry);
     setGeneratedPreview({
       ...preview,
-      heroImageUrl: `https://source.unsplash.com/1600x900/?${searchQuery}`,
+      heroImageUrl: media?.imageUrl || preview.heroImageUrl,
+      heroVideoUrl: media?.videoUrl || preview.heroVideoUrl,
+      gallery: media?.gallery,
     });
     setIsGenerating(false);
     setActiveStep(3);
@@ -268,16 +265,12 @@ export function PlaygroundGenerator() {
       preview = DEMO_RESPONSES.restaurant;
     }
 
-    const searchQuery = encodeURIComponent(
-      text
-        .split(" ")
-        .filter((word) => word.length > 3)
-        .slice(0, 4)
-        .join(",") || preview.industry,
-    );
+    const media = await fetchDynamicMedia(text || preview.industry);
     setGeneratedPreview({
       ...preview,
-      heroImageUrl: `https://source.unsplash.com/1600x900/?${searchQuery}`,
+      heroImageUrl: media?.imageUrl || preview.heroImageUrl,
+      heroVideoUrl: media?.videoUrl || preview.heroVideoUrl,
+      gallery: media?.gallery,
     });
     setIsGenerating(false);
     setActiveStep(3);
@@ -688,10 +681,10 @@ export function PlaygroundGenerator() {
 
                     <section className="px-6 pb-12">
                       <div className="grid gap-4 md:grid-cols-3">
-                        {[0, 1, 2].map((i) => (
+                        {(generatedPreview.gallery?.length ? generatedPreview.gallery : [generatedPreview.heroImageUrl, generatedPreview.heroImageUrl, generatedPreview.heroImageUrl]).slice(0, 3).map((imageSrc, i) => (
                           <div key={i} className="overflow-hidden rounded-xl border border-white/12 bg-slate-900/60">
                             <img
-                              src={`${generatedPreview.heroImageUrl}${generatedPreview.heroImageUrl.includes("?") ? "&" : "?"}sig=${i}`}
+                              src={imageSrc}
                               alt={`${generatedPreview.industry} showcase ${i + 1}`}
                               className="h-36 w-full object-cover transition-transform duration-500 hover:scale-105"
                               loading="lazy"
@@ -744,3 +737,16 @@ export function PlaygroundGenerator() {
     </div>
   );
 }
+  const fetchDynamicMedia = async (queryText: string) => {
+    try {
+      const res = await fetch(`/api/media?q=${encodeURIComponent(queryText)}`);
+      if (!res.ok) return null;
+      return (await res.json()) as {
+        imageUrl?: string;
+        videoUrl?: string;
+        gallery?: string[];
+      };
+    } catch {
+      return null;
+    }
+  };

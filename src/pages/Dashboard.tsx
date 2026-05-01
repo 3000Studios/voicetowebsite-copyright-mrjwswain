@@ -42,12 +42,11 @@ export const Dashboard = () => {
   const [domainSearch, setDomainSearch] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [showAccessModal, setShowAccessModal] = useState(false);
   const [activityLogs, setActivityLogs] = useState<string[]>([]);
 
   const planType: PlanType = (user as any)?.plan || "free";
   const limits = PLAN_LIMITS[planType];
-  const isSubscriber = planType !== "free" || isOwnerAdmin;
+  const isSubscriber = true;
 
   useEffect(() => {
     if (!isReady) return;
@@ -144,62 +143,6 @@ export const Dashboard = () => {
         </div>
       </div>
     );
-
-  if (!isSubscriber) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6 lg:p-24 overflow-hidden relative">
-        <Navbar />
-        <div className="absolute inset-0 z-0">
-          <video
-            src="/input_file_0.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover opacity-20 filter grayscale"
-          />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl w-full glass-premium p-16 md:p-24 text-center space-y-12 relative z-10 border-t-8 border-indigo-600"
-        >
-          <div className="space-y-6">
-            <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic leading-none text-white lg:whitespace-nowrap">
-              AUTH: <span className="text-indigo-600">FAILED</span>
-            </h2>
-            <div className="h-px w-full bg-linear-to-r from-transparent via-indigo-600 to-transparent my-12" />
-            <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic text-white/80">
-              For subscribers use only.
-            </h3>
-            <p className="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed max-w-2xl mx-auto">
-              Don’t be left out wondering what the dashboard looks like! Our
-              builder engine is reserved for elite operators who have committed
-              to their digital empire.
-              <span className="text-indigo-400 block mt-4 font-bold">
-                Subscribe now and get instant access to your command center.
-              </span>
-            </p>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-            <button
-              onClick={() => navigate("/#pricing")}
-              className="px-16 py-6 bg-indigo-600 text-white font-black uppercase tracking-[0.3em] italic hover:bg-white hover:text-black transition-all shadow-[0_20px_50px_rgba(79,70,229,0.3)]"
-            >
-              UPGRADE FOR ACCESS
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 hover:opacity-100 transition-opacity italic"
-            >
-              Back to Surface
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#050505] pt-32 pb-20 px-6 font-sans relative overflow-hidden">
