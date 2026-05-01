@@ -1,21 +1,21 @@
-import { ArrowRight, Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Logo } from './Logo';
+import { ArrowRight, Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Logo } from "./Logo";
 
 const navLinks = [
-  { label: 'Features', href: '/features' },
-  { label: 'Examples', href: '/examples' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'FAQ', href: '/faq' },
-  { label: 'Stories', href: '/stories' },
-  { label: 'Store', href: '/store' },
-  { label: 'About', href: '/about' },
-  { label: 'Legal', href: '/legal' },
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Admin', href: '/admin' },
+  { label: "Features", href: "/features" },
+  { label: "Examples", href: "/examples" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Stories", href: "/stories" },
+  { label: "Store", href: "/store" },
+  { label: "About", href: "/about" },
+  { label: "Legal", href: "/legal" },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Admin", href: "/admin" },
 ];
 
 const NavAnchor = ({
@@ -27,8 +27,9 @@ const NavAnchor = ({
   children: React.ReactNode;
   onClick?: () => void;
 }) => {
-  const isHash = href.startsWith('/#');
-  const className = 'text-sm font-semibold text-slate-200/86 transition hover:text-white';
+  const isHash = href.startsWith("/#");
+  const className =
+    "text-sm font-semibold text-slate-200/86 transition hover:text-white";
 
   if (isHash) {
     return (
@@ -53,8 +54,8 @@ export const Navbar = () => {
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 20);
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -67,17 +68,27 @@ export const Navbar = () => {
         <div
           className={`mx-auto flex w-full max-w-7xl items-center justify-between overflow-hidden rounded-full border px-4 py-3 transition-all duration-300 sm:px-6 ${
             isScrolled
-              ? 'border-white/12 bg-slate-950/80 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl'
-              : 'border-white/10 bg-slate-950/58 backdrop-blur-xl'
+              ? "border-white/12 bg-slate-950/80 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl"
+              : "border-white/10 bg-slate-950/58 backdrop-blur-xl"
           } ${isScrolled ? "lg:pl-4 lg:pr-4" : ""}`}
         >
-          <Link to="/" aria-label="VoiceToWebsite home" className={`shrink-0 transition-all duration-500 ${isScrolled ? "scale-95 opacity-0 pointer-events-none w-0 overflow-hidden" : "scale-100 opacity-100"}`}>
+          <Link
+            to="/"
+            aria-label="VoiceToWebsite home"
+            className={`shrink-0 transition-all duration-500 ${isScrolled ? "scale-95 opacity-0 pointer-events-none w-0 overflow-hidden" : "scale-100 opacity-100"}`}
+          >
             <Logo />
           </Link>
 
-          <div className={`hidden flex-1 items-center justify-center px-6 lg:flex ${isScrolled ? "translate-y-[-140%] opacity-0" : "translate-y-0 opacity-100"} transition-all duration-500`}>
-            <div className="nav-brand-wave w-full max-w-[34rem]">
-              <div className="nav-brand-wave-track">
+          <div
+            className={`flex-1 items-center justify-center px-6 lg:flex transition-all duration-700 ease-in-out ${isScrolled ? "w-12 translate-x-0" : "w-auto translate-x-0"}`}
+          >
+            <div
+              className={`nav-brand-wave transition-all duration-700 ease-in-out ${isScrolled ? "w-12 h-12 rounded-full bg-linear-to-r from-cyan-500 to-indigo-500 scale-75 opacity-80" : "w-full max-w-136 scale-100 opacity-100"}`}
+            >
+              <div
+                className={`nav-brand-wave-track transition-all duration-700 ease-in-out ${isScrolled ? "opacity-0 scale-0" : "opacity-100 scale-100"}`}
+              >
                 <span>Speak. Build. Launch.</span>
                 <span>Voice to website in minutes.</span>
                 <span>Animated. Responsive. Live.</span>
@@ -85,10 +96,18 @@ export const Navbar = () => {
                 <span>Voice to website in minutes.</span>
                 <span>Animated. Responsive. Live.</span>
               </div>
+              {isScrolled && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-4 h-4 rounded-full bg-white/30 animate-ping"></div>
+                  <div className="absolute w-2 h-2 rounded-full bg-white/60"></div>
+                </div>
+              )}
             </div>
           </div>
 
-          <nav className={`hidden items-center gap-8 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}>
+          <nav
+            className={`hidden items-center gap-8 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}
+          >
             {navLinks.map((link) => (
               <NavAnchor key={link.label} href={link.href}>
                 {link.label}
@@ -96,7 +115,9 @@ export const Navbar = () => {
             ))}
           </nav>
 
-          <div className={`hidden items-center gap-3 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}>
+          <div
+            className={`hidden items-center gap-3 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}
+          >
             <Link to="/login" className="nav-ghost-button">
               Login
             </Link>
@@ -123,21 +144,33 @@ export const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-x-4 top-24 z-40 rounded-[2rem] border border-white/12 bg-slate-950/94 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.48)] backdrop-blur-2xl lg:hidden"
+            className="fixed inset-x-4 top-24 z-40 rounded-4xl border border-white/12 bg-slate-950/94 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.48)] backdrop-blur-2xl lg:hidden"
           >
-            <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_38%)]" />
+            <div className="absolute inset-0 rounded-4xl bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_38%)]" />
             <div className="relative space-y-3">
               <div className="grid gap-3 pb-3">
-                <Link to="/login" onClick={() => setIsOpen(false)} className="nav-ghost-button flex w-full justify-center">
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="nav-ghost-button flex w-full justify-center"
+                >
                   Login
                 </Link>
-                <Link to="/login?mode=create" onClick={() => setIsOpen(false)} className="nav-primary-button flex w-full justify-center">
+                <Link
+                  to="/login?mode=create"
+                  onClick={() => setIsOpen(false)}
+                  className="nav-primary-button flex w-full justify-center"
+                >
                   Create account
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
               {navLinks.map((link) => (
-                <NavAnchor key={link.label} href={link.href} onClick={() => setIsOpen(false)}>
+                <NavAnchor
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                >
                   <span className="block rounded-2xl border border-white/8 bg-white/5 px-4 py-4 text-base font-semibold text-white">
                     {link.label}
                   </span>
