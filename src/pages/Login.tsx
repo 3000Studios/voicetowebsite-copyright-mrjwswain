@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Github, LogIn } from "lucide-react";
 
 export const Login = () => {
@@ -14,6 +14,7 @@ export const Login = () => {
     user,
   } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mode, setMode] = React.useState<"signin" | "create">("signin");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -24,6 +25,11 @@ export const Login = () => {
   React.useEffect(() => {
     if (user) navigate("/dashboard");
   }, [user, navigate]);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setMode(params.get("mode") === "create" ? "create" : "signin");
+  }, [location.search]);
 
   const onEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +55,8 @@ export const Login = () => {
         </h2>
         <p className="text-slate-400 mb-8">
           Sign in with Google, GitHub, or email. New users can create an account
-          with phone, email, and password.
+          with phone, email, and password. Create-account users can opt into
+          weekly product updates and promotions.
         </p>
 
         <div className="flex mb-6 rounded-xl border border-white/10 bg-white/5 p-1">
@@ -102,13 +109,19 @@ export const Login = () => {
                 required
                 className="w-full rounded-lg bg-black/40 border border-white/10 px-4 py-3 text-white outline-none focus:border-indigo-400"
               />
-              <input
+            <input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Phone number"
                 required
                 className="w-full rounded-lg bg-black/40 border border-white/10 px-4 py-3 text-white outline-none focus:border-indigo-400"
               />
+              <label className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-300">
+                <input type="checkbox" className="mt-1 h-4 w-4 accent-indigo-500" />
+                <span>
+                  Email me weekly promotions, product updates, and launch tips.
+                </span>
+              </label>
             </>
           )}
           <input
@@ -149,4 +162,3 @@ export const Login = () => {
     </div>
   );
 };
-

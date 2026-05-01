@@ -82,10 +82,10 @@ export const Navbar = () => {
 
           <div className="hidden items-center gap-3 lg:flex">
             <Link to="/login" className="nav-ghost-button">
-              Sign in
+              Login
             </Link>
-            <Link to="/pricing" className="nav-primary-button">
-              Get your site
+            <Link to="/login?mode=create" className="nav-primary-button">
+              Create account
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -111,6 +111,15 @@ export const Navbar = () => {
           >
             <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_38%)]" />
             <div className="relative space-y-3">
+              <div className="grid gap-3 pb-3">
+                <Link to="/login" onClick={() => setIsOpen(false)} className="nav-ghost-button flex w-full justify-center">
+                  Login
+                </Link>
+                <Link to="/login?mode=create" onClick={() => setIsOpen(false)} className="nav-primary-button flex w-full justify-center">
+                  Create account
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
               {navLinks.map((link) => (
                 <NavAnchor key={link.label} href={link.href} onClick={() => setIsOpen(false)}>
                   <span className="block rounded-2xl border border-white/8 bg-white/5 px-4 py-4 text-base font-semibold text-white">

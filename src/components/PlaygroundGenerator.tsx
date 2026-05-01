@@ -360,12 +360,12 @@ export function PlaygroundGenerator({
 
           <div className={`border rounded-2xl p-5 backdrop-blur-xl ${isHero ? "bg-black/35 border-indigo-400/25" : "bg-[#0f172a] border-white/10"}`}>
             <div className="flex justify-center mb-4">
-              <div className="flex bg-white/5 border border-white/10 rounded-xl p-1">
-                <button onClick={() => setInputMode("text")} className={`px-4 py-2 rounded-lg text-sm ${inputMode === "text" ? "bg-cyan-500/20 text-cyan-300" : "text-white/60"}`}>
+              <div className="flex gap-2 rounded-full border border-white/10 bg-white/5 p-1">
+                <button onClick={() => setInputMode("text")} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${inputMode === "text" ? "bg-cyan-500/20 text-cyan-200" : "text-white/60 hover:text-white"}`}>
                   <Keyboard className="w-4 h-4 inline mr-2" />
                   Type
                 </button>
-                <button onClick={() => setInputMode("voice")} className={`px-4 py-2 rounded-lg text-sm ${inputMode === "voice" ? "bg-cyan-500/20 text-cyan-300" : "text-white/60"}`}>
+                <button onClick={() => setInputMode("voice")} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${inputMode === "voice" ? "bg-cyan-500/20 text-cyan-200" : "text-white/60 hover:text-white"}`}>
                   <Mic className="w-4 h-4 inline mr-2" />
                   Speak
                 </button>
@@ -442,6 +442,23 @@ export function PlaygroundGenerator({
       <AnimatePresence>
         {generatedPreview && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 rounded-2xl border border-white/15 bg-slate-950/90 overflow-hidden">
+            <div className="border-b border-white/10 bg-black/25 p-4">
+              <div className="flex items-center gap-3 text-xs uppercase tracking-[0.28em] text-cyan-200">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Build progress
+              </div>
+              <div className="mt-3 space-y-2 font-mono text-[11px] leading-5 text-slate-300">
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ repeat: Infinity, repeatType: "mirror", duration: 1.2 }}>
+                  [1/3] Parsing voice brief and extracting intent...
+                </motion.p>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, repeat: Infinity, repeatType: "mirror", duration: 1.2 }}>
+                  [2/3] Mapping sections into the 12-column grid...
+                </motion.p>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, repeat: Infinity, repeatType: "mirror", duration: 1.2 }}>
+                  [3/3] Writing media, typography, and launch-ready content...
+                </motion.p>
+              </div>
+            </div>
             {variants.length > 0 ? (
               <div className="border-b border-white/10 p-4">
                 <div className="mb-2 text-xs uppercase tracking-[0.25em] text-white/60">
@@ -472,9 +489,10 @@ export function PlaygroundGenerator({
               </div>
             ) : null}
             <div className="relative">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.22),transparent_35%),linear-gradient(180deg,rgba(3,4,10,0.15),rgba(3,4,10,0.65))]" />
               <video src={generatedPreview.heroVideoUrl} autoPlay loop muted playsInline className="h-[330px] w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-              <div className="absolute top-4 left-4 px-4 py-2 rounded-full border border-white/20 bg-black/40 text-white text-xs tracking-widest uppercase">
+              <div className="absolute top-4 left-4 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-white text-xs tracking-widest uppercase">
                 {generatedPreview.siteName}
               </div>
               <div className="absolute bottom-6 left-6 right-6">
