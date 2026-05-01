@@ -5,6 +5,9 @@ export interface Env {
   BRANDFETCH_CLIENT_ID?: string;
   STORYBLOK_OAUTH_TOKEN?: string;
   STORYBLOK_SPACE_ID?: string;
+  UNSPLASH_API_KEY?: string;
+  PEXELS_API_KEY?: string;
+  COVER_API_KEY?: string;
 }
 
 import { compileLayoutFromPrompt, type BrandAsset, type LayoutTree } from "../../src/lib/layoutCompiler";
@@ -132,6 +135,52 @@ async function fetchBrandAssets(queryText: string, env: Env): Promise<Partial<Br
   }
 }
 
+async function fetchMediaAssets(queryText: string, env: Env): Promise<BrandAsset["media"]> {
+  const query = (queryText || "business website").slice(0, 100);
+  const media: NonNullable<BrandAsset["media"]> = {};
+
+  try {
+    if (env.UNSPLASH_API_KEY) {
+      const res = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&orientation=landscape&per_page=6`,
+        { headers: { Authorization: `Client-ID ${env.UNSPLASH_API_KEY}` } },
+      );
+      if (res.ok) {
+        const data = (await res.json()) as {
+          results?: Array<{ urls?: { regular?: string }; alt_description?: string }>;
+        };
+        const gallery = (data.results || [])
+          .map((item) => item.urls?.regular)
+          .filter((value): value is string => Boolean(value));
+        media.imageUrl = gallery[0];
+        media.gallery = gallery.slice(0, 3);
+      }
+    }
+  } catch {}
+
+  try {
+    if (env.PEXELS_API_KEY) {
+      const res = await fetch(
+        `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&orientation=landscape&per_page=5`,
+        { headers: { Authorization: env.PEXELS_API_KEY } },
+      );
+      if (res.ok) {
+        const data = (await res.json()) as {
+          videos?: Array<{ video_files?: Array<{ quality?: string; width?: number; link?: string }> }>;
+        };
+        const files = data.videos?.flatMap((video) => video.video_files || []) || [];
+        const best =
+          files.find((file) => file.quality === "hd" && (file.width || 0) >= 1280) ||
+          files.find((file) => (file.width || 0) >= 960) ||
+          files[0];
+        media.videoUrl = best?.link;
+      }
+    }
+  } catch {}
+
+  return media;
+}
+
 async function storeStoryblokTree(tree: LayoutTree, orderId: string, env: Env) {
   if (!env.STORYBLOK_OAUTH_TOKEN || !env.STORYBLOK_SPACE_ID) return { stored: false, reason: 'storyblok_not_configured' };
 
@@ -187,7 +236,11 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   const orderId = (body.orderId || '').trim();
   const promptOnly = (body.prompt || '').trim();
   if (!orderId && promptOnly) {
-    const brand = await fetchBrandAssets(promptOnly, context.env);
+    const [brandAssets, media] = await Promise.all([
+      fetchBrandAssets(promptOnly, context.env),
+      fetchMediaAssets(promptOnly, context.env),
+    ]);
+    const brand = { ...brandAssets, media };
     const compiled = compileLayoutFromPrompt(promptOnly, brand);
     await writeAuditLog(
       context.env.DB,
@@ -251,7 +304,11 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   ]
     .filter(Boolean)
     .join('\n');
-  const brand = await fetchBrandAssets(`${order.business_description || ''} ${order.industry || ''}`, context.env);
+  const [brandAssets, media] = await Promise.all([
+    fetchBrandAssets(`${order.business_description || ''} ${order.industry || ''}`, context.env),
+    fetchMediaAssets(`${order.business_description || ''} ${order.industry || ''}`, context.env),
+  ]);
+  const brand = { ...brandAssets, media };
   const compiled = compileLayoutFromPrompt(prompt || 'Generate a business website with features, pricing, FAQ, and contact.', brand);
   const html = compiled.html.replace(
     '</footer>',

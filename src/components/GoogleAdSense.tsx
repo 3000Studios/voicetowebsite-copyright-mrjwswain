@@ -27,10 +27,10 @@ export const GoogleAdSense = ({ slot }: { slot?: string }) => {
   }, [slot]);
 
   return (
-    <div className="content-grid py-6">
+    <div className="content-grid py-6" data-vtw-ad-slot={slot || "default-slot"}>
       <div
         ref={adRef}
-        className="rounded-[28px] border border-white/10 bg-white/4 p-4 backdrop-blur-xl"
+        className="min-h-[180px] rounded-[28px] border border-white/10 bg-white/4 p-4 backdrop-blur-xl"
       >
         <div className="mb-3 flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
           <span>Sponsored space</span>
@@ -38,7 +38,7 @@ export const GoogleAdSense = ({ slot }: { slot?: string }) => {
         </div>
         <ins
           className="adsbygoogle"
-          style={{ display: "block", minHeight: "100px", width: "100%" }}
+          style={{ display: "block", minHeight: "120px", width: "100%" }}
           data-ad-client={AD_CLIENT}
           data-ad-slot={slot || "default-slot"}
           data-ad-format="auto"

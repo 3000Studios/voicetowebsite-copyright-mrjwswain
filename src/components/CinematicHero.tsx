@@ -89,7 +89,9 @@ export function CinematicHero() {
           </motion.div>
           <motion.div variants={item}>
             <SectionHeader
-              title={<>Speak your site into existence.</>}
+              label="Premium AI Website Builder"
+              title={<>Turn your voice into the best website.</>}
+              copy="Generate a scrollable homepage preview with custom copy, fonts, colors, video, images, motion, layout, legal notices, and conversion sections inferred from your prompt."
             />
           </motion.div>
           <motion.div variants={item} className="grid gap-3 text-sm text-slate-300 sm:grid-cols-3">

@@ -43,7 +43,7 @@ const faqs: FAQItem[] = [
     category: "Pricing & Plans",
     question: "What's included in each plan?",
     answer:
-      "Starter ($15/month): 3 hosted sites and 10 commands per cycle. Pro ($39/month): 15 hosted sites, 50 commands per cycle, code export, and watermark removal. Enterprise ($99/month): unlimited hosted sites and commands with priority support.",
+      "Starter ($9.99/month): 3 hosted sites and 50 commands per month. Pro ($19.99/month): 15 hosted sites, 150 commands per month, code export, premium sections, and watermark-free paid delivery. Ultimate ($49.99/month): 50 hosted sites and 500 commands per month with priority support.",
   },
   {
     category: "Pricing & Plans",
@@ -79,13 +79,13 @@ const faqs: FAQItem[] = [
     category: "Website Features",
     question: "Do you offer e-commerce functionality?",
     answer:
-      "Yes, our Pro and Enterprise plans include e-commerce templates with product catalogs, shopping carts, and payment integration via Stripe.",
+      "Yes, our Pro and Ultimate plans include e-commerce templates with product catalogs, shopping carts, and payment integration via Stripe.",
   },
   {
     category: "Website Features",
     question: "Can I edit my website after it's generated?",
     answer:
-      "Absolutely. You can regenerate any section using voice commands, or manually edit the code if you're on a Pro or Enterprise plan.",
+      "Absolutely. You can regenerate any section using voice commands, or manually edit the code if you're on a Pro or Ultimate plan.",
   },
   {
     category: "Technical",
@@ -97,7 +97,7 @@ const faqs: FAQItem[] = [
     category: "Technical",
     question: "Do I own the website code?",
     answer:
-      "Yes, with Pro and Enterprise plans you can export your website's source code and host it anywhere. You retain full ownership of your content.",
+      "Yes, with Pro and Ultimate plans you can export your website's source code and host it anywhere. You retain responsibility for your content.",
   },
   {
     category: "Technical",
@@ -109,13 +109,13 @@ const faqs: FAQItem[] = [
     category: "Support",
     question: "How do I get support?",
     answer:
-      "You can reach our support team via email at support@voicetowebsite.com or through the live chat on your dashboard. Enterprise customers get priority support with dedicated account managers.",
+      "You can reach our support team via email at support@voicetowebsite.com or through the live chat on your dashboard. Ultimate customers get priority support.",
   },
   {
     category: "Support",
     question: "Do you offer custom development?",
     answer:
-      "For Enterprise customers, we offer custom development services for complex requirements that go beyond our standard templates.",
+      "For Ultimate customers, we offer custom development services for complex requirements that go beyond our standard templates.",
   },
 ];
 

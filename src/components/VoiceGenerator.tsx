@@ -417,7 +417,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
               )}
 
               {/* Preview Frame */}
-              <div className="relative h-[78vh] min-h-[640px] rounded-2xl overflow-hidden border border-white/10 bg-slate-950">
+              <div className="relative h-[78vh] min-h-[640px] rounded-2xl overflow-auto border border-white/10 bg-slate-950">
                 <iframe
                   srcDoc={activeHtml}
                   className="w-full h-full"
@@ -450,7 +450,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({
-                            html: generatedSite.html,
+                            html: activeHtml,
                             title:
                               generatedSite.variations?.[activeVariation]
                                 ?.name || generatedSite.title,

@@ -1,6 +1,7 @@
 export interface Env {
   UNSPLASH_API_KEY?: string;
   PEXELS_API_KEY?: string;
+  COVER_API_KEY?: string;
 }
 
 function json(body: unknown, init: ResponseInit = {}) {
@@ -87,4 +88,3 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
     videoUrl,
   });
 };
-

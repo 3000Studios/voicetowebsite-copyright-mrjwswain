@@ -58,7 +58,7 @@ export const Pricing = () => {
     const config = PLAN_LIMITS[plan];
     if (plan === "commands") return "$2.99";
     if (cadence === "year") return `$${Math.round(config.price * 12 * 0.8)}`;
-    return `$${config.price}`;
+    return `$${config.price.toFixed(2)}`;
   };
 
   const getSlashPrice = (plan: PlanType) => {
@@ -155,9 +155,9 @@ export const Pricing = () => {
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <InfoCard title="Starter" body="Watermark-free launch. 10 commands." />
-              <InfoCard title="Pro" body="Exports + premium sections. 50 commands." />
-              <InfoCard title="Enterprise" body="Agency handoff + whitelabel use." />
+              <InfoCard title="Starter" body="$9.99/month. 50 commands." />
+              <InfoCard title="Pro" body="$19.99/month. Exports + 150 commands." />
+              <InfoCard title="Ultimate" body="$49.99/month. 500 commands." />
             </div>
           </div>
         </div>
@@ -215,7 +215,7 @@ export const Pricing = () => {
                     <ArrowRight className="h-4 w-4" />
                   </button>
                   <p className="text-xs leading-5 text-slate-400">
-                    One refund policy block, one sentence: after checkout the order is final, then setup begins immediately.
+                    All sales are final. By purchasing, you agree to the Terms, Privacy Policy, and no-refund policy.
                   </p>
                 </div>
               </motion.div>

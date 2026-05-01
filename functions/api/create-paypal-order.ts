@@ -26,6 +26,13 @@ const FALLBACK_CHECKOUT_URLS: Record<string, { month?: string; year?: string }> 
   },
 };
 
+const PLAN_AMOUNTS: Record<string, { value: string; description: string }> = {
+  starter: { value: "9.99", description: "VoiceToWebsite.com Starter - 50 commands per month" },
+  pro: { value: "19.99", description: "VoiceToWebsite.com Pro - 150 commands per month" },
+  enterprise: { value: "49.99", description: "VoiceToWebsite.com Ultimate - 500 commands per month" },
+  commands: { value: "2.99", description: "VoiceToWebsite.com More Commands - one-time add-on" },
+};
+
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
     ...init,
@@ -101,8 +108,38 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
             : context.env.PAYPAL_PLAN_ENTERPRISE;
 
       if (!planId) {
-        if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
-        return jsonResponse({ error: "PayPal subscription plans not configured yet" }, { status: 500 });
+        const amount = PLAN_AMOUNTS[plan];
+        if (!amount) return jsonResponse({ error: "Invalid plan" }, { status: 400 });
+        const orderRes = await fetch(`${paypalBaseUrl(context.env)}/v2/checkout/orders`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            intent: "CAPTURE",
+            purchase_units: [
+              {
+                amount: { currency_code: "USD", value: amount.value },
+                description: amount.description,
+              },
+            ],
+            application_context: {
+              brand_name: "VoiceToWebsite.com",
+              shipping_preference: "NO_SHIPPING",
+              user_action: "PAY_NOW",
+              return_url: `${appUrl}/setup?provider=paypal&plan=${encodeURIComponent(plan)}`,
+              cancel_url: `${appUrl}/pricing?canceled=1&provider=paypal`,
+            },
+          }),
+        });
+        const order = (await orderRes.json()) as { links?: Array<{ rel: string; href: string }> };
+        const approveUrl = order.links?.find((l) => l.rel === "approve")?.href;
+        if (!orderRes.ok || !approveUrl) {
+          if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
+          return jsonResponse({ error: "PayPal order creation failed" }, { status: 500 });
+        }
+        return jsonResponse({ url: approveUrl, fallback: false, note: "One-time PayPal checkout used because subscription plan IDs are not configured." });
       }
 
       const subRes = await fetch(`${paypalBaseUrl(context.env)}/v1/billing/subscriptions`, {
@@ -114,7 +151,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         body: JSON.stringify({
           plan_id: planId,
           application_context: {
-            brand_name: "Voice2Website",
+            brand_name: "VoiceToWebsite.com",
             locale: "en-US",
             user_action: "SUBSCRIBE_NOW",
             return_url: `${appUrl}/setup?provider=paypal&plan=${encodeURIComponent(plan)}`,
@@ -145,11 +182,11 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         purchase_units: [
           {
             amount: { currency_code: "USD", value: "2.99" },
-            description: "Voice2Website Extra Commands Pack — Adds 5 more commands (one-time, repeatable).",
+            description: PLAN_AMOUNTS.commands.description,
           },
         ],
         application_context: {
-          brand_name: "Voice2Website",
+          brand_name: "VoiceToWebsite.com",
           shipping_preference: "NO_SHIPPING",
           user_action: "PAY_NOW",
           return_url: `${appUrl}/setup?provider=paypal&plan=commands`,

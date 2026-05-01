@@ -12,6 +12,13 @@ export interface Env {
 
 const STRIPE_SESSIONS_URL = 'https://api.stripe.com/v1/checkout/sessions';
 
+const PRICE_DATA: Record<string, { name: string; amount: number; recurring: boolean }> = {
+  starter: { name: "VoiceToWebsite.com Starter", amount: 999, recurring: true },
+  pro: { name: "VoiceToWebsite.com Pro", amount: 1999, recurring: true },
+  enterprise: { name: "VoiceToWebsite.com Ultimate", amount: 4999, recurring: true },
+  commands: { name: "VoiceToWebsite.com More Commands", amount: 299, recurring: false },
+};
+
 const FALLBACK_STRIPE_LINKS: Record<string, { month?: string; year?: string }> = {
   starter: {
     month: "https://buy.stripe.com/9B65kD2Kx5mK5le8nUbAs0u",
@@ -101,7 +108,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         ? FALLBACK_STRIPE_LINKS.commands.month
         : FALLBACK_STRIPE_LINKS[plan]?.[cadence];
 
-    if (!priceId) {
+    if (!priceId && !PRICE_DATA[plan]) {
       if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
       return jsonResponse({ error: 'Invalid plan' }, { status: 400 });
     }
@@ -122,7 +129,18 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     form.set('mode', mode);
     form.set('success_url', `${appUrl}/success?provider=stripe&plan=${encodeURIComponent(plan)}&session_id={CHECKOUT_SESSION_ID}`);
     form.set('cancel_url', `${appUrl}/pricing?canceled=1`);
-    form.set('line_items[0][price]', priceId);
+    if (priceId) {
+      form.set('line_items[0][price]', priceId);
+    } else {
+      const priceData = PRICE_DATA[plan];
+      if (!priceData) return jsonResponse({ error: 'Invalid plan' }, { status: 400 });
+      form.set('line_items[0][price_data][currency]', 'usd');
+      form.set('line_items[0][price_data][product_data][name]', priceData.name);
+      form.set('line_items[0][price_data][unit_amount]', String(priceData.amount));
+      if (priceData.recurring) {
+        form.set('line_items[0][price_data][recurring][interval]', cadence === 'year' ? 'year' : 'month');
+      }
+    }
     form.set('line_items[0][quantity]', '1');
     form.set('client_reference_id', `voice2website_${plan}_${Date.now()}`);
     form.set('metadata[plan]', plan);

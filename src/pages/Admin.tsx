@@ -150,7 +150,7 @@ export const Admin = () => {
           <StatCard icon={<Users size={16} />} label="Users" value={String(analytics.totalUsers)} />
           <StatCard icon={<Globe size={16} />} label="Sites" value={String(analytics.totalSites)} />
           <StatCard icon={<DollarSign size={16} />} label="Paid Orders" value={String(analytics.paidOrders)} />
-          <StatCard icon={<BarChart3 size={16} />} label="Pro/Enterprise" value={String(analytics.proUsers)} />
+          <StatCard icon={<BarChart3 size={16} />} label="Pro/Ultimate" value={String(analytics.proUsers)} />
           <StatCard icon={<Shield size={16} />} label="24h Activity" value={String(analytics.activeLast24h)} />
           <StatCard icon={<Globe size={16} />} label="Countries Seen" value={String(analytics.countriesKnown)} />
         </div>
