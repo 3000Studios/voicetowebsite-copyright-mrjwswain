@@ -5,6 +5,19 @@ pages_build_output_dir = "dist"
 # Production environment - deploys to voicetowebsite.com
 [env.production]
 name = "voicetowebsite"
+vars = { NODE_VERSION = "20" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_id = "ca8260b3-d2e6-4fd3-933e-fd71ab52c71d"
+
+[[env.production.r2_buckets]]
+binding = "SITES_BUCKET"
+bucket_name = "voicetowebsite"
+
+[[env.production.kv_namespaces]]
+binding = "ORDERS_KV"
+id = "62e1beaaf1e54d09bd2dad0c81036c8a"
 
 [vars]
 NODE_VERSION = "20"
