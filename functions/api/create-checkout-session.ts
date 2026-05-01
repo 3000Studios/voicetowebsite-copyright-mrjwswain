@@ -8,6 +8,9 @@ export interface Env {
   STRIPE_PRICE_ENTERPRISE_MONTH: string;
   STRIPE_PRICE_ENTERPRISE_YEAR: string;
   STRIPE_PRICE_COMMANDS: string;
+  PAYPAL_CLIENT_ID?: string;
+  PAYPAL_CLIENT_SECRET?: string;
+  PAYPAL_ENV?: string;
 }
 
 const STRIPE_SESSIONS_URL = 'https://api.stripe.com/v1/checkout/sessions';
@@ -18,6 +21,53 @@ const PRICE_DATA: Record<string, { name: string; amount: number; recurring: bool
   enterprise: { name: "VoiceToWebsite.com Ultimate", amount: 4999, recurring: true },
   commands: { name: "VoiceToWebsite.com More Commands", amount: 299, recurring: false },
 };
+
+function paypalBaseUrl(env: Env) {
+  return (env.PAYPAL_ENV || "").toLowerCase() === "sandbox"
+    ? "https://api-m.sandbox.paypal.com"
+    : "https://api-m.paypal.com";
+}
+
+async function createPayPalFallback(env: Env, plan: string, appUrl: string) {
+  const price = PRICE_DATA[plan];
+  if (!price || !env.PAYPAL_CLIENT_ID || !env.PAYPAL_CLIENT_SECRET || !appUrl) return null;
+  const credentials = btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`);
+  const tokenRes = await fetch(`${paypalBaseUrl(env)}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      "content-type": "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials",
+  });
+  const token = (await tokenRes.json()) as { access_token?: string };
+  if (!tokenRes.ok || !token.access_token) return null;
+  const orderRes = await fetch(`${paypalBaseUrl(env)}/v2/checkout/orders`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token.access_token}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          amount: { currency_code: "USD", value: (price.amount / 100).toFixed(2) },
+          description: price.name,
+        },
+      ],
+      application_context: {
+        brand_name: "VoiceToWebsite.com",
+        shipping_preference: "NO_SHIPPING",
+        user_action: "PAY_NOW",
+        return_url: `${appUrl}/setup?provider=paypal&plan=${encodeURIComponent(plan)}`,
+        cancel_url: `${appUrl}/pricing?canceled=1&provider=paypal`,
+      },
+    }),
+  });
+  const order = (await orderRes.json()) as { links?: Array<{ rel: string; href: string }> };
+  return orderRes.ok ? order.links?.find((link) => link.rel === "approve")?.href || null : null;
+}
 
 const FALLBACK_STRIPE_LINKS: Record<string, { month?: string; year?: string }> = {
   starter: {
@@ -166,6 +216,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       }
     }
     if (!response.ok || !data.url) {
+      const paypalFallback = await createPayPalFallback(context.env, plan, appUrl);
+      if (paypalFallback) return jsonResponse({ url: paypalFallback, fallback: "paypal" });
       if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
       return jsonResponse({ error: data?.error?.message || 'Stripe session creation failed' }, { status: 500 });
     }
