@@ -1,4 +1,4 @@
-import { PLAN_LIMITS, PlanType } from "@/constants/plans";
+import { PLAN_LIMITS, PlanType, STRIPE_PAYMENT_LINKS } from "@/constants/plans";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
 import React from "react";
@@ -37,7 +37,17 @@ export const Pricing = () => {
       });
       const data = (await response.json()) as { url?: string; error?: string };
       if (!response.ok || !data.url) {
-        throw new Error(data.error || "Checkout initialization failed.");
+        if (provider === "stripe") {
+          const fallback =
+            plan === "commands"
+              ? STRIPE_PAYMENT_LINKS.commands.month
+              : STRIPE_PAYMENT_LINKS[plan][cadence];
+          if (fallback) {
+            window.location.href = fallback;
+            return;
+          }
+        }
+        throw new Error(data.error || `${provider} checkout initialization failed.`);
       }
       window.location.href = data.url;
     } catch (error) {
