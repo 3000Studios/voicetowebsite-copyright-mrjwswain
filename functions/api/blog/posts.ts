@@ -1,4 +1,5 @@
 import { BlogPostRow, Env, json, toPublicPost } from "./_shared";
+import { publishNextPost } from "./_publisher";
 
 export const onRequestGet = async (context: {
   request: Request;
@@ -7,6 +8,8 @@ export const onRequestGet = async (context: {
   if (!context.env.DB) {
     return json({ error: "DB binding not configured" }, { status: 500 });
   }
+
+  await publishNextPost(context.env);
 
   const url = new URL(context.request.url);
   const page = Math.max(1, Number(url.searchParams.get("page") || "1"));
@@ -61,4 +64,3 @@ export const onRequestGet = async (context: {
     },
   });
 };
-
