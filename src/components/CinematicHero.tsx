@@ -100,6 +100,43 @@ export function CinematicHero() {
               </div>
             ))}
           </motion.div>
+          <motion.div
+            variants={item}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr] pt-2"
+          >
+            <div className="overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/50 shadow-[0_24px_90px_rgba(0,0,0,0.35)]">
+              <video
+                src="/videos/voice-to-website-demo.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="h-[16rem] w-full object-cover"
+              />
+            </div>
+            <div className="grid gap-4">
+              <div className="overflow-hidden rounded-[24px] border border-white/10 bg-linear-to-br from-cyan-400/18 via-indigo-500/12 to-transparent">
+                <video
+                  src="/videos/tiktok-promo.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="h-[7.2rem] w-full object-cover opacity-90"
+                />
+              </div>
+              <div className="overflow-hidden rounded-[24px] border border-white/10 bg-linear-to-br from-fuchsia-400/18 via-indigo-500/12 to-transparent">
+                <video
+                  src="/videos/referral.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="h-[7.2rem] w-full object-cover opacity-90"
+                />
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         <motion.div variants={item}>
