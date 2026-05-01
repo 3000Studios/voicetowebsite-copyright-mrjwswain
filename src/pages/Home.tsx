@@ -3,7 +3,6 @@ import { CompetitorComparison } from "@/components/CompetitorComparison";
 import { FeaturesV2 } from "@/components/FeaturesV2";
 import { GoogleAdSense } from "@/components/GoogleAdSense";
 import { PlaygroundGenerator } from "@/components/PlaygroundGenerator";
-import { PricingV2 } from "@/components/PricingV2";
 import {
   ArrowRight,
   CheckCircle2,
@@ -130,8 +129,6 @@ export const Home = () => {
           <PlaygroundGenerator />
         </div>
       </section>
-
-      <PricingV2 />
 
       <CompetitorComparison />
 
