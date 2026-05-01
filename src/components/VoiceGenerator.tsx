@@ -450,7 +450,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({
-                            html: activeHtml,
+                            html: generatedSite.html,
                             title:
                               generatedSite.variations?.[activeVariation]
                                 ?.name || generatedSite.title,
