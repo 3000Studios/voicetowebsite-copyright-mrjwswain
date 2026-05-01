@@ -1,5 +1,7 @@
 export interface Env {
   DB: D1Database;
+  ADMIN_API_TOKEN?: string;
+  OWNER_ADMIN_EMAIL?: string;
 }
 
 function json(body: unknown, init: ResponseInit = {}) {
@@ -14,7 +16,20 @@ function json(body: unknown, init: ResponseInit = {}) {
 }
 
 export const onRequestGet = async (context: { request: Request; env: Env }) => {
-  // NOTE: protect this route with Cloudflare Access in production.
+  const authHeader = context.request.headers.get("authorization") || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length).trim()
+    : "";
+  const ownerHeader = (context.request.headers.get("x-owner-email") || "")
+    .trim()
+    .toLowerCase();
+  const expectedOwner = (context.env.OWNER_ADMIN_EMAIL || "").trim().toLowerCase();
+  const tokenOk = !!context.env.ADMIN_API_TOKEN && token === context.env.ADMIN_API_TOKEN;
+  const ownerOk = !!expectedOwner && ownerHeader === expectedOwner;
+  if (!tokenOk && !ownerOk) {
+    return json({ error: "Unauthorized", success: false }, { status: 401 });
+  }
+
   if (!context.env.DB) {
     console.error("DB binding missing");
     return json({ error: "Database binding not configured on server", success: false }, { status: 500 });

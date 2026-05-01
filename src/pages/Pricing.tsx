@@ -1,4 +1,5 @@
 import { isUnlimited, PLAN_LIMITS, PlanType, STRIPE_PAYMENT_LINKS } from "@/constants/plans";
+import { trackEvent } from "@/lib/analytics";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
 import React from "react";
@@ -17,6 +18,7 @@ export const Pricing = () => {
   const [provider, setProvider] = React.useState<"stripe" | "paypal">("stripe");
 
   const handleUpgrade = async (plan: PlanType) => {
+    trackEvent("pricing_cta_clicked", { plan, cadence, provider });
     setSubmitting(plan);
     try {
       if (plan === "free") {
@@ -35,6 +37,7 @@ export const Pricing = () => {
       const response = await fetch(`${endpoint}?${query}`, {
         method: "POST",
       });
+      trackEvent("checkout_started", { plan, provider, cadence });
       const data = (await response.json()) as { url?: string; error?: string };
       if (!response.ok || !data.url) {
         if (provider === "stripe") {

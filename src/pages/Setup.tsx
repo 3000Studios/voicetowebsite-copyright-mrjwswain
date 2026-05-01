@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { PLAN_LIMITS, PlanType } from '@/constants/plans';
+import { trackEvent } from '@/lib/analytics';
 import { FizzyButton } from '@/components/ui/FizzyButton';
 
 async function sha256Hex(input: string) {
@@ -91,6 +92,7 @@ export const Setup = () => {
       );
 
       navigate('/dashboard');
+      trackEvent("user_onboarding_completed", { plan, provider });
     } catch (e: any) {
       setError(e?.message || 'Setup failed');
     } finally {

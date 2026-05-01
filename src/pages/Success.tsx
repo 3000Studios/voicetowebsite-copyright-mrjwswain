@@ -9,6 +9,7 @@ import { motion } from "motion/react";
 import React, { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useSearchParams } from "react-router-dom";
+import { trackEvent } from "@/lib/analytics";
 
 type SessionResponse = {
   ok?: boolean;
@@ -75,6 +76,21 @@ export const Success = () => {
     style_preference: "",
   });
 
+  useEffect(() => {
+    const storedStyle = localStorage.getItem("vtw_preview_style") || "";
+    const mapped =
+      storedStyle === "Minimal"
+        ? "clean-minimal"
+        : storedStyle === "Bold"
+          ? "bold-energetic"
+          : storedStyle === "Luxury"
+            ? "dark-premium"
+            : "";
+    if (mapped) {
+      setForm((current) => ({ ...current, style_preference: mapped }));
+    }
+  }, []);
+
   const plan = useMemo(
     () => session?.plan || initialPlan,
     [session?.plan, initialPlan],
@@ -102,6 +118,7 @@ export const Success = () => {
         const data = (await response.json()) as SessionResponse;
         if (!response.ok)
           throw new Error(data.error || "Unable to verify checkout session.");
+        trackEvent("checkout_completed", { provider: "stripe", plan: data.plan });
 
         setSession(data);
         setForm((current) => ({
@@ -162,6 +179,7 @@ export const Success = () => {
         throw new Error(orderData.error || "Unable to create the order.");
 
       setOrderId(orderData.id);
+      trackEvent("user_onboarding_started", { plan, orderId: orderData.id });
       setStage("generating");
 
       const generateQuery = new URLSearchParams({ orderId: orderData.id });
@@ -175,6 +193,7 @@ export const Success = () => {
 
       setSiteUrl(generateData.siteUrl || `/api/site/${orderData.id}`);
       setStage("done");
+      trackEvent("site_generation_success", { orderId: orderData.id, plan });
     } catch (submitError) {
       setError(
         submitError instanceof Error

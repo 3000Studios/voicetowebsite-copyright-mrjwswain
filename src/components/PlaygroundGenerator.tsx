@@ -30,6 +30,11 @@ interface GeneratedPreview {
   cta: string;
 }
 
+type PreviewVariant = {
+  label: "Luxury" | "Minimal" | "Bold";
+  preview: GeneratedPreview;
+};
+
 const EXAMPLE_PROMPTS = [
   "Create a luxury salon website for Halo Beauty Studio with a hero video and booking section",
   "Build a fitness landing page for Iron Pulse Gym with bold neon colors and trainer highlights",
@@ -123,6 +128,8 @@ export function PlaygroundGenerator({
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPreview, setGeneratedPreview] =
     useState<GeneratedPreview | null>(null);
+  const [variants, setVariants] = useState<PreviewVariant[]>([]);
+  const [selectedVariant, setSelectedVariant] = useState<"Luxury" | "Minimal" | "Bold" | null>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [inputMode, setInputMode] = useState<"voice" | "text">("text");
   const [textInput, setTextInput] = useState("");
@@ -233,7 +240,7 @@ export function PlaygroundGenerator({
       style?.headlineEffect || prompt,
     );
 
-    setGeneratedPreview({
+    const basePreview: GeneratedPreview = {
       siteName,
       heroHeadline: remoteCopy?.heroHeadline || localCopy.heroHeadline,
       heroSubhead: remoteCopy?.heroSubhead || localCopy.heroSubhead,
@@ -253,7 +260,42 @@ export function PlaygroundGenerator({
       accentA: style?.accentA || "#6366f1",
       accentB: style?.accentB || "#d946ef",
       headlineEffect: style?.headlineEffect || "slide-in",
-    });
+    };
+
+    const styleVariants: PreviewVariant[] = [
+      {
+        label: "Luxury",
+        preview: {
+          ...basePreview,
+          accentA: "#a855f7",
+          accentB: "#06b6d4",
+          headingFont: "Poppins",
+        },
+      },
+      {
+        label: "Minimal",
+        preview: {
+          ...basePreview,
+          accentA: "#2563eb",
+          accentB: "#60a5fa",
+          headingFont: "Inter",
+          bodyFont: "Inter",
+        },
+      },
+      {
+        label: "Bold",
+        preview: {
+          ...basePreview,
+          accentA: "#ef4444",
+          accentB: "#f59e0b",
+          headingFont: "Anton",
+        },
+      },
+    ];
+
+    setVariants(styleVariants);
+    setSelectedVariant("Luxury");
+    setGeneratedPreview(styleVariants[0].preview);
 
     setIsGenerating(false);
     setActiveStep(3);
@@ -262,6 +304,8 @@ export function PlaygroundGenerator({
   const startRecording = () => {
     setTranscript("");
     setGeneratedPreview(null);
+    setVariants([]);
+    setSelectedVariant(null);
     setActiveStep(1);
     setIsRecording(true);
     recognitionRef.current?.start?.();
@@ -279,6 +323,13 @@ export function PlaygroundGenerator({
       void generatePreview(textInput.trim());
     }
   };
+
+  useEffect(() => {
+    if (generatedPreview) {
+      localStorage.setItem("vtw_preview_style", selectedVariant || "Luxury");
+      localStorage.setItem("vtw_preview_site_name", generatedPreview.siteName);
+    }
+  }, [generatedPreview, selectedVariant]);
 
   return (
     <div className={`w-full ${isHero ? "max-w-5xl" : "max-w-4xl"} mx-auto`}>
@@ -391,6 +442,35 @@ export function PlaygroundGenerator({
       <AnimatePresence>
         {generatedPreview && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 rounded-2xl border border-white/15 bg-slate-950/90 overflow-hidden">
+            {variants.length > 0 ? (
+              <div className="border-b border-white/10 p-4">
+                <div className="mb-2 text-xs uppercase tracking-[0.25em] text-white/60">
+                  Choose a style
+                </div>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {variants.map((variant) => (
+                    <button
+                      key={variant.label}
+                      type="button"
+                      onClick={() => {
+                        setGeneratedPreview(variant.preview);
+                        setSelectedVariant(variant.label);
+                      }}
+                      className={`rounded-xl border px-4 py-3 text-left transition ${
+                        selectedVariant === variant.label
+                          ? "border-cyan-300/70 bg-cyan-500/20 text-white"
+                          : "border-white/10 bg-white/5 text-white/80 hover:border-white/30"
+                      }`}
+                    >
+                      <div className="font-semibold">{variant.label}</div>
+                      <div className="text-xs text-white/60">
+                        {variant.preview.headingFont} · {variant.preview.accentA}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <div className="relative">
               <video src={generatedPreview.heroVideoUrl} autoPlay loop muted playsInline className="h-[330px] w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />

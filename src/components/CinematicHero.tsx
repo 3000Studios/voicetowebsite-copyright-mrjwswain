@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Globe, Sparkles, Zap } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { trackEvent } from "@/lib/analytics";
 import { PlaygroundGenerator } from "./PlaygroundGenerator";
 
 export function CinematicHero() {
@@ -177,20 +179,30 @@ export function CinematicHero() {
           variants={itemVariants}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <motion.button
-            className="btn-primary text-lg px-8 py-4"
+          <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            Start Building Free
-          </motion.button>
-          <motion.button
-            className="btn-secondary text-lg px-8 py-4"
+            <Link
+              to="/pricing"
+              className="btn-primary text-lg px-8 py-4 inline-flex"
+              onClick={() => trackEvent("hero_cta_clicked", { location: "cinematic_hero" })}
+            >
+              Start Building Free
+            </Link>
+          </motion.div>
+          <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            Watch Demo
-          </motion.button>
+            <Link
+              to="/examples"
+              className="btn-secondary text-lg px-8 py-4 inline-flex"
+              onClick={() => trackEvent("demo_watched", { location: "cinematic_hero" })}
+            >
+              Watch Demo
+            </Link>
+          </motion.div>
         </motion.div>
 
         {/* Trust Indicators */}

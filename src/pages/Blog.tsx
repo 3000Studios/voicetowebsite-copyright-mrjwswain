@@ -25,6 +25,8 @@ interface BlogPost {
   readTime: string;
   slug: string;
   featured?: boolean;
+  sourceMode?: "original" | "sourced";
+  citations?: string[];
 }
 
 const categories = [
@@ -40,19 +42,31 @@ export const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
 
   useEffect(() => {
-    fetchPosts();
+    void fetchPosts(1);
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (nextPage: number) => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/blog/posts");
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        pageSize: "9",
+      });
+      if (selectedCategory !== "All") params.set("category", selectedCategory);
+      const response = await fetch(`/api/blog/posts?${params.toString()}`);
       if (response.ok) {
-        const data = (await response.json()) as { posts?: BlogPost[] };
+        const data = (await response.json()) as {
+          posts?: BlogPost[];
+          pagination?: { hasNext?: boolean };
+        };
         setPosts(data.posts || []);
+        setPage(nextPage);
+        setHasNext(!!data.pagination?.hasNext);
       } else {
-        // Fallback to sample posts if API fails
         setPosts(getSamplePosts());
       }
     } catch (error) {
@@ -61,6 +75,10 @@ export const Blog = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    void fetchPosts(1);
+  }, [selectedCategory]);
 
   const getSamplePosts = (): BlogPost[] => [
     {
@@ -162,6 +180,7 @@ export const Blog = () => {
           name="description"
           content="Stay updated with the latest in AI website building technology, business growth tips, and digital marketing strategies."
         />
+        <link rel="canonical" href="https://voicetowebsite.com/blog" />
       </Helmet>
 
       {/* Header */}
@@ -317,6 +336,28 @@ export const Blog = () => {
               ))}
             </div>
           )}
+
+          {!loading ? (
+            <div className="mt-10 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => void fetchPosts(Math.max(1, page - 1))}
+                disabled={page <= 1}
+                className="hero-secondary-button disabled:opacity-40"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-slate-400">Page {page}</span>
+              <button
+                type="button"
+                onClick={() => void fetchPosts(page + 1)}
+                disabled={!hasNext}
+                className="hero-secondary-button disabled:opacity-40"
+              >
+                Next
+              </button>
+            </div>
+          ) : null}
 
           {!loading && filteredPosts.length === 0 && (
             <div className="text-center py-20">

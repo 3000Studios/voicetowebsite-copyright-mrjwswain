@@ -18,6 +18,10 @@ interface BlogPost {
   readTime: string;
   slug: string;
   author?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  sourceMode?: "original" | "sourced";
+  citations?: string[];
 }
 
 export const BlogPost = () => {
@@ -111,6 +115,27 @@ export const BlogPost = () => {
       <Helmet>
         <title>{post.title} | VoiceToWebsite Blog</title>
         <meta name="description" content={post.excerpt} />
+        <link
+          rel="canonical"
+          href={post.canonicalUrl || `https://voicetowebsite.com/blog/${post.slug}`}
+        />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:type" content="article" />
+        {post.ogImage ? <meta property="og:image" content={post.ogImage} /> : null}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: post.title,
+            description: post.excerpt,
+            datePublished: post.publishedAt,
+            dateModified: post.publishedAt,
+            mainEntityOfPage: post.canonicalUrl || `https://voicetowebsite.com/blog/${post.slug}`,
+            author: { "@type": "Organization", name: "VoiceToWebsite Team" },
+            publisher: { "@type": "Organization", name: "VoiceToWebsite" },
+          })}
+        </script>
       </Helmet>
 
       {/* Header */}
@@ -179,6 +204,26 @@ export const BlogPost = () => {
               </span>
             ))}
           </div>
+
+          {post.citations?.length ? (
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
+              <h3 className="text-white font-semibold mb-3">Sources</h3>
+              <ul className="space-y-2 text-sm text-slate-300">
+                {post.citations.map((citation) => (
+                  <li key={citation}>
+                    <a
+                      href={citation}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-cyan-300 hover:text-cyan-200 underline"
+                    >
+                      {citation}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {/* Share */}
           <div className="mt-8 pt-8 border-t border-white/10">

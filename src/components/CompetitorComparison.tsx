@@ -5,8 +5,6 @@ import { Check, Code2, Globe, Mic, Sparkles, X, Zap } from "lucide-react";
 interface Competitor {
   name: string;
   logo: string;
-  strengths: string[];
-  weaknesses: string[];
   price: string;
   features: {
     voiceInput: boolean;
@@ -29,12 +27,6 @@ const competitors: Competitor[] = [
   {
     name: "Durable",
     logo: "D",
-    strengths: ["Instant setup", "Business tools bundled", "Frequent updates"],
-    weaknesses: [
-      "Generic AI copy",
-      "Limited e-commerce",
-      "Mobile optimization issues",
-    ],
     price: "$15/mo",
     features: {
       voiceInput: false,
@@ -48,12 +40,6 @@ const competitors: Competitor[] = [
   {
     name: "Framer",
     logo: "F",
-    strengths: ["Design freedom", "Free-form canvas", "Plugin ecosystem"],
-    weaknesses: [
-      "Steep learning curve",
-      "Higher monthly fees",
-      "Community support only",
-    ],
     price: "$20/mo",
     features: {
       voiceInput: false,
@@ -67,8 +53,6 @@ const competitors: Competitor[] = [
   {
     name: "10Web",
     logo: "10",
-    strengths: ["WordPress-based", "Fast hosting", "Elementor customization"],
-    weaknesses: ["Traffic restrictions", "Rigid designs", "WP learning curve"],
     price: "$20/mo",
     features: {
       voiceInput: false,
@@ -82,8 +66,6 @@ const competitors: Competitor[] = [
   {
     name: "Wix ADI",
     logo: "W",
-    strengths: ["Brand recognition", "Template library", "SEO tools"],
-    weaknesses: ["Generic layouts", "Expensive upsells", "Limited code access"],
     price: "$16/mo",
     features: {
       voiceInput: false,
@@ -144,7 +126,7 @@ export function CompetitorComparison() {
             transition={{ delay: 0.1 }}
             className="text-headline mb-4"
           >
-            Why We're the <span className="gradient-text">Better Choice</span>
+            Feature Matrix <span className="gradient-text">At a Glance</span>
           </motion.h2>
 
           <motion.p
@@ -154,7 +136,7 @@ export function CompetitorComparison() {
             transition={{ delay: 0.2 }}
             className="text-body max-w-2xl mx-auto"
           >
-            See how VoiceToWebsite compares to other AI website builders
+            Public feature availability and baseline pricing snapshot.
           </motion.p>
         </div>
 

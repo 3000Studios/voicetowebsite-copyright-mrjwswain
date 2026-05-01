@@ -63,7 +63,11 @@ export const Admin = () => {
     setChatLogs(chatSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
 
     try {
-      const res = await fetch("/api/admin/orders?limit=200");
+      const res = await fetch("/api/admin/orders?limit=200", {
+        headers: {
+          "x-owner-email": String(user?.email || "").trim().toLowerCase(),
+        },
+      });
       const data = (await res.json()) as { rows?: OrderRow[] };
       setOrders(data.rows || []);
     } catch {
