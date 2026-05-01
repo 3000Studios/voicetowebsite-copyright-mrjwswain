@@ -60,7 +60,7 @@ const emailTemplates = {
       
       Ready to speak your site into existence?
       
-      [Start Building]
+      [Launch your site]
       
       Need help? Reply to this email - we're here for you.
       

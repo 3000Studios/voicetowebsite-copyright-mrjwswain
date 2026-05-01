@@ -351,7 +351,7 @@ export const Examples = () => {
                   to="/pricing"
                   className="hero-primary-button text-lg px-10 py-5 inline-flex"
                 >
-                  Start Building Free
+                  Launch your site
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </div>

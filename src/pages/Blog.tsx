@@ -42,6 +42,7 @@ export const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(false);
 
@@ -66,11 +67,14 @@ export const Blog = () => {
         setPosts(data.posts || []);
         setPage(nextPage);
         setHasNext(!!data.pagination?.hasNext);
+        setLoadError(null);
       } else {
-        setPosts(getSamplePosts());
+        setPosts([]);
+        setLoadError("Blog publishing is not connected yet.");
       }
     } catch (error) {
-      setPosts(getSamplePosts());
+      setPosts([]);
+      setLoadError("Blog publishing is not connected yet.");
     } finally {
       setLoading(false);
     }
@@ -79,82 +83,6 @@ export const Blog = () => {
   useEffect(() => {
     void fetchPosts(1);
   }, [selectedCategory]);
-
-  const getSamplePosts = (): BlogPost[] => [
-    {
-      id: "1",
-      title: "The Future of AI Website Building: Voice Commands Take Over",
-      excerpt:
-        "Discover how voice-to-website technology is revolutionizing the way businesses create their online presence. No coding required.",
-      content: "",
-      category: "AI & Technology",
-      tags: ["AI", "Voice Technology", "Future"],
-      publishedAt: new Date().toISOString(),
-      readTime: "5 min",
-      slug: "future-of-ai-website-building",
-      featured: true,
-    },
-    {
-      id: "2",
-      title: "How to Launch Your Business Website in Under 5 Minutes",
-      excerpt:
-        "A step-by-step guide to using VoiceToWebsite for rapid website deployment. Perfect for entrepreneurs and small businesses.",
-      content: "",
-      category: "Tutorials",
-      tags: ["Tutorial", "Quick Start", "Business"],
-      publishedAt: new Date(Date.now() - 86400000).toISOString(),
-      readTime: "3 min",
-      slug: "launch-website-in-5-minutes",
-    },
-    {
-      id: "3",
-      title: "10 AI Tools Every Business Owner Should Know in 2024",
-      excerpt:
-        "From content creation to customer service, these AI tools will transform how you run your business.",
-      content: "",
-      category: "Business Growth",
-      tags: ["AI Tools", "Productivity", "2024"],
-      publishedAt: new Date(Date.now() - 172800000).toISOString(),
-      readTime: "8 min",
-      slug: "ai-tools-2024",
-    },
-    {
-      id: "4",
-      title: "SEO Best Practices for AI-Generated Websites",
-      excerpt:
-        "Learn how to optimize your AI-generated website for search engines and drive organic traffic.",
-      content: "",
-      category: "SEO & Marketing",
-      tags: ["SEO", "Marketing", "Traffic"],
-      publishedAt: new Date(Date.now() - 259200000).toISOString(),
-      readTime: "6 min",
-      slug: "seo-for-ai-websites",
-    },
-    {
-      id: "5",
-      title: "Why Your Small Business Needs a Professional Website",
-      excerpt:
-        "The impact of having a professional online presence on customer trust and business growth.",
-      content: "",
-      category: "Business Growth",
-      tags: ["Small Business", "Website", "Growth"],
-      publishedAt: new Date(Date.now() - 345600000).toISOString(),
-      readTime: "4 min",
-      slug: "small-business-website-importance",
-    },
-    {
-      id: "6",
-      title: "Comparing VoiceToWebsite vs Traditional Builders",
-      excerpt:
-        "A detailed comparison of speed, cost, and quality between AI voice builders and traditional website builders.",
-      content: "",
-      category: "Website Building",
-      tags: ["Comparison", "Review", "Builders"],
-      publishedAt: new Date(Date.now() - 432000000).toISOString(),
-      readTime: "7 min",
-      slug: "voicetowebsite-vs-builders",
-    },
-  ];
 
   const filteredPosts =
     selectedCategory === "All"
@@ -288,6 +216,13 @@ export const Blog = () => {
             <div className="flex items-center justify-center py-20">
               <RefreshCw className="w-8 h-8 text-indigo-400 animate-spin" />
             </div>
+          ) : posts.length === 0 ? (
+            <GlassCard className="mx-auto max-w-3xl p-8 text-center">
+              <h2 className="text-2xl font-bold text-white">Blog publishing is coming online.</h2>
+              <p className="mt-3 text-slate-400">
+                {loadError || "We are preparing the editorial feed now. Once posts are connected, they will appear here automatically."}
+              </p>
+            </GlassCard>
           ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {regularPosts.map((post, index) => (

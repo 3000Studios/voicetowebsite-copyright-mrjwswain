@@ -30,7 +30,7 @@ export const Preloader = () => {
           className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-between p-12 lg:p-24"
         >
           <div className="w-full flex justify-between items-start">
-            <span className="text-[10px] font-black tracking-[0.5em] uppercase opacity-40">Neural Architect // System Initialization</span>
+            <span className="text-[10px] font-black tracking-[0.5em] uppercase opacity-40">VoiceToWebsite // System Initialization</span>
             <span className="text-[10px] font-black tracking-[0.5em] uppercase opacity-40">v8.2.0</span>
           </div>
 
@@ -47,7 +47,7 @@ export const Preloader = () => {
 
           <div className="w-full flex justify-between items-end">
             <div className="space-y-2">
-              <span className="block text-[8px] uppercase tracking-widest opacity-20">Protocol: Manifest_Alpha</span>
+              <span className="block text-[8px] uppercase tracking-widest opacity-20">Protocol: Launch_Alpha</span>
               <span className="block text-[8px] uppercase tracking-widest opacity-20">Secure Tunnel: Established</span>
             </div>
             <span className="text-[8px] uppercase tracking-widest opacity-20">© 2026</span>

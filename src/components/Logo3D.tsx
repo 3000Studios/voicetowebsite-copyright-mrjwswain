@@ -49,7 +49,7 @@ const LogoMesh = () => {
                 <Mic2 className="text-white" size={32} />
               </div>
               <div className="px-3 py-1 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg">
-                Neural Link
+                Voice Link
               </div>
             </div>
           </Html>

@@ -7,19 +7,19 @@ export const About = () => {
       <div className="max-w-7xl mx-auto pt-40 pb-20">
         <div className="mb-40 space-y-12">
           <span className="subheading text-indigo-500 font-bold">
-            The Protocol // Origins
+            About VoiceToWebsite
           </span>
           <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             className="hero-title"
           >
-            Neural <br /> <span className="text-white/20">Build.</span>
+            Build with <br /> <span className="text-white/20">voice.</span>
           </motion.h1>
           <p className="text-3xl text-slate-400 max-w-3xl font-light italic leading-relaxed opacity-60">
             We believe that the barrier between an idea and its digital creation
-            should be as thin as a spoken word. Neural Architect is pioneering
-            the next generation of the web.
+            should be as thin as a spoken word. VoiceToWebsite turns business
+            briefs into launch-ready websites with a fast, branded workflow.
           </p>
         </div>
 
@@ -30,19 +30,18 @@ export const About = () => {
           </div>
           <div className="space-y-12">
             <h2 className="text-6xl font-bold tracking-tighter uppercase italic leading-none">
-              Redefining <br /> Creation.
+              Product <br /> direction.
             </h2>
             <div className="space-y-8">
               <p className="text-xl font-light italic leading-relaxed opacity-60">
-                Founded in 2024, Neural Architect started with a simple
-                question: "Why do we still have to code when we can just talk?"
-                Our team of world-class engineers and designers spent two years
-                developing the neural architecture that powers our platform.
+                Founded to remove the friction between a request and a live
+                website, the platform focuses on clear layouts, fast delivery,
+                and production-ready output.
               </p>
               <p className="text-xl font-light italic leading-relaxed opacity-60">
-                Today, we serve over 50,000 users globally, from solo
-                entrepreneurs to Fortune 500 companies, helping them speak their
-                business into life.
+                The goal is simple: keep the product useful, legible, and easy
+                to trust so customers can move from idea to published site
+                without unnecessary steps.
               </p>
             </div>
           </div>
@@ -50,10 +49,10 @@ export const About = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-white/5 border border-white/5">
           {[
-            { title: "50k+", desc: "Active Architects" },
-            { title: "99.9%", desc: "Neural Uptime" },
-            { title: "24ms", desc: "Sync Latency" },
-            { title: "200+", desc: "Awards Won" },
+            { title: "3-step", desc: "Launch flow" },
+            { title: "24/7", desc: "Hosted delivery" },
+            { title: "SEO", desc: "Ready pages" },
+            { title: "Code", desc: "Ownership" },
           ].map((stat, i) => (
             <div key={i} className="p-16 bg-[#080808] space-y-6">
               <div className="text-4xl font-display italic tracking-tight">

@@ -28,10 +28,11 @@ export const GoogleAdSense = ({ slot }: { slot?: string }) => {
     <div className="content-grid py-6">
       <div
         ref={adRef}
-        className="rounded-[28px] border border-white/10 bg-white/4 p-6 text-center backdrop-blur-xl"
+        className="rounded-[28px] border border-white/10 bg-white/4 p-4 backdrop-blur-xl"
       >
-        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
-          Secure ad zone
+        <div className="mb-3 flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-400">
+          <span>Sponsored space</span>
+          <span className="text-cyan-300">Ready</span>
         </div>
         <ins
           className="adsbygoogle"

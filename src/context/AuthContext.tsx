@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const defaultProfile: UserProfile = {
-          username: firebaseUser.displayName || "Neural_Architect",
+      username: firebaseUser.displayName || "VoiceToWebsite_User",
           email: firebaseUser.email || "",
           tokens: 50,
           plan: "free",

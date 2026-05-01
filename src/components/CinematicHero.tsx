@@ -114,14 +114,6 @@ export function CinematicHero() {
           </MediaFrame>
           <div className="mt-4 flex flex-col items-center gap-3">
             <Link
-              to="/pricing"
-              className="hero-primary-button px-8 py-4 text-base"
-              onClick={() => trackEvent("hero_cta_clicked", { location: "cinematic_hero" })}
-            >
-              Start building
-              <Sparkles className="h-4 w-4" />
-            </Link>
-            <Link
               to="/examples"
               className="hero-secondary-button px-8 py-4 text-base"
               onClick={() => trackEvent("demo_watched", { location: "cinematic_hero" })}

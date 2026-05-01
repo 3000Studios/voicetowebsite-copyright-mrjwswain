@@ -37,7 +37,7 @@ export const Legal = () => {
                 <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">3. User Content</h3>
                 <p>You retain all rights to the voice and text input you provide. However, you grant VoiceToWebsite a non-exclusive, worldwide, royalty-free license to use this content to improve our AI models.</p>
                 <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">4. Intellectual Property</h3>
-                <p>The VoiceToWebsite platform, including its neural architecture, design system, and underlying code, is the property of VoiceToWebsite.com and is protected by international copyright laws.</p>
+                <p>The VoiceToWebsite platform, including its design system and underlying code, is the property of VoiceToWebsite.com and is protected by international copyright laws.</p>
                 <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">5. Limitation of Liability</h3>
                 <p>VoiceToWebsite shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use our services.</p>
                 <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">6. Refund Policy</h3>

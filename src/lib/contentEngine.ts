@@ -53,7 +53,7 @@ export function generateComparisonContent(competitor: string, ourStrengths: stri
       { question: `Is VoiceToWebsite faster than ${competitor}?`, answer: `Yes. VoiceToWebsite generates sites in under 2 minutes using voice input, while ${competitor} requires manual configuration.` },
       { question: `Can I export my code with ${competitor}?`, answer: `VoiceToWebsite provides full code ownership. Check ${competitor}'s terms for export limitations.` },
     ],
-    cta: "Start Building Free",
+    cta: "Launch your site",
     schema: {
       "@context": "https://schema.org",
       "@type": "ComparisonTable",

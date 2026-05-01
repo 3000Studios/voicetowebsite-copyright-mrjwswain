@@ -145,7 +145,7 @@ export const VoiceApp = ({
     // Enforce limits
     if (!isOwnerAdmin && generationCount >= limits.commandsPerCycle) {
       setGenError(
-        `Neural limit reached for ${limits.name}. Upgrade to Pro for continued architectural access.`,
+        `Command limit reached for ${limits.name}. Upgrade to Pro for continued architectural access.`,
       );
       setShowPaywall(true);
       return;
@@ -238,7 +238,7 @@ export const VoiceApp = ({
             ownerId: user.uid,
             timestamp: serverTimestamp(),
             isDraft: true,
-            title: `Neural Build ${new Date().toLocaleTimeString()}`,
+            title: `Launch Build ${new Date().toLocaleTimeString()}`,
           });
         } catch (saveErr) {
           console.error(saveErr);
@@ -253,7 +253,7 @@ export const VoiceApp = ({
       });
     } catch (error: any) {
       console.error("Generation error:", error);
-      setGenError(error.message || "Neural Sync Failed");
+      setGenError(error.message || "Launch sync failed");
     } finally {
       setIsGenerating(false);
       setInput("");
@@ -282,7 +282,7 @@ export const VoiceApp = ({
                   Vocal Sync Active
                 </h3>
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest italic leading-none">
-                  Neural Power:{" "}
+                  Launch power:{" "}
                   <span
                     className={
                       generationCount >= limits.commandsPerCycle
@@ -331,7 +331,7 @@ export const VoiceApp = ({
                 {[
                   "Launch Empire Store",
                   "Add Pro Paywall",
-                  "Neural Layout",
+                  "Launch Layout",
                   "Optimize ROI",
                 ].map((hint) => (
                   <button
@@ -356,7 +356,7 @@ export const VoiceApp = ({
               >
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-[10px] font-black uppercase text-red-500 tracking-widest italic">
-                  Neural Sync Failed: {genError}
+                  Launch sync failed: {genError}
                 </span>
                 <button
                   onClick={() => setGenError(null)}
@@ -403,7 +403,7 @@ export const VoiceApp = ({
                   <div className="w-3 h-3 rounded-full bg-slate-800" />
                 </div>
                 <div className="text-[10px] font-mono text-indigo-500 uppercase tracking-widest font-black flex items-center gap-2">
-                  <Monitor size={14} /> LIVE NEURAL PREVIEW
+                  <Monitor size={14} /> LIVE PREVIEW
                 </div>
               </div>
 
@@ -567,7 +567,7 @@ export const VoiceApp = ({
                   🔥 You Hit The Limit
                 </h2>
                 <p className="text-slate-400 font-light italic">
-                  Unlock unlimited websites, elite neural building, and
+                  Unlock unlimited websites, faster building, and
                   high-conversion monetization tools.
                 </p>
               </div>
