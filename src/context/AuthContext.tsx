@@ -36,6 +36,8 @@ interface AuthContextType {
   isLoggedIn: boolean;
   isReady: boolean;
   authError: string | null;
+  isOwnerAdmin: boolean;
+  ownerAdminEmail: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,6 +45,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const ownerAdminEmail = (
+    import.meta.env.VITE_OWNER_ADMIN_EMAIL || "mr.jwswain@gmail.com"
+  )
+    .trim()
+    .toLowerCase();
   const [user, setUser] = useState<
     (FirebaseUser & { profile?: UserProfile }) | null
   >(null);
@@ -215,6 +222,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoggedIn: !!user,
         isReady,
         authError,
+        isOwnerAdmin:
+          !!user?.email &&
+          user.email.trim().toLowerCase() === ownerAdminEmail,
+        ownerAdminEmail,
       }}
     >
       {children}

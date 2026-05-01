@@ -1,260 +1,229 @@
-import { AdminLogin } from "@/components/AdminLogin";
 import { Navbar } from "@/components/Navbar";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { db, handleFirestoreError } from "@/lib/firebase";
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { useAuth } from "@/context/AuthContext";
+import { db } from "@/lib/firebase";
 import {
-  Activity,
-  Database,
-  DollarSign,
-  ExternalLink,
-  RefreshCcw,
-  ShieldAlert,
-  Terminal,
-  TrendingUp,
-  Users,
-  Zap,
-} from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
+import { BarChart3, DollarSign, Globe, Shield, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
+type OrderRow = {
+  id: string;
+  created_at?: string;
+  email?: string;
+  plan?: string;
+  cadence?: string;
+  launch_discount?: number;
+  status?: string;
+  site_url?: string;
+  error?: string;
+};
+
 export const Admin = () => {
-  const { isAdmin, isLoading, error, login, logout, adminEmail } =
-    useAdminAuth();
+  const { isReady, isLoggedIn, isOwnerAdmin, user, ownerAdminEmail } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "revenue" | "users" | "nexus" | "settings"
-  >("overview");
   const [sites, setSites] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [stats, setStats] = useState({
-    totalRevenue: "$42.5K",
-    activeUsers: "1,240",
-    totalManifests: "842",
-    neuralUptime: "100%",
-    monthlyGrowth: "+24%",
-    serverLoad: "34%",
-  });
+  const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [chatLogs, setChatLogs] = useState<any[]>([]);
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
-    if (isAdmin) {
-      fetchAdminData();
+    if (!isReady) return;
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
     }
-  }, [isAdmin]);
+    if (!isOwnerAdmin) {
+      navigate("/dashboard");
+      return;
+    }
+    void loadAdminData();
+  }, [isReady, isLoggedIn, isOwnerAdmin, navigate]);
 
-  const fetchAdminData = async () => {
+  const loadAdminData = async () => {
+    const [sitesSnap, usersSnap, chatSnap] = await Promise.all([
+      getDocs(query(collection(db, "sites"), orderBy("timestamp", "desc"), limit(200))),
+      getDocs(query(collection(db, "users"), limit(500))),
+      getDocs(query(collection(db, "chatLogs"), orderBy("createdAt", "desc"), limit(200))),
+    ]);
+
+    setSites(sitesSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    setUsers(usersSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    setChatLogs(chatSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+
     try {
-      // Fetch sites
-      const sitesQuery = query(
-        collection(db, "sites"),
-        orderBy("timestamp", "desc"),
-        limit(50),
-      );
-      const sitesSnapshot = await getDocs(sitesQuery);
-      setSites(
-        sitesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-      );
-
-      // Update stats based on real data
-      setStats((prev) => ({
-        ...prev,
-        totalManifests: sitesSnapshot.docs.length.toString(),
-      }));
-    } catch (err) {
-      handleFirestoreError(err, "list", "sites");
+      const res = await fetch("/api/admin/orders?limit=200");
+      const data = (await res.json()) as { rows?: OrderRow[] };
+      setOrders(data.rows || []);
+    } catch {
+      setOrders([]);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <Terminal className="text-indigo-500 animate-pulse" size={48} />
-          <span className="text-[10px] font-black uppercase text-indigo-500 tracking-[0.5em] italic">
-            Scanning Authentication Layers...
-          </span>
-        </div>
-      </div>
+  const addAdminRecord = async () => {
+    const email = newAdminEmail.trim().toLowerCase();
+    if (!email) return;
+    const existing = await getDocs(
+      query(collection(db, "admins"), where("email", "==", email), limit(1)),
     );
-  }
+    if (!existing.empty) {
+      setStatusMessage("Admin already exists.");
+      return;
+    }
+    await addDoc(collection(db, "admins"), {
+      email,
+      createdAt: serverTimestamp(),
+      createdBy: user?.email || ownerAdminEmail,
+      ownerGranted: true,
+    });
+    setNewAdminEmail("");
+    setStatusMessage("Admin added to records.");
+  };
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6">
-        <AdminLogin onLogin={login} error={error || undefined} />
-      </div>
-    );
-  }
+  const analytics = useMemo(() => {
+    const paidOrders = orders.filter((o) => o.status === "paid");
+    const revenueCount = paidOrders.length;
+    const proUsers = users.filter((u) => u.plan === "pro" || u.plan === "enterprise").length;
+    const countriesKnown = new Set(
+      chatLogs
+        .map((log) => String((log as any).country || "").trim())
+        .filter(Boolean),
+    ).size;
+
+    return {
+      totalUsers: users.length,
+      totalSites: sites.length,
+      paidOrders: paidOrders.length,
+      proUsers,
+      revenueCount,
+      activeLast24h: chatLogs.filter((log) => {
+        const created = (log as any).createdAt?.toDate?.() || null;
+        return created ? Date.now() - created.getTime() < 24 * 60 * 60 * 1000 : false;
+      }).length,
+      countriesKnown,
+    };
+  }, [orders, users, sites, chatLogs]);
+
+  if (!isReady || !isLoggedIn || !isOwnerAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-32 pb-20 px-6 font-mono">
+    <div className="min-h-screen bg-[#050505] pt-28 pb-20 px-6">
       <Navbar />
-
-      {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none -z-1 opacity-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#4f46e5_0,transparent_50%)]" />
-      </div>
-
-      <div className="max-w-7xl mx-auto">
-        {/* Overseer Header */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between mb-20 gap-12 border-b border-white/10 pb-16">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-3 text-indigo-500 font-mono text-[9px] uppercase tracking-[0.6em] font-black">
-              <ShieldAlert size={14} className="animate-pulse" />
-              Directorial Override: Active
-            </div>
-            <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-none">
-              Nexus <span className="text-white/20">Overseer</span>
-            </h1>
-            <p className="text-slate-500 font-black italic text-xs tracking-widest uppercase flex items-center gap-4">
-              <span>
-                Root: <span className="text-white">{adminEmail}</span>
-              </span>
-              <span className="w-1 h-1 rounded-full bg-slate-800" />
-              <span>
-                Manifests:{" "}
-                <span className="text-indigo-400">{sites.length}</span>
-              </span>
+      <div className="mx-auto max-w-7xl space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-black text-white">Owner Admin Console</h1>
+            <p className="text-slate-400 text-sm">
+              Signed in as {user?.email}. Only owner email has access.
             </p>
           </div>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="px-5 py-3 bg-indigo-600 text-white font-semibold rounded-lg"
+          >
+            Back to Dashboard
+          </button>
+        </div>
 
-          <div className="flex bg-white/5 p-1 border border-white/10 brutal-shadow">
-            {(["overview", "revenue", "users", "nexus"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-8 py-4 text-[10px] font-black uppercase tracking-[0.4em] italic transition-all ${
-                  activeTab === tab
-                    ? "bg-indigo-600 text-white"
-                    : "text-slate-500 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                {tab}
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <StatCard icon={<Users size={16} />} label="Users" value={String(analytics.totalUsers)} />
+          <StatCard icon={<Globe size={16} />} label="Sites" value={String(analytics.totalSites)} />
+          <StatCard icon={<DollarSign size={16} />} label="Paid Orders" value={String(analytics.paidOrders)} />
+          <StatCard icon={<BarChart3 size={16} />} label="Pro/Enterprise" value={String(analytics.proUsers)} />
+          <StatCard icon={<Shield size={16} />} label="24h Activity" value={String(analytics.activeLast24h)} />
+          <StatCard icon={<Globe size={16} />} label="Countries Seen" value={String(analytics.countriesKnown)} />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Panel title="Admin Controls">
+            <p className="text-sm text-slate-300 mb-3">
+              Owner-only controls for admin records and operations.
+            </p>
+            <div className="flex gap-2">
+              <input
+                value={newAdminEmail}
+                onChange={(e) => setNewAdminEmail(e.target.value)}
+                placeholder="new-admin@email.com"
+                className="flex-1 rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-white"
+              />
+              <button onClick={addAdminRecord} className="px-4 py-2 bg-emerald-600 rounded-lg text-white">
+                Add Admin
               </button>
-            ))}
-          </div>
+            </div>
+            {statusMessage ? <p className="text-xs text-emerald-300 mt-2">{statusMessage}</p> : null}
+          </Panel>
+
+          <Panel title="Monetization Notes">
+            <ul className="text-sm text-slate-300 space-y-1">
+              <li>- Pricing links are active with Stripe fallback paths.</li>
+              <li>- Orders endpoint is connected to admin feed.</li>
+              <li>- Add GA4 or Cloudflare Web Analytics for exact live visitors and geo.</li>
+              <li>- Add Sentry DSN to monitor production errors centrally.</li>
+            </ul>
+          </Panel>
         </div>
 
-        {/* Real-time Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10 mb-20">
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
-            <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
-              <DollarSign size={12} className="text-indigo-500" /> Revenue_Flow
-            </div>
-            <div className="text-5xl font-black text-white italic group-hover:translate-x-2 transition-transform">
-              {stats.totalRevenue}
-            </div>
-            <div className="flex items-center gap-2 text-[8px] text-emerald-500 font-bold uppercase tracking-widest">
-              <TrendingUp size={12} /> +18.4% Net Manifest
-            </div>
-          </div>
-
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
-            <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
-              <Users size={12} className="text-indigo-500" /> Active_Architects
-            </div>
-            <div className="text-5xl font-black text-white italic group-hover:translate-x-2 transition-transform">
-              {stats.activeUsers}
-            </div>
-            <div className="flex items-center gap-2 text-[8px] text-emerald-500 font-bold uppercase tracking-widest">
-              <Activity size={12} /> +2.1k Sync Requests
-            </div>
-          </div>
-
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
-            <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
-              <Database size={12} className="text-indigo-500" /> Storage_Index
-            </div>
-            <div className="text-5xl font-black text-white italic group-hover:translate-x-2 transition-transform">
-              {stats.totalManifests}
-            </div>
-            <div className="flex items-center gap-2 text-[8px] text-indigo-500 font-bold uppercase tracking-widest">
-              <Zap size={12} /> 1.2TB PERSISTED
-            </div>
-          </div>
-
-          <div className="bg-[#050505] p-12 space-y-4 hover:bg-white/2 transition-colors group">
-            <div className="text-[10px] text-slate-500 uppercase tracking-[0.3em] font-black italic flex items-center gap-2">
-              <RefreshCcw size={12} className="text-indigo-500" /> System_Health
-            </div>
-            <div className="text-5xl font-black text-emerald-500 italic group-hover:translate-x-2 transition-transform">
-              {stats.neuralUptime}
-            </div>
-            <div className="flex items-center gap-2 text-[8px] text-emerald-500 font-bold uppercase tracking-widest animate-pulse">
-              ALL SYSTEMS OPTIMAL
-            </div>
-          </div>
-        </div>
-
-        {/* Content Tabs */}
-        <AnimatePresence mode="wait">
-          {activeTab === "overview" && (
-            <motion.div
-              key="overview"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              className="space-y-12"
-            >
-              <div className="flex items-center justify-between border-b border-white/5 pb-6">
-                <h2 className="text-3xl font-black uppercase italic tracking-widest text-white">
-                  Edge_Sync_Logs
-                </h2>
-                <div className="flex gap-4">
-                  <button
-                    onClick={fetchAdminData}
-                    className="px-6 py-2 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white hover:text-black transition-all"
-                  >
-                    Flush Buffer
-                  </button>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Panel title="Recent Orders">
+            <div className="max-h-72 overflow-auto text-xs">
+              {orders.slice(0, 40).map((order) => (
+                <div key={order.id} className="border-b border-white/10 py-2 text-slate-300">
+                  {order.email || "no-email"} · {order.plan || "n/a"} · {order.status || "n/a"}
                 </div>
-              </div>
+              ))}
+            </div>
+          </Panel>
 
-              <div className="space-y-1">
-                {sites.map((site, i) => (
-                  <div
-                    key={site.id}
-                    className="group flex items-center justify-between p-8 bg-white/1 border border-white/5 hover:bg-indigo-600/5 hover:border-indigo-500/50 transition-all"
-                  >
-                    <div className="flex items-center gap-8">
-                      <span className="text-slate-800 font-black text-xs w-8">
-                        {i + 1}
-                      </span>
-                      <div className="space-y-2">
-                        <div className="text-xs font-black uppercase tracking-widest text-white">
-                          {site.title || "Spectral-Entity"}
-                        </div>
-                        <div className="text-[9px] text-slate-600 font-bold uppercase tracking-[0.2em]">
-                          {site.ownerId}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-12">
-                      <div className="hidden md:flex flex-col items-end gap-1">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
-                          {site.timestamp?.toDate().toLocaleDateString()}
-                        </span>
-                        <span className="text-[8px] font-mono text-indigo-500 uppercase tracking-widest">
-                          {site.timestamp?.toDate().toLocaleTimeString()}
-                        </span>
-                      </div>
-                      <div className="flex gap-4">
-                        <button className="p-3 bg-white/5 text-slate-500 hover:text-white transition-colors border border-white/5">
-                          <ExternalLink size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+          <Panel title="Recent Users">
+            <div className="max-h-72 overflow-auto text-xs">
+              {users.slice(0, 60).map((u) => (
+                <div key={u.id} className="border-b border-white/10 py-2 text-slate-300">
+                  {String((u as any).email || "no-email")} · {String((u as any).plan || "free")}
+                </div>
+              ))}
+            </div>
+          </Panel>
+        </div>
 
-          {/* Other tabs would go here if needed */}
-        </AnimatePresence>
+        <Panel title="Chat Logs / Inbox">
+          <div className="max-h-96 overflow-auto text-xs">
+            {chatLogs.length === 0 ? (
+              <div className="text-slate-500">No chat logs found in `chatLogs` collection yet.</div>
+            ) : (
+              chatLogs.map((log) => (
+                <div key={log.id} className="border-b border-white/10 py-2 text-slate-300">
+                  {String((log as any).email || "anon")} · {String((log as any).message || "").slice(0, 140)}
+                </div>
+              ))
+            )}
+          </div>
+        </Panel>
       </div>
     </div>
   );
 };
+
+const StatCard = ({ icon, label, value }: { icon: ReactNode; label: string; value: string }) => (
+  <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <div className="flex items-center gap-2 text-slate-400 text-xs uppercase">{icon}{label}</div>
+    <div className="text-2xl font-black text-white mt-2">{value}</div>
+  </div>
+);
+
+const Panel = ({ title, children }: { title: string; children: ReactNode }) => (
+  <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <h2 className="text-white font-bold mb-3">{title}</h2>
+    {children}
+  </div>
+);

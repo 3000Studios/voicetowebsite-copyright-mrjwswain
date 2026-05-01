@@ -32,7 +32,7 @@ import {
 } from "firebase/firestore";
 
 export const Dashboard = () => {
-  const { user, isLoggedIn, isReady } = useAuth();
+  const { user, isLoggedIn, isReady, isOwnerAdmin } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"builder" | "sites" | "publish">(
     "builder",
@@ -47,7 +47,7 @@ export const Dashboard = () => {
 
   const planType: PlanType = (user as any)?.plan || "free";
   const limits = PLAN_LIMITS[planType];
-  const isSubscriber = planType !== "free";
+  const isSubscriber = planType !== "free" || isOwnerAdmin;
 
   useEffect(() => {
     if (!isReady) return;
@@ -231,7 +231,7 @@ export const Dashboard = () => {
               <span className="flex items-center gap-2">
                 Protocol:{" "}
                 <span className="text-white px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/40">
-                  {limits.name}
+                  {isOwnerAdmin ? "Owner Admin" : limits.name}
                 </span>
               </span>
               <span className="flex items-center gap-2">
@@ -243,7 +243,16 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          <div className="flex bg-white/5 p-1 brutal-shadow border border-white/10">
+          <div className="flex items-center gap-3">
+            {isOwnerAdmin ? (
+              <button
+                onClick={() => navigate("/admin")}
+                className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] italic bg-emerald-600 text-white hover:bg-emerald-500 transition-all"
+              >
+                Admin
+              </button>
+            ) : null}
+            <div className="flex bg-white/5 p-1 brutal-shadow border border-white/10">
             {(["builder", "sites", "publish"] as const).map((tab) => (
               <button
                 key={tab}
@@ -261,6 +270,7 @@ export const Dashboard = () => {
                     : "Deployment"}
               </button>
             ))}
+            </div>
           </div>
         </div>
 
