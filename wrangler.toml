@@ -2,6 +2,10 @@ name = "voicetowebsite"
 compatibility_date = "2024-04-12"
 pages_build_output_dir = "dist"
 
+# GLOBAL DEPLOYMENT RULE: Single repo, single branch, single Cloudflare Page
+# Always deploys to voicetowebsite.com and www.voicetowebsite.com
+# NEVER create custom domains or separate deployments
+
 # Production environment - deploys to voicetowebsite.com
 [env.production]
 name = "voicetowebsite"

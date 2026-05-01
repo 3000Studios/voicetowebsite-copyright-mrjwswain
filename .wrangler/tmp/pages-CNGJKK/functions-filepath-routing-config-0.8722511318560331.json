@@ -1,0 +1,165 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/blog/posts/:slug",
+      "mountPath": "/api/blog/posts",
+      "method": "GET",
+      "module": [
+        "api/blog/posts/[slug].ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/admin/orders",
+      "mountPath": "/api/admin",
+      "method": "GET",
+      "module": [
+        "api/admin/orders.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/blog/posts",
+      "mountPath": "/api/blog",
+      "method": "GET",
+      "module": [
+        "api/blog/posts.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/blog/publish",
+      "mountPath": "/api/blog",
+      "method": "POST",
+      "module": [
+        "api/blog/publish.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/blog/rss.xml",
+      "mountPath": "/api/blog",
+      "method": "GET",
+      "module": [
+        "api/blog/rss.xml.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/blog/sitemap.xml",
+      "mountPath": "/api/blog",
+      "method": "GET",
+      "module": [
+        "api/blog/sitemap.xml.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/site/:id",
+      "mountPath": "/api/site",
+      "method": "GET",
+      "module": [
+        "api/site/[id].ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/checkout-session",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/checkout-session.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/create-checkout-session",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/create-checkout-session.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/create-paypal-order",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/create-paypal-order.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/generate-site",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/generate-site.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/media",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/media.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/order",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/order.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/order",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/order.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/paypal-webhook",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/paypal-webhook.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/preview-copy",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/preview-copy.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/preview-style",
+      "mountPath": "/api",
+      "method": "GET",
+      "module": [
+        "api/preview-style.ts:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/api/stripe-verify-session",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/stripe-verify-session.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api/stripe-webhook",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/stripe-webhook.ts:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/api",
+      "mountPath": "/api",
+      "method": "",
+      "middleware": [
+        "api/_middleware.ts:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}
