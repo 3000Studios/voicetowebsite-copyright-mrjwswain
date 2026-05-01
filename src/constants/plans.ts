@@ -30,10 +30,10 @@ export const PLAN_ENTITLEMENTS: Record<PlanType, PlanEntitlements> = {
     commandsPerCycle: 10,
     hostedSites: 3,
     canExportCode: false,
-    removeWatermark: false,
+    removeWatermark: true,
     premiumSections: false,
     price: 15,
-    description: 'For solo operators who need a hosted starter site and a simple launch workflow.',
+    description: 'For solo operators who need a hosted starter site, a clean handoff, and a simple launch workflow.',
   },
   pro: {
     key: "pro",
