@@ -2,7 +2,12 @@ export interface Env {
   DB: D1Database;
   SITES_BUCKET: R2Bucket;
   ORDERS_KV: KVNamespace;
+  BRANDFETCH_CLIENT_ID?: string;
+  STORYBLOK_OAUTH_TOKEN?: string;
+  STORYBLOK_SPACE_ID?: string;
 }
+
+import { compileLayoutFromPrompt, type BrandAsset, type LayoutTree } from "../../src/lib/layoutCompiler";
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
@@ -27,7 +32,7 @@ function escapeHtml(value: string) {
     .replaceAll("'", '&#039;');
 }
 
-async function parseRequestBody(request: Request): Promise<{ orderId?: string }> {
+async function parseRequestBody(request: Request): Promise<{ orderId?: string; prompt?: string; mode?: string; token?: string }> {
   const url = new URL(request.url);
   if (url.searchParams.get('orderId')) {
     return { orderId: url.searchParams.get('orderId') || '' };
@@ -38,13 +43,13 @@ async function parseRequestBody(request: Request): Promise<{ orderId?: string }>
   if (contentType.includes('application/json')) {
     const raw = await request.text();
     if (!raw.trim()) throw new Error('Empty request body');
-    return JSON.parse(raw) as { orderId?: string };
+    return JSON.parse(raw) as { orderId?: string; prompt?: string; mode?: string; token?: string };
   }
 
   if (contentType.includes('application/x-www-form-urlencoded')) {
     const raw = await request.text();
     const form = new URLSearchParams(raw);
-    return { orderId: form.get('orderId') || '' };
+    return { orderId: form.get('orderId') || '', prompt: form.get('prompt') || '' };
   }
 
   throw new Error('Unsupported content type');
@@ -73,78 +78,91 @@ function stylePalette(style: string) {
   }
 }
 
-function renderSiteHtml(opts: { business: string; industry: string; style: string; email: string; orderId: string }) {
-  const industryKey = templateForIndustry(opts.industry);
-  const title = `${opts.industry || 'Business Website'} | VoiceToWebsite`;
-  const description = escapeHtml(opts.business || 'A modern business website generated with VoiceToWebsite.');
-  const palette = stylePalette(opts.style);
-  const style = escapeHtml(opts.style || 'dark-premium');
-  const email = escapeHtml(opts.email);
-  const orderId = escapeHtml(opts.orderId);
+async function fetchBrandAssets(queryText: string, env: Env): Promise<Partial<BrandAsset>> {
+  const brandQuery = (queryText || 'business').slice(0, 80);
+  if (!env.BRANDFETCH_CLIENT_ID) return {};
 
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>${escapeHtml(title)}</title>
-  <meta name="description" content="${description.slice(0, 155)}" />
-  <style>
-    :root{--accent:${palette.accent};--surface:${palette.surface};--text:${palette.text};--bg:#ffffff;--muted:#475569}
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);color:var(--text)}
-    header{padding:32px 20px 88px;background:radial-gradient(circle at top,#e0e7ff 0%,#c7d2fe 30%,#0f172a 100%);color:#fff}
-    .wrap{max-width:1100px;margin:0 auto;padding:0 20px}.eyebrow{display:inline-flex;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
-    h1{font-size:clamp(2.8rem,8vw,5.4rem);line-height:.95;margin:20px 0 16px;letter-spacing:-.04em}p{font-size:1.05rem;line-height:1.7;color:rgba(255,255,255,.82);max-width:760px}
-    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 20px;border-radius:999px;font-weight:700;text-decoration:none}.btn-primary{background:#fff;color:#0f172a}.btn-secondary{border:1px solid rgba(255,255,255,.25);color:#fff}
-    main{margin-top:-48px}.panel{border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:28px;padding:28px;box-shadow:0 30px 90px rgba(15,23,42,.08)}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:22px}.card{border:1px solid rgba(15,23,42,.08);background:var(--surface);border-radius:22px;padding:20px}.card h3{margin:0 0 10px;color:var(--text)}.card p{margin:0;color:var(--muted);font-size:.98rem}
-    .section{padding:22px 0}.section h2{font-size:clamp(2rem,4vw,3rem);line-height:1.05;margin:0 0 12px;color:#0f172a}.section p{color:#475569;max-width:none}
-    footer{padding:32px 20px 48px;color:#64748b}.footer-card{border-top:1px solid rgba(15,23,42,.1);padding-top:18px;font-size:.92rem}
-    @media (max-width: 900px){.grid{grid-template-columns:1fr}.panel{padding:22px}header{padding-bottom:72px}}
-  </style>
-</head>
-<body>
-  <header>
-    <div class="wrap">
-      <span class="eyebrow">VoiceToWebsite delivery</span>
-      <h1>${escapeHtml(opts.industry || 'Your business website')}</h1>
-      <p>${description}</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="mailto:${email}">Contact</a>
-        <a class="btn btn-secondary" href="#offer">See the offer</a>
-      </div>
-    </div>
-  </header>
-  <main class="wrap">
-    <section class="panel" id="offer">
-      <div class="section">
-        <h2>Built for clarity and action</h2>
-        <p>This starter site was generated for ${escapeHtml(opts.industry || industryKey)} using the ${style} design direction. It is structured to explain the offer, build trust, and drive the next step.</p>
-      </div>
-      <div class="grid">
-        <article class="card">
-          <h3>Offer framing</h3>
-          <p>Your main service or product is presented with a clear first-screen call to action.</p>
-        </article>
-        <article class="card">
-          <h3>Proof sections</h3>
-          <p>Add testimonials, results, credentials, or project examples as the next upgrade layer.</p>
-        </article>
-        <article class="card">
-          <h3>Conversion path</h3>
-          <p>Use one primary action such as booking a call, requesting a quote, or starting checkout.</p>
-        </article>
-      </div>
-    </section>
-  </main>
-  <footer>
-    <div class="wrap footer-card">
-      <div>Order ID: ${orderId}</div>
-      <div>Generated by VoiceToWebsite • 3000 Studios LLC • You are responsible for final content and compliance.</div>
-    </div>
-  </footer>
-</body>
-</html>`;
+  try {
+    const search = await fetch(
+      `https://api.brandfetch.io/v2/search/${encodeURIComponent(brandQuery)}?c=${encodeURIComponent(env.BRANDFETCH_CLIENT_ID)}`,
+    );
+    if (!search.ok) return {};
+    const results = (await search.json()) as Array<{
+      name?: string;
+      domain?: string;
+      icon?: string;
+      logo?: string;
+      claimed?: boolean;
+    }>;
+    const match = results.find((item) => item.domain) || results[0];
+    if (!match?.domain) return {};
+
+    const brand = await fetch(`https://api.brandfetch.io/v2/brands/${encodeURIComponent(match.domain)}`, {
+      headers: {
+        Authorization: `Bearer ${env.BRANDFETCH_CLIENT_ID}`,
+      },
+    });
+    if (!brand.ok) {
+      return {
+        name: match.name,
+        domain: match.domain,
+        logoUrl: match.icon || match.logo,
+      };
+    }
+
+    const data = (await brand.json()) as {
+      name?: string;
+      domain?: string;
+      logos?: Array<{ formats?: Array<{ src?: string; format?: string }> }>;
+      colors?: Array<{ hex?: string }>;
+    };
+    const logoUrl =
+      data.logos?.flatMap((logo) => logo.formats || []).find((format) => format.src && (format.format === 'svg' || format.format === 'png'))?.src ||
+      match.icon ||
+      match.logo;
+
+    return {
+      name: data.name || match.name,
+      domain: data.domain || match.domain,
+      logoUrl,
+      colors: (data.colors || []).map((color) => color.hex).filter((value): value is string => !!value).slice(0, 4),
+    };
+  } catch {
+    return {};
+  }
+}
+
+async function storeStoryblokTree(tree: LayoutTree, orderId: string, env: Env) {
+  if (!env.STORYBLOK_OAUTH_TOKEN || !env.STORYBLOK_SPACE_ID) return { stored: false, reason: 'storyblok_not_configured' };
+
+  try {
+    const response = await fetch(`https://mapi.storyblok.com/v1/spaces/${env.STORYBLOK_SPACE_ID}/stories/`, {
+      method: 'POST',
+      headers: {
+        Authorization: env.STORYBLOK_OAUTH_TOKEN,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        story: {
+          name: `${tree.name} ${orderId}`.slice(0, 80),
+          slug: `generated-${orderId}`,
+          content: {
+            component: 'generated_site',
+            prompt: tree.prompt,
+            brand: tree.brand,
+            body: tree.bloks.map((blok) => ({
+              _uid: `${orderId}-${blok.order}`,
+              ...blok,
+            })),
+          },
+        },
+        publish: 1,
+      }),
+    });
+    return { stored: response.ok, status: response.status };
+  } catch {
+    return { stored: false, reason: 'storyblok_request_failed' };
+  }
 }
 
 async function writeAuditLog(db: D1Database, action: string, targetId: string, detail: string) {
@@ -159,7 +177,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     return json({ error: 'Bindings not configured' }, { status: 500 });
   }
 
-  let body: { orderId?: string };
+  let body: { orderId?: string; prompt?: string; mode?: string; token?: string };
   try {
     body = await parseRequestBody(context.request);
   } catch (error) {
@@ -167,7 +185,27 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   }
 
   const orderId = (body.orderId || '').trim();
-  if (!orderId) return json({ error: 'Missing orderId' }, { status: 400 });
+  const promptOnly = (body.prompt || '').trim();
+  if (!orderId && promptOnly) {
+    const brand = await fetchBrandAssets(promptOnly, context.env);
+    const compiled = compileLayoutFromPrompt(promptOnly, brand);
+    await writeAuditLog(
+      context.env.DB,
+      'preview_layout_compiled',
+      `preview-${Date.now()}`,
+      JSON.stringify({
+        compiler: 'layout-compiler-v1',
+        mode: body.mode || 'preview',
+        grid: compiled.tree.bloks.map((blok) => ({ component: blok.component, order: blok.order, grid_span: blok.grid_span })),
+      }),
+    );
+    return json({
+      html: compiled.html,
+      title: `${compiled.tree.name} Generated Site`,
+      layoutTree: compiled.tree,
+    });
+  }
+  if (!orderId) return json({ error: 'Missing orderId or prompt' }, { status: 400 });
 
   const order = await context.env.DB.prepare(
     `SELECT id, email, business_description, industry, style_preference, status, site_url
@@ -199,13 +237,20 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   });
   await writeAuditLog(context.env.DB, 'generation_started', orderId, JSON.stringify({ industry: order.industry, style: order.style_preference }));
 
-  const html = renderSiteHtml({
-    business: order.business_description || '',
-    industry: order.industry || '',
-    style: order.style_preference || '',
-    email: order.email,
-    orderId,
-  });
+  const prompt = [
+    order.business_description || '',
+    order.industry ? `Industry: ${order.industry}` : '',
+    order.style_preference ? `Style: ${order.style_preference}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+  const brand = await fetchBrandAssets(`${order.business_description || ''} ${order.industry || ''}`, context.env);
+  const compiled = compileLayoutFromPrompt(prompt || 'Generate a business website with features, pricing, FAQ, and contact.', brand);
+  const html = compiled.html.replace(
+    '</footer>',
+    `<div class="mt-4">Order ID: ${escapeHtml(orderId)} • Generated by VoiceToWebsite Layout Compiler • You are responsible for final content and compliance.</div></footer>`,
+  );
+  const storyblokResult = await storeStoryblokTree(compiled.tree, orderId, context.env);
 
   if (!html || html.length < 500) {
     await context.env.DB.prepare(`UPDATE orders SET status = 'failed', error = ? WHERE id = ?`).bind('Generated HTML was empty.', orderId).run();
@@ -229,7 +274,17 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   await context.env.ORDERS_KV.put(`order:${orderId}`, JSON.stringify({ id: orderId, status: 'delivered', site_url: siteUrl }), {
     expirationTtl: 60 * 60 * 24 * 30,
   });
-  await writeAuditLog(context.env.DB, 'generation_delivered', orderId, JSON.stringify({ siteUrl }));
+  await writeAuditLog(
+    context.env.DB,
+    'generation_delivered',
+    orderId,
+    JSON.stringify({
+      siteUrl,
+      compiler: 'layout-compiler-v1',
+      storyblok: storyblokResult,
+      grid: compiled.tree.bloks.map((blok) => ({ component: blok.component, order: blok.order, grid_span: blok.grid_span })),
+    }),
+  );
 
   return json({ orderId, status: 'delivered', siteUrl });
 };

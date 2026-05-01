@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
+import { compileLayoutFromPrompt } from "@/lib/layoutCompiler";
 import {
   addDoc,
   collection,
@@ -11,7 +12,7 @@ import {
   serverTimestamp,
   where,
 } from "firebase/firestore";
-import { BarChart3, DollarSign, Globe, Shield, Users } from "lucide-react";
+import { BarChart3, DollarSign, Grid3X3, Globe, LayoutDashboard, Shield, Sparkles, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +38,9 @@ export const Admin = () => {
   const [chatLogs, setChatLogs] = useState<any[]>([]);
   const [newAdminEmail, setNewAdminEmail] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const [compilerPrompt, setCompilerPrompt] = useState(
+    "Build a dashboard website for a local fitness coach with three features, pricing, FAQ, and contact.",
+  );
 
   useEffect(() => {
     if (!isReady) return;
@@ -119,6 +123,8 @@ export const Admin = () => {
     };
   }, [orders, users, sites, chatLogs]);
 
+  const compilerPreview = useMemo(() => compileLayoutFromPrompt(compilerPrompt), [compilerPrompt]);
+
   if (!isReady || !isLoggedIn || !isOwnerAdmin) return null;
 
   return (
@@ -178,6 +184,57 @@ export const Admin = () => {
           </Panel>
         </div>
 
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <Panel title="Layout Compiler Control">
+            <div className="space-y-4">
+              <p className="text-sm text-slate-300">
+                Test how the generator maps raw voice intent into a 12-column Flowbite-compatible Blok tree before delivery.
+              </p>
+              <textarea
+                value={compilerPrompt}
+                onChange={(event) => setCompilerPrompt(event.target.value)}
+                className="min-h-32 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/50"
+              />
+              <div className="grid gap-3 sm:grid-cols-3">
+                <MetricPill icon={<Grid3X3 size={16} />} label="Grid" value="12 columns" />
+                <MetricPill icon={<Sparkles size={16} />} label="Engine" value="Compiler v1" />
+                <MetricPill icon={<LayoutDashboard size={16} />} label="Bloks" value={String(compilerPreview.tree.bloks.length)} />
+              </div>
+            </div>
+          </Panel>
+
+          <Panel title="Compiled Blok Tree">
+            <div className="overflow-hidden rounded-xl border border-white/10">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-white/5 text-xs uppercase tracking-[0.2em] text-slate-400">
+                  <tr>
+                    <th className="px-4 py-3">Order</th>
+                    <th className="px-4 py-3">Section</th>
+                    <th className="px-4 py-3">Grid Span</th>
+                    <th className="px-4 py-3">Placement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {compilerPreview.tree.bloks.map((blok) => (
+                    <tr key={`${blok.order}-${blok.component}`} className="border-t border-white/8">
+                      <td className="px-4 py-3 text-slate-300">{blok.order}</td>
+                      <td className="px-4 py-3 font-semibold text-white">{blok.component}</td>
+                      <td className="px-4 py-3 text-cyan-200">col-span-{blok.grid_span}</td>
+                      <td className="px-4 py-3 text-slate-400">
+                        {blok.component === "sidebar"
+                          ? "Left app rail"
+                          : blok.component === "dashboard"
+                            ? "Main app workspace"
+                            : "Full-width section"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-2">
           <Panel title="Recent Orders">
             <div className="max-h-72 overflow-auto text-xs">
@@ -222,6 +279,16 @@ const StatCard = ({ icon, label, value }: { icon: ReactNode; label: string; valu
   <div className="rounded-xl border border-white/10 bg-white/5 p-4">
     <div className="flex items-center gap-2 text-slate-400 text-xs uppercase">{icon}{label}</div>
     <div className="text-2xl font-black text-white mt-2">{value}</div>
+  </div>
+);
+
+const MetricPill = ({ icon, label, value }: { icon: ReactNode; label: string; value: string }) => (
+  <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <div className="mb-2 flex items-center gap-2 text-cyan-200">
+      {icon}
+      <span className="text-xs uppercase tracking-[0.18em] text-slate-400">{label}</span>
+    </div>
+    <div className="font-bold text-white">{value}</div>
   </div>
 );
 

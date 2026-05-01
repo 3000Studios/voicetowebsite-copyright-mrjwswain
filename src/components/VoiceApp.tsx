@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { NeuralGlobe } from "./NeuralGlobe";
 
 import { useAuth } from "@/context/AuthContext";
+import { compileLayoutFromPrompt } from "@/lib/layoutCompiler";
 import { useSound } from "@/lib/sounds";
 
 import { db } from "@/lib/firebase";
@@ -155,13 +156,20 @@ export const VoiceApp = ({
     playZap();
 
     try {
+      const compiled = compileLayoutFromPrompt(text);
       let fullPrompt = "";
       const monetizationContext = `
         STRATEGIC DIRECTIVE: You are a Revenue Engineer.
+        ARCHITECTURE DIRECTIVE: You are a Layout Compiler, not a string generator.
+        OUTPUT MODEL: Use a 12-column grid. Every generated section must map to a component with order and grid_span metadata.
+        FLOWBITE DIRECTIVE: Use Flowbite-compatible Tailwind HTML patterns, Flowbite Icons-style SVGs, and include Flowbite CDN assets.
+        GRID RULES: Hero col-span-12. Three features use grid-cols-1 md:grid-cols-3 gap-8. Dashboard/app requests use sidebar col-span-3 and main col-span-9.
         PRIORITIZE: High-conversion layouts, strong CTAs, pricing sections, and urgency triggers.
         AUTO-INJECT: A 'Built with VoiceToWebsite' badge in the footer on the free plan.
         STRIPE READY: If the user mentions money, sales, or products, add a distinctive 'Buy Now' button styled for maximum click-through.
         REVENUE TRIGGER: If the user says "create product", inject a high-conversion product block with a price of $49 and a massive 'BUY NOW' button that links to /checkout.
+        BASE LAYOUT TREE:
+        ${JSON.stringify(compiled.tree)}
       `;
 
       if (isEditing && previewHtml) {
@@ -178,11 +186,11 @@ export const VoiceApp = ({
         fullPrompt = `${monetizationContext}
         Generate a world-class, REVENUE-FIXATED, single-file HTML website for: ${text}.
         This is for VoiceToWebsite.com, an elite AI-powered building engine.
-        Use Tailwind CSS via CDN.
+        Use Tailwind CSS via CDN and Flowbite 4.0.1 CDN.
         Ensure the design is ultra-premium, conversion-focused, and mobile-responsive.
-        Include hero, features, trust section, bento-grid modules, pricing section, and a contact form.
-        Use "Inter" as the primary font and "Anton" for headings.
-        Include some sample high-quality image URLs from Unsplash relevant to the topic.
+        Use the provided BASE LAYOUT TREE as the source of truth for section order, grid_span, and app/sidebar placement.
+        Do not output generic default copy. Replace every placeholder with content inferred from: "${text}".
+        Include a <script type="application/json" id="vtw-storyblok-blok-tree"> node containing the final Blok tree.
         Return ONLY the raw HTML code without any markdown formatting or backticks.`;
       }
 
@@ -206,8 +214,11 @@ export const VoiceApp = ({
       }
 
       if (!html.includes("<!DOCTYPE html>") && !html.includes("<html")) {
-        // Basic healing for partial outputs
-        html = `<!DOCTYPE html><html lang="en"><head><link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700&display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script></head><body>${html}</body></html>`;
+        html = compiled.html;
+      }
+
+      if (!html.includes("vtw-storyblok-blok-tree") || !html.includes("grid-cols-12")) {
+        html = compiled.html;
       }
 
       setPreviewHtml(html);
