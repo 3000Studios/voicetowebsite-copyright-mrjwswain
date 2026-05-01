@@ -242,7 +242,7 @@ export function PricingV2() {
           ))}
         </div>
 
-        {/* Money Back Guarantee */}
+        {/* Refund Disclosure */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -250,7 +250,7 @@ export function PricingV2() {
           className="text-center mt-12"
         >
           <p className="text-white/40 text-sm">
-            14-day money-back guarantee. No questions asked. Cancel anytime.
+            All sales are final and non-refundable. Review terms before purchase.
           </p>
         </motion.div>
       </div>

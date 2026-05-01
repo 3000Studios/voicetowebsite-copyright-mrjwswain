@@ -80,7 +80,10 @@ export const Setup = () => {
           username: username.trim(),
           email: user.email || '',
           plan,
-          tokens: planConfig.commands === Number.MAX_SAFE_INTEGER ? 999999 : planConfig.commands,
+          tokens:
+            planConfig.commandsPerCycle === Number.MAX_SAFE_INTEGER
+              ? 999999
+              : planConfig.commandsPerCycle,
           accessKey,
           updatedAt: new Date().toISOString(),
         },

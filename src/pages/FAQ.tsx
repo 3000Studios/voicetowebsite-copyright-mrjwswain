@@ -43,13 +43,13 @@ const faqs: FAQItem[] = [
     category: "Pricing & Plans",
     question: "What's included in each plan?",
     answer:
-      "Starter ($19.99/month): 3 site generations, basic templates, hosted deployment. Pro ($29.99/month): 15 generations, premium templates, code export. Enterprise ($49.99/month): Unlimited generations, all features, priority support.",
+      "Starter ($15/month): 3 hosted sites and 10 commands per cycle. Pro ($39/month): 15 hosted sites, 50 commands per cycle, code export, and watermark removal. Enterprise ($99/month): unlimited hosted sites and commands with priority support.",
   },
   {
     category: "Pricing & Plans",
     question: "Can I change plans later?",
     answer:
-      "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and you'll be charged the prorated difference.",
+      "Yes. You can change plans from your account, and the new entitlements apply as soon as the update is confirmed.",
   },
   {
     category: "Payments",
@@ -61,7 +61,7 @@ const faqs: FAQItem[] = [
     category: "Payments",
     question: "Is there a refund policy?",
     answer:
-      "We offer a 7-day money-back guarantee. If you're not satisfied with your purchase, contact support for a full refund.",
+      "All sales are final. Payments are non-refundable once checkout is completed because generation capacity and hosting resources are allocated immediately.",
   },
   {
     category: "Website Features",

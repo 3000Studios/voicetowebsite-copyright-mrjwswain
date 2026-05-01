@@ -1,4 +1,4 @@
-import { PLAN_LIMITS, PlanType, STRIPE_PAYMENT_LINKS } from "@/constants/plans";
+import { isUnlimited, PLAN_LIMITS, PlanType, STRIPE_PAYMENT_LINKS } from "@/constants/plans";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
 import React from "react";
@@ -163,25 +163,25 @@ export const Pricing = () => {
                     <CheckCircle2 className="h-4 w-4 text-emerald-300" />
                     {plan === "commands"
                       ? "One-time command pack for existing users"
-                      : `${config.sites === Number.MAX_SAFE_INTEGER ? "Unlimited" : config.sites} hosted site builds`}
+                      : `${isUnlimited(config.hostedSites) ? "Unlimited" : config.hostedSites} hosted site builds`}
                   </div>
                   <div className="inline-flex items-center gap-3">
                     <CheckCircle2 className="h-4 w-4 text-emerald-300" />
                     {plan === "commands"
                       ? "Use any time after purchase"
-                      : `${config.commands === Number.MAX_SAFE_INTEGER ? "Unlimited" : config.commands} commands per cycle`}
+                      : `${isUnlimited(config.commandsPerCycle) ? "Unlimited" : config.commandsPerCycle} commands per cycle`}
                   </div>
                   <div className="inline-flex items-center gap-3">
                     <CheckCircle2 className="h-4 w-4 text-emerald-300" />
-                    {config.export
+                    {config.canExportCode
                       ? "GitHub export path included"
                       : "Hosted site delivery included"}
                   </div>
                   <div className="inline-flex items-center gap-3">
                     <CheckCircle2 className="h-4 w-4 text-emerald-300" />
-                    {config.watermark
-                      ? "Watermark stays on lower plans"
-                      : "Watermark removed"}
+                    {config.removeWatermark
+                      ? "Watermark removed"
+                      : "Watermark stays on lower plans"}
                   </div>
                   <div className="inline-flex items-center gap-3">
                     <CheckCircle2 className="h-4 w-4 text-emerald-300" />

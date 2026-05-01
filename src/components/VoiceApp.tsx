@@ -142,7 +142,7 @@ export const VoiceApp = ({
     }
 
     // Enforce limits
-    if (!isOwnerAdmin && generationCount >= limits.commands) {
+    if (!isOwnerAdmin && generationCount >= limits.commandsPerCycle) {
       setGenError(
         `Neural limit reached for ${limits.name}. Upgrade to Pro for continued architectural access.`,
       );
@@ -200,7 +200,7 @@ export const VoiceApp = ({
         .trim();
 
       // Add Watermark if free
-      if (!isOwnerAdmin && limits.watermark && !html.includes('id="vtw-watermark"')) {
+      if (!isOwnerAdmin && !limits.removeWatermark && !html.includes('id="vtw-watermark"')) {
         const watermark = `<div id="vtw-watermark" style="position:fixed;bottom:20px;right:20px;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);color:white;padding:10px 20px;border-radius:100px;font-family:Inter,sans-serif;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:2px;border:1px solid rgba(255,255,255,0.1);z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,0.5);">Built with <span style="color:#6366f1">VoiceToWebsite.com</span></div>`;
         html = html.replace("</body>", `${watermark}</body>`) || html;
       }
@@ -274,13 +274,13 @@ export const VoiceApp = ({
                   Neural Power:{" "}
                   <span
                     className={
-                      generationCount >= limits.commands
+                      generationCount >= limits.commandsPerCycle
                         ? "text-red-500"
                         : "text-emerald-500"
                     }
                   >
-                    {limits.commands - generationCount} Command
-                    {limits.commands - generationCount !== 1 ? "s" : ""}{" "}
+                    {limits.commandsPerCycle - generationCount} Command
+                    {limits.commandsPerCycle - generationCount !== 1 ? "s" : ""}{" "}
                     Remaining
                   </span>
                 </p>

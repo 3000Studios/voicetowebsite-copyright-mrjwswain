@@ -20,7 +20,7 @@ export const Legal = () => {
           <div className="lifted-section bg-slate-900 p-10 border-l-8 border-indigo-600">
             <ScrollArea className="h-[400px] pr-6">
               <div className="text-slate-400 space-y-6 text-lg font-medium leading-relaxed">
-                <p className="font-black text-indigo-400 uppercase tracking-widest italic text-sm">Last Updated: April 11, 2026</p>
+                <p className="font-black text-indigo-400 uppercase tracking-widest italic text-sm">Last Updated: May 1, 2026</p>
                 <p>Welcome to VoiceToWebsite.com. By using our services, you agree to be bound by the following terms and conditions.</p>
                 <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">1. Acceptance of Terms</h3>
                 <p>By accessing or using the VoiceToWebsite platform, you agree to comply with and be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
@@ -33,7 +33,11 @@ export const Legal = () => {
                 <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">5. Limitation of Liability</h3>
                 <p>VoiceToWebsite shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use our services.</p>
                 <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">6. Refund Policy</h3>
-                <p>Due to the nature of digital services and AI processing costs, there are no refunds once a subscription or deployment has been initiated. There is no refund for deployed websites as the resources are consumed instantly upon generation and deployment.</p>
+                <p><strong>All sales are final and non-refundable.</strong> Once checkout is complete, generation and hosting resources are reserved immediately and cannot be reversed.</p>
+                <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">7. User Responsibility</h3>
+                <p>You are solely responsible for the legality, accuracy, and rights clearance of all content, media, claims, and offers on your generated website.</p>
+                <h3 className="text-white font-black uppercase italic tracking-tight text-xl mt-8">8. Indemnity</h3>
+                <p>You agree to defend and indemnify VoiceToWebsite and 3000 Studios LLC from third-party claims, damages, and costs arising from your content, commercial use, or legal non-compliance.</p>
               </div>
             </ScrollArea>
           </div>

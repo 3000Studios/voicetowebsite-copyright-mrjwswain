@@ -1,52 +1,78 @@
-export const PLAN_LIMITS = {
+export type PlanType = "free" | "starter" | "pro" | "enterprise" | "commands";
+
+export interface PlanEntitlements {
+  key: PlanType;
+  name: string;
+  description: string;
+  price: number;
+  commandsPerCycle: number;
+  hostedSites: number;
+  canExportCode: boolean;
+  removeWatermark: boolean;
+  premiumSections: boolean;
+}
+
+export const PLAN_ENTITLEMENTS: Record<PlanType, PlanEntitlements> = {
   free: {
+    key: "free",
     name: 'Free Access',
-    commands: 1,
-    sites: 1,
-    export: false,
-    watermark: true,
+    commandsPerCycle: 1,
+    hostedSites: 1,
+    canExportCode: false,
+    removeWatermark: false,
+    premiumSections: false,
     price: 0,
     description: 'Try the demo with one free build before moving into a paid hosted delivery plan.',
   },
   starter: {
+    key: "starter",
     name: 'Starter',
-    commands: 10,
-    sites: 3,
-    export: false,
-    watermark: true,
+    commandsPerCycle: 10,
+    hostedSites: 3,
+    canExportCode: false,
+    removeWatermark: false,
+    premiumSections: false,
     price: 15,
     description: 'For solo operators who need a hosted starter site and a simple launch workflow.',
   },
   pro: {
+    key: "pro",
     name: 'Pro',
-    commands: 50,
-    sites: 15,
-    export: true,
-    watermark: false,
+    commandsPerCycle: 50,
+    hostedSites: 15,
+    canExportCode: true,
+    removeWatermark: true,
+    premiumSections: true,
     price: 39,
     description: 'For consultants and small teams that need more build volume, exports, and a cleaner handoff.',
   },
   enterprise: {
+    key: "enterprise",
     name: 'Enterprise',
-    commands: Number.MAX_SAFE_INTEGER,
-    sites: Number.MAX_SAFE_INTEGER,
-    export: true,
-    watermark: false,
+    commandsPerCycle: Number.MAX_SAFE_INTEGER,
+    hostedSites: Number.MAX_SAFE_INTEGER,
+    canExportCode: true,
+    removeWatermark: true,
+    premiumSections: true,
     price: 99,
     description: 'For agencies and operators launching multiple client or portfolio sites from one account.',
   },
   commands: {
+    key: "commands",
     name: 'Extra Commands Pack',
-    commands: 5,
-    sites: 0,
-    export: false,
-    watermark: false,
+    commandsPerCycle: 5,
+    hostedSites: 0,
+    canExportCode: false,
+    removeWatermark: false,
+    premiumSections: false,
     price: 2.99,
     description: 'One-time add-on for existing users who need more commands without changing plans.',
   },
 } as const;
 
-export type PlanType = keyof typeof PLAN_LIMITS;
+export const PLAN_LIMITS = PLAN_ENTITLEMENTS;
+
+export const isUnlimited = (value: number) => value === Number.MAX_SAFE_INTEGER;
 
 export const STRIPE_PAYMENT_LINKS: Record<Exclude<PlanType, 'free'>, { month: string; year?: string }> = {
   starter: {

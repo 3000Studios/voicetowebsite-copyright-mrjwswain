@@ -14,7 +14,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 interface GeneratedPreview {
   siteName: string;
-  tagline: string;
+  heroHeadline: string;
+  heroSubhead: string;
   heroVideoUrl: string;
   heroImageUrl: string;
   gallery: string[];
@@ -58,7 +59,8 @@ function buildCustomCopy(prompt: string, siteName: string) {
 
   if (isSalon) {
     return {
-      tagline: `Premium beauty experiences by ${siteName}`,
+      heroHeadline: `${siteName} — Premium Beauty Experiences`,
+      heroSubhead: `Premium beauty experiences by ${siteName}`,
       sectionTitle: "Crafted Beauty Services",
       sectionCopy:
         "From signature styling to treatment packages, every service block is tuned for appointment conversion and brand trust.",
@@ -68,7 +70,8 @@ function buildCustomCopy(prompt: string, siteName: string) {
   }
   if (isGym) {
     return {
-      tagline: `High-performance training at ${siteName}`,
+      heroHeadline: `${siteName} — High-Performance Training`,
+      heroSubhead: `High-performance training at ${siteName}`,
       sectionTitle: "Built for Strong Conversions",
       sectionCopy:
         "This landing layout spotlights offers, class blocks, and trainer credibility so visitors move from browsing to sign-up fast.",
@@ -78,7 +81,8 @@ function buildCustomCopy(prompt: string, siteName: string) {
   }
   if (isCoffee) {
     return {
-      tagline: `Fresh craft coffee by ${siteName}`,
+      heroHeadline: `${siteName} — Fresh Craft Coffee`,
+      heroSubhead: `Fresh craft coffee by ${siteName}`,
       sectionTitle: "Menu + Story in One Flow",
       sectionCopy:
         "A conversion-first coffee layout that blends story, featured drinks, and clear ordering actions in a premium visual style.",
@@ -88,7 +92,8 @@ function buildCustomCopy(prompt: string, siteName: string) {
   }
   if (isRestaurant) {
     return {
-      tagline: `Elevated dining from ${siteName}`,
+      heroHeadline: `${siteName} — Elevated Dining`,
+      heroSubhead: `Elevated dining from ${siteName}`,
       sectionTitle: "Reservation-Driven Layout",
       sectionCopy:
         "The page structure is designed to move visitors into reservation intent while showcasing atmosphere and signature plates.",
@@ -97,7 +102,8 @@ function buildCustomCopy(prompt: string, siteName: string) {
     };
   }
   return {
-    tagline: `Custom digital presence for ${siteName}`,
+    heroHeadline: `${siteName} — Built for Growth`,
+    heroSubhead: `Custom digital presence for ${siteName}`,
     sectionTitle: "AI-Crafted Landing Experience",
     sectionCopy:
       "This preview is generated from your exact prompt with dynamic media, branded hierarchy, and conversion-oriented section flow.",
@@ -180,6 +186,35 @@ export function PlaygroundGenerator({
     }
   };
 
+  const fetchPreviewCopy = async (
+    queryText: string,
+    siteName: string,
+    requestedStyle: string,
+  ) => {
+    try {
+      const res = await fetch("/api/preview-copy", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          prompt: queryText,
+          siteName,
+          requestedStyle,
+        }),
+      });
+      if (!res.ok) return null;
+      return (await res.json()) as {
+        heroHeadline?: string;
+        heroSubhead?: string;
+        valueHeading?: string;
+        valueBody?: string;
+        ctaLabel?: string;
+        featureBullets?: string[];
+      };
+    } catch {
+      return null;
+    }
+  };
+
   const generatePreview = async (promptText: string) => {
     const prompt = promptText.trim();
     if (!prompt) return;
@@ -191,15 +226,21 @@ export function PlaygroundGenerator({
       fetchDynamicMedia(prompt),
       fetchPreviewStyle(prompt),
     ]);
-    const copy = buildCustomCopy(prompt, siteName);
+    const localCopy = buildCustomCopy(prompt, siteName);
+    const remoteCopy = await fetchPreviewCopy(
+      prompt,
+      siteName,
+      style?.headlineEffect || prompt,
+    );
 
     setGeneratedPreview({
       siteName,
-      tagline: copy.tagline,
-      sectionTitle: copy.sectionTitle,
-      sectionCopy: copy.sectionCopy,
-      cta: copy.cta,
-      features: copy.features,
+      heroHeadline: remoteCopy?.heroHeadline || localCopy.heroHeadline,
+      heroSubhead: remoteCopy?.heroSubhead || localCopy.heroSubhead,
+      sectionTitle: remoteCopy?.valueHeading || localCopy.sectionTitle,
+      sectionCopy: remoteCopy?.valueBody || localCopy.sectionCopy,
+      cta: remoteCopy?.ctaLabel || localCopy.cta,
+      features: remoteCopy?.featureBullets || localCopy.features,
       heroVideoUrl:
         media?.videoUrl ||
         "https://cdn.coverr.co/videos/coverr-cinematic-city-pan-7153/1080p.mp4",
@@ -361,10 +402,10 @@ export function PlaygroundGenerator({
                   className="text-4xl font-black text-white drop-shadow-xl"
                   style={{ fontFamily: generatedPreview.headingFont }}
                 >
-                  {generatedPreview.siteName}
+                  {generatedPreview.heroHeadline}
                 </h3>
                 <p className="text-white/90 text-lg mt-2" style={{ fontFamily: generatedPreview.bodyFont }}>
-                  {generatedPreview.tagline}
+                  {generatedPreview.heroSubhead}
                 </p>
               </div>
             </div>
@@ -406,4 +447,3 @@ export function PlaygroundGenerator({
     </div>
   );
 }
-
