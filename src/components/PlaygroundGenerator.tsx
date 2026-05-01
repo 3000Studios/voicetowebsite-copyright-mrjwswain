@@ -20,6 +20,10 @@ interface GeneratedPreview {
   features: string[];
   colorScheme: string;
   layout: string;
+  heroVideoUrl: string;
+  heroImageUrl: string;
+  industry: string;
+  cta: string;
 }
 
 const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
@@ -34,6 +38,12 @@ const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
     ],
     colorScheme: "Warm browns & creams",
     layout: "Single-page with smooth scroll",
+    heroVideoUrl:
+      "https://cdn.coverr.co/videos/coverr-a-brewing-cup-of-coffee-1579/1080p.mp4",
+    heroImageUrl:
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80",
+    industry: "Coffee & Cafe",
+    cta: "Order Online",
   },
   gym: {
     title: "Iron Forge Fitness",
@@ -46,6 +56,12 @@ const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
     ],
     colorScheme: "Dark grays & neon accents",
     layout: "Multi-section landing page",
+    heroVideoUrl:
+      "https://cdn.coverr.co/videos/coverr-workout-gym-session-5176/1080p.mp4",
+    heroImageUrl:
+      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1600&q=80",
+    industry: "Fitness",
+    cta: "Start Membership",
   },
   salon: {
     title: "Luxe Beauty Lounge",
@@ -53,6 +69,12 @@ const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
     features: ["Service menu", "Online booking", "Stylist profiles", "Reviews"],
     colorScheme: "Soft pinks & golds",
     layout: "Minimalist grid layout",
+    heroVideoUrl:
+      "https://cdn.coverr.co/videos/coverr-haircut-close-up-1971/1080p.mp4",
+    heroImageUrl:
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1600&q=80",
+    industry: "Beauty & Salon",
+    cta: "Book Appointment",
   },
   restaurant: {
     title: "Savory Kitchen",
@@ -65,6 +87,12 @@ const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
     ],
     colorScheme: "Deep greens & brass",
     layout: "Classic elegant layout",
+    heroVideoUrl:
+      "https://cdn.coverr.co/videos/coverr-fancy-dinner-table-1563/1080p.mp4",
+    heroImageUrl:
+      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
+    industry: "Restaurant",
+    cta: "Reserve Table",
   },
   default: {
     title: "Your AI-Generated Site",
@@ -72,6 +100,12 @@ const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
     features: ["Hero section", "Services showcase", "Contact form", "Gallery"],
     colorScheme: "Professional & modern",
     layout: "Responsive multi-page",
+    heroVideoUrl:
+      "https://cdn.coverr.co/videos/coverr-cinematic-city-pan-7153/1080p.mp4",
+    heroImageUrl:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
+    industry: "Business",
+    cta: "Get Started",
   },
 };
 
@@ -176,7 +210,17 @@ export function PlaygroundGenerator() {
       preview = DEMO_RESPONSES.restaurant;
     }
 
-    setGeneratedPreview(preview);
+    const searchQuery = encodeURIComponent(
+      transcript
+        .split(" ")
+        .filter((word) => word.length > 3)
+        .slice(0, 4)
+        .join(",") || preview.industry,
+    );
+    setGeneratedPreview({
+      ...preview,
+      heroImageUrl: `https://source.unsplash.com/1600x900/?${searchQuery}`,
+    });
     setIsGenerating(false);
     setActiveStep(3);
     setShowConfetti(true);
@@ -224,7 +268,17 @@ export function PlaygroundGenerator() {
       preview = DEMO_RESPONSES.restaurant;
     }
 
-    setGeneratedPreview(preview);
+    const searchQuery = encodeURIComponent(
+      text
+        .split(" ")
+        .filter((word) => word.length > 3)
+        .slice(0, 4)
+        .join(",") || preview.industry,
+    );
+    setGeneratedPreview({
+      ...preview,
+      heroImageUrl: `https://source.unsplash.com/1600x900/?${searchQuery}`,
+    });
     setIsGenerating(false);
     setActiveStep(3);
     setShowConfetti(true);
@@ -251,6 +305,15 @@ export function PlaygroundGenerator() {
     setIsRecording(false);
     setIsGenerating(false);
   };
+
+  const safePrompt = transcript.trim() || generatedPreview?.description || "";
+  const previewStyles = {
+    coffee: "from-amber-900/50 via-orange-900/30 to-zinc-950",
+    gym: "from-zinc-900 via-slate-900 to-cyan-950",
+    salon: "from-rose-900/50 via-fuchsia-900/30 to-zinc-950",
+    restaurant: "from-emerald-900/50 via-zinc-900 to-black",
+    default: "from-blue-950 via-slate-950 to-black",
+  } as const;
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -552,48 +615,92 @@ export function PlaygroundGenerator() {
                 </button>
               </div>
 
-              {/* Preview Card */}
-              <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center text-2xl">
-                    🌐
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-xl font-bold text-white mb-1">
-                      {generatedPreview.title}
-                    </h4>
-                    <p className="text-white/60">
-                      {generatedPreview.description}
-                    </p>
+              {/* Full Page Preview */}
+              <div className="relative">
+                <div className="absolute inset-0 pointer-events-none opacity-20 [background-image:linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:38px_38px]" />
+                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.22),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.2),transparent_40%)]" />
+                <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+                  <div className="rotate-[-18deg] select-none rounded-2xl border border-cyan-300/30 bg-slate-950/55 px-8 py-4 text-cyan-100/70 tracking-[0.28em] text-lg font-semibold backdrop-blur-sm">
+                    VIEW VOICE TO WEBSITE
                   </div>
                 </div>
+                <div
+                  className="relative z-10 max-h-[72vh] overflow-y-auto rounded-2xl border border-white/12 bg-slate-950"
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
+                  onClickCapture={(e) => {
+                    const target = e.target as HTMLElement;
+                    if (target.closest("a,button")) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }
+                  }}
+                >
+                  <div
+                    className={`min-h-[1200px] bg-gradient-to-b ${previewStyles[(generatedPreview.industry.toLowerCase().includes("coffee") ? "coffee" : generatedPreview.industry.toLowerCase().includes("fitness") ? "gym" : generatedPreview.industry.toLowerCase().includes("salon") ? "salon" : generatedPreview.industry.toLowerCase().includes("restaurant") ? "restaurant" : "default") as keyof typeof previewStyles]}`}
+                  >
+                    <header className="sticky top-0 z-10 border-b border-white/10 bg-slate-950/85 backdrop-blur-xl">
+                      <div className="flex items-center justify-between px-6 py-4">
+                        <div className="text-white font-bold tracking-tight">{generatedPreview.title}</div>
+                        <nav className="hidden md:flex items-center gap-6 text-sm text-white/75">
+                          <a className="hover:text-cyan-300 transition-colors">Home</a>
+                          <a className="hover:text-cyan-300 transition-colors">Services</a>
+                          <a className="hover:text-cyan-300 transition-colors">Gallery</a>
+                          <a className="hover:text-cyan-300 transition-colors">Contact</a>
+                        </nav>
+                      </div>
+                    </header>
 
-                {/* Features Grid */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  {generatedPreview.features.map((feature, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 text-white/70"
-                    >
-                      <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full" />
-                      {feature}
-                    </div>
-                  ))}
-                </div>
+                    <section className="relative px-6 pt-8 pb-10">
+                      <video
+                        className="h-[280px] w-full rounded-2xl object-cover ring-1 ring-white/15"
+                        src={generatedPreview.heroVideoUrl}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                      <div className="absolute inset-0 m-6 rounded-2xl bg-gradient-to-t from-slate-950/70 to-transparent pointer-events-none" />
+                      <div className="relative -mt-24 px-6">
+                        <h4 className="text-3xl font-extrabold text-white drop-shadow-md">{generatedPreview.description}</h4>
+                        <p className="mt-3 max-w-2xl text-white/80">{safePrompt || "Custom AI-driven homepage preview with full interactions and brand visuals."}</p>
+                        <div className="mt-5 flex flex-wrap gap-3">
+                          <span className="rounded-full border border-cyan-300/35 bg-cyan-500/20 px-3 py-1 text-xs font-semibold text-cyan-100">{generatedPreview.colorScheme}</span>
+                          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/85">{generatedPreview.layout}</span>
+                        </div>
+                      </div>
+                    </section>
 
-                {/* Design Details */}
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="px-3 py-1.5 bg-white/5 rounded-lg">
-                    <span className="text-white/40">Colors:</span>{" "}
-                    <span className="text-white">
-                      {generatedPreview.colorScheme}
-                    </span>
-                  </div>
-                  <div className="px-3 py-1.5 bg-white/5 rounded-lg">
-                    <span className="text-white/40">Layout:</span>{" "}
-                    <span className="text-white">
-                      {generatedPreview.layout}
-                    </span>
+                    <section className="px-6 pb-10">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {generatedPreview.features.map((feature, i) => (
+                          <div
+                            key={i}
+                            className="group rounded-xl border border-white/15 bg-white/5 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/45 hover:bg-white/10"
+                          >
+                            <div className="mb-2 text-xs uppercase tracking-[0.22em] text-cyan-200/85">Feature {i + 1}</div>
+                            <div className="text-lg font-semibold text-white">{feature}</div>
+                            <div className="mt-1 text-sm text-white/70">Animated interactions, layered visuals, and conversion-focused layout.</div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    <section className="px-6 pb-12">
+                      <div className="grid gap-4 md:grid-cols-3">
+                        {[0, 1, 2].map((i) => (
+                          <div key={i} className="overflow-hidden rounded-xl border border-white/12 bg-slate-900/60">
+                            <img
+                              src={`${generatedPreview.heroImageUrl}${generatedPreview.heroImageUrl.includes("?") ? "&" : "?"}sig=${i}`}
+                              alt={`${generatedPreview.industry} showcase ${i + 1}`}
+                              className="h-36 w-full object-cover transition-transform duration-500 hover:scale-105"
+                              loading="lazy"
+                            />
+                            <div className="p-3 text-sm text-white/75">Preview module {i + 1}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
                   </div>
                 </div>
               </div>
@@ -608,7 +715,7 @@ export function PlaygroundGenerator() {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl transition-colors"
                 >
                   <Sparkles className="w-5 h-5" />
-                  Start Building for Real
+                  Buy This Site & Launch
                 </a>
                 <p className="text-sm text-white/50 mt-3">
                   Free to start • No credit card required
