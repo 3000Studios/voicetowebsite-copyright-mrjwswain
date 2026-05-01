@@ -8,6 +8,24 @@ export interface Env {
   PAYPAL_PLAN_ENTERPRISE?: string;
 }
 
+const FALLBACK_CHECKOUT_URLS: Record<string, { month?: string; year?: string }> = {
+  starter: {
+    month: "https://buy.stripe.com/9B65kD2Kx5mK5le8nUbAs0u",
+    year: "https://buy.stripe.com/28E5kD70N02q7tm8nUbAs0v",
+  },
+  pro: {
+    month: "https://buy.stripe.com/dRmfZhbh35mK2927jQbAs0w",
+    year: "https://buy.stripe.com/4gM00j3OB6qO9BudIebAs0x",
+  },
+  enterprise: {
+    month: "https://buy.stripe.com/bJe7sLetfcPcdRK1ZwbAs0y",
+    year: "https://buy.stripe.com/dRm00jacZ4iG9Bu0VsbAs0z",
+  },
+  commands: {
+    month: "https://buy.stripe.com/fZubJ12Kx02q9Bu6fMbAs0A",
+  },
+};
+
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
     ...init,
@@ -44,19 +62,35 @@ async function getPayPalAccessToken(env: Env) {
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
   try {
     const url = new URL(context.request.url);
-    let body: { plan?: string } = {};
+    let body: { plan?: string; cadence?: string } = {};
     if (url.searchParams.get("plan")) {
       body.plan = url.searchParams.get("plan") || "";
+      body.cadence = url.searchParams.get("cadence") || "";
     } else {
-      body = (await context.request.json()) as { plan?: string };
+      const raw = await context.request.text();
+      body = raw.trim() ? (JSON.parse(raw) as { plan?: string; cadence?: string }) : {};
     }
     const plan = body.plan?.toLowerCase();
     if (!plan) return jsonResponse({ error: "Missing plan" }, { status: 400 });
+    const cadence = body.cadence?.toLowerCase() === "year" ? "year" : "month";
+    const fallbackUrl =
+      plan === "commands"
+        ? FALLBACK_CHECKOUT_URLS.commands.month
+        : FALLBACK_CHECKOUT_URLS[plan]?.[cadence];
 
     const appUrl = (context.env.APP_URL || "").trim().replace(/\/+$/, "");
-    if (!appUrl) return jsonResponse({ error: "APP_URL not configured" }, { status: 500 });
+    if (!appUrl) {
+      if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
+      return jsonResponse({ error: "APP_URL not configured" }, { status: 500 });
+    }
 
-    const token = await getPayPalAccessToken(context.env);
+    let token: string;
+    try {
+      token = await getPayPalAccessToken(context.env);
+    } catch {
+      if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
+      return jsonResponse({ error: "PayPal token failed" }, { status: 500 });
+    }
 
     if (plan === "starter" || plan === "pro" || plan === "enterprise") {
       const planId =
@@ -67,10 +101,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
             : context.env.PAYPAL_PLAN_ENTERPRISE;
 
       if (!planId) {
-        return jsonResponse(
-          { error: "PayPal subscription plans not configured yet" },
-          { status: 500 }
-        );
+        if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
+        return jsonResponse({ error: "PayPal subscription plans not configured yet" }, { status: 500 });
       }
 
       const subRes = await fetch(`${paypalBaseUrl(context.env)}/v1/billing/subscriptions`, {
@@ -94,6 +126,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       const sub = (await subRes.json()) as { links?: Array<{ rel: string; href: string }> };
       const approveUrl = sub.links?.find((l) => l.rel === "approve")?.href;
       if (!subRes.ok || !approveUrl) {
+        if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
         return jsonResponse({ error: "PayPal subscription creation failed" }, { status: 500 });
       }
       return jsonResponse({ url: approveUrl });
@@ -128,6 +161,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     const order = (await orderRes.json()) as { links?: Array<{ rel: string; href: string }> };
     const approveUrl = order.links?.find((l) => l.rel === "approve")?.href;
     if (!orderRes.ok || !approveUrl) {
+      if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
       return jsonResponse({ error: "PayPal order creation failed" }, { status: 500 });
     }
     return jsonResponse({ url: approveUrl });

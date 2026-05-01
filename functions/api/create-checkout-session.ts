@@ -12,6 +12,24 @@ export interface Env {
 
 const STRIPE_SESSIONS_URL = 'https://api.stripe.com/v1/checkout/sessions';
 
+const FALLBACK_STRIPE_LINKS: Record<string, { month?: string; year?: string }> = {
+  starter: {
+    month: "https://buy.stripe.com/9B65kD2Kx5mK5le8nUbAs0u",
+    year: "https://buy.stripe.com/28E5kD70N02q7tm8nUbAs0v",
+  },
+  pro: {
+    month: "https://buy.stripe.com/dRmfZhbh35mK2927jQbAs0w",
+    year: "https://buy.stripe.com/4gM00j3OB6qO9BudIebAs0x",
+  },
+  enterprise: {
+    month: "https://buy.stripe.com/bJe7sLetfcPcdRK1ZwbAs0y",
+    year: "https://buy.stripe.com/dRm00jacZ4iG9Bu0VsbAs0z",
+  },
+  commands: {
+    month: "https://buy.stripe.com/fZubJ12Kx02q9Bu6fMbAs0A",
+  },
+};
+
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
     ...init,
@@ -36,7 +54,9 @@ async function parseRequestBody(request: Request) {
 
   if (contentType.includes('application/json')) {
     const raw = await request.text();
-    if (!raw.trim()) throw new Error('Empty request body');
+    if (!raw.trim()) {
+      return {};
+    }
     return JSON.parse(raw) as { plan?: string; cadence?: string; launch_discount?: boolean };
   }
 
@@ -76,10 +96,26 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     const cadence = body.cadence?.toLowerCase() === 'year' ? 'year' : 'month';
 
     const priceId = getStripePriceForPlan(context.env, plan, cadence);
-    if (!priceId) return jsonResponse({ error: 'Invalid plan' }, { status: 400 });
+    const fallbackUrl =
+      plan === "commands"
+        ? FALLBACK_STRIPE_LINKS.commands.month
+        : FALLBACK_STRIPE_LINKS[plan]?.[cadence];
+
+    if (!priceId) {
+      if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
+      return jsonResponse({ error: 'Invalid plan' }, { status: 400 });
+    }
 
     const appUrl = (context.env.APP_URL || '').trim().replace(/\/+$/, '');
-    if (!appUrl) return jsonResponse({ error: 'APP_URL not configured' }, { status: 500 });
+    if (!appUrl) {
+      if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
+      return jsonResponse({ error: 'APP_URL not configured' }, { status: 500 });
+    }
+
+    if (!context.env.STRIPE_SECRET_KEY) {
+      if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
+      return jsonResponse({ error: 'STRIPE_SECRET_KEY not configured' }, { status: 500 });
+    }
 
     const mode = plan === 'commands' ? 'payment' : 'subscription';
     const form = new URLSearchParams();
@@ -102,8 +138,17 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       body: form.toString(),
     });
 
-    const data = (await response.json()) as { url?: string; error?: { message?: string } };
+    const raw = await response.text();
+    let data: { url?: string; error?: { message?: string } } = {};
+    if (raw.trim()) {
+      try {
+        data = JSON.parse(raw) as { url?: string; error?: { message?: string } };
+      } catch {
+        data = {};
+      }
+    }
     if (!response.ok || !data.url) {
+      if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
       return jsonResponse({ error: data?.error?.message || 'Stripe session creation failed' }, { status: 500 });
     }
 
