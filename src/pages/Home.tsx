@@ -3,17 +3,12 @@ import { FeaturesV2 } from "@/components/FeaturesV2";
 import {
   ArrowRight,
   CheckCircle2,
-  Code2,
-  Globe,
   Heart,
   LayoutTemplate,
   Mic2,
-  MonitorSmartphone,
-  ShieldCheck,
   Sparkles,
   Target,
   Users,
-  Workflow,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Helmet } from "react-helmet-async";
@@ -23,40 +18,14 @@ const workflowSteps = [
   {
     title: "Tell us what you do",
     copy: "Describe your business, offer, and audience in plain language. The setup flow keeps the intake short and usable.",
-    icon: Mic2,
   },
   {
     title: "Choose the look",
     copy: "Pick a design direction that matches your brand so the first version of your site is usable immediately.",
-    icon: LayoutTemplate,
   },
   {
     title: "Get a hosted site link",
     copy: "After checkout and setup, the generator creates a live starter site that you can review, share, and iterate on.",
-    icon: Globe,
-  },
-];
-
-const capabilities = [
-  {
-    title: "Hosted delivery",
-    copy: "Every completed build is delivered as a live link on Cloudflare-backed infrastructure.",
-    icon: MonitorSmartphone,
-  },
-  {
-    title: "Fast setup flow",
-    copy: "The purchase path leads directly into a short setup and generation flow instead of a complex dashboard maze.",
-    icon: Workflow,
-  },
-  {
-    title: "Monetization ready",
-    copy: "The stack includes pricing, checkout, ads.txt readiness, and a structure built for lead capture and upgrades.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Export path",
-    copy: "Higher plans unlock GitHub export and operational controls for teams that need more than a hosted starter site.",
-    icon: Code2,
   },
 ];
 
@@ -148,63 +117,48 @@ export const Home = () => {
               From voice brief to hosted site link.
             </h2>
             <p className="section-copy">
-              A frictionless 3-step experience designed for business owners who
-              value speed over complex editors.
+              A frictionless 3-step experience distilled into one scrolling strip.
             </p>
           </div>
-          <div className="grid gap-6 lg:grid-cols-3">
-            {workflowSteps.map((step, index) => {
-              const Icon = step.icon;
-              return (
+          <div className="workflow-marquee">
+            <div className="workflow-marquee-track">
+              {[...workflowSteps, ...workflowSteps].map((step, index) => (
                 <motion.div
-                  key={step.title}
-                  initial={{ opacity: 0, y: 30 }}
+                  key={`${step.title}-${index}`}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  className="luxury-card group"
+                  transition={{ delay: index * 0.04, duration: 0.45 }}
+                  className="workflow-chip group"
                 >
-                  <div className="feature-card-icon bg-indigo-500/10! border-indigo-500/20! group-hover:scale-110 transition-transform duration-500">
-                    <Icon className="h-5 w-5 text-indigo-400" />
-                  </div>
-                  <div className="space-y-4">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-indigo-400/80">
-                      Step {index + 1}
+                  <div className="space-y-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.34em] text-indigo-300/80">
+                      Step {((index % workflowSteps.length) + 1)}
                     </div>
-                    <h3 className="text-2xl font-bold text-white tracking-tight">
+                    <h3 className="text-xl font-bold text-white tracking-tight">
                       {step.title}
                     </h3>
-                    <p className="text-base leading-relaxed text-slate-400">
+                    <p className="text-sm leading-relaxed text-slate-400">
                       {step.copy}
                     </p>
                   </div>
                 </motion.div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       <section className="section-shell">
-        <div className="content-grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <div className="section-intro max-w-2xl">
-            <span className="eyebrow">Trust bar</span>
-            <h2 className="section-title text-gradient">
-              Built on tools people already trust.
-            </h2>
+        <div className="content-grid gap-8">
+          <div className="section-intro max-w-3xl">
+            <span className="eyebrow">Why it feels simple</span>
+            <h2 className="section-title text-gradient">One flow. Clear outcome.</h2>
             <p className="section-copy">
-              The home page now uses a trust bar and real video proof instead of
-              empty ad placeholders.
+              VoiceToWebsite is built to feel immediate: speak once, preview the result, and launch without learning a dashboard.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              {['React', 'Cloudflare', 'Stripe', 'PayPal', 'Tailwind'].map((item) => (
-                <div key={item} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200">
-                  {item}
-                </div>
-              ))}
-            </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-1">
+          <div className="grid gap-4 md:grid-cols-2">
             {proofClips.map((clip, index) => (
               <motion.div
                 key={clip.title}
@@ -236,61 +190,18 @@ export const Home = () => {
       </section>
 
       <section className="section-shell">
-        <div className="content-grid items-center gap-16 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <span className="eyebrow">Platform Capabilities</span>
-              <h2 className="section-title text-gradient leading-tight">
-                One technical section. No repeated claims.
-              </h2>
-              <p className="section-copy">
-                Cloudflare delivery, export controls, SEO-ready structure, and a
-                clear launch path in a single block.
+        <div className="content-grid">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-[30px] border border-white/10 bg-white/4 p-6 backdrop-blur-xl">
+              <div className="text-[10px] font-bold uppercase tracking-[0.34em] text-cyan-300/80">Powered by 3000 Studios</div>
+              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                The product is built and maintained by 3000 Studios.
               </p>
             </div>
-            <ul className="space-y-5">
-              {[
-                'Instant hosting on Cloudflare Global Edge',
-                'SEO-optimized semantic HTML structure',
-                'Direct-to-checkout monetization flow',
-                'Zero-config deployment path',
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-4 text-slate-300"
-                >
-                  <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                    <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                  </div>
-                  <span className="text-base font-medium">{item}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="pt-4">
-              <Link to="/pricing" className="hero-secondary-button group">
-                Begin generation
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </div>
-          </div>
-          <div className="luxury-card overflow-hidden p-0!">
-            <video
-              src="/videos/voice-to-website-ad.mp4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="h-full min-h-[520px] w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-[#03040a] via-transparent to-transparent" />
-            <div className="absolute inset-x-6 bottom-6 rounded-[28px] border border-white/10 bg-black/45 p-5 backdrop-blur-xl">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-cyan-200">
-                <Sparkles className="h-4 w-4" />
-                Video proof
-              </div>
+            <div className="rounded-[30px] border border-white/10 bg-white/4 p-6 backdrop-blur-xl">
+              <div className="text-[10px] font-bold uppercase tracking-[0.34em] text-cyan-300/80">Why users stay</div>
               <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                Real clips from the product, referral flow, and promo layer now
-                sit in the page instead of blank decorative shells.
+                Real sites, ongoing updates, and a clear launch path instead of generic template output.
               </p>
             </div>
           </div>

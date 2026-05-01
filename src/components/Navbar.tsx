@@ -59,7 +59,7 @@ export const Navbar = () => {
     <>
       <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6 lg:px-10">
         <div
-          className={`mx-auto flex w-full max-w-7xl items-center justify-between rounded-full border px-4 py-3 transition-all duration-300 sm:px-6 ${
+          className={`mx-auto flex w-full max-w-7xl items-center justify-between overflow-hidden rounded-full border px-4 py-3 transition-all duration-300 sm:px-6 ${
             isScrolled
               ? 'border-white/12 bg-slate-950/80 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl'
               : 'border-white/10 bg-slate-950/58 backdrop-blur-xl'
@@ -68,11 +68,21 @@ export const Navbar = () => {
           <Link to="/" aria-label="VoiceToWebsite home" className="shrink-0">
             <Logo />
           </Link>
-          <span className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-200 lg:inline-flex">
-            Powered by 3000 Studios
-          </span>
 
-          <nav className="hidden items-center gap-8 lg:flex">
+          <div className={`hidden flex-1 items-center justify-center px-6 lg:flex ${isScrolled ? "translate-y-[-140%] opacity-0" : "translate-y-0 opacity-100"} transition-all duration-500`}>
+            <div className="nav-brand-wave w-full max-w-[34rem]">
+              <div className="nav-brand-wave-track">
+                <span>Speak. Build. Launch.</span>
+                <span>Voice to website in minutes.</span>
+                <span>Animated. Responsive. Live.</span>
+                <span>Speak. Build. Launch.</span>
+                <span>Voice to website in minutes.</span>
+                <span>Animated. Responsive. Live.</span>
+              </div>
+            </div>
+          </div>
+
+          <nav className={`hidden items-center gap-8 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}>
             {navLinks.map((link) => (
               <NavAnchor key={link.label} href={link.href}>
                 {link.label}
@@ -80,7 +90,7 @@ export const Navbar = () => {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className={`hidden items-center gap-3 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}>
             <Link to="/login" className="nav-ghost-button">
               Login
             </Link>
@@ -127,10 +137,6 @@ export const Navbar = () => {
                   </span>
                 </NavAnchor>
               ))}
-              <Link to="/pricing" className="nav-primary-button mt-3 flex w-full justify-center">
-                Get your site
-                <ArrowRight className="h-4 w-4" />
-              </Link>
             </div>
           </motion.div>
         ) : null}

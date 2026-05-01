@@ -35,14 +35,19 @@ export const Logo = ({ className = "" }: { className?: string }) => {
         </svg>
       </div>
 
-      <div className="flex flex-col leading-none">
+      <motion.div
+        className="flex flex-col leading-none"
+        initial={{ opacity: 0, x: -14 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      >
         <span className="font-display text-lg font-black uppercase tracking-[0.15em] text-white sm:text-xl">
           VoiceToWebsite
         </span>
         <span className="mt-1 text-[10px] uppercase tracking-[0.34em] text-cyan-100/55 transition-colors group-hover:text-cyan-200">
           Speak. Build. Launch.
         </span>
-      </div>
+      </motion.div>
     </div>
   );
 };

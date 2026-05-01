@@ -76,17 +76,27 @@ export function FeaturesV2() {
             <span className="gradient-text">move fast</span>
           </motion.h2>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-body max-w-2xl mx-auto"
-          >
-            Voice brief, layout generation, hosted delivery, and export options
-            in one production flow.
-          </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="text-body max-w-2xl mx-auto"
+        >
+          Voice brief, layout generation, hosted delivery, and export options
+          in one production flow.
+        </motion.p>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-left backdrop-blur-xl">
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-indigo-200/90">Voice brief</div>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">Speak the site idea, audience, and mood.</p>
+          </div>
+          <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-left backdrop-blur-xl">
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-indigo-200/90">Live preview</div>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">Watch the page compile into a usable structure.</p>
+          </div>
         </div>
+      </div>
 
         <div className="space-y-6 overflow-hidden">
           <div className="feature-marquee feature-marquee-left">
@@ -138,26 +148,6 @@ export function FeaturesV2() {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-20 rounded-[32px] border border-white/10 bg-white/4 p-6 backdrop-blur-xl"
-        >
-          <div className="grid gap-4 md:grid-cols-4">
-            {[
-              { value: "Cloudflare", label: "Global delivery" },
-              { value: "Semantic HTML", label: "SEO structure" },
-              { value: "Stripe + PayPal", label: "Checkout selectors" },
-              { value: "Exports", label: "Plan-controlled access" },
-            ].map((stat) => (
-              <div key={stat.label} className="rounded-2xl border border-white/5 bg-black/15 p-5 text-center">
-                <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
-                <div className="mt-2 text-sm text-white/50">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
       </div>
     </section>
   );
