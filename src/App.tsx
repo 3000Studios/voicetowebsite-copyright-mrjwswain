@@ -4,9 +4,9 @@ import { Navbar } from "@/components/Navbar";
 import { SiteViewer } from "@/components/SiteViewer";
 import { AuthProvider } from "@/context/AuthContext";
 import { ScrollToTop } from "@/hooks/useScrollToTop";
+import { About } from "@/pages/About";
 import { Home } from "@/pages/Home";
 import { Pricing } from "@/pages/Pricing";
-import { About } from "@/pages/About";
 import { Setup } from "@/pages/Setup";
 import { Success } from "@/pages/Success";
 import { AnimatePresence } from "motion/react";
@@ -44,7 +44,9 @@ const Stories = lazy(() =>
   import("@/pages/Stories").then((module) => ({ default: module.Stories })),
 );
 const StoryDetail = lazy(() =>
-  import("@/pages/StoryDetail").then((module) => ({ default: module.StoryDetail })),
+  import("@/pages/StoryDetail").then((module) => ({
+    default: module.StoryDetail,
+  })),
 );
 const Store = lazy(() =>
   import("@/pages/Store").then((module) => ({ default: module.default })),
@@ -104,4 +106,3 @@ export default function App() {
     </AuthProvider>
   );
 }
-

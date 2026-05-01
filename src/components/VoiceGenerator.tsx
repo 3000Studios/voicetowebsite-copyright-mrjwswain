@@ -22,6 +22,13 @@ interface GeneratedSite {
   html: string;
   preview: string;
   title: string;
+  variations?: Array<{
+    id: string;
+    name: string;
+    mood: string;
+    fontPair?: string;
+    html: string;
+  }>;
 }
 
 export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
@@ -35,6 +42,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
   const [generatedSite, setGeneratedSite] = useState<GeneratedSite | null>(
     null,
   );
+  const [activeVariation, setActiveVariation] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"voice" | "text">("voice");
 
@@ -145,13 +153,16 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
         html: string;
         previewUrl?: string;
         title?: string;
+        variations?: GeneratedSite["variations"];
       };
 
       setGeneratedSite({
         html: data.html,
         preview: data.previewUrl || "",
         title: data.title || "Generated Site",
+        variations: data.variations,
       });
+      setActiveVariation(0);
     } catch (err) {
       console.error("Generation error:", err);
       setError("Failed to generate site. Please try again.");
@@ -161,9 +172,11 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
   };
 
   const isPreviewMode = mode === "preview";
+  const activeHtml =
+    generatedSite?.variations?.[activeVariation]?.html || generatedSite?.html || "";
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto">
       {/* Header */}
       <div className="text-center mb-12">
         <motion.div
@@ -193,8 +206,8 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
           className="text-lg text-slate-400 max-w-2xl mx-auto"
         >
           {isPreviewMode
-            ? "Describe your website and see a live preview. Upgrade to save and deploy."
-            : "Full access to generate, save, and deploy unlimited websites with voice or text."}
+            ? "Describe your website and compare three complete scrollable homepage directions."
+            : "Generate complete custom homepages with copy, media, motion, responsive sections, and three premium layout directions."}
         </motion.p>
       </div>
 
@@ -274,7 +287,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
             <textarea
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}
-              placeholder="Describe your website: I need a modern landing page for my consulting business with navy blue theme, hero section, pricing table, and contact form..."
+              placeholder="Describe the site: business name, audience, offer, pages, mood, colors, and anything you want included. If you skip style details, the generator will add premium design, copy, animation, media, and conversion sections automatically."
               className="w-full h-40 bg-white/5 border border-white/10 rounded-2xl p-6 text-white placeholder:text-slate-500 resize-none focus:border-indigo-500/50 focus:outline-none transition-all"
             />
           </div>
@@ -359,7 +372,8 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white flex items-center gap-3">
                   <Monitor className="w-6 h-6 text-indigo-400" />
-                  {generatedSite.title}
+                  {generatedSite.variations?.[activeVariation]?.name ||
+                    generatedSite.title}
                 </h3>
 
                 {isPreviewMode && onUpgrade && (
@@ -375,10 +389,37 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
                 )}
               </div>
 
+              {generatedSite.variations && generatedSite.variations.length > 1 && (
+                <div className="mb-6 grid gap-3 md:grid-cols-3">
+                  {generatedSite.variations.map((variation, index) => (
+                    <button
+                      key={variation.id}
+                      type="button"
+                      onClick={() => setActiveVariation(index)}
+                      className={`rounded-2xl border p-4 text-left transition-all ${
+                        activeVariation === index
+                          ? "border-cyan-300/50 bg-cyan-300/12 text-white shadow-[0_0_44px_rgba(34,211,238,0.16)]"
+                          : "border-white/10 bg-white/5 text-slate-300 hover:border-white/25 hover:bg-white/8"
+                      }`}
+                    >
+                      <span className="block text-xs font-bold uppercase tracking-[0.26em] text-cyan-200/80">
+                        Variation {index + 1}
+                      </span>
+                      <span className="mt-2 block text-lg font-black">
+                        {variation.name}
+                      </span>
+                      <span className="mt-1 block text-sm text-slate-400">
+                        {variation.mood}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Preview Frame */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 bg-slate-950">
+              <div className="relative h-[78vh] min-h-[640px] rounded-2xl overflow-hidden border border-white/10 bg-slate-950">
                 <iframe
-                  srcDoc={generatedSite.html}
+                  srcDoc={activeHtml}
                   className="w-full h-full"
                   sandbox="allow-scripts"
                   title="Generated Site Preview"
@@ -389,7 +430,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
               <div className="mt-6 flex flex-wrap gap-4">
                 <button
                   onClick={() => {
-                    const blob = new Blob([generatedSite.html], {
+                    const blob = new Blob([activeHtml], {
                       type: "text/html",
                     });
                     const url = URL.createObjectURL(blob);
@@ -410,7 +451,9 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({
                             html: generatedSite.html,
-                            title: generatedSite.title,
+                            title:
+                              generatedSite.variations?.[activeVariation]
+                                ?.name || generatedSite.title,
                             token: userToken,
                           }),
                         });

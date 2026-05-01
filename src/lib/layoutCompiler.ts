@@ -1,15 +1,3 @@
-export type LayoutSectionType =
-  | "hero"
-  | "features"
-  | "services"
-  | "pricing"
-  | "faq"
-  | "contact"
-  | "testimonials"
-  | "dashboard"
-  | "sidebar"
-  | "content";
-
 export interface BrandAsset {
   name: string;
   domain?: string;
@@ -17,44 +5,46 @@ export interface BrandAsset {
   colors: string[];
 }
 
-export interface LayoutBlok {
-  component: LayoutSectionType;
-  order: number;
-  grid_span: number;
-  col_start?: number;
-  title: string;
-  body?: string;
-  items?: string[];
-  cta?: string;
-  html?: string;
-  typography?: {
-    heading: string;
-    body: string;
-    prose?: boolean;
-    clamp?: number;
-    scale: "major-second" | "major-third";
-  };
-  motion?: {
-    intent: "entrance" | "emphasis" | "stagger" | "sidebar" | "hero";
-    direction: "left" | "right" | "up" | "down" | "none";
-    layout: boolean;
-  };
-}
-
 export interface LayoutTree {
   name: string;
   prompt: string;
   intent: string[];
   brand: BrandAsset;
-  bloks: LayoutBlok[];
+  variants: SiteVariant[];
+  bloks: Array<{ component: string; order: number; grid_span: number; title: string }>;
 }
 
-const FLOWBITE_CSS = "https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css";
-const FLOWBITE_JS = "https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js";
+export interface SiteVariant {
+  id: string;
+  name: string;
+  mood: string;
+  fontPair: string;
+  palette: string[];
+  html: string;
+}
 
 const fallbackBrand: BrandAsset = {
   name: "Generated Brand",
-  colors: ["#2563eb", "#111827", "#06b6d4"],
+  colors: ["#35e2ff", "#7c7cff", "#111827"],
+};
+
+const videoByIndustry: Record<string, string> = {
+  food: "https://cdn.coverr.co/videos/coverr-serving-coffee-9978/1080p.mp4",
+  fitness: "https://cdn.coverr.co/videos/coverr-woman-training-with-battle-ropes-7809/1080p.mp4",
+  realestate: "https://cdn.coverr.co/videos/coverr-modern-house-exterior-3132/1080p.mp4",
+  beauty: "https://cdn.coverr.co/videos/coverr-applying-makeup-5349/1080p.mp4",
+  tech: "https://cdn.coverr.co/videos/coverr-typing-on-computer-keyboard-2836/1080p.mp4",
+  default: "https://cdn.coverr.co/videos/coverr-working-in-a-modern-office-1565/1080p.mp4",
+};
+
+const imageByIndustry: Record<string, string> = {
+  food: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=80",
+  fitness: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1600&q=80",
+  realestate: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
+  beauty: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80",
+  law: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1600&q=80",
+  tech: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1600&q=80",
+  default: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
 };
 
 function escapeHtml(value = "") {
@@ -67,280 +57,137 @@ function escapeHtml(value = "") {
 }
 
 function toTitle(value: string) {
-  return value
-    .replace(/https?:\/\//g, "")
-    .replace(/\.[a-z]{2,}.*$/i, "")
-    .replace(/[^a-z0-9]+/gi, " ")
-    .trim()
-    .replace(/\b\w/g, (char) => char.toUpperCase()) || "Generated Brand";
+  return (
+    value
+      .replace(/https?:\/\//g, "")
+      .replace(/\.[a-z]{2,}.*$/i, "")
+      .replace(/[^a-z0-9]+/gi, " ")
+      .trim()
+      .replace(/\b\w/g, (char) => char.toUpperCase()) || "Generated Brand"
+  );
 }
 
 function extractBrandName(prompt: string) {
   const quoted = prompt.match(/["']([^"']{3,80})["']/);
   if (quoted?.[1]) return quoted[1];
-  const forMatch = prompt.match(/\b(?:for|called|named)\s+([a-z0-9&.\-\s]{3,60})/i);
-  if (forMatch?.[1]) return forMatch[1].replace(/\b(with|that|and|using|where|who)\b.*$/i, "").trim();
+  const named = prompt.match(/\b(?:for|called|named|brand|business)\s+([a-z0-9&.\-\s]{3,60})/i);
+  if (named?.[1]) return named[1].replace(/\b(with|that|and|using|where|who|needs?)\b.*$/i, "").trim();
   return prompt.split(/\s+/).slice(0, 4).join(" ");
 }
 
-function inferSections(prompt: string): LayoutSectionType[] {
+function detectIndustry(prompt: string) {
   const p = prompt.toLowerCase();
-  const sections: LayoutSectionType[] = ["hero"];
-  if (/dashboard|app feel|admin|portal|sidebar/.test(p)) sections.push("sidebar", "dashboard");
-  if (/feature|features|service|services|offer|offers|three/.test(p)) sections.push(p.includes("service") ? "services" : "features");
-  if (/price|pricing|plan|subscription|package/.test(p)) sections.push("pricing");
-  if (/testimonial|review|proof|trust/.test(p)) sections.push("testimonials");
-  if (/faq|question|answers/.test(p)) sections.push("faq");
-  if (/contact|book|lead|form|quote|call/.test(p)) sections.push("contact");
-  if (sections.length === 1) sections.push("features", "pricing", "faq", "contact");
+  if (/restaurant|food|coffee|cafe|bar|bakery|chef/.test(p)) return "food";
+  if (/fitness|gym|coach|trainer|wellness|yoga/.test(p)) return "fitness";
+  if (/real estate|realtor|property|home|listing/.test(p)) return "realestate";
+  if (/beauty|salon|spa|makeup|skin|hair/.test(p)) return "beauty";
+  if (/law|attorney|legal/.test(p)) return "law";
+  if (/software|saas|ai|app|tech|startup/.test(p)) return "tech";
+  return "default";
+}
+
+function inferSections(prompt: string) {
+  const p = prompt.toLowerCase();
+  const sections = ["hero", "proof", "services"];
+  if (/portfolio|gallery|work|case stud/.test(p)) sections.push("gallery");
+  if (/price|pricing|plan|package|subscription/.test(p) || sections.length < 5) sections.push("pricing");
+  if (/testimonial|review|client|proof/.test(p) || sections.length < 6) sections.push("testimonials");
+  if (/faq|question/.test(p) || sections.length < 7) sections.push("faq");
+  sections.push("contact");
   return [...new Set(sections)];
 }
 
-function countFromPrompt(prompt: string, fallback = 3) {
+function requestedTone(prompt: string) {
   const p = prompt.toLowerCase();
-  if (/\bthree\b|\b3\b/.test(p)) return 3;
-  if (/\bfour\b|\b4\b/.test(p)) return 4;
-  if (/\bsix\b|\b6\b/.test(p)) return 6;
-  if (/\btwo\b|\b2\b/.test(p)) return 2;
-  return fallback;
+  if (/luxury|premium|elegant|high end/.test(p)) return "premium";
+  if (/bold|loud|street|creative|artist/.test(p)) return "bold";
+  if (/minimal|clean|simple/.test(p)) return "minimal";
+  return "custom";
 }
 
-function detectMood(prompt: string) {
-  const p = prompt.toLowerCase();
-  if (/professional|corporate|law|consulting|enterprise/.test(p)) return "professional";
-  if (/luxury|premium|high-end|elegant/.test(p)) return "luxury";
-  if (/bold|energetic|launch|sales|marketing/.test(p)) return "bold";
-  if (/minimal|clean|simple|quiet/.test(p)) return "minimal";
-  return "modern";
-}
+function copyFor(brand: string, prompt: string, industry: string) {
+  const subject =
+    industry === "food"
+      ? "memorable dining and hospitality"
+      : industry === "fitness"
+        ? "stronger coaching, bookings, and client momentum"
+        : industry === "realestate"
+          ? "premium property discovery and qualified buyer leads"
+          : industry === "beauty"
+            ? "elevated appointments, treatments, and client trust"
+            : industry === "law"
+              ? "clear legal guidance and high-intent consultations"
+              : industry === "tech"
+                ? "product clarity, demos, and conversion-ready growth"
+                : "a sharper web presence that turns visitors into customers";
 
-function selectFonts(mood: string) {
-  switch (mood) {
-    case "professional":
-      return { heading: "Roboto", body: "Inter" };
-    case "luxury":
-      return { heading: "Playfair Display", body: "Source Sans 3" };
-    case "bold":
-      return { heading: "Montserrat", body: "Inter" };
-    case "minimal":
-      return { heading: "Manrope", body: "Inter" };
-    default:
-      return { heading: "Space Grotesk", body: "Inter" };
-  }
-}
-
-function typographyForSlot(gridSpan: number, type: LayoutSectionType, prompt: string) {
-  const mood = detectMood(prompt);
-  const fonts = selectFonts(mood);
-  const marketing = /hero|pricing|services|features|testimonials/.test(type);
-  const scale: "major-second" | "major-third" = marketing ? "major-third" : "major-second";
-  const clamp = gridSpan <= 3 ? 3 : gridSpan <= 6 ? 2 : 0;
-  const prose = type === "faq" || type === "contact" || type === "content";
-  const heading =
-    gridSpan <= 3
-      ? "text-lg md:text-xl font-semibold leading-snug"
-      : gridSpan <= 6
-        ? "text-2xl md:text-3xl font-semibold leading-tight"
-        : marketing
-          ? "text-4xl md:text-5xl font-bold leading-[1.05]"
-          : "text-3xl md:text-4xl font-semibold leading-tight";
-  const body =
-    gridSpan <= 3
-      ? "text-sm leading-5"
-      : "text-base leading-relaxed";
   return {
-    fonts,
-    heading,
-    body,
-    prose,
-    clamp,
-    scale,
-    mood,
+    headline: `${brand} turns attention into action`,
+    subhead: `A complete homepage generated from your request for ${subject}.`,
+    intro: `Built from the prompt: "${prompt.slice(0, 150)}${prompt.length > 150 ? "..." : ""}"`,
+    services: ["Signature offer", "Fast consultation", "Premium delivery", "Ongoing support"],
+    proof: ["Mobile-first design", "SEO-ready structure", "Conversion copy", "Media-rich sections"],
+    testimonials: [
+      `${brand} made the offer feel obvious and premium from the first screen.`,
+      "The page explains the business clearly and gives visitors a reason to act.",
+      "The visual direction feels custom instead of template-built.",
+    ],
+    faqs: [
+      ["Can this page be edited?", "Yes. The generated homepage is structured into clear sections so copy, media, and offers can be refined."],
+      ["Is it responsive?", "Yes. The layout is built to adapt from mobile to desktop with readable spacing and stable media frames."],
+      ["Does it include content?", "Yes. Headlines, service copy, proof points, pricing language, FAQ text, and contact copy are written into the output."],
+    ],
   };
 }
 
-function motionForSection(type: LayoutSectionType): LayoutBlok["motion"] {
-  if (type === "sidebar") return { intent: "sidebar", direction: "left", layout: true };
-  if (type === "dashboard") return { intent: "entrance", direction: "up", layout: true };
-  if (type === "hero") return { intent: "hero", direction: "up", layout: true };
-  if (type === "features" || type === "services" || type === "testimonials") return { intent: "stagger", direction: "up", layout: true };
-  if (type === "pricing" || type === "contact" || type === "faq") return { intent: "emphasis", direction: "up", layout: true };
-  return { intent: "entrance", direction: "up", layout: true };
+function cssForVariant(variant: SiteVariant, industry: string) {
+  const [a, b, c] = variant.palette;
+  const media = imageByIndustry[industry] || imageByIndustry.default;
+  return `
+    :root{--a:${a};--b:${b};--c:${c};--ink:#f8fbff;--muted:rgba(232,240,255,.76)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#05070b;color:var(--ink);font-family:${variant.fontPair};overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;z-index:-3;background:radial-gradient(circle at 18% 10%, color-mix(in srgb,var(--a) 35%, transparent), transparent 32%),radial-gradient(circle at 82% 16%, color-mix(in srgb,var(--b) 30%, transparent), transparent 34%),linear-gradient(135deg,#05070b,#0b1020 52%,#03040a)}
+    body:after{content:"";position:fixed;inset:0;z-index:-2;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 88%)}
+    .shell{width:min(1180px,calc(100vw - 32px));margin:auto}.nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);background:rgba(5,7,11,.72);border-bottom:1px solid rgba(255,255,255,.1)}
+    .nav-inner{height:76px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:-.03em}.mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 0 42px color-mix(in srgb,var(--a) 45%, transparent);display:grid;place-items:center}
+    .nav a{color:rgba(255,255,255,.76);text-decoration:none;margin-left:24px;font-size:14px}.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:14px 20px;color:white;background:linear-gradient(120deg,var(--a),var(--b));font-weight:800;text-decoration:none;box-shadow:0 18px 60px color-mix(in srgb,var(--a) 32%, transparent);transition:.25s}.btn:hover{transform:translateY(-2px);filter:saturate(1.2)}
+    .hero{min-height:calc(100vh - 76px);display:grid;grid-template-columns:1.04fr .96fr;gap:44px;align-items:center;padding:74px 0}.hero h1{font-size:clamp(48px,8vw,96px);line-height:.88;letter-spacing:-.065em;margin:0}.hero p{font-size:20px;line-height:1.55;color:var(--muted)}.intro{margin:22px 0;padding:16px 18px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.055);color:rgba(255,255,255,.68)}
+    .media{position:relative;min-height:560px;border:1px solid rgba(255,255,255,.14);border-radius:34px;overflow:hidden;background:#111;box-shadow:0 34px 120px rgba(0,0,0,.42)}.media img,.media video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}.media:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72),transparent 56%)}.media-card{position:absolute;left:22px;right:22px;bottom:22px;z-index:2;padding:22px;border:1px solid rgba(255,255,255,.16);border-radius:24px;background:rgba(5,7,11,.62);backdrop-filter:blur(16px)}
+    section{padding:92px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:30px}.section-head h2{font-size:clamp(34px,5vw,62px);line-height:.95;letter-spacing:-.05em;margin:0}.section-head p{max-width:520px;color:var(--muted);line-height:1.6}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.card{position:relative;border:1px solid rgba(255,255,255,.12);background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.035));border-radius:24px;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.26);transition:.3s;overflow:hidden}.card:hover{transform:translateY(-5px);border-color:color-mix(in srgb,var(--a) 42%, white 10%);box-shadow:0 0 60px color-mix(in srgb,var(--a) 20%, transparent)}
+    .span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-6{grid-column:span 6}.span-8{grid-column:span 8}.span-12{grid-column:span 12}.kpi{font-size:42px;font-weight:950;letter-spacing:-.05em}.muted{color:var(--muted)}.price{font-size:48px;font-weight:950;margin:14px 0}.gallery-img{height:330px;background:url("${media}") center/cover;border-radius:24px}.faq details{border-bottom:1px solid rgba(255,255,255,.12);padding:20px 0}.faq summary{cursor:pointer;font-weight:850;font-size:18px}.faq p{color:var(--muted);line-height:1.65}.contact{background:linear-gradient(135deg,color-mix(in srgb,var(--a) 18%, transparent),rgba(255,255,255,.04));border-radius:34px;padding:36px}.input{width:100%;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.24);border-radius:16px;padding:16px;color:white}
+    .reveal{animation:rise .8s both}@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}.float{animation:float 7s ease-in-out infinite}@keyframes float{50%{transform:translateY(-16px) rotate(1deg)}}.marquee{display:flex;gap:18px;animation:mar 28s linear infinite}.marquee-wrap{overflow:hidden}.marquee .card{min-width:310px}@keyframes mar{to{transform:translateX(-50%)}}
+    @media(max-width:860px){.hero{grid-template-columns:1fr;padding:46px 0}.media{min-height:420px}.nav nav{display:none}.span-3,.span-4,.span-6,.span-8{grid-column:span 12}.section-head{display:block}.hero h1{font-size:52px}}
+  `;
 }
 
-function iconSvg(name: "spark" | "grid" | "chart" | "check" | "mail") {
-  const paths = {
-    spark: '<path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/>',
-    grid: '<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>',
-    chart: '<path d="M4 19V5m0 14h16M8 16v-5m5 5V8m5 8v-9"/>',
-    check: '<path d="m5 12 4 4L19 6"/>',
-    mail: '<path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/>',
-  };
-  return `<svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">${paths[name]}</svg>`;
+function variantMarkup(variant: SiteVariant, brand: BrandAsset, prompt: string, industry: string) {
+  const copy = copyFor(escapeHtml(brand.name), escapeHtml(prompt), industry);
+  const image = imageByIndustry[industry] || imageByIndustry.default;
+  const video = videoByIndustry[industry] || videoByIndustry.default;
+  const mediaTag =
+    variant.id === "editorial"
+      ? `<img src="${image}" alt="${escapeHtml(brand.name)} visual direction" />`
+      : `<video src="${video}" autoplay muted loop playsinline aria-label="${escapeHtml(brand.name)} background video"></video>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>${escapeHtml(brand.name)} | ${escapeHtml(variant.name)}</title><meta name="description" content="${escapeHtml(copy.subhead)}"/><style>${cssForVariant(variant, industry)}.sound-toggle{position:fixed;right:18px;bottom:18px;z-index:20;border:1px solid rgba(255,255,255,.18);background:rgba(5,7,11,.72);color:white;border-radius:999px;padding:13px 16px;font-weight:850;backdrop-filter:blur(14px);box-shadow:0 18px 60px rgba(0,0,0,.34);cursor:pointer}.sound-toggle:hover{border-color:var(--a);transform:translateY(-2px)}</style></head><body>
+    <header class="nav"><div class="shell nav-inner"><div class="brand"><div class="mark">✦</div><span>${escapeHtml(brand.name)}</span></div><nav><a href="#services">Services</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a class="btn" href="#contact">Start</a></nav></div></header>
+    <main>
+      <section class="shell hero"><div class="reveal"><h1>${copy.headline}</h1><p>${copy.subhead}</p><div class="intro">${copy.intro}</div><a class="btn" href="#contact">Book the first step</a></div><div class="media float">${mediaTag}<div class="media-card"><strong>Live media direction</strong><p class="muted">Visuals are selected from copyright-safe open media sources and matched to the page subject.</p></div></div></section>
+      <section class="shell"><div class="grid"><div class="card span-3"><div class="kpi">01</div><p class="muted">Custom page voice and copy.</p></div><div class="card span-3"><div class="kpi">02</div><p class="muted">Responsive sections with motion.</p></div><div class="card span-3"><div class="kpi">03</div><p class="muted">Relevant image and video system.</p></div><div class="card span-3"><div class="kpi">04</div><p class="muted">Lead-ready contact flow.</p></div></div></section>
+      <section class="shell" id="services"><div class="section-head"><h2>What ${escapeHtml(brand.name)} offers</h2><p>Clear service content, benefit-led structure, and premium visual rhythm are written directly into the generated homepage.</p></div><div class="grid">${copy.services.map((item, i) => `<article class="card span-3 reveal" style="animation-delay:${i * 90}ms"><h3>${escapeHtml(item)}</h3><p class="muted">A focused section that explains the value, reduces friction, and gives visitors a next step.</p></article>`).join("")}</div></section>
+      <section class="shell"><div class="section-head"><h2>Built to feel finished</h2><p>Every generated version includes wallpaper layers, hover lighting, typography choices, motion cues, and real section copy when the prompt does not specify them.</p></div><div class="grid"><div class="span-8 gallery-img"></div><div class="card span-4"><h3>Premium content system</h3>${copy.proof.map((item) => `<p class="muted">✓ ${escapeHtml(item)}</p>`).join("")}</div></div></section>
+      <section class="shell" id="pricing"><div class="section-head"><h2>Simple ways to start</h2><p>Pricing copy is generated as part of the page so the offer is not left unfinished.</p></div><div class="grid">${["Starter", "Growth", "Premium"].map((plan, i) => `<article class="card span-4"><h3>${plan}</h3><div class="price">${i === 0 ? "$99" : i === 1 ? "$299" : "$799"}</div><p class="muted">${i === 0 ? "Launch copy and landing structure." : i === 1 ? "Expanded sections and stronger conversion flow." : "Full premium homepage polish and growth-ready content."}</p><a class="btn" href="#contact">Choose ${plan}</a></article>`).join("")}</div></section>
+      <section class="shell"><div class="section-head"><h2>Client confidence</h2><p>Social proof is generated in a brand-safe voice and can be replaced with verified testimonials when available.</p></div><div class="marquee-wrap"><div class="marquee">${[...copy.testimonials, ...copy.testimonials].map((quote) => `<article class="card"><p>${escapeHtml(quote)}</p><p class="muted">Verified-ready proof block</p></article>`).join("")}</div></div></section>
+      <section class="shell faq" id="faq"><div class="section-head"><h2>Questions answered</h2><p>The generator writes practical FAQ content so the homepage can stand on its own.</p></div>${copy.faqs.map(([q, a], i) => `<details ${i === 0 ? "open" : ""}><summary>${escapeHtml(q)}</summary><p>${escapeHtml(a)}</p></details>`).join("")}</section>
+      <section class="shell" id="contact"><div class="contact"><div class="section-head"><h2>Ready for the next customer</h2><p>Use this form section for bookings, quotes, calls, or project inquiries.</p></div><form><input class="input" placeholder="Name"/><input class="input" placeholder="Email"/><textarea class="input" rows="4" placeholder="Tell us what you need"></textarea><button class="btn" type="button">Send request</button></form></div></section>
+    </main><button class="sound-toggle" type="button" id="soundToggle">Play ambient music</button><footer class="shell" style="padding:36px 0;color:rgba(255,255,255,.56)">Generated by VoiceToWebsite. Media from free-to-use open web sources; replace with final licensed assets before regulated ad campaigns.</footer>
+    <script>
+      (()=>{let ctx,osc,gain,lfo,on=false;const btn=document.getElementById('soundToggle');btn?.addEventListener('click',async()=>{if(!ctx){ctx=new AudioContext();osc=ctx.createOscillator();gain=ctx.createGain();lfo=ctx.createOscillator();const lfoGain=ctx.createGain();osc.type='sine';osc.frequency.value=146.83;lfo.frequency.value=.08;lfoGain.gain.value=24;lfo.connect(gain);lfo.connect(lfoGain);lfoGain.connect(osc.frequency);gain.gain.value=0;gain.connect(ctx.destination);osc.start();lfo.start()} if(ctx.state==='suspended') await ctx.resume();on=!on;gain.gain.setTargetAtTime(on ? .045 : 0,ctx.currentTime,.08);btn.textContent=on?'Pause ambient music':'Play ambient music';});})();
+    </script>
+  </body></html>`;
 }
 
-function sectionCopy(type: LayoutSectionType, brandName: string) {
-  const safe = escapeHtml(brandName);
-  switch (type) {
-    case "hero":
-      return { title: `${safe} built for immediate action`, body: `A polished site structure generated from your request, aligned to a 12-column responsive grid instead of a generic template.`, cta: "Start now" };
-    case "features":
-      return { title: "Features placed with intent", body: "Each benefit is mapped into balanced Flowbite-style cards with responsive grid placement.", cta: "Explore features" };
-    case "services":
-      return { title: "Services presented clearly", body: "Service blocks are organized for scanning, trust, and lead conversion.", cta: "View services" };
-    case "pricing":
-      return { title: "Simple pricing", body: "Conversion-focused plan cards with clear next steps.", cta: "Choose plan" };
-    case "faq":
-      return { title: "Questions answered", body: "Accordion-ready FAQ content for faster decisions.", cta: "Read answers" };
-    case "contact":
-      return { title: "Ready to connect", body: "A clean contact path for calls, quotes, bookings, or lead capture.", cta: "Contact us" };
-    case "testimonials":
-      return { title: "Proof that builds trust", body: "Review cards and trust signals are placed near conversion moments.", cta: "See results" };
-    case "dashboard":
-      return { title: "Main app workspace", body: "A col-span-9 content area for product controls, analytics, and workflow cards.", cta: "Open workspace" };
-    case "sidebar":
-      return { title: "App navigation", body: "A col-span-3 sidebar for dashboard-style experiences.", cta: "Navigate" };
-    default:
-      return { title: "Content section", body: "Structured content placed on the grid.", cta: "Learn more" };
-  }
-}
-
-function buildBloks(prompt: string, brand: BrandAsset): LayoutBlok[] {
-  const sections = inferSections(prompt);
-  const itemCount = countFromPrompt(prompt);
-  const appFeel = sections.includes("sidebar") || sections.includes("dashboard");
-  let order = 1;
-  const bloks: LayoutBlok[] = [];
-
-  for (const type of sections) {
-    const copy = sectionCopy(type, brand.name);
-    const typography = typographyForSlot(type === "sidebar" ? 3 : type === "dashboard" ? 9 : type === "hero" ? 12 : type === "features" || type === "services" ? 12 : type === "pricing" ? 12 : type === "faq" ? 12 : type === "contact" ? 12 : 12, type, prompt);
-    if (type === "sidebar") {
-      bloks.push({ component: "sidebar", order: order++, grid_span: 3, col_start: 1, ...copy, typography, motion: motionForSection(type), items: ["Overview", "Pages", "Leads", "Settings"] });
-    } else if (type === "dashboard") {
-      bloks.push({ component: "dashboard", order: order++, grid_span: 9, col_start: 4, ...copy, typography, motion: motionForSection(type), items: ["Live Preview", "Conversion Score", "Pending Tasks"] });
-    } else {
-      bloks.push({
-        component: type,
-        order: order++,
-        grid_span: type === "hero" ? 12 : 12,
-        ...copy,
-        typography,
-        motion: motionForSection(type),
-        items: Array.from({ length: type === "features" || type === "services" ? itemCount : 3 }, (_, index) => {
-          const labels = type === "pricing" ? ["Starter", "Growth", "Scale"] : type === "faq" ? ["How fast is launch?", "Can I edit it?", "Is it responsive?"] : ["Fast setup", "Brand-aware design", "Conversion-ready layout", "Mobile polish", "SEO structure", "Lead capture"];
-          return labels[index % labels.length];
-        }),
-      });
-    }
-  }
-
-  if (appFeel && !bloks.some((blok) => blok.component === "contact")) {
-    // App-like layouts still need one full-width conversion/next-step band.
-    bloks.push({ component: "contact", order: order++, grid_span: 12, ...sectionCopy("contact", brand.name), items: ["Email", "Phone", "Project details"] });
-  }
-
-  return bloks.sort((a, b) => a.order - b.order);
-}
-
-function renderLogo(brand: BrandAsset) {
-  if (brand.logoUrl) {
-    return `<img src="${escapeHtml(brand.logoUrl)}" alt="${escapeHtml(brand.name)} logo" class="h-10 w-auto rounded-lg bg-white p-1" />`;
-  }
-  return `<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-sm font-black text-white">${escapeHtml(brand.name.slice(0, 1).toUpperCase())}</div>`;
-}
-
-function renderBlok(blok: LayoutBlok, brand: BrandAsset) {
-  const span = blok.grid_span === 3 ? "lg:col-span-3" : blok.grid_span === 9 ? "lg:col-span-9" : "col-span-12";
-  const base = `col-span-12 ${span}`;
-  const title = escapeHtml(blok.title);
-  const body = escapeHtml(blok.body || "");
-  const items = blok.items || [];
-  const headingClass = blok.typography?.heading || "text-3xl md:text-4xl font-semibold leading-tight";
-  const bodyClass = blok.typography?.body || "text-base leading-relaxed";
-  const clampClass = blok.typography?.clamp ? `line-clamp-${blok.typography.clamp}` : "";
-  const proseClass = blok.typography?.prose ? "prose prose-lg max-w-none prose-headings:text-gray-950 prose-p:text-gray-600" : "";
-  const motionAttrs = blok.motion ? `data-motion-intent="${blok.motion.intent}" data-motion-direction="${blok.motion.direction}" data-motion-layout="${String(blok.motion.layout)}"` : "";
-
-  if (blok.component === "hero") {
-    return `<section class="${base}" ${motionAttrs}>
-      <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl lg:p-14">
-        <div class="mb-8 flex items-center gap-3">${renderLogo(brand)}<span class="text-sm font-semibold text-gray-600">${escapeHtml(brand.name)}</span></div>
-        <div class="grid items-center gap-10 lg:grid-cols-12">
-          <div class="lg:col-span-7">
-            <h1 class="mb-6 max-w-4xl ${headingClass} tracking-tight text-gray-950">${title}</h1>
-            <p class="mb-8 ${bodyClass} ${clampClass} text-gray-600">${body}</p>
-            <a href="#contact" class="inline-flex items-center rounded-lg bg-blue-700 px-6 py-3 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300">${escapeHtml(blok.cta || "Start now")}</a>
-          </div>
-          <div class="lg:col-span-5">
-            <div class="rounded-2xl bg-gray-900 p-5 text-white shadow-2xl">
-              <div class="mb-5 flex gap-2"><span class="h-3 w-3 rounded-full bg-red-400"></span><span class="h-3 w-3 rounded-full bg-yellow-300"></span><span class="h-3 w-3 rounded-full bg-green-400"></span></div>
-              <div class="grid grid-cols-12 gap-3"><div class="col-span-12 h-16 rounded-xl bg-blue-500/40"></div><div class="col-span-4 h-24 rounded-xl bg-white/10"></div><div class="col-span-8 h-24 rounded-xl bg-white/10"></div><div class="col-span-6 h-16 rounded-xl bg-white/10"></div><div class="col-span-6 h-16 rounded-xl bg-white/10"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>`;
-  }
-
-  if (blok.component === "sidebar") {
-    return `<aside class="${base}" ${motionAttrs}><div class="h-full rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"><h2 class="mb-4 ${headingClass} text-gray-950">${title}</h2><nav class="space-y-2">${items.map((item) => `<a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 ${bodyClass} font-medium text-gray-700 hover:bg-gray-100">${iconSvg("grid")}<span>${escapeHtml(item)}</span></a>`).join("")}</nav></div></aside>`;
-  }
-
-  if (blok.component === "dashboard") {
-    return `<section class="${base}" ${motionAttrs}><div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"><div class="mb-6"><h2 class="${headingClass} text-gray-950">${title}</h2><p class="mt-2 ${bodyClass} text-gray-600">${body}</p></div><div class="grid grid-cols-1 gap-4 md:grid-cols-3">${items.map((item, i) => `<article class="rounded-xl border border-gray-200 p-5"><div class="mb-3 text-blue-700">${iconSvg(i === 1 ? "chart" : "grid")}</div><h3 class="${blok.typography?.clamp ? "line-clamp-2" : ""} font-bold text-gray-950">${escapeHtml(item)}</h3><p class="mt-2 text-sm text-gray-600">Grid-aware app module placed inside the main col-span-9 workspace.</p></article>`).join("")}</div></div></section>`;
-  }
-
-  if (blok.component === "features" || blok.component === "services") {
-    return `<section class="${base}" ${motionAttrs}><div class="py-10"><div class="mx-auto mb-8 max-w-3xl text-center"><h2 class="mb-4 ${headingClass} tracking-tight text-gray-950">${title}</h2><p class="${bodyClass} text-gray-600">${body}</p></div><div class="grid grid-cols-1 gap-8 md:grid-cols-3">${items.map((item, i) => `<article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-700">${iconSvg(i % 2 ? "spark" : "check")}</div><h3 class="mb-2 ${blok.typography?.clamp ? "line-clamp-2" : ""} ${headingClass} text-gray-950">${escapeHtml(item)}</h3><p class="${bodyClass} text-gray-600">A non-default component populated from the request and locked to responsive grid placement.</p></article>`).join("")}</div></div></section>`;
-  }
-
-  if (blok.component === "pricing") {
-    return `<section class="${base}" ${motionAttrs}><div class="py-10"><div class="mx-auto mb-8 max-w-3xl text-center"><h2 class="mb-4 ${headingClass} text-gray-950">${title}</h2><p class="${bodyClass} text-gray-600">${body}</p></div><div class="grid grid-cols-1 gap-6 md:grid-cols-3">${items.map((item, i) => `<div class="rounded-2xl border ${i === 1 ? "border-blue-600 ring-4 ring-blue-100" : "border-gray-200"} bg-white p-6 shadow-sm"><h3 class="${headingClass} text-gray-950">${escapeHtml(item)}</h3><div class="my-5 text-4xl font-extrabold text-gray-950">${i === 0 ? "$19" : i === 1 ? "$49" : "$99"}</div><ul class="mb-6 space-y-3 text-sm text-gray-600"><li>Grid compiled layout</li><li>Flowbite-ready UI</li><li>Responsive sections</li></ul><a class="block rounded-lg bg-blue-700 px-5 py-3 text-center text-sm font-medium text-white hover:bg-blue-800" href="#contact">${escapeHtml(blok.cta || "Choose plan")}</a></div>`).join("")}</div></div></section>`;
-  }
-
-  if (blok.component === "faq") {
-    return `<section class="${base}" ${motionAttrs}><div class="py-10"><h2 class="mb-6 ${headingClass} text-gray-950">${title}</h2><div id="accordion-flush" data-accordion="collapse" class="rounded-2xl border border-gray-200 bg-white p-4">${items.map((item, i) => `<h3 id="accordion-heading-${i}"><button type="button" class="flex w-full items-center justify-between border-b border-gray-200 py-5 text-left ${bodyClass} font-medium text-gray-700" data-accordion-target="#accordion-body-${i}" aria-expanded="${i === 0}" aria-controls="accordion-body-${i}"><span>${escapeHtml(item)}</span><svg data-accordion-icon class="h-3 w-3 shrink-0 rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/></svg></button></h3><div id="accordion-body-${i}" class="${i === 0 ? "" : "hidden"}" aria-labelledby="accordion-heading-${i}"><div class="border-b border-gray-200 py-5 text-gray-600 ${proseClass}">${body}</div></div>`).join("")}</div></div></section>`;
-  }
-
-  if (blok.component === "contact") {
-    return `<section id="contact" class="${base}" ${motionAttrs}><div class="rounded-3xl bg-gray-950 p-8 text-white md:p-10"><div class="grid gap-8 md:grid-cols-2"><div><h2 class="mb-4 ${headingClass}">${title}</h2><p class="${bodyClass} text-gray-300">${body}</p></div><form class="grid gap-4"><input class="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white" placeholder="Name"/><input class="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white" placeholder="Email"/><button class="rounded-lg bg-blue-600 px-5 py-3 font-medium hover:bg-blue-700" type="button">${iconSvg("mail")} ${escapeHtml(blok.cta || "Contact us")}</button></form></div></div></section>`;
-  }
-
-  return `<section class="${base}" ${motionAttrs}><div class="rounded-2xl border border-gray-200 bg-white p-6"><h2 class="${headingClass} text-gray-950">${title}</h2><p class="mt-2 ${bodyClass} text-gray-600">${body}</p></div></section>`;
-}
-
-export function compileLayoutDocument(tree: LayoutTree) {
-  const primary = tree.brand.colors[0] || fallbackBrand.colors[0];
-  const secondary = tree.brand.colors[1] || fallbackBrand.colors[1];
-  const title = escapeHtml(`${tree.name} | VoiceToWebsite`);
-  const description = escapeHtml(`Generated 12-column grid website for ${tree.name}.`);
-  const schema = escapeHtml(JSON.stringify(tree));
-
-  const tailwindConfig = buildTailwindConfig(tree);
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${title}</title>
-  <meta name="description" content="${description}" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="${FLOWBITE_CSS}" rel="stylesheet" />
-  <script type="text/javascript">${tailwindConfig}</script>
-  <style>:root{--brand-primary:${escapeHtml(primary)};--brand-secondary:${escapeHtml(secondary)}} html{scroll-behavior:smooth} body{font-family:Inter,ui-sans-serif,system-ui,sans-serif}</style>
-</head>
-<body class="bg-gray-50 text-gray-900">
-  <script type="application/json" id="vtw-storyblok-blok-tree">${schema}</script>
-  <main class="max-w-screen-xl mx-auto px-4 py-8">
-    <div class="grid grid-cols-12 gap-8">
-      ${tree.bloks.map((blok) => renderBlok(blok, tree.brand)).join("\n")}
-    </div>
-  </main>
-  <footer class="max-w-screen-xl mx-auto px-4 pb-10 text-sm text-gray-500">Generated by VoiceToWebsite Layout Compiler. Every section includes grid_span and order metadata.</footer>
-  <script src="${FLOWBITE_JS}"></script>
-</body>
-</html>`;
+export function compileLayoutDocument(tree: LayoutTree, variantId?: string) {
+  return (tree.variants.find((variant) => variant.id === variantId) || tree.variants[0]).html;
 }
 
 export function compileLayoutFromPrompt(prompt: string, brandInput?: Partial<BrandAsset>) {
@@ -351,19 +198,29 @@ export function compileLayoutFromPrompt(prompt: string, brandInput?: Partial<Bra
     name: brandName,
     colors: brandInput?.colors?.length ? brandInput.colors : fallbackBrand.colors,
   };
+  const industry = detectIndustry(prompt);
+  const tone = requestedTone(prompt);
+  const variants: SiteVariant[] = [
+    { id: "cinematic", name: "Cinematic Glass", mood: `${tone} dark motion`, fontPair: "Inter, ui-sans-serif, system-ui, sans-serif", palette: [brand.colors[0] || "#35e2ff", brand.colors[1] || "#7c7cff", "#03040a"], html: "" },
+    { id: "editorial", name: "Editorial Luxe", mood: "image-led premium", fontPair: "Georgia, 'Times New Roman', serif", palette: ["#f59e0b", "#ef4444", "#111827"], html: "" },
+    { id: "studio", name: "Studio Neon", mood: "bold animated launch", fontPair: "'Trebuchet MS', Inter, ui-sans-serif, sans-serif", palette: ["#22c55e", "#06b6d4", "#0f172a"], html: "" },
+  ].map((variant) => ({
+    ...variant,
+    html: variantMarkup(variant, brand, prompt || "Build a premium business homepage", industry),
+  }));
   const tree: LayoutTree = {
     name: brand.name,
     prompt,
     intent: inferSections(prompt),
     brand,
-    bloks: buildBloks(prompt, brand),
+    variants,
+    bloks: inferSections(prompt).map((section, index) => ({ component: section, order: index + 1, grid_span: 12, title: section })),
   };
-  return { tree, html: compileLayoutDocument(tree) };
+  return { tree, html: variants[0].html, variants };
 }
 
-export function buildTailwindConfig(tree: LayoutTree) {
-  const fonts = tree.bloks[0]?.typography ? selectFonts(tree.bloks[0].typography.scale === "major-third" ? "professional" : "modern") : selectFonts("modern");
-  return `tailwind = window.tailwind || {}; tailwind.config = { theme: { extend: { fontFamily: { sans: ['${fonts.body}', 'ui-sans-serif', 'system-ui'], display: ['${fonts.heading}', '${fonts.body}', 'ui-sans-serif', 'system-ui'] } } } };`;
+export function buildTailwindConfig() {
+  return "tailwind = window.tailwind || {}; tailwind.config = { theme: { extend: {} } };";
 }
 
 export const layoutCompiler = {

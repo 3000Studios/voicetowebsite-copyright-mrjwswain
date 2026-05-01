@@ -16,7 +16,6 @@ if ($LASTEXITCODE -ne 0) {
 
 # Deploy to main Cloudflare Pages project
 Write-Host "Deploying to voicetowebsite.com..." -ForegroundColor Green
-$env:CLOUDFLARE_API_TOKEN = $env:CLOUDFLARE_API_TOKEN
 npx wrangler pages deploy dist --project-name voicetowebsite --commit-dirty=true
 
 if ($LASTEXITCODE -ne 0) {

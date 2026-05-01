@@ -203,6 +203,13 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       html: compiled.html,
       title: `${compiled.tree.name} Generated Site`,
       layoutTree: compiled.tree,
+      variations: compiled.variants.map((variant) => ({
+        id: variant.id,
+        name: variant.name,
+        mood: variant.mood,
+        fontPair: variant.fontPair,
+        html: variant.html,
+      })),
     });
   }
   if (!orderId) return json({ error: 'Missing orderId or prompt' }, { status: 400 });

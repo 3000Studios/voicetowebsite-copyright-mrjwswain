@@ -1,15 +1,12 @@
-import { ArrowRight, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Logo } from "./Logo";
 
-const navLinks = [
-  { label: "Features", href: "/features" },
-  { label: "Examples", href: "/examples" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Blog", href: "/blog" },
-  { label: "FAQ", href: "/faq" },
+const navItems = [
+  { label: "Forge", href: "/features" },
+  { label: "Echo", href: "/examples" },
+  { label: "Vortex", href: "/pricing" },
+  { label: "Pulse", href: "/blog" },
   { label: "Stories", href: "/stories" },
   { label: "Store", href: "/store" },
   { label: "About", href: "/about" },
@@ -18,42 +15,33 @@ const navLinks = [
   { label: "Admin", href: "/admin" },
 ];
 
-const NavAnchor = ({
-  href,
-  children,
-  onClick,
-}: {
-  href: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-}) => {
-  const isHash = href.startsWith("/#");
-  const className =
-    "text-sm font-semibold text-slate-200/86 transition hover:text-white";
-
-  if (isHash) {
-    return (
-      <a href={href} onClick={onClick} className={className}>
-        {children}
-      </a>
-    );
-  }
-
-  return (
-    <Link to={href} onClick={onClick} className={className}>
-      {children}
-    </Link>
-  );
-};
-
-export const Navbar = () => {
+const MoltenNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [ripples, setRipples] = useState<
+    { id: string; x: number; y: number }[]
+  >([]);
+  const lastScrollTop = useRef(0);
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 20);
-    onScroll();
+    const onScroll = () => {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+
+      // Hide/show on scroll
+      if (scrollTop > lastScrollTop.current && scrollTop > 100) {
+        setIsHidden(true);
+      } else {
+        setIsHidden(false);
+      }
+
+      // Change style when scrolled
+      setIsScrolled(scrollTop > 20);
+      lastScrollTop.current = scrollTop;
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -62,124 +50,257 @@ export const Navbar = () => {
     setIsOpen(false);
   }, [location.pathname, location.search, location.hash]);
 
+  const handleMenuClick = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  };
+
+  const handleLinkClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    e.preventDefault();
+
+    // Create ripple effect
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const id = Date.now().toString();
+
+    setRipples((prev) => [...prev, { id, x, y }]);
+
+    // Remove ripple after animation
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((r) => r.id !== id));
+    }, 1000);
+
+    // Navigate after animation
+    setTimeout(() => {
+      setIsOpen(false);
+      document.body.style.overflow = "auto";
+      window.location.href = href;
+    }, 400);
+  };
+
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 sm:px-6 lg:px-10">
-        <div
-          className={`mx-auto flex w-full max-w-7xl items-center justify-between overflow-hidden rounded-full border px-4 py-3 transition-all duration-300 sm:px-6 ${
-            isScrolled
-              ? "border-white/12 bg-slate-950/80 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl"
-              : "border-white/10 bg-slate-950/58 backdrop-blur-xl"
-          } ${isScrolled ? "lg:pl-4 lg:pr-4" : ""}`}
-        >
-          <Link
-            to="/"
-            aria-label="VoiceToWebsite home"
-            className={`shrink-0 transition-all duration-500 ${isScrolled ? "scale-95 opacity-0 pointer-events-none w-0 overflow-hidden" : "scale-100 opacity-100"}`}
-          >
-            <Logo />
-          </Link>
-
-          <div
-            className={`flex-1 items-center justify-center px-6 lg:flex transition-all duration-700 ease-in-out ${isScrolled ? "w-12 translate-x-0" : "w-auto translate-x-0"}`}
-          >
-            <div
-              className={`nav-brand-wave transition-all duration-700 ease-in-out ${isScrolled ? "w-12 h-12 rounded-full bg-linear-to-r from-cyan-500 to-indigo-500 scale-75 opacity-80" : "w-full max-w-136 scale-100 opacity-100"}`}
-            >
-              <div
-                className={`nav-brand-wave-track transition-all duration-700 ease-in-out ${isScrolled ? "opacity-0 scale-0" : "opacity-100 scale-100"}`}
-              >
-                <span>Speak. Build. Launch.</span>
-                <span>Voice to website in minutes.</span>
-                <span>Animated. Responsive. Live.</span>
-                <span>Speak. Build. Launch.</span>
-                <span>Voice to website in minutes.</span>
-                <span>Animated. Responsive. Live.</span>
-              </div>
-              {isScrolled && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-4 h-4 rounded-full bg-white/30 animate-ping"></div>
-                  <div className="absolute w-2 h-2 rounded-full bg-white/60"></div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <nav
-            className={`hidden items-center gap-8 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}
-          >
-            {navLinks.map((link) => (
-              <NavAnchor key={link.label} href={link.href}>
-                {link.label}
-              </NavAnchor>
-            ))}
-          </nav>
-
-          <div
-            className={`hidden items-center gap-3 lg:flex transition-all duration-500 ${isScrolled ? "translate-x-4 opacity-0 pointer-events-none" : "translate-x-0 opacity-100"}`}
-          >
-            <Link to="/login" className="nav-ghost-button">
-              Login
-            </Link>
-            <Link to="/login?mode=create" className="nav-primary-button">
-              Create account
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsOpen((value) => !value)}
-            aria-label="Toggle menu"
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-white/5 text-white transition-all duration-500 ${isScrolled ? "lg:translate-x-0" : ""}`}
-          >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+      {/* Navigation Header */}
+      <nav
+        className={`fixed top-0 left-0 w-full h-20 flex justify-between items-center px-8 z-1000 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isHidden ? "-translate-y-full" : "translate-y-0"
+        } ${
+          isScrolled
+            ? "bg-black/40 backdrop-blur-lg"
+            : "bg-black/20 backdrop-blur-md"
+        }`}
+      >
+        <div className="logo font-outfit font-bold text-lg uppercase tracking-tight font-space-mono bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+          VoiceToWebsite
         </div>
-      </header>
 
+        {/* Hamburger Icon */}
+        <button
+          onClick={handleMenuClick}
+          className={`ham-trigger w-10 h-10 relative z-1001 flex flex-col justify-center gap-1.5 cursor-pointer ${
+            isOpen ? "active" : ""
+          }`}
+          aria-label="Toggle menu"
+        >
+          <span className="ham-line block w-full h-0.5 bg-white rounded-full transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)]" />
+          <span className="ham-line block w-full h-0.5 bg-white rounded-full transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)]" />
+          <span className="ham-line block w-full h-0.5 bg-white rounded-full transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)]" />
+        </button>
+      </nav>
+
+      {/* Fullscreen Overlay */}
       <AnimatePresence>
-        {isOpen ? (
+        {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-x-4 top-24 z-40 rounded-4xl border border-white/12 bg-slate-950/94 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.48)] backdrop-blur-2xl lg:hidden"
+            initial={{ opacity: 0, visibility: "hidden" }}
+            animate={{ opacity: 1, visibility: "visible" }}
+            exit={{ opacity: 0, visibility: "hidden" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 bg-black z-999 flex items-center justify-center overflow-hidden"
           >
-            <div className="absolute inset-0 rounded-4xl bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.22),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.16),transparent_38%)]" />
-            <div className="relative space-y-3">
-              <div className="grid gap-3 pb-3">
-                <Link
-                  to="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="nav-ghost-button flex w-full justify-center"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/login?mode=create"
-                  onClick={() => setIsOpen(false)}
-                  className="nav-primary-button flex w-full justify-center"
-                >
-                  Create account
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+            {/* 3D Animated Background */}
+            <div className="absolute inset-0 opacity-60">
+              <div className="absolute inset-0 bg-linear-to-br from-purple-600/20 via-cyan-500/20 to-orange-600/20 animate-pulse" />
+              <div className="absolute inset-0">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute inset-0 border border-white/10 rounded-full scale-150 animate-spin"
+                    style={{
+                      animationDuration: `${20 + i * 10}s`,
+                      animationDirection: i % 2 === 0 ? "normal" : "reverse",
+                      opacity: 0.1 + i * 0.05,
+                    }}
+                  />
+                ))}
               </div>
-              {navLinks.map((link) => (
-                <NavAnchor
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span className="block rounded-2xl border border-white/8 bg-white/5 px-4 py-4 text-base font-semibold text-white">
-                    {link.label}
-                  </span>
-                </NavAnchor>
-              ))}
             </div>
+
+            {/* Stratigraphy Label */}
+            <div className="absolute bottom-10 left-10 font-space-mono text-xs text-cyan-400 uppercase tracking-widest opacity-50">
+              Stratigraphy: 001_Molten_Void
+            </div>
+
+            {/* Menu Links */}
+            <ul className="menu-links relative z-10 list-none text-center w-full p-5">
+              {navItems.map((item, index) => (
+                <motion.li
+                  key={item.label}
+                  initial={{ y: 100, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{
+                    delay: 0.3 + index * 0.1,
+                    duration: 1,
+                    ease: [0.19, 1, 0.22, 1],
+                  }}
+                  className="menu-item my-8 relative overflow-visible"
+                >
+                  <Link
+                    to={item.href}
+                    onClick={(e) => handleLinkClick(e, item.href)}
+                    className="menu-link block text-5xl md:text-7xl lg:text-8xl font-black uppercase text-transparent stroke-white/30 stroke-1 transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-white hover:stroke-0 hover:tracking-[0.2em] relative"
+                  >
+                    {item.label}
+                    {/* Hover Sound Wave Animation */}
+                    <span className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                      <span className="w-[110%] h-5 bg-repeating-linear-gradient-90 from-cyan-400 from-0 to-transparent to-2 animate-wave" />
+                    </span>
+                  </Link>
+                </motion.li>
+              ))}
+            </ul>
+
+            {/* Ripple Effects */}
+            {ripples.map((ripple) => (
+              <div
+                key={ripple.id}
+                className="frequency-bar fixed bottom-0 left-0 w-full h-full bg-white mix-blend-difference pointer-events-none"
+                style={{
+                  clipPath: `circle(0% at ${ripple.x}px ${ripple.y}px)`,
+                  animation: "rippleExpand 1s ease-out forwards",
+                }}
+              />
+            ))}
           </motion.div>
-        ) : null}
+        )}
       </AnimatePresence>
+
+      <style>{`
+        .ham-line {
+          animation: colorShift 4s infinite alternate;
+        }
+
+        .ham-line:nth-child(2) {
+          animation-delay: 0.5s;
+        }
+
+        .ham-line:nth-child(3) {
+          animation-delay: 1s;
+        }
+
+        .ham-trigger.active .ham-line:nth-child(1) {
+          transform: translateY(8px) rotate(45deg);
+          animation: none;
+          background: white;
+        }
+
+        .ham-trigger.active .ham-line:nth-child(2) {
+          opacity: 0;
+        }
+
+        .ham-trigger.active .ham-line:nth-child(3) {
+          transform: translateY(-8px) rotate(-45deg);
+          animation: none;
+          background: white;
+        }
+
+        @keyframes colorShift {
+          0% {
+            background: #00f2ff;
+            transform: scaleX(0.8);
+          }
+          50% {
+            background: #ff3c00;
+            transform: scaleX(1);
+          }
+          100% {
+            background: #7000ff;
+            transform: scaleX(0.9);
+          }
+        }
+
+        @keyframes wave {
+          0% {
+            transform: scaleY(1);
+          }
+          50% {
+            transform: scaleY(2.5);
+            filter: hue-rotate(90deg);
+          }
+          100% {
+            transform: scaleY(1);
+          }
+        }
+
+        @keyframes rippleExpand {
+          0% {
+            clip-path: circle(0% at var(--x) var(--y));
+            background-color: #00f2ff;
+          }
+          50% {
+            clip-path: circle(100% at var(--x) var(--y));
+            background-color: #00f2ff;
+          }
+          100% {
+            clip-path: circle(100% at var(--x) var(--y));
+            opacity: 0;
+          }
+        }
+
+        .animate-wave {
+          animation: wave 0.4s steps(4) infinite;
+        }
+
+        .font-outfit {
+          font-family: "Outfit", sans-serif;
+        }
+
+        .font-space-mono {
+          font-family: "Space Mono", monospace;
+        }
+
+        .bg-repeating-linear-gradient-90 {
+          background-image: repeating-linear-gradient(
+            90deg,
+            #00f2ff 0px,
+            #00f2ff 2px,
+            transparent 2px,
+            transparent 8px
+          );
+        }
+
+        .stroke-white\/30 {
+          -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .stroke-0 {
+          -webkit-text-stroke: 0px;
+        }
+
+        .stroke-1 {
+          -webkit-text-stroke: 1px;
+        }
+      `}</style>
     </>
   );
 };
+
+export const Navbar = MoltenNav;
