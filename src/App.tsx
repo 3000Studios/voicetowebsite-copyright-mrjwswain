@@ -1,3 +1,4 @@
+import { BrandWallpaper } from "@/components/BrandSystem";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { SiteViewer } from "@/components/SiteViewer";
@@ -39,21 +40,9 @@ const Login = lazy(() =>
   import("@/pages/Login").then((module) => ({ default: module.Login })),
 );
 
-const BackgroundLayers = () => (
-  <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#1f2a44_0%,#09111f_42%,#05070b_100%)]" />
-    <div className="absolute left-[-10%] -top-32 h-112 w-112 rounded-full bg-indigo-500/18 blur-3xl" />
-    <div className="absolute right-[-12%] top-[18%] h-96 w-96 rounded-full bg-cyan-400/14 blur-3xl" />
-    <div className="absolute -bottom-40 left-[18%] h-88 w-88 rounded-full bg-fuchsia-500/12 blur-3xl" />
-    <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
-    <div className="absolute bottom-0 inset-x-0 h-px bg-white/10" />
-    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[72px_72px] opacity-[0.08]" />
-  </div>
-);
-
 const AppFrame = ({ children }: { children: React.ReactNode }) => (
   <div className="relative min-h-screen bg-transparent text-slate-50">
-    <BackgroundLayers />
+    <BrandWallpaper />
     <Navbar />
     <div className="relative z-10 flex min-h-screen flex-col pt-24">
       <main className="flex-1">{children}</main>
@@ -101,3 +90,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+

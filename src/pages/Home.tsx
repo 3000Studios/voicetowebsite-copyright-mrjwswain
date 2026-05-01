@@ -212,16 +212,26 @@ export const Home = () => {
             </div>
           </div>
           <div className="video-shell premium-shadow ultra-glow rounded-[40px]! border-white/10">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="h-full w-full object-cover opacity-80"
-              poster="/og-image.png"
-            >
-              <source src="/input_file_0.mp4" type="video/mp4" />
-            </video>
+            <div className="absolute inset-0 responsive-wallpaper" />
+            <div className="absolute inset-0 opacity-70 [background-image:linear-gradient(120deg,transparent_0_42%,rgba(53,226,255,0.2)_43%,transparent_46%),radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.22),transparent_18%)] [background-size:180px_180px,100%_100%]" />
+            <div className="absolute inset-x-8 top-10 rounded-[28px] border border-white/10 bg-black/30 p-5 backdrop-blur-xl">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full bg-rose-300" />
+                <span className="h-3 w-3 rounded-full bg-amber-300" />
+                <span className="h-3 w-3 rounded-full bg-emerald-300" />
+                <span className="ml-3 text-xs text-slate-400">live site preview</span>
+              </div>
+              <div className="space-y-4">
+                <div className="h-12 w-3/4 rounded-2xl bg-gradient-to-r from-white/35 to-white/8" />
+                <div className="h-4 w-full rounded-full bg-white/12" />
+                <div className="h-4 w-2/3 rounded-full bg-white/10" />
+                <div className="grid grid-cols-3 gap-3 pt-4">
+                  <div className="h-24 rounded-2xl bg-cyan-300/15" />
+                  <div className="h-24 rounded-2xl bg-indigo-300/15" />
+                  <div className="h-24 rounded-2xl bg-fuchsia-300/15" />
+                </div>
+              </div>
+            </div>
             <div className="video-shell-overlay">
               <div className="glass-premium inline-flex items-center gap-3 rounded-full px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
                 <Sparkles className="h-4 w-4 text-cyan-400 animate-pulse" />{" "}
