@@ -33,8 +33,8 @@ const proofClips = [
   {
     title: "Referral live flow",
     label: "Referral system",
-    src: "/videos/referrals-live.mp4",
-    poster: "/videos/referral.mp4",
+    tone: "from-cyan-400/20 via-indigo-500/14 to-fuchsia-500/18",
+    copy: "Referral journeys and promo pathways presented as a clean visual card instead of a looping clip.",
   },
   {
     title: "Promo cut",
@@ -168,21 +168,36 @@ export const Home = () => {
                 transition={{ delay: index * 0.08 }}
                 className="luxury-card overflow-hidden p-0!"
               >
-                <video
-                  src={clip.src}
-                  poster={clip.poster}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="h-56 w-full object-cover"
-                />
-                <div className="space-y-2 p-5">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-300/80">
-                    {clip.label}
+                {"src" in clip ? (
+                  <>
+                    <video
+                      src={clip.src}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="h-56 w-full object-cover"
+                    />
+                    <div className="space-y-2 p-5">
+                      <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-300/80">
+                        {clip.label}
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">{clip.title}</h3>
+                    </div>
+                  </>
+                ) : (
+                  <div className={`h-full min-h-[18rem] bg-linear-to-br ${clip.tone} p-5`}>
+                    <div className="flex h-full flex-col justify-end rounded-[22px] border border-white/10 bg-slate-950/35 p-5 backdrop-blur-md">
+                      <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-300/80">
+                        {clip.label}
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold text-white">{clip.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                        {clip.copy}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white">{clip.title}</h3>
-                </div>
+                )}
               </motion.div>
             ))}
           </div>
