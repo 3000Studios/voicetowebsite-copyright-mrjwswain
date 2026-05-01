@@ -68,6 +68,9 @@ export const Navbar = () => {
           <Link to="/" aria-label="VoiceToWebsite home" className="shrink-0">
             <Logo />
           </Link>
+          <span className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-200 lg:inline-flex">
+            Powered by 3000 Studios
+          </span>
 
           <nav className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => (

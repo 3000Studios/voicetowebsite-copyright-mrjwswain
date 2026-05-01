@@ -41,9 +41,9 @@ export const Footer = () => {
             {footerLinks.map((item) => (
               <li key={item.label}>
                 {item.href.startsWith('/#') ? (
-                  <a href={item.href} className="footer-link">{item.label}</a>
+                <a href={item.href} className="footer-link inline-flex min-h-11 items-center px-1 py-2">{item.label}</a>
                 ) : (
-                  <Link to={item.href} className="footer-link">{item.label}</Link>
+                  <Link to={item.href} className="footer-link inline-flex min-h-11 items-center px-1 py-2">{item.label}</Link>
                 )}
               </li>
             ))}
@@ -52,7 +52,7 @@ export const Footer = () => {
 
         <div className="space-y-5">
           <h3 className="footer-heading">Need help?</h3>
-          <a href="mailto:support@voicetowebsite.com" className="footer-link flex items-center gap-2">
+          <a href="mailto:support@voicetowebsite.com" className="footer-link inline-flex min-h-11 items-center gap-2 px-1 py-2">
             <Mail className="h-4 w-4" /> support@voicetowebsite.com
           </a>
           <Link to="/legal" className="footer-link block">Terms, privacy, refunds</Link>

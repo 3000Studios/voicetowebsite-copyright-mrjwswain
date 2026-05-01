@@ -127,6 +127,21 @@ const comparisonFeatures = [
   },
 ];
 
+const featureHighlights = [
+  {
+    title: "Voice input",
+    copy: "Speak naturally and the generator maps intent to layout.",
+  },
+  {
+    title: "Full code ownership",
+    copy: "Export production code when your plan includes it.",
+  },
+  {
+    title: "Fast generation",
+    copy: "Build a launch-ready site in minutes, not days.",
+  },
+];
+
 export const Features = () => {
   return (
     <div className="relative">
@@ -182,6 +197,15 @@ export const Features = () => {
                 </StaggerItem>
               ))}
             </StaggerContainer>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {featureHighlights.map((item) => (
+                <div key={item.title} className="rounded-[24px] border border-white/10 bg-white/4 p-5 backdrop-blur-xl">
+                  <div className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-200">{item.title}</div>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">{item.copy}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -253,7 +277,7 @@ export const Features = () => {
               </p>
             </ScrollReveal>
 
-            <ScrollReveal>
+            <ScrollReveal className="hidden lg:block">
               <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-white/5 to-transparent backdrop-blur-2xl overflow-hidden">
                 {/* Header */}
                 <div className="grid grid-cols-5 gap-4 p-6 bg-white/5 border-b border-white/10 text-sm font-bold uppercase tracking-wider">
@@ -305,6 +329,31 @@ export const Features = () => {
                 ))}
               </div>
             </ScrollReveal>
+
+            <div className="grid gap-4 lg:hidden">
+              <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
+                <div className="text-sm font-bold uppercase tracking-[0.28em] text-cyan-200">VoiceToWebsite</div>
+                <div className="mt-4 grid gap-3">
+                  {comparisonFeatures.slice(0, 4).map((feature) => (
+                    <div key={feature.name} className="flex items-start justify-between gap-4 rounded-2xl border border-white/8 bg-black/15 p-4">
+                      <div>
+                        <div className="font-semibold text-white">{feature.name}</div>
+                        <div className="text-sm text-slate-400">Built for voice-first layout compilation.</div>
+                      </div>
+                      <CheckCircle2 className="mt-1 h-5 w-5 text-emerald-400" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-[28px] border border-white/10 bg-black/20 p-5">
+                <div className="text-sm font-bold uppercase tracking-[0.28em] text-slate-300">Why competitors lag</div>
+                <ul className="mt-4 space-y-3 text-sm text-slate-400">
+                  <li>• Voice input is usually absent or limited.</li>
+                  <li>• Export and ownership are split across plans.</li>
+                  <li>• Mobile comparison tables are hard to use.</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 

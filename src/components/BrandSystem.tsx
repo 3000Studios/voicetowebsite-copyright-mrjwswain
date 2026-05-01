@@ -44,7 +44,7 @@ export const SectionHeader = ({
 }) => (
   <div className={`section-intro ${align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"} ${className}`}>
     {label ? <span className={`eyebrow ${align === "center" ? "justify-center" : ""}`}>{label}</span> : null}
-    <h2 className="section-title text-gradient">{title}</h2>
+    <h2 className="section-title text-gradient text-[2.35rem] leading-[1.02] sm:text-5xl lg:text-6xl">{title}</h2>
     {copy ? <p className="section-copy">{copy}</p> : null}
   </div>
 );
