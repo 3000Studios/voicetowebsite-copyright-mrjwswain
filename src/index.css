@@ -278,6 +278,28 @@
     @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-3 py-2;
   }
 
+  .workflow-marquee {
+    @apply overflow-hidden rounded-[30px] border border-white/10 bg-white/4 backdrop-blur-xl;
+  }
+
+  .workflow-marquee-track {
+    @apply flex w-max gap-4 px-4 py-4;
+    animation: workflow-marquee 22s linear infinite;
+  }
+
+  .workflow-chip {
+    @apply w-[18rem] shrink-0 rounded-[24px] border border-white/10 bg-black/20 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.18)];
+  }
+
+  .nav-brand-wave {
+    @apply overflow-hidden rounded-full border border-cyan-300/10 bg-white/4 px-4 py-2 backdrop-blur-xl;
+  }
+
+  .nav-brand-wave-track {
+    @apply flex w-max items-center gap-8 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.34em] text-cyan-100/70;
+    animation: nav-brand-wave 10s linear infinite;
+  }
+
   .glass-premium {
     @apply border border-white/10 bg-white/5 backdrop-blur-xl;
   }
@@ -351,6 +373,16 @@
   @keyframes marquee-right {
     from { transform: translateX(-50%); }
     to { transform: translateX(0); }
+  }
+
+  @keyframes workflow-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes nav-brand-wave {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
 }
 

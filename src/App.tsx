@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ScrollToTop } from "@/hooks/useScrollToTop";
 import { Home } from "@/pages/Home";
 import { Pricing } from "@/pages/Pricing";
+import { About } from "@/pages/About";
 import { Setup } from "@/pages/Setup";
 import { Success } from "@/pages/Success";
 import { AnimatePresence } from "motion/react";
@@ -38,6 +39,15 @@ const Dashboard = lazy(() =>
 );
 const Login = lazy(() =>
   import("@/pages/Login").then((module) => ({ default: module.Login })),
+);
+const Stories = lazy(() =>
+  import("@/pages/Stories").then((module) => ({ default: module.Stories })),
+);
+const StoryDetail = lazy(() =>
+  import("@/pages/StoryDetail").then((module) => ({ default: module.StoryDetail })),
+);
+const Store = lazy(() =>
+  import("@/pages/Store").then((module) => ({ default: module.default })),
 );
 
 const AppFrame = ({ children }: { children: React.ReactNode }) => (
@@ -76,6 +86,10 @@ export default function App() {
                 <Route path="/legal" element={<Legal />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/stories" element={<Stories />} />
+                <Route path="/stories/:id" element={<StoryDetail />} />
+                <Route path="/store" element={<Store />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/pricing" element={<Pricing />} />

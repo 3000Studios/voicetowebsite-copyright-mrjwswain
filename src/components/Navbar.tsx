@@ -10,6 +10,12 @@ const navLinks = [
   { label: 'Pricing', href: '/pricing' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQ', href: '/faq' },
+  { label: 'Stories', href: '/stories' },
+  { label: 'Store', href: '/store' },
+  { label: 'About', href: '/about' },
+  { label: 'Legal', href: '/legal' },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Admin', href: '/admin' },
 ];
 
 const NavAnchor = ({
@@ -63,9 +69,9 @@ export const Navbar = () => {
             isScrolled
               ? 'border-white/12 bg-slate-950/80 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl'
               : 'border-white/10 bg-slate-950/58 backdrop-blur-xl'
-          }`}
+          } ${isScrolled ? "lg:pl-4 lg:pr-4" : ""}`}
         >
-          <Link to="/" aria-label="VoiceToWebsite home" className="shrink-0">
+          <Link to="/" aria-label="VoiceToWebsite home" className={`shrink-0 transition-all duration-500 ${isScrolled ? "scale-95 opacity-0 pointer-events-none w-0 overflow-hidden" : "scale-100 opacity-100"}`}>
             <Logo />
           </Link>
 
@@ -104,7 +110,7 @@ export const Navbar = () => {
             type="button"
             onClick={() => setIsOpen((value) => !value)}
             aria-label="Toggle menu"
-            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-white/5 text-white lg:hidden"
+            className={`inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-white/5 text-white transition-all duration-500 ${isScrolled ? "lg:translate-x-0" : ""}`}
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
