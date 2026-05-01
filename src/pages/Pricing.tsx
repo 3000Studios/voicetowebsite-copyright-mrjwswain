@@ -91,7 +91,7 @@ export const Pricing = () => {
               <span className="text-xs font-bold uppercase tracking-[0.28em]">60-second build</span>
             </div>
             <video
-              src="/input_file_0.mp4"
+              src="/videos/voice-to-website-demo.mp4"
               autoPlay
               muted
               loop

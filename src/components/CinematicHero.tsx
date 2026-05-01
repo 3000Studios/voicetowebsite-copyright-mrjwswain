@@ -90,7 +90,7 @@ export function CinematicHero() {
           <motion.div variants={item}>
             <SectionHeader
               title={<>Speak your site into existence.</>}
-              copy="Transform a business idea, voice note, or typed brief into a polished hosted website with production-ready structure, conversion copy, and instant launch flow."
+              copy="Turn a voice brief into a polished hosted site with clean structure, focused copy, and instant launch."
             />
           </motion.div>
           <motion.div variants={item} className="flex flex-col items-center gap-4 sm:flex-row lg:items-start">

@@ -1,7 +1,5 @@
 import { CinematicHero } from "@/components/CinematicHero";
-import { CompetitorComparison } from "@/components/CompetitorComparison";
 import { FeaturesV2 } from "@/components/FeaturesV2";
-import { GoogleAdSense } from "@/components/GoogleAdSense";
 import {
   ArrowRight,
   CheckCircle2,
@@ -59,6 +57,25 @@ const capabilities = [
     title: "Export path",
     copy: "Higher plans unlock GitHub export and operational controls for teams that need more than a hosted starter site.",
     icon: Code2,
+  },
+];
+
+const proofClips = [
+  {
+    title: "Referral live flow",
+    label: "Referral system",
+    src: "/videos/referrals-live.mp4",
+    poster: "/videos/referral.mp4",
+  },
+  {
+    title: "Promo cut",
+    label: "Short-form marketing",
+    src: "/videos/tiktok-promo.mp4",
+  },
+  {
+    title: "Product demo",
+    label: "Brand walkthrough",
+    src: "/videos/voice-to-website-demo.mp4",
   },
 ];
 
@@ -123,12 +140,10 @@ export const Home = () => {
 
       <FeaturesV2 />
 
-      <CompetitorComparison />
-
       <section id="how-it-works" className="section-shell">
         <div className="content-grid gap-16">
           <div className="section-intro max-w-3xl">
-            <span className="eyebrow">The Evolution</span>
+            <span className="eyebrow">The Workflow</span>
             <h2 className="section-title text-gradient">
               From voice brief to hosted site link.
             </h2>
@@ -154,7 +169,7 @@ export const Home = () => {
                   </div>
                   <div className="space-y-4">
                     <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-indigo-400/80">
-                      Module 0{index + 1}
+                      Step {index + 1}
                     </div>
                     <h3 className="text-2xl font-bold text-white tracking-tight">
                       {step.title}
@@ -170,7 +185,55 @@ export const Home = () => {
         </div>
       </section>
 
-      <GoogleAdSense slot="home-fold-top" />
+      <section className="section-shell">
+        <div className="content-grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div className="section-intro max-w-2xl">
+            <span className="eyebrow">Trust bar</span>
+            <h2 className="section-title text-gradient">
+              Built on tools people already trust.
+            </h2>
+            <p className="section-copy">
+              The home page now uses a trust bar and real video proof instead of
+              empty ad placeholders.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              {['React', 'Cloudflare', 'Stripe', 'PayPal', 'Tailwind'].map((item) => (
+                <div key={item} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-1">
+            {proofClips.map((clip, index) => (
+              <motion.div
+                key={clip.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08 }}
+                className="luxury-card overflow-hidden p-0!"
+              >
+                <video
+                  src={clip.src}
+                  poster={clip.poster}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="h-56 w-full object-cover"
+                />
+                <div className="space-y-2 p-5">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-300/80">
+                    {clip.label}
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">{clip.title}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="section-shell">
         <div className="content-grid items-center gap-16 lg:grid-cols-[0.9fr_1.1fr]">
@@ -178,20 +241,19 @@ export const Home = () => {
             <div className="space-y-4">
               <span className="eyebrow">Platform Capabilities</span>
               <h2 className="section-title text-gradient leading-tight">
-                High-clarity delivery. No blank canvases.
+                One technical section. No repeated claims.
               </h2>
               <p className="section-copy">
-                VoiceToWebsite is optimized for the first 24 hours of a business
-                launch. We get you online fast, so you can start selling
-                immediately.
+                Cloudflare delivery, export controls, SEO-ready structure, and a
+                clear launch path in a single block.
               </p>
             </div>
             <ul className="space-y-5">
               {[
-                "Instant hosting on Cloudflare Global Edge",
-                "SEO-optimized semantic HTML structure",
-                "Direct-to-checkout monetization flow",
-                "Zero-config deployment path",
+                'Instant hosting on Cloudflare Global Edge',
+                'SEO-optimized semantic HTML structure',
+                'Direct-to-checkout monetization flow',
+                'Zero-config deployment path',
               ].map((item) => (
                 <li
                   key={item}
@@ -211,119 +273,31 @@ export const Home = () => {
               </Link>
             </div>
           </div>
-          <div className="video-shell premium-shadow ultra-glow rounded-[40px]! border-white/10">
-            <div className="absolute inset-0 responsive-wallpaper" />
-            <div className="absolute inset-0 opacity-70 [background-image:linear-gradient(120deg,transparent_0_42%,rgba(53,226,255,0.2)_43%,transparent_46%),radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.22),transparent_18%)] [background-size:180px_180px,100%_100%]" />
-            <div className="absolute inset-x-8 top-10 rounded-[28px] border border-white/10 bg-black/30 p-5 backdrop-blur-xl">
-              <div className="mb-4 flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-rose-300" />
-                <span className="h-3 w-3 rounded-full bg-amber-300" />
-                <span className="h-3 w-3 rounded-full bg-emerald-300" />
-                <span className="ml-3 text-xs text-slate-400">live site preview</span>
+          <div className="luxury-card overflow-hidden p-0!">
+            <video
+              src="/videos/voice-to-website-ad.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="h-full min-h-[520px] w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-[#03040a] via-transparent to-transparent" />
+            <div className="absolute inset-x-6 bottom-6 rounded-[28px] border border-white/10 bg-black/45 p-5 backdrop-blur-xl">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-cyan-200">
+                <Sparkles className="h-4 w-4" />
+                Video proof
               </div>
-              <div className="space-y-4">
-                <div className="h-12 w-3/4 rounded-2xl bg-gradient-to-r from-white/35 to-white/8" />
-                <div className="h-4 w-full rounded-full bg-white/12" />
-                <div className="h-4 w-2/3 rounded-full bg-white/10" />
-                <div className="grid grid-cols-3 gap-3 pt-4">
-                  <div className="h-24 rounded-2xl bg-cyan-300/15" />
-                  <div className="h-24 rounded-2xl bg-indigo-300/15" />
-                  <div className="h-24 rounded-2xl bg-fuchsia-300/15" />
-                </div>
-              </div>
-            </div>
-            <div className="video-shell-overlay">
-              <div className="glass-premium inline-flex items-center gap-3 rounded-full px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
-                <Sparkles className="h-4 w-4 text-cyan-400 animate-pulse" />{" "}
-                Live Generator Preview
-              </div>
+              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                Real clips from the product, referral flow, and promo layer now
+                sit in the page instead of blank decorative shells.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       <section className="section-shell">
-        <div className="content-grid gap-16">
-          <div className="section-intro max-w-3xl">
-            <span className="eyebrow">Enterprise Grade</span>
-            <h2 className="section-title text-gradient">
-              Hardened Infrastructure.
-            </h2>
-            <p className="section-copy">
-              Built on the same stack that powers the most resilient platforms
-              on the web.
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {capabilities.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className="luxury-card p-7! group"
-                >
-                  <div className="feature-card-icon bg-white/5! border-white/10! group-hover:border-indigo-500/30 transition-colors">
-                    <Icon className="h-5 w-5 text-indigo-300" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-slate-400">
-                    {item.copy}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-
-              <div className="comparison-shell bg-white/2! border-white/5">
-            <div className="comparison-row comparison-row-header bg-white/5! border-b! border-white/10">
-              <span className="text-indigo-400">Platform fit</span>
-              <span>VoiceToWebsite</span>
-              <span>Manual builders</span>
-              <span>Generative AI</span>
-            </div>
-            {[
-              [
-                "Best for",
-                "Fast hosted starter site",
-                "Deep design control",
-                "Prompt exploration",
-              ],
-              [
-                "Velocity",
-                "Minutes to launch",
-                "Days of configuration",
-                "Instant but variable",
-              ],
-              [
-                "Integrity",
-                "Locked production truth",
-                "Manual drift risk",
-                "Ghost assets",
-              ],
-            ].map(([label, v1, v2, v3]) => (
-              <div
-                key={label}
-                className="comparison-row border-white/5! hover:bg-white/2 transition-colors"
-              >
-                <span className="font-semibold text-slate-200">{label}</span>
-                <span className="text-white font-medium">{v1}</span>
-                <span>{v2}</span>
-                <span>{v3}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <GoogleAdSense slot="home-content-mid" />
-
-      <section id="examples" className="section-shell">
         <div className="content-grid gap-16">
           <div className="section-intro max-w-3xl">
             <span className="eyebrow">The Gallery</span>
@@ -367,72 +341,9 @@ export const Home = () => {
         </div>
       </section>
 
-      <section className="section-shell">
-        <div className="content-grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-          <div className="section-intro">
-            <span className="eyebrow">Monetization Ready</span>
-            <h2 className="section-title text-gradient">
-              Start with the workflow you need now.
-            </h2>
-            <p className="section-copy">
-              Transparent, tier-based access to the generator. No hidden fees or
-              complex subscriptions.
-            </p>
-          </div>
-          <div className="luxury-card bg-white/2! border-white/5 p-8!">
-            <div className="grid gap-6 md:grid-cols-3">
-              {[
-                {
-                  name: "Starter",
-                  value: "3 builds",
-                  detail: "Perfect for solo operators.",
-                },
-                {
-                  name: "Professional",
-                  value: "15 builds",
-                  detail: "Includes code export options.",
-                },
-                {
-                  name: "Enterprise",
-                  value: "Unlimited",
-                  detail: "For agencies and high-volume teams.",
-                },
-              ].map((item) => (
-                <div
-                  key={item.name}
-                  className="space-y-4 p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/20 transition-colors"
-                >
-                  <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                    {item.name}
-                  </div>
-                  <div className="text-3xl font-bold text-white">
-                    {item.value}
-                  </div>
-                  <p className="text-xs leading-relaxed text-slate-400">
-                    {item.detail}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Link to="/pricing" className="hero-primary-button px-10!">
-                View detailed plans
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-              <a
-                href="mailto:support@voicetowebsite.com"
-                className="hero-secondary-button"
-              >
-                Custom requirements
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* About / Mission Section */}
       <section className="section-shell">
-        <div className="content-grid gap-16 lg:grid-cols-[1fr_1fr] items-center">
+        <div className="content-grid gap-16 lg:grid-cols-[1fr_1fr] items-start">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -499,6 +410,27 @@ export const Home = () => {
                 </div>
               </div>
             </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {['/videos/referral.mp4', '/videos/voice-to-website-demo.mp4', '/videos/black-woman-demo.mp4'].map((src, index) => (
+                <motion.div
+                  key={src}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08 }}
+                  className="overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+                >
+                  <video
+                    src={src}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="h-40 w-full object-cover"
+                  />
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
@@ -513,7 +445,7 @@ export const Home = () => {
             </p>
           </div>
           <div className="space-y-4">
-            {faqs.map((faq, index) => (
+            {faqs.map((faq) => (
               <motion.details
                 key={faq.question}
                 className="faq-card group bg-white/3! border-white/5! p-6!"

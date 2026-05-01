@@ -69,8 +69,8 @@ export function FeaturesV2() {
             transition={{ delay: 0.1 }}
             className="text-headline mb-4"
           >
-            Everything You Need to{" "}
-            <span className="gradient-text">Build & Launch</span>
+            Core capabilities that{" "}
+            <span className="gradient-text">move fast</span>
           </motion.h2>
 
           <motion.p
@@ -80,8 +80,8 @@ export function FeaturesV2() {
             transition={{ delay: 0.2 }}
             className="text-body max-w-2xl mx-auto"
           >
-            From voice input to live deployment, we handle everything so you can
-            focus on your vision.
+            Voice brief, layout generation, hosted delivery, and export options
+            in one production flow.
           </motion.p>
         </div>
 
@@ -124,26 +124,25 @@ export function FeaturesV2() {
           ))}
         </div>
 
-        {/* Platform Highlights */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
+          className="mt-20 rounded-[32px] border border-white/10 bg-white/4 p-6 backdrop-blur-xl"
         >
-          {[
-            { value: "Cloudflare", label: "Global Delivery" },
-            { value: "Semantic", label: "SEO Structure" },
-            { value: "Stripe + PayPal", label: "Checkout Options" },
-            { value: "Plan Gates", label: "Feature Control" },
-          ].map((stat, index) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold gradient-text mb-2">
-                {stat.value}
+          <div className="grid gap-4 md:grid-cols-4">
+            {[
+              { value: "Cloudflare", label: "Global delivery" },
+              { value: "Semantic HTML", label: "SEO structure" },
+              { value: "Stripe + PayPal", label: "Checkout selectors" },
+              { value: "Exports", label: "Plan-controlled access" },
+            ].map((stat) => (
+              <div key={stat.label} className="rounded-2xl border border-white/5 bg-black/15 p-5 text-center">
+                <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
+                <div className="mt-2 text-sm text-white/50">{stat.label}</div>
               </div>
-              <div className="text-white/50 text-sm">{stat.label}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>
