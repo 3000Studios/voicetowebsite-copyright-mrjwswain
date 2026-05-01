@@ -88,7 +88,7 @@ export const Home = () => {
   return (
     <div className="relative overflow-hidden bg-black">
       <Helmet>
-        <title>VoiceToWebsite.com — Speak. Build. Launch.</title>
+        <title>VoiceToWebsite.com - Speak. Build. Launch.</title>
         <meta
           name="description"
           content="Transform your voice into a stunning, professional website in minutes. No coding required."
@@ -108,9 +108,9 @@ export const Home = () => {
                 Generate three complete premium homepages.
               </h2>
               <p className="section-copy">
-                Speak or type what the business needs. If style, copy,
-                animation, media, or layout details are missing, the generator
-                fills them in and produces three scrollable directions to
+                Speak or type what the business needs. VoiceToWebsite.com
+                fills in premium strategy, copy, animation, media, and layout
+                details, then produces three scrollable custom directions to
                 compare.
               </p>
             </div>

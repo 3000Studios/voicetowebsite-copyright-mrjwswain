@@ -99,7 +99,7 @@ const MoltenNav = () => {
         }`}
       >
         <div className="logo font-outfit font-bold text-lg uppercase tracking-tight font-space-mono bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
-          VoiceToWebsite
+          VoiceToWebsite.com
         </div>
 
         {/* Hamburger Icon */}
