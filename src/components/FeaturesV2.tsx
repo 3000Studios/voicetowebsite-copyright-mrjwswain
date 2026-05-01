@@ -124,7 +124,7 @@ export function FeaturesV2() {
           ))}
         </div>
 
-        {/* Stats Section */}
+        {/* Platform Highlights */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -132,10 +132,10 @@ export function FeaturesV2() {
           className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
           {[
-            { value: "50K+", label: "Sites Generated" },
-            { value: "2min", label: "Avg. Build Time" },
-            { value: "99.9%", label: "Uptime" },
-            { value: "4.9/5", label: "User Rating" },
+            { value: "Cloudflare", label: "Global Delivery" },
+            { value: "Semantic", label: "SEO Structure" },
+            { value: "Stripe + PayPal", label: "Checkout Options" },
+            { value: "Plan Gates", label: "Feature Control" },
           ].map((stat, index) => (
             <div key={stat.label} className="text-center">
               <div className="text-3xl md:text-4xl font-bold gradient-text mb-2">

@@ -26,6 +26,9 @@ const Blog = lazy(() =>
 const BlogPost = lazy(() =>
   import("@/pages/BlogPost").then((module) => ({ default: module.BlogPost })),
 );
+const Legal = lazy(() =>
+  import("@/pages/Legal").then((module) => ({ default: module.Legal })),
+);
 const Admin = lazy(() =>
   import("@/pages/Admin").then((module) => ({ default: module.Admin })),
 );
@@ -81,6 +84,7 @@ export default function App() {
                 <Route path="/features" element={<Features />} />
                 <Route path="/examples" element={<Examples />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/legal" element={<Legal />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/admin" element={<Admin />} />

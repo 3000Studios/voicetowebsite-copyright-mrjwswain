@@ -151,6 +151,7 @@ export const FAQ = () => {
           name="description"
           content="Find answers to common questions about VoiceToWebsite. Learn about pricing, features, and how to build websites with AI."
         />
+        <link rel="canonical" href="https://voicetowebsite.com/faq" />
       </Helmet>
 
       {/* Hero with Video */}

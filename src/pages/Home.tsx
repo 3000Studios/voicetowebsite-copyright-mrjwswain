@@ -115,6 +115,7 @@ export const Home = () => {
           name="description"
           content="Transform your voice into a stunning, professional website in minutes. No coding required."
         />
+        <link rel="canonical" href="https://voicetowebsite.com/" />
         {/* Build timestamp: 2026-04-29-2200 */}
       </Helmet>
 

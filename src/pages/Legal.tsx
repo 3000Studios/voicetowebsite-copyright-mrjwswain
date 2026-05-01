@@ -1,11 +1,19 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Helmet } from 'react-helmet-async';
 
 export const Legal = () => {
   return (
     <div className="pt-32 pb-20 px-6 max-w-4xl mx-auto">
+      <Helmet>
+        <title>Legal | VoiceToWebsite</title>
+        <meta
+          name="description"
+          content="Read VoiceToWebsite terms, privacy, refund policy, and limitation of liability."
+        />
+        <link rel="canonical" href="https://voicetowebsite.com/legal" />
+      </Helmet>
       <motion.h1 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

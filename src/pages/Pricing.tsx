@@ -74,6 +74,7 @@ export const Pricing = () => {
           name="description"
           content="Choose the VoiceToWebsite plan that fits your build volume, export needs, and delivery workflow."
         />
+        <link rel="canonical" href="https://voicetowebsite.com/pricing" />
       </Helmet>
 
       <div className="content-grid gap-10">

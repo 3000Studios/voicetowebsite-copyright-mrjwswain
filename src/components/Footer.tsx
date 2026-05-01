@@ -5,9 +5,9 @@ import { Logo } from './Logo';
 
 const footerLinks = [
   { label: 'How it works', href: '/#how-it-works' },
-  { label: 'Examples', href: '/#examples' },
+  { label: 'Examples', href: '/examples' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'FAQ', href: '/#faq' },
+  { label: 'FAQ', href: '/faq' },
 ];
 
 export const Footer = () => {
