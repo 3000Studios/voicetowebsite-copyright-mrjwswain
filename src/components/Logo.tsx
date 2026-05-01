@@ -28,7 +28,8 @@ export const Logo = ({ className = "" }: { className?: string }) => {
               cy={cy}
               r="4"
               fill={index % 2 ? "#a5b4fc" : "#67e8f9"}
-              animate={{ opacity: [0.55, 1, 0.55], r: [3.2, 5.2, 3.2], y: [0, -1, 0] }}
+              animate={{ opacity: [0.55, 1, 0.55], scale: [0.82, 1.18, 0.82], y: [0, -1, 0] }}
+              style={{ transformBox: "fill-box", transformOrigin: "center" }}
               transition={{ duration: 1.8 + index * 0.2, repeat: Infinity, ease: "easeInOut" }}
             />
           ))}

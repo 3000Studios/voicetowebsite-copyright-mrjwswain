@@ -3,10 +3,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
-  { label: "Forge", href: "/features" },
-  { label: "Echo", href: "/examples" },
-  { label: "Vortex", href: "/pricing" },
-  { label: "Pulse", href: "/blog" },
+  { label: "Features", href: "/features" },
+  { label: "Examples", href: "/examples" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog" },
   { label: "Stories", href: "/stories" },
   { label: "Store", href: "/store" },
   { label: "About", href: "/about" },
@@ -48,7 +48,14 @@ const MoltenNav = () => {
 
   useEffect(() => {
     setIsOpen(false);
+    document.body.style.overflow = "auto";
   }, [location.pathname, location.search, location.hash]);
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
@@ -98,9 +105,13 @@ const MoltenNav = () => {
             : "bg-black/20 backdrop-blur-md"
         }`}
       >
-        <div className="logo font-outfit font-bold text-lg uppercase tracking-tight font-space-mono bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+        <Link
+          to="/"
+          className="logo font-outfit font-bold text-lg uppercase tracking-tight font-space-mono bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent transition hover:scale-[1.02]"
+          aria-label="VoiceToWebsite.com home"
+        >
           VoiceToWebsite.com
-        </div>
+        </Link>
 
         {/* Hamburger Icon */}
         <button
@@ -124,7 +135,7 @@ const MoltenNav = () => {
             animate={{ opacity: 1, visibility: "visible" }}
             exit={{ opacity: 0, visibility: "hidden" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 bg-black z-999 flex items-center justify-center overflow-hidden"
+            className="fixed inset-0 bg-black z-999 flex items-center justify-center overflow-y-auto"
           >
             {/* 3D Animated Background */}
             <div className="absolute inset-0 opacity-60">
@@ -145,28 +156,28 @@ const MoltenNav = () => {
             </div>
 
             {/* Stratigraphy Label */}
-            <div className="absolute bottom-10 left-10 font-space-mono text-xs text-cyan-400 uppercase tracking-widest opacity-50">
-              Stratigraphy: 001_Molten_Void
+            <div className="absolute bottom-10 left-10 hidden font-space-mono text-xs text-cyan-400 uppercase tracking-widest opacity-50 md:block">
+              VoiceToWebsite.com launch menu
             </div>
 
             {/* Menu Links */}
-            <ul className="menu-links relative z-10 list-none text-center w-full p-5">
+            <ul className="menu-links relative z-10 grid max-h-screen w-full max-w-6xl list-none gap-3 overflow-y-auto p-5 py-24 text-center md:grid-cols-2 md:gap-x-10 md:gap-y-4">
               {navItems.map((item, index) => (
                 <motion.li
                   key={item.label}
                   initial={{ y: 100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{
-                    delay: 0.3 + index * 0.1,
-                    duration: 1,
+                    delay: 0.08 + index * 0.035,
+                    duration: 0.45,
                     ease: [0.19, 1, 0.22, 1],
                   }}
-                  className="menu-item my-8 relative overflow-visible"
+                  className="menu-item relative overflow-visible"
                 >
                   <Link
                     to={item.href}
                     onClick={(e) => handleLinkClick(e, item.href)}
-                    className="menu-link block text-5xl md:text-7xl lg:text-8xl font-black uppercase text-transparent stroke-white/30 stroke-1 transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-white hover:stroke-0 hover:tracking-[0.2em] relative"
+                    className="menu-link relative block text-3xl font-black uppercase text-transparent stroke-white/30 stroke-1 transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-white hover:stroke-0 hover:tracking-[0.08em] sm:text-4xl lg:text-5xl"
                   >
                     {item.label}
                     {/* Hover Sound Wave Animation */}

@@ -10,14 +10,16 @@ const AD_CLIENT = "ca-pub-5800977493749262";
 
 export const GoogleAdSense = ({ slot }: { slot?: string }) => {
   const adRef = useRef<HTMLDivElement>(null);
+  const pushedRef = useRef(false);
 
   useEffect(() => {
-    if (!slot) return;
+    if (!slot || pushedRef.current) return;
 
     try {
       if (typeof window !== "undefined") {
         window.adsbygoogle = window.adsbygoogle || [];
         window.adsbygoogle.push({});
+        pushedRef.current = true;
       }
     } catch (error) {
       console.error("AdSense push error", error);
