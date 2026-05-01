@@ -59,27 +59,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Fetch or create user profile in Firestore
-        const userRef = doc(db, "users", firebaseUser.uid);
-        const userDoc = await getDoc(userRef);
+        const defaultProfile: UserProfile = {
+          username: firebaseUser.displayName || "Neural_Architect",
+          email: firebaseUser.email || "",
+          tokens: 50,
+          plan: "free",
+        };
 
-        let profile: UserProfile;
-        if (userDoc.exists()) {
-          profile = userDoc.data() as UserProfile;
-        } else {
-          profile = {
-            username: firebaseUser.displayName || "Neural_Architect",
-            email: firebaseUser.email || "",
-            tokens: 50,
-            plan: "free",
-          };
-          await setDoc(userRef, {
-            ...profile,
-            createdAt: serverTimestamp(),
-          });
+        try {
+          const userRef = doc(db, "users", firebaseUser.uid);
+          const userDoc = await getDoc(userRef);
+
+          let profile: UserProfile;
+          if (userDoc.exists()) {
+            profile = userDoc.data() as UserProfile;
+          } else {
+            profile = defaultProfile;
+            await setDoc(
+              userRef,
+              {
+                ...profile,
+                createdAt: serverTimestamp(),
+              },
+              { merge: true },
+            );
+          }
+
+          setUser({ ...firebaseUser, profile, plan: profile.plan } as any);
+        } catch (error) {
+          console.error("Failed to load Firestore profile; continuing auth:", error);
+          setUser({ ...firebaseUser, profile: defaultProfile, plan: "free" } as any);
+          setAuthError(
+            "Signed in, but profile sync failed. Please check Firebase Firestore rules.",
+          );
         }
-
-        setUser({ ...firebaseUser, profile, plan: profile.plan } as any);
       } else {
         setUser(null);
       }
