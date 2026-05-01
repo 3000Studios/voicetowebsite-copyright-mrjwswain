@@ -2,7 +2,6 @@ import { CinematicHero } from "@/components/CinematicHero";
 import { CompetitorComparison } from "@/components/CompetitorComparison";
 import { FeaturesV2 } from "@/components/FeaturesV2";
 import { GoogleAdSense } from "@/components/GoogleAdSense";
-import { PlaygroundGenerator } from "@/components/PlaygroundGenerator";
 import {
   ArrowRight,
   CheckCircle2,
@@ -122,13 +121,6 @@ export const Home = () => {
       <CinematicHero />
 
       <FeaturesV2 />
-
-      {/* AI Playground Demo Section */}
-      <section className="section-shell py-24!">
-        <div className="content-grid">
-          <PlaygroundGenerator />
-        </div>
-      </section>
 
       <CompetitorComparison />
 

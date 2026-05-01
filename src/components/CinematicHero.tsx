@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { Globe, Mic, Sparkles, Zap } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Globe, Sparkles, Zap } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { PlaygroundGenerator } from "./PlaygroundGenerator";
 
 export function CinematicHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isRecording, setIsRecording] = useState(false);
 
   // Animated background particles
   useEffect(() => {
@@ -168,66 +168,8 @@ export function CinematicHero() {
           No coding required. Full code ownership. Deploy instantly.
         </motion.p>
 
-        {/* Voice Input Demo */}
-        <motion.div variants={itemVariants} className="max-w-xl mx-auto mb-12">
-          <div className="glass-card-elevated p-2 rounded-2xl">
-            <div className="flex items-center gap-4 p-4">
-              <motion.button
-                onClick={() => setIsRecording(!isRecording)}
-                className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all ${
-                  isRecording
-                    ? "bg-red-500/20 text-red-400 animate-pulse"
-                    : "bg-linear-to-br from-indigo-500 to-purple-600 text-white hover:shadow-lg hover:shadow-indigo-500/30"
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Mic className="w-7 h-7" />
-                {isRecording && (
-                  <span className="absolute inset-0 rounded-full bg-red-500/30 animate-ping" />
-                )}
-              </motion.button>
-
-              <div className="flex-1 text-left">
-                <p className="text-white font-medium">
-                  {isRecording ? "Listening..." : "Tap to record your vision"}
-                </p>
-                <p className="text-sm text-white/50">
-                  {isRecording
-                    ? "Describe your website idea"
-                    : 'Or type: "Create a portfolio for my photography business"'}
-                </p>
-              </div>
-
-              <motion.button
-                className="btn-primary px-6 py-3 rounded-xl text-sm font-semibold"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Generate
-              </motion.button>
-            </div>
-
-            {/* Audio Waveform Animation */}
-            {isRecording && (
-              <div className="flex items-center justify-center gap-1 h-12 px-4">
-                {[...Array(20)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="w-1 h-3 bg-linear-to-t from-indigo-500 to-purple-500 rounded-full"
-                    animate={{
-                      height: [10, Math.random() * 40 + 10, 10],
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      repeat: Infinity,
-                      delay: i * 0.05,
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+        <motion.div variants={itemVariants} className="max-w-5xl mx-auto mb-12">
+          <PlaygroundGenerator variant="hero" />
         </motion.div>
 
         {/* CTA Buttons */}

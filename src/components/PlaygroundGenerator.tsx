@@ -25,6 +25,11 @@ interface GeneratedPreview {
   industry: string;
   cta: string;
   gallery?: string[];
+  headingFont?: string;
+  bodyFont?: string;
+  accentA?: string;
+  accentB?: string;
+  headlineEffect?: string;
 }
 
 const DEMO_RESPONSES: Record<string, GeneratedPreview> = {
@@ -117,7 +122,11 @@ const EXAMPLE_PROMPTS = [
   "Make a restaurant site with reservations and menu",
 ];
 
-export function PlaygroundGenerator() {
+export function PlaygroundGenerator({
+  variant = "default",
+}: {
+  variant?: "default" | "hero";
+}) {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -129,6 +138,39 @@ export function PlaygroundGenerator() {
   const [textInput, setTextInput] = useState("");
   const recognitionRef = useRef<any>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
+  const isHero = variant === "hero";
+
+  const fetchDynamicMedia = async (queryText: string) => {
+    try {
+      const res = await fetch(`/api/media?q=${encodeURIComponent(queryText)}`);
+      if (!res.ok) return null;
+      return (await res.json()) as {
+        imageUrl?: string;
+        videoUrl?: string;
+        gallery?: string[];
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const fetchPreviewStyle = async (queryText: string) => {
+    try {
+      const res = await fetch(
+        `/api/preview-style?q=${encodeURIComponent(queryText)}`,
+      );
+      if (!res.ok) return null;
+      return (await res.json()) as {
+        headingFont?: string;
+        bodyFont?: string;
+        accentA?: string;
+        accentB?: string;
+        headlineEffect?: string;
+      };
+    } catch {
+      return null;
+    }
+  };
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
@@ -212,11 +254,17 @@ export function PlaygroundGenerator() {
     }
 
     const media = await fetchDynamicMedia(transcript || preview.industry);
+    const styleProfile = await fetchPreviewStyle(transcript || preview.industry);
     setGeneratedPreview({
       ...preview,
       heroImageUrl: media?.imageUrl || preview.heroImageUrl,
       heroVideoUrl: media?.videoUrl || preview.heroVideoUrl,
       gallery: media?.gallery,
+      headingFont: styleProfile?.headingFont || "Poppins",
+      bodyFont: styleProfile?.bodyFont || "Inter",
+      accentA: styleProfile?.accentA || "#6366f1",
+      accentB: styleProfile?.accentB || "#d946ef",
+      headlineEffect: styleProfile?.headlineEffect || "fade-up",
     });
     setIsGenerating(false);
     setActiveStep(3);
@@ -266,11 +314,17 @@ export function PlaygroundGenerator() {
     }
 
     const media = await fetchDynamicMedia(text || preview.industry);
+    const styleProfile = await fetchPreviewStyle(text || preview.industry);
     setGeneratedPreview({
       ...preview,
       heroImageUrl: media?.imageUrl || preview.heroImageUrl,
       heroVideoUrl: media?.videoUrl || preview.heroVideoUrl,
       gallery: media?.gallery,
+      headingFont: styleProfile?.headingFont || "Poppins",
+      bodyFont: styleProfile?.bodyFont || "Inter",
+      accentA: styleProfile?.accentA || "#6366f1",
+      accentB: styleProfile?.accentB || "#d946ef",
+      headlineEffect: styleProfile?.headlineEffect || "fade-up",
     });
     setIsGenerating(false);
     setActiveStep(3);
@@ -309,9 +363,10 @@ export function PlaygroundGenerator() {
   } as const;
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className={`w-full ${isHero ? "max-w-5xl" : "max-w-4xl"} mx-auto`}>
       {/* Header */}
-      <div className="text-center mb-8">
+      <div className={`text-center ${isHero ? "mb-6" : "mb-8"}`}>
+        {!isHero && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -320,7 +375,8 @@ export function PlaygroundGenerator() {
           <Sparkles className="w-4 h-4" />
           Try It Free - No Signup Required
         </motion.div>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+        )}
+        <h2 className={`${isHero ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"} font-bold text-white mb-3`}>
           See the AI in Action
         </h2>
         <p className="text-white/60 max-w-lg mx-auto">
@@ -390,7 +446,7 @@ export function PlaygroundGenerator() {
       )}
 
       {/* Example Prompts */}
-      {!isRecording && !isGenerating && !generatedPreview && (
+      {!isHero && !isRecording && !isGenerating && !generatedPreview && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -414,7 +470,7 @@ export function PlaygroundGenerator() {
       {/* Recording Interface */}
       <div className="relative">
         {/* Main Input Area */}
-        <div className="bg-[#0f172a] border border-white/10 rounded-2xl p-6 mb-4">
+        <div className={`${isHero ? "bg-black/35 border-indigo-400/25" : "bg-[#0f172a] border-white/10"} border rounded-2xl p-6 mb-4 backdrop-blur-xl`}>
           {!generatedPreview ? (
             <>
               {inputMode === "voice" ? (
@@ -511,7 +567,7 @@ export function PlaygroundGenerator() {
                         onChange={(e) => setTextInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Describe your dream website... (e.g., 'A modern coffee shop with online ordering, warm brown colors, and a gallery section')"
-                        className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-white/40 resize-none focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+                        className={`w-full h-32 bg-white/5 border ${isHero ? "border-indigo-400/20 focus:border-indigo-400/60 focus:ring-indigo-400/40" : "border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/50"} rounded-xl p-4 text-white placeholder-white/40 resize-none focus:outline-none focus:ring-1 transition-all`}
                         disabled={isGenerating}
                       />
                       <div className="absolute bottom-3 right-3 text-xs text-white/30">
@@ -526,7 +582,7 @@ export function PlaygroundGenerator() {
                         whileTap={{ scale: 0.98 }}
                         onClick={handleTextSubmit}
                         disabled={!textInput.trim() || isGenerating}
-                        className="flex items-center gap-2 px-8 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-white/10 disabled:text-white/40 text-white font-semibold rounded-xl transition-all"
+                        className={`flex items-center gap-2 px-8 py-3 ${isHero ? "bg-linear-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-400 hover:to-fuchsia-400" : "bg-cyan-500 hover:bg-cyan-600"} disabled:bg-white/10 disabled:text-white/40 text-white font-semibold rounded-xl transition-all`}
                       >
                         {isGenerating ? (
                           <>
@@ -655,10 +711,24 @@ export function PlaygroundGenerator() {
                       />
                       <div className="absolute inset-0 m-6 rounded-2xl bg-gradient-to-t from-slate-950/70 to-transparent pointer-events-none" />
                       <div className="relative -mt-24 px-6">
-                        <h4 className="text-3xl font-extrabold text-white drop-shadow-md">{generatedPreview.description}</h4>
+                        <h4
+                          className={`text-3xl font-extrabold text-white drop-shadow-md ${generatedPreview.headlineEffect === "slide-in" ? "animate-[fadeIn_0.8s_ease-out]" : ""}`}
+                          style={{ fontFamily: generatedPreview.headingFont || "Poppins, sans-serif" }}
+                        >
+                          {generatedPreview.description}
+                        </h4>
                         <p className="mt-3 max-w-2xl text-white/80">{safePrompt || "Custom AI-driven homepage preview with full interactions and brand visuals."}</p>
                         <div className="mt-5 flex flex-wrap gap-3">
-                          <span className="rounded-full border border-cyan-300/35 bg-cyan-500/20 px-3 py-1 text-xs font-semibold text-cyan-100">{generatedPreview.colorScheme}</span>
+                          <span
+                            className="rounded-full border px-3 py-1 text-xs font-semibold"
+                            style={{
+                              borderColor: generatedPreview.accentA || "#6366f1",
+                              backgroundColor: `${generatedPreview.accentA || "#6366f1"}33`,
+                              color: "#e2e8f0",
+                            }}
+                          >
+                            {generatedPreview.colorScheme}
+                          </span>
                           <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/85">{generatedPreview.layout}</span>
                         </div>
                       </div>
@@ -705,7 +775,7 @@ export function PlaygroundGenerator() {
                 </p>
                 <a
                   href="/pricing"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl transition-colors"
+                  className={`inline-flex items-center gap-2 px-6 py-3 ${isHero ? "bg-linear-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-400 hover:to-fuchsia-400" : "bg-cyan-500 hover:bg-cyan-600"} text-white font-semibold rounded-xl transition-colors`}
                 >
                   <Sparkles className="w-5 h-5" />
                   Buy This Site & Launch
@@ -737,16 +807,3 @@ export function PlaygroundGenerator() {
     </div>
   );
 }
-  const fetchDynamicMedia = async (queryText: string) => {
-    try {
-      const res = await fetch(`/api/media?q=${encodeURIComponent(queryText)}`);
-      if (!res.ok) return null;
-      return (await res.json()) as {
-        imageUrl?: string;
-        videoUrl?: string;
-        gallery?: string[];
-      };
-    } catch {
-      return null;
-    }
-  };
