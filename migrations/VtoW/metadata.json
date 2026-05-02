@@ -1,0 +1,6 @@
+{
+  "name": "VoiceToWebsite.com",
+  "description": "VoiceToWebsite.com is the world’s most advanced voice-powered website creation platform. Instantly turn your spoken business idea into a complete, premium, conversion-optimized website with strategy, copywriting, branding, and design.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["AI Website Generation", "Voice-to-Text", "SaaS Dashboard"]
+}
