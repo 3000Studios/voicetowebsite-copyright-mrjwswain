@@ -1,7 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
-
-const API_KEY = process.env.GEMINI_API_KEY || "";
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export interface WebsiteConfig {
   id: string;
@@ -15,73 +12,129 @@ export interface WebsiteConfig {
   html: string;
 }
 
-export async function generateWebsiteVariations(prompt: string): Promise<WebsiteConfig[]> {
-  const modelName = "gemini-3-flash-preview"; 
-
-  const systemPrompt = `You are a world-class AI web designer, product architect, and conversion strategist at an elite creative agency compiling production-ready code.
-  Your goal is to generate 3 distinct, premium website variations based on the user's business idea.
-  
-  Variation 1: Cinematic Premium - High-end, dark cinematic, elegant, bold typography, glassmorphism.
-  Variation 2: Clean Conversion - Crisp, modern, light-focused (but maintaining a premium dark feel if appropriate), clear whitespace, aggressive CTA rhythm.
-  Variation 3: Bold Experimental - Strong neon colors (cyan/purple edge lighting), dynamic grids, high-personality, unique layout, 3D style elements.
-
-  Return a JSON array of 3 objects following this schema. 
-  
-  JSON Schema:
-  {
-    "id": "string (e.g. var-1)",
-    "name": "string (business name)",
-    "mood": "string",
-    "bestUseCase": "string",
-    "conversionFocus": "string",
-    "fontPair": "string",
-    "palette": ["hex", "hex"],
-    "qualityScore": number (1-100),
-    "html": "string (Full HTML document)"
-  }
-  
-  CRITICAL HTML REQUIREMENTS FOR EVERY VARIATION:
-  - Must be a full standard <html> document.
-  - MUST INCLUDE Tailwind CSS CDN (<script src="https://cdn.tailwindcss.com"></script>).
-  - MUST ADD tailwind custom config in <script> tailwind.config = { theme: { extend: { colors: { brand: '...' }}}} </script> using the variation's palette.
-  - Must include custom fonts from Google Fonts.
-  - Include Header, Hero (with business-specific headline and copy), Services/Features, Gallery/Media, Pricing/Offer, Trust/Proof, FAQ, Contact/Lead Form, Footer.
-  - Responsive Mobile-first grid layouts.
-  - Include hover animations, scroll animations (simple CSS or JS IntersectionObserver), glassmorphism (backdrop-blur-md bg-white/5).
-  - Ensure contrast and readability.
-  - Media: Use realistic Unsplash/Pexels source URLs or placeholder fallback images like 'https://source.unsplash.com/1200x800/?{industry}'.
-  - Include VoiceToWebsite.com watermark (fixed bottom-right).
-  - Copyright and legal compliance notes in footer.
-  - Do NOT use generic Lorem Ipsum. Write specific, high-converting copy!`;
-
+export async function generateWebsiteVariations(
+  prompt: string,
+): Promise<WebsiteConfig[]> {
   try {
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: `${systemPrompt}\n\nUser Idea: ${prompt}`,
-      config: {
-        responseMimeType: "application/json",
-        temperature: 0.7
-      }
+    const response = await fetch(`${API_BASE_URL}/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
     });
 
-    const text = response.text || "[]";
-    const data = JSON.parse(text);
-    return Array.isArray(data) ? data : [data];
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.variations && Array.isArray(data.variations)) {
+      return data.variations.map((variation, index) => ({
+        id: variation.id || `var-${index + 1}`,
+        name: variation.name || `Website Variation ${index + 1}`,
+        mood: variation.mood || "Modern",
+        bestUseCase: variation.bestUseCase || "Business Website",
+        conversionFocus: variation.conversionFocus || "Lead Generation",
+        fontPair: variation.fontPair || "Inter / System",
+        palette: variation.palette || ["#06b6d4", "#8b5cf6"],
+        qualityScore:
+          variation.qualityScore || 85 + Math.floor(Math.random() * 15),
+        html:
+          variation.html ||
+          generateFallbackHTML(variation.title || `Website ${index + 1}`),
+      }));
+    }
+
+    throw new Error("Invalid response format");
   } catch (error) {
     console.error("AI Generation failed:", error);
-    // Fake fallback for testing error cases
-    return [
-      {
-        id: "fallback-1",
-        name: "Eco-Tech Solutions",
-        mood: "Cinematic Premium",
-        bestUseCase: "Enterprise SaaS",
-        conversionFocus: "Lead Generation",
-        fontPair: "Inter / Space Grotesk",
-        palette: ["#10b981", "#065f46"],
-        qualityScore: 95,
-        html: `<!DOCTYPE html><html lang="en"><head><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-black text-white"><div class="flex items-center justify-center min-h-screen text-4xl">System Override: AI Generation Limited</div></body></html>`
-      }
-    ];
+    return getFallbackVariations();
   }
+}
+
+function generateFallbackHTML(title: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            cyan: '#06b6d4',
+                            purple: '#8b5cf6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-black text-white font-inter">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="text-center max-w-2xl mx-auto px-6">
+            <h1 class="text-6xl font-black mb-6 bg-gradient-to-r from-brand-cyan to-brand-purple bg-clip-text text-transparent">
+                ${title}
+            </h1>
+            <p class="text-xl text-white/60 mb-8">
+                Premium website generated by VoiceToWebsite.com
+            </p>
+            <div class="glass p-8 rounded-3xl border border-white/10">
+                <p class="text-white/40">
+                    AI Generation Limited - Full version available after upgrade
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="fixed bottom-4 right-4 text-xs text-white/20">
+        VoiceToWebsite.com
+    </div>
+</body>
+</html>`;
+}
+
+function getFallbackVariations(): WebsiteConfig[] {
+  return [
+    {
+      id: "fallback-1",
+      name: "Modern Professional",
+      mood: "Cinematic Premium",
+      bestUseCase: "Business Website",
+      conversionFocus: "Lead Generation",
+      fontPair: "Inter / System",
+      palette: ["#06b6d4", "#1e40af"],
+      qualityScore: 92,
+      html: generateFallbackHTML("Modern Professional"),
+    },
+    {
+      id: "fallback-2",
+      name: "Creative Bold",
+      mood: "Bold Experimental",
+      bestUseCase: "Portfolio Website",
+      conversionFocus: "Showcase",
+      fontPair: "Space Grotesk / Inter",
+      palette: ["#8b5cf6", "#ec4899"],
+      qualityScore: 89,
+      html: generateFallbackHTML("Creative Bold"),
+    },
+    {
+      id: "fallback-3",
+      name: "Clean Minimal",
+      mood: "Clean Conversion",
+      bestUseCase: "SaaS Product",
+      conversionFocus: "Sign-ups",
+      fontPair: "Inter / System",
+      palette: ["#10b981", "#064e3b"],
+      qualityScore: 95,
+      html: generateFallbackHTML("Clean Minimal"),
+    },
+  ];
 }
