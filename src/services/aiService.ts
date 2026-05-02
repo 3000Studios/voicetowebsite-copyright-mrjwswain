@@ -30,7 +30,13 @@ export async function generateWebsiteVariations(
 
     const data = await response.json();
 
-    if (data.variations && Array.isArray(data.variations)) {
+    // Type guard to ensure data has variations property
+    if (
+      data &&
+      typeof data === "object" &&
+      "variations" in data &&
+      Array.isArray(data.variations)
+    ) {
       return data.variations.map((variation, index) => ({
         id: variation.id || `var-${index + 1}`,
         name: variation.name || `Website Variation ${index + 1}`,
@@ -81,7 +87,7 @@ function generateFallbackHTML(title: string): string {
 <body class="bg-black text-white font-inter">
     <div class="min-h-screen flex items-center justify-center">
         <div class="text-center max-w-2xl mx-auto px-6">
-            <h1 class="text-6xl font-black mb-6 bg-gradient-to-r from-brand-cyan to-brand-purple bg-clip-text text-transparent">
+            <h1 class="text-6xl font-black mb-6 bg-linear-to-r from-brand-cyan to-brand-purple bg-clip-text text-transparent">
                 ${title}
             </h1>
             <p class="text-xl text-white/60 mb-8">
