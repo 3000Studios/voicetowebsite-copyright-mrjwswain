@@ -3,7 +3,6 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
-import paypal from "@paypal/checkout-server-sdk";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,171 +10,219 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
-const PORT = 3000;
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2024-12-18.acacia" as any,
+}) : null;
 
-// Payment Configs
-const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY) 
-  : null;
-
-const paypalClient = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET
-  ? new paypal.core.PayPalHttpClient(
-      new paypal.core.LiveEnvironment(
-        process.env.PAYPAL_CLIENT_ID,
-        process.env.PAYPAL_CLIENT_SECRET
-      )
-    )
-  : null;
-
-// In-memory store
-let stories: any[] = [
-  {
-    id: "1",
-    title: "The Future of Voice",
-    topic: "AI Innovation",
-    heroVideoDescription: "futuristic city",
-    storyContent: "Voice technology is revolutionizing how we interact with the digital world..."
-  }
-];
-let messages: any[] = [];
-let appointments: any[] = [];
-let sites: any[] = [];
-let users: any[] = [
-  { email: "admin@voicetowebsite.com", key: "ADMIN-123", role: "admin" },
-  { email: "test@test.com", key: "KEY-123", role: "user" }
-];
-
-app.use(express.json());
-
-// API Routes
-app.get("/api/stories", (req, res) => {
-  res.json(stories);
-});
-
-app.post("/api/messages", (req, res) => {
-  const { name, email, message } = req.body;
-  const newMessage = { id: Date.now(), name, email, message, timestamp: new Date().toISOString() };
-  messages.push(newMessage);
-  console.log(`New message from ${name}: ${message}. Forwarding to 404-640-7734...`);
-  res.json({ success: true });
-});
-
-app.get("/api/admin/messages", (req, res) => {
-  res.json(messages);
-});
-
-app.post("/api/appointments", (req, res) => {
-  const { name, email, date, time } = req.body;
-  const newAppointment = { id: Date.now(), name, email, date, time, timestamp: new Date().toISOString() };
-  appointments.push(newAppointment);
-  res.json({ success: true });
-});
-
-app.get("/api/admin/appointments", (req, res) => {
-  res.json(appointments);
-});
-
-app.post("/api/login", (req, res) => {
-  const { email, key } = req.body;
-  const user = users.find(u => u.email === email && u.key === key);
-  if (user) {
-    res.json({ success: true, user });
-  } else {
-    res.status(401).json({ error: "Invalid email or subscription key" });
-  }
-});
-
-app.get("/api/admin/stats", (req, res) => {
-  res.json({
-    totalUsers: users.length,
-    totalMessages: messages.length,
-    totalAppointments: appointments.length,
-    totalStories: stories.length,
-    totalSites: sites.length,
-    revenue: users.length * 19.99,
-    activeSessions: Math.floor(Math.random() * 50) + 10,
-    dailyGenerations: sites.filter(s => {
-      const today = new Date().toISOString().split('T')[0];
-      return s.timestamp.startsWith(today);
-    }).length
+async function generatePayPalAccessToken() {
+  const auth = Buffer.from(process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_CLIENT_SECRET).toString("base64");
+  const base = process.env.PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
+  const response = await fetch(`${base}/v1/oauth2/token`, {
+    method: "POST",
+    body: "grant_type=client_credentials",
+    headers: {
+      Authorization: `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
   });
-});
-
-app.post("/api/admin/generate-story", async (req, res) => {
-  res.json({ success: true, message: "Story generation moved to client-side." });
-});
-
-app.post("/api/create-checkout-session", async (req, res) => {
-  if (!stripe) {
-    return res.status(500).json({ error: "Stripe not configured" });
-  }
-
-  const { plan } = req.body;
-  const isElite = plan === 'elite';
-  const amount = isElite ? 4999 : 1999;
-  const planName = isElite ? "Empire Elite Build" : "VoiceToWebsite Pro Deployment";
-
-  try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: planName,
-              description: isElite ? "Unlimited neural builds + white-label access" : "100 neural builds + priority sync",
-            },
-            unit_amount: amount,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${process.env.APP_URL || "http://localhost:3000"}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.APP_URL || "http://localhost:3000"}/pricing`,
-    });
-
-    res.json({ id: session.id, url: session.url });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/create-paypal-order", async (req, res) => {
-  if (!paypalClient) {
-    return res.status(500).json({ error: "PayPal not configured" });
-  }
-
-  const { plan } = req.body;
-  const isElite = plan === 'elite';
-  const amount = isElite ? "49.99" : "19.99";
-
-  const request = new paypal.orders.OrdersCreateRequest();
-  request.prefer("return=representation");
-  request.requestBody({
-    intent: "CAPTURE",
-    purchase_units: [
-      {
-        amount: {
-          currency_code: "USD",
-          value: amount,
-        },
-        description: isElite ? "Empire Elite Build" : "VoiceToWebsite Pro Deployment",
-      },
-    ],
-  });
-
-  try {
-    const order = await paypalClient.execute(request);
-    res.json({ id: order.result.id });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  const data = await response.json();
+  return data.access_token;
+}
 
 async function startServer() {
+  const app = express();
+  const PORT = 3000;
+
+  app.use(express.json());
+
+  // API routes
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", brand: "VoiceToWebsite.com" });
+  });
+
+  app.get("/api/media", async (req, res) => {
+    try {
+      const query = req.query.q as string || "technology";
+      const media = {
+         query,
+         imageUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200", 
+         gallery: [
+           "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
+           "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
+           "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800"
+         ],
+         videoUrl: "",
+         sources: ["unsplash"]
+      };
+
+      if (process.env.UNSPLASH_API_KEY) {
+         try {
+            const uRes = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${process.env.UNSPLASH_API_KEY}&per_page=3`);
+            const uData = await uRes.json();
+            if (uData.results && uData.results.length > 0) {
+               media.imageUrl = uData.results[0].urls.regular;
+               media.gallery = uData.results.map((r: any) => r.urls.regular);
+               media.sources.push("unsplash");
+            }
+         } catch (e) {
+            console.error("Unsplash error", e);
+         }
+      }
+
+      if (process.env.PEXELS_API_KEY) {
+         try {
+             const pRes = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=1`, {
+                 headers: { Authorization: process.env.PEXELS_API_KEY }
+             });
+             const pData = await pRes.json();
+             if (pData.videos && pData.videos.length > 0 && pData.videos[0].video_files.length > 0) {
+                 const hdVideo = pData.videos[0].video_files.find((v: any) => v.quality === "hd") || pData.videos[0].video_files[0];
+                 if (hdVideo) {
+                    media.videoUrl = hdVideo.link;
+                    media.sources.push("pexels");
+                 }
+             }
+         } catch (e) {
+             console.error("Pexels error", e);
+         }
+      }
+
+      res.json(media);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Media fetch failed" });
+    }
+  });
+
+  app.post("/api/create-checkout-session", async (req, res) => {
+    try {
+      if (!stripe) {
+         return res.status(500).json({ error: "Stripe is not configured." });
+      }
+
+      const { planId, returnUrl } = req.body;
+      
+      let priceId = "";
+      if (planId === "starter") priceId = process.env.STRIPE_PRICE_STARTER_MONTH || "";
+      else if (planId === "pro") priceId = process.env.STRIPE_PRICE_PRO_MONTH || "";
+      else if (planId === "ultimate") priceId = process.env.STRIPE_PRICE_ULTIMATE_MONTH || "";
+      else if (planId === "commands") priceId = process.env.STRIPE_PRICE_COMMANDS || "";
+
+      if (!priceId) {
+         const dummyPrices: Record<string, number> = {
+            starter: 999,
+            pro: 1999,
+            ultimate: 4999,
+            commands: 299
+         };
+         
+         const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: [
+               {
+                  price_data: {
+                     currency: "usd",
+                     product_data: { name: `${planId.toUpperCase()} Plan` },
+                     unit_amount: dummyPrices[planId] || 999,
+                     recurring: planId !== "commands" ? { interval: "month" } : undefined
+                  },
+                  quantity: 1,
+               },
+            ],
+            mode: planId === "commands" ? "payment" : "subscription",
+            success_url: `${returnUrl || process.env.APP_URL || "http://localhost:3000"}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${returnUrl || process.env.APP_URL || "http://localhost:3000"}/pricing`,
+         });
+         
+         return res.json({ url: session.url });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: planId === "commands" ? "payment" : "subscription",
+        success_url: `${returnUrl || process.env.APP_URL || "http://localhost:3000"}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${returnUrl || process.env.APP_URL || "http://localhost:3000"}/pricing`,
+      });
+
+      res.json({ url: session.url });
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/create-paypal-order", async (req, res) => {
+     try {
+       const { planId } = req.body;
+       const dummyPrices: Record<string, string> = {
+          starter: "9.99",
+          pro: "19.99",
+          ultimate: "49.99",
+          commands: "2.99"
+       };
+       const amount = dummyPrices[planId] || "9.99";
+
+       if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
+          return res.status(500).json({ error: "PayPal is not configured." });
+       }
+
+       const accessToken = await generatePayPalAccessToken();
+       const base = process.env.PAYPAL_ENV === "sandbox" ? "https://api-m.sandbox.paypal.com" : "https://api-m.paypal.com";
+       
+       const response = await fetch(`${base}/v2/checkout/orders`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+           Authorization: `Bearer ${accessToken}`,
+         },
+         body: JSON.stringify({
+           intent: "CAPTURE",
+           purchase_units: [
+             {
+               amount: { currency_code: "USD", value: amount },
+             },
+           ],
+           application_context: {
+              return_url: `${process.env.APP_URL || "http://localhost:3000"}/success`,
+              cancel_url: `${process.env.APP_URL || "http://localhost:3000"}/pricing`
+           }
+         }),
+       });
+
+       const data = await response.json();
+       if (data.links) {
+          const approveLink = data.links.find((link: any) => link.rel === "approve");
+          return res.json({ url: approveLink?.href });
+       }
+       res.status(500).json({ error: "Could not create PayPal order" });
+     } catch (err: any) {
+       console.error(err);
+       res.status(500).json({ error: err.message });
+     }
+  });
+
+  // Placeholder for Adsense support
+  app.get("/ads.txt", (req, res) => {
+    res.send("google.com, pub-replace-me, DIRECT, f08c47fec0942fa0");
+  });
+
+  app.get("/sitemap.xml", (req, res) => {
+    res.header("Content-Type", "application/xml");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://voicetowebsite.com/</loc></url>
+  <url><loc>https://voicetowebsite.com/pricing</loc></url>
+  <url><loc>https://voicetowebsite.com/examples</loc></url>
+</urlset>`);
+  });
+
+  app.get("/robots.txt", (req, res) => {
+    res.header("Content-Type", "text/plain");
+    res.send("User-agent: *\nAllow: /\nSitemap: https://voicetowebsite.com/sitemap.xml");
+  });
+
+  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
