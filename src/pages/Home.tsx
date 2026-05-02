@@ -2,6 +2,7 @@ import { CinematicHero } from "@/components/CinematicHero";
 import { FeaturesV2 } from "@/components/FeaturesV2";
 import VoiceGenerator from "@/components/VoiceGenerator";
 import { ArrowRight, Heart, Target, Users } from "lucide-react";
+import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 import { motion } from "motion/react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
@@ -119,6 +120,33 @@ export const Home = () => {
         </section>
 
         <FeaturesV2 />
+
+        <section className="section-shell">
+          <div className="content-grid">
+            <div className="cta-shell">
+              <div className="section-intro max-w-3xl">
+                <span className="eyebrow">Google AI Studio Integration</span>
+                <h2 className="section-title text-gradient">
+                  Continue the build in your connected AI Studio app.
+                </h2>
+                <p className="section-copy">
+                  VoiceToWebsite.com now links directly to the Google AI Studio
+                  app so the generator, prompt workflow, and production build
+                  instructions can stay connected while the site evolves.
+                </p>
+              </div>
+              <a
+                href={GOOGLE_AI_STUDIO_APP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-primary-button w-full justify-center sm:w-auto"
+              >
+                Open AI Studio App
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </section>
 
         <section id="how-it-works" className="section-shell">
           <div className="content-grid gap-16">

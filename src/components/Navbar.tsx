@@ -1,11 +1,13 @@
 import { AnimatePresence, motion } from "motion/react";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 
 const navItems = [
   { label: "Features", href: "/features" },
   { label: "Examples", href: "/examples" },
   { label: "Pricing", href: "/pricing" },
+  { label: "AI Studio", href: GOOGLE_AI_STUDIO_APP_URL },
   { label: "Blog", href: "/blog" },
   { label: "Stories", href: "/stories" },
   { label: "Store", href: "/store" },
@@ -72,6 +74,12 @@ const MoltenNav = () => {
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string,
   ) => {
+    if (href.startsWith("http")) {
+      setIsOpen(false);
+      document.body.style.overflow = "auto";
+      return;
+    }
+
     e.preventDefault();
 
     // Create ripple effect
@@ -176,8 +184,22 @@ const MoltenNav = () => {
                   }}
                   className="menu-item relative overflow-visible"
                 >
-                  <Link
-                    to={item.href}
+                  {item.href.startsWith("http") ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => handleLinkClick(e, item.href)}
+                      className="menu-link relative block text-3xl font-black uppercase text-transparent stroke-white/30 stroke-1 transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-white hover:stroke-0 hover:tracking-[0.08em] sm:text-4xl lg:text-5xl"
+                    >
+                      {item.label}
+                      <span className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                        <span className="w-[110%] h-5 bg-repeating-linear-gradient-90 from-cyan-400 from-0 to-transparent to-2 animate-wave" />
+                      </span>
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.href}
                     onClick={(e) => handleLinkClick(e, item.href)}
                     className="menu-link relative block text-3xl font-black uppercase text-transparent stroke-white/30 stroke-1 transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-white hover:stroke-0 hover:tracking-[0.08em] sm:text-4xl lg:text-5xl"
                   >
@@ -187,6 +209,7 @@ const MoltenNav = () => {
                       <span className="w-[110%] h-5 bg-repeating-linear-gradient-90 from-cyan-400 from-0 to-transparent to-2 animate-wave" />
                     </span>
                   </Link>
+                  )}
                 </motion.li>
               ))}
             </ul>

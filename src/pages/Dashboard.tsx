@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { VoiceApp } from "@/components/VoiceApp";
 import { useAuth } from "@/context/AuthContext";
+import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 import { db, handleFirestoreError } from "@/lib/firebase";
 import {
   addDoc,
@@ -193,6 +194,14 @@ export const Dashboard = () => {
               >
                 My Sites
               </button>
+              <a
+                href={GOOGLE_AI_STUDIO_APP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-secondary-button"
+              >
+                AI Studio
+              </a>
           </div>
         </div>
         {dashboardNotice ? (

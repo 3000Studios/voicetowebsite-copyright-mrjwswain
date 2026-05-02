@@ -1,4 +1,5 @@
 import { PLAN_LIMITS, PlanType, STRIPE_PAYMENT_LINKS } from "@/constants/plans";
+import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 import { trackEvent } from "@/lib/analytics";
 import { ArrowRight, CheckCircle2, PlayCircle, ShieldCheck, Sparkles, Wand2 } from "lucide-react";
 import { motion } from "motion/react";
@@ -240,6 +241,9 @@ export const Pricing = () => {
             <Link to="/features" className="hero-secondary-button">
               See generator features
             </Link>
+            <a href={GOOGLE_AI_STUDIO_APP_URL} target="_blank" rel="noreferrer" className="hero-secondary-button">
+              Open AI Studio app
+            </a>
           </div>
         </div>
       </div>

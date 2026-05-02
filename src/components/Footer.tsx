@@ -2,11 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Mail, ShieldCheck, FileText, Sparkles } from 'lucide-react';
 import { Logo } from './Logo';
+import { GOOGLE_AI_STUDIO_APP_URL } from '@/constants/integrations';
 
 const footerLinks = [
   { label: 'How it works', href: '/#how-it-works' },
   { label: 'Examples', href: '/examples' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'AI Studio App', href: GOOGLE_AI_STUDIO_APP_URL },
   { label: 'FAQ', href: '/faq' },
 ];
 
@@ -40,7 +42,9 @@ export const Footer = () => {
           <ul className="space-y-3 text-sm text-slate-300/78">
             {footerLinks.map((item) => (
               <li key={item.label}>
-                {item.href.startsWith('/#') ? (
+                {item.href.startsWith('http') ? (
+                  <a href={item.href} target="_blank" rel="noreferrer" className="footer-link inline-flex min-h-11 items-center px-1 py-2">{item.label}</a>
+                ) : item.href.startsWith('/#') ? (
                 <a href={item.href} className="footer-link inline-flex min-h-11 items-center px-1 py-2">{item.label}</a>
                 ) : (
                   <Link to={item.href} className="footer-link inline-flex min-h-11 items-center px-1 py-2">{item.label}</Link>
@@ -60,6 +64,10 @@ export const Footer = () => {
             View plans
             <ArrowRight className="h-4 w-4" />
           </Link>
+          <a href={GOOGLE_AI_STUDIO_APP_URL} target="_blank" rel="noreferrer" className="hero-secondary-button inline-flex">
+            Open AI Studio app
+            <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </div>
 
