@@ -347,7 +347,6 @@ const Dashboard = () => {
    }, [user]);
 
    if (loading) return <div className="pt-32 pb-20 px-6 min-h-screen text-center">Loading...</div>;
-   if (!user) return <div className="pt-32 pb-20 px-6 min-h-screen text-center"><h1 className="text-3xl font-black mb-4">Unauthorized</h1><p><Link to="/signin" className="text-brand-cyan">Sign in here</Link></p></div>;
 
    return (
   <div className="pt-32 pb-20 px-6 lg:px-12 min-h-screen">
@@ -360,12 +359,17 @@ const Dashboard = () => {
               <p className="text-[10px] uppercase font-black tracking-widest text-white/40 italic">Sync Level: <span className="text-white">Neural Maximum</span></p>
            </div>
         </div>
-        <div className="flex gap-4 w-full md:w-auto">
+           <div className="flex gap-4 w-full md:w-auto">
+           {!user ? (
+             <Link to="/signin" className="glass px-8 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest text-brand-cyan hover:bg-white/10 transition-colors flex items-center justify-center">
+               Sign In To Sync
+             </Link>
+           ) : null}
            <div className="glass px-8 py-4 rounded-[1.5rem] flex-grow md:flex-grow-0">
               <p className="text-[8px] uppercase font-black text-white/20 mb-1">Commands Remaining</p>
               <div className="flex items-center gap-2">
                  <Zap className="w-3 h-3 text-brand-purple" />
-                 <p className="font-black text-brand-purple tracking-tighter">? / ?</p>
+                 <p className="font-black text-brand-purple tracking-tighter">{user ? "? / ?" : "3 Demo"}</p>
               </div>
            </div>
            <Link to="/pricing" className="px-8 py-4 bg-brand-cyan text-black font-black rounded-[1.5rem] hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20 flex items-center justify-center">
