@@ -1,7 +1,7 @@
+import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 
 const navItems = [
   { label: "Features", href: "/features" },
@@ -200,15 +200,15 @@ const MoltenNav = () => {
                   ) : (
                     <Link
                       to={item.href}
-                    onClick={(e) => handleLinkClick(e, item.href)}
-                    className="menu-link relative block text-3xl font-black uppercase text-transparent stroke-white/30 stroke-1 transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-white hover:stroke-0 hover:tracking-[0.08em] sm:text-4xl lg:text-5xl"
-                  >
-                    {item.label}
-                    {/* Hover Sound Wave Animation */}
-                    <span className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                      <span className="w-[110%] h-5 bg-repeating-linear-gradient-90 from-cyan-400 from-0 to-transparent to-2 animate-wave" />
-                    </span>
-                  </Link>
+                      onClick={(e) => handleLinkClick(e, item.href)}
+                      className="menu-link relative block text-3xl font-black uppercase text-transparent stroke-white/30 stroke-1 transition-all duration-600 ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-white hover:stroke-0 hover:tracking-[0.08em] sm:text-4xl lg:text-5xl"
+                    >
+                      {item.label}
+                      {/* Hover Sound Wave Animation */}
+                      <span className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                        <span className="w-[110%] h-5 bg-repeating-linear-gradient-90 from-cyan-400 from-0 to-transparent to-2 animate-wave" />
+                      </span>
+                    </Link>
                   )}
                 </motion.li>
               ))}
