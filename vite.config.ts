@@ -20,5 +20,17 @@ export default defineConfig(({mode}) => {
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom', 'react-router-dom'],
+            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+            three: ['three', '@react-three/fiber', '@react-three/drei'],
+            motion: ['motion'],
+          },
+        },
+      },
+    },
   };
 });

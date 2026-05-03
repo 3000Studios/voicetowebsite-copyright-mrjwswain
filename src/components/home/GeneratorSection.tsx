@@ -8,6 +8,16 @@ import {
   WebsiteConfig,
 } from "../../services/aiService";
 
+type BlogStory = {
+  title: string;
+  summary: string;
+};
+
+type BlogIndexItem = {
+  title: string;
+  slug: string;
+};
+
 export const GeneratorSection = () => {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -234,15 +244,18 @@ export const GeneratorSection = () => {
 import { useEffect } from "react";
 
 const BlogSection = () => {
-  const [stories, setStories] = useState([]);
-  const [index, setIndex] = useState([]);
+  const [stories, setStories] = useState<BlogStory[]>([]);
+  const [, setIndex] = useState<BlogIndexItem[]>([]);
 
   useEffect(() => {
     const fetchStories = async () => {
       const response = await fetch("/api/blog-stories");
-      const data = await response.json();
-      setStories(data.stories);
-      setIndex(data.index);
+      const data = (await response.json()) as {
+        stories?: BlogStory[];
+        index?: BlogIndexItem[];
+      };
+      setStories(data.stories || []);
+      setIndex(data.index || []);
     };
 
     fetchStories();

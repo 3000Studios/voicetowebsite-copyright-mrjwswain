@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -21,11 +21,16 @@ const isConfigured =
 export const app = isConfigured && !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
+export const googleProvider = new GoogleAuthProvider();
+export const githubProvider = new GithubAuthProvider();
+
+export const handleFirestoreError = (error: unknown, action: string, resource: string) => {
+  console.error(`Firestore ${action} failed for ${resource}:`, error);
+};
 
 export const signInWithGoogle = async () => {
   if (!auth) throw new Error("Firebase Auth is not initialized");
-  const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+  return signInWithPopup(auth, googleProvider);
 };
 
 export const logOut = async () => {

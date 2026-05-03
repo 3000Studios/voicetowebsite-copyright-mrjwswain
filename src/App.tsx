@@ -153,6 +153,7 @@ const Footer = () => (
           <li><Link to="/features" className="hover:text-brand-cyan">Features</Link></li>
           <li><Link to="/examples" className="hover:text-brand-cyan">Examples</Link></li>
           <li><Link to="/pricing" className="hover:text-brand-cyan">Pricing</Link></li>
+          <li><Link to="/deployment-ready-prompt" className="hover:text-brand-cyan">Launch Prompt</Link></li>
           <li><Link to="/dashboard" className="hover:text-brand-cyan">Dashboard</Link></li>
         </ul>
       </div>
@@ -182,6 +183,7 @@ const Footer = () => (
 );
 
 import { Home } from "./components/Home";
+import { UniversalDeploymentPrompt } from "./pages/UniversalDeploymentPrompt";
 // --- AdSense Component ---
 export const AdContainer = ({ className }: { className?: string }) => (
   <div className={cn("w-full bg-white/5 border border-white/5 flex items-center justify-center text-[10px] uppercase tracking-widest text-white/20 min-h-[100px] overflow-hidden", className)}>
@@ -537,6 +539,7 @@ export default function App() {
             <Route path="/features" element={<AboutPage />} />
             <Route path="/examples" element={<ExamplesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/deployment-ready-prompt" element={<UniversalDeploymentPrompt />} />
             <Route path="/blog" element={<StoriesPage />} />
             <Route path="/stories" element={<StoriesPage />} />
             <Route path="/store" element={<PricingPage />} />
@@ -570,5 +573,3 @@ const PricingPage = () => (
     <TrustSection />
   </div>
 );
-
-

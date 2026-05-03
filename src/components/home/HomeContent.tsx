@@ -292,7 +292,7 @@ export const PricingSection = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ planId, returnUrl: window.location.origin }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
         window.location.href = data.url;
       } else {
