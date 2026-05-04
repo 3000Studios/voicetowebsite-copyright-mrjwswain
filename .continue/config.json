@@ -1,0 +1,84 @@
+{
+  "models": [
+    {
+      "title": "Free Local Qwen Coder 7B",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:7b",
+      "apiBase": "http://127.0.0.1:11434",
+      "contextLength": 32768,
+      "completionOptions": {
+        "temperature": 0.15,
+        "topP": 0.9,
+        "numCtx": 32768,
+        "numPredict": 4096
+      }
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Free Local Qwen Coder 7B Autocomplete",
+    "provider": "ollama",
+    "model": "qwen2.5-coder:7b",
+    "apiBase": "http://127.0.0.1:11434",
+    "contextLength": 8192,
+    "completionOptions": {
+      "temperature": 0.05,
+      "topP": 0.8,
+      "numCtx": 8192,
+      "numPredict": 256
+    }
+  },
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text",
+    "apiBase": "http://127.0.0.1:11434"
+  },
+  "contextProviders": [
+    {
+      "name": "code",
+      "params": {}
+    },
+    {
+      "name": "docs",
+      "params": {}
+    },
+    {
+      "name": "diff",
+      "params": {}
+    },
+    {
+      "name": "terminal",
+      "params": {}
+    },
+    {
+      "name": "problems",
+      "params": {}
+    },
+    {
+      "name": "folder",
+      "params": {}
+    },
+    {
+      "name": "codebase",
+      "params": {}
+    }
+  ],
+  "slashCommands": [
+    {
+      "name": "edit",
+      "description": "Edit highlighted code with the free local coding model"
+    },
+    {
+      "name": "comment",
+      "description": "Write comments for highlighted code"
+    },
+    {
+      "name": "share",
+      "description": "Export the current chat transcript"
+    },
+    {
+      "name": "cmd",
+      "description": "Generate a shell command"
+    }
+  ],
+  "allowAnonymousTelemetry": false
+}

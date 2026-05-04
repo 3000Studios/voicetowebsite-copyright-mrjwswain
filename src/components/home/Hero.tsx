@@ -72,19 +72,7 @@ export const Hero = () => {
         <div className="relative glass p-4 rounded-[2.5rem] border border-white/20">
           <div className="aspect-video rounded-[1.5rem] bg-black/60 overflow-hidden relative border border-white/5">
             {/* Realistic Video Placeholder */}
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover opacity-60"
-              poster="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1600"
-            >
-              <source
-                src="https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-his-laptop-34448-large.mp4"
-                type="video/mp4"
-              />
-            </video>
+            <div className="h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.35),transparent_32%),radial-gradient(circle_at_80%_30%,rgba(168,85,247,0.3),transparent_30%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.72))] opacity-90" />
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors">
               <div className="w-20 h-20 rounded-full bg-brand-cyan/20 backdrop-blur-md flex items-center justify-center border border-brand-cyan/50 group-hover:scale-110 transition-transform">
                 <Play className="w-8 h-8 text-white fill-white translate-x-1" />

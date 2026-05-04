@@ -11,9 +11,12 @@ const AD_CLIENT = "ca-pub-5800977493749262";
 export const GoogleAdSense = ({ slot }: { slot?: string }) => {
   const adRef = useRef<HTMLDivElement>(null);
   const pushedRef = useRef(false);
+  const isLocalPreview =
+    typeof window !== "undefined" &&
+    /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(window.location.hostname);
 
   useEffect(() => {
-    if (!slot || pushedRef.current) return;
+    if (!slot || pushedRef.current || isLocalPreview) return;
 
     try {
       if (typeof window !== "undefined") {
@@ -24,7 +27,7 @@ export const GoogleAdSense = ({ slot }: { slot?: string }) => {
     } catch (error) {
       console.error("AdSense push error", error);
     }
-  }, [slot]);
+  }, [slot, isLocalPreview]);
 
   return (
     <div className="content-grid py-6" data-vtw-ad-slot={slot || "default-slot"}>
@@ -36,14 +39,20 @@ export const GoogleAdSense = ({ slot }: { slot?: string }) => {
           <span>Sponsored space</span>
           <span className="text-cyan-300">Ready</span>
         </div>
-        <ins
-          className="adsbygoogle"
-          style={{ display: "block", minHeight: "120px", width: "100%" }}
-          data-ad-client={AD_CLIENT}
-          data-ad-slot={slot || "default-slot"}
-          data-ad-format="auto"
-          data-full-width-responsive="true"
-        />
+        {isLocalPreview ? (
+          <div className="flex min-h-[120px] items-center justify-center rounded-2xl border border-dashed border-cyan-300/20 bg-cyan-300/5 text-center text-xs font-semibold uppercase tracking-[0.25em] text-cyan-200/70">
+            Local ad preview disabled
+          </div>
+        ) : (
+          <ins
+            className="adsbygoogle"
+            style={{ display: "block", minHeight: "120px", width: "100%" }}
+            data-ad-client={AD_CLIENT}
+            data-ad-slot={slot || "default-slot"}
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          />
+        )}
       </div>
     </div>
   );

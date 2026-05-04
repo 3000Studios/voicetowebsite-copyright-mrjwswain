@@ -137,42 +137,42 @@ export const ExamplesSection = () => {
     {
       industry: "Beauty Salon",
       name: "Lumière Aesthetics",
-      img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-pink-500/30 via-fuchsia-500/20 to-cyan-400/20",
     },
     {
       industry: "Restaurant",
       name: "Osteria Volare",
-      img: "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-amber-500/30 via-orange-500/20 to-rose-500/20",
     },
     {
       industry: "Real Estate",
       name: "Summit Estates",
-      img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-emerald-400/25 via-cyan-500/20 to-blue-500/20",
     },
     {
       industry: "Fitness Coach",
       name: "Iron Peak Performance",
-      img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-red-500/30 via-violet-500/20 to-cyan-400/20",
     },
     {
       industry: "Music Artist",
       name: "Lunar Echoes",
-      img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-indigo-500/30 via-purple-500/20 to-pink-500/20",
     },
     {
       industry: "Consultant",
       name: "Strategy Lab",
-      img: "https://images.unsplash.com/photo-1454165833767-027ff0d58883?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-sky-400/25 via-blue-500/20 to-slate-400/20",
     },
     {
       industry: "SaaS Startup",
       name: "Nexis Cloud",
-      img: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-cyan-400/30 via-indigo-500/20 to-purple-500/20",
     },
     {
       industry: "Auto Detailer",
       name: "Gloss Armor",
-      img: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=800",
+      gradient: "from-zinc-300/25 via-cyan-400/20 to-blue-700/20",
     },
   ];
 
@@ -208,11 +208,13 @@ export const ExamplesSection = () => {
               className="group relative glass rounded-[2.5rem] p-4 border-white/10 hover:border-brand-cyan/50 transition-all overflow-hidden"
             >
               <div className="aspect-[3/4] rounded-[2rem] overflow-hidden mb-6 relative">
-                <img
-                  src={ex.img}
-                  alt={ex.name}
-                  className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700"
-                />
+                <div
+                  role="img"
+                  aria-label={`${ex.name} generated website preview`}
+                  className={`flex h-full w-full items-center justify-center bg-linear-to-br ${ex.gradient} transition-transform duration-700 group-hover:scale-110`}
+                >
+                  <ImageIcon className="h-16 w-16 text-white/45" />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                 <div className="absolute top-4 right-4 glass px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
                   Variation {["A", "B", "C"][i % 3]}

@@ -103,12 +103,12 @@ export const StoriesPage = () => (
       <h1 className="text-5xl font-black mb-16 italic text-center">Success Stories</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
         {[
-          { name: "Sarah J.", role: "Spa Owner", quote: "I described my vision in 10 seconds and had a live site that looked better than the $5k agency version.", img: "https://images.unsplash.com/photo-1544005313-94ddf028fbdb" },
-          { name: "Marcus L.", role: "Tech Consultant", quote: "The code export feature is a game changer. I prototype in VoiceToWebsite and then ship to production.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d" },
-          { name: "Elena V.", role: "Bistro Owner", quote: "Finally, a builder that understands 'atmosphere'. My restaurant's online presence matches the food.", img: "https://images.unsplash.com/photo-1580489944761-15a19d654956" },
+          { name: "Sarah J.", role: "Spa Owner", quote: "I described my vision in 10 seconds and had a live site that looked better than the $5k agency version." },
+          { name: "Marcus L.", role: "Tech Consultant", quote: "The code export feature is a game changer. I prototype in VoiceToWebsite and then ship to production." },
+          { name: "Elena V.", role: "Bistro Owner", quote: "Finally, a builder that understands 'atmosphere'. My restaurant's online presence matches the food." },
         ].map((story, i) => (
           <div key={i} className="glass p-8 rounded-[3rem] text-center border-white/5">
-            <img src={story.img} alt={story.name} className="w-24 h-24 rounded-full mx-auto mb-6 object-cover border-4 border-brand-cyan/20" />
+            <div aria-label={story.name} className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full border-4 border-brand-cyan/20 bg-linear-to-br from-brand-cyan/25 via-brand-purple/20 to-white/10"><User className="h-10 w-10 text-white/70" /></div>
             <p className="text-lg font-bold mb-6 italic leading-relaxed text-white/80">"{story.quote}"</p>
             <h4 className="font-bold uppercase tracking-widest text-xs">{story.name}</h4>
             <p className="text-[10px] text-white/40 uppercase">{story.role}</p>

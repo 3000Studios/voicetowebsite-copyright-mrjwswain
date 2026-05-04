@@ -3,6 +3,7 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "saoudrizwan.claude-dev",
+    "continue.continue",
     "bradlc.vscode-tailwindcss",
     "formulahendry.auto-rename-tag",
     "christian-kohler.path-intellisense",
@@ -27,7 +28,6 @@
     "orta.vscode-jest"
   ],
   "unwantedRecommendations": [
-    "continue.continue",
     "tabnine.tabnine-vscode",
     "github.copilot",
     "github.copilot-chat",
