@@ -277,15 +277,11 @@ const Footer = () => (
 
 import { Home } from "./components/Home";
 import { UniversalDeploymentPrompt } from "./pages/UniversalDeploymentPrompt";
-// --- AdSense Component ---
-export const AdContainer = ({ className }: { className?: string }) => (
-  <div
-    className={cn(
-      "w-full bg-white/5 border border-white/5 flex items-center justify-center text-[10px] uppercase tracking-widest text-white/20 min-h-[100px] overflow-hidden",
-      className,
-    )}
-  >
-    ADVERTISEMENT - ca-pub-replace-me
+// --- AdSense Component (real) ---
+import { GoogleAdSense } from "./components/GoogleAdSense";
+export const AdContainer = ({ className, slot }: { className?: string; slot?: string }) => (
+  <div className={cn("w-full", className)}>
+    <GoogleAdSense slot={slot || "homepage-mid"} />
   </div>
 );
 
@@ -717,88 +713,209 @@ import {
 
 const AdminPanel = () => {
   const { user, role, loading } = useAuth();
+  const [stats, setStats] = React.useState({ users: 0, sites: 0, orders: 0, revenue: 0 });
+  const [recentOrders, setRecentOrders] = React.useState<any[]>([]);
+  const [recentUsers, setRecentUsers] = React.useState<any[]>([]);
+  const [activity, setActivity] = React.useState<any[]>([]);
+  const [dataLoading, setDataLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!user || role !== "admin") return;
+    const loadData = async () => {
+      setDataLoading(true);
+      try {
+        if (db) {
+          const { getDocs, collection, query, orderBy, limit } = await import("firebase/firestore");
+          const [sitesSnap, usersSnap] = await Promise.all([
+            getDocs(query(collection(db, "sites"), orderBy("timestamp", "desc"), limit(200))),
+            getDocs(query(collection(db, "users"), limit(500))),
+          ]);
+          let ordersData: any[] = [];
+          try {
+            const ordersSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(50)));
+            ordersData = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          } catch { /* orders collection may not exist yet */ }
+
+          const sitesData = sitesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          const usersData = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          const paidOrders = ordersData.filter((o: any) => o.status === "paid" || o.status === "active");
+          const revenue = paidOrders.reduce((sum: number, o: any) => {
+            const amt = parseFloat(o.amount || o.price || "0");
+            return sum + (isNaN(amt) ? 0 : amt);
+          }, 0);
+
+          setStats({ users: usersData.length, sites: sitesData.length, orders: paidOrders.length, revenue });
+          setRecentOrders(ordersData.slice(0, 10));
+          setRecentUsers(usersData.slice(0, 10));
+
+          const feed = [
+            ...sitesData.slice(0, 5).map((s: any) => ({
+              type: "site",
+              label: `Site generated: ${s.title || "Untitled"}`,
+              email: s.ownerId || "—",
+              time: s.timestamp?.toDate?.()?.toLocaleString() || "—",
+            })),
+            ...ordersData.slice(0, 5).map((o: any) => ({
+              type: "order",
+              label: `Order: ${o.plan || "Plan"} — ${o.status || "pending"}`,
+              email: o.email || "—",
+              time: o.createdAt?.toDate?.()?.toLocaleString() || "—",
+            })),
+          ].sort((a, b) => (a.time > b.time ? -1 : 1)).slice(0, 12);
+          setActivity(feed);
+        }
+      } catch (err) {
+        console.error("Admin data load error:", err);
+      } finally {
+        setDataLoading(false);
+      }
+    };
+    void loadData();
+  }, [user, role]);
 
   if (loading)
-    return (
-      <div className="pt-40 pb-24 px-6 min-h-screen text-center">
-        Loading...
-      </div>
-    );
+    return <div className="pt-40 pb-24 px-6 min-h-screen text-center text-white">Loading...</div>;
 
   if (!user || role !== "admin") {
     return (
       <div className="pt-40 pb-24 px-6 flex flex-col items-center min-h-screen text-center">
         <Shield className="w-16 h-16 text-brand-purple mx-auto mb-6" />
-        <h1 className="text-4xl font-black mb-4">Access Denied</h1>
-        <p className="text-white/40">
-          You do not have administrative privileges.
-        </p>
+        <h1 className="text-4xl font-black mb-4 text-white">Access Denied</h1>
+        <p className="text-white/40">You do not have administrative privileges.</p>
       </div>
     );
   }
 
+  const statCards = [
+    { label: "Total Revenue", value: `$${stats.revenue.toFixed(2)}`, icon: BarChart3, color: "text-cyan-400" },
+    { label: "Total Users", value: String(stats.users), icon: User, color: "text-purple-400" },
+    { label: "Sites Generated", value: String(stats.sites), icon: Layout, color: "text-blue-400" },
+    { label: "Paid Orders", value: String(stats.orders), icon: CreditCard, color: "text-green-400" },
+  ];
+
   return (
-    <div className="pt-32 pb-20 px-6 lg:px-12 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="text-4xl font-extrabold italic tracking-tight underline decoration-brand-purple underline-offset-8">
-            Admin Nexus
-          </h1>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          {[
-            {
-              label: "Total Revenue",
-              value: "$0.00",
-              icon: BarChart3,
-              color: "text-brand-cyan",
-            },
-            {
-              label: "Total Users",
-              value: "0",
-              icon: User,
-              color: "text-brand-purple",
-            },
-            {
-              label: "Sites Generated",
-              value: "0",
-              icon: Layout,
-              color: "text-brand-blue",
-            },
-            {
-              label: "Pending Support",
-              value: "0",
-              icon: MessageSquare,
-              color: "text-green-400",
-            },
-          ].map((stat, i) => (
-            <div key={i} className="glass p-8 rounded-[2.5rem]">
-              <stat.icon className={cn("w-8 h-8 mb-4", stat.color)} />
-              <p className="text-[10px] uppercase font-black tracking-widest text-white/20 mb-1">
-                {stat.label}
-              </p>
-              <p className="text-2xl font-black">{stat.value}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="glass p-8 rounded-[3rem]">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 italic">
-              <CreditCard className="w-5 h-5 text-brand-cyan" /> Recent Orders
-            </h2>
-            <div className="space-y-4">
-              <p className="text-white/40 text-sm">No recent orders found.</p>
-            </div>
+    <div className="pt-32 pb-20 px-6 lg:px-12 min-h-screen bg-black">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-extrabold italic tracking-tight text-white underline decoration-purple-500 underline-offset-8">
+              Admin Nexus
+            </h1>
+            <p className="text-slate-400 text-sm mt-1">Signed in as {user.email}</p>
           </div>
-          <div className="glass p-8 rounded-[3rem]">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 italic">
-              <Zap className="w-5 h-5 text-brand-purple" /> Live Activity
+          <div className="flex gap-3">
+            <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer"
+              className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg text-sm hover:bg-indigo-700 transition">
+              Stripe ↗
+            </a>
+            <a href="https://console.firebase.google.com/project/gen-lang-client-0914367944" target="_blank" rel="noreferrer"
+              className="px-4 py-2 bg-orange-600 text-white font-semibold rounded-lg text-sm hover:bg-orange-700 transition">
+              Firebase ↗
+            </a>
+            <a href="https://dash.cloudflare.com" target="_blank" rel="noreferrer"
+              className="px-4 py-2 bg-yellow-600 text-white font-semibold rounded-lg text-sm hover:bg-yellow-700 transition">
+              Cloudflare ↗
+            </a>
+          </div>
+        </div>
+
+        {dataLoading ? (
+          <div className="text-slate-400 text-sm animate-pulse">Loading live data from Firebase...</div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {statCards.map((s, i) => (
+              <div key={i} className="glass p-6 rounded-[2rem] border border-white/5">
+                <s.icon className={cn("w-7 h-7 mb-3", s.color)} />
+                <p className="text-[10px] uppercase font-black tracking-widest text-white/30 mb-1">{s.label}</p>
+                <p className="text-3xl font-black text-white">{s.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="glass p-6 rounded-[2rem] border border-white/5">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-white italic">
+              <CreditCard className="w-5 h-5 text-cyan-400" /> Recent Orders
             </h2>
-            <div className="space-y-4">
-              <p className="text-white/40 text-sm">No recent activity.</p>
+            {recentOrders.length === 0 ? (
+              <p className="text-white/30 text-sm">No orders yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {recentOrders.map((o: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 text-sm">
+                    <div>
+                      <span className="text-white font-semibold">{o.email || o.userId || "—"}</span>
+                      <span className="ml-2 text-slate-400">{o.plan || "—"}</span>
+                    </div>
+                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-bold",
+                      o.status === "paid" || o.status === "active" ? "bg-green-500/20 text-green-300" : "bg-yellow-500/20 text-yellow-300"
+                    )}>{o.status || "pending"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="glass p-6 rounded-[2rem] border border-white/5">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-white italic">
+              <User className="w-5 h-5 text-purple-400" /> Recent Users
+            </h2>
+            {recentUsers.length === 0 ? (
+              <p className="text-white/30 text-sm">No users yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {recentUsers.map((u: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 text-sm">
+                    <span className="text-white">{u.email || u.username || "—"}</span>
+                    <span className="text-slate-400 text-xs">{u.plan || "free"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="glass p-6 rounded-[2rem] border border-white/5">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-white italic">
+            <Zap className="w-5 h-5 text-purple-400" /> Live Activity Feed
+          </h2>
+          {activity.length === 0 ? (
+            <p className="text-white/30 text-sm">No recent activity.</p>
+          ) : (
+            <div className="space-y-2">
+              {activity.map((a: any, i: number) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 text-sm">
+                  <div className="flex items-center gap-3">
+                    <span className={cn("w-2 h-2 rounded-full flex-shrink-0",
+                      a.type === "order" ? "bg-green-400" : "bg-blue-400"
+                    )} />
+                    <span className="text-white">{a.label}</span>
+                  </div>
+                  <span className="text-slate-500 text-xs">{a.time}</span>
+                </div>
+              ))}
             </div>
+          )}
+        </div>
+
+        <div className="glass p-6 rounded-[2rem] border border-white/5">
+          <h2 className="text-lg font-bold mb-4 text-white italic">Quick Links</h2>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { label: "Stripe Payments", url: "https://dashboard.stripe.com/payments" },
+              { label: "Stripe Customers", url: "https://dashboard.stripe.com/customers" },
+              { label: "Firebase Auth Users", url: "https://console.firebase.google.com/project/gen-lang-client-0914367944/authentication/users" },
+              { label: "Firebase Firestore", url: "https://console.firebase.google.com/project/gen-lang-client-0914367944/firestore" },
+              { label: "Cloudflare Analytics", url: "https://dash.cloudflare.com" },
+              { label: "Google Analytics", url: "https://analytics.google.com" },
+              { label: "AdSense", url: "https://adsense.google.com" },
+            ].map((link: any, i: number) => (
+              <a key={i} href={link.url} target="_blank" rel="noreferrer"
+                className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white hover:bg-white/10 transition">
+                {link.label} ↗
+              </a>
+            ))}
           </div>
         </div>
       </div>

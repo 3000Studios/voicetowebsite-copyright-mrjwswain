@@ -1,6 +1,6 @@
 import { CinematicHero } from "@/components/CinematicHero";
 import { FeaturesV2 } from "@/components/FeaturesV2";
-import VoiceGenerator from "@/components/VoiceGenerator";
+import { PlaygroundGenerator } from "@/components/PlaygroundGenerator";
 import { ArrowRight, Heart, Target, Users } from "lucide-react";
 import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 import { motion } from "motion/react";
@@ -115,7 +115,7 @@ export const Home = () => {
                 compare.
               </p>
             </div>
-            <VoiceGenerator mode="preview" />
+            <PlaygroundGenerator />
           </div>
         </section>
 
