@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Waveform } from "./BrandSystem";
 
 interface VideoHeroProps {
-  videoSrc: string;
+  videoSrc?: string;
+  videoUrl?: string;
   title?: string;
   subtitle?: string;
   ctaText?: string;
@@ -15,6 +16,7 @@ interface VideoHeroProps {
 
 export const VideoHero: React.FC<VideoHeroProps> = ({
   videoSrc,
+  videoUrl,
   title,
   subtitle,
   ctaText,
@@ -60,7 +62,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
       {!videoFailed ? (
         <video
           ref={videoRef}
-          src={videoSrc}
+          src={videoUrl || videoSrc}
           autoPlay
           muted
           loop

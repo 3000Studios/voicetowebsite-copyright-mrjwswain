@@ -11,11 +11,14 @@ PROJECT OPERATING RULES
 9. Prioritize automation, speed, and working output.
 10. Do not ask unnecessary questions — implement and verify.
 
+11. Review relevant existing code before making changes in any environment.
+12. Use `npm run deploy` or `npm run deploy:prod` for production deployment; both must call Cloudflare Wrangler.
+
 Workspace root:
 C:\Workspaces\voicetowebsite
 
 Primary deployment:
-Cloudflare Pages
+Cloudflare Pages via Cloudflare Wrangler only
 
 Repository:
 https://github.com/3000Studios/voicetowebsite-copyright-mrjwswain

@@ -8,7 +8,7 @@ declare global {
 
 const AD_CLIENT = "ca-pub-5800977493749262";
 
-export const GoogleAdSense = ({ slot }: { slot?: string }) => {
+export const GoogleAdSense = ({ slot, className = "" }: { slot?: string; className?: string }) => {
   const adRef = useRef<HTMLDivElement>(null);
   const pushedRef = useRef(false);
   const isLocalPreview =
@@ -30,7 +30,7 @@ export const GoogleAdSense = ({ slot }: { slot?: string }) => {
   }, [slot, isLocalPreview]);
 
   return (
-    <div className="content-grid py-6" data-vtw-ad-slot={slot || "default-slot"}>
+    <div className={`content-grid py-6 ${className}`} data-vtw-ad-slot={slot || "default-slot"}>
       <div
         ref={adRef}
         className="min-h-[180px] rounded-[28px] border border-white/10 bg-white/4 p-4 backdrop-blur-xl"

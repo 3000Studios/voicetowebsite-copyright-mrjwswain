@@ -265,7 +265,7 @@ export const PricingSection = () => {
       ],
     },
     {
-      id: "ultimate",
+      id: "enterprise",
       name: "Ultimate",
       price: "49.99",
       commands: "500",
@@ -292,7 +292,7 @@ export const PricingSection = () => {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId, returnUrl: window.location.origin }),
+        body: JSON.stringify({ plan: planId, cadence: "month" }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {

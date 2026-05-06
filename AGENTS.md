@@ -17,10 +17,13 @@ At the beginning of each project or session:
 5. Confirm there is exactly one production branch: `main`.
 6. Inspect environment needs through `C:\Users\Servi\.config\env\global.env`.
 7. Optimize local tooling and project configuration for production output.
+8. Review relevant existing code before making any edits in any environment.
+9. Treat Cloudflare Wrangler as the deployment path for every production change.
 
 ## Version Control and Deployment
 
 - `main` is the live production branch.
+- All production deploys must go through Cloudflare Wrangler commands, preferably `npm run deploy` or `npm run deploy:prod`.
 - Successful changes must be tested, committed, pushed, deployed, and verified by the agent.
 - Pushes to `main` should trigger production deployment.
 - Deployments must publish to the live custom production domain, not a development domain.

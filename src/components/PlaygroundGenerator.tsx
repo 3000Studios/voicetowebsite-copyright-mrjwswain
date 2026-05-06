@@ -19,6 +19,17 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
+type BrowserSpeechRecognition = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
 interface Variation {
   id: string;
   name: string;
@@ -89,19 +100,19 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
   const [media, setMedia] = useState<MediaResult | null>(null);
   const [loadStage, setLoadStage] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
 
   const activeVariation = variations[activeIdx] ?? null;
 
   const startListening = useCallback(() => {
-    const SR = (window as unknown as Record<string, unknown>).SpeechRecognition as (new () => SpeechRecognition) | undefined
-      || (window as unknown as Record<string, unknown>).webkitSpeechRecognition as (new () => SpeechRecognition) | undefined;
+    const SR = (window as unknown as Record<string, unknown>).SpeechRecognition as (new () => BrowserSpeechRecognition) | undefined
+      || (window as unknown as Record<string, unknown>).webkitSpeechRecognition as (new () => BrowserSpeechRecognition) | undefined;
     if (!SR) { alert("Voice input is not supported in this browser. Please use Chrome."); return; }
     const rec = new SR();
     rec.lang = "en-US";
     rec.continuous = false;
     rec.interimResults = false;
-    rec.onresult = (e: SpeechRecognitionEvent) => {
+    rec.onresult = (e) => {
       const t = e.results[0][0].transcript;
       setPrompt((prev) => prev ? `${prev} ${t}` : t);
       setIsListening(false);

@@ -7,6 +7,8 @@
 ## Always Do
 
 - Use TypeScript for new code
+- Review the relevant code before editing or deploying
+- Deploy production changes with Cloudflare Wrangler through `npm run deploy` or `npm run deploy:prod`
 - Add types to all functions and variables
 - Use async/await over callbacks
 - Keep functions under 50 lines
@@ -20,6 +22,7 @@
 
 - Never commit secrets or API keys
 - Never modify Cloudflare credentials
+- Never deploy this project through Firebase, Netlify, Vercel, manual zip uploads, or any path other than Cloudflare Wrangler unless the owner explicitly overrides it
 - Never delete tests without approval
 - Never push broken builds to main
 - Never use `any` type in TypeScript

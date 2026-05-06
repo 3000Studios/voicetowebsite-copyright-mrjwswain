@@ -12,10 +12,8 @@
     "readFiles",
     "editFiles",
     "createFiles",
-    "deleteFiles",
     "runCommands",
-    "browserControl",
-    "systemAccess"
+    "browserControl"
   ],
   "cline.mcpServers": {
     "filesystem": true,
@@ -27,7 +25,7 @@
     "cloudflare": true,
     "docker": false,
     "npm-modules": false,
-    "stripe": false
+    "stripe": true
   },
   "cline.environment": {
     "CLOUDFLARE_API_TOKEN": "${CLOUDFLARE_API_TOKEN}",
@@ -57,11 +55,11 @@
     "imageAnalysis": "ollama/qwen2.5-coder:7b"
   },
   "cline.shortcuts": {
-    "deployProduction": "npm run deploy && npm run pages:deploy",
+    "deployProduction": "npm run deploy:prod",
     "lintAndTest": "npm run lint && npm run test",
     "buildAndTest": "npm run build && npm run test",
     "gitSync": "git pull origin main && git push origin main",
-    "installDeps": "npm install && pip install -r requirements.txt"
+    "installDeps": "npm install"
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -171,5 +169,5 @@
     "sonarsource.sonarlint-vscode"
   ],
   "security.workspace.trust.untrustedFiles": "prompt",
-  "security.workspace.trust.enabled": false
+  "security.workspace.trust.enabled": true
 }
