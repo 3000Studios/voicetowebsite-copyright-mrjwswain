@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
@@ -26,20 +26,20 @@ interface ExampleSite {
   html: string;
   liveUrl?: string;
   badgeText?: string;
+  isGenerated?: boolean;
 }
 
-const exampleSites: ExampleSite[] = [
+// ── Static curated examples ───────────────────────────────────────────────────
+const STATIC_EXAMPLES: ExampleSite[] = [
   {
     id: "coach-consultant",
     title: "Elite Coaching",
     category: "Coach / Consultant",
-    description:
-      "Premium coaching business with booking integration and testimonials.",
+    description: "Premium coaching business with booking integration and testimonials.",
     previewImage: "/examples/coach.jpg",
     color: "from-indigo-500/20 to-purple-500/10",
-    prompt:
-      'A premium coaching website with dark navy theme, hero section with headline "Transform Your Life", booking calendar integration, testimonials section, and contact form.',
-    html: `<!DOCTYPE html><html><head><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:40px;background:#0d0d1f;color:white;}</style></head><body><h1>Elite Coaching</h1><p>Premium coaching services.</p></body></html>`,
+    prompt: 'A premium coaching website with dark navy theme, hero section with headline "Transform Your Life", booking calendar integration, testimonials section, and contact form.',
+    html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Elite Coaching</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#0d0d1f;color:#fff;overflow-x:hidden}.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(135deg,#0d0d1f 0%,#1a1a3e 100%);padding:4rem 2rem}.hero h1{font-family:'Playfair Display',serif;font-size:clamp(3rem,7vw,6rem);font-weight:900;background:linear-gradient(135deg,#a855f7,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1.5rem}.hero p{font-size:1.2rem;color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 2rem}.btn{display:inline-block;padding:1rem 2.5rem;background:linear-gradient(135deg,#a855f7,#06b6d4);color:#fff;border-radius:50px;font-weight:700;text-decoration:none;font-size:1rem}section{padding:5rem 2rem;max-width:1200px;margin:0 auto}h2{font-family:'Playfair Display',serif;font-size:2.5rem;margin-bottom:2rem;color:#a855f7}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem}.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:2rem}.card h3{font-size:1.2rem;margin-bottom:.75rem;color:#06b6d4}.card p{color:rgba(255,255,255,.65);line-height:1.7}</style></head><body><div class="hero"><div><h1>Transform Your Life</h1><p>Premium coaching services to unlock your full potential and achieve extraordinary results.</p><a href="#contact" class="btn">Book Free Session</a></div></div><div style="background:#0a0a1a;padding:5rem 2rem"><section><h2>Our Services</h2><div class="grid"><div class="card"><h3>1-on-1 Coaching</h3><p>Personalized sessions tailored to your unique goals and challenges.</p></div><div class="card"><h3>Group Programs</h3><p>Join a community of high-achievers on the same transformational journey.</p></div><div class="card"><h3>Online Courses</h3><p>Self-paced learning modules you can access from anywhere, anytime.</p></div></div></section></div></body></html>`,
     liveUrl: "https://demo-coach.voicetowebsite.com",
     badgeText: "⭐ Featured Site",
   },
@@ -47,13 +47,11 @@ const exampleSites: ExampleSite[] = [
     id: "local-service",
     title: "Premier Plumbing",
     category: "Local Business",
-    description:
-      "Service business with quote forms and emergency call features.",
+    description: "Service business with quote forms and emergency call features.",
     previewImage: "/examples/local.jpg",
     color: "from-cyan-500/20 to-blue-500/10",
-    prompt:
-      "A professional plumbing service website with bright blue theme, emergency call button, service area map, quote request form, and customer reviews.",
-    html: `<!DOCTYPE html><html><head><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:40px;background:#0d1f2f;color:white;}</style></head><body><h1>Premier Plumbing</h1><p>24/7 Emergency Services.</p></body></html>`,
+    prompt: "A professional plumbing service website with bright blue theme, emergency call button, service area map, quote request form, and customer reviews.",
+    html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Premier Plumbing</title><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#0d1f2f;color:#fff}.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(135deg,#0d1f2f,#0a3d5c);padding:4rem 2rem}.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;color:#06b6d4;margin-bottom:1rem}.emergency{display:inline-block;padding:1rem 2rem;background:#ef4444;color:#fff;border-radius:50px;font-weight:700;font-size:1.1rem;margin-bottom:1rem;text-decoration:none}.btn{display:inline-block;padding:.9rem 2rem;background:#06b6d4;color:#fff;border-radius:50px;font-weight:700;text-decoration:none;margin-left:1rem}section{padding:5rem 2rem;max-width:1100px;margin:0 auto}h2{font-family:'Space Grotesk',sans-serif;font-size:2rem;color:#06b6d4;margin-bottom:2rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem}.card{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:14px;padding:1.75rem}.card h3{color:#06b6d4;margin-bottom:.5rem}.card p{color:rgba(255,255,255,.65);line-height:1.7}</style></head><body><div class="hero"><div><h1>Premier Plumbing</h1><p style="color:rgba(255,255,255,.7);font-size:1.1rem;margin-bottom:1.5rem">24/7 Emergency Service — Licensed &amp; Insured</p><a href="tel:+15550001234" class="emergency">📞 Emergency: (555) 000-1234</a><a href="#quote" class="btn">Get Free Quote</a></div></div><div style="background:#091929;padding:5rem 2rem"><section><h2>Our Services</h2><div class="grid"><div class="card"><h3>Emergency Repairs</h3><p>Available 24/7 for burst pipes, leaks, and urgent plumbing issues.</p></div><div class="card"><h3>Drain Cleaning</h3><p>Professional drain clearing for kitchens, bathrooms, and main lines.</p></div><div class="card"><h3>Water Heaters</h3><p>Installation, repair, and replacement of all water heater types.</p></div><div class="card"><h3>Pipe Installation</h3><p>New construction and remodel piping for residential and commercial.</p></div></div></section></div></body></html>`,
     liveUrl: "https://demo-plumber.voicetowebsite.com",
     badgeText: "🏆 Best Local Site",
   },
@@ -64,425 +62,225 @@ const exampleSites: ExampleSite[] = [
     description: "SaaS landing page with pricing tiers and feature comparison.",
     previewImage: "/examples/saas.jpg",
     color: "from-emerald-500/20 to-teal-500/10",
-    prompt:
-      "A modern SaaS productivity app landing page with gradient hero, feature grid, pricing table with 3 tiers, customer logos, and CTA sections.",
-    html: `<!DOCTYPE html><html><head><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:40px;background:#0d1f15;color:white;}</style></head><body><h1>TaskFlow Pro</h1><p>Boost your productivity.</p></body></html>`,
+    prompt: "A modern SaaS productivity app landing page with gradient hero, feature grid, pricing table with 3 tiers, customer logos, and CTA sections.",
+    html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TaskFlow Pro</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:#030712;color:#fff}.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at top,#064e3b 0%,#030712 60%);padding:4rem 2rem}.badge{display:inline-block;padding:.4rem 1rem;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:50px;color:#10b981;font-size:.8rem;margin-bottom:1.5rem}.hero h1{font-size:clamp(2.5rem,6vw,5.5rem);font-weight:900;margin-bottom:1.5rem;line-height:1.05}.hero h1 span{background:linear-gradient(135deg,#10b981,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.btn{display:inline-block;padding:.9rem 2.2rem;background:linear-gradient(135deg,#10b981,#06b6d4);color:#fff;border-radius:50px;font-weight:700;text-decoration:none}section{padding:5rem 2rem;max-width:1100px;margin:0 auto}h2{font-size:2.2rem;font-weight:900;margin-bottom:2rem;text-align:center}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem}.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:2rem}.price{font-size:2.5rem;font-weight:900;color:#10b981;margin:1rem 0}.price span{font-size:1rem;color:rgba(255,255,255,.4)}</style></head><body><div class="hero"><div><div class="badge">🚀 Now in Public Beta</div><h1>Work Smarter with <span>TaskFlow Pro</span></h1><p style="color:rgba(255,255,255,.65);font-size:1.1rem;max-width:550px;margin:0 auto 2rem">The AI-powered productivity platform that helps teams ship faster and stay focused.</p><a href="#pricing" class="btn">Start Free Trial</a></div></div><div style="background:#050d1a;padding:5rem 2rem"><section><h2>Simple Pricing</h2><div class="grid"><div class="card" style="text-align:center"><h3>Starter</h3><div class="price">$9<span>/mo</span></div><p style="color:rgba(255,255,255,.6)">5 projects, 2 users, core features</p></div><div class="card" style="text-align:center;border-color:rgba(16,185,129,.3)"><h3>Pro</h3><div class="price">$29<span>/mo</span></div><p style="color:rgba(255,255,255,.6)">Unlimited projects, 10 users, AI features</p></div><div class="card" style="text-align:center"><h3>Enterprise</h3><div class="price">$99<span>/mo</span></div><p style="color:rgba(255,255,255,.6)">Unlimited everything, SSO, priority support</p></div></div></section></div></body></html>`,
     liveUrl: "https://demo-saas.voicetowebsite.com",
     badgeText: "🚀 Startup Choice",
   },
-  {
-    id: "real-estate",
-    title: "Luxury Estates",
-    category: "Real Estate",
-    description: "Property showcase with listings and agent profiles.",
-    previewImage: "/examples/realestate.jpg",
-    color: "from-amber-500/20 to-orange-500/10",
-    prompt:
-      "A luxury real estate website with gold accents, property gallery, agent team section, mortgage calculator, and contact forms.",
-    html: `<!DOCTYPE html><html><head><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:40px;background:#1f1a0d;color:white;}</style></head><body><h1>Luxury Estates</h1><p>Find your dream home.</p></body></html>`,
-    liveUrl: "https://demo-realestate.voicetowebsite.com",
-    badgeText: "🏠 Top Real Estate",
-  },
-  {
-    id: "restaurant",
-    title: "Bistro Central",
-    category: "Restaurant",
-    description: "Restaurant with menu, reservations, and location info.",
-    previewImage: "/examples/restaurant.jpg",
-    color: "from-rose-500/20 to-red-500/10",
-    prompt:
-      "An elegant restaurant website with warm colors, full menu display, online reservation system, chef profiles, and location map.",
-    html: `<!DOCTYPE html><html><head><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:40px;background:#1f0d0d;color:white;}</style></head><body><h1>Bistro Central</h1><p>Fine dining experience.</p></body></html>`,
-    liveUrl: "https://demo-restaurant.voicetowebsite.com",
-    badgeText: "🍽️ Top Restaurant",
-  },
-  {
-    id: "fitness",
-    title: "PowerFit Gym",
-    category: "Fitness",
-    description: "Gym website with class schedules and membership plans.",
-    previewImage: "/examples/fitness.jpg",
-    color: "from-violet-500/20 to-fuchsia-500/10",
-    prompt:
-      "A high-energy gym website with bold typography, class schedule, trainer profiles, membership pricing, and before/after gallery.",
-    html: `<!DOCTYPE html><html><head><style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:40px;background:#1a0d1f;color:white;}</style></head><body><h1>PowerFit Gym</h1><p>Transform your body.</p></body></html>`,
-    liveUrl: "https://demo-gym.voicetowebsite.com",
-    badgeText: "💪 Top Fitness",
-  },
 ];
 
-const categories = [
-  "All",
-  "Coach / Consultant",
-  "Local Business",
-  "Product / SaaS",
-  "Real Estate",
-  "Restaurant",
-  "Fitness",
-];
+// ── Component ─────────────────────────────────────────────────────────────────
 
-export const Examples = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedExample, setSelectedExample] = useState<ExampleSite | null>(
-    null,
-  );
-  const [viewMode, setViewMode] = useState<"preview" | "code">("preview");
+export default function Examples() {
+  const [selectedSite, setSelectedSite] = useState<ExampleSite | null>(null);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [allSites, setAllSites] = useState<ExampleSite[]>(STATIC_EXAMPLES);
 
-  const filteredExamples =
-    selectedCategory === "All"
-      ? exampleSites
-      : exampleSites.filter((e) => e.category === selectedCategory);
+  // Load AI-generated examples from localStorage
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("vtw_examples") || "[]") as Array<{
+        id: string; prompt: string; name: string; html: string; imageUrl: string; savedAt: string;
+      }>;
+      if (stored.length) {
+        const generated: ExampleSite[] = stored.map((e) => ({
+          id: e.id,
+          title: e.name,
+          category: "AI Generated",
+          description: e.prompt.slice(0, 100) + (e.prompt.length > 100 ? "..." : ""),
+          previewImage: e.imageUrl,
+          color: "from-cyan-500/20 to-violet-500/10",
+          prompt: e.prompt,
+          html: e.html,
+          badgeText: "✨ AI Generated",
+          isGenerated: true,
+        }));
+        setAllSites([...generated, ...STATIC_EXAMPLES]);
+      }
+    } catch { /* non-critical */ }
+  }, []);
+
+  const categories = ["All", "AI Generated", "Coach / Consultant", "Local Business", "Product / SaaS", "Real Estate", "Restaurant", "Fitness"];
+
+  const filtered = activeCategory === "All"
+    ? allSites
+    : allSites.filter((s) => s.category === activeCategory);
 
   return (
-    <div className="relative">
+    <>
       <Helmet>
-        <title>Examples | VoiceToWebsite - Website Showcase</title>
-        <meta
-          name="description"
-          content="See real websites built with VoiceToWebsite AI. Browse examples for coaches, businesses, SaaS, and more."
-        />
+        <title>Website Examples | VoiceToWebsite.com</title>
+        <meta name="description" content="Browse premium AI-generated website examples across every industry. See what VoiceToWebsite.com can build for your business." />
       </Helmet>
 
-      {/* Hero with Video */}
       <VideoHero
-        videoSrc="/videos/Vocietowebsite.com-video-black-woman.mp4"
-        title="Website Showcase"
-        subtitle="Real websites built with voice commands and AI"
-        overlayOpacity={0.6}
-        showControls={false}
+        title="Premium Website Examples"
+        subtitle="Every site below was generated from a voice or text prompt — fully coded, fully custom."
+        videoUrl="https://cdn.coverr.co/videos/coverr-working-in-a-modern-office-1565/1080p.mp4"
       />
 
-      {/* Main Content */}
-      <div className="relative z-10 bg-[#05070b]">
-        {/* AdSense */}
-        <div className="pt-8">
-          <GoogleAdSense slot="examples-top" />
-        </div>
-
-        {/* Category Filter */}
-        <section className="section-shell pb-12">
-          <div className="content-grid">
-            <ScrollReveal className="text-center mb-12">
-              <span className="eyebrow mb-4">Gallery</span>
-              <h2 className="section-title text-gradient mb-4">
-                Browse Examples
-              </h2>
-              <p className="section-copy max-w-2xl mx-auto">
-                Explore websites built with VoiceToWebsite across different
-                industries.
-              </p>
-            </ScrollReveal>
-
-            <div className="flex flex-wrap justify-center gap-3">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-6 py-3 rounded-full font-medium transition-all ${
-                    selectedCategory === category
-                      ? "bg-indigo-500 text-white"
-                      : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/10"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Examples Grid */}
-        <section className="section-shell pt-0">
-          <div className="content-grid">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedCategory}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Category filter */}
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                  activeCategory === cat
+                    ? "bg-gradient-to-r from-cyan-500 to-violet-600 text-white"
+                    : "border border-white/10 bg-white/5 text-white/60 hover:text-white hover:border-white/25"
+                }`}
               >
-                {filteredExamples.map((example, index) => (
-                  <motion.div
-                    key={example.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <GlassCard
-                      onClick={() => setSelectedExample(example)}
-                      className="cursor-pointer group overflow-hidden p-0 relative"
+                {cat}
+                {cat === "AI Generated" && allSites.filter((s) => s.isGenerated).length > 0 && (
+                  <span className="ml-2 bg-cyan-500/30 text-cyan-300 text-xs px-1.5 py-0.5 rounded-full">
+                    {allSites.filter((s) => s.isGenerated).length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Generate CTA */}
+          <div className="text-center mb-12">
+            <Link
+              to="/#generator"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500/20 to-violet-600/20 border border-cyan-400/30 text-white font-semibold hover:from-cyan-500/30 hover:to-violet-600/30 transition-all"
+            >
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+              Generate Your Own Preview — Free
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((site, i) => (
+              <ScrollReveal key={site.id} delay={i * 0.05}>
+                <GlassCard className={`group cursor-pointer bg-gradient-to-br ${site.color} border border-white/10 hover:border-white/25 transition-all overflow-hidden`}>
+                  {/* Preview thumbnail */}
+                  <div className="relative h-48 overflow-hidden bg-black/30">
+                    {site.html ? (
+                      <iframe
+                        srcDoc={site.html}
+                        title={site.title}
+                        className="w-full h-full border-0 pointer-events-none"
+                        style={{ transform: "scale(0.5)", transformOrigin: "top left", width: "200%", height: "200%" }}
+                        sandbox="allow-scripts"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <img src={site.previewImage} alt={site.title} className="w-full h-full object-cover" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    {site.badgeText && (
+                      <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm border border-white/15 rounded-full px-3 py-1 text-xs text-white font-semibold">
+                        {site.badgeText}
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSite(site)}
+                      className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      {/* Badge */}
-                      {example.badgeText && (
-                        <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-xs font-medium text-amber-400">
-                          {example.badgeText}
-                        </div>
-                      )}
+                      <div className="bg-black/70 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 text-white text-sm font-semibold flex items-center gap-2">
+                        <Eye className="w-4 h-4" /> Full Preview
+                      </div>
+                    </button>
+                  </div>
 
-                      {/* Preview Image Area */}
-                      <div
-                        className={`h-48 bg-linear-to-br ${example.color} relative overflow-hidden`}
+                  {/* Info */}
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="text-white font-bold text-lg leading-tight">{site.title}</h3>
+                      <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-white/60 whitespace-nowrap">{site.category}</span>
+                    </div>
+                    <p className="text-white/60 text-sm leading-relaxed mb-4">{site.description}</p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSite(site)}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs hover:text-white hover:border-white/25 transition-all"
                       >
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-500">
-                            <Eye className="w-8 h-8 text-white" />
-                          </div>
-                        </div>
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300" />
-
-                        {/* Live Demo Badge on Hover */}
-                        {example.liveUrl && (
-                          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="px-3 py-1.5 bg-cyan-500 text-white text-xs font-medium rounded-lg flex items-center gap-1.5">
-                              <ExternalLink className="w-3 h-3" />
-                              View Live Site
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
-                            {example.category}
-                          </span>
-                          {example.liveUrl && (
-                            <span className="text-[10px] px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full flex items-center gap-1">
-                              <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                              Live
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">
-                          {example.title}
-                        </h3>
-                        <p className="text-slate-400 text-sm">
-                          {example.description}
-                        </p>
-
-                        {/* Built with Badge */}
-                        <div className="mt-4 pt-4 border-t border-white/10">
-                          <span className="text-[10px] text-white/40 flex items-center gap-1.5">
-                            <Sparkles className="w-3 h-3 text-cyan-400" />
-                            Built with VoiceToWebsite
-                          </span>
-                        </div>
-                      </div>
-                    </GlassCard>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section className="section-shell bg-linear-to-b from-transparent via-white/2 to-transparent">
-          <div className="content-grid">
-            <ScrollReveal className="text-center mb-16">
-              <span className="eyebrow mb-4">Success Stories</span>
-              <h2 className="section-title text-gradient mb-4">
-                What Our Users Say
-              </h2>
-            </ScrollReveal>
-
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  quote:
-                    "I literally described my coaching business to my phone and had a professional website 3 minutes later. Unbelievable.",
-                  author: "Sarah Mitchell",
-                  role: "Business Coach",
-                },
-                {
-                  quote:
-                    "We needed a landing page for a product launch by morning. VoiceToWebsite delivered in 5 minutes. The quality was outstanding.",
-                  author: "Marcus Chen",
-                  role: "Startup Founder",
-                },
-                {
-                  quote:
-                    "As a non-tech person, this is a dream come true. I just speak what I need and it appears. My clients love my new site.",
-                  author: "Jennifer Rodriguez",
-                  role: "Real Estate Agent",
-                },
-              ].map((testimonial, index) => (
-                <ScrollReveal key={index} delay={index * 0.1}>
-                  <GlassCard className="h-full">
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Sparkles key={i} className="w-4 h-4 text-amber-400" />
-                      ))}
+                        <Eye className="w-3.5 h-3.5" /> Preview
+                      </button>
+                      {site.liveUrl && (
+                        <a
+                          href={site.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 text-xs hover:text-white hover:border-white/25 transition-all"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" /> Live
+                        </a>
+                      )}
                     </div>
-                    <p className="text-white/90 mb-6 leading-relaxed">
-                      "{testimonial.quote}"
-                    </p>
-                    <div>
-                      <div className="font-bold text-white">
-                        {testimonial.author}
-                      </div>
-                      <div className="text-slate-400 text-sm">
-                        {testimonial.role}
-                      </div>
-                    </div>
-                  </GlassCard>
-                </ScrollReveal>
-              ))}
-            </div>
+                  </div>
+                </GlassCard>
+              </ScrollReveal>
+            ))}
           </div>
-        </section>
 
-        {/* CTA */}
-        <section className="section-shell pb-32">
-          <div className="content-grid">
-            <ScrollReveal>
-              <div className="rounded-[40px] border border-white/10 bg-linear-to-br from-indigo-500/10 via-white/5 to-cyan-500/10 backdrop-blur-2xl p-12 md:p-20 text-center">
-                <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
-                  Build Yours Today
-                </h2>
-                <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
-                  Join thousands of creators who have launched their websites
-                  with VoiceToWebsite.
-                </p>
-                <Link
-                  to="/pricing"
-                  className="hero-primary-button text-lg px-10 py-5 inline-flex"
-                >
-                  Launch your site
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-      </div>
+          <GoogleAdSense slot="examples-bottom" className="mt-16" />
+        </div>
+      </section>
 
-      {/* Modal */}
+      {/* Full-screen preview modal */}
       <AnimatePresence>
-        {selectedExample && (
+        {selectedSite && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-            onClick={() => setSelectedExample(null)}
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-5xl max-h-[90vh] overflow-auto rounded-[32px] border border-white/10 bg-[#0d0d1f]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-white/10">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/60 flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <Code2 className="w-5 h-5 text-cyan-400" />
                 <div>
-                  <h3 className="text-2xl font-bold text-white">
-                    {selectedExample.title}
-                  </h3>
-                  <p className="text-slate-400 text-sm">
-                    {selectedExample.category}
-                  </p>
+                  <h3 className="text-white font-bold">{selectedSite.title}</h3>
+                  <p className="text-white/50 text-xs">{selectedSite.category}</p>
                 </div>
-                <button
-                  onClick={() => setSelectedExample(null)}
-                  className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/pricing"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition-all"
                 >
-                  <X className="w-6 h-6 text-slate-400" />
+                  Get This Site
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSite(null)}
+                  className="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/70 hover:text-white transition-all"
+                >
+                  <X className="w-4 h-4" />
                 </button>
               </div>
+            </div>
 
-              {/* View Toggle */}
-              <div className="flex gap-2 p-4 border-b border-white/10">
-                <button
-                  onClick={() => setViewMode("preview")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    viewMode === "preview"
-                      ? "bg-indigo-500 text-white"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <Eye className="w-4 h-4" />
-                  Preview
-                </button>
-                <button
-                  onClick={() => setViewMode("code")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    viewMode === "code"
-                      ? "bg-indigo-500 text-white"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <Code2 className="w-4 h-4" />
-                  Code
-                </button>
-              </div>
+            {/* Scrollable iframe */}
+            <div className="flex-1 overflow-hidden relative">
+              <iframe
+                srcDoc={selectedSite.html}
+                title={`Full preview: ${selectedSite.title}`}
+                className="w-full h-full border-0"
+                sandbox="allow-scripts allow-same-origin"
+              />
+            </div>
 
-              {/* Content */}
-              <div className="p-6">
-                {viewMode === "preview" ? (
-                  <div className="aspect-video rounded-2xl overflow-hidden border border-white/10 bg-white">
-                    <iframe
-                      srcDoc={selectedExample.html}
-                      className="w-full h-full"
-                      title={selectedExample.title}
-                    />
-                  </div>
-                ) : (
-                  <pre className="aspect-video overflow-auto rounded-2xl bg-slate-950 p-6 text-sm text-slate-300 font-mono">
-                    {selectedExample.html}
-                  </pre>
-                )}
-
-                {/* Prompt */}
-                <div className="mt-6 p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2 block">
-                    Prompt Used
-                  </span>
-                  <p className="text-slate-300">{selectedExample.prompt}</p>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="flex justify-between items-center p-6 border-t border-white/10">
-                <div className="flex gap-3">
-                  {selectedExample.liveUrl && (
-                    <a
-                      href={selectedExample.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/20 text-cyan-400 font-medium hover:bg-cyan-500/30 transition-colors border border-cyan-500/30"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      View Live Site
-                    </a>
-                  )}
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setSelectedExample(null)}
-                    className="px-6 py-3 rounded-xl text-slate-400 hover:text-white transition-colors"
-                  >
-                    Close
-                  </button>
-                  <Link
-                    to="/pricing"
-                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition-colors"
-                  >
-                    Build Similar
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
+            {/* Prompt bar */}
+            <div className="px-6 py-3 border-t border-white/10 bg-black/60 flex-shrink-0">
+              <p className="text-xs text-white/40 mb-1">Prompt used:</p>
+              <p className="text-white/70 text-sm italic">"{selectedSite.prompt}"</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
-};
-
-export default Examples;
+}

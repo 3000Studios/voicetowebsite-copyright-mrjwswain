@@ -1,553 +1,359 @@
-import { AnimatePresence, motion } from "framer-motion";
+/**
+ * PlaygroundGenerator — VoiceToWebsite.com
+ * Upgraded: full premium HTML previews via /api/generate, scrollable iframe, watermark, media fetching, save-to-examples
+ */
+import { AnimatePresence, motion } from "motion/react";
 import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
   Eye,
   Keyboard,
   Loader2,
   Mic,
   MicOff,
+  Save,
   Send,
   Sparkles,
-  Volume2,
-  Wand2,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-interface GeneratedPreview {
-  siteName: string;
-  heroHeadline: string;
-  heroSubhead: string;
-  heroVideoUrl: string;
-  heroImageUrl: string;
-  gallery: string[];
-  headingFont: string;
-  bodyFont: string;
-  accentA: string;
-  accentB: string;
-  headlineEffect: string;
-  sectionTitle: string;
-  sectionCopy: string;
-  features: string[];
-  cta: string;
+interface Variation {
+  id: string;
+  name: string;
+  mood: string;
+  fontPair: string;
+  palette: string[];
+  qualityScore: number;
+  html: string;
 }
 
-type PreviewVariant = {
-  label: "Luxury" | "Minimal" | "Bold";
-  preview: GeneratedPreview;
-};
+interface MediaResult {
+  imageUrl: string;
+  gallery: string[];
+  videoUrl: string;
+}
 
 const EXAMPLE_PROMPTS = [
   "Create a luxury salon website for Halo Beauty Studio with a hero video and booking section",
   "Build a fitness landing page for Iron Pulse Gym with bold neon colors and trainer highlights",
   "Make a modern coffee website for Ember Roast with warm tones and product cards",
+  "Design a law firm website for Sterling Legal Group with a dark professional theme",
+  "Create a restaurant website for Casa Fuego with a vibrant food gallery and reservation form",
 ];
 
-function extractSiteName(prompt: string) {
-  const cleaned = prompt.trim();
-  const forMatch = cleaned.match(/\bfor\s+([a-z0-9&\-\s]{3,60})/i);
-  if (forMatch?.[1]) return forMatch[1].trim().replace(/[.,;:!?]+$/, "");
-  const calledMatch = cleaned.match(/\bcalled\s+([a-z0-9&\-\s]{3,60})/i);
-  if (calledMatch?.[1])
-    return calledMatch[1].trim().replace(/[.,;:!?]+$/, "");
-  return cleaned
-    .split(" ")
-    .slice(0, 4)
-    .join(" ")
-    .replace(/[.,;:!?]+$/, "") || "Your Custom Website";
-}
-
-function buildCustomCopy(prompt: string, siteName: string) {
-  const topic = prompt.toLowerCase();
-  const isSalon = topic.includes("salon") || topic.includes("beauty");
-  const isGym = topic.includes("gym") || topic.includes("fitness");
-  const isCoffee = topic.includes("coffee") || topic.includes("cafe");
-  const isRestaurant = topic.includes("restaurant") || topic.includes("food");
-
-  if (isSalon) {
-    return {
-      heroHeadline: `${siteName} — Premium Beauty Experiences`,
-      heroSubhead: `Premium beauty experiences by ${siteName}`,
-      sectionTitle: "Crafted Beauty Services",
-      sectionCopy:
-        "From signature styling to treatment packages, every service block is tuned for appointment conversion and brand trust.",
-      cta: "Book Your Session",
-      features: ["Service Catalog", "Stylist Profiles", "Client Reviews", "Booking CTA"],
-    };
-  }
-  if (isGym) {
-    return {
-      heroHeadline: `${siteName} — High-Performance Training`,
-      heroSubhead: `High-performance training at ${siteName}`,
-      sectionTitle: "Built for Strong Conversions",
-      sectionCopy:
-        "This landing layout spotlights offers, class blocks, and trainer credibility so visitors move from browsing to sign-up fast.",
-      cta: "Start Membership",
-      features: ["Program Blocks", "Coach Highlights", "Membership Plans", "Lead Capture"],
-    };
-  }
-  if (isCoffee) {
-    return {
-      heroHeadline: `${siteName} — Fresh Craft Coffee`,
-      heroSubhead: `Fresh craft coffee by ${siteName}`,
-      sectionTitle: "Menu + Story in One Flow",
-      sectionCopy:
-        "A conversion-first coffee layout that blends story, featured drinks, and clear ordering actions in a premium visual style.",
-      cta: "Order Online",
-      features: ["Featured Drinks", "Brand Story", "Location/Hours", "Order CTA"],
-    };
-  }
-  if (isRestaurant) {
-    return {
-      heroHeadline: `${siteName} — Elevated Dining`,
-      heroSubhead: `Elevated dining from ${siteName}`,
-      sectionTitle: "Reservation-Driven Layout",
-      sectionCopy:
-        "The page structure is designed to move visitors into reservation intent while showcasing atmosphere and signature plates.",
-      cta: "Reserve Table",
-      features: ["Signature Menu", "Chef Story", "Reservation CTA", "Gallery"],
-    };
-  }
+async function fetchMedia(query: string): Promise<MediaResult> {
+  try {
+    const res = await fetch(`/api/media?q=${encodeURIComponent(query)}`);
+    if (res.ok) return (await res.json()) as MediaResult;
+  } catch { /* fall through */ }
   return {
-    heroHeadline: `${siteName} — Built for Growth`,
-    heroSubhead: `Custom digital presence for ${siteName}`,
-    sectionTitle: "AI-Crafted Landing Experience",
-    sectionCopy:
-      "This preview is generated from your exact prompt with dynamic media, branded hierarchy, and conversion-oriented section flow.",
-    cta: "Launch This Site",
-    features: ["Hero Video", "Custom Brand Header", "Prompt-Based Copy", "Conversion CTA"],
+    imageUrl: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    gallery: [
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=800&q=80",
+    ],
+    videoUrl: "https://cdn.coverr.co/videos/coverr-working-in-a-modern-office-1565/1080p.mp4",
   };
 }
 
-export function PlaygroundGenerator({
-  variant = "default",
-}: {
-  variant?: "default" | "hero";
-}) {
-  const isHero = variant === "hero";
-  const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedPreview, setGeneratedPreview] =
-    useState<GeneratedPreview | null>(null);
-  const [variants, setVariants] = useState<PreviewVariant[]>([]);
-  const [selectedVariant, setSelectedVariant] = useState<"Luxury" | "Minimal" | "Bold" | null>(null);
-  const [activeStep, setActiveStep] = useState(0);
-  const [inputMode, setInputMode] = useState<"voice" | "text">("text");
-  const [textInput, setTextInput] = useState("");
-  const recognitionRef = useRef<any>(null);
-  const sourcePrompt = useMemo(
-    () => (transcript || textInput).trim(),
-    [transcript, textInput],
-  );
+function saveToExamples(prompt: string, variation: Variation, media: MediaResult): void {
+  try {
+    const stored = JSON.parse(localStorage.getItem("vtw_examples") || "[]") as Array<{
+      id: string; prompt: string; name: string; html: string; imageUrl: string; savedAt: string;
+    }>;
+    const entry = {
+      id: `gen-${Date.now()}`,
+      prompt,
+      name: variation.name,
+      html: variation.html,
+      imageUrl: media.imageUrl,
+      savedAt: new Date().toISOString(),
+    };
+    const filtered = stored.filter((e) => e.prompt !== prompt);
+    filtered.unshift(entry);
+    localStorage.setItem("vtw_examples", JSON.stringify(filtered.slice(0, 50)));
+  } catch { /* non-critical */ }
+}
 
-  useEffect(() => {
-    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.onresult = (event: any) => {
-        let finalTranscript = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          }
-        }
-        if (finalTranscript) setTranscript((prev) => `${prev} ${finalTranscript}`.trim());
-      };
-      recognitionRef.current.onerror = () => setIsRecording(false);
-      recognitionRef.current.onend = () => setIsRecording(false);
-    }
+export function PlaygroundGenerator({ variant = "default" }: { variant?: "default" | "hero" }) {
+  const [prompt, setPrompt] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [variations, setVariations] = useState<Variation[]>([]);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [inputMode, setInputMode] = useState<"voice" | "text">("text");
+  const [isListening, setIsListening] = useState(false);
+  const [savedMsg, setSavedMsg] = useState("");
+  const [media, setMedia] = useState<MediaResult | null>(null);
+  const [loadStage, setLoadStage] = useState(0);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  const activeVariation = variations[activeIdx] ?? null;
+
+  const startListening = useCallback(() => {
+    const SR = (window as unknown as Record<string, unknown>).SpeechRecognition as (new () => SpeechRecognition) | undefined
+      || (window as unknown as Record<string, unknown>).webkitSpeechRecognition as (new () => SpeechRecognition) | undefined;
+    if (!SR) { alert("Voice input is not supported in this browser. Please use Chrome."); return; }
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      const t = e.results[0][0].transcript;
+      setPrompt((prev) => prev ? `${prev} ${t}` : t);
+      setIsListening(false);
+    };
+    rec.onerror = () => setIsListening(false);
+    rec.onend = () => setIsListening(false);
+    recognitionRef.current = rec;
+    rec.start();
+    setIsListening(true);
   }, []);
 
-  const fetchDynamicMedia = async (queryText: string) => {
-    try {
-      const res = await fetch(`/api/media?q=${encodeURIComponent(queryText)}`);
-      if (!res.ok) return null;
-      return (await res.json()) as {
-        imageUrl?: string;
-        videoUrl?: string;
-        gallery?: string[];
-      };
-    } catch {
-      return null;
-    }
-  };
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
 
-  const fetchPreviewStyle = async (queryText: string) => {
+  const handleGenerate = useCallback(async (overridePrompt?: string) => {
+    const p = (overridePrompt ?? prompt).trim();
+    if (!p || isLoading) return;
+    setIsLoading(true);
+    setVariations([]);
+    setActiveIdx(0);
+    setMedia(null);
+    setLoadStage(1);
     try {
-      const res = await fetch(
-        `/api/preview-style?q=${encodeURIComponent(queryText)}`,
-      );
-      if (!res.ok) return null;
-      return (await res.json()) as {
-        headingFont?: string;
-        bodyFont?: string;
-        accentA?: string;
-        accentB?: string;
-        headlineEffect?: string;
-      };
-    } catch {
-      return null;
-    }
-  };
-
-  const fetchPreviewCopy = async (
-    queryText: string,
-    siteName: string,
-    requestedStyle: string,
-  ) => {
-    try {
-      const res = await fetch("/api/preview-copy", {
+      const mediaResult = await fetchMedia(p);
+      setMedia(mediaResult);
+      setLoadStage(2);
+      const res = await fetch("/api/generate", {
         method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          prompt: queryText,
-          siteName,
-          requestedStyle,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: p, imageUrls: mediaResult.gallery, videoUrl: mediaResult.videoUrl }),
       });
-      if (!res.ok) return null;
-      return (await res.json()) as {
-        heroHeadline?: string;
-        heroSubhead?: string;
-        valueHeading?: string;
-        valueBody?: string;
-        ctaLabel?: string;
-        featureBullets?: string[];
-      };
-    } catch {
-      return null;
+      setLoadStage(3);
+      if (!res.ok) throw new Error(`API error ${res.status}`);
+      const data = await res.json() as { variations?: Variation[]; error?: string };
+      if (!data.variations?.length) throw new Error(data.error || "No variations returned");
+      setVariations(data.variations);
+      setLoadStage(0);
+      saveToExamples(p, data.variations[0], mediaResult);
+    } catch (err) {
+      console.error("Generation failed:", err);
+      setLoadStage(0);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const generatePreview = async (promptText: string) => {
-    const prompt = promptText.trim();
-    if (!prompt) return;
-    setIsGenerating(true);
-    setActiveStep(2);
-
-    const siteName = extractSiteName(prompt);
-    const [media, style] = await Promise.all([
-      fetchDynamicMedia(prompt),
-      fetchPreviewStyle(prompt),
-    ]);
-    const localCopy = buildCustomCopy(prompt, siteName);
-    const remoteCopy = await fetchPreviewCopy(
-      prompt,
-      siteName,
-      style?.headlineEffect || prompt,
-    );
-
-    const basePreview: GeneratedPreview = {
-      siteName,
-      heroHeadline: remoteCopy?.heroHeadline || localCopy.heroHeadline,
-      heroSubhead: remoteCopy?.heroSubhead || localCopy.heroSubhead,
-      sectionTitle: remoteCopy?.valueHeading || localCopy.sectionTitle,
-      sectionCopy: remoteCopy?.valueBody || localCopy.sectionCopy,
-      cta: remoteCopy?.ctaLabel || localCopy.cta,
-      features: remoteCopy?.featureBullets || localCopy.features,
-      heroVideoUrl:
-        media?.videoUrl ||
-        "https://cdn.coverr.co/videos/coverr-cinematic-city-pan-7153/1080p.mp4",
-      heroImageUrl:
-        media?.imageUrl ||
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
-      gallery: media?.gallery?.slice(0, 3) || [],
-      headingFont: style?.headingFont || "Poppins",
-      bodyFont: style?.bodyFont || "Inter",
-      accentA: style?.accentA || "#6366f1",
-      accentB: style?.accentB || "#d946ef",
-      headlineEffect: style?.headlineEffect || "slide-in",
-    };
-
-    const styleVariants: PreviewVariant[] = [
-      {
-        label: "Luxury",
-        preview: {
-          ...basePreview,
-          accentA: "#a855f7",
-          accentB: "#06b6d4",
-          headingFont: "Poppins",
-        },
-      },
-      {
-        label: "Minimal",
-        preview: {
-          ...basePreview,
-          accentA: "#2563eb",
-          accentB: "#60a5fa",
-          headingFont: "Inter",
-          bodyFont: "Inter",
-        },
-      },
-      {
-        label: "Bold",
-        preview: {
-          ...basePreview,
-          accentA: "#ef4444",
-          accentB: "#f59e0b",
-          headingFont: "Anton",
-        },
-      },
-    ];
-
-    setVariants(styleVariants);
-    setSelectedVariant("Luxury");
-    setGeneratedPreview(styleVariants[0].preview);
-
-    setIsGenerating(false);
-    setActiveStep(3);
-  };
-
-  const startRecording = () => {
-    setTranscript("");
-    setGeneratedPreview(null);
-    setVariants([]);
-    setSelectedVariant(null);
-    setActiveStep(1);
-    setIsRecording(true);
-    recognitionRef.current?.start?.();
-  };
-
-  const stopRecording = () => {
-    recognitionRef.current?.stop?.();
-    setIsRecording(false);
-    if (transcript.trim()) void generatePreview(transcript);
-  };
-
-  const handleTextSubmit = () => {
-    if (textInput.trim()) {
-      setTranscript(textInput.trim());
-      void generatePreview(textInput.trim());
-    }
-  };
+  }, [prompt, isLoading]);
 
   useEffect(() => {
-    if (generatedPreview) {
-      localStorage.setItem("vtw_preview_style", selectedVariant || "Luxury");
-      localStorage.setItem("vtw_preview_site_name", generatedPreview.siteName);
-    }
-  }, [generatedPreview, selectedVariant]);
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void handleGenerate();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleGenerate]);
+
+  const handleSave = () => {
+    if (!activeVariation || !media) return;
+    saveToExamples(prompt, activeVariation, media);
+    setSavedMsg("Saved to Examples!");
+    setTimeout(() => setSavedMsg(""), 2500);
+  };
+
+  const handleDownload = () => {
+    if (!activeVariation) return;
+    const blob = new Blob([activeVariation.html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${activeVariation.name.replace(/\s+/g, "-").toLowerCase()}-preview.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const loadStageLabels = [
+    "",
+    "Fetching copyright-free media for your brand...",
+    "Generating premium website variations with AI...",
+    "Compiling full HTML, CSS, and animations...",
+  ];
 
   return (
-    <div className={`w-full ${isHero ? "max-w-5xl" : "max-w-4xl"} mx-auto`}>
-      <div className="text-center mb-6">
-        {!isHero && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-sm mb-4">
-            <Sparkles className="w-4 h-4" />
-            Try It Free - No Signup Required
+    <div className={`w-full ${variant === "hero" ? "max-w-5xl" : "max-w-4xl"} mx-auto px-4`}>
+      {/* Input bar */}
+      <div className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden mb-4">
+        <div className="flex items-center gap-3 p-4">
+          <button
+            type="button"
+            onClick={() => {
+              if (inputMode === "voice") { setInputMode("text"); stopListening(); }
+              else { setInputMode("voice"); startListening(); }
+            }}
+            className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              isListening
+                ? "bg-red-500/20 border border-red-400/50 text-red-400 animate-pulse"
+                : "bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/30"
+            }`}
+            title={inputMode === "voice" ? "Stop listening" : "Use voice input"}
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : inputMode === "voice" ? <Mic className="w-4 h-4" /> : <Keyboard className="w-4 h-4" />}
+          </button>
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void handleGenerate(); } }}
+            placeholder='Describe your business... e.g. "A luxury spa called Serenity Haven with a dark theme and booking form"'
+            className="flex-1 bg-transparent text-white placeholder-white/35 resize-none outline-none text-sm leading-relaxed min-h-[52px] max-h-[120px]"
+            rows={2}
+          />
+          <button
+            type="button"
+            onClick={() => void handleGenerate()}
+            disabled={!prompt.trim() || isLoading}
+            className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {isLoading ? "Building..." : "Generate"}
+          </button>
+        </div>
+        {!variations.length && !isLoading && (
+          <div className="px-4 pb-4 flex flex-wrap gap-2">
+            {EXAMPLE_PROMPTS.map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                onClick={() => { setPrompt(ex); void handleGenerate(ex); }}
+                className="text-xs px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white/55 hover:text-white hover:border-white/25 transition-all"
+              >
+                {ex.length > 55 ? ex.slice(0, 55) + "\u2026" : ex}
+              </button>
+            ))}
           </div>
         )}
-        <h2 className={`${isHero ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"} font-bold text-white mb-3`}>
-          See the AI in Action
-        </h2>
       </div>
 
-      {!generatedPreview && (
-        <>
-          {!isHero && (
-            <div className="flex items-center justify-center gap-4 mb-8">
-              {[{ icon: Volume2, label: "Speak" }, { icon: Wand2, label: "AI Builds" }, { icon: Eye, label: "Preview" }].map((step, i) => (
-                <div key={step.label} className={`px-3 py-2 rounded-full border text-sm ${activeStep >= i ? "border-cyan-400/40 text-cyan-300 bg-cyan-500/10" : "border-white/10 text-white/40"}`}>
-                  <step.icon className="w-4 h-4 inline mr-2" />
-                  {step.label}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className={`border rounded-2xl p-5 backdrop-blur-xl ${isHero ? "bg-black/35 border-indigo-400/25" : "bg-[#0f172a] border-white/10"}`}>
-            <div className="flex justify-center mb-4">
-              <div className="flex gap-2 rounded-full border border-white/10 bg-white/5 p-1">
-                <button onClick={() => setInputMode("text")} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${inputMode === "text" ? "bg-cyan-500/20 text-cyan-200" : "text-white/60 hover:text-white"}`}>
-                  <Keyboard className="w-4 h-4 inline mr-2" />
-                  Type
-                </button>
-                <button onClick={() => setInputMode("voice")} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${inputMode === "voice" ? "bg-cyan-500/20 text-cyan-200" : "text-white/60 hover:text-white"}`}>
-                  <Mic className="w-4 h-4 inline mr-2" />
-                  Speak
-                </button>
-              </div>
-            </div>
-
-            {inputMode === "voice" ? (
-              <div className="text-center">
-                <button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`w-20 h-20 rounded-full ${isRecording ? "bg-red-500/20 border-red-400" : "bg-cyan-500/20 border-cyan-400"} border-2 inline-flex items-center justify-center`}
-                >
-                  {isRecording ? <MicOff className="text-red-300" /> : <Mic className="text-cyan-300" />}
-                </button>
-                <p className="text-white/70 mt-3">{isRecording ? "Listening..." : "Tap to record your website request"}</p>
-                {transcript ? <p className="text-white/80 mt-3">{transcript}</p> : null}
-                {!isRecording && transcript ? (
-                  <button
-                    onClick={() => void generatePreview(transcript)}
-                    className="mt-4 px-6 py-3 bg-linear-to-r from-indigo-500 to-fuchsia-500 rounded-xl text-white font-semibold"
-                  >
-                    Generate
-                  </button>
-                ) : null}
-              </div>
-            ) : (
-              <div>
-                <textarea
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleTextSubmit();
-                    }
-                  }}
-                  placeholder='Describe exact brand/site needed. Example: "Create a landing page for Halo Beauty Studio with premium booking flow and pink luxury style."'
-                  className={`w-full h-28 rounded-xl bg-white/5 border ${isHero ? "border-indigo-400/20" : "border-white/10"} p-4 text-white`}
-                />
-                <div className="flex justify-center mt-4">
-                  <button
-                    onClick={handleTextSubmit}
-                    disabled={!textInput.trim() || isGenerating}
-                    className="flex items-center gap-2 px-8 py-3 bg-linear-to-r from-indigo-500 to-fuchsia-500 rounded-xl text-white font-semibold disabled:opacity-40"
-                  >
-                    {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4" />}
-                    {isGenerating ? "Generating..." : "Generate"}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {!isHero && (
-            <div className="flex flex-wrap justify-center gap-2 mt-4">
-              {EXAMPLE_PROMPTS.map((prompt) => (
-                <button
-                  key={prompt}
-                  onClick={() => {
-                    setTextInput(prompt);
-                    setTranscript(prompt);
-                    void generatePreview(prompt);
-                  }}
-                  className="px-3 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg text-white/75"
-                >
-                  {prompt.slice(0, 52)}...
-                </button>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
+      {/* Loading */}
       <AnimatePresence>
-        {generatedPreview && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 rounded-2xl border border-white/15 bg-slate-950/90 overflow-hidden">
-            <div className="border-b border-white/10 bg-black/25 p-4">
-              <div className="flex items-center gap-3 text-xs uppercase tracking-[0.28em] text-cyan-200">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Build progress
-              </div>
-              <div className="mt-3 space-y-2 font-mono text-[11px] leading-5 text-slate-300">
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ repeat: Infinity, repeatType: "mirror", duration: 1.2 }}>
-                  [1/3] Parsing voice brief and extracting intent...
-                </motion.p>
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, repeat: Infinity, repeatType: "mirror", duration: 1.2 }}>
-                  [2/3] Mapping sections into the 12-column grid...
-                </motion.p>
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, repeat: Infinity, repeatType: "mirror", duration: 1.2 }}>
-                  [3/3] Writing media, typography, and launch-ready content...
-                </motion.p>
-              </div>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 text-center mb-4"
+          >
+            <Sparkles className="w-8 h-8 text-cyan-400 mx-auto mb-4 animate-pulse" />
+            <p className="text-white/80 text-sm font-medium">{loadStageLabels[loadStage] || "Generating..."}</p>
+            <div className="mt-4 flex justify-center gap-1">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="w-2 h-2 rounded-full bg-cyan-400" style={{ animation: `bounce 1.2s ${i * 0.2}s infinite` }} />
+              ))}
             </div>
-            {variants.length > 0 ? (
-              <div className="border-b border-white/10 p-4">
-                <div className="mb-2 text-xs uppercase tracking-[0.25em] text-white/60">
-                  Choose a style
-                </div>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {variants.map((variant) => (
-                    <button
-                      key={variant.label}
-                      type="button"
-                      onClick={() => {
-                        setGeneratedPreview(variant.preview);
-                        setSelectedVariant(variant.label);
-                      }}
-                      className={`rounded-xl border px-4 py-3 text-left transition ${
-                        selectedVariant === variant.label
-                          ? "border-cyan-300/70 bg-cyan-500/20 text-white"
-                          : "border-white/10 bg-white/5 text-white/80 hover:border-white/30"
-                      }`}
-                    >
-                      <div className="font-semibold">{variant.label}</div>
-                      <div className="text-xs text-white/60">
-                        {variant.preview.headingFont} · {variant.preview.accentA}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-            <div className="relative">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.22),transparent_35%),linear-gradient(180deg,rgba(3,4,10,0.15),rgba(3,4,10,0.65))]" />
-              <video src={generatedPreview.heroVideoUrl} autoPlay loop muted playsInline className="h-[330px] w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-              <div className="absolute top-4 left-4 rounded-full border border-white/20 bg-black/40 px-4 py-2 text-white text-xs tracking-widest uppercase">
-                {generatedPreview.siteName}
-              </div>
-              <div className="absolute bottom-6 left-6 right-6">
-                <h3
-                  className="text-4xl font-black text-white drop-shadow-xl"
-                  style={{ fontFamily: generatedPreview.headingFont }}
-                >
-                  {generatedPreview.heroHeadline}
-                </h3>
-                <p className="text-white/90 text-lg mt-2" style={{ fontFamily: generatedPreview.bodyFont }}>
-                  {generatedPreview.heroSubhead}
-                </p>
-              </div>
-            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            <div className="p-6">
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="rounded-xl overflow-hidden border border-white/10">
-                  <img src={generatedPreview.gallery[0] || generatedPreview.heroImageUrl} className="w-full h-52 object-cover" />
-                </div>
-                <div className="flex flex-col justify-center">
-                  <h4 className="text-2xl font-bold text-white mb-2 animate-[fadeIn_0.7s_ease-out]" style={{ fontFamily: generatedPreview.headingFont }}>
-                    {generatedPreview.sectionTitle}
-                  </h4>
-                  <p className="text-white/75 leading-relaxed animate-[fadeIn_0.9s_ease-out]">
-                    {generatedPreview.sectionCopy}
-                  </p>
+      {/* Results */}
+      <AnimatePresence>
+        {variations.length > 0 && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden"
+          >
+            {/* Tabs */}
+            <div className="flex items-center justify-between gap-2 p-4 border-b border-white/10 flex-wrap">
+              <div className="flex gap-2 flex-wrap">
+                {variations.map((v, i) => (
                   <button
-                    className="mt-5 w-fit px-6 py-3 rounded-xl text-white font-semibold transition-transform hover:-translate-y-0.5"
-                    style={{
-                      backgroundImage: `linear-gradient(90deg, ${generatedPreview.accentA}, ${generatedPreview.accentB})`,
-                    }}
+                    key={v.id}
+                    type="button"
+                    onClick={() => setActiveIdx(i)}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                      i === activeIdx
+                        ? "bg-gradient-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/50 text-white"
+                        : "border border-white/10 bg-white/5 text-white/60 hover:text-white hover:border-white/25"
+                    }`}
                   >
-                    {generatedPreview.cta}
+                    {v.name} <span className="ml-1 text-xs opacity-60">{v.mood}</span>
                   </button>
-                </div>
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-4 mt-6">
-                {generatedPreview.features.map((feature) => (
-                  <div key={feature} className="rounded-lg border border-white/10 bg-white/5 p-3 text-white/85 text-sm transition-all hover:border-white/30 hover:bg-white/10">
-                    {feature}
-                  </div>
                 ))}
               </div>
-              <div className="mt-5 flex flex-col items-center gap-3">
-                <Link to="/examples" className="hero-secondary-button">
-                  View examples
-                </Link>
+              <div className="flex items-center gap-2">
+                {savedMsg && <span className="text-xs text-green-400 font-medium">{savedMsg}</span>}
+                <button type="button" onClick={handleSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white/60 hover:text-white text-xs transition-all">
+                  <Save className="w-3.5 h-3.5" /> Save to Examples
+                </button>
+                <button type="button" onClick={handleDownload} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white/60 hover:text-white text-xs transition-all">
+                  <Download className="w-3.5 h-3.5" /> Download
+                </button>
+              </div>
+            </div>
+
+            {/* Palette strip */}
+            {activeVariation && (
+              <div className="flex items-center gap-3 px-4 py-2 border-b border-white/10">
+                <div className="flex gap-1.5">
+                  {activeVariation.palette.map((c) => (
+                    <div key={c} className="w-5 h-5 rounded-full border border-white/20" style={{ background: c }} title={c} />
+                  ))}
+                </div>
+                <span className="text-xs text-white/50">{activeVariation.fontPair}</span>
+                <span className="ml-auto text-xs text-cyan-400 font-semibold">Quality: {activeVariation.qualityScore}/100</span>
+              </div>
+            )}
+
+            {/* Scrollable iframe preview */}
+            {activeVariation && (
+              <div className="relative">
+                <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 bg-black/60 backdrop-blur-md border border-white/15 rounded-full px-3 py-1.5 text-xs text-white/70 pointer-events-none">
+                  <Eye className="w-3 h-3" /> Live Preview — Scroll to explore
+                </div>
+                {variations.length > 1 && (
+                  <>
+                    <button type="button" onClick={() => setActiveIdx((i) => (i - 1 + variations.length) % variations.length)} className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/70 hover:text-white transition-all">
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button type="button" onClick={() => setActiveIdx((i) => (i + 1) % variations.length)} className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/70 hover:text-white transition-all">
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+                <iframe
+                  ref={iframeRef}
+                  srcDoc={activeVariation.html}
+                  title={`Preview: ${activeVariation.name}`}
+                  className="w-full border-0"
+                  style={{ height: "680px" }}
+                  sandbox="allow-scripts allow-same-origin"
+                  loading="lazy"
+                />
+              </div>
+            )}
+
+            {/* CTA footer */}
+            <div className="p-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-cyan-500/5 to-violet-600/5">
+              <div>
+                <p className="text-white font-semibold text-sm">Love what you see?</p>
+                <p className="text-white/55 text-xs mt-0.5">Purchase a plan to get your full custom-coded site — no watermark, full ownership.</p>
+              </div>
+              <div className="flex gap-3">
+                <Link to="/examples" className="px-4 py-2 rounded-xl border border-white/15 text-white/70 text-sm hover:text-white hover:border-white/30 transition-all">View Examples</Link>
+                <Link to="/pricing" className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition-all">Get My Site</Link>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <style>{`@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}`}</style>
     </div>
   );
 }
+
+export default PlaygroundGenerator;
