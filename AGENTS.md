@@ -24,10 +24,12 @@ At the beginning of each project or session:
 
 - `main` is the live production branch.
 - All production deploys must go through Cloudflare Wrangler commands, preferably `npm run deploy` or `npm run deploy:prod`.
-- Successful changes must be tested, committed, pushed, deployed, and verified by the agent.
-- Pushes to `main` should trigger production deployment.
-- Deployments must publish to the live custom production domain, not a development domain.
-- The agent must verify that the live UI/UX reflects the latest deployment.
+- Every commit or push for production work must result in a live production deployment.
+- Successful changes must be tested, committed, pushed, deployed with Wrangler, and verified by the agent on `https://voicetowebsite.com`.
+- Pushes to `main` should trigger production deployment, but automated deploys do not replace manual Wrangler deployment when the user asks the agent to ship work.
+- Pages preview URLs are useful for diagnostics only. Never tell the user a change is live based only on a `*.pages.dev` preview URL.
+- Deployments must publish to the live custom production domain `https://voicetowebsite.com`, not a development domain.
+- Before saying a change is live, the agent must verify the custom domain homepage, relevant production routes/API endpoints, and visible UI/UX behavior on `https://voicetowebsite.com`.
 
 ## Communication Format
 
