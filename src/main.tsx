@@ -11,3 +11,5 @@ createRoot(document.getElementById('root')!).render(
     </AuthProvider>
   </StrictMode>,
 );
+
+document.getElementById('boot')?.remove();

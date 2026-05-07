@@ -53,20 +53,20 @@ const Navbar = () => {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-6 lg:px-12 flex items-center justify-between",
+        "site-header-wallpaper fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-6 lg:px-12 flex items-center justify-between overflow-hidden",
         isScrolled
           ? "h-20 bg-black/60 backdrop-blur-xl border-b border-white/5"
           : "h-28 bg-transparent",
       )}
     >
-      <Link to="/" className="flex items-center gap-3 group">
+      <Link to="/" className="relative z-10 flex items-center gap-3 group">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan group-hover:scale-110 transition-transform">
           <Mic className="text-white w-5 h-5 animate-pulse" />
         </div>
       </Link>
 
       {/* Desktop Menu */}
-      <div className="hidden lg:flex items-center gap-10 text-[10px] uppercase font-black tracking-[0.2em] text-white/50">
+      <div className="relative z-10 hidden lg:flex items-center gap-10 text-[10px] uppercase font-black tracking-[0.2em] text-white/50">
         {navLinks.map((link) => (
           <Link
             key={link.path}
@@ -82,7 +82,7 @@ const Navbar = () => {
         ))}
       </div>
 
-      <div className="hidden lg:flex items-center gap-6">
+      <div className="relative z-10 hidden lg:flex items-center gap-6">
         <Link
           to="/signin"
           className="text-[10px] uppercase font-black tracking-widest text-white/40 hover:text-white transition-colors"
@@ -99,7 +99,7 @@ const Navbar = () => {
 
       {/* Mobile Menu Trigger */}
       <button
-        className="lg:hidden p-2 glass rounded-xl text-white"
+        className="relative z-10 lg:hidden p-2 glass rounded-xl text-white"
         onClick={() => setIsOpen(true)}
       >
         <Menu className="w-6 h-6" />
@@ -164,7 +164,7 @@ const Navbar = () => {
 };
 
 const Footer = () => (
-  <footer className="py-20 px-6 lg:px-12 bg-black/50 border-t border-white/5">
+  <footer className="site-footer-wallpaper relative overflow-hidden py-20 px-6 lg:px-12 bg-black/50 border-t border-white/5">
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
       <div className="lg:col-span-2">
         <Link to="/" className="flex items-center gap-2 mb-6">
@@ -929,8 +929,8 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <div className="min-h-screen relative flex flex-col">
-        {/* Persistent Mesh Gradient Background */}
-        <div className="fixed inset-0 -z-10 mesh-gradient animate-mesh pointer-events-none" />
+        <div className="responsive-wallpaper fixed inset-0 -z-20 pointer-events-none" />
+        <div className="fixed inset-0 -z-10 bg-black/45 pointer-events-none" />
 
         <Navbar />
 

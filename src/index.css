@@ -84,6 +84,118 @@ body {
   background-size: 200% 200%;
 }
 
+.responsive-wallpaper {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(0, 242, 255, 0.28), transparent 18rem),
+    radial-gradient(circle at 78% 16%, rgba(157, 0, 255, 0.22), transparent 20rem),
+    radial-gradient(circle at 54% 84%, rgba(255, 0, 255, 0.16), transparent 18rem),
+    linear-gradient(135deg, #02040d 0%, #070314 45%, #020711 100%);
+}
+
+.responsive-wallpaper::before,
+.responsive-wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+}
+
+.responsive-wallpaper::before {
+  opacity: 0.46;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    repeating-radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.18) 0 1px, transparent 2px 18px);
+  background-size: 72px 72px, 72px 72px, 210px 210px;
+  animation: wallpaper-spin 46s linear infinite;
+}
+
+.responsive-wallpaper::after {
+  opacity: 0.72;
+  background:
+    radial-gradient(circle at 24% 32%, rgba(0, 242, 255, 0.34) 0 0.8rem, transparent 0.9rem),
+    radial-gradient(circle at 72% 24%, rgba(157, 0, 255, 0.32) 0 1.1rem, transparent 1.2rem),
+    radial-gradient(circle at 62% 68%, rgba(255, 255, 255, 0.16) 0 0.55rem, transparent 0.62rem),
+    conic-gradient(from 90deg at 50% 50%, transparent 0 18deg, rgba(0, 242, 255, 0.12) 20deg 24deg, transparent 26deg 82deg, rgba(157, 0, 255, 0.14) 84deg 88deg, transparent 90deg 360deg);
+  filter: blur(0.2px);
+  animation: wallpaper-orbit 34s ease-in-out infinite alternate;
+}
+
+.site-header-wallpaper::before,
+.site-footer-wallpaper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: inherit;
+}
+
+.site-header-wallpaper::before,
+.site-footer-wallpaper::before {
+  background:
+    radial-gradient(at 0% 0%, rgba(0, 98, 255, 0.16) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(157, 0, 255, 0.13) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(255, 0, 255, 0.12) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(0, 242, 255, 0.15) 0px, transparent 50%);
+  background-size: 200% 200%;
+  animation: mesh 25s ease-in-out infinite;
+  opacity: 0.68;
+}
+
+.site-footer-wallpaper > * {
+  position: relative;
+  z-index: 1;
+}
+
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: #030712;
+}
+
+.boot-card {
+  display: grid;
+  place-items: center;
+}
+
+.boot-mark {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 0.65rem;
+  background: linear-gradient(135deg, #00f2ff, #9d00ff);
+  color: white;
+  font-weight: 900;
+  box-shadow: 0 0 36px rgba(0, 242, 255, 0.28);
+}
+
+@keyframes wallpaper-spin {
+  from { transform: rotate(0deg) scale(1.08); }
+  to { transform: rotate(360deg) scale(1.08); }
+}
+
+@keyframes wallpaper-orbit {
+  from { transform: translate3d(-2%, -1%, 0) rotate(-8deg) scale(1); }
+  to { transform: translate3d(2%, 1%, 0) rotate(10deg) scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .responsive-wallpaper::before,
+  .responsive-wallpaper::after,
+  .site-header-wallpaper::before,
+  .site-footer-wallpaper::before {
+    animation: none;
+  }
+}
+
 .perspective-1000 {
   perspective: 1000px;
 }
