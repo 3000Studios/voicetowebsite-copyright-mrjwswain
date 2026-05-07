@@ -6,15 +6,21 @@ import { AnimatePresence, motion } from "motion/react";
 import {
   ChevronLeft,
   ChevronRight,
+  CheckCircle2,
   Download,
   Eye,
   Keyboard,
   Loader2,
+  Maximize2,
   Mic,
   MicOff,
+  Monitor,
+  RotateCcw,
   Save,
   Send,
   Sparkles,
+  Smartphone,
+  Wand2,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -38,6 +44,25 @@ interface Variation {
   palette: string[];
   qualityScore: number;
   html: string;
+  promptMatch?: PromptMatch;
+}
+
+interface PromptMatch {
+  passed: boolean;
+  score: number;
+  matched: string[];
+  missing: string[];
+}
+
+interface PromptBrief {
+  businessName: string;
+  pageTitle: string;
+  industry: string;
+  audience: string;
+  tone: string;
+  primaryCta: string;
+  requestedSections: string[];
+  requiredTerms: string[];
 }
 
 interface MediaResult {
@@ -99,6 +124,9 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
   const [savedMsg, setSavedMsg] = useState("");
   const [media, setMedia] = useState<MediaResult | null>(null);
   const [loadStage, setLoadStage] = useState(0);
+  const [brief, setBrief] = useState<PromptBrief | null>(null);
+  const [error, setError] = useState("");
+  const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
 
@@ -136,6 +164,8 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
     setVariations([]);
     setActiveIdx(0);
     setMedia(null);
+    setBrief(null);
+    setError("");
     setLoadStage(1);
     try {
       const mediaResult = await fetchMedia(p);
@@ -148,13 +178,23 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
       });
       setLoadStage(3);
       if (!res.ok) throw new Error(`API error ${res.status}`);
-      const data = await res.json() as { variations?: Variation[]; error?: string };
+      const data = await res.json() as { brief?: PromptBrief; variations?: Variation[]; error?: string; details?: string };
       if (!data.variations?.length) throw new Error(data.error || "No variations returned");
+      setBrief(data.brief || null);
       setVariations(data.variations);
       setLoadStage(0);
+      localStorage.setItem("vtw_pending_site", JSON.stringify({
+        prompt: p,
+        brief: data.brief || null,
+        variationName: data.variations[0].name,
+        html: data.variations[0].html,
+        imageUrl: mediaResult.imageUrl,
+        savedAt: new Date().toISOString(),
+      }));
       saveToExamples(p, data.variations[0], mediaResult);
     } catch (err) {
       console.error("Generation failed:", err);
+      setError(err instanceof Error ? err.message : "Generation failed. Try a more specific prompt.");
       setLoadStage(0);
     } finally {
       setIsLoading(false);
@@ -187,11 +227,26 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
     URL.revokeObjectURL(url);
   };
 
+  const regenerateWithInstruction = (instruction: string) => {
+    const nextPrompt = `${prompt.trim()}\n\nRevise the preview and focus harder on: ${instruction}.`;
+    setPrompt(nextPrompt);
+    void handleGenerate(nextPrompt);
+  };
+
+  const jumpPreview = (hash: string) => {
+    const frameWindow = iframeRef.current?.contentWindow;
+    if (frameWindow) frameWindow.location.hash = hash;
+  };
+
+  const fullscreenPreview = () => {
+    void iframeRef.current?.requestFullscreen?.();
+  };
+
   const loadStageLabels = [
     "",
     "Fetching copyright-free media for your brand...",
     "Generating premium website variations with AI...",
-    "Compiling full HTML, CSS, and animations...",
+    "Checking prompt match, sections, and preview quality...",
   ];
 
   return (
@@ -247,6 +302,13 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
           </div>
         )}
       </div>
+
+      {error && (
+        <div className="mb-4 rounded-2xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm text-red-100">
+          <div className="font-bold">Generation needs another pass</div>
+          <div className="mt-1 text-red-100/75">{error}</div>
+        </div>
+      )}
 
       {/* Loading */}
       <AnimatePresence>
@@ -319,11 +381,96 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
               </div>
             )}
 
+            {brief && (
+              <div className="grid gap-4 border-b border-white/10 bg-white/[0.025] p-4 lg:grid-cols-[0.9fr_1.1fr]">
+                <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+                  <div className="mb-3 flex items-center gap-2 text-cyan-200">
+                    <Wand2 className="h-4 w-4" />
+                    <span className="text-xs font-black uppercase tracking-[0.24em]">Prompt Brief</span>
+                  </div>
+                  <div className="grid gap-3 text-sm sm:grid-cols-2">
+                    <BriefField label="Business" value={brief.businessName} />
+                    <BriefField label="Industry" value={brief.industry} />
+                    <BriefField label="Tone" value={brief.tone} />
+                    <BriefField label="CTA" value={brief.primaryCta} />
+                  </div>
+                  <div className="mt-4">
+                    <div className="mb-2 text-[10px] font-black uppercase tracking-[0.24em] text-white/35">Requested content</div>
+                    <div className="flex flex-wrap gap-2">
+                      {brief.requestedSections.slice(0, 8).map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => regenerateWithInstruction(item)}
+                          className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100 hover:border-cyan-200/50"
+                          title={`Regenerate with stronger focus on ${item}`}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-emerald-200">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span className="text-xs font-black uppercase tracking-[0.24em]">Prompt Match</span>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-bold ${activeVariation?.promptMatch?.passed ? "bg-emerald-500/15 text-emerald-200" : "bg-amber-500/15 text-amber-200"}`}>
+                      {activeVariation?.promptMatch?.score ?? 0}%
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(activeVariation?.promptMatch?.matched || []).map((item) => (
+                      <span key={item} className="rounded-full border border-emerald-300/20 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-100">
+                        {item}
+                      </span>
+                    ))}
+                    {(activeVariation?.promptMatch?.missing || []).map((item) => (
+                      <button key={item} type="button" onClick={() => regenerateWithInstruction(item)} className="rounded-full border border-amber-300/25 bg-amber-400/10 px-3 py-1 text-xs text-amber-100">
+                        Missing: {item}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <button type="button" onClick={() => regenerateWithInstruction("all missing prompt details")} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/70 hover:text-white">
+                      <RotateCcw className="h-3.5 w-3.5" /> Regenerate match
+                    </button>
+                    <button type="button" onClick={() => regenerateWithInstruction("more premium graphics, stronger cards, and richer section copy")} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/70 hover:text-white">
+                      <Sparkles className="h-3.5 w-3.5" /> Upgrade graphics
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Scrollable iframe preview */}
             {activeVariation && (
-              <div className="relative">
-                <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 bg-black/60 backdrop-blur-md border border-white/15 rounded-full px-3 py-1.5 text-xs text-white/70 pointer-events-none">
+              <div className="relative bg-black/35 p-3">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <Eye className="w-3 h-3" /> Live Preview — Scroll to explore
+                </div>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {["services", "gallery", "pricing", "contact"].map((section) => (
+                      <button key={section} type="button" onClick={() => jumpPreview(section)} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold capitalize text-white/65 hover:text-white">
+                        {section}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={() => setPreviewMode("desktop")} className={`rounded-lg border px-3 py-1.5 text-xs ${previewMode === "desktop" ? "border-cyan-300/40 bg-cyan-400/10 text-cyan-100" : "border-white/10 bg-white/5 text-white/60"}`}>
+                      <Monitor className="mr-1 inline h-3.5 w-3.5" /> Desktop
+                    </button>
+                    <button type="button" onClick={() => setPreviewMode("mobile")} className={`rounded-lg border px-3 py-1.5 text-xs ${previewMode === "mobile" ? "border-cyan-300/40 bg-cyan-400/10 text-cyan-100" : "border-white/10 bg-white/5 text-white/60"}`}>
+                      <Smartphone className="mr-1 inline h-3.5 w-3.5" /> Mobile
+                    </button>
+                    <button type="button" onClick={fullscreenPreview} className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/60 hover:text-white">
+                      <Maximize2 className="mr-1 inline h-3.5 w-3.5" /> Full
+                    </button>
+                  </div>
                 </div>
                 {variations.length > 1 && (
                   <>
@@ -335,15 +482,17 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
                     </button>
                   </>
                 )}
-                <iframe
-                  ref={iframeRef}
-                  srcDoc={activeVariation.html}
-                  title={`Preview: ${activeVariation.name}`}
-                  className="w-full border-0"
-                  style={{ height: "680px" }}
-                  sandbox="allow-scripts allow-same-origin"
-                  loading="lazy"
-                />
+                <div className="mx-auto overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl" style={{ maxWidth: previewMode === "mobile" ? 390 : "100%" }}>
+                  <iframe
+                    ref={iframeRef}
+                    srcDoc={activeVariation.html}
+                    title={`Preview: ${activeVariation.name}`}
+                    className="w-full border-0"
+                    style={{ height: previewMode === "mobile" ? "740px" : "680px" }}
+                    sandbox="allow-scripts allow-same-origin"
+                    loading="lazy"
+                  />
+                </div>
               </div>
             )}
 
@@ -355,7 +504,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
               </div>
               <div className="flex gap-3">
                 <Link to="/examples" className="px-4 py-2 rounded-xl border border-white/15 text-white/70 text-sm hover:text-white hover:border-white/30 transition-all">View Examples</Link>
-                <Link to="/pricing" className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition-all">Get My Site</Link>
+                <Link to="/pricing?source=generator" className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition-all">Get My Site</Link>
               </div>
             </div>
           </motion.div>
@@ -366,5 +515,12 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
     </div>
   );
 }
+
+const BriefField = ({ label, value }: { label: string; value: string }) => (
+  <div>
+    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/35">{label}</div>
+    <div className="mt-1 text-white/85">{value}</div>
+  </div>
+);
 
 export default PlaygroundGenerator;

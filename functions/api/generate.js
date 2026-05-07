@@ -32,6 +32,7 @@ export async function onRequestPost(context) {
     const geminiKey = env.GEMINI_API_KEY || '';
     const vid = videoUrl || 'https://cdn.coverr.co/videos/coverr-working-in-a-modern-office-1565/1080p.mp4';
     const imgs = imageUrls.length ? imageUrls : ['https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80'];
+    const brief = analyzePrompt(prompt, extractName(prompt));
 
     const enriched = `Business prompt: "${prompt}"\nHero video URL: ${vid}\nGallery images: ${imgs.join(', ')}\nGenerate 3 complete premium website variations. Write real copy specific to this business.`;
 
@@ -65,12 +66,18 @@ export async function onRequestPost(context) {
       parsed = buildFallback(prompt, vid, imgs);
     }
 
-    parsed.variations = parsed.variations.map(v => ({
-      ...v,
-      html: injectWM(v.html || buildHtml(prompt, vid, imgs, v)),
-    }));
+    parsed.variations = parsed.variations.map(v => {
+      const candidateHtml = v.html || '';
+      const match = validatePromptMatch(candidateHtml, brief);
+      const html = match.passed ? candidateHtml : buildHtml(prompt, vid, imgs, v);
+      return {
+        ...v,
+        html: injectWM(html),
+        promptMatch: validatePromptMatch(html, brief),
+      };
+    });
 
-    return jsonR({ variations: parsed.variations });
+    return jsonR({ brief: publicBrief(brief), variations: parsed.variations });
   } catch (err) {
     return jsonR({ error: 'Internal error', details: err.message }, 500);
   }
@@ -238,6 +245,36 @@ document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 </html>`;
 }
 
+function publicBrief(brief) {
+  return {
+    businessName: unesc(brief.businessName),
+    pageTitle: unesc(brief.pageTitle),
+    industry: brief.industryLabel,
+    audience: unesc(brief.audience),
+    tone: brief.toneLabel,
+    primaryCta: unesc(brief.primaryCta),
+    requestedSections: brief.requestedItems,
+    requiredTerms: brief.requiredTerms,
+  };
+}
+
+function validatePromptMatch(html, brief) {
+  const text = stripHtml(html).toLowerCase();
+  const required = brief.requiredTerms || [];
+  const matched = required.filter((term) => text.includes(term.toLowerCase()));
+  const missing = required.filter((term) => !text.includes(term.toLowerCase()));
+  const score = required.length ? Math.round((matched.length / required.length) * 100) : 100;
+  return { passed: score >= 80, score, matched, missing };
+}
+
+function stripHtml(value) {
+  return String(value || "")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ");
+}
+
 function analyzePrompt(prompt, name) {
   const raw = String(prompt || "").replace(/\s+/g, " ").trim();
   const p = raw.toLowerCase();
@@ -256,6 +293,12 @@ function analyzePrompt(prompt, name) {
   }
 
   return {
+    businessName: safeName,
+    industryLabel: industry.label,
+    audience,
+    toneLabel: tone.replace(/^A\s+/i, ""),
+    requestedItems: requested,
+    requiredTerms: requiredTermsFor(name, requested, industry),
     pageTitle: esc(pageTitle),
     metaDescription: esc(`${safeName} ${industry.metaVerb} ${requested.slice(0, 4).join(", ")} for ${audience}.`),
     headline: esc(`${safeName} ${industry.headlineVerb} ${toTitle(coreOffer)}`),
@@ -276,6 +319,14 @@ function analyzePrompt(prompt, name) {
     testimonials: testimonialCards(safeName, requested, industry),
     plans: pricingCards(requested, industry, cta),
   };
+}
+
+function requiredTermsFor(name, requested, industry) {
+  return unique([
+    cleanName(name).toLowerCase(),
+    ...requested.slice(0, 5).map((item) => item.toLowerCase()),
+    industry.label.toLowerCase(),
+  ]).filter((term) => term.length > 2);
 }
 
 const INDUSTRIES = {
@@ -400,10 +451,12 @@ function extractRequestedItems(prompt, industry) {
   const promptDetails = [];
   const detailMatch = prompt.match(/\b(?:with|including|include|needs?|has|featuring)\s+(.+)$/i);
   if (detailMatch?.[1]) {
+    const detailText = detailMatch[1].replace(/before and after/gi, "before-after");
     promptDetails.push(
-      ...detailMatch[1]
+      ...detailText
         .split(/\s*(?:,|;|\+|\band\b)\s*/i)
         .map((item) => item.trim())
+        .map((item) => item.replace(/before-after/gi, "before and after"))
         .filter((item) => item.length > 2)
     );
   }
@@ -527,6 +580,15 @@ function esc(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function unesc(value) {
+  return String(value || "")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&gt;/g, ">")
+    .replace(/&lt;/g, "<")
+    .replace(/&amp;/g, "&");
 }
 
 function corsH() {

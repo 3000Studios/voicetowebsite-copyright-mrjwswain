@@ -25,10 +25,21 @@ export const Setup = () => {
   const sessionId = params.get('session_id') || '';
 
   const [username, setUsername] = useState(user?.profile?.username || user?.displayName || '');
+  const [phone, setPhone] = useState('');
+  const [pendingSite, setPendingSite] = useState<{ prompt?: string; brief?: { businessName?: string; industry?: string; primaryCta?: string }; variationName?: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const planConfig = useMemo(() => PLAN_LIMITS[plan], [plan]);
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('vtw_pending_site');
+      if (stored) setPendingSite(JSON.parse(stored));
+    } catch {
+      setPendingSite(null);
+    }
+  }, []);
 
   const verifyStripe = async () => {
     const res = await fetch('/api/stripe-verify-session', {
@@ -80,12 +91,16 @@ export const Setup = () => {
         {
           username: username.trim(),
           email: user.email || '',
+          phone: phone.trim(),
           plan,
           tokens:
             planConfig.commandsPerCycle === Number.MAX_SAFE_INTEGER
               ? 999999
               : planConfig.commandsPerCycle,
           accessKey,
+          pendingSitePrompt: pendingSite?.prompt || '',
+          pendingSiteBusinessName: pendingSite?.brief?.businessName || '',
+          pendingSiteVariation: pendingSite?.variationName || '',
           updatedAt: new Date().toISOString(),
         },
         { merge: true }
@@ -148,6 +163,25 @@ export const Setup = () => {
               placeholder="Your handle"
             />
           </div>
+
+          <div className="text-left space-y-2">
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 italic">Phone</div>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full bg-black/40 border border-white/10 px-4 py-4 text-white italic focus:border-indigo-500 outline-none"
+              placeholder="+1 (555) 000-0000"
+            />
+          </div>
+
+          {pendingSite ? (
+            <div className="text-left rounded-3xl border border-cyan-300/20 bg-cyan-400/10 p-5">
+              <div className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-200/70 italic">Selected Preview</div>
+              <div className="mt-3 text-xl font-black uppercase italic text-white">{pendingSite.brief?.businessName || 'Generated Website'}</div>
+              <div className="mt-2 text-sm text-slate-300">{pendingSite.brief?.industry || 'custom'} / {pendingSite.variationName || 'selected variation'} / {pendingSite.brief?.primaryCta || 'primary CTA'}</div>
+              <div className="mt-3 line-clamp-3 text-xs leading-5 text-slate-400">{pendingSite.prompt}</div>
+            </div>
+          ) : null}
 
           {error ? <div className="text-red-400 text-sm italic">{error}</div> : null}
 
