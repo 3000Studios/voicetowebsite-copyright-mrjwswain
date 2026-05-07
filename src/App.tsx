@@ -28,6 +28,7 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+import { BrandWallpaper } from "./components/BrandSystem";
 import { PricingSection, TrustSection } from "./components/home/HomeContent";
 import { cn } from "./lib/utils";
 
@@ -929,7 +930,7 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <div className="min-h-screen relative flex flex-col">
-        <div className="responsive-wallpaper fixed inset-0 -z-20 pointer-events-none" />
+        <BrandWallpaper />
         <div className="fixed inset-0 -z-10 bg-black/45 pointer-events-none" />
 
         <Navbar />

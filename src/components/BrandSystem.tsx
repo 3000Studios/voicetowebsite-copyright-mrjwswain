@@ -11,10 +11,11 @@ export const BrandWallpaper = ({ density = "default" }: { density?: "default" | 
   const quiet = density === "quiet";
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[var(--vtw-canvas)]">
+    <div className="pointer-events-none fixed inset-0 -z-20 overflow-hidden bg-[var(--vtw-canvas)]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(53,226,255,0.16),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(99,102,241,0.18),transparent_35%),linear-gradient(180deg,#050711_0%,#070a14_48%,#03040a_100%)]" />
       <div className="absolute inset-0 opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(circle_at_top,black,transparent_72%)]" />
       <div className="absolute inset-0 opacity-[0.11] [background-image:linear-gradient(115deg,transparent_0_48%,rgba(53,226,255,0.22)_49%,transparent_51%)] [background-size:160px_160px]" />
+      <div className="absolute inset-[-20%] opacity-[0.14] [background-image:repeating-radial-gradient(circle_at_50%_50%,rgba(53,226,255,0.22)_0_1px,transparent_2px_24px)] [background-size:220px_220px] animate-[wallpaper-spin_58s_linear_infinite]" />
       {orbs.map((classes, index) => (
         <motion.div
           key={classes}
