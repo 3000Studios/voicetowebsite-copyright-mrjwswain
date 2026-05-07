@@ -24,7 +24,7 @@ export const ChatBot = () => {
     "who are you":
       "I am the VoiceToWebsite AI. I'm like a genie, but instead of a lamp, I live in your browser and I don't grant wishes—I build digital realities.",
     price:
-      "Our plans start at $19.99/mo. It's a small price to pay for digital dominance.",
+      "Launch pricing starts at $4.99/mo for Starter, with Pro at $9.99/mo and Ultimate at $24.99/mo.",
     help: "I can help you with pricing, features, or just keep you company while you launch your vision.",
     hello: "Greetings, visionary! Ready to speak your dreams into existence?",
   };

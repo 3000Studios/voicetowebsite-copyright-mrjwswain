@@ -32,7 +32,7 @@ export const HowItWorks = () => {
     },
     {
       title: "Pick & Launch",
-      desc: "Select your favorite version and deploy with one click.",
+      desc: "Select your favorite version, checkout securely, and launch your site.",
       icon: Rocket,
     },
     {
@@ -98,7 +98,7 @@ export const WhatYouGet = () => {
               word is generated uniquely for your brand.
             </p>
             <ul className="space-y-4">
-              {["No Watermarks (Pro)", "Full Hosting", "Domain Setup"].map(
+              {["Watermark-Free Paid Plans", "Full Hosting", "Domain Setup"].map(
                 (item) => (
                   <li
                     key={item}
@@ -240,7 +240,8 @@ export const PricingSection = () => {
     {
       id: "starter",
       name: "Starter",
-      price: "9.99",
+      listPrice: "9.99",
+      price: "4.99",
       commands: "50",
       popular: false,
       features: [
@@ -253,7 +254,8 @@ export const PricingSection = () => {
     {
       id: "pro",
       name: "Pro",
-      price: "19.99",
+      listPrice: "19.99",
+      price: "9.99",
       commands: "150",
       popular: true,
       features: [
@@ -267,7 +269,8 @@ export const PricingSection = () => {
     {
       id: "enterprise",
       name: "Ultimate",
-      price: "49.99",
+      listPrice: "49.99",
+      price: "24.99",
       commands: "500",
       popular: false,
       features: [
@@ -292,7 +295,11 @@ export const PricingSection = () => {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: planId, cadence: "month" }),
+        body: JSON.stringify({
+          plan: planId,
+          cadence: "month",
+          launch_discount: true,
+        }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
       if (data.url) {
@@ -315,7 +322,7 @@ export const PricingSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="text-4xl lg:text-7xl font-black mb-6 italic tracking-tight">
-            Invest in Your vision
+            Invest in Your Vision
           </h2>
           <p className="text-white/40 max-w-xl mx-auto">
             Choose a plan that scales with your ambition. Professional grade
@@ -340,9 +347,17 @@ export const PricingSection = () => {
                 </div>
               )}
               <h3 className="text-2xl font-black italic mb-6">{plan.name}</h3>
-              <div className="flex items-baseline gap-2 mb-10">
-                <span className="text-5xl font-black">${plan.price}</span>
-                <span className="text-white/40 text-sm">/month</span>
+              <div className="mb-10">
+                <div className="mb-2 inline-flex rounded-full border border-brand-cyan/30 bg-brand-cyan/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-brand-cyan">
+                  50% launch discount
+                </div>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-5xl font-black">${plan.price}</span>
+                  <span className="text-white/40 text-sm">/month</span>
+                </div>
+                <div className="mt-2 text-xs text-white/35">
+                  Regularly <span className="line-through">${plan.listPrice}</span>/month
+                </div>
               </div>
               <ul className="space-y-6 mb-12">
                 <li className="flex items-center gap-3 text-sm">
@@ -389,7 +404,7 @@ export const PricingSection = () => {
             onClick={() => handleCheckout("commands", "stripe")}
             className="text-white hover:text-brand-cyan underline"
           >
-            <strong>$2.99 Bundle</strong>
+            <strong>$1.49 Launch Bundle</strong>
           </button>{" "}
           adds 10 extra commands on any plan.
           <br />

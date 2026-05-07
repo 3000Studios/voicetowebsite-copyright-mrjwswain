@@ -21,7 +21,8 @@ const plans = [
   {
     name: "Starter",
     icon: Zap,
-    price: 9.99,
+    price: 4.99,
+    regularPrice: 9.99,
     description: "For creators and small businesses",
     features: [
       "Everything in Free, plus:",
@@ -38,7 +39,8 @@ const plans = [
   {
     name: "Pro",
     icon: Building2,
-    price: 19.99,
+    price: 9.99,
+    regularPrice: 19.99,
     description: "For agencies and power users",
     features: [
       "Everything in Starter, plus:",
@@ -54,7 +56,8 @@ const plans = [
   {
     name: "Ultimate",
     icon: Crown,
-    price: 49.99,
+    price: 24.99,
+    regularPrice: 49.99,
     description: "For high-volume launch teams",
     features: [
       "Everything in Pro, plus:",
@@ -162,22 +165,32 @@ export function PricingV2() {
                 {/* Price */}
                 <div className="mb-4">
                   {plan.price !== null ? (
-                    <div className="flex items-baseline gap-1">
-                      <span
-                        className={`text-4xl font-bold ${
-                          plan.popular ? "text-white" : "text-white"
-                        }`}
-                      >
-                        ${plan.price}
-                      </span>
-                      <span
-                        className={`text-sm ${
-                          plan.popular ? "text-white/80" : "text-white/50"
-                        }`}
-                      >
-                        /month
-                      </span>
-                    </div>
+                    <>
+                      <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/80">
+                        50% launch discount
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span
+                          className={`text-4xl font-bold ${
+                            plan.popular ? "text-white" : "text-white"
+                          }`}
+                        >
+                          ${plan.price}
+                        </span>
+                        <span
+                          className={`text-sm ${
+                            plan.popular ? "text-white/80" : "text-white/50"
+                          }`}
+                        >
+                          /month
+                        </span>
+                      </div>
+                      {"regularPrice" in plan ? (
+                        <div className="mt-1 text-xs text-white/45">
+                          Regularly <span className="line-through">${plan.regularPrice}</span>/month
+                        </div>
+                      ) : null}
+                    </>
                   ) : (
                     <span
                       className={`text-2xl font-bold ${

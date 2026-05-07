@@ -26,12 +26,20 @@ const FALLBACK_CHECKOUT_URLS: Record<string, { month?: string; year?: string }> 
   },
 };
 
-const PLAN_AMOUNTS: Record<string, { value: string; description: string }> = {
-  starter: { value: "9.99", description: "VoiceToWebsite.com Starter - 50 commands per month" },
-  pro: { value: "19.99", description: "VoiceToWebsite.com Pro - 150 commands per month" },
-  enterprise: { value: "49.99", description: "VoiceToWebsite.com Ultimate - 500 commands per month" },
-  commands: { value: "2.99", description: "VoiceToWebsite.com More Commands - one-time add-on" },
+const PLAN_AMOUNTS: Record<string, { value: string; launchValue: string; description: string }> = {
+  starter: { value: "9.99", launchValue: "4.99", description: "VoiceToWebsite.com Starter - 50 commands per month" },
+  pro: { value: "19.99", launchValue: "9.99", description: "VoiceToWebsite.com Pro - 150 commands per month" },
+  enterprise: { value: "49.99", launchValue: "24.99", description: "VoiceToWebsite.com Ultimate - 500 commands per month" },
+  commands: { value: "2.99", launchValue: "1.49", description: "VoiceToWebsite.com More Commands - one-time add-on" },
 };
+
+function paypalAmount(plan: string, cadence: "month" | "year", launchDiscount: boolean) {
+  const amount = PLAN_AMOUNTS[plan];
+  if (!amount) return null;
+  const monthly = Number(launchDiscount ? amount.launchValue : amount.value);
+  if (plan === "commands" || cadence === "month") return monthly.toFixed(2);
+  return (monthly * 12 * 0.8).toFixed(2);
+}
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
@@ -69,17 +77,19 @@ async function getPayPalAccessToken(env: Env) {
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
   try {
     const url = new URL(context.request.url);
-    let body: { plan?: string; cadence?: string } = {};
+    let body: { plan?: string; cadence?: string; launch_discount?: boolean } = {};
     if (url.searchParams.get("plan")) {
       body.plan = url.searchParams.get("plan") || "";
       body.cadence = url.searchParams.get("cadence") || "";
+      body.launch_discount = String(url.searchParams.get("launch_discount") || "").toLowerCase() === "true";
     } else {
       const raw = await context.request.text();
-      body = raw.trim() ? (JSON.parse(raw) as { plan?: string; cadence?: string }) : {};
+      body = raw.trim() ? (JSON.parse(raw) as { plan?: string; cadence?: string; launch_discount?: boolean }) : {};
     }
     const plan = body.plan?.toLowerCase();
     if (!plan) return jsonResponse({ error: "Missing plan" }, { status: 400 });
     const cadence = body.cadence?.toLowerCase() === "year" ? "year" : "month";
+    const launchDiscount = Boolean(body.launch_discount);
     const fallbackUrl =
       plan === "commands"
         ? FALLBACK_CHECKOUT_URLS.commands.month
@@ -107,7 +117,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
             ? context.env.PAYPAL_PLAN_PRO
             : context.env.PAYPAL_PLAN_ENTERPRISE;
 
-      if (!planId) {
+      if (!planId || launchDiscount) {
         const amount = PLAN_AMOUNTS[plan];
         if (!amount) return jsonResponse({ error: "Invalid plan" }, { status: 400 });
         const orderRes = await fetch(`${paypalBaseUrl(context.env)}/v2/checkout/orders`, {
@@ -120,8 +130,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
             intent: "CAPTURE",
             purchase_units: [
               {
-                amount: { currency_code: "USD", value: amount.value },
-                description: amount.description,
+                amount: { currency_code: "USD", value: paypalAmount(plan, cadence, launchDiscount) || amount.value },
+                description: launchDiscount ? `${amount.description} - 50% launch discount` : amount.description,
               },
             ],
             application_context: {
@@ -139,7 +149,13 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
           if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
           return jsonResponse({ error: "PayPal order creation failed" }, { status: 500 });
         }
-        return jsonResponse({ url: approveUrl, fallback: false, note: "One-time PayPal checkout used because subscription plan IDs are not configured." });
+        return jsonResponse({
+          url: approveUrl,
+          fallback: false,
+          note: launchDiscount
+            ? "One-time PayPal checkout used for the 50% launch discount."
+            : "One-time PayPal checkout used because subscription plan IDs are not configured.",
+        });
       }
 
       const subRes = await fetch(`${paypalBaseUrl(context.env)}/v1/billing/subscriptions`, {
@@ -181,8 +197,10 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         intent: "CAPTURE",
         purchase_units: [
           {
-            amount: { currency_code: "USD", value: "2.99" },
-            description: PLAN_AMOUNTS.commands.description,
+            amount: { currency_code: "USD", value: launchDiscount ? PLAN_AMOUNTS.commands.launchValue : PLAN_AMOUNTS.commands.value },
+            description: launchDiscount
+              ? `${PLAN_AMOUNTS.commands.description} - 50% launch discount`
+              : PLAN_AMOUNTS.commands.description,
           },
         ],
         application_context: {

@@ -43,7 +43,7 @@ const faqs: FAQItem[] = [
     category: "Pricing & Plans",
     question: "What's included in each plan?",
     answer:
-      "Starter ($9.99/month): 3 hosted sites and 50 commands per month. Pro ($19.99/month): 15 hosted sites, 150 commands per month, code export, premium sections, and watermark-free paid delivery. Ultimate ($49.99/month): 50 hosted sites and 500 commands per month with priority support.",
+      "Launch pricing is 50 percent off: Starter ($4.99/month): 3 hosted sites and 50 commands per month. Pro ($9.99/month): 15 hosted sites, 150 commands per month, code export, premium sections, and watermark-free paid delivery. Ultimate ($24.99/month): 50 hosted sites and 500 commands per month with priority support.",
   },
   {
     category: "Pricing & Plans",

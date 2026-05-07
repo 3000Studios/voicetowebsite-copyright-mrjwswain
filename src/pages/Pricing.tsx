@@ -29,7 +29,7 @@ export const Pricing = () => {
       }
 
       const endpoint = provider === "stripe" ? "/api/create-checkout-session" : "/api/create-paypal-order";
-      const query = new URLSearchParams({ plan, cadence }).toString();
+      const query = new URLSearchParams({ plan, cadence, launch_discount: "true" }).toString();
       const response = await fetch(`${endpoint}?${query}`, { method: "POST" });
       trackEvent("checkout_started", { plan, provider, cadence });
       const data = (await response.json()) as { url?: string; error?: string };
@@ -57,15 +57,19 @@ export const Pricing = () => {
 
   const getDisplayedPrice = (plan: PlanType) => {
     const config = PLAN_LIMITS[plan];
-    if (plan === "commands") return "$2.99";
-    if (cadence === "year") return `$${Math.round(config.price * 12 * 0.8)}`;
+    if (plan === "commands") return "$1.49";
+    if (cadence === "year") return `$${(config.price * 12 * 0.8).toFixed(2)}`;
     return `$${config.price.toFixed(2)}`;
   };
 
   const getSlashPrice = (plan: PlanType) => {
-    if (plan === "commands" || cadence === "month") return null;
+    if (plan === "commands") return PLAN_LIMITS[plan].regularPrice ? `$${PLAN_LIMITS[plan].regularPrice}` : null;
     const config = PLAN_LIMITS[plan];
-    return `$${config.price}/mo`;
+    return config.regularPrice
+      ? cadence === "year"
+        ? `$${(config.regularPrice * 12 * 0.8).toFixed(2)}`
+        : `$${config.regularPrice}/mo`
+      : null;
   };
 
   return (
@@ -81,7 +85,7 @@ export const Pricing = () => {
           <span className="eyebrow justify-center">Pricing</span>
           <h1 className="section-title">Choose the plan that matches how many sites you need to launch.</h1>
           <p className="section-copy">
-            One free sandbox preview, then paid delivery for hosted sites. Annual billing saves 20 percent.
+            One free sandbox preview, then paid delivery for hosted sites. Launch pricing is 50 percent off, and annual billing saves more.
           </p>
         </div>
 
@@ -122,7 +126,8 @@ export const Pricing = () => {
                   );
                 })}
               </div>
-              {cadence === "year" ? <span className="rounded-full border border-emerald-300/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-200">Save 20%</span> : null}
+              <span className="rounded-full border border-emerald-300/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-200">50% launch discount</span>
+              {cadence === "year" ? <span className="rounded-full border border-cyan-300/20 bg-cyan-500/10 px-3 py-1 text-xs font-bold text-cyan-200">Annual saves more</span> : null}
             </div>
 
             <div className="mt-6">
@@ -156,9 +161,9 @@ export const Pricing = () => {
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <InfoCard title="Starter" body="$9.99/month. 50 commands." />
-              <InfoCard title="Pro" body="$19.99/month. Exports + 150 commands." />
-              <InfoCard title="Ultimate" body="$49.99/month. 500 commands." />
+              <InfoCard title="Starter" body="$4.99 launch. 50 commands." />
+              <InfoCard title="Pro" body="$9.99 launch. Exports + 150 commands." />
+              <InfoCard title="Ultimate" body="$24.99 launch. 500 commands." />
             </div>
           </div>
         </div>
