@@ -100,13 +100,14 @@ function buildHtml(prompt, vid, imgs, variant) {
   const business = analyzePrompt(prompt, name);
   const [a, a2, bg] = variant.palette || ['#06b6d4', '#8b5cf6', '#030712'];
   const [hf, bf] = (variant.fontPair || 'Playfair Display / Inter').split('/').map(s => s.trim());
-  const gallery = imgs.slice(0, 6).map((u, i) => `<div class="gi fade-in"><img src="${u}" alt="Project ${i + 1}" loading="lazy"></div>`).join('');
+  const gallery = imgs.slice(0, 6).map((u, i) => `<div class="gi fade-in"><img src="${esc(u)}" alt="${business.galleryAlts[i % business.galleryAlts.length]}" loading="lazy"></div>`).join('');
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${name}</title>
+<title>${business.pageTitle}</title>
+<meta name="description" content="${business.metaDescription}">
 <link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(hf)}:wght@400;700;900&family=${encodeURIComponent(bf)}:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -153,7 +154,7 @@ h2{font-family:var(--hf);font-size:clamp(2rem,4vw,3.5rem);font-weight:900;margin
 .pr span{font-size:1rem;color:rgba(255,255,255,.45)}
 .pl{list-style:none;margin:1.5rem 0;text-align:left}
 .pl li{padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.72);font-size:.9rem}
-.pl li::before{content:"✓ ";color:var(--a);font-weight:900}
+.pl li::before{content:"- ";color:var(--a);font-weight:900}
 .fw{max-width:620px;margin:3rem auto 0}
 .fg{margin-bottom:1.5rem}
 .fg label{display:block;margin-bottom:.45rem;color:rgba(255,255,255,.65);font-size:.88rem}
@@ -238,144 +239,286 @@ document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 }
 
 function analyzePrompt(prompt, name) {
-  const p = prompt.toLowerCase();
+  const raw = String(prompt || "").replace(/\s+/g, " ").trim();
+  const p = raw.toLowerCase();
   const safeName = esc(name);
-  const isRestaurant = /restaurant|bistro|cafe|coffee|food|bar|bakery|chef|menu/.test(p);
-  const isBeauty = /spa|salon|beauty|hair|makeup|skin|wellness|massage/.test(p);
-  const isFitness = /fitness|gym|trainer|coach|yoga|workout|health/.test(p);
-  const isLaw = /law|legal|attorney|lawyer|firm/.test(p);
-  const isRealEstate = /real estate|realtor|property|homes?|listing/.test(p);
-  const isSaas = /saas|software|app|startup|platform|ai|tech/.test(p);
-  const isStore = /store|shop|ecommerce|e-commerce|product|boutique/.test(p);
-  const wantsBooking = /book|booking|appointment|reservation|schedule/.test(p);
-  const wantsDark = /dark|black|neon|cyber|night/.test(p);
-  const wantsLuxury = /luxury|premium|elegant|high end|upscale/.test(p);
+  const industry = detectIndustry(p);
+  const requested = extractRequestedItems(raw, industry);
+  const tone = extractTone(p);
+  const audience = extractAudience(raw, industry);
+  const cta = primaryCta(p, industry);
+  const coreOffer = requested[0] || industry.offer;
+  const pageTitle = `${safeName} | ${toTitle(coreOffer)} ${industry.titleSuffix}`;
 
-  const tone = wantsLuxury ? "premium" : wantsDark ? "bold" : "conversion-ready";
-  const cta = wantsBooking || isRestaurant || isBeauty || isFitness ? "Book Now" : isStore ? "Shop Now" : isSaas ? "Request Demo" : "Start Today";
-
-  let profile = {
-    headline: `${safeName} Built Around Your Customer's Next Click`,
-    subhead: `A ${tone} website preview shaped directly from your request: ${esc(prompt.slice(0, 130))}${prompt.length > 130 ? "..." : ""}`,
-    serviceTitle: `What ${safeName} Can Offer`,
-    serviceIntro: "This preview turns your prompt into real business sections, useful copy, visual media, and a clear conversion path.",
-    galleryLabel: "Visual Direction",
-    galleryTitle: `${safeName} Media Preview`,
-    testimonialTitle: `Why Customers Choose ${safeName}`,
-    pricingLabel: "Packages",
-    pricingTitle: "Choose the Right Starting Point",
-    contactTitle: `Talk With ${safeName}`,
-    messageLabel: "What do you need?",
-    messagePlaceholder: "Tell us what you want to build, buy, book, or improve...",
-    primaryCta: cta,
-    services: [
-      { icon: "⚡", title: "Fast Response", copy: "Give visitors a clear next step with direct calls to action and fast-loading sections." },
-      { icon: "🎯", title: "Focused Offers", copy: "Turn your core services into easy-to-scan cards, benefits, and proof points." },
-      { icon: "📈", title: "Conversion Flow", copy: "Guide customers from the hero section into trust, pricing, and contact without friction." },
-      { icon: "🎬", title: "Video-Led Story", copy: "Use motion and media to make the brand feel active, credible, and premium." },
-      { icon: "🔎", title: "SEO Structure", copy: "Ship with semantic sections, keyword-rich headings, and crawlable content." },
-      { icon: "💎", title: "Polished Brand", copy: "Give the business a finished visual system instead of a generic template." },
-    ],
-    testimonials: [
-      { quote: `${safeName} made the decision easy from the first visit.`, author: "Avery R., Customer" },
-      { quote: "The page answered my questions quickly and gave me a reason to reach out.", author: "Morgan T., Client" },
-      { quote: "The design felt custom, trustworthy, and ready for business.", author: "Jordan K., Buyer" },
-    ],
-    plans: [
-      { name: "Starter", price: "$497", unit: "/project", features: ["Homepage", "Mobile responsive", "Lead form", "SEO-ready copy", "Fast launch"], cta: cta },
-      { name: "Professional", price: "$997", unit: "/project", features: ["Expanded pages", "Video hero", "Gallery", "Testimonials", "Analytics-ready"], cta: "Most Popular" },
-      { name: "Premium", price: "$2,497", unit: "/project", features: ["Custom sections", "Advanced conversion flow", "Media library", "Priority launch", "Growth support"], cta: "Contact Us" },
-    ],
-  };
-
-  if (isRestaurant) {
-    profile = {
-      ...profile,
-      headline: `${safeName} Serves an Experience Worth Reserving`,
-      subhead: "A restaurant-ready website with atmosphere, menu highlights, reservations, social proof, and food-forward media.",
-      serviceTitle: "Menu, Reservations, and Hospitality Flow",
-      serviceIntro: "Show signature dishes, location, hours, private events, and reservation actions in one premium path.",
-      messageLabel: "Reservation or event details",
-      messagePlaceholder: "Tell us your party size, date, event type, or catering request...",
-      services: [
-        { icon: "🍽️", title: "Signature Menu", copy: "Highlight best-selling dishes, drinks, chef specials, and seasonal offers." },
-        { icon: "📅", title: "Reservations", copy: "Move guests from interest to booking with clear date, party, and contact fields." },
-        { icon: "📍", title: "Location and Hours", copy: "Make hours, parking, directions, and service windows easy to find." },
-        { icon: "🎉", title: "Private Events", copy: "Promote catering, private dining, birthdays, and group reservations." },
-        { icon: "⭐", title: "Guest Reviews", copy: "Use social proof to build trust before guests arrive." },
-        { icon: "📸", title: "Food Gallery", copy: "Let strong visuals sell the atmosphere and menu before the first click." },
-      ],
-    };
-  } else if (isBeauty) {
-    profile = {
-      ...profile,
-      headline: `${safeName} Turns Self-Care Into a Premium Booking`,
-      subhead: "A beauty and wellness preview built around services, appointments, treatment trust, and visual polish.",
-      serviceTitle: "Appointments, Treatments, and Client Confidence",
-      serviceIntro: "Show service menus, stylist or provider expertise, before-and-after visuals, and appointment CTAs.",
-      messageLabel: "Service or appointment request",
-      messagePlaceholder: "Tell us the service, date, provider preference, or treatment goal...",
-      services: [
-        { icon: "✨", title: "Signature Services", copy: "Present treatments, packages, pricing cues, and appointment-ready details." },
-        { icon: "📅", title: "Online Booking", copy: "Push visitors toward scheduling with frictionless calls to action." },
-        { icon: "🧴", title: "Treatment Trust", copy: "Explain benefits, safety, process, and expected outcomes clearly." },
-        { icon: "👩‍🎨", title: "Provider Profiles", copy: "Show expertise, style, and personality to build confidence." },
-        { icon: "📷", title: "Before and After", copy: "Use visual proof to show transformation and quality." },
-        { icon: "💬", title: "Client Reviews", copy: "Put testimonials near service CTAs to lift booking intent." },
-      ],
-    };
-  } else if (isFitness) {
-    profile = {
-      ...profile,
-      headline: `${safeName} Builds Momentum Before the First Session`,
-      subhead: "A fitness-focused preview with programs, coaching proof, memberships, transformation stories, and signup CTAs.",
-      serviceTitle: "Training, Programs, and Membership Growth",
-      serviceIntro: "Turn classes, coaching, plans, and testimonials into a high-energy funnel for leads and signups.",
-    };
-  } else if (isLaw) {
-    profile = {
-      ...profile,
-      headline: `${safeName} Makes Legal Help Clear and Trustworthy`,
-      subhead: "A professional legal website preview with practice areas, attorney credibility, consultation CTAs, and trust signals.",
-      serviceTitle: "Practice Areas and Consultation Flow",
-      serviceIntro: "Help visitors understand services, urgency, credentials, and the safest next step.",
-      primaryCta: "Request Consultation",
-    };
-  } else if (isRealEstate) {
-    profile = {
-      ...profile,
-      headline: `${safeName} Converts Property Interest Into Qualified Leads`,
-      subhead: "A real-estate preview with featured listings, neighborhood story, buyer/seller CTAs, and lead capture.",
-      serviceTitle: "Listings, Neighborhoods, and Lead Capture",
-      serviceIntro: "Showcase properties and guide buyers or sellers into a confident conversation.",
-    };
-  } else if (isSaas) {
-    profile = {
-      ...profile,
-      headline: `${safeName} Explains the Product and Wins the Demo`,
-      subhead: "A SaaS-ready preview with product clarity, benefits, feature cards, pricing, proof, and demo CTAs.",
-      serviceTitle: "Product Clarity and Demo Conversion",
-      serviceIntro: "Explain what the product does, who it helps, why it is different, and how to start.",
-      primaryCta: "Book a Demo",
-    };
-  } else if (isStore) {
-    profile = {
-      ...profile,
-      headline: `${safeName} Turns Browsers Into Buyers`,
-      subhead: "A commerce-ready preview with product story, featured collections, trust badges, and purchase CTAs.",
-      serviceTitle: "Products, Collections, and Sales Flow",
-      serviceIntro: "Feature what customers can buy, why it matters, and how to complete the purchase.",
-      primaryCta: "Shop Now",
-    };
+  const services = requested.slice(0, 6).map((item, index) => serviceCard(item, index, industry, safeName));
+  while (services.length < 6) {
+    services.push(serviceCard(industry.defaults[services.length % industry.defaults.length], services.length, industry, safeName));
   }
 
-  return profile;
+  return {
+    pageTitle: esc(pageTitle),
+    metaDescription: esc(`${safeName} ${industry.metaVerb} ${requested.slice(0, 4).join(", ")} for ${audience}.`),
+    headline: esc(`${safeName} ${industry.headlineVerb} ${toTitle(coreOffer)}`),
+    subhead: esc(`${tone} ${industry.label} website for ${audience}, built around ${joinHuman(requested.slice(0, 4))}.`),
+    serviceTitle: esc(`${toTitle(industry.serviceNoun)} Built From Your Prompt`),
+    serviceIntro: esc(`${safeName} needs pages that talk about ${joinHuman(requested.slice(0, 5))}. These cards are generated from that request, not a generic layout.`),
+    galleryLabel: esc(`${toTitle(industry.label)} Visuals`),
+    galleryTitle: esc(`${safeName} ${toTitle(coreOffer)} Gallery`),
+    galleryAlts: requested.map((item) => esc(`${safeName} ${item} website visual`)),
+    testimonialTitle: esc(`${toTitle(industry.proofNoun)} for ${safeName}`),
+    pricingLabel: esc(`${toTitle(industry.packageNoun)} Options`),
+    pricingTitle: esc(`${toTitle(coreOffer)} Packages`),
+    contactTitle: esc(`${cta} With ${safeName}`),
+    messageLabel: esc(industry.messageLabel),
+    messagePlaceholder: esc(`${industry.messagePrompt} Mention ${requested.slice(0, 3).join(", ")} if that is what you need.`),
+    primaryCta: esc(cta),
+    services,
+    testimonials: testimonialCards(safeName, requested, industry),
+    plans: pricingCards(requested, industry, cta),
+  };
+}
+
+const INDUSTRIES = {
+  restaurant: {
+    label: "restaurant",
+    titleSuffix: "Restaurant",
+    offer: "reservations",
+    headlineVerb: "Makes Every Visit Start With",
+    metaVerb: "promotes",
+    serviceNoun: "menu and reservation sections",
+    proofNoun: "guest trust",
+    packageNoun: "dining",
+    messageLabel: "Reservation or event details",
+    messagePrompt: "Tell us your party size, preferred date, menu interest, event type, or catering request.",
+    defaults: ["chef menu", "online reservations", "wine room", "private dining", "seasonal specials", "location and hours"],
+  },
+  beauty: {
+    label: "beauty and wellness",
+    titleSuffix: "Appointments",
+    offer: "appointments",
+    headlineVerb: "Turns Interest Into",
+    metaVerb: "books",
+    serviceNoun: "services and appointments",
+    proofNoun: "client confidence",
+    packageNoun: "treatment",
+    messageLabel: "Service or appointment request",
+    messagePrompt: "Tell us the service, date, provider preference, treatment goal, or event.",
+    defaults: ["service menu", "online booking", "treatment benefits", "provider profiles", "before and after gallery", "client reviews"],
+  },
+  fitness: {
+    label: "fitness",
+    titleSuffix: "Training",
+    offer: "training signups",
+    headlineVerb: "Builds Momentum Through",
+    metaVerb: "sells",
+    serviceNoun: "programs and memberships",
+    proofNoun: "member results",
+    packageNoun: "training",
+    messageLabel: "Training goal",
+    messagePrompt: "Tell us your goal, experience level, preferred schedule, and program interest.",
+    defaults: ["personal training", "group classes", "transformation plans", "membership options", "coach profiles", "progress tracking"],
+  },
+  law: {
+    label: "legal",
+    titleSuffix: "Consultations",
+    offer: "consultations",
+    headlineVerb: "Builds Trust Around",
+    metaVerb: "explains",
+    serviceNoun: "practice areas",
+    proofNoun: "case confidence",
+    packageNoun: "consultation",
+    messageLabel: "Legal matter",
+    messagePrompt: "Tell us the practice area, urgency, location, and consultation request.",
+    defaults: ["practice areas", "attorney credentials", "case evaluations", "consultation booking", "client confidentiality", "local representation"],
+  },
+  realestate: {
+    label: "real estate",
+    titleSuffix: "Listings",
+    offer: "qualified property leads",
+    headlineVerb: "Converts Searches Into",
+    metaVerb: "showcases",
+    serviceNoun: "listings and lead capture",
+    proofNoun: "buyer and seller confidence",
+    packageNoun: "property",
+    messageLabel: "Property goal",
+    messagePrompt: "Tell us whether you are buying, selling, investing, or booking a showing.",
+    defaults: ["featured listings", "home valuation", "buyer consultation", "seller strategy", "neighborhood guide", "showing requests"],
+  },
+  saas: {
+    label: "software",
+    titleSuffix: "Product Demo",
+    offer: "product demos",
+    headlineVerb: "Explains and Sells",
+    metaVerb: "positions",
+    serviceNoun: "features and demos",
+    proofNoun: "product proof",
+    packageNoun: "software",
+    messageLabel: "Product interest",
+    messagePrompt: "Tell us your team size, use case, integration needs, and demo timing.",
+    defaults: ["product dashboard", "automation workflow", "integrations", "security", "pricing", "demo booking"],
+  },
+  store: {
+    label: "commerce",
+    titleSuffix: "Shop",
+    offer: "featured products",
+    headlineVerb: "Turns Browsers Into Buyers With",
+    metaVerb: "sells",
+    serviceNoun: "products and collections",
+    proofNoun: "buyer trust",
+    packageNoun: "shopping",
+    messageLabel: "Product request",
+    messagePrompt: "Tell us what product, collection, size, style, or delivery option you want.",
+    defaults: ["featured products", "new arrivals", "best sellers", "customer reviews", "shipping details", "secure checkout"],
+  },
+  general: {
+    label: "business",
+    titleSuffix: "Website",
+    offer: "customer inquiries",
+    headlineVerb: "Turns Visitors Into",
+    metaVerb: "presents",
+    serviceNoun: "offers and conversion paths",
+    proofNoun: "customer trust",
+    packageNoun: "service",
+    messageLabel: "Project details",
+    messagePrompt: "Tell us what you need, who it is for, and what should happen next.",
+    defaults: ["core offer", "service details", "customer proof", "booking flow", "media gallery", "contact form"],
+  },
+};
+
+function detectIndustry(p) {
+  if (/restaurant|bistro|cafe|coffee|food|bar|bakery|chef|menu|wine|reservation/.test(p)) return INDUSTRIES.restaurant;
+  if (/spa|salon|beauty|hair|makeup|skin|wellness|massage|treatment|appointment/.test(p)) return INDUSTRIES.beauty;
+  if (/fitness|gym|trainer|coach|yoga|workout|health|membership/.test(p)) return INDUSTRIES.fitness;
+  if (/law|legal|attorney|lawyer|firm|consultation/.test(p)) return INDUSTRIES.law;
+  if (/real estate|realtor|property|homes?|listing|showing/.test(p)) return INDUSTRIES.realestate;
+  if (/saas|software|app|startup|platform|ai|tech|dashboard|demo/.test(p)) return INDUSTRIES.saas;
+  if (/store|shop|ecommerce|e-commerce|product|boutique|checkout|collection/.test(p)) return INDUSTRIES.store;
+  return INDUSTRIES.general;
+}
+
+function extractRequestedItems(prompt, industry) {
+  const promptDetails = [];
+  const detailMatch = prompt.match(/\b(?:with|including|include|needs?|has|featuring)\s+(.+)$/i);
+  if (detailMatch?.[1]) {
+    promptDetails.push(
+      ...detailMatch[1]
+        .split(/\s*(?:,|;|\+|\band\b)\s*/i)
+        .map((item) => item.trim())
+        .filter((item) => item.length > 2)
+    );
+  }
+  const cleaned = prompt
+    .replace(/\b(build|create|make|design|generate|website|site|landing page|homepage|for|called|named|with|and|that|has|needs?|including|include|using|a|an|the)\b/gi, " ")
+    .replace(/[^a-z0-9&$%.\-\s]/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const phrases = cleaned
+    .split(/\s*(?:,|;|\+|\band\b|\bwith\b)\s*/i)
+    .map((item) => item.trim())
+    .filter((item) => item.length > 2 && !isMostlyBrand(item, prompt));
+
+  const keywordMatches = industry.defaults.filter((item) => prompt.toLowerCase().includes(item.split(" ")[0]));
+  return unique([...promptDetails, ...phrases, ...keywordMatches, ...industry.defaults]).slice(0, 8);
+}
+
+function isMostlyBrand(item, prompt) {
+  const name = extractName(prompt).toLowerCase();
+  return name && item.toLowerCase().includes(name);
+}
+
+function serviceCard(item, index, industry, safeName) {
+  const title = esc(toTitle(item));
+  const copy = esc(copyForItem(item, industry, safeName));
+  return { icon: String(index + 1).padStart(2, "0"), title, copy };
+}
+
+function copyForItem(item, industry, safeName) {
+  const lower = item.toLowerCase();
+  if (/video|background|media|gallery|photo|image/.test(lower)) return `${safeName} uses this visual section to show atmosphere, quality, and proof before visitors decide.`;
+  if (/book|reservation|appointment|schedule|demo|consultation|showing/.test(lower)) return `Visitors can move directly from interest to action with a clear ${item} flow.`;
+  if (/menu|product|collection|listing|program|service|practice/.test(lower)) return `This section presents ${item} clearly so customers understand what is available and why it matters.`;
+  if (/review|testimonial|proof|case|result/.test(lower)) return `Trust content supports ${item} with specific claims, outcomes, and reasons to take the next step.`;
+  if (/price|pricing|package|membership|plan/.test(lower)) return `Package copy for ${item} helps visitors compare options without slowing down the sale.`;
+  return `${safeName} gets a dedicated section for ${item}, written in the same language the customer asked for.`;
+}
+
+function testimonialCards(safeName, requested, industry) {
+  const a = requested[0] || industry.offer;
+  const b = requested[1] || industry.defaults[1];
+  const c = requested[2] || industry.defaults[2];
+  return [
+    { quote: esc(`${safeName} made ${a} clear right away.`), author: "Verified Customer" },
+    { quote: esc(`I found ${b} without searching through filler.`), author: "Local Client" },
+    { quote: esc(`The page explained ${c} and gave me a reason to reach out.`), author: "New Lead" },
+  ];
+}
+
+function pricingCards(requested, industry, cta) {
+  const base = requested.slice(0, 5);
+  return [
+    { name: esc(`Essential ${toTitle(industry.packageNoun)}`), price: "$497", unit: "/start", features: base.slice(0, 3).map(toTitle), cta: esc(cta) },
+    { name: esc(`Complete ${toTitle(industry.packageNoun)}`), price: "$997", unit: "/build", features: base.slice(0, 4).map(toTitle), cta: "Most Popular" },
+    { name: esc(`Premium ${toTitle(industry.packageNoun)}`), price: "$2,497", unit: "/launch", features: base.slice(0, 5).map(toTitle), cta: "Contact Us" },
+  ];
+}
+
+function extractTone(p) {
+  if (/luxury|premium|elegant|upscale|high end/.test(p)) return "A premium";
+  if (/dark|black|neon|cyber|bold/.test(p)) return "A bold";
+  if (/minimal|clean|simple/.test(p)) return "A clean";
+  if (/fun|colorful|playful/.test(p)) return "A lively";
+  return "A custom";
+}
+
+function extractAudience(prompt, industry) {
+  const m = prompt.match(/\b(?:for|serving|targeting|made for)\s+([^.,;]{4,80})/i);
+  if (m?.[1] && !/called|named|brand|business/i.test(m[1])) return esc(m[1].trim());
+  return esc(industry.label === "restaurant" ? "hungry local guests" : industry.label === "software" ? "teams comparing products" : `${industry.label} customers`);
+}
+
+function primaryCta(p, industry) {
+  if (/reservation|reserve/.test(p)) return "Reserve a Table";
+  if (/appointment|book|schedule/.test(p)) return "Book Now";
+  if (/demo/.test(p)) return "Book a Demo";
+  if (/shop|buy|product/.test(p)) return "Shop Now";
+  if (/consult/.test(p)) return "Request Consultation";
+  return industry.label === "restaurant" ? "Reserve a Table" : industry.label === "commerce" ? "Shop Now" : "Start Today";
 }
 
 function extractName(prompt) {
-  const m = prompt.match(/\b(?:for|called|named|brand|business)\s+([A-Za-z0-9&.\-\s]{3,50})/i);
-  if (m && m[1]) return m[1].trim().replace(/[.,;:!?]+$/, '');
-  return prompt.split(/\s+/).slice(0, 4).join(' ');
+  const quoted = prompt.match(/["']([^"']{3,80})["']/);
+  if (quoted?.[1]) return cleanName(quoted[1]);
+  const m = prompt.match(/\b(?:for|called|named|brand|business)\s+([A-Za-z0-9&.\-\s]{3,70})/i);
+  if (m?.[1]) return cleanName(m[1].replace(/\b(with|that|and|using|needs?|including|include|has)\b.*$/i, ""));
+  return cleanName(prompt.split(/\s+/).slice(0, 4).join(' '));
+}
+
+function cleanName(value) {
+  return String(value || "Generated Brand").trim().replace(/[.,;:!?]+$/, '').slice(0, 70) || "Generated Brand";
+}
+
+function toTitle(value) {
+  return String(value || "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b[a-z]/gi, (char) => char.toUpperCase());
+}
+
+function joinHuman(items) {
+  const clean = items.filter(Boolean).map((item) => item.toLowerCase());
+  if (clean.length <= 1) return clean[0] || "the requested offer";
+  return `${clean.slice(0, -1).join(", ")} and ${clean[clean.length - 1]}`;
+}
+
+function unique(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = item.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function esc(value) {
