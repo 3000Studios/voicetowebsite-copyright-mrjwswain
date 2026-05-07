@@ -29,37 +29,38 @@ export async function onRequestPost(context) {
     const { prompt, imageUrls = [], videoUrl = '' } = body;
     if (!prompt || prompt.trim().length < 3) return jsonR({ error: 'Prompt is required' }, 400);
 
-    const geminiKey = env.GEMINI_API_KEY || 'AIzaSyCBGfV7VjEKmuYkKvzuALs20GFJVUTiIwk';
+    const geminiKey = env.GEMINI_API_KEY || '';
     const vid = videoUrl || 'https://cdn.coverr.co/videos/coverr-working-in-a-modern-office-1565/1080p.mp4';
     const imgs = imageUrls.length ? imageUrls : ['https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80'];
 
     const enriched = `Business prompt: "${prompt}"\nHero video URL: ${vid}\nGallery images: ${imgs.join(', ')}\nGenerate 3 complete premium website variations. Write real copy specific to this business.`;
 
-    const gRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: [{ parts: [{ text: enriched }] }],
-          generationConfig: { temperature: 0.85, maxOutputTokens: 8192, responseMimeType: 'application/json' },
-        }),
-      }
-    );
-
     let parsed = null;
-    if (gRes.ok) {
-      const gData = await gRes.json();
-      const raw = gData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      try {
-        parsed = JSON.parse(raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim());
-      } catch {
-        const m = raw.match(/\{[\s\S]*\}/);
-        if (m) { try { parsed = JSON.parse(m[0]); } catch { parsed = null; } }
+    if (geminiKey) {
+      const gRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents: [{ parts: [{ text: enriched }] }],
+            generationConfig: { temperature: 0.85, maxOutputTokens: 8192, responseMimeType: 'application/json' },
+          }),
+        }
+      );
+
+      if (gRes.ok) {
+        const gData = await gRes.json();
+        const raw = gData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        try {
+          parsed = JSON.parse(raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim());
+        } catch {
+          const m = raw.match(/\{[\s\S]*\}/);
+          if (m) { try { parsed = JSON.parse(m[0]); } catch { parsed = null; } }
+        }
       }
     }
-
     if (!parsed?.variations?.length) {
       parsed = buildFallback(prompt, vid, imgs);
     }
@@ -96,6 +97,7 @@ function buildFallback(prompt, vid, imgs) {
 
 function buildHtml(prompt, vid, imgs, variant) {
   const name = extractName(prompt);
+  const business = analyzePrompt(prompt, name);
   const [a, a2, bg] = variant.palette || ['#06b6d4', '#8b5cf6', '#030712'];
   const [hf, bf] = (variant.fontPair || 'Playfair Display / Inter').split('/').map(s => s.trim());
   const gallery = imgs.slice(0, 6).map((u, i) => `<div class="gi fade-in"><img src="${u}" alt="Project ${i + 1}" loading="lazy"></div>`).join('');
@@ -151,7 +153,7 @@ h2{font-family:var(--hf);font-size:clamp(2rem,4vw,3.5rem);font-weight:900;margin
 .pr span{font-size:1rem;color:rgba(255,255,255,.45)}
 .pl{list-style:none;margin:1.5rem 0;text-align:left}
 .pl li{padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.72);font-size:.9rem}
-.pl li::before{content:"checkmark ";color:var(--a)}
+.pl li::before{content:"✓ ";color:var(--a);font-weight:900}
 .fw{max-width:620px;margin:3rem auto 0}
 .fg{margin-bottom:1.5rem}
 .fg label{display:block;margin-bottom:.45rem;color:rgba(255,255,255,.65);font-size:.88rem}
@@ -179,57 +181,48 @@ footer{padding:3rem 5vw;border-top:1px solid rgba(255,255,255,.08);text-align:ce
   <video src="${vid}" autoplay loop muted playsinline></video>
   <div class="hero-ov"></div>
   <div class="hc">
-    <h1>Premium ${name} Experience</h1>
-    <p>We deliver exceptional results with a commitment to quality, innovation, and your complete satisfaction.</p>
-    <a href="#contact" class="btn">Start Your Project</a>
+    <h1>${business.headline}</h1>
+    <p>${business.subhead}</p>
+    <a href="#contact" class="btn">${business.primaryCta}</a>
     <a href="#services" class="btn btn-g">Learn More</a>
   </div>
 </section>
 <section id="services">
   <div class="lbl">What We Offer</div>
-  <h2>Our Premium Services</h2>
-  <p style="color:rgba(255,255,255,.6);max-width:580px;line-height:1.8">Everything you need to succeed, delivered with precision and care by our expert team.</p>
+  <h2>${business.serviceTitle}</h2>
+  <p style="color:rgba(255,255,255,.6);max-width:580px;line-height:1.8">${business.serviceIntro}</p>
   <div class="g3">
-    <div class="card fade-in"><div class="ci">&#9889;</div><h3>Fast Delivery</h3><p>We work efficiently without compromising quality, ensuring your project launches on time every time.</p></div>
-    <div class="card fade-in"><div class="ci">&#127919;</div><h3>Precision Results</h3><p>Every detail is crafted with intention. We focus on what matters most to your business and customers.</p></div>
-    <div class="card fade-in"><div class="ci">&#128274;</div><h3>Trusted and Secure</h3><p>Your data and projects are protected with enterprise-grade security and complete confidentiality.</p></div>
-    <div class="card fade-in"><div class="ci">&#128200;</div><h3>Growth Focused</h3><p>We build with conversion and growth in mind, turning visitors into loyal, paying customers.</p></div>
-    <div class="card fade-in"><div class="ci">&#127760;</div><h3>Global Reach</h3><p>Reach customers anywhere in the world with our globally optimized infrastructure and strategy.</p></div>
-    <div class="card fade-in"><div class="ci">&#128142;</div><h3>Premium Quality</h3><p>Top-tier craftsmanship in every deliverable. We never cut corners on quality or customer experience.</p></div>
+    ${business.services.map((item) => `<div class="card fade-in"><div class="ci">${item.icon}</div><h3>${item.title}</h3><p>${item.copy}</p></div>`).join('')}
   </div>
 </section>
 <section id="gallery" style="background:rgba(255,255,255,.02)">
-  <div class="lbl">Our Work</div>
-  <h2>Featured Projects</h2>
+  <div class="lbl">${business.galleryLabel}</div>
+  <h2>${business.galleryTitle}</h2>
   <div class="gg">${gallery}</div>
 </section>
 <section style="background:rgba(255,255,255,.03)">
   <div class="lbl">Client Love</div>
-  <h2>What Our Clients Say</h2>
+  <h2>${business.testimonialTitle}</h2>
   <div class="tg">
-    <div class="tc fade-in"><p>"Working with ${name} was the best business decision we made this year. The results exceeded every expectation."</p><div class="au">&#8212; Sarah M., CEO</div></div>
-    <div class="tc fade-in"><p>"Professional, fast, and incredibly talented. Our revenue increased 40% within the first month of launch."</p><div class="au">&#8212; James K., Founder</div></div>
-    <div class="tc fade-in"><p>"The attention to detail is unmatched. Every element was crafted perfectly for our brand and audience."</p><div class="au">&#8212; Priya L., Director</div></div>
+    ${business.testimonials.map((item) => `<div class="tc fade-in"><p>"${item.quote}"</p><div class="au">&#8212; ${item.author}</div></div>`).join('')}
   </div>
 </section>
 <section id="pricing">
-  <div class="lbl">Transparent Pricing</div>
-  <h2>Choose Your Plan</h2>
+  <div class="lbl">${business.pricingLabel}</div>
+  <h2>${business.pricingTitle}</h2>
   <div class="pg">
-    <div class="pc fade-in"><h3>Starter</h3><div class="pr">$497<span>/project</span></div><ul class="pl"><li>5-page website</li><li>Mobile responsive</li><li>SEO optimized</li><li>Contact form</li><li>1 revision round</li></ul><a href="#contact" class="btn" style="width:100%;text-align:center;display:block;margin-top:1.5rem">Get Started</a></div>
-    <div class="pc ft fade-in"><h3>Professional</h3><div class="pr">$997<span>/project</span></div><ul class="pl"><li>10-page website</li><li>Custom animations</li><li>CMS integration</li><li>Analytics setup</li><li>3 revision rounds</li></ul><a href="#contact" class="btn" style="width:100%;text-align:center;display:block;margin-top:1.5rem">Most Popular</a></div>
-    <div class="pc fade-in"><h3>Enterprise</h3><div class="pr">$2,497<span>/project</span></div><ul class="pl"><li>Unlimited pages</li><li>E-commerce ready</li><li>Custom integrations</li><li>Priority support</li><li>Unlimited revisions</li></ul><a href="#contact" class="btn" style="width:100%;text-align:center;display:block;margin-top:1.5rem">Contact Us</a></div>
+    ${business.plans.map((plan, index) => `<div class="pc ${index === 1 ? 'ft' : ''} fade-in"><h3>${plan.name}</h3><div class="pr">${plan.price}<span>${plan.unit}</span></div><ul class="pl">${plan.features.map((feature) => `<li>${feature}</li>`).join('')}</ul><a href="#contact" class="btn" style="width:100%;text-align:center;display:block;margin-top:1.5rem">${plan.cta}</a></div>`).join('')}
   </div>
 </section>
 <section id="contact">
   <div class="lbl">Get In Touch</div>
-  <h2>Start Your Project Today</h2>
+  <h2>${business.contactTitle}</h2>
   <div class="fw fade-in">
     <div class="fg"><label>Full Name</label><input type="text" placeholder="Your full name"></div>
     <div class="fg"><label>Email Address</label><input type="email" placeholder="your@email.com"></div>
     <div class="fg"><label>Phone Number</label><input type="tel" placeholder="+1 (555) 000-0000"></div>
-    <div class="fg"><label>Project Details</label><textarea placeholder="Tell us about your project..."></textarea></div>
-    <button class="btn" style="width:100%" type="button">Send Message</button>
+    <div class="fg"><label>${business.messageLabel}</label><textarea placeholder="${business.messagePlaceholder}"></textarea></div>
+    <button class="btn" style="width:100%" type="button">${business.primaryCta}</button>
   </div>
 </section>
 <footer>
@@ -244,10 +237,153 @@ document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 </html>`;
 }
 
+function analyzePrompt(prompt, name) {
+  const p = prompt.toLowerCase();
+  const safeName = esc(name);
+  const isRestaurant = /restaurant|bistro|cafe|coffee|food|bar|bakery|chef|menu/.test(p);
+  const isBeauty = /spa|salon|beauty|hair|makeup|skin|wellness|massage/.test(p);
+  const isFitness = /fitness|gym|trainer|coach|yoga|workout|health/.test(p);
+  const isLaw = /law|legal|attorney|lawyer|firm/.test(p);
+  const isRealEstate = /real estate|realtor|property|homes?|listing/.test(p);
+  const isSaas = /saas|software|app|startup|platform|ai|tech/.test(p);
+  const isStore = /store|shop|ecommerce|e-commerce|product|boutique/.test(p);
+  const wantsBooking = /book|booking|appointment|reservation|schedule/.test(p);
+  const wantsDark = /dark|black|neon|cyber|night/.test(p);
+  const wantsLuxury = /luxury|premium|elegant|high end|upscale/.test(p);
+
+  const tone = wantsLuxury ? "premium" : wantsDark ? "bold" : "conversion-ready";
+  const cta = wantsBooking || isRestaurant || isBeauty || isFitness ? "Book Now" : isStore ? "Shop Now" : isSaas ? "Request Demo" : "Start Today";
+
+  let profile = {
+    headline: `${safeName} Built Around Your Customer's Next Click`,
+    subhead: `A ${tone} website preview shaped directly from your request: ${esc(prompt.slice(0, 130))}${prompt.length > 130 ? "..." : ""}`,
+    serviceTitle: `What ${safeName} Can Offer`,
+    serviceIntro: "This preview turns your prompt into real business sections, useful copy, visual media, and a clear conversion path.",
+    galleryLabel: "Visual Direction",
+    galleryTitle: `${safeName} Media Preview`,
+    testimonialTitle: `Why Customers Choose ${safeName}`,
+    pricingLabel: "Packages",
+    pricingTitle: "Choose the Right Starting Point",
+    contactTitle: `Talk With ${safeName}`,
+    messageLabel: "What do you need?",
+    messagePlaceholder: "Tell us what you want to build, buy, book, or improve...",
+    primaryCta: cta,
+    services: [
+      { icon: "⚡", title: "Fast Response", copy: "Give visitors a clear next step with direct calls to action and fast-loading sections." },
+      { icon: "🎯", title: "Focused Offers", copy: "Turn your core services into easy-to-scan cards, benefits, and proof points." },
+      { icon: "📈", title: "Conversion Flow", copy: "Guide customers from the hero section into trust, pricing, and contact without friction." },
+      { icon: "🎬", title: "Video-Led Story", copy: "Use motion and media to make the brand feel active, credible, and premium." },
+      { icon: "🔎", title: "SEO Structure", copy: "Ship with semantic sections, keyword-rich headings, and crawlable content." },
+      { icon: "💎", title: "Polished Brand", copy: "Give the business a finished visual system instead of a generic template." },
+    ],
+    testimonials: [
+      { quote: `${safeName} made the decision easy from the first visit.`, author: "Avery R., Customer" },
+      { quote: "The page answered my questions quickly and gave me a reason to reach out.", author: "Morgan T., Client" },
+      { quote: "The design felt custom, trustworthy, and ready for business.", author: "Jordan K., Buyer" },
+    ],
+    plans: [
+      { name: "Starter", price: "$497", unit: "/project", features: ["Homepage", "Mobile responsive", "Lead form", "SEO-ready copy", "Fast launch"], cta: cta },
+      { name: "Professional", price: "$997", unit: "/project", features: ["Expanded pages", "Video hero", "Gallery", "Testimonials", "Analytics-ready"], cta: "Most Popular" },
+      { name: "Premium", price: "$2,497", unit: "/project", features: ["Custom sections", "Advanced conversion flow", "Media library", "Priority launch", "Growth support"], cta: "Contact Us" },
+    ],
+  };
+
+  if (isRestaurant) {
+    profile = {
+      ...profile,
+      headline: `${safeName} Serves an Experience Worth Reserving`,
+      subhead: "A restaurant-ready website with atmosphere, menu highlights, reservations, social proof, and food-forward media.",
+      serviceTitle: "Menu, Reservations, and Hospitality Flow",
+      serviceIntro: "Show signature dishes, location, hours, private events, and reservation actions in one premium path.",
+      messageLabel: "Reservation or event details",
+      messagePlaceholder: "Tell us your party size, date, event type, or catering request...",
+      services: [
+        { icon: "🍽️", title: "Signature Menu", copy: "Highlight best-selling dishes, drinks, chef specials, and seasonal offers." },
+        { icon: "📅", title: "Reservations", copy: "Move guests from interest to booking with clear date, party, and contact fields." },
+        { icon: "📍", title: "Location and Hours", copy: "Make hours, parking, directions, and service windows easy to find." },
+        { icon: "🎉", title: "Private Events", copy: "Promote catering, private dining, birthdays, and group reservations." },
+        { icon: "⭐", title: "Guest Reviews", copy: "Use social proof to build trust before guests arrive." },
+        { icon: "📸", title: "Food Gallery", copy: "Let strong visuals sell the atmosphere and menu before the first click." },
+      ],
+    };
+  } else if (isBeauty) {
+    profile = {
+      ...profile,
+      headline: `${safeName} Turns Self-Care Into a Premium Booking`,
+      subhead: "A beauty and wellness preview built around services, appointments, treatment trust, and visual polish.",
+      serviceTitle: "Appointments, Treatments, and Client Confidence",
+      serviceIntro: "Show service menus, stylist or provider expertise, before-and-after visuals, and appointment CTAs.",
+      messageLabel: "Service or appointment request",
+      messagePlaceholder: "Tell us the service, date, provider preference, or treatment goal...",
+      services: [
+        { icon: "✨", title: "Signature Services", copy: "Present treatments, packages, pricing cues, and appointment-ready details." },
+        { icon: "📅", title: "Online Booking", copy: "Push visitors toward scheduling with frictionless calls to action." },
+        { icon: "🧴", title: "Treatment Trust", copy: "Explain benefits, safety, process, and expected outcomes clearly." },
+        { icon: "👩‍🎨", title: "Provider Profiles", copy: "Show expertise, style, and personality to build confidence." },
+        { icon: "📷", title: "Before and After", copy: "Use visual proof to show transformation and quality." },
+        { icon: "💬", title: "Client Reviews", copy: "Put testimonials near service CTAs to lift booking intent." },
+      ],
+    };
+  } else if (isFitness) {
+    profile = {
+      ...profile,
+      headline: `${safeName} Builds Momentum Before the First Session`,
+      subhead: "A fitness-focused preview with programs, coaching proof, memberships, transformation stories, and signup CTAs.",
+      serviceTitle: "Training, Programs, and Membership Growth",
+      serviceIntro: "Turn classes, coaching, plans, and testimonials into a high-energy funnel for leads and signups.",
+    };
+  } else if (isLaw) {
+    profile = {
+      ...profile,
+      headline: `${safeName} Makes Legal Help Clear and Trustworthy`,
+      subhead: "A professional legal website preview with practice areas, attorney credibility, consultation CTAs, and trust signals.",
+      serviceTitle: "Practice Areas and Consultation Flow",
+      serviceIntro: "Help visitors understand services, urgency, credentials, and the safest next step.",
+      primaryCta: "Request Consultation",
+    };
+  } else if (isRealEstate) {
+    profile = {
+      ...profile,
+      headline: `${safeName} Converts Property Interest Into Qualified Leads`,
+      subhead: "A real-estate preview with featured listings, neighborhood story, buyer/seller CTAs, and lead capture.",
+      serviceTitle: "Listings, Neighborhoods, and Lead Capture",
+      serviceIntro: "Showcase properties and guide buyers or sellers into a confident conversation.",
+    };
+  } else if (isSaas) {
+    profile = {
+      ...profile,
+      headline: `${safeName} Explains the Product and Wins the Demo`,
+      subhead: "A SaaS-ready preview with product clarity, benefits, feature cards, pricing, proof, and demo CTAs.",
+      serviceTitle: "Product Clarity and Demo Conversion",
+      serviceIntro: "Explain what the product does, who it helps, why it is different, and how to start.",
+      primaryCta: "Book a Demo",
+    };
+  } else if (isStore) {
+    profile = {
+      ...profile,
+      headline: `${safeName} Turns Browsers Into Buyers`,
+      subhead: "A commerce-ready preview with product story, featured collections, trust badges, and purchase CTAs.",
+      serviceTitle: "Products, Collections, and Sales Flow",
+      serviceIntro: "Feature what customers can buy, why it matters, and how to complete the purchase.",
+      primaryCta: "Shop Now",
+    };
+  }
+
+  return profile;
+}
+
 function extractName(prompt) {
   const m = prompt.match(/\b(?:for|called|named|brand|business)\s+([A-Za-z0-9&.\-\s]{3,50})/i);
   if (m && m[1]) return m[1].trim().replace(/[.,;:!?]+$/, '');
   return prompt.split(/\s+/).slice(0, 4).join(' ');
+}
+
+function esc(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function corsH() {

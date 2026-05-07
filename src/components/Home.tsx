@@ -1,18 +1,35 @@
 import { Hero } from "./home/Hero";
-import { GeneratorSection } from "./home/GeneratorSection";
 import { HowItWorks, WhatYouGet, ExamplesSection, PricingSection, TrustSection } from "./home/HomeContent";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AdContainer } from "../App";
+import { PlaygroundGenerator } from "./PlaygroundGenerator";
 
 export const Home = () => {
   return (
     <div className="flex flex-col">
       <Hero />
       <AdContainer className="py-8" />
-      <GeneratorSection />
+      <section
+        className="py-24 px-6 lg:px-12 relative overflow-hidden"
+        id="generator"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center mb-12 text-center">
+            <h2 className="text-4xl lg:text-6xl font-black mb-6 italic tracking-tight">
+              Try the Live Generator
+            </h2>
+            <p className="text-white/40 max-w-2xl">
+              Speak or type the exact business you want. The preview builds a
+              scrollable custom website with video, copy, sections, and a
+              watermark from your prompt.
+            </p>
+          </div>
+          <PlaygroundGenerator />
+        </div>
+      </section>
       <AdContainer className="py-12" />
       <HowItWorks />
       <WhatYouGet />
