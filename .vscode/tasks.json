@@ -60,6 +60,35 @@
       "problemMatcher": []
     },
     {
+      "label": "Free Agent: Open Aider",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .\\free-agent.ps1",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Free Agent: Setup/Repair",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .\\setup-free-agent.ps1",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "npm: dev",
       "type": "shell",
       "command": "npm run dev",

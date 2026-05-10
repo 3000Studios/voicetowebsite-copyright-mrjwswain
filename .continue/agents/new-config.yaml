@@ -1,0 +1,77 @@
+name: 3000 Studios Continue
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Qwen 2.5 Coder 7B Local
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://127.0.0.1:11434
+    roles:
+      - chat
+      - edit
+      - apply
+      - autocomplete
+    defaultCompletionOptions:
+      temperature: 0.15
+      topP: 0.9
+      maxTokens: 4096
+      contextLength: 32768
+
+  - name: Gemini 2.5 Flash
+    provider: gemini
+    model: gemini-2.5-flash
+    apiKey: ${{ secrets.GEMINI_API_KEY }}
+    roles:
+      - chat
+      - edit
+      - apply
+      - summarize
+    capabilities:
+      - tool_use
+      - image_input
+    defaultCompletionOptions:
+      temperature: 0.35
+      maxTokens: 8192
+      contextLength: 1000000
+
+  - name: Gemini 2.0 Flash Backup
+    provider: gemini
+    model: gemini-2.0-flash
+    apiKey: ${{ secrets.GEMINI_API_KEY }}
+    roles:
+      - chat
+      - edit
+      - apply
+      - summarize
+    capabilities:
+      - tool_use
+      - image_input
+    defaultCompletionOptions:
+      temperature: 0.35
+      maxTokens: 8192
+      contextLength: 1000000
+
+  - name: Nomic Embed Text Local
+    provider: ollama
+    model: nomic-embed-text:latest
+    apiBase: http://127.0.0.1:11434
+    roles:
+      - embed
+
+context:
+  - provider: code
+  - provider: docs
+  - provider: diff
+  - provider: terminal
+  - provider: problems
+  - provider: folder
+  - provider: codebase
+
+rules:
+  - Always inspect the actual project files before giving code.
+  - Return complete, production-ready code.
+  - Do not use placeholders, dummy URLs, fake APIs, or incomplete snippets.
+  - Prefer simple, secure, maintainable solutions.
+  - Continue through obvious next steps instead of stopping after one small task.
+  - For Shopify work, prioritize sales, trust, mobile UX, speed, SEO, product clarity, checkout clarity, and revenue.
