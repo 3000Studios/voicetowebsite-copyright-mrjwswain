@@ -26,7 +26,7 @@ export async function generateWithFallback(prompt: string) {
     });
 
     if (res.ok) {
-      const data = await res.json();
+      const data = await res.json() as { response?: string };
       if (data?.response) return data.response;
     }
   } catch (err) {
@@ -66,7 +66,7 @@ export async function generateWithFallback(prompt: string) {
     throw new Error(`Vertex failed: ${errText}`);
   }
 
-  const json = await vertexRes.json();
+  const json = await vertexRes.json() as any;
 
   return json?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 }
