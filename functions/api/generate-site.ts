@@ -215,13 +215,33 @@ async function storeStoryblokTree(tree: LayoutTree, orderId: string, env: Env) {
 }
 
 async function writeAuditLog(db: D1Database, action: string, targetId: string, detail: string) {
-  await db
-    .prepare('INSERT INTO audit_log (created_at, actor, action, target_id, detail) VALUES (?, ?, ?, ?, ?)')
-    .bind(nowIso(), 'system', action, targetId, detail.slice(0, 4000))
-    .run();
+  try {
+    await db.prepare(`CREATE TABLE IF NOT EXISTS audit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_at TEXT, actor TEXT, action TEXT, target_id TEXT, detail TEXT
+    )`).run();
+    await db
+      .prepare('INSERT INTO audit_log (created_at, actor, action, target_id, detail) VALUES (?, ?, ?, ?, ?)')
+      .bind(nowIso(), 'system', action, targetId, detail.slice(0, 4000))
+      .run();
+  } catch {
+    // Audit log is fire-and-forget — never crash the request
+  }
 }
 
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
+  // TOP-LEVEL SAFETY NET: always return JSON, never an empty body
+  try {
+    return await _onRequestPost(context);
+  } catch (fatal) {
+    return new Response(JSON.stringify({ error: 'Internal server error', details: String((fatal as Error)?.message || fatal) }), {
+      status: 500,
+      headers: { 'content-type': 'application/json; charset=utf-8' },
+    });
+  }
+};
+
+const _onRequestPost = async (context: { request: Request; env: Env }) => {
   if (!context.env.DB || !context.env.SITES_BUCKET || !context.env.ORDERS_KV) {
     return json({ error: 'Bindings not configured' }, { status: 500 });
   }
@@ -242,7 +262,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     ]);
     const brand = { ...brandAssets, media };
     const compiled = compileLayoutFromPrompt(promptOnly, brand);
-    await writeAuditLog(
+    try { await writeAuditLog(
       context.env.DB,
       'preview_layout_compiled',
       `preview-${Date.now()}`,
@@ -251,7 +271,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         mode: body.mode || 'preview',
         grid: compiled.tree.bloks.map((blok) => ({ component: blok.component, order: blok.order, grid_span: blok.grid_span })),
       }),
-    );
+    ); } catch { /* non-fatal */ }
     return json({
       html: compiled.html,
       title: `${compiled.tree.name} Generated Site`,
@@ -295,7 +315,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   await context.env.ORDERS_KV.put(`order:${orderId}`, JSON.stringify({ id: orderId, status: 'generating' }), {
     expirationTtl: 60 * 60 * 24 * 30,
   });
-  await writeAuditLog(context.env.DB, 'generation_started', orderId, JSON.stringify({ industry: order.industry, style: order.style_preference }));
+  try { await writeAuditLog(context.env.DB, 'generation_started', orderId, JSON.stringify({ industry: order.industry, style: order.style_preference })); } catch { /* non-fatal */ }
 
   const prompt = [
     order.business_description || '',
@@ -318,7 +338,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
 
   if (!html || html.length < 500) {
     await context.env.DB.prepare(`UPDATE orders SET status = 'failed', error = ? WHERE id = ?`).bind('Generated HTML was empty.', orderId).run();
-    await writeAuditLog(context.env.DB, 'generation_failed', orderId, 'Generated HTML was empty.');
+    try { await writeAuditLog(context.env.DB, 'generation_failed', orderId, 'Generated HTML was empty.'); } catch { /* non-fatal */ }
     return json({ error: 'Generated HTML was invalid.' }, { status: 500 });
   }
 
@@ -329,7 +349,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   const stored = await context.env.SITES_BUCKET.head(`sites/${orderId}/index.html`);
   if (!stored) {
     await context.env.DB.prepare(`UPDATE orders SET status = 'failed', error = ? WHERE id = ?`).bind('Site storage verification failed.', orderId).run();
-    await writeAuditLog(context.env.DB, 'generation_failed', orderId, 'R2 verification failed after put.');
+    try { await writeAuditLog(context.env.DB, 'generation_failed', orderId, 'R2 verification failed after put.'); } catch { /* non-fatal */ }
     return json({ error: 'Site storage verification failed.' }, { status: 500 });
   }
 
