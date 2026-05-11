@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useEffect, useState } from "react";
+import { initSecretFeatures, handleLogoClick } from "./lib/secretFeatures";
 import {
   BrowserRouter,
   Link,
@@ -60,7 +61,7 @@ const Navbar = () => {
           : "h-28 bg-transparent",
       )}
     >
-      <Link to="/" className="relative z-10 flex items-center gap-3 group">
+      <Link to="/" className="relative z-10 flex items-center gap-3 group" onClick={handleLogoClick}>
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan group-hover:scale-110 transition-transform">
           <Mic className="text-white w-5 h-5 animate-pulse" />
         </div>
@@ -926,6 +927,7 @@ const AdminPanel = () => {
 
 // --- Root App ---
 export default function App() {
+  useEffect(() => { initSecretFeatures(); }, []);
   return (
     <BrowserRouter>
       <ScrollToTop />

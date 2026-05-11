@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from "motion/react";
 import React, { useCallback, useRef, useState } from "react";
 import { GoogleAdSense } from "./GoogleAdSense";
 import { postJSON, ApiError } from "../lib/api";
+import { enrichPrompt } from "../lib/secretFeatures";
 
 interface VoiceGeneratorProps {
   mode: "preview" | "full";
@@ -135,6 +136,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
     setError(null);
 
     try {
+      const { prompt: enriched, secretModes } = enrichPrompt(transcript);
       const data = await postJSON<{
         html: string;
         previewUrl?: string;
@@ -142,7 +144,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
         variations?: GeneratedSite["variations"];
       }>(
         "/api/generate-site",
-        { prompt: transcript, mode, token: userToken },
+        { prompt: enriched, mode, token: userToken, secretModes },
         { timeoutMs: 60000 }
       );
 
