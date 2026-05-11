@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/Navbar";
+import { parseResponse, ApiError } from "../lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { compileLayoutFromPrompt } from "@/lib/layoutCompiler";
@@ -72,7 +73,7 @@ export const Admin = () => {
           "x-owner-email": String(user?.email || "").trim().toLowerCase(),
         },
       });
-      const data = (await res.json()) as { rows?: OrderRow[] };
+      const data = (await parseResponse<{ rows?: OrderRow[] };
       setOrders(data.rows || []);
     } catch {
       setOrders([]);

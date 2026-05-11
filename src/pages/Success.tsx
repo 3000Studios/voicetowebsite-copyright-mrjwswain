@@ -1,4 +1,5 @@
 import {
+import { parseResponse, ApiError } from "../lib/api";
   ArrowRight,
   CheckCircle2,
   ExternalLink,
@@ -115,7 +116,7 @@ export const Success = () => {
           },
           body: JSON.stringify({ session_id: sessionId }),
         });
-        const data = (await response.json()) as SessionResponse;
+        const data = (await parseResponse<SessionResponse>(response));
         if (!response.ok)
           throw new Error(data.error || "Unable to verify checkout session.");
         trackEvent("checkout_completed", { provider: "stripe", plan: data.plan });
@@ -174,7 +175,7 @@ export const Success = () => {
       const orderResponse = await fetch(`/api/order?${orderQuery.toString()}`, {
         method: "POST",
       });
-      const orderData = (await orderResponse.json()) as OrderResponse;
+      const orderData = (await parseResponse<OrderResponse>(orderResponse));
       if (!orderResponse.ok)
         throw new Error(orderData.error || "Unable to create the order.");
 
@@ -187,7 +188,7 @@ export const Success = () => {
         `/api/generate-site?${generateQuery.toString()}`,
         { method: "POST" },
       );
-      const generateData = (await generateResponse.json()) as GenerateResponse;
+      const generateData = (await parseResponse<GenerateResponse>(generateResponse));
       if (!generateResponse.ok)
         throw new Error(generateData.error || "Unable to generate the site.");
 

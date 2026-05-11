@@ -1,4 +1,5 @@
 import { GlassCard } from "@/components/GlassCard";
+import { parseResponse, ApiError } from "../lib/api";
 import { GoogleAdSense } from "@/components/GoogleAdSense";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import {
@@ -60,7 +61,7 @@ export const Blog = () => {
       if (selectedCategory !== "All") params.set("category", selectedCategory);
       const response = await fetch(`/api/blog/posts?${params.toString()}`);
       if (response.ok) {
-        const data = (await response.json()) as {
+        const data = (await parseResponse(response)) as {
           posts?: BlogPost[];
           pagination?: { hasNext?: boolean };
         };

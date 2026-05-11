@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { parseResponse, ApiError } from "../lib/api";
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'motion/react';
 import { useParams, Link } from 'react-router-dom';
@@ -38,7 +39,7 @@ export const BlogPost = () => {
     try {
       const response = await fetch(`/api/blog/posts/${slug}`);
       if (response.ok) {
-        const data = await response.json() as { post: BlogPost; related: BlogPost[] };
+        const data = await parseResponse<{ post: BlogPost; related: BlogPost[] };
         setPost(data.post);
         setRelatedPosts(data.related || []);
       } else {

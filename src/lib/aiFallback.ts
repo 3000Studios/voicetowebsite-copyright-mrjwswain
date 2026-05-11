@@ -1,4 +1,5 @@
 import { GoogleAuth } from "google-auth-library";
+import { parseResponse, ApiError } from "../lib/api";
 
 const auth = new GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/cloud-platform"],
@@ -26,7 +27,7 @@ export async function generateWithFallback(prompt: string) {
     });
 
     if (res.ok) {
-      const data = await res.json() as { response?: string };
+      const data = await parseResponse<any>(res) as { response?: string };
       if (data?.response) return data.response;
     }
   } catch (err) {
@@ -66,7 +67,7 @@ export async function generateWithFallback(prompt: string) {
     throw new Error(`Vertex failed: ${errText}`);
   }
 
-  const json = await vertexRes.json() as any;
+  const json = await parseResponse<any>(vertexRes);
 
   return json?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 }

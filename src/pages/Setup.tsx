@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { parseResponse, ApiError } from "../lib/api";
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
 import { motion } from 'motion/react';
@@ -47,7 +48,7 @@ export const Setup = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: sessionId }),
     });
-    const data = (await res.json()) as any;
+    const data = (await parseResponse<any>(res));
     if (!res.ok || !data?.ok) throw new Error(data?.error || 'Verification failed');
     return data as { email: string; plan: string };
   };

@@ -28,7 +28,7 @@ export async function generateWebsiteVariations(
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await parseResponse(response);
 
     // Type guard to ensure data has variations property
     if (

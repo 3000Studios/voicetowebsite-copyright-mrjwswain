@@ -1,4 +1,5 @@
 import {
+import { parseResponse, ApiError } from "../../lib/api";
   ArrowRight,
   Check,
   Code,
@@ -301,7 +302,7 @@ export const PricingSection = () => {
           launch_discount: true,
         }),
       });
-      const data = (await res.json()) as { url?: string; error?: string };
+      const data = (await parseResponse(res)) as { url?: string; error?: string };
       if (data.url) {
         window.location.href = data.url;
       } else {

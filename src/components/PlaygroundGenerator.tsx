@@ -83,7 +83,7 @@ const EXAMPLE_PROMPTS = [
 async function fetchMedia(query: string): Promise<MediaResult> {
   try {
     const res = await fetch(`/api/media?q=${encodeURIComponent(query)}`);
-    if (res.ok) return (await res.json()) as MediaResult;
+    if (res.ok) return (await parseResponse<MediaResult>(res));
   } catch { /* fall through */ }
   return {
     imageUrl: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",

@@ -1,4 +1,5 @@
 import { Download, Eye, Loader2, Lock, Mic, Wand2 } from "lucide-react";
+import { parseResponse, ApiError } from "../../lib/api";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -250,7 +251,7 @@ const BlogSection = () => {
   useEffect(() => {
     const fetchStories = async () => {
       const response = await fetch("/api/blog-stories");
-      const data = (await response.json()) as {
+      const data = (await parseResponse(response)) as {
         stories?: BlogStory[];
         index?: BlogIndexItem[];
       };
