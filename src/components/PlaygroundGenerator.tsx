@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { postJSON, ApiError } from "../lib/api";
 
 type BrowserSpeechRecognition = {
   lang: string;
@@ -171,14 +172,12 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
       const mediaResult = await fetchMedia(p);
       setMedia(mediaResult);
       setLoadStage(2);
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: p, imageUrls: mediaResult.gallery, videoUrl: mediaResult.videoUrl }),
-      });
       setLoadStage(3);
-      if (!res.ok) throw new Error(`API error ${res.status}`);
-      const data = await res.json() as { brief?: PromptBrief; variations?: Variation[]; error?: string; details?: string };
+      const data = await postJSON<{ brief?: PromptBrief; variations?: Variation[]; error?: string; details?: string }>(
+        "/api/generate",
+        { prompt: p, imageUrls: mediaResult.gallery, videoUrl: mediaResult.videoUrl },
+        { timeoutMs: 60000 }
+      );
       if (!data.variations?.length) throw new Error(data.error || "No variations returned");
       setBrief(data.brief || null);
       setVariations(data.variations);
@@ -194,7 +193,12 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
       saveToExamples(p, data.variations[0], mediaResult);
     } catch (err) {
       console.error("Generation failed:", err);
-      setError(err instanceof Error ? err.message : "Generation failed. Try a more specific prompt.");
+      const msg = err instanceof ApiError
+        ? `${err.message}${err.status ? ` (${err.status})` : ''}`
+        : err instanceof Error 
+        ? err.message 
+        : "Generation failed. Try a more specific prompt.";
+      setError(msg);
       setLoadStage(0);
     } finally {
       setIsLoading(false);

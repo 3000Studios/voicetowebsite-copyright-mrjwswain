@@ -11,6 +11,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import React, { useCallback, useRef, useState } from "react";
 import { GoogleAdSense } from "./GoogleAdSense";
+import { postJSON, ApiError } from "../lib/api";
 
 interface VoiceGeneratorProps {
   mode: "preview" | "full";
@@ -134,27 +135,16 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
     setError(null);
 
     try {
-      // Call the generation API
-      const response = await fetch("/api/generate-site", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: transcript,
-          mode,
-          token: userToken,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Generation failed");
-      }
-
-      const data = (await response.json()) as {
+      const data = await postJSON<{
         html: string;
         previewUrl?: string;
         title?: string;
         variations?: GeneratedSite["variations"];
-      };
+      }>(
+        "/api/generate-site",
+        { prompt: transcript, mode, token: userToken },
+        { timeoutMs: 60000 }
+      );
 
       setGeneratedSite({
         html: data.html,
@@ -165,7 +155,11 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
       setActiveVariation(0);
     } catch (err) {
       console.error("Generation error:", err);
-      setError("Failed to generate site. Please try again.");
+      setError(
+        err instanceof ApiError
+          ? `${err.message}${err.status ? ` (${err.status})` : ''}`
+          : "Failed to generate site. Please try again."
+      );
     } finally {
       setIsGenerating(false);
     }
