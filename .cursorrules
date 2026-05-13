@@ -1,0 +1,9 @@
+Legacy compatibility file.
+
+Primary rules live in:
+- `.cursor/rules/vtw-production-governance.mdc`
+- other files under `.cursor/rules/*.mdc`
+
+Guidance:
+- Prefer project rules in `.cursor/rules` over this file.
+- Do not add conflicting directives here.

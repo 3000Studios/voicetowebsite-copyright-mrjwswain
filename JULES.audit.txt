@@ -1,0 +1,10 @@
+JULES DEPLOY AUDIT
+=================
+[ ] Repo clean
+[ ] No console errors
+[ ] Fonts assigned correctly
+[ ] No autoplay audio
+[ ] Admin isolated
+[ ] Mobile safe
+[ ] Cloudflare build passes
+FAIL = DO NOT DEPLOY

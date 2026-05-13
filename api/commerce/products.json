@@ -1,0 +1,37 @@
+{
+  "products": [
+    {
+      "id": "vtw-pro",
+      "type": "product",
+      "name": "VoiceToWebsite Pro",
+      "price": "29.00",
+      "currency": "USD",
+      "providers": ["paypal", "stripe"],
+      "license": true,
+      "description": "Full access to VoiceToWebsite Pro tools"
+    }
+  ],
+  "apps": [
+    {
+      "id": "vtw-app-builder",
+      "type": "app",
+      "name": "VoiceToWebsite App Builder",
+      "price": "49.00",
+      "currency": "USD",
+      "providers": ["paypal", "stripe"],
+      "download": "/downloads/vtw-app.zip",
+      "license": true
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "vtw-monthly",
+      "type": "subscription",
+      "name": "VoiceToWebsite Monthly",
+      "price": "19.00",
+      "interval": "month",
+      "currency": "USD",
+      "provider": "stripe"
+    }
+  ]
+}

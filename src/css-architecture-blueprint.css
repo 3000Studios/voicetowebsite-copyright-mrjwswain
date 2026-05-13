@@ -1,0 +1,441 @@
+/**
+ * VoiceToWebsite CSS Architecture Realignment Blueprint
+ * 
+ * Combines Performance Budget Enforcement + Canary Branch Separation 
+ * + Revenue Optimization + WAF-Compatible Minimal Payload Strategy
+ * 
+ * Version: 1.0.0
+ * Target: < 50KB critical CSS, < 150KB total CSS
+ * Architecture: Modular, budget-constrained, revenue-optimized
+ */
+
+/* ============================================================================ */
+/* CRITICAL PATH CSS (< 25KB gzipped) - Above-the-fold content only */
+/* ============================================================================ */
+
+/* === PERFORMANCE BUDGET ENFORCEMENT === */
+/* Critical: Must load in < 100ms on 3G */
+/* Budget: 25KB gzipped, 50KB uncompressed */
+
+/* === CANARY BRANCH SEPARATION === */
+/* Feature flags for A/B testing and gradual rollout */
+:root {
+  /* Canary flags - controlled via environment variables */
+  --canary-revenue-layout: var(--env-canary-revenue-layout, "control");
+  --canary-cta-variants: var(--env-canary-cta-variants, "control");
+  --canary-payment-flow: var(--env-canary-payment-flow, "control");
+
+  /* Revenue optimization toggles */
+  --revenue-cta-density: var(--env-revenue-density, "standard");
+  --revenue-ad-strategy: var(--env-revenue-ad-strategy, "balanced");
+  --revenue-checkout-flow: var(--env-revenue-checkout-flow, "optimized");
+}
+
+/* === WAF-COMPATIBLE MINIMAL PAYLOAD === */
+/* Only essential styles, no complex selectors that could trigger WAF rules */
+/* Safe selector patterns: .class, #id, tag */
+/* Avoid: :nth-child(), :not(), complex attribute selectors */
+
+/* Critical layout structure - minimal selectors */
+.vt-page {
+  min-height: 100vh;
+  background: #020408;
+  color: #f8fbff;
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+.vt-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .vt-container {
+    padding: 0 1.5rem;
+  }
+}
+
+/* Critical revenue components - optimized for conversion */
+.vt-cta {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #00f2ff, #38bdf8);
+  color: #000;
+  text-decoration: none;
+  border-radius: 2rem;
+  font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.vt-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 242, 255, 0.3);
+}
+
+/* Revenue-optimized pricing cards */
+.vt-pricing-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2rem;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.vt-pricing-card.featured {
+  border-color: #00f2ff;
+  box-shadow: 0 0 50px rgba(0, 242, 255, 0.1);
+}
+
+/* Critical navigation - WAF-safe selectors */
+.vt-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(2, 4, 8, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vt-nav-link {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.vt-nav-link:hover {
+  color: #00f2ff;
+  background: rgba(0, 242, 255, 0.1);
+}
+
+/* ============================================================================ */
+/* NON-CRITICAL CSS (25KB-150KB) - Lazy loaded after critical path */
+/* ============================================================================ */
+
+/* === PERFORMANCE BUDGET ENFORCEMENT === */
+/* Non-critical: Can load in < 500ms, budget: 125KB total */
+/* Must be split into chunks for optimal loading */
+
+/* === CANARY BRANCH SEPARATION === */
+/* Branch-specific design tokens and variants */
+.canary-revenue-layout-high-density .vt-cta {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+}
+
+.canary-revenue-layout-minimal .vt-cta {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.canary-cta-variants-gradient .vt-cta {
+  background: linear-gradient(45deg, #00f2ff, #fbbf24, #00f2ff);
+  background-size: 200% 200%;
+  animation: vt-gradient-shift 3s ease infinite;
+}
+
+.canary-payment-flow-steps .vt-checkout {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.canary-payment-flow-steps .vt-checkout-step {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.canary-payment-flow-steps .vt-checkout-step.active {
+  background: #00f2ff;
+  color: #000;
+}
+
+/* === REVENUE OPTIMIZATION LAYOUT TUNING === */
+/* Conversion-focused layout variants */
+.revenue-layout-cta-dominant .vt-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  text-align: center;
+}
+
+.revenue-layout-cta-dominant .vt-hero-cta {
+  font-size: 1.2rem;
+  padding: 1rem 3rem;
+}
+
+.revenue-layout-donation-heavy .vt-donation-section {
+  order: -1;
+  margin-bottom: 3rem;
+}
+
+.revenue-layout-sponsor-focus .vt-sponsor-banner {
+  background: linear-gradient(
+    135deg,
+    rgba(251, 191, 36, 0.1),
+    rgba(251, 191, 36, 0.05)
+  );
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+/* Revenue density guard - prevents ad overload */
+.revenue-density-standard .vt-ad-slot {
+  max-width: 300px;
+}
+
+.revenue-density-high .vt-ad-slot {
+  max-width: 400px;
+}
+
+/* === WAF-COMPATIBLE MINIMAL PAYLOAD STRATEGY === */
+/* Optimized selectors to reduce attack surface */
+/* Avoid complex pseudo-selectors and deep nesting */
+
+/* Safe component patterns */
+.vt-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vt-button-primary {
+  background: #00f2ff;
+  color: #000;
+}
+
+.vt-button-secondary {
+  background: transparent;
+  color: #00f2ff;
+  border: 1px solid #00f2ff;
+}
+
+.vt-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.vt-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.vt-modal-content {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+}
+
+/* === PERFORMANCE MONITORING === */
+/* Budget tracking hooks */
+.vt-budget-tracker {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #00f2ff;
+  padding: 0.5rem;
+  font-family: monospace;
+  font-size: 0.8rem;
+  z-index: 10000;
+}
+
+/* Budget warning indicators */
+.vt-budget-warning {
+  color: #f59e0b;
+}
+
+.vt-budget-error {
+  color: #ef4444;
+}
+
+/* ============================================================================ */
+/* LAZY-LOADED MODULES (150KB+) - Component-specific chunks */
+/* ============================================================================ */
+
+/* === PERFORMANCE BUDGET ENFORCEMENT === */
+/* Component chunks: Load on-demand, < 25KB each */
+/* Must be code-split by functionality */
+
+/* Admin dashboard chunk - load only on /admin routes */
+.vt-admin-dashboard {
+  /* Admin-specific styles, budget: 20KB */
+}
+
+.vt-admin-nav {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 250px;
+  background: rgba(15, 23, 42, 0.95);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 50;
+}
+
+.vt-admin-content {
+  margin-left: 250px;
+  padding: 2rem;
+}
+
+/* Store components chunk - load only on /store routes */
+.vt-store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.vt-store-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.vt-store-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 242, 255, 0.15);
+}
+
+/* Live streaming chunk - load only on /livestream routes */
+.vt-live-player {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  background: #000;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.vt-live-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vt-live-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ============================================================================ */
+/* IMPLEMENTATION STRATEGY */
+/* ============================================================================ */
+
+/*
+1. CRITICAL CSS INLINE
+   - Extract critical styles to inline in <head>
+   - Budget: < 25KB gzipped
+   - Load in < 100ms on 3G
+
+2. NON-CRITICAL CSS SPLIT
+   - Split into feature-specific chunks
+   - Load on-demand based on route
+   - Each chunk < 25KB
+
+3. CANARY BRANCH DEPLOYMENT
+   - Use CSS custom properties for feature flags
+   - Environment variables control variants
+   - A/B test without code changes
+
+4. REVENUE OPTIMIZATION
+   - Conversion-focused layout variants
+   - CTA density controls
+   - Ad placement optimization
+
+5. WAF COMPATIBILITY
+   - Simple, safe selectors only
+   - No complex pseudo-selectors
+   - Minimal attack surface
+
+6. PERFORMANCE MONITORING
+   - Real-time budget tracking
+   - Warning indicators
+   - Automated budget enforcement
+
+7. DEPLOYMENT PIPELINE
+   - CSS budget validation
+   - Automated purging
+   - Critical path optimization
+*/
+
+/* ============================================================================ */
+/* BUDGET VALIDATION RULES */
+/* ============================================================================ */
+
+/*
+CSS Budget Rules (enforced in build pipeline):
+
+CRITICAL PATH:
+- Max: 25KB gzipped (50KB uncompressed)
+- Must include: layout, typography, critical UI, revenue components
+- Load time: < 100ms on 3G
+
+NON-CRITICAL:
+- Max: 125KB total (150KB including critical)
+- Chunk size: < 25KB per module
+- Load time: < 500ms per chunk
+
+SELECTOR COMPLEXITY:
+- Max depth: 3 levels
+- No complex pseudo-selectors
+- WAF-safe patterns only
+
+REVENUE COMPONENTS:
+- CTA variants: 3 max
+- Ad density: 3 slots per page max
+- Conversion funnel: < 5 steps
+
+MONITORING:
+- Real-time budget tracking
+- Automated alerts on budget exceed
+- Performance regression detection
+*/

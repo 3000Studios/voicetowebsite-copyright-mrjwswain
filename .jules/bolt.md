@@ -1,0 +1,1 @@
+## 2026-03-12 - Parallelize Cloudflare build path fetching **Learning:** Sequential network requests in Cloudflare Worker handlers significantly increase total request latency, especially when fallback paths are involved. **Action:** Use `Promise.all` to fire off multiple Cloudflare API requests concurrently and then process results in the desired priority order.

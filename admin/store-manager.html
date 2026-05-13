@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | Store Manager</title>
+    <meta name="description" content="Admin store manager." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script type="module" src="./access-guard.js"></script>
+  </head>
+  <body>
+    <div class="admin-video-bg" aria-hidden="true">
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop playsinline></video>
+    </div>
+    <div class="noise-overlay" aria-hidden="true"></div>
+
+    <div class="admin-shell">
+      <main class="admin-grid">
+        <section
+          class="card wide"
+          id="store-manager"
+          style="
+            background-image:
+              linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(&quot;/vtw-wallpaper.png&quot;);
+            background-size: cover;
+            background-position: center;
+          "
+        >
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Products</p>
+              <h2>Store Manager</h2>
+              <p class="muted">
+                Add products here. The Store page will render these as cards automatically (this device/browser).
+              </p>
+            </div>
+            <div class="status-strip">
+              <span class="status-chip" id="products-count">— products</span>
+              <button class="ghost small" id="products-reset" type="button">Refresh</button>
+            </div>
+          </div>
+
+          <div class="app-grid">
+            <div class="app-block">
+              <div class="table-shell">
+                <div class="table-head">
+                  <h3>Live products</h3>
+                  <p class="muted">Rendered on `store.html` using the new glass cards.</p>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Label</th>
+                      <th>Price</th>
+                      <th>Tag</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="product-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="app-block">
+              <form id="product-form" class="app-form" data-mode="readonly">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input name="title" placeholder="Aether OS" required />
+                  </div>
+                  <div class="form-group">
+                    <label>Price (USD)</label>
+                    <input name="price" type="number" step="0.01" placeholder="149" required />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Label</label>
+                    <input name="label" placeholder="Architecture / 01" />
+                  </div>
+                  <div class="form-group">
+                    <label>Tag</label>
+                    <input name="tag" placeholder="License" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Description</label>
+                  <textarea name="desc" rows="3" placeholder="What the buyer gets..." required></textarea>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Product ID (optional)</label>
+                    <input name="id" placeholder="aether-os" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Stripe Buy Button ID (optional)</label>
+                    <input name="stripeBuyButtonId" placeholder="buy_btn_..." />
+                  </div>
+                  <div class="form-group">
+                    <label>Stripe Payment Link (optional)</label>
+                    <input name="stripePaymentLink" placeholder="https://buy.stripe.com/..." />
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button
+                    class="primary"
+                    type="submit"
+                    disabled
+                    title="Catalog is file-based. Edit products.json and redeploy."
+                  >
+                    Add product
+                  </button>
+                  <button class="ghost" type="button" id="product-clear">Clear</button>
+                </div>
+                <p class="muted small" style="margin-top: 10px">
+                  This page is read-only in production. To change inventory, edit <code>products.json</code> and
+                  redeploy.
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./store-products-admin.js"></script>
+    <script type="module" src="../nav.js"></script>
+  </body>
+</html>

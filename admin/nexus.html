@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite | Nexus Intelligence Hub</title>
+    <meta name="description" content="Central Nexus interface for Claude artifacts." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script type="module" src="./access-guard.js"></script>
+  </head>
+  <body>
+    <div class="admin-video-bg" aria-hidden="true">
+      <video src="/media/vtw-admin-dashboard.mp4" autoplay muted loop></video>
+    </div>
+    <div class="noise-overlay" aria-hidden="true"></div>
+
+    <div class="admin-shell">
+      <main class="admin-grid">
+        <section class="card wide" id="nexus-interface">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Claude Ops</p>
+              <h2>Nexus Artifact Console</h2>
+              <p class="muted">
+                Secure embed of the latest Claude artifact feed. Use this panel to review outputs and copy assets
+                directly into your workflows.
+              </p>
+            </div>
+            <div class="status-strip">
+              <span class="status-chip">Live</span>
+              <span class="status-chip" id="nexus-clipboard-state">Clipboard Enabled</span>
+            </div>
+          </div>
+
+          <div class="nexus-iframe-shell">
+            <iframe
+              src="https://claude.site/public/artifacts/ad8e180a-b315-4a9b-a514-6da782fa3456/embed"
+              title="Claude Artifact"
+              width="100%"
+              height="600"
+              frameborder="0"
+              allow="clipboard-write"
+              allowfullscreen
+            ></iframe>
+          </div>
+
+          <div class="nexus-notes muted">
+            <ul>
+              <li>Clipboard-write permission is restricted to this card and never exposed publicly.</li>
+              <li>If the embed fails to load, confirm Claude artifact visibility and refresh.</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const bgVideo = document.querySelector(".admin-video-bg video");
+      if (bgVideo) {
+        const enableInlinePlayback = () => {
+          try {
+            bgVideo.playsInline = true;
+            bgVideo.setAttribute("playsinline", "");
+            bgVideo.setAttribute("webkit-playsinline", "");
+            bgVideo.setAttribute("x5-playsinline", "");
+          } catch (_) {}
+        };
+        if (bgVideo.readyState >= 1) {
+          enableInlinePlayback();
+        } else {
+          bgVideo.addEventListener("loadedmetadata", enableInlinePlayback, { once: true });
+        }
+      }
+    </script>
+    <script type="module" src="./admin.js"></script>
+    <script type="module" src="../nav.js"></script>
+  </body>
+</html>

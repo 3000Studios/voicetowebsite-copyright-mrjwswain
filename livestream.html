@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceToWebsite Live Stream</title>
+    <meta name="description" content="Live Stream - VoiceToWebsite" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Macondo&display=swap" />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
+      crossorigin="anonymous"
+    ></script>
+    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
+  </head>
+  <body class="livestream">
+    <div class="video-bg" aria-hidden="true"></div>
+    <div class="edge-glow" aria-hidden="true"></div>
+    <div class="edge-frame" aria-hidden="true"></div>
+    <main class="page">
+      <section class="section live-setup">
+        <div class="live-head">
+          <div>
+            <p class="eyebrow">Live Control</p>
+            <h2>Live Stream Setup</h2>
+            <p class="muted">Configure your live stream destinations and embeds.</p>
+          </div>
+        </div>
+        <div class="live-panel">
+          <div class="live-grid">
+            <div class="live-block">
+              <h3>Current Stream</h3>
+              <div class="live-player-shell">
+                <video
+                  id="live-player"
+                  playsinline
+                  autoplay
+                  controls
+                  muted
+                  style="display: none; width: 100%; height: 100%; background: #000"
+                ></video>
+                <iframe
+                  id="live-embed"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  allowfullscreen
+                  title="Live stream"
+                  loading="lazy"
+                  referrerpolicy="origin-when-cross-origin"
+                  sandbox="allow-scripts allow-same-origin allow-presentation"
+                ></iframe>
+              </div>
+              <p class="muted" id="live-session-status">Checking live session…</p>
+              <label class="sr-only" for="live-url">Live embed URL</label>
+              <input
+                type="url"
+                id="live-url"
+                placeholder="https://www.youtube.com/embed/..."
+                inputmode="url"
+                autocomplete="off"
+              />
+              <div class="live-actions">
+                <button id="live-load" class="primary" type="button" aria-label="Load live stream embed">
+                  Load Stream
+                </button>
+                <button id="live-save" class="ghost" type="button" aria-label="Save current clip">Save Clip</button>
+              </div>
+              <p class="muted" id="live-status" aria-live="polite"></p>
+            </div>
+            <div class="live-block live-clips-block">
+              <div class="live-clips-head">
+                <h3>Saved Clips</h3>
+                <button class="ghost small" id="live-clear" type="button" aria-label="Clear saved clips">Clear</button>
+              </div>
+              <ul id="live-clips" class="clip-list">
+                <li class="muted">No clips yet.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section story-feed" id="live-blog">
+        <div class="lineup-header">
+          <div>
+            <h2>Latest Web Build Signals</h2>
+            <p class="muted">SEO-rich, voice-first success stories for livestream viewers.</p>
+          </div>
+          <a class="pill-link" href="blog.html">View archive</a>
+        </div>
+        <div class="story-grid" id="live-story-grid">
+          <article class="story-card skeleton">
+            <div class="story-bg skeleton-line w-80"></div>
+            <div class="story-copy">
+              <h3 class="skeleton-line w-60"></h3>
+              <p class="skeleton-line w-90"></p>
+            </div>
+          </article>
+          <article class="story-card skeleton">
+            <div class="story-bg skeleton-line w-80"></div>
+            <div class="story-copy">
+              <h3 class="skeleton-line w-70"></h3>
+              <p class="skeleton-line w-90"></p>
+            </div>
+          </article>
+          <article class="story-card skeleton">
+            <div class="story-bg skeleton-line w-80"></div>
+            <div class="story-copy">
+              <h3 class="skeleton-line w-65"></h3>
+              <p class="skeleton-line w-90"></p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <script type="module" src="/livestream.js"></script>
+    <script type="module" src="/nav.js"></script>
+  </body>
+</html>

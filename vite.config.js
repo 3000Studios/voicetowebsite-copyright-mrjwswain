@@ -1,0 +1,197 @@
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+import { visualizer } from "rollup-plugin-visualizer";
+import { defineConfig } from "vite";
+
+const enableAnalyzer =
+  process.env.ANALYZE === "1" || process.env.VITE_ANALYZE === "1";
+
+export default defineConfig({
+  plugins: [
+    react(),
+    ...(enableAnalyzer
+      ? [
+          visualizer({
+            filename: resolve(__dirname, "dist", "stats.html"),
+            open: false,
+            gzipSize: true,
+            brotliSize: true,
+            template: "treemap",
+          }),
+        ]
+      : []),
+  ],
+  server: {
+    proxy: {
+      // Route API and preview to the local Cloudflare Worker (`wrangler dev`).
+      "/api/orchestrator": "http://127.0.0.1:8787",
+      "/api/analytics": "http://127.0.0.1:8787",
+      "/api/chat": "http://127.0.0.1:8787",
+      "/api/generate": "http://127.0.0.1:8787",
+      "/api/preview": "http://127.0.0.1:8787",
+      "/api/publish": "http://127.0.0.1:8787",
+      "/api/execute": "http://127.0.0.1:8787",
+      "/api/ui-command": "http://127.0.0.1:8787",
+      "/api/deploy": "http://127.0.0.1:8787",
+      "/api/voice": "http://127.0.0.1:8787",
+      "/api/fs": "http://127.0.0.1:8787",
+      "/api/repo": "http://127.0.0.1:8787",
+      "/api/governance": "http://127.0.0.1:8787",
+      "/api/monetization": "http://127.0.0.1:8787",
+      "/api/env": "http://127.0.0.1:8787",
+      "/api/live": "http://127.0.0.1:8787",
+      "/api/store": "http://127.0.0.1:8787",
+      "/api/media": "http://127.0.0.1:8787",
+      "/api/audio": "http://127.0.0.1:8787",
+      "/api/bot-hub": "http://127.0.0.1:8787",
+      "/api/bots": "http://127.0.0.1:8787",
+      "/api/health": "http://127.0.0.1:8787",
+      "/api/config": "http://127.0.0.1:8787",
+      "/api/admin": "http://127.0.0.1:8787",
+      "/api/paypal": "http://127.0.0.1:8787",
+      "/api/stripe": "http://127.0.0.1:8787",
+      "/api/checkout": "http://127.0.0.1:8787",
+      "/api/catalog": "http://127.0.0.1:8787",
+      "/api/products": "http://127.0.0.1:8787",
+      "/admin/logs": "http://127.0.0.1:8787",
+      "/preview": "http://127.0.0.1:8787",
+    },
+  },
+  build: {
+    target: "esnext",
+    minify: "esbuild",
+    cssCodeSplit: true,
+    sourcemap: false,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        about: resolve(__dirname, "about.html"),
+        sandbox: resolve(__dirname, "sandbox.html"),
+        admin: resolve(__dirname, "admin/index.html"),
+        adminAccess: resolve(__dirname, "admin/access.html"),
+        adminLogin: resolve(__dirname, "admin/login.html"),
+        adminVoice: resolve(__dirname, "admin/voice-commands.html"),
+        adminAnalytics: resolve(__dirname, "admin/analytics.html"),
+        adminLive: resolve(__dirname, "admin/live-stream.html"),
+        adminStore: resolve(__dirname, "admin/store-manager.html"),
+        adminAppStore: resolve(__dirname, "admin/app-store-manager.html"),
+        adminIntegrated: resolve(__dirname, "admin/integrated-dashboard.html"),
+        adminLiveRoomTest: resolve(__dirname, "admin/live-room-test.html"),
+        store: resolve(__dirname, "store.html"),
+        appstore: resolve(__dirname, "appstore.html"),
+        appstoreNew: resolve(__dirname, "appstore-new.html"),
+        license: resolve(__dirname, "license.html"),
+        howItWorks: resolve(__dirname, "how-it-works.html"),
+        templates: resolve(__dirname, "templates.html"),
+        features: resolve(__dirname, "features.html"),
+        featuresEnhanced: resolve(__dirname, "features-enhanced.html"),
+        pricing: resolve(__dirname, "pricing.html"),
+        pricingEnhanced: resolve(__dirname, "pricing-enhanced.html"),
+        demo: resolve(__dirname, "demo.html"),
+        search: resolve(__dirname, "search.html"),
+        searchEnhanced: resolve(__dirname, "search-enhanced.html"),
+        support: resolve(__dirname, "support.html"),
+        status: resolve(__dirname, "status.html"),
+        trust: resolve(__dirname, "trust.html"),
+        partners: resolve(__dirname, "partners.html"),
+        webforge: resolve(__dirname, "webforge.html"),
+        cursorDemo: resolve(__dirname, "cursor-demo.html"),
+        projectPlanningHub: resolve(__dirname, "project-planning-hub.html"),
+        rushPercussion: resolve(__dirname, "rush-percussion.html"),
+        blog: resolve(__dirname, "blog.html"),
+        contact: resolve(__dirname, "contact.html"),
+        contactEnhanced: resolve(__dirname, "contact-enhanced.html"),
+        gallery: resolve(__dirname, "gallery.html"),
+        legal: resolve(__dirname, "legal.html"),
+        copyrights: resolve(__dirname, "copyrights.html"),
+        livestream: resolve(__dirname, "livestream.html"),
+        phosphorNav: resolve(__dirname, "phosphor-nav.html"),
+        referrals: resolve(__dirname, "referrals.html"),
+        projects: resolve(__dirname, "projects.html"),
+        studio3000: resolve(__dirname, "studio3000.html"),
+        the3000: resolve(__dirname, "the3000.html"),
+        the3000gallery: resolve(__dirname, "the3000-gallery.html"),
+        neuralEngine: resolve(__dirname, "neural-engine.html"),
+        strataDesignSystem: resolve(__dirname, "strata-design-system.html"),
+        apiDocumentation: resolve(__dirname, "api-documentation.html"),
+        voiceToJson: resolve(__dirname, "voice-to-json.html"),
+        geologicalStudies: resolve(__dirname, "geological-studies.html"),
+        privacy: resolve(__dirname, "privacy.html"),
+        terms: resolve(__dirname, "terms.html"),
+        lexiconPro: resolve(__dirname, "lexicon-pro.html"),
+        // App preview pages
+        aiContentGenerator: resolve(
+          __dirname,
+          "src/apps/ai-content-generator.html"
+        ),
+        seoOptimizer: resolve(__dirname, "src/apps/seo-optimizer.html"),
+        socialMediaManager: resolve(
+          __dirname,
+          "src/apps/social-media-manager.html"
+        ),
+        emailMarketing: resolve(__dirname, "src/apps/email-marketing.html"),
+        analyticsDashboard: resolve(
+          __dirname,
+          "src/apps/analytics-dashboard.html"
+        ),
+        taskManager: resolve(__dirname, "src/apps/task-manager.html"),
+        invoiceGenerator: resolve(__dirname, "src/apps/invoice-generator.html"),
+        calendarScheduler: resolve(
+          __dirname,
+          "src/apps/calendar-scheduler.html"
+        ),
+        contactFormBuilder: resolve(
+          __dirname,
+          "src/apps/contact-form-builder.html"
+        ),
+        imageEditor: resolve(__dirname, "src/apps/image-editor.html"),
+        passwordManager: resolve(__dirname, "src/apps/password-manager.html"),
+        noteTakingApp: resolve(__dirname, "src/apps/note-taking-app.html"),
+        expenseTracker: resolve(__dirname, "src/apps/expense-tracker.html"),
+        timeTracker: resolve(__dirname, "src/apps/time-tracker.html"),
+        weatherDashboard: resolve(__dirname, "src/apps/weather-dashboard.html"),
+        recipeManager: resolve(__dirname, "src/apps/recipe-manager.html"),
+        fitnessTracker: resolve(__dirname, "src/apps/fitness-tracker.html"),
+        budgetPlanner: resolve(__dirname, "src/apps/budget-planner.html"),
+        habitTracker: resolve(__dirname, "src/apps/habit-tracker.html"),
+        mindMapper: resolve(__dirname, "src/apps/mind-mapper.html"),
+        pomodoroTimer: resolve(__dirname, "src/apps/pomodoro-timer.html"),
+        fileConverter: resolve(__dirname, "src/apps/file-converter.html"),
+        qrCodeGenerator: resolve(__dirname, "src/apps/qr-code-generator.html"),
+        colorPalette: resolve(__dirname, "src/apps/color-palette.html"),
+        fontFinder: resolve(__dirname, "src/apps/font-finder.html"),
+        logoMaker: resolve(__dirname, "src/apps/logo-maker.html"),
+        videoEditor: resolve(__dirname, "src/apps/video-editor.html"),
+        audioMixer: resolve(__dirname, "src/apps/audio-mixer.html"),
+        pdfTools: resolve(__dirname, "src/apps/pdf-tools.html"),
+        screenshotCapture: resolve(
+          __dirname,
+          "src/apps/screenshot-capture.html"
+        ),
+        textAnalyzer: resolve(__dirname, "src/apps/text-analyzer.html"),
+        presentationBuilder: resolve(
+          __dirname,
+          "src/apps/presentation-builder.html"
+        ),
+        databaseManager: resolve(__dirname, "src/apps/database-manager.html"),
+        apiTester: resolve(__dirname, "src/apps/api-tester.html"),
+        codeEditor: resolve(__dirname, "src/apps/code-editor.html"),
+        websiteBuilder: resolve(__dirname, "src/apps/website-builder.html"),
+        crmSystem: resolve(__dirname, "src/apps/crm-system.html"),
+        inventoryManager: resolve(__dirname, "src/apps/inventory-manager.html"),
+        learningPlatform: resolve(__dirname, "src/apps/learning-platform.html"),
+        surveyBuilder: resolve(__dirname, "src/apps/survey-builder.html"),
+        chatbotBuilder: resolve(__dirname, "src/apps/chatbot-builder.html"),
+        backupManager: resolve(__dirname, "src/apps/backup-manager.html"),
+        securityScanner: resolve(__dirname, "src/apps/security-scanner.html"),
+        translationTool: resolve(__dirname, "src/apps/translation-tool.html"),
+      },
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          "framer-motion": ["framer-motion"],
+        },
+      },
+    },
+  },
+});

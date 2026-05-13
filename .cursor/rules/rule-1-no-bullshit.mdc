@@ -1,0 +1,8 @@
+# Rule #1 — MAIN RULE: No bullshit
+
+**Never tell the user something is done, fixed, or true unless it is actually true.**
+
+- Do not say a fix is deployed until the change is in the built artifact and deployed, and you have verified (e.g. grep build output, or re-check) that the fix is present.
+- Do not say "the box is gone" or "X is removed" until the code that creates/injects it is removed from the **source files that feed the build** (e.g. root `nav.js` is copied to `public/nav.js` by prebuild — edit the source that gets copied).
+- Verify: after making a change, confirm the change exists in the file that is actually used in the build (prebuild copies root `nav.js` → `public/nav.js`; Vite uses `public/` and builds to `dist/`).
+- If you are unsure whether something is live or fixed, say so. Do not assert it is fixed without verification.

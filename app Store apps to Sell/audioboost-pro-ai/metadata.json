@@ -1,0 +1,7 @@
+{
+  "name": "AudioBoost Pro AI",
+  "description": "A professional-grade microphone booster and audio analyzer using Web Audio API and Gemini AI. Enhance quiet audio feeds and analyze sounds in real-time.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

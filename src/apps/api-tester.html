@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Tester - VoiceToWebsite App Store</title>
+    <script src="/nav.js"></script>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+        --success: #00ff88;
+        --warning: #ffaa00;
+        --error: #ff4444;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 15% 15%, rgba(0, 242, 255, 0.12), transparent 32%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+
+      .shell {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+
+      .badge {
+        display: inline-flex;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(0, 242, 255, 0.14);
+        border: 1px solid rgba(0, 242, 255, 0.35);
+        color: var(--accent);
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        min-height: 600px;
+      }
+
+      .request-panel,
+      .response-panel {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .panel-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        color: var(--text);
+        font-family: inherit;
+      }
+
+      textarea {
+        min-height: 150px;
+        font-family: "JetBrains Mono", monospace;
+        resize: vertical;
+      }
+
+      .method-selector {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .method-btn {
+        padding: 8px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+      }
+
+      .method-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .method-btn.active {
+        background: var(--accent);
+        color: #041018;
+        border-color: var(--accent);
+      }
+
+      .method-btn.get.active {
+        background: #00ff88;
+        color: #041018;
+      }
+      .method-btn.post.active {
+        background: #00f2ff;
+        color: #041018;
+      }
+      .method-btn.put.active {
+        background: #ffaa00;
+        color: #041018;
+      }
+      .method-btn.delete.active {
+        background: #ff4444;
+        color: #041018;
+      }
+
+      .headers-section {
+        margin-bottom: 16px;
+      }
+
+      .header-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.2s;
+        font-size: 0.9rem;
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #ff4444, #cc0000);
+        color: white;
+      }
+
+      .btn-small {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+
+      .response-content {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 16px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.9rem;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+
+      .response-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .status-indicator {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .status-success {
+        background: rgba(0, 255, 136, 0.1);
+        color: var(--success);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+      }
+
+      .status-error {
+        background: rgba(255, 68, 68, 0.1);
+        color: var(--error);
+        border: 1px solid rgba(255, 68, 68, 0.3);
+      }
+
+      .saved-requests {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        margin-top: 20px;
+      }
+
+      .request-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .request-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .request-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .request-method {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .method-get {
+        background: rgba(0, 255, 136, 0.2);
+        color: var(--success);
+      }
+      .method-post {
+        background: rgba(0, 242, 255, 0.2);
+        color: var(--accent);
+      }
+      .method-put {
+        background: rgba(255, 170, 0, 0.2);
+        color: var(--warning);
+      }
+      .method-delete {
+        background: rgba(255, 68, 68, 0.2);
+        color: var(--error);
+      }
+
+      @media (max-width: 960px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div class="header">
+        <div class="badge">API</div>
+        <span style="color: var(--muted); font-weight: 600"
+          >Test and debug APIs with request builder and response analysis.</span
+        >
+      </div>
+
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">API Tester</h1>
+      <p style="color: var(--muted)">Build and test API requests with comprehensive response analysis.</p>
+
+      <div class="workspace">
+        <div class="request-panel">
+          <div class="panel-header">
+            <div class="panel-title">Request Builder</div>
+            <button class="btn btn-ghost btn-small" id="saveRequestBtn">💾 Save</button>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">HTTP Method</div>
+            <div class="method-selector">
+              <button class="method-btn get" data-method="GET">GET</button>
+              <button class="method-btn post active" data-method="POST">POST</button>
+              <button class="method-btn put" data-method="PUT">PUT</button>
+              <button class="method-btn delete" data-method="DELETE">DELETE</button>
+              <button class="method-btn" data-method="PATCH">PATCH</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">URL</div>
+            <input
+              type="text"
+              id="urlInput"
+              value="https://api.voicetowebsite.com/test"
+              placeholder="Enter API endpoint URL"
+            />
+          </div>
+
+          <div class="headers-section">
+            <div class="form-label">Headers</div>
+            <div id="headersContainer">
+              <div class="header-row">
+                <input type="text" class="header-key" placeholder="Header name" value="Content-Type" />
+                <input type="text" class="header-value" placeholder="Header value" value="application/json" />
+                <button class="btn btn-danger btn-small" onclick="this.parentElement.remove()">✕</button>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-small" id="addHeaderBtn">+ Add Header</button>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Body (JSON)</div>
+            <textarea id="bodyInput" placeholder='{"key": "value"}'>
+{
+  "test": true,
+  "message": "Hello from API Tester"
+}</textarea
+            >
+          </div>
+
+          <button class="btn btn-primary" id="sendRequestBtn">🚀 Send Request</button>
+        </div>
+
+        <div class="response-panel">
+          <div class="panel-header">
+            <div class="panel-title">Response</div>
+            <button class="btn btn-ghost btn-small" id="clearResponseBtn">🗑️ Clear</button>
+          </div>
+
+          <div class="response-meta">
+            <div>
+              <div class="form-label">Status</div>
+              <div class="status-indicator status-success" id="statusIndicator">200 OK</div>
+            </div>
+            <div>
+              <div class="form-label">Time</div>
+              <div class="status-indicator" id="timeIndicator">245ms</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Response Headers</div>
+            <textarea id="responseHeadersInput" readonly>
+content-type: application/json
+content-length: 123
+cache-control: no-cache</textarea
+            >
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">Response Body</div>
+            <div class="response-content" id="responseContent">
+              { "success": true, "message": "Request processed successfully", "data": { "id": 123, "timestamp":
+              "2024-01-20T12:00:00Z" } }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="saved-requests">
+        <div class="panel-header">
+          <div class="panel-title">Saved Requests</div>
+          <button class="btn btn-ghost btn-small" id="clearSavedBtn">Clear All</button>
+        </div>
+        <div id="savedRequestsList">
+          <div
+            class="request-item"
+            data-request='{"method":"POST","url":"https://api.voicetowebsite.com/test","headers":{"Content-Type":"application/json"},"body":"{\"test\":true}"}'
+          >
+            <div class="request-info">
+              <div class="request-method method-post">POST</div>
+              <div>/test endpoint</div>
+            </div>
+            <button class="btn btn-ghost btn-small" onclick="loadRequest(this)">Load</button>
+          </div>
+          <div
+            class="request-item"
+            data-request='{"method":"GET","url":"https://api.voicetowebsite.com/users","headers":{},"body":""}'
+          >
+            <div class="request-info">
+              <div class="request-method method-get">GET</div>
+              <div>/users endpoint</div>
+            </div>
+            <button class="btn btn-ghost btn-small" onclick="loadRequest(this)">Load</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      let currentMethod = "POST";
+
+      // Method selection
+      document.querySelectorAll(".method-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".method-btn").forEach((b) => b.classList.remove("active"));
+          this.classList.add("active");
+          currentMethod = this.dataset.method;
+        });
+      });
+
+      // Add header
+      document.getElementById("addHeaderBtn").addEventListener("click", function () {
+        const headerRow = document.createElement("div");
+        headerRow.className = "header-row";
+        headerRow.innerHTML = `
+                <input type="text" class="header-key" placeholder="Header name">
+                <input type="text" class="header-value" placeholder="Header value">
+                <button class="btn btn-danger btn-small" onclick="this.parentElement.remove()">✕</button>
+            `;
+        document.getElementById("headersContainer").appendChild(headerRow);
+      });
+
+      // Send request
+      document.getElementById("sendRequestBtn").addEventListener("click", async function () {
+        const url = document.getElementById("urlInput").value;
+        const body = document.getElementById("bodyInput").value;
+
+        // Collect headers
+        const headers = {};
+        document.querySelectorAll(".header-row").forEach((row) => {
+          const key = row.querySelector(".header-key").value.trim();
+          const value = row.querySelector(".header-value").value.trim();
+          if (key && value) {
+            headers[key] = value;
+          }
+        });
+
+        // Update UI
+        this.textContent = "Sending...";
+        this.disabled = true;
+
+        const startTime = Date.now();
+
+        try {
+          // Simulate API call
+          await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 1000));
+
+          const endTime = Date.now();
+          const responseTime = endTime - startTime;
+
+          // Simulate response
+          const isSuccess = Math.random() > 0.2; // 80% success rate
+          const status = isSuccess ? 200 : 400;
+          const statusText = isSuccess ? "OK" : "Bad Request";
+
+          // Update response UI
+          const statusIndicator = document.getElementById("statusIndicator");
+          statusIndicator.textContent = `${status} ${statusText}`;
+          statusIndicator.className = `status-indicator ${isSuccess ? "status-success" : "status-error"}`;
+
+          document.getElementById("timeIndicator").textContent = `${responseTime}ms`;
+
+          // Generate mock response
+          const mockResponse = {
+            success: isSuccess,
+            method: currentMethod,
+            url: url,
+            timestamp: new Date().toISOString(),
+            data: isSuccess
+              ? {
+                  id: Math.floor(Math.random() * 1000),
+                  message: "Request processed successfully",
+                  received: body ? JSON.parse(body) : null,
+                }
+              : {
+                  error: "Invalid request format",
+                  details: "Please check your request parameters",
+                },
+          };
+
+          document.getElementById("responseContent").textContent = JSON.stringify(mockResponse, null, 2);
+
+          // Mock response headers
+          const mockHeaders = `content-type: application/json
+content-length: ${JSON.stringify(mockResponse).length}
+cache-control: no-cache
+x-response-time: ${responseTime}ms
+x-request-id: ${Math.random().toString(36).substr(2, 9)}`;
+
+          document.getElementById("responseHeadersInput").value = mockHeaders;
+        } catch (error) {
+          document.getElementById("statusIndicator").textContent = "Error";
+          document.getElementById("statusIndicator").className = "status-indicator status-error";
+          document.getElementById("responseContent").textContent = "Network error: " + error.message;
+        } finally {
+          this.textContent = "🚀 Send Request";
+          this.disabled = false;
+        }
+      });
+
+      // Save request
+      document.getElementById("saveRequestBtn").addEventListener("click", function () {
+        const url = document.getElementById("urlInput").value;
+        const body = document.getElementById("bodyInput").value;
+
+        // Collect headers
+        const headers = {};
+        document.querySelectorAll(".header-row").forEach((row) => {
+          const key = row.querySelector(".header-key").value.trim();
+          const value = row.querySelector(".header-value").value.trim();
+          if (key && value) {
+            headers[key] = value;
+          }
+        });
+
+        const requestData = {
+          method: currentMethod,
+          url: url,
+          headers: headers,
+          body: body,
+        };
+
+        // Add to saved requests
+        const requestItem = document.createElement("div");
+        requestItem.className = "request-item";
+        requestItem.dataset.request = JSON.stringify(requestData);
+
+        const endpoint = url.split("/").pop() || "root";
+        requestItem.innerHTML = `
+                <div class="request-info">
+                    <div class="request-method method-${currentMethod.toLowerCase()}">${currentMethod}</div>
+                    <div>/${endpoint} endpoint</div>
+                </div>
+                <button class="btn btn-ghost btn-small" onclick="loadRequest(this)">Load</button>
+            `;
+
+        document.getElementById("savedRequestsList").appendChild(requestItem);
+      });
+
+      // Load request
+      window.loadRequest = function (button) {
+        const requestItem = button.closest(".request-item");
+        const requestData = JSON.parse(requestItem.dataset.request);
+
+        // Set method
+        document.querySelectorAll(".method-btn").forEach((btn) => {
+          btn.classList.remove("active");
+          if (btn.dataset.method === requestData.method) {
+            btn.classList.add("active");
+          }
+        });
+        currentMethod = requestData.method;
+
+        // Set URL
+        document.getElementById("urlInput").value = requestData.url;
+
+        // Set headers
+        document.getElementById("headersContainer").innerHTML = "";
+        Object.entries(requestData.headers).forEach(([key, value]) => {
+          const headerRow = document.createElement("div");
+          headerRow.className = "header-row";
+          headerRow.innerHTML = `
+                    <input type="text" class="header-key" placeholder="Header name" value="${key}">
+                    <input type="text" class="header-value" placeholder="Header value" value="${value}">
+                    <button class="btn btn-danger btn-small" onclick="this.parentElement.remove()">✕</button>
+                `;
+          document.getElementById("headersContainer").appendChild(headerRow);
+        });
+
+        // Set body
+        document.getElementById("bodyInput").value = requestData.body || "";
+      };
+
+      // Clear response
+      document.getElementById("clearResponseBtn").addEventListener("click", function () {
+        document.getElementById("statusIndicator").textContent = "No Response";
+        document.getElementById("statusIndicator").className = "status-indicator";
+        document.getElementById("timeIndicator").textContent = "0ms";
+        document.getElementById("responseContent").textContent = "";
+        document.getElementById("responseHeadersInput").value = "";
+      });
+
+      // Clear saved requests
+      document.getElementById("clearSavedBtn").addEventListener("click", function () {
+        if (confirm("Clear all saved requests?")) {
+          document.getElementById("savedRequestsList").innerHTML = "";
+        }
+      });
+    </script>
+  </body>
+</html>

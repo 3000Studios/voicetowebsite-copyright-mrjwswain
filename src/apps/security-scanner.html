@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security Scanner | VoiceToWebsite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+      }
+      body {
+        background:
+          radial-gradient(circle at 20% 20%, rgba(0, 242, 255, 0.12), transparent 30%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+      .shell {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        display: grid;
+        gap: 12px;
+      }
+      .section-title {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      input {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 12px;
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .issues {
+        display: grid;
+        gap: 10px;
+      }
+      .issue {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <div
+          style="
+            display: inline-flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0, 242, 255, 0.14);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          "
+        >
+          Security
+        </div>
+        <span style="color: var(--muted); font-weight: 600">Stub scanner for VoiceToWebsite previews.</span>
+      </div>
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">Scan endpoints</h1>
+      <p style="color: var(--muted)">Enter a URL, simulate a scan, and copy the report.</p>
+
+      <div class="card">
+        <div class="section-title">Target</div>
+        <input id="url" type="url" placeholder="https://voicetowebsite.com" />
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button class="btn btn-primary" id="scan" type="button">Scan</button>
+          <button class="btn btn-ghost" id="copy" type="button">Copy report</button>
+        </div>
+        <div class="issues" id="issues"></div>
+      </div>
+    </main>
+
+    <script>
+      const issues = document.getElementById("issues");
+      const scan = document.getElementById("scan");
+      const copy = document.getElementById("copy");
+      const url = document.getElementById("url");
+
+      scan.addEventListener("click", () => {
+        issues.innerHTML = "";
+        const findings = ["Strict-Transport-Security missing", "CSP not defined", "Cookies not marked HttpOnly"];
+        findings.forEach((f) => {
+          const div = document.createElement("div");
+          div.className = "issue";
+          div.textContent = f;
+          issues.appendChild(div);
+        });
+      });
+
+      copy.addEventListener("click", () => {
+        navigator.clipboard.writeText("Security scan ready for " + (url.value || "target"));
+      });
+    </script>
+  </body>
+</html>

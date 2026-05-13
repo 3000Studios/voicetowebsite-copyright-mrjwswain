@@ -1,0 +1,18 @@
+{
+  "main": [
+    { "label": "Home", "route": "/" },
+    { "label": "How It Works", "route": "/how-it-works" },
+    { "label": "Features", "route": "/features" },
+    { "label": "Pricing", "route": "/pricing" },
+    { "label": "Apps", "route": "/store" },
+    { "label": "Store", "route": "/store" },
+    { "label": "Blog", "route": "/blog" }
+  ],
+  "footer": [
+    { "label": "Support", "route": "/support" },
+    { "label": "Privacy", "route": "/privacy" },
+    { "label": "Terms", "route": "/terms" },
+    { "label": "Legal", "route": "/legal" },
+    { "label": "Admin Login", "route": "/admin/login.html" }
+  ]
+}

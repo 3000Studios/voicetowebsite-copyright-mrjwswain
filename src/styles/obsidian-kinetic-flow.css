@@ -1,0 +1,386 @@
+/* Obsidian Kinetic Flow - Homepage Styling */
+:root {
+  --obsidian: #0a0a0b;
+  --glass: rgba(255, 255, 255, 0.03);
+  --neon-cyan: #00f2ff;
+  --neon-purple: #bc13fe;
+  --text-main: #e0e0e0;
+  --card-radius: 24px;
+  --neon-glow: 0 0 20px rgba(0, 242, 255, 0.4);
+  --fluid-speed: 0.6s;
+  --border-beam-color: linear-gradient(
+    90deg,
+    transparent,
+    var(--neon-cyan),
+    var(--neon-purple),
+    transparent
+  );
+}
+
+/* START: EDGE LIGHTING FRAME */
+#edge-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  border: 1px solid rgba(0, 242, 255, 0.2);
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.5s ease;
+}
+/* END: EDGE LIGHTING FRAME */
+
+/* START: CUSTOM CURSOR */
+#cursor {
+  width: 20px;
+  height: 20px;
+  background: var(--neon-cyan);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  mix-blend-mode: difference;
+  transition: transform 0.1s ease;
+}
+/* END: CUSTOM CURSOR */
+
+/* START: BACKGROUND CANVAS */
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+/* END: BACKGROUND CANVAS */
+
+/* START: HERO SECTION */
+.obsidian-hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  perspective: 1000px;
+  padding: 0 10%;
+  position: relative;
+  z-index: 10;
+}
+
+.obsidian-hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(3rem, 10vw, 8rem);
+  line-height: 0.9;
+  margin-bottom: 2rem;
+  transform-style: preserve-3d;
+  position: relative;
+  color: #fff;
+  text-shadow:
+    0 1px 0 #ccc,
+    0 2px 0 #c9c9c9,
+    0 3px 0 #bbb,
+    0 4px 0 #b9b9b9,
+    0 5px 0 #aaa,
+    0 6px 1px rgba(0, 0, 0, 0.1),
+    0 0 5px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    0 5px 10px rgba(0, 0, 0, 0.25),
+    0 10px 10px rgba(0, 0, 0, 0.2),
+    0 20px 20px rgba(0, 0, 0, 0.15);
+}
+
+.obsidian-hero h1 span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(50px) rotateX(-90deg);
+}
+
+.obsidian-hero p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.2rem;
+  max-width: 600px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 3rem;
+  opacity: 0;
+}
+
+.cta-button {
+  padding: 1.2rem 3rem;
+  background: transparent;
+  border: 1px solid var(--neon-cyan);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  transition: 0.4s;
+  box-shadow: var(--neon-glow);
+  transform-style: preserve-3d;
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.cta-button:hover {
+  background: var(--neon-cyan);
+  color: var(--obsidian);
+  transform: translateZ(30px);
+}
+/* END: HERO SECTION */
+
+/* START: INTERACTIVE CARDS */
+.obsidian-features {
+  padding: 10rem 5%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.obsidian-card {
+  background: #121214;
+  border-radius: var(--card-radius);
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+}
+
+.obsidian-card:hover {
+  transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+  border-color: rgba(0, 242, 255, 0.3);
+}
+
+.obsidian-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 242, 255, 0.1) 0%,
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.obsidian-card:hover::before {
+  opacity: 1;
+}
+
+/* Border Beam Effect */
+.obsidian-card::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 70%,
+    var(--neon-cyan),
+    var(--neon-purple)
+  );
+  border-radius: var(--card-radius);
+  z-index: -1;
+  animation: rotate-beam 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.obsidian-card:hover::after {
+  opacity: 1;
+}
+
+@keyframes rotate-beam {
+  to {
+    --angle: 360deg;
+  }
+}
+
+.obsidian-card i {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  color: var(--neon-cyan);
+  transform: translateZ(40px);
+}
+
+.obsidian-card h3 {
+  font-family: "Inter", sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  transform: translateZ(30px);
+  color: #fff;
+}
+
+.obsidian-card p {
+  font-family: "Inter", sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  transform: translateZ(20px);
+}
+/* END: INTERACTIVE CARDS */
+
+/* START: PHONE TILT SECTION */
+.phone-showcase {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+}
+
+.phone-container {
+  width: 300px;
+  height: 600px;
+  background: #000;
+  border: 8px solid #333;
+  border-radius: 40px;
+  position: relative;
+  transform-style: preserve-3d;
+  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8);
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  overflow: hidden;
+  background: linear-gradient(45deg, #111, #222);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+}
+
+.phone-screen i {
+  font-size: 4rem;
+  color: var(--neon-cyan);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/* END: PHONE TILT SECTION */
+
+/* START: FOOTER REVEAL */
+.obsidian-footer {
+  position: relative;
+  height: 400px;
+  background: #050505;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.obsidian-footer .footer-content {
+  text-align: center;
+}
+
+.obsidian-footer .footer-links {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.obsidian-footer .footer-links a {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: 0.3s;
+}
+
+.obsidian-footer .footer-links a:hover {
+  color: var(--neon-cyan);
+}
+
+.obsidian-footer .logo {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(to right, #fff, var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* END: FOOTER REVEAL */
+
+/* START: UTILITIES */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.ripple {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-animation 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.admin-lock {
+  cursor: pointer;
+}
+
+/* Override body styling for obsidian theme */
+body.obsidian-theme {
+  background-color: var(--obsidian);
+  color: var(--text-main);
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+body.obsidian-theme * {
+  cursor: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .obsidian-hero h1 {
+    font-size: 4rem;
+  }
+  .phone-container {
+    transform: scale(0.7);
+  }
+  .obsidian-features {
+    padding: 5rem 3%;
+    grid-template-columns: 1fr;
+  }
+}
+/* END: UTILITIES */

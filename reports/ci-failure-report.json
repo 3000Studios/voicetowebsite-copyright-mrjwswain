@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-02-24T03:29:13.996Z",
+  "error": "Verification failed",
+  "stack": "Error: Verification failed\n    at ContinuousIntegration.runVerification (file:///C:/WorkSpaces/voicetowebsite-copyright-mrjwswain/scripts/continuous-integration.mjs:165:13)\n    at ContinuousIntegration.runPipeline (file:///C:/WorkSpaces/voicetowebsite-copyright-mrjwswain/scripts/continuous-integration.mjs:114:18)\n    at async ContinuousIntegration.start (file:///C:/WorkSpaces/voicetowebsite-copyright-mrjwswain/scripts/continuous-integration.mjs:31:5)",
+  "gitStatus": "MM ENV_SCHEMA.md\nMM GLOBAL_SYSTEM_INSTRUCTIONS.md\nM  nav.js\nM  package-lock.json\n M package.json\nA  public/logo-voicetowebsite.svg\nM  public/nav.js\nM  public/styles.css\nMM reports/env-audit.json\nA  scripts/auto-dev-push.ps1\nM  src/App.tsx\nM  src/apps/backup-manager.html\nM  src/apps/learning-platform.html\nM  src/components/BioluminescentHeader.tsx\nA  src/components/BubbleFooter.tsx\nA  src/components/SiteLogo.tsx\nM  styles.css\nM  styles/components.css\nM  tests/database-cache.test.js\nM  vite.config.js\n?? scripts/advanced-heal.mjs\n?? scripts/continuous-integration.mjs\n?? scripts/pre-commit-enhanced.mjs",
+  "recommendations": ["Run npm run verify manually to see detailed errors"]
+}

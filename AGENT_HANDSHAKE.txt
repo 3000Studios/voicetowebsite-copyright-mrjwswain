@@ -1,0 +1,38 @@
+VOICE TO WEBSITE - AGENT HANDSHAKE
+==================================
+
+Purpose
+-------
+Shared coordination contract for humans and coding agents.
+
+Canonical docs
+--------------
+1) Root policy: AGENTS.md
+2) System ops: SYSTEM_OPERATIONS.md
+3) Deploy law: DEPLOYMENT.md
+4) Global workbook: GLOBAL_SYSTEM_INSTRUCTIONS.md
+5) Skills index: skills/README.md
+
+Hard rules
+----------
+- Verify before ship/deploy: npm run verify
+- Never expose secrets in client code
+- Keep admin auth server-side with signed HttpOnly cookies
+- Keep route/path consistency across worker, static pages, and React nav
+
+Directory overrides
+-------------------
+- admin/AGENTS.md
+- src/AGENTS.md
+- functions/AGENTS.md
+- scripts/AGENTS.md
+- tests/AGENTS.md
+- .agent/AGENTS.md
+- voicetowebsite-orchestrator/AGENTS.md
+
+Coordination notes
+------------------
+- Keep changes small and reviewable.
+- If a path is changed, update all references in docs and route maps.
+- Use skills/* playbooks to avoid drift.
+

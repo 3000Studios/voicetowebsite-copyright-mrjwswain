@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite | Admin Login</title>
+    <meta
+      name="description"
+      content="Secure admin login for VoiceToWebsite command center. Access your AI-powered web development dashboard."
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <link rel="stylesheet" href="./particle-wallpaper.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .admin-login-wallpaper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f172a 75%, #0f0f23 100%);
+        background-size: 400% 400%;
+        animation: adminLoginGradient 20s ease infinite;
+        z-index: -2;
+      }
+
+      @keyframes adminLoginGradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .admin-particles {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+      }
+
+      .admin-particle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: rgba(100, 255, 218, 0.8);
+        border-radius: 50%;
+        animation: adminParticleFloat 15s infinite linear;
+      }
+
+      @keyframes adminParticleFloat {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        font-family: "Inter", sans-serif;
+      }
+
+      .login-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.15;
+        background-image:
+          radial-gradient(circle at 20% 50%, rgba(100, 255, 218, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.2) 0%, transparent 50%);
+        animation: adminFloat 25s ease-in-out infinite;
+      }
+
+      @keyframes adminFloat {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        33% {
+          transform: translateY(-30px) rotate(2deg);
+        }
+        66% {
+          transform: translateY(20px) rotate(-2deg);
+        }
+      }
+
+      .login-card {
+        background: rgba(15, 23, 42, 0.95);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(100, 255, 218, 0.3);
+        border-radius: 24px;
+        padding: 3rem;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 10;
+        animation: slideInUp 0.8s ease-out;
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px) scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #64ffda, #9333ea);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        font-family: "Inter", sans-serif;
+      }
+
+      .login-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+        font-weight: 400;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label {
+        display: block;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-family: "Inter", sans-serif;
+      }
+
+      .form-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(100, 255, 218, 0.2);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #64ffda;
+        box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .login-button {
+        width: 100%;
+        background: linear-gradient(135deg, #64ffda, #9333ea);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        font-family: "Inter", sans-serif;
+      }
+
+      .login-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(100, 255, 218, 0.4);
+      }
+
+      .login-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      .login-button:hover::before {
+        left: 100%;
+      }
+
+      .security-features {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(100, 255, 218, 0.2);
+      }
+
+      .security-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+      }
+
+      .security-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.75rem;
+        color: #64ffda;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 2rem;
+      }
+
+      .back-link a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+      }
+
+      .back-link a:hover {
+        color: #64ffda;
+      }
+
+      .video-container {
+        margin-top: 2rem;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .video-container video {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+      }
+
+      .particle-1 {
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .particle-2 {
+        left: 20%;
+        animation-delay: 1s;
+      }
+      .particle-3 {
+        left: 30%;
+        animation-delay: 2s;
+      }
+      .particle-4 {
+        left: 40%;
+        animation-delay: 3s;
+      }
+      .particle-5 {
+        left: 50%;
+        animation-delay: 4s;
+      }
+      .particle-6 {
+        left: 60%;
+        animation-delay: 5s;
+      }
+      .particle-7 {
+        left: 70%;
+        animation-delay: 6s;
+      }
+      .particle-8 {
+        left: 80%;
+        animation-delay: 7s;
+      }
+      .particle-9 {
+        left: 90%;
+        animation-delay: 8s;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Admin Login Wallpaper -->
+    <div class="admin-login-wallpaper"></div>
+    <div class="admin-particles">
+      <div class="admin-particle particle-1"></div>
+      <div class="admin-particle particle-2"></div>
+      <div class="admin-particle particle-3"></div>
+      <div class="admin-particle particle-4"></div>
+      <div class="admin-particle particle-5"></div>
+      <div class="admin-particle particle-6"></div>
+      <div class="admin-particle particle-7"></div>
+      <div class="admin-particle particle-8"></div>
+      <div class="admin-particle particle-9"></div>
+    </div>
+
+    <div class="login-bg"></div>
+
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <h1 class="login-title">Admin Portal</h1>
+          <p class="login-subtitle">Access your AI-powered development dashboard</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label" for="accessCode">Admin Access Code</label>
+            <input
+              type="password"
+              id="accessCode"
+              class="form-input"
+              placeholder="Enter your access code"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+
+          <button type="submit" class="login-button">🔐 Open Admin</button>
+        </form>
+
+        <div class="security-features">
+          <div class="security-item">
+            <span class="security-icon">🛡️</span>
+            <span>Secure admin cookie issued by the live Worker</span>
+          </div>
+          <div class="security-item">
+            <span class="security-icon">🔐</span>
+            <span>End-to-end encryption</span>
+          </div>
+          <div class="security-item">
+            <span class="security-icon">📊</span>
+            <span>Real-time monitoring & alerts</span>
+          </div>
+          <div class="security-item">
+            <span class="security-icon">🌐</span>
+            <span>Global CDN protection</span>
+          </div>
+        </div>
+
+        <div class="video-container">
+          <video autoplay muted loop title="Admin login background video">
+            <source
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div class="back-link">
+          <a href="/">← Back to Main Site</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("loginForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const accessCode = document.getElementById("accessCode").value;
+
+        if (accessCode) {
+          const button = document.querySelector(".login-button");
+          const originalText = button.innerHTML;
+          button.innerHTML = "🔄 Authenticating...";
+          button.disabled = true;
+
+          fetch("/api/admin/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ accessCode }),
+          })
+            .then(async (response) => {
+              const data = await response.json().catch(() => ({}));
+              if (!response.ok) {
+                throw new Error(data.error || "Login failed.");
+              }
+              window.location.href = "/admin/mission";
+            })
+            .catch((error) => {
+              alert(error.message || "Login failed.");
+              button.innerHTML = originalText;
+              button.disabled = false;
+            });
+        } else {
+          alert("Please enter your access code");
+        }
+      });
+
+      // Add input animations
+      const inputs = document.querySelectorAll(".form-input");
+      inputs.forEach((input) => {
+        input.addEventListener("focus", function () {
+          this.parentElement.style.transform = "scale(1.02)";
+        });
+
+        input.addEventListener("blur", function () {
+          this.parentElement.style.transform = "scale(1)";
+        });
+      });
+    </script>
+  </body>
+</html>

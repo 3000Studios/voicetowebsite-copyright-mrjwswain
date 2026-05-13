@@ -1,0 +1,6 @@
+{
+  "audio.enable": false,
+  "audio.cues": "off",
+  "workbench.sound.enable": false,
+  "editor.sound": false
+}

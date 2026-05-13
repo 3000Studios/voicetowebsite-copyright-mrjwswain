@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="https://js.stripe.com/v3"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>App Store | VoiceToWebsite - Revenue Engine</title>
+    <meta
+      name="description"
+      content="Browse and license VoiceToWebsite apps, templates, and automation tools. Secure checkout with Stripe and PayPal."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-deep: #030305;
+        --membrane-fill: rgba(15, 15, 25, 0.65);
+        --conductive-cyan: #00f2ff;
+        --conductive-purple: #7000ff;
+        --flux-gradient: linear-gradient(135deg, var(--conductive-cyan), var(--conductive-purple));
+        --text-main: #e0e0e0;
+        --text-dim: #94a3b8;
+        --border-membrane: rgba(255, 255, 255, 0.08);
+        --font-sans: "Inter", system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg-deep);
+        color: var(--text-main);
+        font-family: var(--font-sans);
+        overflow-x: hidden;
+        line-height: 1.5;
+      }
+
+      .flux-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        background: radial-gradient(circle at 50% 50%, #0a0a1a 0%, #030305 100%);
+        overflow: hidden;
+      }
+
+      .flux-membrane {
+        position: absolute;
+        width: 150%;
+        height: 150%;
+        top: -25%;
+        left: -25%;
+        background-image:
+          radial-gradient(circle at 20% 30%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+          radial-gradient(circle at 80% 70%, rgba(112, 0, 255, 0.08) 0%, transparent 40%);
+        filter: blur(80px);
+        animation: membrane-shift 20s ease-in-out infinite alternate;
+      }
+
+      @keyframes membrane-shift {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        100% {
+          transform: translate(5%, 5%) rotate(5deg);
+        }
+      }
+
+      .conduction-lines {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 60px 60px;
+        -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+        mask-image: radial-gradient(circle at center, black, transparent 80%);
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 4rem;
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-membrane);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .brand-mark {
+        width: 40px;
+        height: 40px;
+        background: var(--flux-gradient);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: #000;
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+      }
+
+      .brand-text strong {
+        font-size: 1.2rem;
+        display: block;
+        letter-spacing: -0.5px;
+      }
+      .brand-text span {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--conductive-cyan);
+        letter-spacing: 2px;
+      }
+
+      .nav {
+        display: flex;
+        gap: 2.5rem;
+      }
+
+      .nav a {
+        text-decoration: none;
+        color: var(--text-dim);
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .nav a:hover,
+      .nav a.active {
+        color: var(--conductive-cyan);
+      }
+
+      .ghost-button {
+        background: transparent;
+        border: 1px solid var(--border-membrane);
+        color: var(--text-main);
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .ghost-button:hover {
+        border-color: var(--conductive-cyan);
+        box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+      }
+
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 6rem 2rem;
+      }
+
+      .hero {
+        text-align: center;
+        margin-bottom: 6rem;
+      }
+
+      h1 {
+        font-size: 4.5rem;
+        font-weight: 800;
+        letter-spacing: -2px;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(to bottom, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .subhead {
+        font-size: 1.25rem;
+        color: var(--text-dim);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .category-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin: 2rem auto 3rem;
+      }
+
+      .category-pill {
+        border-radius: 999px;
+        padding: 0.6rem 1.1rem;
+        border: 1px solid var(--border-membrane);
+        background: rgba(0, 0, 0, 0.35);
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.7rem;
+        font-family: var(--font-mono);
+      }
+
+      .app-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+
+      .app-card {
+        position: relative;
+        background: var(--membrane-fill);
+        border: 1px solid var(--border-membrane);
+        padding: 2.5rem;
+        border-radius: 24px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .app-card.premium-brand {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .app-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, transparent, rgba(0, 242, 255, 0.05), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+
+      .app-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(0, 242, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .app-card:hover::before {
+        transform: translateX(100%);
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        padding: 0.4rem 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 100px;
+        color: var(--text-dim);
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--border-membrane);
+      }
+
+      .status-pill.live {
+        color: var(--conductive-cyan);
+        border-color: rgba(0, 242, 255, 0.2);
+      }
+      .status-pill.live::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: var(--conductive-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--conductive-cyan);
+      }
+
+      .app-video-container {
+        margin-bottom: 1.5rem;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+      }
+
+      .app-preview-video {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+      }
+
+      .app-video-container:hover .app-preview-video {
+        opacity: 1;
+      }
+
+      .app-card h3 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      .app-card p {
+        color: var(--text-dim);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+        flex-grow: 1;
+      }
+
+      .card-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .primary-btn {
+        flex: 1;
+        padding: 1rem;
+        background: #fff;
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .primary-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      }
+
+      .monetization {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--conductive-cyan);
+        opacity: 0.8;
+      }
+
+      .footer {
+        margin-top: 8rem;
+        padding: 4rem 2rem;
+        border-top: 1px solid var(--border-membrane);
+        text-align: center;
+      }
+
+      .footer strong {
+        font-size: 1.5rem;
+        letter-spacing: -1px;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .footer p {
+        color: var(--text-dim);
+        font-size: 0.9rem;
+      }
+
+      /* Storefront carousel */
+      .carousel-section {
+        margin-bottom: 4rem;
+      }
+      .carousel-section h2 {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+      }
+      .carousel-wrap {
+        position: relative;
+        margin-top: 2rem;
+      }
+      .carousel-track {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding: 1rem 0;
+        -webkit-overflow-scrolling: touch;
+      }
+      .carousel-track::-webkit-scrollbar {
+        height: 6px;
+      }
+      .carousel-track::-webkit-scrollbar-thumb {
+        background: var(--conductive-cyan);
+        border-radius: 3px;
+      }
+      .carousel-card {
+        flex: 0 0 min(300px, 82vw);
+        scroll-snap-align: start;
+        background: var(--membrane-fill);
+        border: 1px solid var(--border-membrane);
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s;
+      }
+      .carousel-card:hover {
+        border-color: rgba(0, 242, 255, 0.35);
+      }
+      .carousel-card-preview {
+        height: 120px;
+        background: linear-gradient(135deg, rgba(0, 242, 255, 0.08), rgba(112, 0, 255, 0.08));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--conductive-cyan);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .carousel-card-body {
+        padding: 1.25rem;
+        flex: 1;
+      }
+      .carousel-card-body h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+      .carousel-card-body p {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+      }
+      .carousel-card-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .carousel-card-actions .primary-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+      }
+      .carousel-card-actions a.primary-btn {
+        text-decoration: none;
+      }
+      .carousel-prev,
+      .carousel-next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid var(--border-membrane);
+        background: rgba(0, 0, 0, 0.6);
+        color: var(--text-main);
+        font-size: 1.2rem;
+        cursor: pointer;
+        z-index: 5;
+        transition: 0.3s;
+      }
+      .carousel-prev:hover,
+      .carousel-next:hover {
+        border-color: var(--conductive-cyan);
+        background: rgba(0, 242, 255, 0.1);
+      }
+      .carousel-prev {
+        left: -12px;
+      }
+      .carousel-next {
+        right: -12px;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2.5rem;
+        }
+        .site-header {
+          padding: 1.5rem;
+        }
+        .nav {
+          display: none;
+        }
+        .carousel-prev {
+          left: 4px;
+        }
+        .carousel-next {
+          right: 4px;
+        }
+      }
+    </style>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5800977493749262"
+      crossorigin="anonymous"
+    ></script>
+    <meta name="google-adsense-account" content="ca-pub-5800977493749262" />
+  </head>
+  <body>
+    <div class="video-bg" aria-hidden="true">
+      <video
+        src="https://cdn.coverr.co/videos/coverr-mobile-apps-5473/1080p.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </div>
+
+    <main class="page">
+      <section class="hero">
+        <p
+          class="sale-banner"
+          role="banner"
+          style="
+            background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%);
+            color: #fff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-align: center;
+          "
+        >
+          25% off everything — today until end of March. All sales final.
+        </p>
+        <h1>The App Flux</h1>
+        <p class="subhead">
+          Deploy autonomous modules that build, monetize, and scale your digital ecosystem in real-time. Preview and
+          description only; full access after purchase. No free downloads of paid apps.
+        </p>
+        <div class="category-grid">
+          <span class="category-pill">Voice AI</span>
+          <span class="category-pill">Design Systems</span>
+          <span class="category-pill">Automation</span>
+          <span class="category-pill">Growth Ops</span>
+          <span class="category-pill">Data Rooms</span>
+          <span class="category-pill">Motion Kits</span>
+        </div>
+      </section>
+
+      <section class="carousel-section">
+        <h2>Storefront — Demo &amp; Buy</h2>
+        <p class="subhead">Every app has a viewable demo. Try it, then buy.</p>
+        <div class="carousel-wrap">
+          <button type="button" class="carousel-prev" id="storefrontCarouselPrev" aria-label="Previous">‹</button>
+          <button type="button" class="carousel-next" id="storefrontCarouselNext" aria-label="Next">›</button>
+          <div class="carousel-track" id="storefrontCarouselTrack">
+            <!-- Filled by storefront-apps.json -->
+          </div>
+        </div>
+      </section>
+
+      <div class="app-grid" id="appGrid">
+        <!-- Apps will be dynamically loaded here -->
+
+        <div class="app-card glass-morphism">
+          <div>
+            <div class="status-pill live">Arcade</div>
+            <h3>Neon Snake</h3>
+            <p>High-speed cybernetic reflex trainer. Compete for high scores in the flux grid.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-retro-games-8767/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a class="primary-btn" href="neon-snake.html">PLAY NOW</a>
+            <span class="monetization">FREE</span>
+          </div>
+        </div>
+
+        <div class="app-card glass-morphism">
+          <div>
+            <div class="status-pill live">Knowledge</div>
+            <h3>Cyber Insights</h3>
+            <p>Critical transmissions from the edge of the digital frontier. Read the latest on AI & Web.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-cybersecurity-8768/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a class="primary-btn" href="cyber-blog.html">READ</a>
+            <span class="monetization">INCLUDED</span>
+          </div>
+        </div>
+
+        <div class="app-card glass-morphism">
+          <div>
+            <div class="status-pill live">Productivity</div>
+            <h3>Focus Flux</h3>
+            <p>Cybernetic timer for deep work sessions. Optimize your flow state.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-productivity-8769/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a class="primary-btn" href="focus-timer.html">START</a>
+            <span class="monetization">FREE</span>
+          </div>
+        </div>
+
+        <div class="app-card glass-morphism">
+          <div>
+            <div class="status-pill live">Arcade</div>
+            <h3>Memory Matrix</h3>
+            <p>Test your cognitive retention. Pattern matching for the digital age.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-brain-training-8770/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a class="primary-btn" href="memory-matrix.html">PLAY</a>
+            <span class="monetization">FREE</span>
+          </div>
+        </div>
+
+        <div class="app-card glass-morphism">
+          <div>
+            <div class="status-pill live">Visualizer</div>
+            <h3>Zen Particles</h3>
+            <p>Interactive flow system for digital relaxation and stress relief.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-meditation-8771/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a class="primary-btn" href="zen-particles.html">ENTER</a>
+            <span class="monetization">FREE</span>
+          </div>
+        </div>
+
+        <div class="app-card">
+          <div>
+            <div class="status-pill live">New Drop</div>
+            <h3>Rush Percussion</h3>
+            <p>Tap-to-sync resin runner built for high-retention engagement. Includes the playable web build.</p>
+            <div class="app-video-container">
+              <video
+                src="https://cdn.coverr.co/videos/coverr-music-production-8772/1080p.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                class="app-preview-video"
+              ></video>
+            </div>
+          </div>
+          <div class="card-actions">
+            <a class="primary-btn" href="rush-percussion.html">PLAY DEMO</a>
+            <span class="monetization">GAME / $4.99</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Load apps from products API
+      async function loadApps() {
+        try {
+          const response = await fetch("/api/products");
+          const data = await response.json();
+          const appGrid = document.getElementById("appGrid");
+
+          // Render all apps
+          data.apps.forEach((app) => {
+            const appCard = document.createElement("div");
+            appCard.className = "app-card glass-morphism";
+            appCard.innerHTML = `
+              <div>
+                ${app.price < 20 ? '<div class="status-pill live">Hot Deal</div>' : ""}
+                <h3>${app.title}</h3>
+                <p>${app.desc}</p>
+                <div class="app-video-container">
+                  <video
+                    src="https://cdn.coverr.co/videos/coverr-abstract-geometric-shapes-8157/1080p.mp4"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    class="app-preview-video"
+                  ></video>
+                </div>
+              </div>
+              <div class="card-actions">
+                <button
+                  class="primary-btn purchase-btn"
+                  data-product="${app.title}"
+                  data-sku="${app.id}"
+                  data-label="${app.title}"
+                  data-price="${app.price}"
+                  data-url="${app.previewUrl || "#"}"
+                >
+                  BUY NOW - $${app.price}
+                </button>
+                <span class="monetization">${app.label.toUpperCase()} / $${app.price}</span>
+              </div>
+            `;
+            appGrid.appendChild(appCard);
+          });
+        } catch (error) {
+          console.error("Failed to load apps:", error);
+        }
+      }
+
+      // Load apps when page loads
+      document.addEventListener("DOMContentLoaded", loadApps);
+
+      document.addEventListener("mousemove", (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+
+        const membrane = document.querySelector(".flux-membrane");
+        if (!membrane) return;
+        membrane.style.transform = `translate(${x * 20}px, ${y * 20}px) rotate(${x * 5}deg)`;
+      });
+
+      document.querySelectorAll(".app-card").forEach((card, index) => {
+        card.style.opacity = "0";
+        card.style.transform = "translateY(30px)";
+        setTimeout(() => {
+          card.style.transition = "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+          card.style.opacity = "1";
+          card.style.transform = "translateY(0)";
+        }, 100 * index);
+      });
+    </script>
+    <script type="module" src="/src/appstore-init.js"></script>
+    <script>
+      (function () {
+        var track = document.getElementById("storefrontCarouselTrack");
+        var prevBtn = document.getElementById("storefrontCarouselPrev");
+        var nextBtn = document.getElementById("storefrontCarouselNext");
+        if (!track) return;
+
+        function renderCard(app) {
+          var isFree = !app.price || app.price <= 0;
+          var demoUrl = app.demoUrl || "/" + (app.id || "").replace(/-/g, "") + ".html";
+          var card = document.createElement("div");
+          card.className = "carousel-card";
+          card.innerHTML = `
+            <div class="carousel-card-preview">${app.category || "App"}</div>
+            <div class="carousel-card-body">
+              <h3>${app.name || app.id}</h3>
+              <p>${app.description || ""}</p>
+              <div class="carousel-card-actions">
+                <a href="${demoUrl}" class="primary-btn">View Demo</a>
+                ${
+                  isFree
+                    ? '<span class="monetization">Free</span>'
+                    : `<button type="button" class="primary-btn purchase-btn" data-product="${app.id || ""}" data-sku="${app.id || ""}" data-label="${app.name || app.id}" data-price="${app.price}" data-url="${demoUrl}">Buy $${Number(app.price).toFixed(2)}</button>`
+                }
+              </div>
+            </div>`;
+          return card;
+        }
+
+        fetch("/data/storefront-apps.json")
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (apps) {
+            if (!Array.isArray(apps)) return;
+            track.innerHTML = "";
+            apps.forEach(function (app) {
+              track.appendChild(renderCard(app));
+            });
+          })
+          .catch(function () {
+            track.innerHTML = '<p class="subhead" style="padding:2rem;">Catalog loading…</p>';
+          });
+
+        if (prevBtn)
+          prevBtn.addEventListener("click", function () {
+            track.scrollBy({ left: -320, behavior: "smooth" });
+          });
+        if (nextBtn)
+          nextBtn.addEventListener("click", function () {
+            track.scrollBy({ left: 320, behavior: "smooth" });
+          });
+      })();
+    </script>
+    <script type="module" src="/nav.js"></script>
+  </body>
+</html>

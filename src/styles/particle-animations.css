@@ -1,0 +1,89 @@
+/**
+ * Shared CSS utilities for particle / floating shape animations.
+ * Use with .vtw-particle-* classes; respect .vtw-reduce-motion to disable animation.
+ */
+
+/* Reduce motion: disable all particle animations */
+.vtw-reduce-motion .vtw-particle-float,
+.vtw-reduce-motion .vtw-particle-opacity-pulse,
+.vtw-reduce-motion .vtw-particle-orb,
+.vtw-reduce-motion [class*="vtw-particle-"] {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vtw-particle-float,
+  .vtw-particle-opacity-pulse,
+  .vtw-particle-orb {
+    animation: none !important;
+  }
+}
+
+/* Float: gentle vertical/horizontal drift */
+@keyframes vtw-particle-float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(var(--vtw-float-y, 15px));
+  }
+}
+
+@keyframes vtw-particle-float-x {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(var(--vtw-float-x, 10px));
+  }
+}
+
+.vtw-particle-float {
+  animation: vtw-particle-float-y 12s ease-in-out infinite;
+}
+
+.vtw-particle-float-x {
+  animation: vtw-particle-float-x 10s ease-in-out infinite;
+}
+
+/* Opacity pulse for particles/shapes */
+@keyframes vtw-particle-opacity-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.vtw-particle-opacity-pulse {
+  animation: vtw-particle-opacity-pulse 4s ease-in-out infinite;
+}
+
+/* Orb / circle gentle float (for background orbs) */
+@keyframes vtw-particle-orb {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(5%, 5%) scale(1.05);
+  }
+  66% {
+    transform: translate(-3%, 3%) scale(0.98);
+  }
+}
+
+.vtw-particle-orb {
+  animation: vtw-particle-orb 20s ease-in-out infinite;
+}
+
+/* Base particle container: no pointer events, positioned for overlay */
+.vtw-particle-layer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}

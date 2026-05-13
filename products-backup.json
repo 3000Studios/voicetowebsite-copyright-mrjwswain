@@ -1,0 +1,81 @@
+{
+  "products": [
+    {
+      "id": "single",
+      "type": "service",
+      "title": "Solo Page",
+      "label": "Instant Launch",
+      "desc": "Perfect for a single landing page or personal portfolio. Includes 1 high-conversion AI page, secure hosting, and voice updates.",
+      "price": 49.0,
+      "currency": "USD",
+      "interval": "one-time",
+      "features": ["1 AI Page", "Secure Hosting", "Basic SEO", "Voice Updates"]
+    },
+    {
+      "id": "business",
+      "type": "service",
+      "title": "Business Bundle",
+      "label": "Scale Up",
+      "desc": "A complete multi-page presence. Up to 5 AI-generated pages, custom domain integration, and priority support.",
+      "price": 199.0,
+      "currency": "USD",
+      "interval": "one-time",
+      "features": ["Up to 5 AI Pages", "Custom Domain", "Analytics", "Priority Support"]
+    },
+    {
+      "id": "unlimited",
+      "type": "service",
+      "title": "Enterprise Voice",
+      "label": "Maximum Reach",
+      "desc": "Unlimited pages, deep AI customization, and full white-label options.",
+      "price": 499.0,
+      "currency": "USD",
+      "interval": "month",
+      "features": ["Unlimited Pages", "Custom AI Model", "24/7 Support"]
+    }
+  ],
+  "apps": [
+    {
+      "id": "project-planning-hub",
+      "type": "app",
+      "title": "Project Planning Hub",
+      "label": "Productivity",
+      "desc": "A comprehensive notion-style planning workspace for managing voice-to-website projects.",
+      "price": 49.0,
+      "currency": "USD",
+      "previewUrl": "/project-planning-hub.html",
+      "downloadUrl": "/downloads/project-planning-hub.zip"
+    },
+    {
+      "id": "webforge",
+      "type": "app",
+      "title": "Webforge",
+      "label": "Builder",
+      "desc": "Interactive web build studio: prompt, upload screenshots, and iterate fast.",
+      "price": 29.0,
+      "currency": "USD",
+      "previewUrl": "/webforge.html"
+    },
+    {
+      "id": "audioboost-pro-ai",
+      "type": "app",
+      "title": "AudioBoost Pro AI",
+      "label": "Audio",
+      "desc": "Audio enhancement toolchain export (downloadable project bundle).",
+      "price": 19.0,
+      "currency": "USD",
+      "downloadUrl": "/downloads/audioboost-pro-ai.zip"
+    },
+    {
+      "id": "rush-percussion",
+      "type": "app",
+      "title": "Rush Percussion",
+      "label": "Showcase",
+      "desc": "Example app listing page used for store + checkout validation.",
+      "price": 4.99,
+      "currency": "USD",
+      "previewUrl": "/rush-percussion.html"
+    }
+  ],
+  "subscriptions": []
+}

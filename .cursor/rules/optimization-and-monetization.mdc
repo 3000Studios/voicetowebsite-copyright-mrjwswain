@@ -1,0 +1,10 @@
+---
+description: Optimize for revenue and performance; use recommended extensions and run checks before concluding.
+alwaysApply: false
+---
+
+# Optimization and monetization
+
+- **Performance**: Prefer running build and type-check so output stays small and correct; use project scripts (e.g. `npm run build`, `npm run verify`) when making changes.
+- **Revenue and analytics**: Config for AdSense, Stripe, PayPal, and analytics lives in `wrangler.toml` [vars], Worker secrets, and `public/config/`. Do not commit secrets; use Dashboard or `wrangler secret put`.
+- **Useful extensions** (install from .vscode/extensions.json): ESLint, Prettier, Cloudflare KV Explorer, GitLens, Error Lens, Thunder Client (API tests), Link Status (broken links/SEO). Install via: Command Palette → "Extensions: Show Recommended Extensions" → Install.

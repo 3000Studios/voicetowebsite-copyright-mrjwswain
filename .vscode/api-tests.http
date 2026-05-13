@@ -1,0 +1,55 @@
+# VoiceToWebsite API tests (REST Client)
+# Use with "Send Request" above each request, or run all in sequence.
+# Local: run `npm run dev:worker` (port 8787) and/or `npm run dev` (5173 proxies to 8787).
+
+@base = http://127.0.0.1:8787
+@vite = http://localhost:5173
+
+### Health
+GET {{base}}/api/health
+
+### Capabilities (public)
+GET {{base}}/api/capabilities
+
+### Generate site (topic-specific preview)
+POST {{base}}/api/generate
+Content-Type: application/json
+
+{
+  "prompt": "A local chicken restaurant called Cluck & Co, farm to table",
+  "tone": "default"
+}
+
+### Execute (Custom GPT / command center)
+POST {{base}}/api/execute
+Content-Type: application/json
+
+{
+  "action": "execute",
+  "parameters": {
+    "api": {
+      "path": "/api/fs/tree",
+      "method": "GET"
+    }
+  }
+}
+
+### Deploy logs (requires admin auth)
+GET {{base}}/api/deploy/logs
+
+### Deploy meter
+GET {{base}}/api/deploy/meter
+
+### FS tree (requires admin auth)
+GET {{base}}/api/fs/tree
+
+### Preview build (command center; requires admin auth)
+POST {{base}}/api/preview/build
+Content-Type: application/json
+
+{
+  "routes": ["/", "/store"]
+}
+
+### Via Vite proxy (when npm run dev is running)
+GET {{vite}}/api/health

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Palette | VoiceToWebsite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+      }
+      body {
+        background:
+          radial-gradient(circle at 20% 20%, rgba(0, 242, 255, 0.12), transparent 30%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+      .shell {
+        max-width: 1080px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .swatch {
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .top {
+        height: 120px;
+      }
+      .meta {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <div
+          style="
+            display: inline-flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0, 242, 255, 0.14);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          "
+        >
+          Palettes
+        </div>
+        <span style="color: var(--muted); font-weight: 600">Pick and copy theme colors into VoiceToWebsite.</span>
+      </div>
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">Curated palettes</h1>
+      <p style="color: var(--muted)">Tap a color to copy its hex code.</p>
+
+      <div class="grid" id="grid"></div>
+    </main>
+
+    <script>
+      const palettes = [
+        ["#00f2ff", "#00141f", "#0a1f2f", "#5bfcff"],
+        ["#ff00bd", "#1a0a1f", "#2e1433", "#ff74d8"],
+        ["#7cffb2", "#062010", "#0d3320", "#a6ffd1"],
+        ["#ffd166", "#2c1a00", "#4a2c00", "#ffe2a1"],
+      ];
+      const grid = document.getElementById("grid");
+
+      palettes.forEach((palette) => {
+        const sw = document.createElement("div");
+        sw.className = "swatch";
+        const top = document.createElement("div");
+        top.className = "top";
+        top.style.background = `linear-gradient(135deg, ${palette[0]}, ${palette[1]})`;
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        palette.forEach((color) => {
+          const row = document.createElement("div");
+          row.style.display = "flex";
+          row.style.justifyContent = "space-between";
+          row.style.alignItems = "center";
+          row.innerHTML = `<span>${color}</span><span style="width:16px;height:16px;border-radius:4px;background:${color};border:1px solid rgba(255,255,255,0.2);"></span>`;
+          row.dataset.color = color;
+          meta.appendChild(row);
+        });
+        sw.appendChild(top);
+        sw.appendChild(meta);
+        grid.appendChild(sw);
+      });
+
+      grid.addEventListener("click", (e) => {
+        const color = e.target.closest("[data-color]")?.dataset.color;
+        if (!color) return;
+        navigator.clipboard.writeText(color);
+      });
+    </script>
+  </body>
+</html>

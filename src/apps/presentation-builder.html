@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presentation Builder - VoiceToWebsite App Store</title>
+    <script src="/nav.js"></script>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+        --success: #00ff88;
+        --warning: #ffaa00;
+        --error: #ff4444;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 15% 15%, rgba(0, 242, 255, 0.12), transparent 32%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+
+      .shell {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+
+      .badge {
+        display: inline-flex;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(0, 242, 255, 0.14);
+        border: 1px solid rgba(0, 242, 255, 0.35);
+        color: var(--accent);
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 0.2s;
+        font-size: 0.9rem;
+      }
+
+      .btn:hover {
+        transform: scale(1.05);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 20px;
+        min-height: 500px;
+      }
+
+      .slide-editor {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        position: relative;
+      }
+
+      .slide {
+        background: white;
+        color: black;
+        border-radius: 8px;
+        padding: 40px;
+        min-height: 400px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .slide-title {
+        font-size: 2rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+        color: #1a1a1a;
+      }
+
+      .slide-content {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .slide-number {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .slide-thumbnails {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+      }
+
+      .thumbnail {
+        background: white;
+        border-radius: 6px;
+        padding: 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+      }
+
+      .thumbnail:hover {
+        border-color: var(--accent);
+      }
+
+      .thumbnail.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+      }
+
+      .thumbnail-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .thumbnail-content {
+        font-size: 0.6rem;
+        color: #666;
+        line-height: 1.3;
+      }
+
+      .properties {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+      }
+
+      .property-group {
+        margin-bottom: 16px;
+      }
+
+      .property-label {
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px;
+        color: var(--text);
+        font-family: inherit;
+      }
+
+      .templates {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .template {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .template:hover {
+        background: rgba(0, 242, 255, 0.1);
+        border-color: var(--accent);
+      }
+
+      .template-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+
+      .template-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      @media (max-width: 960px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          order: -1;
+        }
+
+        .slide-thumbnails {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div class="header">
+        <div class="badge">Builder</div>
+        <span style="color: var(--muted); font-weight: 600">Create stunning presentations with AI assistance.</span>
+      </div>
+
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">Presentation Builder</h1>
+      <p style="color: var(--muted)">Design professional presentations with templates and animations.</p>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" id="addSlideBtn">+ Add Slide</button>
+        <button class="btn btn-ghost" id="previewBtn">👁️ Preview</button>
+        <button class="btn btn-ghost" id="exportBtn">💾 Export</button>
+        <button class="btn btn-ghost" id="templatesBtn">📚 Templates</button>
+        <button class="btn btn-ghost" id="aiAssistBtn">🤖 AI Assist</button>
+      </div>
+
+      <div class="workspace">
+        <div class="slide-editor">
+          <div class="slide" id="currentSlide">
+            <div class="slide-title" contenteditable="true">Welcome to Your Presentation</div>
+            <div class="slide-content" contenteditable="true">
+              This is your first slide. Click to edit the text and start building your amazing presentation. You can add
+              more slides, choose templates, and export when you're ready.
+            </div>
+            <div class="slide-number">Slide 1</div>
+          </div>
+        </div>
+
+        <div class="sidebar">
+          <div class="slide-thumbnails">
+            <div class="thumbnail active" data-slide="0">
+              <div class="thumbnail-title">Slide 1</div>
+              <div class="thumbnail-content">Welcome to Your Presentation...</div>
+            </div>
+          </div>
+
+          <div class="properties">
+            <div class="property-group">
+              <div class="property-label">Slide Layout</div>
+              <select id="layoutSelect">
+                <option value="title">Title Only</option>
+                <option value="content" selected>Title & Content</option>
+                <option value="two-column">Two Column</option>
+                <option value="image">Image & Text</option>
+              </select>
+            </div>
+
+            <div class="property-group">
+              <div class="property-label">Theme</div>
+              <select id="themeSelect">
+                <option value="default" selected>Default</option>
+                <option value="dark">Dark</option>
+                <option value="corporate">Corporate</option>
+                <option value="creative">Creative</option>
+              </select>
+            </div>
+
+            <div class="property-group">
+              <div class="property-label">Animation</div>
+              <select id="animationSelect">
+                <option value="none" selected>None</option>
+                <option value="fade">Fade In</option>
+                <option value="slide">Slide In</option>
+                <option value="zoom">Zoom In</option>
+              </select>
+            </div>
+
+            <div class="property-group">
+              <div class="property-label">Templates</div>
+              <div class="templates">
+                <div class="template" data-template="business">
+                  <div class="template-icon">💼</div>
+                  <div class="template-name">Business</div>
+                </div>
+                <div class="template" data-template="education">
+                  <div class="template-icon">🎓</div>
+                  <div class="template-name">Education</div>
+                </div>
+                <div class="template" data-template="creative">
+                  <div class="template-icon">🎨</div>
+                  <div class="template-name">Creative</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      let slides = [
+        {
+          title: "Welcome to Your Presentation",
+          content:
+            "This is your first slide. Click to edit the text and start building your amazing presentation. You can add more slides, choose templates, and export when you're ready.",
+          layout: "content",
+          theme: "default",
+          animation: "none",
+        },
+      ];
+
+      let currentSlideIndex = 0;
+
+      function updateSlideEditor() {
+        const slide = slides[currentSlideIndex];
+        const slideElement = document.getElementById("currentSlide");
+
+        slideElement.querySelector(".slide-title").textContent = slide.title;
+        slideElement.querySelector(".slide-content").textContent = slide.content;
+        slideElement.querySelector(".slide-number").textContent = `Slide ${currentSlideIndex + 1}`;
+
+        document.getElementById("layoutSelect").value = slide.layout;
+        document.getElementById("themeSelect").value = slide.theme;
+        document.getElementById("animationSelect").value = slide.animation;
+      }
+
+      function updateThumbnails() {
+        const thumbnailsContainer = document.querySelector(".slide-thumbnails");
+        thumbnailsContainer.innerHTML = slides
+          .map(
+            (slide, index) => `
+                <div class="thumbnail ${index === currentSlideIndex ? "active" : ""}" data-slide="${index}">
+                    <div class="thumbnail-title">Slide ${index + 1}</div>
+                    <div class="thumbnail-content">${slide.title.substring(0, 30)}...</div>
+                </div>
+            `
+          )
+          .join("");
+
+        // Add click handlers
+        document.querySelectorAll(".thumbnail").forEach((thumb) => {
+          thumb.addEventListener("click", function () {
+            currentSlideIndex = parseInt(this.dataset.slide);
+            updateSlideEditor();
+            updateThumbnails();
+          });
+        });
+      }
+
+      function addSlide() {
+        const newSlide = {
+          title: `Slide ${slides.length + 1}`,
+          content: "Click to edit this slide content.",
+          layout: "content",
+          theme: "default",
+          animation: "none",
+        };
+
+        slides.push(newSlide);
+        currentSlideIndex = slides.length - 1;
+        updateSlideEditor();
+        updateThumbnails();
+      }
+
+      function exportPresentation() {
+        const presentationData = {
+          title: "My Presentation",
+          slides: slides,
+          exportDate: new Date().toISOString(),
+        };
+
+        const blob = new Blob([JSON.stringify(presentationData, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "presentation.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function previewPresentation() {
+        alert("Preview mode would open a full-screen presentation viewer. This is a demo version.");
+      }
+
+      function applyTemplate(templateName) {
+        const templates = {
+          business: {
+            title: "Business Strategy Overview",
+            content: "Key objectives and strategic initiatives for Q4 2024. Market analysis and growth opportunities.",
+            theme: "corporate",
+          },
+          education: {
+            title: "Learning Objectives",
+            content:
+              "By the end of this session, students will understand core concepts and be able to apply them practically.",
+            theme: "default",
+          },
+          creative: {
+            title: "Creative Vision",
+            content:
+              "Exploring innovative ideas and pushing creative boundaries. Design thinking and artistic expression.",
+            theme: "creative",
+          },
+        };
+
+        const template = templates[templateName];
+        if (template) {
+          slides[currentSlideIndex] = {
+            ...slides[currentSlideIndex],
+            ...template,
+          };
+          updateSlideEditor();
+          updateThumbnails();
+        }
+      }
+
+      // Event listeners
+      document.getElementById("addSlideBtn").addEventListener("click", addSlide);
+      document.getElementById("exportBtn").addEventListener("click", exportPresentation);
+      document.getElementById("previewBtn").addEventListener("click", previewPresentation);
+
+      document.getElementById("layoutSelect").addEventListener("change", function () {
+        slides[currentSlideIndex].layout = this.value;
+      });
+
+      document.getElementById("themeSelect").addEventListener("change", function () {
+        slides[currentSlideIndex].theme = this.value;
+      });
+
+      document.getElementById("animationSelect").addEventListener("change", function () {
+        slides[currentSlideIndex].animation = this.value;
+      });
+
+      document.querySelectorAll(".template").forEach((template) => {
+        template.addEventListener("click", function () {
+          applyTemplate(this.dataset.template);
+        });
+      });
+
+      // Content editable handlers
+      document.getElementById("currentSlide").addEventListener("input", function (e) {
+        if (e.target.classList.contains("slide-title")) {
+          slides[currentSlideIndex].title = e.target.textContent;
+        } else if (e.target.classList.contains("slide-content")) {
+          slides[currentSlideIndex].content = e.target.textContent;
+        }
+        updateThumbnails();
+      });
+
+      // Initialize
+      updateSlideEditor();
+      updateThumbnails();
+    </script>
+  </body>
+</html>

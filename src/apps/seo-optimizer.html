@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEO Optimizer - VoiceToWebsite App</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .seo-form {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .results-panel {
+        background: rgba(0, 255, 0, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(0, 255, 0, 0.3);
+      }
+      .score {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #00ff00;
+        text-align: center;
+        margin: 1rem 0;
+      }
+      .btn {
+        background: linear-gradient(45deg, #00ff00, #00aa00);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: transform 0.2s;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .input-field {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        margin: 0.5rem 0;
+      }
+      .input-field::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .metric {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .good {
+        color: #00ff00;
+      }
+      .warning {
+        color: #ffaa00;
+      }
+      .error {
+        color: #ff0000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>🔍 SEO Optimizer</h1>
+        <p>Analyze and optimize your website for search engines</p>
+      </header>
+
+      <main>
+        <section class="seo-form">
+          <h2>Enter Your URL or Content</h2>
+          <form id="seoForm">
+            <div>
+              <label for="url">Website URL:</label>
+              <input type="url" id="url" class="input-field" placeholder="https://example.com" />
+            </div>
+
+            <div>
+              <label for="title">Page Title:</label>
+              <input type="text" id="title" class="input-field" placeholder="Enter your page title" maxlength="60" />
+            </div>
+
+            <div>
+              <label for="description">Meta Description:</label>
+              <textarea
+                id="description"
+                class="input-field"
+                placeholder="Enter meta description"
+                maxlength="160"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div>
+              <label for="keywords">Target Keywords (comma-separated):</label>
+              <input type="text" id="keywords" class="input-field" placeholder="keyword1, keyword2, keyword3" />
+            </div>
+
+            <div>
+              <label for="content">Page Content:</label>
+              <textarea id="content" class="input-field" placeholder="Paste your page content here" rows="8"></textarea>
+            </div>
+
+            <button type="submit" class="btn">Analyze SEO</button>
+          </form>
+        </section>
+
+        <section id="results" class="results-panel" style="display: none">
+          <h3>SEO Analysis Results</h3>
+          <div class="score" id="seoScore">0/100</div>
+
+          <div id="metrics">
+            <div class="metric">
+              <span>Title Length</span>
+              <span id="titleLength" class="good">Good</span>
+            </div>
+            <div class="metric">
+              <span>Description Length</span>
+              <span id="descLength" class="good">Good</span>
+            </div>
+            <div class="metric">
+              <span>Keyword Density</span>
+              <span id="keywordDensity" class="good">Optimal</span>
+            </div>
+            <div class="metric">
+              <span>Readability Score</span>
+              <span id="readability" class="good">Excellent</span>
+            </div>
+            <div class="metric">
+              <span>Word Count</span>
+              <span id="wordCount" class="good">Sufficient</span>
+            </div>
+            <div class="metric">
+              <span>Heading Structure</span>
+              <span id="headings" class="good">Proper</span>
+            </div>
+          </div>
+
+          <div id="recommendations">
+            <h4>Recommendations:</h4>
+            <ul id="recList"></ul>
+          </div>
+
+          <button id="exportBtn" class="btn">Export Report</button>
+          <button id="reanalyzeBtn" class="btn">Re-analyze</button>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      document.getElementById("seoForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const data = {
+          url: document.getElementById("url").value,
+          title: document.getElementById("title").value,
+          description: document.getElementById("description").value,
+          keywords: document.getElementById("keywords").value,
+          content: document.getElementById("content").value,
+        };
+
+        analyzeSEO(data);
+      });
+
+      function analyzeSEO(data) {
+        let score = 0;
+        const recommendations = [];
+
+        // Title analysis
+        const titleLength = data.title.length;
+        if (titleLength >= 30 && titleLength <= 60) {
+          score += 15;
+          document.getElementById("titleLength").className = "good";
+          document.getElementById("titleLength").textContent = "Good";
+        } else {
+          document.getElementById("titleLength").className = "warning";
+          document.getElementById("titleLength").textContent = titleLength < 30 ? "Too Short" : "Too Long";
+          recommendations.push("Optimize title length to 30-60 characters");
+        }
+
+        // Description analysis
+        const descLength = data.description.length;
+        if (descLength >= 120 && descLength <= 160) {
+          score += 15;
+          document.getElementById("descLength").className = "good";
+          document.getElementById("descLength").textContent = "Good";
+        } else {
+          document.getElementById("descLength").className = "warning";
+          document.getElementById("descLength").textContent = descLength < 120 ? "Too Short" : "Too Long";
+          recommendations.push("Optimize description length to 120-160 characters");
+        }
+
+        // Content analysis
+        const wordCount = data.content.split(/\s+/).length;
+        if (wordCount >= 300) {
+          score += 20;
+          document.getElementById("wordCount").className = "good";
+          document.getElementById("wordCount").textContent = "Sufficient";
+        } else {
+          document.getElementById("wordCount").className = "warning";
+          document.getElementById("wordCount").textContent = "Too Short";
+          recommendations.push("Increase content to at least 300 words");
+        }
+
+        // Keyword analysis
+        const keywords = data.keywords.split(",").map((k) => k.trim().toLowerCase());
+        const contentLower = data.content.toLowerCase();
+        let keywordDensity = 0;
+
+        keywords.forEach((keyword) => {
+          const regex = new RegExp(keyword, "gi");
+          const matches = contentLower.match(regex);
+          if (matches) {
+            keywordDensity += matches.length;
+          }
+        });
+
+        const density = (keywordDensity / wordCount) * 100;
+        if (density >= 1 && density <= 3) {
+          score += 20;
+          document.getElementById("keywordDensity").className = "good";
+          document.getElementById("keywordDensity").textContent = "Optimal";
+        } else {
+          document.getElementById("keywordDensity").className = density < 1 ? "warning" : "error";
+          document.getElementById("keywordDensity").textContent = density < 1 ? "Too Low" : "Too High";
+          recommendations.push("Aim for keyword density of 1-3%");
+        }
+
+        // Readability (simplified)
+        const sentences = data.content.split(/[.!?]+/).length;
+        const avgWordsPerSentence = wordCount / sentences;
+        if (avgWordsPerSentence >= 15 && avgWordsPerSentence <= 20) {
+          score += 15;
+          document.getElementById("readability").className = "good";
+          document.getElementById("readability").textContent = "Excellent";
+        } else {
+          document.getElementById("readability").className = "warning";
+          document.getElementById("readability").textContent = avgWordsPerSentence < 15 ? "Too Simple" : "Too Complex";
+          recommendations.push("Improve readability with 15-20 words per sentence");
+        }
+
+        // Heading structure (simplified)
+        const hasH1 = /<h1/i.test(data.content);
+        const hasH2 = /<h2/i.test(data.content);
+        if (hasH1 && hasH2) {
+          score += 15;
+          document.getElementById("headings").className = "good";
+          document.getElementById("headings").textContent = "Proper";
+        } else {
+          document.getElementById("headings").className = "warning";
+          document.getElementById("headings").textContent = "Missing";
+          recommendations.push("Include H1 and H2 headings for better structure");
+        }
+
+        // Update score
+        document.getElementById("seoScore").textContent = `${score}/100`;
+
+        // Update recommendations
+        const recList = document.getElementById("recList");
+        recList.innerHTML = "";
+        recommendations.forEach((rec) => {
+          const li = document.createElement("li");
+          li.textContent = rec;
+          recList.appendChild(li);
+        });
+
+        // Show results
+        document.getElementById("results").style.display = "block";
+      }
+
+      document.getElementById("exportBtn").addEventListener("click", () => {
+        const report = `
+SEO Analysis Report
+==================
+URL: ${document.getElementById("url").value}
+Score: ${document.getElementById("seoScore").textContent}
+Date: ${new Date().toLocaleDateString()}
+
+Recommendations:
+${Array.from(document.getElementById("recList").children)
+  .map((li) => li.textContent)
+  .join("\n")}
+            `;
+
+        const blob = new Blob([report], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "seo-report.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById("reanalyzeBtn").addEventListener("click", () => {
+        document.getElementById("seoForm").dispatchEvent(new Event("submit"));
+      });
+    </script>
+  </body>
+</html>

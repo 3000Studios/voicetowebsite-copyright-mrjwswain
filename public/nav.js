@@ -1,0 +1,2218 @@
+(() => {
+  const THEME_KEY = "vtw-theme";
+  const LOCAL_ANALYTICS_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
+  const THEMES = [
+    { id: "metallic", label: "Metallic" },
+    { id: "midnight", label: "Midnight" },
+    { id: "volt", label: "Volt" },
+    { id: "ember", label: "Ember" },
+    { id: "ocean", label: "Ocean" },
+  ];
+  const hexToRgb = (hex) => {
+    const normalized = String(hex || "")
+      .replace(/[^0-9a-f]/gi, "")
+      .substring(0, 6);
+    if (normalized.length !== 6) return { r: 125, g: 211, b: 252 };
+    return {
+      r: parseInt(normalized.substring(0, 2), 16),
+      g: parseInt(normalized.substring(2, 4), 16),
+      b: parseInt(normalized.substring(4, 6), 16),
+    };
+  };
+
+  const WAVE_COLOR_PRESETS = [
+    {
+      id: "blue-surge",
+      layers: ["#0b1f33", "#0ea5e9", "#38bdf8", "#dbeafe"],
+    },
+    {
+      id: "azure-rush",
+      layers: ["#0f172a", "#1d4ed8", "#3b82f6", "#93c5fd"],
+    },
+    {
+      id: "ion-sky",
+      layers: ["#0b233d", "#0ea5e9", "#7dd3fc", "#bae6fd"],
+    },
+    {
+      id: "cobalt-ocean",
+      layers: ["#142c54", "#1e3a8a", "#38bdf8", "#fdf7ef"],
+    },
+  ];
+  // Force cache-bust/version stamp so new nav bundle propagates
+  document.documentElement.dataset.navVersion = "2026-02-25-02";
+
+  const ensureLatexFonts = () => {
+    if (document.getElementById("vtw-latex-fonts")) return;
+    const link = document.createElement("link");
+    link.id = "vtw-latex-fonts";
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&family=Syne:wght@800&display=swap";
+    document.head.appendChild(link);
+  };
+
+  const isShellDisabled = () => {
+    try {
+      const meta = document.querySelector('meta[name="vtw-shell"]');
+      if (
+        meta &&
+        String(meta.getAttribute("content") || "").toLowerCase() === "off"
+      )
+        return true;
+      if (document.documentElement?.dataset?.vtwShell === "off") return true;
+      if (document.body?.dataset?.vtwShell === "off") return true;
+    } catch (_) {}
+    return false;
+  };
+
+  const isAdminPage = () => {
+    try {
+      return location.pathname.startsWith("/admin");
+    } catch (_) {
+      return false;
+    }
+  };
+  const prefersReducedMotion = () => {
+    try {
+      return (
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      );
+    } catch (_) {
+      return false;
+    }
+  };
+  const isLocalRuntime = () =>
+    LOCAL_ANALYTICS_HOSTS.has(window.location.hostname);
+  // Public pages (always visible)
+  const publicLinks = [
+    { href: "/", label: "Home", icon: "🏠" },
+    { href: "/features", label: "Features", icon: "⚡" },
+    { href: "/how-it-works", label: "How It Works", icon: "🔧" },
+    { href: "/demo", label: "Demo", icon: "🚀" },
+    { href: "/pricing", label: "Pricing", icon: "💎" },
+    { href: "/store", label: "Store", icon: "🛒" },
+    { href: "/appstore", label: "App Store", icon: "📱" },
+    { href: "/blog", label: "Blog", icon: "📝" },
+    { href: "/livestream", label: "Livestream", icon: "🎥" },
+    { href: "/support", label: "Support", icon: "💬" },
+    { href: "/contact", label: "Contact", icon: "📧" },
+    { href: "/about", label: "About", icon: "🗿" },
+    { href: "/status", label: "Status", icon: "📡" },
+    { href: "/search", label: "Search", icon: "🔍" },
+    { href: "/gallery", label: "Gallery", icon: "🖼️" },
+    { href: "/templates", label: "Templates", icon: "📋" },
+    { href: "/partners", label: "Partners", icon: "🤝" },
+    { href: "/trust", label: "Trust Center", icon: "🛡️" },
+    { href: "/referrals", label: "Referrals", icon: "🎁" },
+    { href: "/projects", label: "Projects", icon: "📂" },
+    { href: "/the3000", label: "The3000", icon: "🎨" },
+    { href: "/studio3000", label: "Studio3000", icon: "🎬" },
+    { href: "/webforge", label: "Webforge", icon: "🔨" },
+    { href: "/cursor-demo", label: "Cursor Demo", icon: "👆" },
+    { href: "/sandbox", label: "Sandbox", icon: "🧪" },
+    { href: "/license", label: "License", icon: "🔐" },
+    { href: "/privacy", label: "Privacy", icon: "🔒" },
+    { href: "/terms", label: "Terms", icon: "📜" },
+    { href: "/legal", label: "Legal", icon: "⚖️" },
+    { href: "/copyrights", label: "Copyrights", icon: "©️" },
+    { href: "/api-documentation", label: "API Docs", icon: "📚" },
+    { href: "/neural-engine", label: "Neural Engine", icon: "🧠" },
+    { href: "/strata-design-system", label: "Design System", icon: "🎨" },
+    { href: "/lexicon-pro", label: "Lexicon Pro", icon: "📖" },
+    { href: "/voice-to-json", label: "Voice to JSON", icon: "🎤" },
+    { href: "/geological-studies", label: "Geological Studies", icon: "🏔️" },
+  ];
+
+  const primaryLinks = [
+    ...publicLinks,
+    {
+      href: "/admin/access",
+      label: "Admin Login",
+      icon: "🔐",
+      admin: true,
+    },
+  ];
+
+  const navDataTags = {
+    Home: "01_INIT",
+    Features: "02_CORE",
+    "How It Works": "03_WORKS",
+    Demo: "04_DEMO",
+    Pricing: "05_SUBS",
+    Store: "06_KITS",
+    "App Store": "07_APPS",
+    Blog: "08_SIG",
+    Livestream: "09_STREAM",
+    Support: "10_HELP",
+    Contact: "11_CONT",
+    About: "12_ABOUT",
+    Status: "13_STAT",
+    Search: "14_SRCH",
+    Gallery: "15_GAL",
+    Templates: "16_TEMP",
+    Partners: "17_PART",
+    "Trust Center": "18_TRUST",
+    Referrals: "19_REF",
+    Projects: "20_PROJ",
+    The3000: "21_3K",
+    Studio3000: "22_3KS",
+    Webforge: "23_FORGE",
+    "Cursor Demo": "24_CUR",
+    Sandbox: "25_SAN",
+    License: "26_LIC",
+    Privacy: "27_PRIV",
+    Terms: "28_TERM",
+    Legal: "29_LEG",
+    Copyrights: "30_COPY",
+    "API Docs": "31_API",
+    "Neural Engine": "32_NEUR",
+    "Design System": "33_DESG",
+    "Lexicon Pro": "34_LEX",
+    "Voice to JSON": "35_JSON",
+    "Geological Studies": "36_GEO",
+  };
+
+  const formatDataTag = (label, idx) => {
+    if (navDataTags[label]) return navDataTags[label];
+    const prefix = String(idx + 1).padStart(2, "0");
+    const slug = label
+      .replace(/[^a-z0-9]/gi, "")
+      .slice(0, 4)
+      .toUpperCase();
+    return `${prefix}_${slug || "VTW"}`;
+  };
+
+  const adminLinks = [
+    { href: "/admin/mission", label: "Mission", icon: "🎯" },
+    { href: "/admin/cc", label: "Command Center", icon: "🛠️" },
+    { href: "/admin/vcc", label: "Voice", icon: "🎤" },
+    { href: "/admin/monetization", label: "Monetization", icon: "💰" },
+    { href: "/admin/analytics", label: "Analytics", icon: "📈" },
+    { href: "/admin/live", label: "Live", icon: "🎬" },
+    { href: "/admin/store", label: "Store", icon: "🛒" },
+    { href: "/admin/media", label: "Media", icon: "🖼️" },
+    { href: "/admin/audio", label: "Audio", icon: "🎵" },
+    { href: "/admin/settings", label: "Settings", icon: "⚙️" },
+  ];
+
+  const footerLinks = {
+    platform: [
+      { href: "/features", label: "Features", icon: "⚡" },
+      { href: "/how-it-works", label: "How it Works", icon: "🔧" },
+      { href: "/templates", label: "Templates", icon: "📋" },
+      { href: "/demo", label: "Interactive Demo", icon: "🚀" },
+      { href: "/pricing", label: "Pricing", icon: "💎" },
+      { href: "/license", label: "Licensing", icon: "🔐" },
+      { href: "/store", label: "Store", icon: "🛒" },
+      { href: "/store", label: "Apps", icon: "📱" },
+    ],
+    company: [
+      { href: "/about", label: "About Us", icon: "🗿" },
+      { href: "/partners", label: "Partners", icon: "🤝" },
+      { href: "/trust", label: "Trust Center", icon: "🛡️" },
+      { href: "/status", label: "Status", icon: "📡" },
+      { href: "/privacy", label: "Privacy", icon: "🔒" },
+      { href: "/terms", label: "Terms", icon: "📜" },
+      { href: "/contact", label: "Contact", icon: "💬" },
+      { href: "/admin/access", label: "Admin Login", icon: "⚙️" },
+    ],
+    affiliates: [
+      {
+        href: "https://www.cloudflare.com/",
+        label: "Powered by Cloudflare",
+        icon: "☁️",
+      },
+      {
+        href: "https://openai.com/api/",
+        label: "Build with OpenAI",
+        icon: "🧠",
+      },
+      {
+        href: "/referrals",
+        label: "Refer a Friend (Get 10%)",
+        icon: "🎁",
+      },
+    ],
+  };
+  // Avoid third-party/background video fetches for performance and copyright hygiene.
+
+  const normalizeTheme = (value) => {
+    const found = THEMES.some((t) => t.id === value);
+    return found ? value : "midnight";
+  };
+
+  const applyTheme = (theme) => {
+    const next = normalizeTheme(theme);
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch (_) {}
+
+    document.querySelectorAll("[data-vtw-theme-btn]").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.theme === next);
+      btn.setAttribute(
+        "aria-pressed",
+        btn.dataset.theme === next ? "true" : "false"
+      );
+    });
+  };
+
+  const initTheme = () => {
+    let stored = null;
+    try {
+      stored = localStorage.getItem(THEME_KEY);
+    } catch (_) {}
+    applyTheme(stored || "midnight");
+  };
+  const enforceAdminTheme = () => {
+    try {
+      if (!isAdminPage()) return;
+      // Admin is locked to Metallic for a unified control-room feel.
+      applyTheme("metallic");
+    } catch (_) {}
+  };
+
+  const wireThemeSwitcher = () => {
+    document.querySelectorAll("[data-vtw-theme-btn]").forEach((btn) => {
+      if (btn.dataset.vtwWired) return;
+      btn.dataset.vtwWired = "1";
+      btn.addEventListener("click", () => applyTheme(btn.dataset.theme));
+    });
+    applyTheme(document.documentElement.dataset.theme);
+  };
+
+  const SoundEngine = {
+    ctx: null,
+    init: () => {
+      if (!SoundEngine.ctx) {
+        SoundEngine.ctx = new (
+          window.AudioContext || window.webkitAudioContext
+        )();
+      }
+      if (SoundEngine.ctx.state === "suspended") {
+        SoundEngine.ctx.resume();
+      }
+      return SoundEngine.ctx;
+    },
+    play: (type = "hover") => {
+      try {
+        const ctx = SoundEngine.init();
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === "hover") {
+          // Subtle tech chirp
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(440, t);
+          osc.frequency.exponentialRampToValueAtTime(880, t + 0.05);
+          gain.gain.setValueAtTime(0.02, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+          osc.start(t);
+          osc.stop(t + 0.05);
+        } else if (type === "click") {
+          // Percussive blip
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(800, t);
+          osc.frequency.exponentialRampToValueAtTime(100, t + 0.1);
+          gain.gain.setValueAtTime(0.05, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+          osc.start(t);
+          osc.stop(t + 0.1);
+        } else if (type === "success") {
+          // Ascending chime
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(500, t);
+          osc.frequency.exponentialRampToValueAtTime(1200, t + 0.2);
+          gain.gain.setValueAtTime(0.03, t);
+          gain.gain.linearRampToValueAtTime(0, t + 0.3);
+          osc.start(t);
+          osc.stop(t + 0.3);
+
+          // Harmonics
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.type = "square";
+          osc2.frequency.setValueAtTime(250, t);
+          osc2.frequency.exponentialRampToValueAtTime(600, t + 0.2);
+          gain2.gain.setValueAtTime(0.01, t);
+          gain2.gain.linearRampToValueAtTime(0, t + 0.3);
+          osc2.start(t);
+          osc2.stop(t + 0.3);
+        } else if (type === "zap") {
+          const zapOsc = ctx.createOscillator();
+          const zapGain = ctx.createGain();
+          zapOsc.type = "sawtooth";
+          zapOsc.frequency.setValueAtTime(400, t);
+          zapOsc.frequency.linearRampToValueAtTime(2000, t + 0.12);
+          zapGain.gain.setValueAtTime(0.22, t);
+          zapGain.gain.linearRampToValueAtTime(0, t + 0.4);
+          zapOsc.connect(zapGain);
+          zapGain.connect(ctx.destination);
+          zapOsc.start(t);
+          zapOsc.stop(t + 0.4);
+        }
+      } catch (_) {}
+    },
+  };
+
+  const playHover = () => SoundEngine.play("hover");
+  const playClick = () => SoundEngine.play("click");
+  const ADMIN_UNLOCK_TS_KEY = "yt-admin-unlocked-ts";
+  const ADMIN_UNLOCK_STATE_KEY = "adminAccessValidated";
+  const ADMIN_AUTH_REFRESH_KEY = "vtw-admin-auth-refresh";
+  const ADMIN_SESSION_TTL_MS = 1000 * 60 * 60 * 2;
+  let serverAdminAuthenticated = false;
+
+  const touchAdminSession = () => {
+    try {
+      sessionStorage.setItem(ADMIN_UNLOCK_STATE_KEY, "true");
+      sessionStorage.setItem(ADMIN_UNLOCK_TS_KEY, String(Date.now()));
+    } catch (_) {
+      // ignore
+    }
+  };
+
+  const clearAdminSession = () => {
+    try {
+      sessionStorage.removeItem(ADMIN_UNLOCK_STATE_KEY);
+      sessionStorage.removeItem(ADMIN_UNLOCK_TS_KEY);
+    } catch (_) {
+      // ignore
+    }
+  };
+
+  const isAdminSessionFresh = () => {
+    try {
+      const ts = Number(sessionStorage.getItem(ADMIN_UNLOCK_TS_KEY) || 0);
+      if (!ts) return false;
+      return Date.now() - ts < ADMIN_SESSION_TTL_MS;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const hasSessionUnlock = () => {
+    try {
+      const unlocked =
+        sessionStorage.getItem(ADMIN_UNLOCK_STATE_KEY) === "true";
+      if (!unlocked) return false;
+      return isAdminSessionFresh();
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const hasAdminAccess = () => serverAdminAuthenticated || hasSessionUnlock();
+
+  const refreshAdminAccessState = async () => {
+    if (!isAdminPage() && !hasSessionUnlock()) {
+      serverAdminAuthenticated = false;
+      return false;
+    }
+    try {
+      const response = await fetch("/api/config/status", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      const authenticated = response.ok;
+      serverAdminAuthenticated = authenticated;
+      if (authenticated) {
+        touchAdminSession();
+      } else {
+        clearAdminSession();
+      }
+      return authenticated;
+    } catch (_) {
+      return hasSessionUnlock();
+    }
+  };
+
+  const trackRevenueEvent = (eventName, properties = {}, value) => {
+    try {
+      if (isLocalRuntime()) return;
+      if (typeof window.vtwTrackEvent === "function") {
+        window.vtwTrackEvent(eventName, properties, value);
+        return;
+      }
+      fetch("/api/analytics/event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        keepalive: true,
+        body: JSON.stringify({
+          eventName,
+          properties,
+          value,
+          page: location.pathname,
+          ts: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch (_) {}
+  };
+
+  const getNavLinks = () => {
+    if (hasAdminAccess()) {
+      // User is logged in - show all pages except login
+      return [...publicLinks, ...adminLinks];
+    } else {
+      // User not logged in - show only public pages + login
+      return primaryLinks;
+    }
+  };
+  // Admin was getting clipped off on mid-sized viewports because the nav bar
+  // had `overflow: hidden` and too many links in one row. Keep Admin pinned
+  // in a right-side "actions" area so it's always reachable.
+  const getPrimaryNavLinks = () =>
+    getNavLinks().filter((l) => l.label !== "Admin Login");
+  const getAdminNavLink = () =>
+    getNavLinks().find((l) => l.label === "Admin Login") || null;
+
+  const buildPrimaryLinksHtml = () =>
+    getPrimaryNavLinks()
+      .map((link, idx) => {
+        const dataTag = formatDataTag(link.label, idx);
+        return `
+          <li class="crystal-nav-item" style="--vtw-i:${idx}">
+            <a class="crystal-nav-link" href="${link.href}" data-name="${link.label}" data-vtw-scrollfx="label">
+              <span class="crystal-data-tag">${dataTag}</span>
+              ${link.label}
+            </a>
+          </li>
+        `;
+      })
+      .join("");
+
+  const buildActionsHtml = () => {
+    // Admin bubble removed - all links will be in hamburger menu
+    return "";
+  };
+
+  const buildListHtml = () => {
+    // Mobile overlay: include primary links + Admin.
+    const items = [];
+    let i = 0;
+    getPrimaryNavLinks().forEach((link) => {
+      items.push(
+        `<li style="--vtw-i:${i}"><a href="${link.href}">${link.icon} ${link.label}</a></li>`
+      );
+      i += 1;
+    });
+    const admin = getAdminNavLink();
+    if (admin)
+      items.push(
+        `<li style="--vtw-i:${i}"><a href="${admin.href}">${admin.icon} ${admin.label}</a></li>`
+      );
+    return items.join("");
+  };
+
+  const ensureAdminSubnavManagement = () => {
+    try {
+      if (!isAdminPage()) return;
+      const subnav = document.querySelector(".admin-subnav");
+      if (!subnav) return;
+      if (document.getElementById("vtw-admin-management")) return;
+
+      const wrap = document.createElement("div");
+      wrap.id = "vtw-admin-management";
+      wrap.className = "nav-dropdown admin-subnav-dropdown";
+      wrap.hidden = true;
+      wrap.innerHTML = `
+        <button class="nav-dropdown-trigger" type="button" aria-expanded="false">Management ▾</button>
+        <div class="nav-dropdown-menu">
+          ${adminLinks.map((l) => `<a href="${l.href}">${l.icon} ${l.label}</a>`).join("")}
+        </div>
+      `;
+      subnav.appendChild(wrap);
+
+      const trigger = wrap.querySelector(".nav-dropdown-trigger");
+      const close = () => {
+        wrap.classList.remove("is-open");
+        trigger?.setAttribute("aria-expanded", "false");
+      };
+      trigger?.addEventListener("click", (e) => {
+        e.preventDefault();
+        const open = !wrap.classList.contains("is-open");
+        wrap.classList.toggle("is-open", open);
+        trigger.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      document.addEventListener("click", (e) => {
+        if (!wrap.classList.contains("is-open")) return;
+        if (wrap.contains(e.target)) return;
+        close();
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        close();
+      });
+
+      // If the user unlocks after page load, reveal it.
+      const update = () => {
+        wrap.hidden = !hasAdminAccess();
+      };
+      update();
+      if (wrap.hidden) {
+        let tries = 0;
+        const timer = window.setInterval(() => {
+          tries += 1;
+          update();
+          if (!wrap.hidden || tries >= 60) window.clearInterval(timer);
+        }, 500);
+      }
+    } catch (_) {}
+  };
+  const clearExistingNav = () => {
+    document
+      .querySelectorAll(
+        ".glass-nav, .crystal-nav, .crystal-nav-wrapper, .mobile-overlay, .site-header, .site-nav, .latex-header, #vtwLatexHeader, .vt-footer, .bubble-footer, #vtwNavWrapper, .flash-nav, .vtw-phosphor-trigger, .vtw-phosphor-menu, .vtw-crt-overlay, .vtw-grain, #vtwPhosphorMenu, #vtwPhosphorTrigger"
+      )
+      .forEach((el) => el.remove());
+    const skip = document.querySelector(".vtw-skip-link");
+    if (skip) skip.remove();
+    const toggle = document.getElementById("mobileNavToggle");
+    if (toggle) toggle.remove();
+    const phosphorSvg = document.getElementById("vtw-phosphor-svg-defs");
+    if (phosphorSvg) phosphorSvg.remove();
+  };
+  const ensureMainAnchor = () => {
+    try {
+      if (document.getElementById("main")) return;
+      const main = document.querySelector("main");
+      if (main && !main.id) {
+        main.id = "main";
+        return;
+      }
+      const root = document.getElementById("root");
+      if (root && !root.id) root.id = "main";
+    } catch (_) {}
+  };
+  const ensureVideoBg = () => {
+    if (prefersReducedMotion()) return;
+    if (document.querySelector(".video-bg")) return;
+    // The React home app already renders its own video atmosphere.
+    if (document.getElementById("root")) return;
+    const wrap = document.createElement("div");
+    wrap.className = "video-bg";
+    wrap.setAttribute("aria-hidden", "true");
+    wrap.innerHTML = `
+      <video autoplay muted loop playsinline preload="metadata">
+        <source src="/media/vtw-home-wallpaper.mp4" type="video/mp4" />
+      </video>
+    `;
+    document.body.prepend(wrap);
+  };
+  const buildLatexHeader = () => {
+    const header = document.createElement("header");
+    header.id = "vtwLatexHeader";
+    header.className = "latex-header smash-effect";
+    header.setAttribute("aria-label", "VoiceToWebsite global hero header");
+    header.innerHTML = `
+      <div class="latex-hero-text">
+        <h1 class="latex-hero-title">VoiceToWebsite</h1>
+      </div>
+
+      <div class="latex-wave-container" aria-hidden="true">
+        <svg class="latex-synth-waves" viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <path id="vtw-latex-wave-1" class="latex-wave-path" d=""></path>
+          <path id="vtw-latex-wave-2" class="latex-wave-path" d=""></path>
+          <path id="vtw-latex-wave-3" class="latex-wave-path" d=""></path>
+        </svg>
+      </div>
+
+      <div class="latex-scroll-indicator">Drag Down to Stretch</div>
+      <div class="latex-reflection" aria-hidden="true"></div>
+    `;
+    return header;
+  };
+
+  const latexWaveConfig = [
+    { color: "#00f2ff", amp: 60, freq: 0.02, speed: 0.05 },
+    { color: "#bc13fe", amp: 40, freq: 0.015, speed: 0.03 },
+    { color: "#ff00bd", amp: 80, freq: 0.01, speed: 0.02 },
+  ];
+  const latexWaveState = { raf: 0, phase: 0, paths: [] };
+  const startLatexWaves = (header) => {
+    if (!header) return;
+    if (prefersReducedMotion()) return;
+    const paths = [
+      header.querySelector("#vtw-latex-wave-1"),
+      header.querySelector("#vtw-latex-wave-2"),
+      header.querySelector("#vtw-latex-wave-3"),
+    ].filter(Boolean);
+    if (!paths.length) return;
+    latexWaveState.paths = paths;
+    const createPath = (amplitude, frequency, phase, offset) => {
+      let path = `M 0 ${160 + offset}`;
+      for (let x = 0; x <= 1440; x += 12) {
+        const y = 160 + Math.sin(x * frequency + phase) * amplitude;
+        path += ` L ${x} ${y}`;
+      }
+      return path;
+    };
+    const loop = () => {
+      latexWaveState.phase += 0.05;
+      const liftFactor = 1 - (Number(header.dataset.latexLift) || 0);
+      paths.forEach((path, i) => {
+        const cfg = latexWaveConfig[i];
+        const dynamicAmp =
+          cfg.amp *
+          liftFactor *
+          (1 + Math.sin(latexWaveState.phase * 0.5) * 0.2);
+        const d = createPath(
+          dynamicAmp,
+          cfg.freq,
+          latexWaveState.phase * cfg.speed * 10,
+          i * 10
+        );
+        path.setAttribute("d", d);
+        path.setAttribute("stroke", cfg.color);
+        path.style.opacity = `${0.35 + liftFactor * 0.65}`;
+      });
+      latexWaveState.raf = window.requestAnimationFrame(loop);
+    };
+    if (latexWaveState.raf) window.cancelAnimationFrame(latexWaveState.raf);
+    latexWaveState.phase = 0;
+    latexWaveState.raf = window.requestAnimationFrame(loop);
+  };
+
+  const setupLatexScroll = (header, navWrapper) => {
+    if (!header) {
+      if (navWrapper) navWrapper.classList.add("is-visible");
+      return;
+    }
+    if (prefersReducedMotion()) {
+      if (navWrapper) navWrapper.classList.add("is-visible");
+      header.classList.remove("smash-effect");
+      return;
+    }
+    const title = header.querySelector(".latex-hero-title");
+    const subtitle = header.querySelector(".latex-hero-subtitle");
+    const indicator = header.querySelector(".latex-scroll-indicator");
+    const onScroll = () => {
+      const threshold = window.innerHeight * 0.65;
+      const progress = Math.min(window.scrollY / threshold, 1);
+      header.style.transform = `translateY(-${progress * 100}%)`;
+      header.dataset.latexLift = progress.toFixed(3);
+      if (title) {
+        title.style.transform = `scale(${1 + progress * 0.35}) translateY(${
+          progress * -50
+        }px)`;
+        title.style.filter = `blur(${progress * 16}px) brightness(${
+          1 + progress * 1.5
+        })`;
+        title.style.opacity = `${1 - progress}`;
+      }
+      if (subtitle) {
+        subtitle.style.opacity = `${Math.max(0, 1 - progress * 1.2)}`;
+      }
+      if (indicator) {
+        indicator.style.opacity = `${Math.max(0, 1 - progress * 1.5)}`;
+      }
+      if (navWrapper) {
+        const showNav = progress > 0.45;
+        navWrapper.classList.toggle("is-visible", showNav);
+        navWrapper.style.setProperty("--vtw-scroll-p", String(progress));
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    window.requestAnimationFrame(onScroll);
+    window.setTimeout(() => header.classList.remove("smash-effect"), 1200);
+  };
+  const buildPhosphorLinksHtml = () => {
+    const links = getNavLinks();
+    return links
+      .map((link) => {
+        const text = String(link.label).toUpperCase().replace(/\s+/g, " ");
+        const dataText = String(link.label).toUpperCase().replace(/\s+/g, "_");
+        return `<li class="vtw-phosphor-nav-item"><a class="vtw-phosphor-nav-link" href="${link.href}" data-text="${dataText}">${text}</a></li>`;
+      })
+      .join("");
+  };
+
+  const ensurePhosphorCss = () => {
+    if (document.getElementById("vtw-phosphor-nav-css")) return;
+    const link = document.createElement("link");
+    link.id = "vtw-phosphor-nav-css";
+    link.rel = "stylesheet";
+    link.href = "/phosphor-nav.css";
+    document.head.appendChild(link);
+    const fonts = document.createElement("link");
+    fonts.rel = "stylesheet";
+    fonts.href =
+      "https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Mono&display=swap";
+    document.head.appendChild(fonts);
+  };
+
+  const injectNav = () => {
+    clearExistingNav();
+    ensureLatexFonts();
+    ensureMainAnchor();
+    ensureVideoBg();
+    ensurePhosphorCss();
+    const body = document.body;
+    const fragment = document.createDocumentFragment();
+
+    const skip = document.createElement("a");
+    skip.className = "vtw-skip-link";
+    skip.href = "#main";
+    skip.textContent = "Skip to content";
+
+    const svgDefs = document.createElement("div");
+    svgDefs.id = "vtw-phosphor-svg-defs";
+    svgDefs.className = "vtw-phosphor-svg-defs";
+    svgDefs.setAttribute("aria-hidden", "true");
+    svgDefs.innerHTML = `<svg><filter id="vtw-melt-filter"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.1" numOctaves="2" result="noise" seed="1"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="50" xChannelSelector="R" yChannelSelector="G"/></filter></svg>`;
+
+    const crtOverlay = document.createElement("div");
+    crtOverlay.className = "vtw-crt-overlay";
+    crtOverlay.setAttribute("aria-hidden", "true");
+
+    const grain = document.createElement("div");
+    grain.className = "vtw-grain";
+    grain.setAttribute("aria-hidden", "true");
+
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.id = "vtwPhosphorTrigger";
+    trigger.className = "vtw-phosphor-trigger";
+    trigger.setAttribute("aria-label", "Open menu");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-controls", "vtwPhosphorMenu");
+    trigger.innerHTML = `<span class="vtw-phosphor-logo-text">Voicetowebsite.com</span><div class="vtw-phosphor-burger-icon"><span class="vtw-phosphor-burger-line"></span><span class="vtw-phosphor-burger-line"></span><span class="vtw-phosphor-burger-line"></span></div>`;
+
+    const menu = document.createElement("nav");
+    menu.id = "vtwPhosphorMenu";
+    menu.className = "vtw-phosphor-menu";
+    menu.setAttribute("aria-label", "Main navigation");
+    menu.setAttribute("role", "navigation");
+    menu.hidden = true;
+    menu.innerHTML = `<canvas id="vtw-three-canvas" class="vtw-phosphor-three-canvas" aria-hidden="true"></canvas><ul class="vtw-phosphor-nav-links" id="vtwPhosphorLinks">${buildPhosphorLinksHtml()}</ul>`;
+
+    fragment.append(skip, svgDefs, crtOverlay, grain, trigger, menu);
+    body.prepend(fragment);
+    body.classList.add("nav-ready");
+
+    setupLatexScroll(null, null);
+
+    const initPhosphorNav = () => {
+      const burger = document.getElementById("vtwPhosphorTrigger");
+      const menuEl = document.getElementById("vtwPhosphorMenu");
+      const linksContainer = document.getElementById("vtwPhosphorLinks");
+      if (!burger || !menuEl || !linksContainer) return;
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const playSizzle = () => {
+        try {
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const bufferSize = audioCtx.sampleRate * 1.5;
+          const buffer = audioCtx.createBuffer(
+            1,
+            bufferSize,
+            audioCtx.sampleRate
+          );
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = "highpass";
+          filter.frequency.value = 2000;
+          const gain = audioCtx.createGain();
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioCtx.currentTime + 1.2
+          );
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          noise.start();
+        } catch (_) {}
+      };
+      const setMenuState = (open) => {
+        menuEl.classList.toggle("open", open);
+        burger.classList.toggle("active", open);
+        burger.setAttribute("aria-expanded", open ? "true" : "false");
+        menuEl.hidden = !open;
+        document.body.style.overflow = open ? "hidden" : "";
+        if (open && audioCtx.state === "suspended") audioCtx.resume();
+      };
+      const isSpaRoute = (href) => {
+        try {
+          const url = new URL(href, window.location.href);
+          return (
+            url.origin === window.location.origin &&
+            !url.pathname.startsWith("/admin") &&
+            !url.pathname.endsWith(".html")
+          );
+        } catch (_) {
+          return false;
+        }
+      };
+      const navigateWithinApp = (href) => {
+        if (!isSpaRoute(href)) {
+          window.location.href = href;
+          return;
+        }
+        const url = new URL(href, window.location.href);
+        const nextPath = `${url.pathname}${url.search}${url.hash}`;
+        const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+        if (nextPath === currentPath) {
+          setMenuState(false);
+          return;
+        }
+        if (typeof window.__VTW_REACT_NAVIGATE__ === "function") {
+          window.__VTW_REACT_NAVIGATE__(nextPath);
+        } else {
+          window.location.assign(nextPath);
+          return;
+        }
+        if (!url.hash) {
+          window.scrollTo(0, 0);
+        }
+      };
+
+      const canvas = document.getElementById("vtw-three-canvas");
+      if (typeof THREE !== "undefined" && canvas) {
+        const renderer = new THREE.WebGLRenderer({
+          canvas,
+          antialias: true,
+          alpha: true,
+        });
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.z = 5;
+        const geometries = [
+          new THREE.IcosahedronGeometry(1, 0),
+          new THREE.TorusKnotGeometry(0.7, 0.3, 100, 16),
+          new THREE.OctahedronGeometry(1, 0),
+        ];
+        const objects = [];
+        for (let i = 0; i < 15; i++) {
+          const material = new THREE.MeshPhysicalMaterial({
+            color: i % 2 === 0 ? 0xff00ff : 0x00ffff,
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: i % 2 === 0 ? 0x220022 : 0x002222,
+            transparent: true,
+            opacity: 0.8,
+          });
+          const mesh = new THREE.Mesh(
+            geometries[Math.floor(Math.random() * geometries.length)],
+            material
+          );
+          mesh.position.set(
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 5
+          );
+          mesh.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            0
+          );
+          scene.add(mesh);
+          objects.push(mesh);
+        }
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+        let mouseX = 0,
+          mouseY = 0,
+          targetX = 0,
+          targetY = 0;
+        window.addEventListener("mousemove", (e) => {
+          mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+          mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+        window.addEventListener("deviceorientation", (e) => {
+          if (e.beta != null && e.gamma != null) {
+            targetX = e.gamma / 30;
+            targetY = e.beta / 30;
+          }
+        });
+        const animate = () => {
+          requestAnimationFrame(animate);
+          targetX += (mouseX - targetX) * 0.05;
+          targetY += (mouseY - targetY) * 0.05;
+          objects.forEach((obj, i) => {
+            obj.rotation.x += 0.01;
+            obj.rotation.y += 0.01;
+            obj.position.x += Math.sin(Date.now() * 0.001 + i) * 0.005;
+            obj.position.z = 2 + targetY * 2 + Math.cos(Date.now() * 0.001 + i);
+          });
+          camera.position.x += (targetX - camera.position.x) * 0.05;
+          camera.position.y += (-targetY - camera.position.y) * 0.05;
+          camera.lookAt(scene.position);
+          renderer.render(scene, camera);
+        };
+        animate();
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      burger.addEventListener("click", () => {
+        setMenuState(!menuEl.classList.contains("open"));
+      });
+
+      const attachLinkListeners = () => {
+        linksContainer
+          .querySelectorAll(".vtw-phosphor-nav-link")
+          .forEach((link) => {
+            link.addEventListener("click", (e) => {
+              const href = link.getAttribute("href");
+              if (!href || href === "#") return;
+              const internalRoute = isSpaRoute(href);
+              e.preventDefault();
+              playSizzle();
+              link.classList.add("vtw-phosphor-melting");
+              setTimeout(
+                () => {
+                  link.classList.remove("vtw-phosphor-melting");
+                  setMenuState(false);
+                  navigateWithinApp(href);
+                },
+                internalRoute ? 150 : 400
+              );
+            });
+          });
+      };
+      attachLinkListeners();
+      window.__vtwPhosphorAttachLinkListeners = attachLinkListeners;
+      window.__vtwPhosphorBuildLinksHtml = buildPhosphorLinksHtml;
+      window.__vtwPhosphorSetMenuState = setMenuState;
+    };
+
+    if (typeof THREE !== "undefined") {
+      initPhosphorNav();
+    } else {
+      const script = document.createElement("script");
+      script.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      script.onload = () => initPhosphorNav();
+      document.head.appendChild(script);
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const menuEl = document.getElementById("vtwPhosphorMenu");
+        const burger = document.getElementById("vtwPhosphorTrigger");
+        if (menuEl && menuEl.classList.contains("open")) {
+          menuEl.classList.remove("open");
+          menuEl.hidden = true;
+          if (burger) {
+            burger.classList.remove("active");
+            burger.setAttribute("aria-expanded", "false");
+          }
+          document.body.style.overflow = "";
+        }
+      }
+    });
+
+    let lastAuthState = null;
+    let updateTimeout = null;
+
+    const updateNavigation = () => {
+      const currentState = hasAdminAccess();
+      if (currentState === lastAuthState) return;
+      lastAuthState = currentState;
+      const linksContainer = document.getElementById("vtwPhosphorLinks");
+      if (linksContainer && window.__vtwPhosphorBuildLinksHtml) {
+        const newHtml = window.__vtwPhosphorBuildLinksHtml();
+        if (linksContainer.innerHTML !== newHtml) {
+          linksContainer.innerHTML = newHtml;
+          if (window.__vtwPhosphorAttachLinkListeners)
+            window.__vtwPhosphorAttachLinkListeners();
+        }
+      }
+    };
+
+    // Debounced update function
+    const debouncedUpdate = () => {
+      if (updateTimeout) clearTimeout(updateTimeout);
+      updateTimeout = setTimeout(updateNavigation, 100);
+    };
+
+    const refreshAndUpdateNavigation = () => {
+      refreshAdminAccessState().finally(() => {
+        debouncedUpdate();
+      });
+    };
+
+    // Listen for auth state changes
+    window.addEventListener("storage", (e) => {
+      if (
+        e.key === ADMIN_UNLOCK_STATE_KEY ||
+        e.key === ADMIN_AUTH_REFRESH_KEY ||
+        e.key?.includes("vtw_admin")
+      ) {
+        refreshAndUpdateNavigation();
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        refreshAndUpdateNavigation();
+      }
+    });
+
+    // Initial + periodic auth refresh keeps nav in sync after login/logout.
+    refreshAndUpdateNavigation();
+    setInterval(refreshAndUpdateNavigation, 15000);
+  };
+
+  const initPlasmaEffects = () => {
+    const canvas = document.getElementById("waveCanvas");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const ball = document.getElementById("ball");
+    const target = document.getElementById("target");
+
+    let width, height;
+    const mouse = { x: -1000, y: -1000, active: false };
+    const points = [];
+    const count = 60;
+    let animationId = null;
+    let audioCtx = null;
+
+    // Cleanup function
+    const cleanup = () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+      if (audioCtx) {
+        try {
+          audioCtx.close();
+        } catch (_) {}
+        audioCtx = null;
+      }
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", mouseMoveHandler);
+      if (target) {
+        target.removeEventListener("mouseenter", mouseEnterHandler);
+        target.removeEventListener("click", clickHandler);
+      }
+    };
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = 80;
+    }
+
+    const mouseMoveHandler = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      if (ball) {
+        ball.style.transform = `translate(${mouse.x - 60}px, ${e.clientY - 60}px)`;
+      }
+    };
+
+    // Audio Context for Synth Sounds
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (_) {
+      console.warn("AudioContext not supported");
+    }
+
+    function playSparkle() {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(
+          800 + Math.random() * 1000,
+          audioCtx.currentTime
+        );
+        osc.frequency.exponentialRampToValueAtTime(
+          40,
+          audioCtx.currentTime + 0.3
+        );
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioCtx.currentTime + 0.3
+        );
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch (_) {}
+    }
+
+    function playDetonation() {
+      if (!audioCtx) return;
+      try {
+        const noise = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        noise.type = "sawtooth";
+        noise.frequency.setValueAtTime(150, audioCtx.currentTime);
+        noise.frequency.exponentialRampToValueAtTime(
+          10,
+          audioCtx.currentTime + 0.5
+        );
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioCtx.currentTime + 0.5
+        );
+        noise.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start();
+        noise.stop(audioCtx.currentTime + 0.5);
+      } catch (_) {}
+    }
+
+    // Animation Loop for Wave
+    let tick = 0;
+    function animate() {
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, width, height);
+      tick += 0.02;
+
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      for (let i = 0; i <= count; i++) {
+        const x = (width / count) * i;
+        const dist = Math.abs(x - mouse.x);
+        const influence = Math.max(0, 1 - dist / 200);
+        const amp = 10 + influence * 30;
+        const y = height / 2 + Math.sin(tick + i * 0.2) * amp;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      const gradient = ctx.createLinearGradient(0, 0, width, 0);
+      gradient.addColorStop(0, "transparent");
+      gradient.addColorStop(0.5, "#00f2ff");
+      gradient.addColorStop(1, "transparent");
+
+      ctx.strokeStyle = gradient;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#00f2ff";
+      ctx.stroke();
+
+      animationId = requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", mouseMoveHandler);
+    resize();
+    animate();
+
+    const mouseEnterHandler = () => {
+      playSparkle();
+    };
+
+    const clickHandler = (e) => {
+      playDetonation();
+      explode(e.clientX, e.clientY);
+      target.style.opacity = "0";
+      target.style.pointerEvents = "none";
+
+      setTimeout(() => {
+        target.style.opacity = "1";
+        target.style.pointerEvents = "auto";
+      }, 2000);
+    };
+
+    if (target) {
+      target.addEventListener("mouseenter", mouseEnterHandler);
+      target.addEventListener("click", clickHandler);
+    }
+
+    // Store cleanup function for global access
+    window.cleanupPlasmaEffects = cleanup;
+
+    // Auto-cleanup on page unload
+    window.addEventListener("beforeunload", cleanup);
+
+    function explode(x, y) {
+      for (let i = 0; i < 40; i++) {
+        const frag = document.createElement("div");
+        frag.className = "fragment";
+        document.body.appendChild(frag);
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = 5 + Math.random() * 10;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+
+        let posX = x;
+        let posY = y;
+        let opacity = 1;
+
+        function moveFragment() {
+          posX += vx;
+          posY += vy;
+          opacity -= 0.02;
+          frag.style.transform = `translate(${posX}px, ${posY}px)`;
+          frag.style.opacity = opacity;
+
+          if (opacity > 0) {
+            requestAnimationFrame(moveFragment);
+          } else {
+            frag.remove();
+          }
+        }
+        moveFragment();
+      }
+    }
+  };
+
+  const triggerBoltZap = (target) => {
+    if (!target || !target.classList) return;
+    target.classList.remove("crystal-zap");
+    // Force reflow so animation can retrigger quickly.
+    void target.offsetWidth;
+    target.classList.add("crystal-zap");
+    window.setTimeout(() => target.classList.remove("crystal-zap"), 420);
+    try {
+      SoundEngine.play("zap");
+    } catch (_) {}
+  };
+
+  const triggerBubbleBurst = (target, clientX, clientY) => {
+    if (!target) return;
+    try {
+      SoundEngine.play("success");
+    } catch (_) {}
+
+    const rect = target.getBoundingClientRect();
+    const centerX = clientX || rect.left + rect.width / 2;
+    const centerY = clientY || rect.top + rect.height / 2;
+
+    target.classList.add("bubble-pop");
+    window.setTimeout(() => target.classList.remove("bubble-pop"), 600);
+
+    const sporeCount = 16;
+    for (let i = 0; i < sporeCount; i++) {
+      const spore = document.createElement("span");
+      spore.className = "bubble-spore";
+      const size = 5 + Math.random() * 12;
+      spore.style.width = `${size}px`;
+      spore.style.height = `${size}px`;
+      spore.style.left = `${centerX - size / 2}px`;
+      spore.style.top = `${centerY - size / 2}px`;
+      document.body.appendChild(spore);
+
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 40 + Math.random() * 50;
+      const dx = Math.cos(angle) * velocity;
+      const dy = Math.sin(angle) * velocity;
+      const duration = 450 + Math.random() * 250;
+
+      spore.animate(
+        [
+          { transform: "translate(0,0) scale(1)", opacity: 0.95 },
+          { transform: `translate(${dx}px, ${dy}px) scale(0.2)`, opacity: 0 },
+        ],
+        {
+          duration,
+          easing: "ease-out",
+          fill: "forwards",
+        }
+      ).onfinish = () => spore.remove();
+    }
+  };
+
+  const createShardExplosion = (clientX, clientY) => {
+    if (!clientX && !clientY) return;
+    const shardCount = 18;
+    for (let i = 0; i < shardCount; i++) {
+      const shard = document.createElement("span");
+      shard.className = "crystal-shard";
+      const size = 8 + Math.random() * 24;
+      shard.style.width = `${size}px`;
+      shard.style.height = `${size}px`;
+      shard.style.left = `${clientX - size / 2}px`;
+      shard.style.top = `${clientY - size / 2}px`;
+      document.body.appendChild(shard);
+
+      const dx = (Math.random() - 0.5) * 420;
+      const dy = (Math.random() - 0.5) * 420;
+      const rotate = (Math.random() - 0.5) * 720;
+      const duration = 600 + Math.random() * 500;
+
+      shard.animate(
+        [
+          { transform: "translate(0,0) scale(1) rotate(0deg)", opacity: 0.95 },
+          {
+            transform: `translate(${dx}px, ${dy}px) scale(0) rotate(${rotate}deg)`,
+            opacity: 0,
+          },
+        ],
+        {
+          duration,
+          easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          fill: "forwards",
+        }
+      ).onfinish = () => shard.remove();
+    }
+  };
+
+  const initTextFx = () => {
+    try {
+      if (prefersReducedMotion()) return;
+      if (!("IntersectionObserver" in window)) return;
+
+      const headlineSelector =
+        "h1, h2, h3, h4, h5, h6, .vt-h1, .vt-h2, .strata-heading";
+      const headlines = Array.from(document.querySelectorAll(headlineSelector));
+      const variants = ["scan", "glitch", "float", "spark", "slice", "press"];
+
+      headlines.forEach((el, idx) => {
+        if (el.dataset.vtwHeadInit) return;
+        el.dataset.vtwHeadInit = "1";
+        el.classList.add("vtw-headline");
+        const key = `${el.textContent || ""}:${idx}`;
+        const v = variants[hashString(key) % variants.length];
+        el.dataset.vtwHeadAnim = v;
+      });
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("vtw-inview");
+            observer.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -15% 0px" }
+      );
+
+      headlines.forEach((el) => observer.observe(el));
+    } catch (_) {}
+  };
+
+  const initScrollChromeFx = () => {
+    try {
+      if (prefersReducedMotion()) return;
+
+      const nav = document.querySelector(".crystal-nav");
+      const fxEls = Array.from(
+        document.querySelectorAll("[data-vtw-scrollfx]")
+      );
+      if (!nav || !fxEls.length) return;
+
+      fxEls.forEach((el, idx) => {
+        if (el.dataset.vtwScrollSeed) return;
+        const key = `${el.getAttribute("data-vtw-scrollfx") || ""}:${el.textContent || ""}:${idx}`;
+        const seed = (hashString(key) % 97) / 97;
+        el.dataset.vtwScrollSeed = String(seed);
+      });
+
+      let raf = 0;
+      const tick = () => {
+        raf = 0;
+        const y = Math.max(0, window.scrollY || 0);
+        const p = Math.min(1, y / 900);
+
+        nav.style.setProperty("--vtw-scroll-p", String(p));
+
+        fxEls.forEach((el) => {
+          const seed = Number(el.dataset.vtwScrollSeed || 0) || 0;
+          const base = 6 + seed * 18;
+          const lift = Math.min(base, y * (0.012 + seed * 0.01));
+          const twist = (seed - 0.5) * 8 * p;
+          el.style.setProperty("--vtw-scroll-y", `${lift.toFixed(2)}px`);
+          el.style.setProperty("--vtw-scroll-r", `${twist.toFixed(2)}deg`);
+          el.style.setProperty(
+            "--vtw-scroll-o",
+            `${(0.75 + (1 - p) * 0.25).toFixed(3)}`
+          );
+        });
+      };
+
+      const onScroll = () => {
+        if (raf) return;
+        raf = window.requestAnimationFrame(tick);
+      };
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      tick();
+    } catch (_) {}
+  };
+
+  const hashString = (value) => {
+    const str = String(value || "");
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+
+  const hslToRgb = (h, s, l) => {
+    const hue = (((h % 360) + 360) % 360) / 360;
+    const sat = Math.max(0, Math.min(1, s));
+    const lit = Math.max(0, Math.min(1, l));
+
+    if (sat === 0) {
+      const v = Math.round(lit * 255);
+      return { r: v, g: v, b: v };
+    }
+
+    const q = lit < 0.5 ? lit * (1 + sat) : lit + sat - lit * sat;
+    const p = 2 * lit - q;
+    const hueToChannel = (t) => {
+      let x = t;
+      if (x < 0) x += 1;
+      if (x > 1) x -= 1;
+      if (x < 1 / 6) return p + (q - p) * 6 * x;
+      if (x < 1 / 2) return q;
+      if (x < 2 / 3) return p + (q - p) * (2 / 3 - x) * 6;
+      return p;
+    };
+
+    return {
+      r: Math.round(hueToChannel(hue + 1 / 3) * 255),
+      g: Math.round(hueToChannel(hue) * 255),
+      b: Math.round(hueToChannel(hue - 1 / 3) * 255),
+    };
+  };
+
+  const buildWavePalette = (pathKey) => {
+    const seed = hashString(pathKey || "/");
+    const hue = seed % 360;
+    const sat = 0.62 + ((seed >>> 9) % 18) / 100;
+    const lit = 0.58 + ((seed >>> 15) % 12) / 100;
+    return [
+      hslToRgb(hue, sat, lit),
+      hslToRgb(
+        (hue + 28 + ((seed >>> 3) % 16)) % 360,
+        Math.min(0.92, sat + 0.08),
+        Math.min(0.82, lit + 0.09)
+      ),
+      hslToRgb(
+        (hue + 330 + ((seed >>> 19) % 24)) % 360,
+        Math.max(0.5, sat - 0.12),
+        Math.max(0.48, lit - 0.12)
+      ),
+    ];
+  };
+
+  const injectBottomWaves = () => {
+    try {
+      if (document.getElementById("vtw-bottom-waves")) return;
+
+      const canvas = document.createElement("canvas");
+      canvas.id = "vtw-bottom-waves";
+      canvas.className = "vtw-bottom-waves";
+      canvas.setAttribute("aria-hidden", "true");
+      document.body.appendChild(canvas);
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const [rgb1, rgb2, rgb3] = buildWavePalette(normalizePath());
+
+      let w = 0;
+      let h = 0;
+      let dpr = 1;
+      const resize = () => {
+        dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+        w = Math.max(1, Math.floor(window.innerWidth));
+        h = Math.max(
+          1,
+          Math.floor(canvas.getBoundingClientRect().height || 140)
+        );
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      };
+      resize();
+      window.addEventListener("resize", resize, { passive: true });
+
+      let t = 0;
+      const draw = () => {
+        t += 0.016;
+        ctx.clearRect(0, 0, w, h);
+        ctx.globalCompositeOperation = "lighter";
+
+        const maxBar = Math.floor(h * 0.85);
+        const step = 12;
+        const base = h - 1;
+
+        for (let x = 0; x < w + step; x += step) {
+          const n1 = (Math.sin(t * 1.7 + x * 0.035) + 1) * 0.5;
+          const n2 = (Math.sin(t * 2.3 + x * 0.021 + 1.1) + 1) * 0.5;
+          const n3 = (Math.sin(t * 3.1 + x * 0.015 + 2.6) + 1) * 0.5;
+          const amp = 0.35 * n1 + 0.4 * n2 + 0.25 * n3;
+          const barH = Math.max(6, Math.floor(maxBar * amp));
+
+          const mix = x / Math.max(1, w);
+          const leftMix = 1 - Math.min(1, mix * 2);
+          const rightMix = Math.max(0, (mix - 0.5) * 2);
+          const midMix = 1 - leftMix - rightMix;
+
+          const r = Math.floor(
+            rgb1.r * leftMix + rgb2.r * midMix + rgb3.r * rightMix
+          );
+          const g = Math.floor(
+            rgb1.g * leftMix + rgb2.g * midMix + rgb3.g * rightMix
+          );
+          const b = Math.floor(
+            rgb1.b * leftMix + rgb2.b * midMix + rgb3.b * rightMix
+          );
+
+          const glow = 0.22 + amp * 0.68;
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(0.92, glow)})`;
+          ctx.shadowBlur = 18;
+          ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${Math.min(0.55, glow)})`;
+
+          const bw = step - 3;
+          const x0 = x + 1;
+          const y0 = base - barH;
+          const radius = Math.max(3, Math.min(14, Math.floor(bw * 0.55)));
+
+          ctx.beginPath();
+          ctx.moveTo(x0 + radius, y0);
+          ctx.arcTo(x0 + bw, y0, x0 + bw, y0 + barH, radius);
+          ctx.arcTo(x0 + bw, y0 + barH, x0, y0 + barH, radius);
+          ctx.arcTo(x0, y0 + barH, x0, y0, radius);
+          ctx.arcTo(x0, y0, x0 + bw, y0, radius);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(draw);
+      };
+      draw();
+    } catch (_) {}
+  };
+
+  const normalizePath = () => {
+    try {
+      let p = String(location.pathname || "/");
+      if (!p.startsWith("/")) p = `/${p}`;
+      p = p.replace(/\/$/, "");
+      if (!p) p = "/";
+      if (p.endsWith(".html")) p = p.slice(0, -5);
+      return p || "/";
+    } catch (_) {
+      return "/";
+    }
+  };
+
+  const normalizeAdsMode = (raw) => {
+    const v = String(raw || "auto")
+      .trim()
+      .toLowerCase();
+    if (!v) return "auto";
+    if (["off", "disabled", "false", "0", "none"].includes(v)) return "off";
+    if (["auto", "autoads", "page"].includes(v)) return "auto";
+    if (["slots", "manual"].includes(v)) return "slots";
+    if (["hybrid", "both"].includes(v)) return "hybrid";
+    return "auto";
+  };
+
+  const detectPublisherFromDom = () => {
+    try {
+      const script = document.querySelector(
+        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="]'
+      );
+      if (!script) return "";
+      const src = String(script.getAttribute("src") || "");
+      const match = src.match(/[?&]client=([^&]+)/i);
+      return match ? decodeURIComponent(match[1]) : "";
+    } catch (_) {
+      return "";
+    }
+  };
+
+  const isAdsAllowed = () => {
+    try {
+      const p = normalizePath();
+      if (p.startsWith("/admin") || p.startsWith("/the3000")) return false;
+
+      const meta = document.querySelector('meta[name="vtw-ads"]');
+      const setting = String(meta?.getAttribute("content") || "")
+        .trim()
+        .toLowerCase();
+      if (setting === "off" || setting === "false" || setting === "0")
+        return false;
+      if (setting === "on" || setting === "true" || setting === "1")
+        return true;
+
+      // Maximize by default: show ads everywhere except admin/secret or pages that explicitly opt out.
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const ensureAdsenseLoader = (publisher) => {
+    try {
+      if (!publisher) return Promise.resolve(false);
+      if (document.getElementById("vtw-adsense-loader"))
+        return Promise.resolve(true);
+      const existing = document.querySelector(
+        'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
+      );
+      if (existing) return Promise.resolve(true);
+
+      const script = document.createElement("script");
+      script.id = "vtw-adsense-loader";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(
+        publisher
+      )}`;
+      document.head.appendChild(script);
+      return new Promise((resolve) => {
+        script.addEventListener("load", () => resolve(true), { once: true });
+        script.addEventListener("error", () => resolve(false), { once: true });
+      });
+    } catch (_) {
+      return Promise.resolve(false);
+    }
+  };
+
+  const pushAdsense = () => {
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (_) {}
+  };
+
+  const createAdsenseSlot = ({ publisher, slot, placement }) => {
+    const wrap = document.createElement("div");
+    wrap.className = `vtw-adsense-slot vtw-adsense-${placement}`;
+    wrap.dataset.vtwPlacement = placement;
+    wrap.innerHTML = `
+      <div class="vtw-ad-label">Advertisement</div>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="${publisher}"
+           data-ad-slot="${slot}"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    `;
+    return wrap;
+  };
+
+  const insertSlot = (wrap, placement) => {
+    const footer = document.querySelector(".vt-footer");
+    const main =
+      document.querySelector("main.page") ||
+      document.querySelector("main") ||
+      document.body;
+    const sections = main
+      ? Array.from(main.querySelectorAll("section.section"))
+      : [];
+
+    if (placement === "top") {
+      const anchor = sections[0] || main.firstElementChild;
+      if (anchor) anchor.insertAdjacentElement("beforebegin", wrap);
+      else main.prepend(wrap);
+      return;
+    }
+
+    if (placement === "mid") {
+      const idx = sections.length
+        ? Math.min(
+            sections.length - 1,
+            Math.max(0, Math.floor(sections.length / 2))
+          )
+        : -1;
+      const anchor = idx >= 0 ? sections[idx] : main.firstElementChild;
+      if (anchor) anchor.insertAdjacentElement("afterend", wrap);
+      else main.appendChild(wrap);
+      return;
+    }
+
+    // bottom
+    if (footer) footer.insertAdjacentElement("beforebegin", wrap);
+    else main.appendChild(wrap);
+  };
+
+  const maybeInjectAdsense = () => {
+    try {
+      if (!isAdsAllowed()) return;
+      const env = window.__ENV || {};
+      const mode = normalizeAdsMode(env.ADSENSE_MODE);
+      if (mode === "off") return;
+
+      const publisher = String(
+        env.ADSENSE_PUBLISHER || detectPublisherFromDom() || ""
+      ).trim();
+      if (!publisher) return;
+
+      const slotFallback = String(env.ADSENSE_SLOT || "").trim();
+      const slotTopRaw = String(env.ADSENSE_SLOT_TOP || "").trim();
+      const slotMidRaw = String(env.ADSENSE_SLOT_MID || "").trim();
+      const slotBottomRaw = String(env.ADSENSE_SLOT_BOTTOM || "").trim();
+      const maxSlots = Math.max(
+        0,
+        Math.min(
+          6,
+          Number.parseInt(String(env.ADSENSE_MAX_SLOTS || "3"), 10) || 3
+        )
+      );
+
+      // Auto ads: just ensure the loader is present. Google will place units based on account settings.
+      if (mode === "auto") {
+        ensureAdsenseLoader(publisher);
+        return;
+      }
+
+      const providedSlots = [slotTopRaw, slotMidRaw, slotBottomRaw].filter(
+        Boolean
+      );
+      const candidateSlots = providedSlots.length
+        ? providedSlots
+        : slotFallback
+          ? [slotFallback]
+          : [];
+      const distinctSlots = [...new Set(candidateSlots)];
+
+      // Avoid reusing the same slot ID in multiple placements unless explicitly provided.
+      let placements = [];
+      if (distinctSlots.length === 1) {
+        placements = [{ placement: "mid", slot: distinctSlots[0] }];
+      } else {
+        placements = [
+          { placement: "top", slot: slotTopRaw || slotFallback },
+          { placement: "mid", slot: slotMidRaw || slotFallback },
+          { placement: "bottom", slot: slotBottomRaw || slotFallback },
+        ]
+          .filter((p) => p.slot)
+          .filter(
+            (p, idx, arr) => arr.findIndex((x) => x.slot === p.slot) === idx
+          );
+      }
+
+      if (!placements.length) {
+        if (mode === "hybrid") ensureAdsenseLoader(publisher);
+        return;
+      }
+
+      const existing = document.querySelectorAll("ins.adsbygoogle").length;
+      let remaining = Math.max(0, maxSlots - existing);
+      if (!remaining) return;
+
+      const loader = ensureAdsenseLoader(publisher);
+
+      const inserts = [];
+      for (const p of placements) {
+        if (!remaining) break;
+        if (
+          document.querySelector(
+            `.vtw-adsense-slot[data-vtw-placement="${p.placement}"]`
+          )
+        )
+          continue;
+        const wrap = createAdsenseSlot({
+          publisher,
+          slot: p.slot,
+          placement: p.placement,
+        });
+        insertSlot(wrap, p.placement);
+        inserts.push(wrap);
+        remaining--;
+      }
+
+      if (!inserts.length) return;
+
+      loader.then((ok) => {
+        if (!ok) return;
+        // Push only the slots we created (avoids double-push on pages that already do it manually).
+        inserts.forEach(() => pushAdsense());
+      });
+    } catch (_) {}
+  };
+
+  const init = () => {
+    console.log("[VTW Nav] Starting init...");
+    initTheme();
+    enforceAdminTheme();
+
+    const adminPage = isAdminPage();
+    const shellDisabled = isShellDisabled() || adminPage;
+    console.log(
+      "[VTW Nav] adminPage:",
+      adminPage,
+      "shellDisabled:",
+      shellDisabled
+    );
+
+    if (!shellDisabled) {
+      console.log("[VTW Nav] Injecting nav...");
+      injectNav();
+      wireThemeSwitcher();
+      if (!adminPage) {
+        console.log("[VTW Nav] Injecting footer...");
+        injectFooter();
+        electrifyLinks();
+        spectralizeCards();
+        initTextFx();
+        initScrollChromeFx();
+        if (!prefersReducedMotion()) initScrollReveals();
+      }
+    } else {
+      console.log("[VTW Nav] Shell is disabled, skipping injection");
+    }
+
+    if (!prefersReducedMotion()) injectBottomWaves();
+
+    if (!adminPage) {
+      maybeInjectAdsense();
+    }
+
+    ensureAdminSubnavManagement();
+    maybeInitAdminTerminalFix();
+    console.log("[VTW Nav] Init complete");
+  };
+  const maybeInitAdminTerminalFix = () => {
+    try {
+      if (!location.pathname.startsWith("/admin")) return;
+      if (!document.getElementById("apply")) return;
+      import("/admin/terminal-fix.js").catch(() => {});
+    } catch (_) {}
+  };
+  const initScrollReveals = () => {
+    if (!("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -12% 0px" }
+    );
+
+    document.querySelectorAll(".spectral-card").forEach((el) => {
+      if (el.dataset.revealInit) return;
+      el.dataset.revealInit = "1";
+      el.classList.add("reveal");
+      observer.observe(el);
+    });
+  };
+  /* --- Bubble Footer (global) --- */
+  const injectFooter = () => {
+    if (document.querySelector(".bubble-footer")) return;
+    const footer = document.createElement("footer");
+    footer.className = "bubble-footer";
+    footer.id = "vtwBubbleFooter";
+    footer.innerHTML = `
+      <div class="bubble-footer__glass">
+        <div class="bubble-brand" aria-label="VoiceToWebsite">VoiceToWebsite</div>
+        <div class="bubble-social" aria-label="Social links">
+          <a class="bubble-icon" href="https://x.com/voicetowebsite" target="_blank" rel="noopener" aria-label="X (Twitter)">
+            <span aria-hidden="true">✕</span>
+          </a>
+          <a class="bubble-icon" href="https://instagram.com/3000studios" target="_blank" rel="noopener" aria-label="Instagram">
+            <span aria-hidden="true">◎</span>
+          </a>
+          <a class="bubble-icon" href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube">
+            <span aria-hidden="true">▶</span>
+          </a>
+        </div>
+        <div class="bubble-dancer" aria-hidden="true">
+          <svg viewBox="0 0 50 100" focusable="false">
+            <circle cx="25" cy="20" r="8" />
+            <path d="M25 28 V60 M10 40 H40 M25 60 L10 90 M25 60 L40 90" />
+          </svg>
+        </div>
+      </div>
+      <div class="bubble-haze" aria-hidden="true"></div>
+    `;
+    document.body.appendChild(footer);
+    initBubbleFooterInteractions(footer);
+  };
+
+  const initBubbleFooterInteractions = (footer) => {
+    if (!footer) return;
+    if (prefersReducedMotion()) {
+      footer.classList.add("is-active", "is-ignited");
+      return;
+    }
+    const glass = footer.querySelector(".bubble-footer__glass");
+    const tilt = (e) => {
+      const rect = glass.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+      const y = ((e.clientY - rect.top) / rect.height - 0.5) * 6;
+      glass.style.setProperty("--tilt-x", `${x.toFixed(2)}deg`);
+      glass.style.setProperty("--tilt-y", `${-y.toFixed(2)}deg`);
+    };
+    glass.addEventListener("mousemove", tilt);
+    glass.addEventListener("mouseleave", () => {
+      glass.style.removeProperty("--tilt-x");
+      glass.style.removeProperty("--tilt-y");
+    });
+
+    const onScroll = () => {
+      const scrollPos = window.scrollY + window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const progress = Math.min(
+        Math.max((scrollPos - (docHeight - 600)) / 420, 0),
+        1
+      );
+      footer.style.setProperty("--footer-progress", progress.toFixed(3));
+      footer.classList.toggle("is-active", progress > 0.05);
+      footer.classList.toggle("is-ignited", scrollPos >= docHeight - 8);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    requestAnimationFrame(onScroll);
+  };
+  const electrifyLinks = () => {
+    const links = () => document.querySelectorAll(".nav-links a");
+    const tick = () => {
+      const nodes = links();
+      if (!nodes.length) return;
+      const pick = nodes[Math.floor(Math.random() * nodes.length)];
+      pick.classList.add("electrify");
+      setTimeout(() => pick.classList.remove("electrify"), 1200);
+      setTimeout(tick, 2400 + Math.random() * 1200);
+    };
+    setTimeout(tick, 1800);
+  };
+  const cardSelectors = [
+    ".feature-card",
+    ".step-card",
+    ".lineup-card",
+    ".lineup-grid article",
+    ".blog-card",
+    ".story-card",
+    ".price-card",
+    ".card.luxe",
+    ".card-3000",
+    ".cards-3000 .card-3000",
+    ".race-card",
+    ".kpi-card",
+    ".search-card",
+    ".secret-card",
+    ".help-card",
+    ".appstore .product-card",
+    ".admin-grid .card",
+    ".lock-card",
+    ".crystal-card",
+  ];
+  const supportsFinePointer = () => {
+    try {
+      return window.matchMedia && window.matchMedia("(pointer: fine)").matches;
+    } catch (_) {
+      return true;
+    }
+  };
+  const glowState = new WeakMap();
+  const spectralizeCards = () => {
+    if (prefersReducedMotion()) return;
+    if (!supportsFinePointer()) return;
+    const seen = new Set();
+    cardSelectors.forEach((selector) => {
+      document.querySelectorAll(selector).forEach((el) => {
+        if (seen.has(el)) return;
+        seen.add(el);
+        el.classList.add("spectral-card");
+        el.addEventListener("pointerenter", cacheGlowRect, { passive: true });
+        el.addEventListener("pointermove", handleGlow, { passive: true });
+        el.addEventListener("pointerleave", resetGlow, { passive: true });
+      });
+    });
+  };
+  const cacheGlowRect = (event) => {
+    const el = event.currentTarget;
+    const state = glowState.get(el) || {
+      rect: null,
+      raf: 0,
+      lastClientX: 0,
+      lastClientY: 0,
+    };
+    state.rect = el.getBoundingClientRect();
+    glowState.set(el, state);
+  };
+  const handleGlow = (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    const el = event.currentTarget;
+    const state = glowState.get(el) || {
+      rect: null,
+      raf: 0,
+      lastClientX: 0,
+      lastClientY: 0,
+    };
+    state.lastClientX = event.clientX;
+    state.lastClientY = event.clientY;
+    if (!state.rect) state.rect = el.getBoundingClientRect();
+    if (state.raf) {
+      glowState.set(el, state);
+      return;
+    }
+    state.raf = window.requestAnimationFrame(() => {
+      const next = glowState.get(el);
+      if (!next || !next.rect) return;
+      const rect = next.rect;
+      const x = ((next.lastClientX - rect.left) / rect.width) * 100;
+      const y = ((next.lastClientY - rect.top) / rect.height) * 100;
+      el.style.setProperty("--glow-x", `${x}%`);
+      el.style.setProperty("--glow-y", `${y}%`);
+      next.raf = 0;
+      glowState.set(el, next);
+    });
+    glowState.set(el, state);
+  };
+  const resetGlow = (event) => {
+    const el = event.currentTarget;
+    const state = glowState.get(el);
+    if (state?.raf) {
+      try {
+        window.cancelAnimationFrame(state.raf);
+      } catch (_) {}
+    }
+    glowState.delete(el);
+    el.style.removeProperty("--glow-x");
+    el.style.removeProperty("--glow-y");
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  /* Music Autoplay */
+  const ensureMusic = () => {
+    if (document.getElementById("vtw-bg-music")) return;
+    // Home app owns its own music engine; avoid double-play.
+    if (document.getElementById("root")) return;
+    const audio = document.createElement("audio");
+    audio.id = "vtw-bg-music";
+    audio.loop = true;
+    audio.volume = 0.65;
+    audio.preload = "auto";
+    // Same-origin media is more reliable across browsers and ad-blockers.
+    audio.src = "/background-music.wav";
+    document.body.appendChild(audio);
+
+    const play = () => {
+      audio.play().catch(() => {
+        console.log("Autoplay blocked. Waiting for interaction.");
+        const unlock = () => {
+          audio.play().catch(() => {});
+          document.removeEventListener("click", unlock);
+          document.removeEventListener("keydown", unlock);
+        };
+        document.addEventListener("click", unlock);
+        document.addEventListener("keydown", unlock);
+      });
+    };
+    // Attempt immediate play
+    play();
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ensureMusic);
+  } else {
+    ensureMusic();
+  }
+
+  /* Heading + Label Scroll FX (site-wide) */
+  const decorateScrollFx = () => {
+    if (prefersReducedMotion()) return;
+    const pickFx = (seed) => {
+      const fxs = ["scan", "glitch", "drift", "snap", "prism", "ember"];
+      return fxs[seed % fxs.length];
+    };
+    const hash = (s) => {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return Math.abs(h);
+    };
+    const isExcluded = (el) => {
+      try {
+        return Boolean(
+          el.closest(
+            ".glass-nav, .mobile-overlay, footer, .admin-topbar, .admin-shell"
+          )
+        );
+      } catch (_) {
+        return false;
+      }
+    };
+
+    const headings = Array.from(document.querySelectorAll("h1,h2,h3")).filter(
+      (el) => !isExcluded(el)
+    );
+    headings.forEach((el, idx) => {
+      if (el.dataset.vtwHeadingFxApplied) return;
+      el.dataset.vtwHeadingFxApplied = "1";
+      const seed = hash(
+        `${location.pathname}::${el.textContent || ""}::${idx}`
+      );
+      const fx = pickFx(seed);
+      el.classList.add(
+        "vtw-riser",
+        "vtw-reveal",
+        "vtw-headingfx",
+        `vtw-headingfx--${fx}`
+      );
+      el.dataset.vtwHeadingfx = fx;
+    });
+
+    const labels = Array.from(
+      document.querySelectorAll("label,.form-label,.badge,.chip,small")
+    ).filter((el) => !isExcluded(el));
+    labels.forEach((el, idx) => {
+      if (el.dataset.vtwLabelFxApplied) return;
+      el.dataset.vtwLabelFxApplied = "1";
+      const seed = hash(
+        `${location.pathname}::${el.textContent || ""}::${idx}`
+      );
+      el.classList.add("vtw-riser", "vtw-reveal", "vtw-labelfx");
+      el.style.setProperty(
+        "--vtw-reveal-d",
+        `${Math.min(420, (seed % 8) * 55)}ms`
+      );
+    });
+
+    const revealTargets = Array.from(
+      document.querySelectorAll(".vtw-reveal,[data-vtw-scrollfx]")
+    ).filter((el) => !isExcluded(el));
+    if (!revealTargets.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-inview");
+          io.unobserve(entry.target);
+        });
+      },
+      { root: null, threshold: 0.15, rootMargin: "0px 0px -10% 0px" }
+    );
+    revealTargets.forEach((el) => io.observe(el));
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", decorateScrollFx);
+  } else {
+    decorateScrollFx();
+  }
+})();

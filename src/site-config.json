@@ -1,0 +1,15 @@
+{
+  "copy": {
+    "eyebrow": "VoiceToWebsite Platform",
+    "headline": "Turn voice commands into production-ready websites.",
+    "subhead": "Generate pages, copy, navigation, and deploy-safe updates from natural language with preview-first workflows.",
+    "cta": "Start a build",
+    "price": "",
+    "metric1": "No credit card",
+    "metric2": "Privacy-first posture",
+    "metric3": "Lighthouse targets 90+/95+"
+  },
+  "theme": {
+    "default": "midnight"
+  }
+}

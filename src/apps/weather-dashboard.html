@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Dashboard | VoiceToWebsite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #02060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+      }
+      body {
+        background:
+          radial-gradient(circle at 20% 20%, rgba(0, 242, 255, 0.12), transparent 30%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 20px;
+        margin-top: 18px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+      }
+      .section-title {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      input {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 12px;
+      }
+      .forecast {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+      }
+      .chip {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        text-align: center;
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <div
+          style="
+            display: inline-flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(0, 242, 255, 0.14);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          "
+        >
+          Weather
+        </div>
+        <span style="color: var(--muted); font-weight: 600"
+          >Embed live weather tiles in VoiceToWebsite experiences.</span
+        >
+      </div>
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">City conditions + 5-day outlook</h1>
+      <p style="color: var(--muted)">Search a city, preview the layout, and export cards.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="section-title">Location</div>
+          <div style="display: grid; gap: 12px">
+            <div>
+              <label for="city">City or ZIP</label>
+              <input id="city" type="text" placeholder="Austin, TX" />
+            </div>
+            <button class="btn btn-primary" id="load" type="button">Load weather</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Current</div>
+          <div id="current" style="display: flex; align-items: center; gap: 16px">
+            <div style="font-size: 3rem; font-weight: 900" id="temp">72°</div>
+            <div>
+              <div id="summary" style="font-weight: 800">Clear skies</div>
+              <div id="meta" style="color: var(--muted)">Feels 74° • Humidity 40%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 18px">
+        <div class="section-title">Forecast</div>
+        <div class="forecast" id="forecast"></div>
+      </div>
+    </main>
+
+    <script>
+      const cityInput = document.getElementById("city");
+      const loadBtn = document.getElementById("load");
+      const temp = document.getElementById("temp");
+      const summary = document.getElementById("summary");
+      const meta = document.getElementById("meta");
+      const forecastEl = document.getElementById("forecast");
+
+      const sampleDays = [
+        { day: "Mon", hi: 78, lo: 62, icon: "☀️" },
+        { day: "Tue", hi: 75, lo: 60, icon: "⛅" },
+        { day: "Wed", hi: 70, lo: 58, icon: "🌧️" },
+        { day: "Thu", hi: 73, lo: 59, icon: "🌦️" },
+        { day: "Fri", hi: 76, lo: 61, icon: "☀️" },
+      ];
+
+      const renderForecast = (days) => {
+        forecastEl.innerHTML = "";
+        days.forEach((d) => {
+          const div = document.createElement("div");
+          div.className = "chip";
+          div.innerHTML = \`
+            <div style="font-size:1.6rem;">\${d.icon}</div>
+            <div style="font-weight:800;">\${d.day}</div>
+            <div style="color:var(--muted);">\${d.hi}° / \${d.lo}°</div>
+          \`;
+          forecastEl.appendChild(div);
+        });
+      };
+
+      loadBtn.addEventListener("click", () => {
+        const city = cityInput.value.trim() || "Austin";
+        temp.textContent = "72°";
+        summary.textContent = `Clear over ${city}`;
+        meta.textContent = "Feels 74° • Humidity 40%";
+        renderForecast(sampleDays);
+      });
+
+      renderForecast(sampleDays);
+    </script>
+  </body>
+</html>

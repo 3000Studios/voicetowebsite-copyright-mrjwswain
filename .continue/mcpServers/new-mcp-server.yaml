@@ -1,0 +1,14 @@
+name: Workspace MCP servers
+version: 1.0.0
+schema: v1
+mcpServers:
+  - name: project-context
+    command: node
+    args:
+      - C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\mcp-server-project.mjs
+    env: {}
+  - name: ui-commands
+    command: node
+    args:
+      - C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\mcp-server-ui-commands.mjs
+    env: {}

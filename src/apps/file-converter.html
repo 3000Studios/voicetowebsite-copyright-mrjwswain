@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Converter | VoiceToWebsite</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      :root {
+        --bg: #03060b;
+        --panel: rgba(255, 255, 255, 0.03);
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #00f2ff;
+        --text: #eaf2f8;
+        --muted: #9cb3c7;
+      }
+      body {
+        background:
+          radial-gradient(circle at 12% 12%, rgba(0, 242, 255, 0.12), transparent 30%),
+          radial-gradient(circle at 80% 0%, rgba(255, 0, 189, 0.08), transparent 35%), var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 32px;
+        min-height: 100vh;
+      }
+      .shell {
+        max-width: 960px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        display: grid;
+        gap: 12px;
+      }
+      .section-title {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .drop {
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        border-radius: 14px;
+        padding: 30px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      input,
+      select {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 12px;
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #00f2ff, #00b8e6);
+        color: #041018;
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div
+        style="
+          display: inline-flex;
+          gap: 8px;
+          padding: 10px 14px;
+          border-radius: 999px;
+          background: rgba(0, 242, 255, 0.14);
+          border: 1px solid rgba(0, 242, 255, 0.35);
+          color: var(--accent);
+          font-weight: 800;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        "
+      >
+        File Converter
+      </div>
+      <h1 style="margin: 12px 0 6px; font-size: 2rem; font-weight: 900">Convert files and push into VoiceToWebsite</h1>
+      <p style="color: var(--muted)">Drop files, choose a target format, and get an instant download link.</p>
+
+      <div class="card">
+        <div class="section-title">Upload</div>
+        <div class="drop" id="drop">Drop file here or pick below</div>
+        <input id="file" type="file" />
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+          <div>
+            <label for="from">From</label>
+            <select id="from">
+              <option>PDF</option>
+              <option>DOCX</option>
+              <option>PNG</option>
+              <option>JPG</option>
+            </select>
+          </div>
+          <div>
+            <label for="to">To</label>
+            <select id="to">
+              <option>PNG</option>
+              <option>JPG</option>
+              <option>PDF</option>
+              <option>TXT</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="convert" type="button">Convert</button>
+        <div id="result" style="color: var(--muted)"></div>
+      </div>
+    </main>
+
+    <script>
+      const drop = document.getElementById("drop");
+      const fileInput = document.getElementById("file");
+      const convert = document.getElementById("convert");
+      const result = document.getElementById("result");
+      const from = document.getElementById("from");
+      const to = document.getElementById("to");
+
+      let fileName = null;
+
+      const setFile = (name) => {
+        fileName = name;
+        drop.textContent = `Selected: ${name}`;
+      };
+
+      drop.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        drop.style.borderColor = "rgba(0,242,255,0.6)";
+      });
+      drop.addEventListener("dragleave", () => {
+        drop.style.borderColor = "rgba(255,255,255,0.2)";
+      });
+      drop.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const f = e.dataTransfer.files[0];
+        if (f) setFile(f.name);
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        const f = e.target.files[0];
+        if (f) setFile(f.name);
+      });
+
+      convert.addEventListener("click", () => {
+        if (!fileName) {
+          result.textContent = "Pick a file to convert.";
+          return;
+        }
+        result.textContent = `${fileName} → ${to.value.toLowerCase()} ready. Click to copy link.`;
+      });
+    </script>
+  </body>
+</html>

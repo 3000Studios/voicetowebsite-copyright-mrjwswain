@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics Dashboard - VoiceToWebsite App</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .app-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+      .metric-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #00ff88;
+        margin: 0.5rem 0;
+      }
+      .metric-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+      }
+      .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .date-range {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        align-items: center;
+      }
+      .btn {
+        background: linear-gradient(45deg, #00ff88, #00cc6a);
+        color: black;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .input-field {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        padding: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>📊 Analytics Dashboard</h1>
+        <p>Real-time website performance metrics</p>
+      </header>
+
+      <div class="date-range">
+        <input type="date" id="startDate" class="input-field" value="2024-01-01" />
+        <span>to</span>
+        <input type="date" id="endDate" class="input-field" value="2024-12-31" />
+        <button class="btn" onclick="updateDashboard()">Update</button>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="metric-card">
+          <h3>Total Visitors</h3>
+          <div class="metric-value" id="totalVisitors">24,567</div>
+          <div class="metric-label">+12.5% from last period</div>
+        </div>
+
+        <div class="metric-card">
+          <h3>Page Views</h3>
+          <div class="metric-value" id="pageViews">89,234</div>
+          <div class="metric-label">+8.3% from last period</div>
+        </div>
+
+        <div class="metric-card">
+          <h3>Bounce Rate</h3>
+          <div class="metric-value" id="bounceRate">32.4%</div>
+          <div class="metric-label">-2.1% from last period</div>
+        </div>
+
+        <div class="metric-card">
+          <h3>Avg. Session Duration</h3>
+          <div class="metric-value" id="avgDuration">3:42</div>
+          <div class="metric-label">+18 seconds from last period</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="chart-container">
+          <h3>Traffic Overview</h3>
+          <canvas id="trafficChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+          <h3>Device Breakdown</h3>
+          <canvas id="deviceChart"></canvas>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="chart-container">
+          <h3>Top Pages</h3>
+          <div id="topPages">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+              "
+            >
+              <span>/home</span><span>12,345 views</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+              "
+            >
+              <span>/products</span><span>8,901 views</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+              "
+            >
+              <span>/about</span><span>6,789 views</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0">
+              <span>/contact</span><span>4,567 views</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <h3>Traffic Sources</h3>
+          <canvas id="sourceChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Traffic Chart
+      const trafficCtx = document.getElementById("trafficChart").getContext("2d");
+      new Chart(trafficCtx, {
+        type: "line",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          datasets: [
+            {
+              label: "Visitors",
+              data: [3200, 3800, 4200, 4100, 4500, 4800],
+              borderColor: "#00ff88",
+              backgroundColor: "rgba(0, 255, 136, 0.1)",
+              tension: 0.4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "white" } } },
+          scales: {
+            x: { ticks: { color: "white" }, grid: { color: "rgba(255,255,255,0.1)" } },
+            y: { ticks: { color: "white" }, grid: { color: "rgba(255,255,255,0.1)" } },
+          },
+        },
+      });
+
+      // Device Chart
+      const deviceCtx = document.getElementById("deviceChart").getContext("2d");
+      new Chart(deviceCtx, {
+        type: "doughnut",
+        data: {
+          labels: ["Desktop", "Mobile", "Tablet"],
+          datasets: [
+            {
+              data: [55, 35, 10],
+              backgroundColor: ["#00ff88", "#00cc6a", "#009944"],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "white" } } },
+        },
+      });
+
+      // Source Chart
+      const sourceCtx = document.getElementById("sourceChart").getContext("2d");
+      new Chart(sourceCtx, {
+        type: "bar",
+        data: {
+          labels: ["Organic", "Direct", "Social", "Referral", "Email"],
+          datasets: [
+            {
+              label: "Visitors",
+              data: [8500, 6200, 4800, 3100, 1967],
+              backgroundColor: "#00ff88",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "white" } } },
+          scales: {
+            x: { ticks: { color: "white" }, grid: { color: "rgba(255,255,255,0.1)" } },
+            y: { ticks: { color: "white" }, grid: { color: "rgba(255,255,255,0.1)" } },
+          },
+        },
+      });
+
+      function updateDashboard() {
+        // Simulate data update
+        const metrics = {
+          totalVisitors: Math.floor(Math.random() * 10000) + 20000,
+          pageViews: Math.floor(Math.random() * 20000) + 80000,
+          bounceRate: (Math.random() * 10 + 30).toFixed(1) + "%",
+          avgDuration: Math.floor(Math.random() * 60) + 180 + "s",
+        };
+
+        Object.keys(metrics).forEach((key) => {
+          const element = document.getElementById(key);
+          if (element) {
+            element.textContent = metrics[key];
+          }
+        });
+
+        alert("Dashboard updated with fresh data!");
+      }
+
+      // Auto-refresh every 30 seconds
+      setInterval(() => {
+        updateDashboard();
+      }, 30000);
+    </script>
+  </body>
+</html>

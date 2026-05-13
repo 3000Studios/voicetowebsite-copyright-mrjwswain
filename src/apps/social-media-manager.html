@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Social Media Manager - VoiceToWebsite App</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        min-height: 100vh;
+        color: white;
+      }
+      .social-form {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .post-preview {
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+      .platform-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .tab {
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .tab.active {
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+      }
+      .btn {
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: transform 0.2s;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .input-field {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        margin: 0.5rem 0;
+      }
+      .input-field::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .char-count {
+        text-align: right;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .media-preview {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>📱 Social Media Manager</h1>
+        <p>Create and schedule posts across multiple platforms</p>
+      </header>
+
+      <main>
+        <section class="social-form">
+          <h2>Create Your Post</h2>
+
+          <div class="platform-tabs">
+            <button class="tab active" data-platform="twitter">Twitter/X</button>
+            <button class="tab" data-platform="facebook">Facebook</button>
+            <button class="tab" data-platform="instagram">Instagram</button>
+            <button class="tab" data-platform="linkedin">LinkedIn</button>
+            <button class="tab" data-platform="tiktok">TikTok</button>
+          </div>
+
+          <form id="socialForm">
+            <div>
+              <label for="platform">Platform:</label>
+              <select id="platform" class="input-field">
+                <option value="twitter">Twitter/X</option>
+                <option value="facebook">Facebook</option>
+                <option value="instagram">Instagram</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="tiktok">TikTok</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="content">Post Content:</label>
+              <textarea
+                id="content"
+                class="input-field"
+                placeholder="Write your post content here..."
+                rows="4"
+                maxlength="280"
+              ></textarea>
+              <div class="char-count" id="charCount">0/280</div>
+            </div>
+
+            <div>
+              <label for="hashtags">Hashtags (comma-separated):</label>
+              <input type="text" id="hashtags" class="input-field" placeholder="#tech #innovation #future" />
+            </div>
+
+            <div>
+              <label for="media">Media URL (optional):</label>
+              <input type="url" id="media" class="input-field" placeholder="https://example.com/image.jpg" />
+            </div>
+
+            <div>
+              <label for="schedule">Schedule Post:</label>
+              <input type="datetime-local" id="schedule" class="input-field" />
+            </div>
+
+            <div>
+              <label for="tone">Tone:</label>
+              <select id="tone" class="input-field">
+                <option value="professional">Professional</option>
+                <option value="casual">Casual</option>
+                <option value="enthusiastic">Enthusiastic</option>
+                <option value="humorous">Humorous</option>
+                <option value="inspirational">Inspirational</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn">Create Post</button>
+          </form>
+        </section>
+
+        <section id="preview" class="post-preview" style="display: none">
+          <h3>Post Preview</h3>
+          <div id="platformPreview"></div>
+          <div id="postContent"></div>
+          <img id="mediaPreview" class="media-preview" style="display: none" />
+          <div id="hashtagsPreview"></div>
+          <div id="scheduleInfo"></div>
+
+          <button id="editBtn" class="btn">Edit Post</button>
+          <button id="scheduleBtn" class="btn">Schedule Now</button>
+          <button id="postNowBtn" class="btn">Post Immediately</button>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const platformLimits = {
+        twitter: 280,
+        facebook: 5000,
+        instagram: 2200,
+        linkedin: 3000,
+        tiktok: 150,
+      };
+
+      // Platform tabs
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          document.getElementById("platform").value = tab.dataset.platform;
+          updateCharLimit();
+        });
+      });
+
+      // Update character count
+      const contentField = document.getElementById("content");
+      const charCount = document.getElementById("charCount");
+
+      contentField.addEventListener("input", updateCharLimit);
+      document.getElementById("platform").addEventListener("change", updateCharLimit);
+
+      function updateCharLimit() {
+        const platform = document.getElementById("platform").value;
+        const limit = platformLimits[platform];
+        const current = contentField.value.length;
+
+        charCount.textContent = `${current}/${limit}`;
+        contentField.maxLength = limit;
+
+        if (current > limit * 0.9) {
+          charCount.style.color = "#ff6b6b";
+        } else if (current > limit * 0.7) {
+          charCount.style.color = "#ffd93d";
+        } else {
+          charCount.style.color = "rgba(255, 255, 255, 0.7)";
+        }
+      }
+
+      // Form submission
+      document.getElementById("socialForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = {
+          platform: document.getElementById("platform").value,
+          content: document.getElementById("content").value,
+          hashtags: document.getElementById("hashtags").value,
+          media: document.getElementById("media").value,
+          schedule: document.getElementById("schedule").value,
+          tone: document.getElementById("tone").value,
+        };
+
+        showPreview(formData);
+      });
+
+      function showPreview(data) {
+        const platformIcons = {
+          twitter: "🐦",
+          facebook: "📘",
+          instagram: "📷",
+          linkedin: "💼",
+          tiktok: "🎵",
+        };
+
+        document.getElementById("platformPreview").innerHTML =
+          `<strong>${platformIcons[data.platform]} ${data.platform.charAt(0).toUpperCase() + data.platform.slice(1)}</strong>`;
+
+        document.getElementById("postContent").innerHTML = `<p>${data.content}</p>`;
+
+        const hashtags = data.hashtags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag);
+        document.getElementById("hashtagsPreview").innerHTML =
+          hashtags.length > 0 ? `<p style="color: #3b82f6;">${hashtags.join(" ")}</p>` : "";
+
+        if (data.media) {
+          document.getElementById("mediaPreview").src = data.media;
+          document.getElementById("mediaPreview").style.display = "block";
+        } else {
+          document.getElementById("mediaPreview").style.display = "none";
+        }
+
+        if (data.schedule) {
+          const scheduleDate = new Date(data.schedule);
+          document.getElementById("scheduleInfo").innerHTML =
+            `<p><em>Scheduled for: ${scheduleDate.toLocaleString()}</em></p>`;
+        } else {
+          document.getElementById("scheduleInfo").innerHTML = "<p><em>Ready to post immediately</em></p>";
+        }
+
+        document.getElementById("preview").style.display = "block";
+      }
+
+      // Button actions
+      document.getElementById("editBtn").addEventListener("click", () => {
+        document.getElementById("preview").style.display = "none";
+      });
+
+      document.getElementById("scheduleBtn").addEventListener("click", () => {
+        alert("Post scheduled successfully! (Demo mode)");
+        document.getElementById("socialForm").reset();
+        document.getElementById("preview").style.display = "none";
+      });
+
+      document.getElementById("postNowBtn").addEventListener("click", () => {
+        alert("Post published successfully! (Demo mode)");
+        document.getElementById("socialForm").reset();
+        document.getElementById("preview").style.display = "none";
+      });
+
+      // Initialize
+      updateCharLimit();
+    </script>
+  </body>
+</html>

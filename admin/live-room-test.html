@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Room WebSocket Test — VoiceToWebsite</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+    <script src="/admin/access-guard.js" type="module" defer></script>
+    <style>
+      .live-test {
+        max-width: 36rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        font-family: system-ui, sans-serif;
+      }
+      .live-test h1 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+      .live-test .muted {
+        color: #666;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+      }
+      .live-test label {
+        display: block;
+        margin-top: 0.75rem;
+        font-weight: 500;
+      }
+      .live-test input,
+      .live-test select {
+        width: 100%;
+        padding: 0.5rem;
+        margin-top: 0.25rem;
+        box-sizing: border-box;
+      }
+      .live-test button {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+      }
+      .live-test #status {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 4px;
+        min-height: 2rem;
+      }
+      .live-test #status.connected {
+        background: #d4edda;
+        color: #155724;
+      }
+      .live-test #status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .live-test #status.idle {
+        background: #e2e3e5;
+        color: #383d41;
+      }
+      .live-test #log {
+        margin-top: 1rem;
+        max-height: 12rem;
+        overflow-y: auto;
+        font-size: 0.8rem;
+        font-family: monospace;
+        white-space: pre-wrap;
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="live-test">
+      <h1>Live Room WebSocket Test</h1>
+      <p class="muted">
+        Verify connection to the Live Room Durable Object. Set token in Worker secrets (e.g. LIVE_ROOM_VIEWER_TOKEN or
+        CONTROL_PASSWORD).
+      </p>
+      <label for="role">Role</label>
+      <select id="role">
+        <option value="viewer">viewer</option>
+        <option value="host">host</option>
+      </select>
+      <label for="token">Token (required)</label>
+      <input type="password" id="token" placeholder="Paste viewer or host token" autocomplete="off" />
+      <button type="button" id="connect">Connect</button>
+      <button type="button" id="disconnect" disabled>Disconnect</button>
+      <div id="status" class="idle">Idle. Enter token and click Connect.</div>
+      <div id="log"></div>
+    </div>
+    <script>
+      (function () {
+        const roleEl = document.getElementById("role");
+        const tokenEl = document.getElementById("token");
+        const connectBtn = document.getElementById("connect");
+        const disconnectBtn = document.getElementById("disconnect");
+        const statusEl = document.getElementById("status");
+        const logEl = document.getElementById("log");
+
+        let ws = null;
+
+        function log(msg) {
+          const line = new Date().toISOString().slice(11, 19) + " " + msg;
+          logEl.textContent = (logEl.textContent ? logEl.textContent + "\n" : "") + line;
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function setStatus(text, className) {
+          statusEl.textContent = text;
+          statusEl.className = className || "idle";
+        }
+
+        function connect() {
+          const token = (tokenEl.value || "").trim();
+          if (!token) {
+            setStatus("Enter a token (e.g. CONTROL_PASSWORD or LIVE_ROOM_VIEWER_TOKEN).", "error");
+            return;
+          }
+          const role = (roleEl.value || "viewer").trim();
+          const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
+          const url =
+            scheme +
+            "//" +
+            window.location.host +
+            "/api/live/ws?role=" +
+            encodeURIComponent(role) +
+            "&token=" +
+            encodeURIComponent(token);
+          setStatus("Connecting…", "idle");
+          log("Connecting to " + url.replace(token, "***"));
+          try {
+            ws = new WebSocket(url);
+          } catch (e) {
+            setStatus("Error: " + e.message, "error");
+            log("Error: " + e.message);
+            return;
+          }
+          ws.onopen = function () {
+            setStatus("Connected as " + role + ".", "connected");
+            log("Connected.");
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+          };
+          ws.onmessage = function (ev) {
+            try {
+              const data = JSON.parse(ev.data);
+              log("← " + JSON.stringify(data));
+            } catch (_) {
+              log("← " + ev.data);
+            }
+          };
+          ws.onclose = function (ev) {
+            setStatus(
+              "Disconnected. " + (ev.code !== 1000 ? "Code: " + ev.code + " " + (ev.reason || "") : ""),
+              "idle"
+            );
+            log("Closed: " + ev.code + " " + (ev.reason || ""));
+            ws = null;
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+          };
+          ws.onerror = function () {
+            setStatus("WebSocket error.", "error");
+            log("WebSocket error.");
+          };
+        }
+
+        function disconnect() {
+          if (ws) {
+            ws.close(1000);
+            ws = null;
+          }
+          connectBtn.disabled = false;
+          disconnectBtn.disabled = true;
+        }
+
+        connectBtn.addEventListener("click", connect);
+        disconnectBtn.addEventListener("click", disconnect);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoiceToWebsite Command Center OS</title>
+    <meta name="description" content="VoiceToWebsite single-brand admin command center operating shell" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+    <link rel="stylesheet" href="/admin/ccos.css" />
+    <script src="/admin/access-guard.js" type="module"></script>
+    <script src="/admin/ccos.js" type="module" defer></script>
+  </head>
+  <body class="ccos-body">
+    <div class="ccos-layout" id="ccos-root">
+      <aside id="sidebar" aria-label="Dashboard Navigation">
+        <div class="ccos-brand">
+          <strong>VoiceToWebsite</strong>
+          <span>Command Center OS</span>
+        </div>
+        <nav class="ccos-nav" id="ccos-nav">
+          <button type="button" data-route="/admin/mission" class="ccos-nav-item">Mission Control</button>
+          <button type="button" data-route="/admin/cc" class="ccos-nav-item">Command Center</button>
+          <button type="button" data-route="/admin/vcc" class="ccos-nav-item">Voice Command Center</button>
+          <button type="button" data-route="/admin/monetization" class="ccos-nav-item">Monetization</button>
+          <button type="button" data-route="/admin/analytics" class="ccos-nav-item">Analytics</button>
+          <button type="button" data-route="/admin/live" class="ccos-nav-item">Live Manager</button>
+          <button type="button" data-route="/admin/store" class="ccos-nav-item">Store Manager</button>
+          <button type="button" data-route="/admin/ui-generator" class="ccos-nav-item">UI Generator</button>
+          <button type="button" data-route="/admin/media" class="ccos-nav-item">Media Library</button>
+          <button type="button" data-route="/admin/audio" class="ccos-nav-item">Audio Library</button>
+          <button type="button" data-route="/admin/settings" class="ccos-nav-item">Settings</button>
+        </nav>
+      </aside>
+
+      <main class="ccos-main">
+        <header id="topbar">
+          <div>
+            <p class="ccos-label">Single Brand Operations</p>
+            <h1 id="ccos-title">Mission Control</h1>
+          </div>
+          <div class="ccos-top-actions">
+            <button type="button" id="deploy-button">Deploy</button>
+          </div>
+        </header>
+
+        <section id="dashboard-content" aria-live="polite"></section>
+
+        <section id="deploy-rail" aria-label="Deploy status and logs">
+          <div class="deploy-rail-header">
+            <h2>Deploy Rail</h2>
+            <button type="button" id="refresh-deploy-logs">Refresh Logs</button>
+          </div>
+          <div class="deploy-rail-status" id="deploy-rail-status">Idle</div>
+          <pre class="deploy-rail-logs" id="deploy-rail-logs">No deployment logs yet.</pre>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

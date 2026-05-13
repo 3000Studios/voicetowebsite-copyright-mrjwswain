@@ -1,0 +1,22 @@
+{
+  "pointers": [
+    "/content/hero/headline",
+    "/content/hero/subheadline",
+    "/content/hero/cta/label",
+    "/content/hero/cta/href",
+    "/seo/title",
+    "/seo/description",
+    "/nav/main/*/label",
+    "/nav/main/*/route",
+    "/nav/footer/*/label",
+    "/nav/footer/*/route",
+    "/materials/*",
+    "/adsense/enabled",
+    "/adsense/clientId",
+    "/adsense/slots/*",
+    "/affiliates/amazonTag",
+    "/affiliates/impactId",
+    "/affiliates/shareasaleId",
+    "/affiliates/cjId"
+  ]
+}
