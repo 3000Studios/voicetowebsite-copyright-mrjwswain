@@ -11,8 +11,8 @@ const state = {
   testimonialsVisible: true,
 };
 // Bump the storage key to flush stale cached values (CTA was blank for some users).
-const storageKey = "youtuneai-state-v2";
-const controlKey = "youtuneai-control-unlocked";
+const storageKey = "voicetowebsite-state-v2";
+const controlKey = "voicetowebsite-control-unlocked";
 const controlPassword =
   window.__ENV && window.__ENV.CONTROL_PASSWORD
     ? window.__ENV.CONTROL_PASSWORD

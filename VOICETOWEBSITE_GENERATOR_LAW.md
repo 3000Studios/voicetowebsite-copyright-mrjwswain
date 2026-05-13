@@ -10,8 +10,8 @@ This document is mandatory project law for VoiceToWebsite.com.
 - The only deployment path is Cloudflare Wrangler.
 - GitHub deployment and GitHub Actions production deployment are not allowed.
 - The only production domains are `voicetowebsite.com` and `www.voicetowebsite.com`.
-- No Netlify deployment, Netlify configuration, Netlify route, or Netlify branding is allowed.
-- No YoutuneAI identity, copy, project name, deployment target, route, storage key, or branding is allowed.
+- No legacy deployment provider deployment, legacy deployment provider configuration, legacy deployment provider route, or legacy deployment provider branding is allowed.
+- No voicetowebsite identity, copy, project name, deployment target, route, storage key, or branding is allowed.
 
 ## Mission
 
@@ -231,10 +231,10 @@ Allowed commands:
 
 Not allowed:
 
-- GitHub Actions deployment.
-- GitHub Pages deployment.
-- GitHub-based production deploy dependency.
-- Netlify deployment.
+- repository-hosted CI deployment.
+- repository-hosted static hosting.
+- repository-hosted production deploy dependency.
+- legacy deployment provider deployment.
 - Any production domain except `voicetowebsite.com` and `www.voicetowebsite.com`.
 
 ## Final Never Rules

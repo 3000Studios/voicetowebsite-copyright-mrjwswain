@@ -23,7 +23,7 @@ Use this as the working draft for counsel. Do not distribute without written per
 - Client: Admin console with speech-to-text, plan/apply, iframe preview, and history.
 - Orchestrator (Cloudflare Worker): AI planning (OpenAI), action execution on repo files, Git commit
   to `main`, CI auto-deploy via Wrangler.
-- Targets: Static HTML/CSS/JS bundle (Vite), Cloudflare Worker routes (youtuneai.com/\*), D1 + KV
+- Targets: Static HTML/CSS/JS bundle (Vite), Cloudflare Worker routes (voicetowebsite.com/\*), D1 + KV
   logging.
 
 ## System architecture
@@ -45,7 +45,7 @@ Use this as the working draft for counsel. Do not distribute without written per
 3. Apply: fetches repo files (app.js, index.html, styles.css, new pages), mutates according to
    actions, commits directly to `main` via GitHub API.
 4. CI: GitHub Actions auto-runs build + `wrangler deploy` to Cloudflare, updating worker + assets.
-5. Runtime: `app.js` state hydrates UI; new storage key `youtuneai-state-v2` flushes stale local
+5. Runtime: `app.js` state hydrates UI; new storage key `voicetowebsite-state-v2` flushes stale local
    data.
 
 ## Differentiators (novel points)

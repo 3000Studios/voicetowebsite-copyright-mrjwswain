@@ -282,7 +282,7 @@ const buildItems = (env) => {
       ],
       details: [
         "Single deploy path is `npm run deploy:live`.",
-        "GitHub Actions deployment is intentionally not the source of truth.",
+        "repository-hosted CI deployment is intentionally not the source of truth.",
       ],
       links: [],
     },

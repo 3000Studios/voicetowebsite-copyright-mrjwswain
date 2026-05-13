@@ -252,7 +252,7 @@ OR use a simpler approach:
 
 From `AGENTS.md`:
 
-> "GitHub Actions deployment is intentionally disabled for this repo. Production deploy is performed
+> "repository-hosted CI deployment is intentionally disabled for this repo. Production deploy is performed
 > via local `wrangler deploy` (`npm run deploy`), typically driven by `npm run auto:ship`."
 
 This is by design for safety. The project requires explicit local deployment.

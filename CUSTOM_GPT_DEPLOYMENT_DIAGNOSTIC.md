@@ -16,7 +16,7 @@ Your Custom GPT is getting stuck in a queue because:
    - Result: "queued" status that never completes
 
 3. **GitHub Actions disabled**
-   - `AGENTS.md` states: "GitHub Actions deployment is intentionally disabled"
+   - `AGENTS.md` states: "repository-hosted CI deployment is intentionally disabled"
    - Deployment MUST be local: `npm run deploy`
    - Custom GPT webhook can't run local commands
    - Result: Commands queue but never trigger build pipeline
