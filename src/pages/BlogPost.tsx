@@ -39,7 +39,7 @@ export const BlogPost = () => {
     try {
       const response = await fetch(`/api/blog/posts/${slug}`);
       if (response.ok) {
-        const data = await parseResponse<{ post: BlogPost; related: BlogPost[] };
+        const data = await parseResponse<{ post: BlogPost; related: BlogPost[] }>(response);
         setPost(data.post);
         setRelatedPosts(data.related || []);
       } else {

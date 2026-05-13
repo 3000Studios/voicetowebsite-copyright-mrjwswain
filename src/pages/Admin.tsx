@@ -73,7 +73,7 @@ export const Admin = () => {
           "x-owner-email": String(user?.email || "").trim().toLowerCase(),
         },
       });
-      const data = (await parseResponse<{ rows?: OrderRow[] };
+      const data = await parseResponse<{ rows?: OrderRow[] }>(res);
       setOrders(data.rows || []);
     } catch {
       setOrders([]);

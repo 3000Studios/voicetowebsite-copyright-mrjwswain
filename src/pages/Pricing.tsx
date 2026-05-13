@@ -33,7 +33,7 @@ export const Pricing = () => {
       const query = new URLSearchParams({ plan, cadence, launch_discount: "true" }).toString();
       const response = await fetch(`${endpoint}?${query}`, { method: "POST" });
       trackEvent("checkout_started", { plan, provider, cadence });
-      const data = (await parseResponse<{ url?: string; error?: string };
+      const data = await parseResponse<{ url?: string; error?: string }>(response);
 
       if (!response.ok || !data.url) {
         if (provider === "stripe") {

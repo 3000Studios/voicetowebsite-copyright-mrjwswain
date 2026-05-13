@@ -1,11 +1,11 @@
 import {
-import { parseResponse, ApiError } from "../lib/api";
   ArrowRight,
   CheckCircle2,
   ExternalLink,
   LoaderCircle,
   ShieldCheck,
 } from "lucide-react";
+import { parseResponse } from "../lib/api";
 import { motion } from "motion/react";
 import React, { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
