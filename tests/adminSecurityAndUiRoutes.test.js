@@ -137,6 +137,8 @@ describe("Admin UI route guarding + critical admin endpoints", () => {
     expect(res.status).toBe(200);
     const body = await res.text();
     expect(body).toContain("Open admin dashboard");
+    expect(body).toContain('src="/admin/access.js"');
+    expect(body).not.toContain("form.addEventListener");
   });
 
   it("normalizes clean public admin auth routes", async () => {

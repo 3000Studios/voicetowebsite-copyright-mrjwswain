@@ -1,14 +1,32 @@
-name: Workspace MCP servers
-version: 1.0.0
+name: VoiceToWebsite MCP servers
+version: 1.1.0
 schema: v1
 mcpServers:
-  - name: project-context
-    command: node
+  - name: memory
+    command: pwsh.exe
     args:
-      - C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\mcp-server-project.mjs
+      - -NoLogo
+      - -NoProfile
+      - -File
+      - C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\scripts\continue-mcp-memory.ps1
+    cwd: C:\WorkSpaces\voicetowebsite-copyright-mrjwswain
+    env: {}
+  - name: project-context
+    command: pwsh.exe
+    args:
+      - -NoLogo
+      - -NoProfile
+      - -File
+      - C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\scripts\continue-mcp-project.ps1
+    cwd: C:\WorkSpaces\voicetowebsite-copyright-mrjwswain
     env: {}
   - name: ui-commands
-    command: node
+    command: pwsh.exe
     args:
-      - C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\mcp-server-ui-commands.mjs
-    env: {}
+      - -NoLogo
+      - -NoProfile
+      - -File
+      - C:\WorkSpaces\voicetowebsite-copyright-mrjwswain\scripts\continue-mcp-ui-commands.ps1
+    cwd: C:\WorkSpaces\voicetowebsite-copyright-mrjwswain
+    env:
+      VTW_SITE_ORIGIN: https://voicetowebsite.com

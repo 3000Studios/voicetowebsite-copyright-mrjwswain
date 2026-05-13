@@ -445,6 +445,82 @@
             "type": "string",
             "description": "Trace identifier for request correlation."
           },
+          "ok": {
+            "type": "boolean",
+            "description": "True only when the server completed the requested action without an execution error."
+          },
+          "execution": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Server-generated execution proof. Clients should report this block verbatim instead of inventing success text.",
+            "properties": {
+              "requestedAction": {
+                "type": "string"
+              },
+              "mode": {
+                "type": "string",
+                "description": "Normalized execution state such as preview_only, applied, deployed, read, status, rolled_back, or error."
+              },
+              "verified": {
+                "type": "boolean",
+                "description": "True only when the backend actually executed the request."
+              },
+              "message": {
+                "type": "string"
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "changedFiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "changedFileCount": {
+                "type": "integer"
+              },
+              "deployment": {
+                "type": ["object", "null"],
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "deploymentId": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              },
+              "traceId": {
+                "type": "string"
+              },
+              "eventId": {
+                "type": "string"
+              },
+              "idempotencyKey": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "requestedAction",
+              "mode",
+              "verified",
+              "message",
+              "steps",
+              "changedFiles",
+              "changedFileCount",
+              "traceId",
+              "eventId",
+              "idempotencyKey"
+            ]
+          },
           "eventType": {
             "type": "string",
             "enum": [
@@ -476,7 +552,7 @@
             "description": "Error details for failed actions."
           }
         },
-        "required": ["eventId", "timestamp", "traceId", "eventType", "action"]
+        "required": ["eventId", "timestamp", "traceId", "ok", "execution", "eventType", "action"]
       },
       "ErrorResponse": {
         "type": "object",

@@ -1,37 +1,44 @@
+name: VoiceToWebsite Workspace
+version: 1.2.0
+schema: v1
+
 models:
-  # Free-first local profile (Ollama)
-  - title: Qwen2.5 Coder 7B (Local Free)
+  - name: local-fast-code
     provider: ollama
     model: qwen2.5-coder:7b
     apiBase: http://localhost:11434
 
-  - title: Llama 3.2 3B (Local Free Chat)
+  - name: local-chat
     provider: ollama
     model: llama3.2:3b
     apiBase: http://localhost:11434
 
-  - title: Nomic Embed (Local Free)
+  - name: local-deep-code
+    provider: ollama
+    model: qwen2.5-coder:14b
+    apiBase: http://localhost:11434
+
+  - name: local-embed
     provider: ollama
     model: nomic-embed-text
     apiBase: http://localhost:11434
 
-  # Optional BYO-API profile (enable in Continue UI if you add keys)
-  - title: OpenAI GPT-4o Mini (BYO API)
+  - name: openai-fallback
     provider: openai
     model: gpt-4o-mini
     apiKey: ${OPENAI_API}
 
 chat:
-  model: Llama 3.2 3B (Local Free Chat)
+  model: local-chat
 
 autocomplete:
-  model: Qwen2.5 Coder 7B (Local Free)
+  model: local-fast-code
 
 edit:
-  model: Qwen2.5 Coder 7B (Local Free)
+  model: local-fast-code
 
 apply:
-  model: Qwen2.5 Coder 7B (Local Free)
+  model: local-fast-code
 
 embed:
   provider: ollama
@@ -45,6 +52,6 @@ rerank:
 
 agent:
   enabled: true
-  maxIterations: 8
-  temperature: 0.2
-  model: Qwen2.5 Coder 7B (Local Free)
+  maxIterations: 24
+  temperature: 0.15
+  model: local-fast-code

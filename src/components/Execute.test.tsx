@@ -192,7 +192,10 @@ describe("/api/execute", () => {
     expect(lastOrchestratorPayload?.mode).toBe("plan");
 
     const body = await response.json();
+    expect(body.ok).toBe(true);
     expect(body.eventType).toBe("previewed");
+    expect(body.execution.mode).toBe("preview_only");
+    expect(body.execution.verified).toBe(true);
     expect(typeof body.result.confirmToken).toBe("string");
   });
 
@@ -284,7 +287,10 @@ describe("/api/execute", () => {
     expect(lastOrchestratorPayload?.confirmation).toBe("hell yeah ship it");
 
     const applyBody = await apply.json();
+    expect(applyBody.ok).toBe(true);
     expect(applyBody.eventType).toBe("applied");
+    expect(applyBody.execution.mode).toBe("applied");
+    expect(applyBody.execution.verified).toBe(true);
   });
 
   it("maps deploy action to orchestrator deploy mode", async () => {
@@ -319,7 +325,9 @@ describe("/api/execute", () => {
     expect(deploy.status).toBe(200);
     expect(lastOrchestratorPayload?.mode).toBe("deploy");
     const deployBody = await deploy.json();
+    expect(deployBody.ok).toBe(true);
     expect(deployBody.eventType).toBe("deployed");
+    expect(deployBody.execution.mode).toBe("deployed");
   });
 
   it("auto falls back to deploy when apply returns no supported changes", async () => {
@@ -369,8 +377,17 @@ describe("/api/execute", () => {
     expect(response.status).toBe(200);
     expect(modes).toEqual(["apply", "deploy"]);
     const body = await response.json();
+    expect(body.ok).toBe(true);
     expect(body.eventType).toBe("applied");
     expect(body.result.noChanges).toBe(true);
+    expect(body.execution.mode).toBe("deployed");
+    expect(body.execution.deployment).toMatchObject({
+      status: "queued",
+      deploymentId: "abc123",
+    });
+    expect(body.execution.deployment.message).toContain(
+      "No content delta was produced by apply"
+    );
     expect(body.result.steps).toEqual([
       "planned",
       "no_changes",
@@ -426,6 +443,8 @@ describe("/api/execute", () => {
 
     expect(deploy.status).toBe(200);
     const deployBody = await deploy.json();
+    expect(deployBody.ok).toBe(true);
     expect(deployBody.eventType).toBe("deployed");
+    expect(deployBody.execution.mode).toBe("deployed");
   });
 });

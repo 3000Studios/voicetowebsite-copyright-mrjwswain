@@ -36,6 +36,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ config }) => {
     imageAlt,
     extraImageUrls = [],
     extraImageAlts = [],
+    videoUrl,
     videoTitle,
     paragraphs,
     cards = [],
@@ -145,6 +146,47 @@ const ContentPage: React.FC<ContentPageProps> = ({ config }) => {
             </div>
           </article>
         </ScrollReveal>
+
+        {videoUrl && (
+          <ScrollReveal as="section" className="vtw-section" variant="fade">
+            <div
+              className="vtw-glass-card"
+              style={{ padding: "1.2rem", overflow: "hidden" }}
+            >
+              <div className="vtw-section-label">Video</div>
+              <h2
+                className="vtw-section-title"
+                style={{ margin: "0.5rem 0 0.8rem" }}
+              >
+                {videoTitle}
+              </h2>
+              <div
+                className="vtw-video-wrap"
+                style={{
+                  position: "relative",
+                  paddingBottom: "56.25%",
+                  height: 0,
+                }}
+              >
+                <iframe
+                  title={videoTitle}
+                  src={videoUrl}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                    borderRadius: "16px",
+                  }}
+                />
+              </div>
+            </div>
+          </ScrollReveal>
+        )}
 
         <ScrollReveal
           as="section"

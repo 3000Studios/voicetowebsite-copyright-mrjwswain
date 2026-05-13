@@ -405,6 +405,28 @@ textarea {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.vtw-app-cards-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.vtw-app-card {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.vtw-app-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0, 242, 255, 0.12);
+}
+
+.vtw-app-price {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
 .vtw-grid-auto {
   display: grid;
   gap: 1.5rem;

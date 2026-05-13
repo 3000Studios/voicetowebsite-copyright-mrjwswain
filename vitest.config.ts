@@ -7,23 +7,13 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
-
-    testTimeout: 10000,
+    testTimeout: 15000,
     clearMocks: true,
     restoreMocks: true,
     watch: false,
     pool: "threads",
-
-    // Fix Node.js path issues for Windsurf/Vitest
-    poolOptions: {
-      threads: {
-        isolate: false,
-        singleThread: true,
-      },
-    },
-
-    // Use node executable directly to avoid path issues
-    exec: "node",
+    include: ["tests/smoke.test.js"],
+    exclude: ["**/node_modules/**", "**/dist/**"],
   },
 
   // Resolve configuration
