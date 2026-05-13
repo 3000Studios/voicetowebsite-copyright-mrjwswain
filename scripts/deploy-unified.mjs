@@ -124,8 +124,8 @@ function run(name, cmd, args, opts = {}) {
   logStep(name, `Completed successfully in ${duration}ms`);
 
   // Log output for debugging (only in development)
-  // Fix: Use consistent environment detection
-  const isDevelopment = process.env.NODE_ENV === "development";
+  const isDevelopment =
+    process.env.NODE_ENV !== "production" && process.env.CI !== "true";
   if (isDevelopment && result.stdout) {
     logStep(name, `Output:\n${result.stdout.toString()}`);
   }
