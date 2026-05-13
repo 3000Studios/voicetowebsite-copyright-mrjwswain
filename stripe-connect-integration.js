@@ -695,13 +695,15 @@ app.post(
 
       console.log(`Processing webhook event: ${event.type}`);
 
+      const db = req.app.locals?.db;
+
       // Handle V2 account requirement changes (thin events)
       if (event.type.startsWith("v2.core.account")) {
         await handleV2AccountEvent(event);
       }
       // Handle subscription events
       else if (event.type.startsWith("customer.subscription")) {
-        await handleSubscriptionEvent(event);
+        await handleSubscriptionEvent(event, db);
       }
       // Handle payment method events
       else if (event.type.startsWith("payment_method")) {
@@ -780,7 +782,7 @@ async function handleV2AccountEvent(event) {
 /**
  * Handle Subscription Events
  */
-async function handleSubscriptionEvent(event) {
+async function handleSubscriptionEvent(event, db) {
   try {
     const subscription = event.data.object;
     const accountId = subscription.customer_account; // V2 accounts use customer_account
@@ -789,41 +791,50 @@ async function handleSubscriptionEvent(event) {
       `Processing subscription event: ${event.type} for account: ${accountId}`
     );
 
+    const subscriptionData = {
+      subscriptionId: subscription.id,
+      status: subscription.status,
+      current_period_end: subscription.current_period_end,
+      cancel_at_period_end: subscription.cancel_at_period_end,
+    };
+
     switch (event.type) {
       case "customer.subscription.updated":
         // Handle subscription updates (upgrades, downgrades, pauses)
         console.log(`Subscription updated: ${subscription.id}`);
 
-        // TODO: Update subscription status in database
-        // Check for quantity changes, plan changes, pause/resume
+        // Update database with new status/data
+        if (db) {
+          await dbOperations.setSubscription(db, accountId, subscriptionData);
+        }
         break;
 
       case "customer.subscription.deleted":
         // Handle subscription cancellation
         console.log(`Subscription deleted: ${subscription.id}`);
 
-        // TODO: Remove user access, update database
-        // Revoke access to products/services
+        // Update database (status will be 'canceled')
+        if (db) {
+          await dbOperations.setSubscription(db, accountId, subscriptionData);
+        }
         break;
 
       case "customer.subscription.created":
         // Handle new subscription
         console.log(`Subscription created: ${subscription.id}`);
 
-        // TODO: Grant access to products, update database
+        // Grant access to products, update database
+        if (db) {
+          await dbOperations.setSubscription(db, accountId, subscriptionData);
+        }
         break;
 
       default:
         console.log(`Unhandled subscription event: ${event.type}`);
     }
 
-    // Store subscription info in our database (replace with actual DB)
-    userSubscriptions.set(accountId, {
-      subscriptionId: subscription.id,
-      status: subscription.status,
-      current_period_end: subscription.current_period_end,
-      cancel_at_period_end: subscription.cancel_at_period_end,
-    });
+    // Store subscription info in our database (fallback for demo)
+    userSubscriptions.set(accountId, subscriptionData);
   } catch (error) {
     console.error("Error handling subscription event:", error);
   }
