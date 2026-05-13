@@ -1,5 +1,13 @@
 # VoiceToWebsite Agent Governance
 
+## Mandatory Project Law
+
+Before making changes, agents must read and follow `VOICETOWEBSITE_GENERATOR_LAW.md`.
+
+That file is the controlling source of truth for VoiceToWebsite.com product direction, repo identity, branch policy, Cloudflare Wrangler deployment, domain limits, generator quality standards, local/free generation requirements, monetization, SEO, accessibility, preview watermarking, logo/brand-kit/dashboard behavior, and final never/always rules.
+
+If any instruction conflicts with `VOICETOWEBSITE_GENERATOR_LAW.md`, stop and resolve the conflict before editing or deploying.
+
 ## Production Standard
 
 Every change in this repository is production-first. Work must result in real, working, user-visible outcomes with no dummy features, broken routes, placeholder assets, unfinished public experiences, or fake completion claims.
