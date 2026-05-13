@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Voicetowebsite operator preview</title>
+  <desc id="desc">Abstract dashboard style preview with charts, content blocks, and checkout controls.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#091120"/>
+      <stop offset="50%" stop-color="#121b35"/>
+      <stop offset="100%" stop-color="#0b1222"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff8a3d"/>
+      <stop offset="100%" stop-color="#5be7c4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" rx="48" fill="url(#bg)"/>
+  <circle cx="240" cy="180" r="180" fill="#ff8a3d" fill-opacity=".14"/>
+  <circle cx="1320" cy="760" r="220" fill="#5be7c4" fill-opacity=".12"/>
+  <rect x="92" y="96" width="1416" height="708" rx="32" fill="#0f1830" stroke="#2b335f"/>
+  <rect x="140" y="152" width="320" height="596" rx="24" fill="#131f3d" stroke="#31406f"/>
+  <rect x="516" y="152" width="420" height="280" rx="24" fill="#131f3d" stroke="#31406f"/>
+  <rect x="980" y="152" width="480" height="280" rx="24" fill="#131f3d" stroke="#31406f"/>
+  <rect x="516" y="472" width="944" height="276" rx="24" fill="#131f3d" stroke="#31406f"/>
+  <rect x="188" y="214" width="224" height="14" rx="7" fill="#5be7c4" fill-opacity=".82"/>
+  <rect x="188" y="252" width="196" height="10" rx="5" fill="#dde7fb" fill-opacity=".48"/>
+  <rect x="188" y="316" width="224" height="48" rx="18" fill="url(#accent)"/>
+  <rect x="188" y="398" width="224" height="10" rx="5" fill="#dde7fb" fill-opacity=".44"/>
+  <rect x="188" y="438" width="224" height="10" rx="5" fill="#dde7fb" fill-opacity=".32"/>
+  <rect x="188" y="478" width="224" height="10" rx="5" fill="#dde7fb" fill-opacity=".24"/>
+  <rect x="188" y="560" width="224" height="138" rx="18" fill="#0d1428"/>
+  <path d="M560 352c58-86 115-88 174-18s113 76 158-14" fill="none" stroke="url(#accent)" stroke-width="16" stroke-linecap="round"/>
+  <rect x="560" y="214" width="196" height="12" rx="6" fill="#dde7fb" fill-opacity=".8"/>
+  <rect x="560" y="246" width="140" height="10" rx="5" fill="#dde7fb" fill-opacity=".34"/>
+  <rect x="1028" y="214" width="232" height="12" rx="6" fill="#dde7fb" fill-opacity=".8"/>
+  <rect x="1028" y="246" width="300" height="10" rx="5" fill="#dde7fb" fill-opacity=".34"/>
+  <rect x="1028" y="306" width="150" height="78" rx="22" fill="#0d1428"/>
+  <rect x="1202" y="306" width="210" height="78" rx="22" fill="url(#accent)"/>
+  <rect x="560" y="532" width="380" height="14" rx="7" fill="#dde7fb" fill-opacity=".82"/>
+  <rect x="560" y="570" width="650" height="10" rx="5" fill="#dde7fb" fill-opacity=".34"/>
+  <rect x="560" y="612" width="844" height="88" rx="18" fill="#0d1428"/>
+  <rect x="1246" y="532" width="158" height="168" rx="28" fill="url(#accent)"/>
+</svg>

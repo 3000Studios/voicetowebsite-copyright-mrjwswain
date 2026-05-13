@@ -1,0 +1,42 @@
+{
+  "slug": "creator-course-kit",
+  "name": "Creator Course Kit",
+  "headline": "A creator storefront for selling a course, membership, or workshop offer",
+  "priceAnchor": "$99",
+  "stripeMode": "payment",
+  "stripePriceId": "price_1TL8WzGejm3JMan4y2BpZpVh",
+  "stripePaymentLink": "https://buy.stripe.com/14A5kDacZg1o6pi33AbAs06",
+  "idealFor": "Creators, coaches, educators, and audience-led businesses",
+  "description": "A productized creator site with launch narrative, curriculum highlights, social proof, and mobile-first purchase sections.",
+  "category": "app",
+  "badge": "Creator",
+  "deliveryType": "source_bundle",
+  "deliveryCopy": "Includes sales page sections, program modules, FAQ, and credibility blocks.",
+  "bullets": [
+    "Built to sell digital products with clearer story flow",
+    "Module sections, testimonials, and purchase CTA bands included",
+    "Works for cohorts, self-paced courses, and memberships"
+  ],
+  "sections": [
+    {
+      "title": "Story-led launch page",
+      "description": "The structure balances authority, aspiration, and practical details so the offer feels more credible."
+    },
+    {
+      "title": "Higher-trust conversion",
+      "description": "Buyers see what is included, why it matters, and what the next step is without hunting through long copy."
+    },
+    {
+      "title": "Easy to repurpose",
+      "description": "Swap the curriculum, testimonials, and media to create multiple creator offers from one system."
+    }
+  ],
+  "media": {
+    "eyebrow": "Creator demo",
+    "title": "A sales-page kit for audience-driven offers",
+    "body": "Ship a better course page, workshop funnel, or membership launch site without rebuilding every section by hand.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/store-creator-course.svg",
+    "imageUrl": "/media/store-creator-course.svg"
+  }
+}

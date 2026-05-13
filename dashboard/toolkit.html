@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voicetowebsite.com — toolkit</title>
+<meta name="description" content="Customer-facing AI Automation Toolkit with deployment templates, automation scripts, launch checklists, and growth-ready workflow assets.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#07101d;
+--text:#f6fbff;
+--muted:#b9c9da;
+--accent:#22f0ff;
+--panel:rgba(11,19,34,.76);
+--line:rgba(255,255,255,.08);
+}
+body{
+font-family:"Inter",sans-serif;
+background:radial-gradient(circle at top,#12213f 0%,#060a13 55%,#04060a 100%);
+color:var(--text);
+line-height:1.5;
+}
+main{
+width:min(1040px,100% - 32px);
+margin:0 auto;
+padding:32px 0 56px;
+}
+nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 20px;
+backdrop-filter:blur(16px);
+background:rgba(4,8,16,.6);
+border-bottom:1px solid var(--line);
+position:sticky;
+top:0;
+}
+.logo,.nav-link{
+text-decoration:none;
+color:var(--text);
+}
+.logo{
+font-family:"Orbitron",sans-serif;
+letter-spacing:.14em;
+color:var(--accent);
+}
+.hero,.panel{
+background:var(--panel);
+border:1px solid var(--line);
+border-radius:20px;
+padding:24px;
+box-shadow:0 20px 50px rgba(0,0,0,.24);
+}
+.hero h1,.panel h2{
+font-family:"Orbitron",sans-serif;
+}
+.hero h1{
+font-size:clamp(2rem,8vw,4rem);
+line-height:1.02;
+margin-bottom:16px;
+}
+.hero p,.panel p,.item p{
+color:var(--muted);
+}
+.cta{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+margin-top:22px;
+}
+.btn{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:14px 20px;
+border-radius:14px;
+text-decoration:none;
+font-weight:600;
+}
+.btn-primary{
+background:linear-gradient(135deg,var(--accent),#68f8ff);
+color:#021117;
+}
+.btn-secondary{
+background:rgba(255,255,255,.05);
+color:var(--text);
+border:1px solid var(--line);
+}
+.grid{
+display:grid;
+grid-template-columns:1fr;
+gap:18px;
+margin-top:20px;
+}
+.item{
+padding:18px;
+border-radius:16px;
+background:rgba(255,255,255,.04);
+border:1px solid var(--line);
+}
+.item strong,.price{
+display:block;
+font-family:"Orbitron",sans-serif;
+}
+.price{
+font-size:34px;
+color:var(--accent);
+margin:8px 0 12px;
+}
+ul{
+padding-left:18px;
+margin-top:12px;
+}
+li+li{
+margin-top:8px;
+}
+@media (min-width:800px){
+.grid{
+grid-template-columns:1.2fr .8fr;
+}
+}
+</style>
+</head>
+<body>
+<nav>
+<a class="logo" href="index.html">MYAPPAI</a>
+<a class="nav-link" href="index.html">Back to Landing</a>
+</nav>
+<main>
+<section class="hero">
+<h1>AI Automation Toolkit</h1>
+<p>A revenue-ready digital product for teams that want deployment templates, automation scripts, and growth workflows without spending weeks assembling the stack.</p>
+<div class="cta">
+<a class="btn btn-primary" href="https://buy.stripe.com/test_123">Buy the Toolkit</a>
+<a class="btn btn-secondary" href="#deliverables">View Deliverables</a>
+</div>
+</section>
+
+<section class="grid">
+<article class="panel" id="deliverables">
+<h2>What’s Included</h2>
+<div class="item">
+<strong>Deployment Templates</strong>
+<p>Cloudflare-ready build and deploy patterns for static launches, admin panels, and AI-assisted workflows.</p>
+</div>
+<div class="item">
+<strong>Automation Scripts</strong>
+<p>Starter scripts for content tasks, deployment flows, and repeatable build operations that teams can adapt quickly.</p>
+</div>
+<div class="item">
+<strong>Growth Assets</strong>
+<p>SEO-friendly page structures, pricing ideas, launch checklists, and customer-facing product positioning examples.</p>
+</div>
+</article>
+
+<aside class="panel">
+<h2>Offer Snapshot</h2>
+<div class="price">$49</div>
+<p>One-time purchase for founders, agencies, and operators building AI-assisted web products.</p>
+<ul>
+<li>Ready-to-adapt templates</li>
+<li>Workflow and deployment patterns</li>
+<li>Launch checklists for revenue pages</li>
+<li>Foundation for automation-led SaaS</li>
+</ul>
+<div class="cta">
+<a class="btn btn-primary" href="https://buy.stripe.com/test_123">Checkout</a>
+<a class="btn btn-secondary" href="../admin/jarvis.html">Admin Preview</a>
+</div>
+</aside>
+</section>
+</main>
+</body>
+</html>

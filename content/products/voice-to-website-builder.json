@@ -1,0 +1,49 @@
+{
+  "slug": "voice-to-website-builder",
+  "name": "VoiceToWebsite Builder",
+  "headline": "Turn a short idea into a client-ready website preview and source pack",
+  "priceAnchor": "$49",
+  "stripeMode": "payment",
+  "stripePriceId": "price_1TL8WzGejm3JMan4Qwk0CcGz",
+  "stripePaymentLink": "https://buy.stripe.com/9B6fZhdpb9D09Bu33AbAs04",
+  "idealFor": "Founders, agencies, and operators who need a fast first version",
+  "description": "VoiceToWebsite Builder is the entry product for buyers who want a polished homepage, a preview they can inspect before buying, and a reserved source bundle tied to their checkout email.",
+  "category": "app",
+  "badge": "Featured",
+  "deliveryType": "source_bundle",
+  "deliveryCopy": "Includes a preview-linked source pack reserved to the checkout email.",
+  "bullets": [
+    "Generate a scrollable website preview from a short prompt",
+    "Inspect the outcome before you commit to the source pack",
+    "Reserve the generated files to the buyer email used at checkout"
+  ],
+  "sections": [
+    {
+      "title": "Preview first",
+      "description": "The homepage now includes a preview studio so buyers can see a generated outcome in a scrollable browser frame before purchasing."
+    },
+    {
+      "title": "Source delivery lane",
+      "description": "Each generated preview creates a source bundle record that can be fulfilled automatically once Stripe and mail credentials are active."
+    },
+    {
+      "title": "Mobile-ready offer",
+      "description": "The product pitch, proof, preview, and checkout path are designed to remain legible and high-converting on small screens."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Best first purchase",
+    "heading": "Sell the builder as the fastest path from idea to preview.",
+    "body": "It is an easy entry offer, it demonstrates the platform quickly, and it creates a natural path into higher-ticket services and subscriptions.",
+    "primaryLabel": "Open the preview studio",
+    "primaryHref": "/"
+  },
+  "media": {
+    "eyebrow": "Builder demo",
+    "title": "The builder preview is now part of the homepage",
+    "body": "Buyers can generate a concept, inspect the preview in a scrollable viewport, and then purchase the source pack from the same experience.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/store-voice-builder.svg",
+    "imageUrl": "/media/store-voice-builder.svg"
+  }
+}

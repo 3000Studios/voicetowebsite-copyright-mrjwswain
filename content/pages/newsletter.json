@@ -1,0 +1,36 @@
+{
+  "eyebrow": "Newsletter",
+  "headline": "Subscribe for product stories, release notes, and monetization updates",
+  "subheadline": "Use the newsletter as the low-friction path for readers who are interested but not ready to buy yet. It turns content traffic into an owned audience instead of a one-time visit.",
+  "sections": [
+    {
+      "title": "What subscribers get",
+      "description": "Expect one useful update at a time: new stories, launch notes, product changes, and practical lessons from running AI-assisted delivery."
+    },
+    {
+      "title": "Why it matters",
+      "description": "A newsletter creates an owned marketing channel that is independent of paid traffic, social volatility, or search ranking swings."
+    },
+    {
+      "title": "How it fits the funnel",
+      "description": "Readers who are too early for checkout can still enter the system, receive proof over time, and convert later."
+    }
+  ],
+  "cta": {
+    "eyebrow": "After subscribing",
+    "heading": "Move from light interest into a real buying path when the timing is right.",
+    "body": "Subscribers can later progress into products, pricing, or a direct implementation conversation without starting from zero.",
+    "primaryLabel": "Review products",
+    "primaryHref": "/products",
+    "secondaryLabel": "See pricing",
+    "secondaryHref": "/pricing"
+  },
+  "media": {
+    "eyebrow": "Story feed",
+    "title": "A reusable media lane for every content page",
+    "body": "The same video and visual system can carry across blog, product, pricing, and newsletter surfaces while the content model matures.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/operator-preview.svg",
+    "imageUrl": "/media/operator-preview.svg"
+  }
+}

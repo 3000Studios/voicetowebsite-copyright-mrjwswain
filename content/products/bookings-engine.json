@@ -1,0 +1,42 @@
+{
+  "slug": "bookings-engine",
+  "name": "Bookings Engine",
+  "headline": "A bookings and appointment website source pack that sells availability clearly",
+  "priceAnchor": "$149",
+  "stripeMode": "payment",
+  "stripePriceId": "price_1TL8WzGejm3JMan4FSm7WYYK",
+  "stripePaymentLink": "https://buy.stripe.com/14AaEX70N16u14Y33AbAs07",
+  "idealFor": "Consultants, photographers, studios, clinics, and appointment-led businesses",
+  "description": "A premium appointment funnel with service detail blocks, availability framing, and higher-trust checkout or booking calls to action.",
+  "category": "app",
+  "badge": "Popular",
+  "deliveryType": "source_bundle",
+  "deliveryCopy": "Includes appointment offer layouts, service cards, and booking-focused CTA sections.",
+  "bullets": [
+    "Service overview, pricing cues, and session framing",
+    "Premium appointment funnel layout with proof and outcomes",
+    "Works for paid consults, sessions, and retainers"
+  ],
+  "sections": [
+    {
+      "title": "Premium service framing",
+      "description": "The page uses calm hierarchy and strong proof blocks so higher-ticket appointments feel worth booking."
+    },
+    {
+      "title": "Session detail",
+      "description": "This pack leaves room for service breakdowns, FAQs, and objections without overwhelming the first viewport."
+    },
+    {
+      "title": "Fast customization",
+      "description": "Swap the media, offer copy, and session types quickly while keeping the conversion structure intact."
+    }
+  ],
+  "media": {
+    "eyebrow": "Bookings demo",
+    "title": "A source pack for appointment-driven offers",
+    "body": "Use it for premium consultations, coaching calls, studio sessions, or any business that needs a better booking page.",
+    "videoUrl": "/media/hero-operator.mp4",
+    "posterUrl": "/media/store-bookings.svg",
+    "imageUrl": "/media/store-bookings.svg"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "eyebrow": "Pricing",
+  "headline": "Choose the path that matches your stage and buying style",
+  "subheadline": "The pricing model supports self-serve adoption, implementation revenue, and enterprise expansion.",
+  "tiers": [
+    {
+      "name": "Starter",
+      "price": "$0",
+      "description": "A lightweight entry point for exploring the platform, planning workflows, and validating fit.",
+      "features": [
+        "Core planning and positioning framework",
+        "Limited project and page management",
+        "Good for internal evaluation"
+      ]
+    },
+    {
+      "name": "Operator",
+      "price": "$99/mo",
+      "description": "The core software offer for founders and small teams running marketing, delivery, and internal operations.",
+      "featured": true,
+      "features": [
+        "AI-managed command routing",
+        "Project, page, and workflow execution",
+        "Content and deployment operations",
+        "Designed for recurring software revenue"
+      ]
+    },
+    {
+      "name": "Launch Sprint",
+      "price": "$2,500+",
+      "description": "A done-with-you setup package for businesses that want a fast implementation instead of a blank dashboard.",
+      "features": [
+        "Offer, funnel, and workflow setup",
+        "Priority implementation guidance",
+        "A faster path to first revenue outcome"
+      ]
+    },
+    {
+      "name": "Enterprise",
+      "price": "Custom",
+      "description": "For teams that need self-hosting, governance, onboarding, and deeper operational support.",
+      "features": [
+        "Self-hosted deployment path",
+        "Security and control review",
+        "Support, customization, and rollout planning"
+      ]
+    }
+  ],
+  "faqHeadline": "Pricing questions",
+  "faq": [
+    {
+      "question": "Why mix subscriptions and services?",
+      "answer": "Because services create early cash flow and implementation success, while subscriptions create recurring revenue and scale over time."
+    },
+    {
+      "question": "Should the free plan be generous?",
+      "answer": "It should be useful enough to create trust, but limited enough that serious buyers naturally move into Operator or Launch Sprint."
+    }
+  ],
+  "cta": {
+    "eyebrow": "Best next move",
+    "heading": "Use pricing to sort buyers into the right lane.",
+    "body": "Founders can start self-serve, growth-minded teams can buy implementation, and larger organizations can move into enterprise deployment.",
+    "primaryLabel": "See products",
+    "primaryHref": "/products",
+    "secondaryLabel": "Talk through fit",
+    "secondaryHref": "/contact"
+  },
+  "updatedAt": "2026-03-20T00:00:00.000Z"
+}

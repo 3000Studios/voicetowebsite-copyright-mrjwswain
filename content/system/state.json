@@ -1,0 +1,48 @@
+{
+  "scheduler": {
+    "status": "idle",
+    "lastTickAt": "2026-03-15T08:46:31.683Z",
+    "lastTaskAt": "2026-03-15T08:32:31.558Z",
+    "lastCompletedTaskAt": "2026-03-15T08:32:33.590Z",
+    "lastErrorAt": null,
+    "consecutiveFailures": 0
+  },
+  "tasks": {
+    "run_traffic_cycle": {
+      "status": "idle",
+      "lastRunAt": "2026-03-15T08:29:31.516Z",
+      "lastSuccessAt": "2026-03-15T08:29:31.516Z",
+      "lastResult": {
+        "action": "run_traffic_cycle",
+        "success": true
+      }
+    },
+    "create_blog_post": {
+      "status": "idle",
+      "lastRunAt": "2026-03-15T08:30:31.547Z",
+      "lastSuccessAt": "2026-03-15T08:30:31.547Z",
+      "lastResult": {
+        "action": "create_blog_post",
+        "success": true
+      }
+    },
+    "create_page": {
+      "status": "idle",
+      "lastRunAt": "2026-03-15T08:31:31.569Z",
+      "lastSuccessAt": "2026-03-15T08:31:31.569Z",
+      "lastResult": {
+        "action": "create_page",
+        "success": true
+      }
+    },
+    "deploy_site": {
+      "status": "idle",
+      "lastRunAt": "2026-03-15T08:32:33.590Z",
+      "lastSuccessAt": "2026-03-15T08:32:33.590Z",
+      "lastResult": {
+        "action": "deploy_site",
+        "success": true
+      }
+    }
+  }
+}
