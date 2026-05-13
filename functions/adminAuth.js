@@ -6,7 +6,8 @@ const base64UrlEncode = (data) =>
     .replace(/\//g, "_")
     .replace(/=+$/g, "");
 
-const timingSafeEqual = (a, b) => {
+export const timingSafeEqual = (a, b) => {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
   if (a.length !== b.length) return false;
   let out = 0;
   for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);

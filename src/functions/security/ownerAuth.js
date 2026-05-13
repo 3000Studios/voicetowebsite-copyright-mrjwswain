@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "../../../functions/adminAuth.js";
+
 export function isOwner(request, env) {
   const ownerKey = request.headers.get("X-VTW-OWNER-KEY");
   if (!ownerKey) return false;
@@ -5,8 +7,8 @@ export function isOwner(request, env) {
   const validKey = env.OWNER_KEY;
   if (!validKey) return false;
 
-  // Simple equality for now, could use crypto.subtle.timingSafeEqual for better security
-  return ownerKey === validKey;
+  // Uses constant-time comparison to prevent timing attacks
+  return timingSafeEqual(ownerKey, validKey);
 }
 
 export function authResponse() {
