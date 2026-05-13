@@ -48,6 +48,7 @@ export default function App() {
           <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
           <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
           <Route path="/:slug" element={<GenericPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin" element={<AdminLayout />}>
@@ -58,7 +59,6 @@ export default function App() {
           <Route path="content" element={<AdminContentPage />} />
           <Route path="console" element={<AdminConsolePage />} />
         </Route>
-        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </SiteRuntimeProvider>
   )

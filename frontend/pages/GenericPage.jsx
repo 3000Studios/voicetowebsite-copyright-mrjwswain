@@ -60,19 +60,45 @@ export default function GenericPage() {
       {page.sections ? <RichBlocks items={page.sections} /> : null}
       {page.items ? <RichBlocks items={page.items} /> : null}
       {page.tiers ? (
-        <section className="card-grid">
-          {page.tiers.map((tier) => (
-            <article key={tier.name} className={`content-card pricing-card${tier.featured ? ' pricing-card--featured' : ''}`}>
-              <span className="meta-line">{tier.price}</span>
-              <h2>{tier.name}</h2>
-              <p>{tier.description}</p>
-              <ul className="bullet-list">
-                {tier.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-            </article>
-          ))}
+        <section className="pricing-ladder pricing-ladder--page">
+          {page.tiers.map((tier) => {
+            const ctaLabel = tier.ctaLabel ?? (tier.featured ? 'Buy now' : 'Choose plan')
+            const ctaHref = tier.ctaHref ?? '/contact'
+            const ctaClassName = `button ${tier.featured ? 'button--primary' : 'button--ghost'} pricing-card__cta`
+            const ctaIsInternal = isExternalHref(ctaHref)
+              ? false
+              : typeof ctaHref === 'string' && ctaHref.startsWith('/') && !ctaHref.includes('#')
+            return (
+              <article
+                key={tier.name}
+                className={`pricing-card${tier.featured ? ' pricing-card--featured' : ''}`}
+              >
+                {tier.featured ? <span className="pricing-card__badge">Most popular</span> : null}
+                <header className="pricing-card__head">
+                  <span className="eyebrow">{tier.name}</span>
+                  <div className="pricing-card__price">
+                    <strong>{tier.price}</strong>
+                    {tier.priceDetail ? <span>{tier.priceDetail}</span> : null}
+                  </div>
+                  <p>{tier.description}</p>
+                </header>
+                <ul className="bullet-list pricing-card__features">
+                  {(tier.features ?? []).map((feature) => (
+                    <li key={feature}>{feature}</li>
+                  ))}
+                </ul>
+                {ctaIsInternal ? (
+                  <Link className={ctaClassName} to={ctaHref}>
+                    {ctaLabel}
+                  </Link>
+                ) : (
+                  <a className={ctaClassName} href={ctaHref}>
+                    {ctaLabel}
+                  </a>
+                )}
+              </article>
+            )
+          })}
         </section>
       ) : null}
       {slug === 'pricing' && snapshot?.commerce?.offers?.length ? (

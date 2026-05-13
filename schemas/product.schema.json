@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voicetowebsite.com/schemas/product.schema.json",
+  "title": "VoiceToWebsite Product",
+  "description": "Product / app-store offer stored at /content/products/<slug>.json.",
+  "type": "object",
+  "required": ["slug", "name"],
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "headline": { "type": "string" },
+    "summary": { "type": "string" },
+    "description": { "type": "string" },
+    "idealFor": { "type": "string" },
+    "outcome": { "type": "string" },
+    "priceAnchor": { "type": "string", "minLength": 1 },
+    "category": { "type": "string" },
+    "badge": { "type": "string" },
+    "deliveryType": { "type": "string", "enum": ["source_bundle", "service", "subscription", "install", "hybrid"] },
+    "deliveryCopy": { "type": "string" },
+    "stripeMode": { "type": "string", "enum": ["payment", "subscription", "setup"] },
+    "stripePriceId": { "type": "string", "pattern": "^price_[A-Za-z0-9]+$" },
+    "stripePaymentLink": { "type": "string", "format": "uri" },
+    "bullets": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "media": {
+      "type": "object",
+      "properties": {
+        "eyebrow": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "posterUrl": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "updatedAt": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": true
+}

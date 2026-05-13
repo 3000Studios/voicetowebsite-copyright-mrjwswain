@@ -6,11 +6,14 @@ import {
   getSourceBundleByToken,
   recordPreviewCheckoutIntent
 } from './previewStudioService.js'
+import { provisionCustomerAccountFromPayment } from './customerAccountService.js'
 
 const DEFAULT_PAYMENTS = {
   payments: [],
   updatedAt: null
 }
+
+let cachedLedger = null
 
 function nowIso() {
   return new Date().toISOString()
@@ -88,8 +91,11 @@ function getStripeConfig(slug, product) {
     product.stripeMode ??
     (/month|mo/i.test(product.priceAnchor ?? '') ? 'subscription' : 'payment')
 
+  const normalizedPaymentLink =
+    typeof paymentLink === 'string' && /^https:\/\/buy\.stripe\.com\//i.test(paymentLink) ? paymentLink : null
+
   return {
-    paymentLink,
+    paymentLink: normalizedPaymentLink,
     priceId,
     mode
   }
@@ -105,14 +111,22 @@ function getPayPalConfig(slug) {
 }
 
 async function readPayments() {
-  return readSystemDocument('payments.json', DEFAULT_PAYMENTS)
+  if (cachedLedger) {
+    return cachedLedger
+  }
+
+  cachedLedger = await readSystemDocument('payments.json', DEFAULT_PAYMENTS)
+  return cachedLedger
 }
 
 async function writePayments(payload) {
-  await writeSystemDocument('payments.json', {
+  const nextLedger = {
     ...payload,
     updatedAt: nowIso()
-  })
+  }
+
+  cachedLedger = nextLedger
+  await writeSystemDocument('payments.json', nextLedger)
 }
 
 export async function recordPayment(payment) {
@@ -315,6 +329,14 @@ export async function verifyStripeCheckoutSession(sessionId) {
       amount_total: session.amount_total
     }
   })
+  await provisionCustomerAccountFromPayment({
+    provider: 'stripe',
+    transactionId: session.payment_intent ?? session.id,
+    customerEmail: session.customer_details?.email ?? null,
+    offerSlug: session.metadata?.offerSlug ?? null,
+    amountCents,
+    currency: session.currency ?? 'usd'
+  })
 
   await fulfillPreviewSourceDelivery({
     requestId: session.metadata?.previewRequestId ?? null,
@@ -358,6 +380,14 @@ export async function handleStripeWebhook(rawBody, signature) {
         payment_status: session.payment_status,
         amount_total: session.amount_total
       }
+    })
+    await provisionCustomerAccountFromPayment({
+      provider: 'stripe',
+      transactionId: session.payment_intent ?? session.id,
+      customerEmail: session.customer_details?.email ?? null,
+      offerSlug: session.metadata?.offerSlug ?? null,
+      amountCents: session.amount_total ?? 0,
+      currency: session.currency ?? 'usd'
     })
     await fulfillPreviewSourceDelivery({
       requestId: session.metadata?.previewRequestId ?? null,
@@ -498,6 +528,14 @@ export async function capturePayPalOrder(orderId) {
       id: payload.id,
       status: payload.status
     }
+  })
+  await provisionCustomerAccountFromPayment({
+    provider: 'paypal',
+    transactionId: capture.id,
+    customerEmail: payload.payer?.email_address ?? null,
+    offerSlug: purchaseUnit?.reference_id ?? null,
+    amountCents,
+    currency: String(capture.amount?.currency_code ?? 'USD').toLowerCase()
   })
 
   return {

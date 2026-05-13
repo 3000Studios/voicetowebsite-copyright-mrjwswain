@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PrismHeadline from '../components/PrismHeadline.jsx'
 import AdminChrome from '../components/admin/AdminChrome.jsx'
+import SiteFooter from '../components/SiteFooter.jsx'
 import { saveAdminSession } from '../src/adminSession.js'
 import { createAdminSession } from '../src/adminApi.js'
 import { COPYRIGHT_HOLDER, SITE_DISPLAY_NAME, SITE_DOMAIN } from '../src/siteMeta.js'
@@ -35,9 +36,10 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="admin-app admin-app--login">
-      <AdminChrome />
-      <main className="admin-login">
+    <div className="admin-shell">
+      <div className="admin-app admin-app--login">
+        <AdminChrome />
+        <main className="admin-login">
         <section className="auth-card admin-login__card">
           <div className="admin-login__brand">
             <span className="admin-sidebar__mark admin-login__mark" aria-hidden="true" />
@@ -82,7 +84,9 @@ export default function AdminLoginPage() {
             © {new Date().getFullYear()} {COPYRIGHT_HOLDER}
           </p>
         </section>
-      </main>
+        </main>
+      </div>
+      <SiteFooter />
     </div>
   )
 }

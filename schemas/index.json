@@ -1,0 +1,70 @@
+{
+  "$schema": "./index.schema.json",
+  "schemas": [
+    {
+      "id": "https://voicetowebsite.com/schemas/command.schema.json",
+      "name": "command",
+      "path": "schemas/command.schema.json",
+      "description": "Commands dispatched to ai/router/commandRouter.js.",
+      "matches": ["**/commands/*.json"]
+    },
+    {
+      "id": "https://voicetowebsite.com/schemas/page.schema.json",
+      "name": "page",
+      "path": "schemas/page.schema.json",
+      "description": "Structured marketing pages under /content/pages.",
+      "matches": [
+        "content/pages/*.json",
+        "!content/pages/theme.json"
+      ]
+    },
+    {
+      "id": "https://voicetowebsite.com/schemas/theme.schema.json",
+      "name": "theme",
+      "path": "schemas/theme.schema.json",
+      "description": "Theme palette and motion tokens.",
+      "matches": ["content/pages/theme.json"]
+    },
+    {
+      "id": "https://voicetowebsite.com/schemas/blog-post.schema.json",
+      "name": "blog-post",
+      "path": "schemas/blog-post.schema.json",
+      "description": "Individual blog entries.",
+      "matches": [
+        "content/blog/*.json",
+        "!content/blog/index.json"
+      ]
+    },
+    {
+      "id": "https://voicetowebsite.com/schemas/blog-index.schema.json",
+      "name": "blog-index",
+      "path": "schemas/blog-index.schema.json",
+      "description": "Generated blog index.",
+      "matches": ["content/blog/index.json"]
+    },
+    {
+      "id": "https://voicetowebsite.com/schemas/product.schema.json",
+      "name": "product",
+      "path": "schemas/product.schema.json",
+      "description": "App-store product definitions.",
+      "matches": [
+        "content/products/*.json",
+        "!content/products/catalog.json"
+      ]
+    },
+    {
+      "id": "https://voicetowebsite.com/schemas/product-catalog.schema.json",
+      "name": "product-catalog",
+      "path": "schemas/product-catalog.schema.json",
+      "description": "Product catalog aggregate.",
+      "matches": ["content/products/catalog.json"]
+    },
+    {
+      "id": "https://voicetowebsite.com/schemas/deployment-history.schema.json",
+      "name": "deployment-history",
+      "path": "schemas/deployment-history.schema.json",
+      "description": "Historical deploy ledger.",
+      "matches": ["content/system/deployments.json"]
+    }
+  ]
+}

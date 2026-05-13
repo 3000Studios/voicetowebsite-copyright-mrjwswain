@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voicetowebsite.com/schemas/blog-post.schema.json",
+  "title": "VoiceToWebsite Blog Post",
+  "description": "Blog post stored at /content/blog/<slug>.json.",
+  "type": "object",
+  "required": ["slug", "title"],
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "excerpt": { "type": "string" },
+    "body": { "type": "string" },
+    "status": { "type": "string", "enum": ["draft", "published", "rejected", "archived"] },
+    "publishedAt": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "string", "format": "date" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "updatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "approvedAt": { "type": ["string", "null"], "format": "date-time" },
+    "rejectedAt": { "type": ["string", "null"], "format": "date-time" },
+    "reviewNotes": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["heading", "body"],
+        "properties": {
+          "heading": { "type": "string", "minLength": 1 },
+          "body": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "properties": {
+        "generatedBy": { "type": "string" },
+        "model": { "type": "string" },
+        "reviewState": { "type": "string", "enum": ["pending", "approved", "rejected"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

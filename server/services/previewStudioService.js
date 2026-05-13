@@ -8,6 +8,8 @@ const DEFAULT_PREVIEW_REQUESTS = {
 
 const DELIVERY_FROM_EMAIL = process.env.SOURCE_DELIVERY_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? ''
 const RESEND_API_KEY = process.env.RESEND_API_KEY ?? ''
+const SOURCE_DOWNLOAD_TTL_MS = Number(process.env.SOURCE_DOWNLOAD_TTL_MS ?? 1000 * 60 * 60 * 24 * 2)
+const SOURCE_DOWNLOAD_MAX_COUNT = Number(process.env.SOURCE_DOWNLOAD_MAX_COUNT ?? 3)
 
 function nowIso() {
   return new Date().toISOString()
@@ -15,6 +17,10 @@ function nowIso() {
 
 function buildId(prefix) {
   return `${prefix}-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`
+}
+
+function createSecureToken() {
+  return crypto.randomBytes(32).toString('base64url')
 }
 
 function escapeHtml(value) {
@@ -88,6 +94,82 @@ function extractTitle(brief, websiteType) {
     .join(' ')
 }
 
+function extractKeywords(brief, websiteType, audience) {
+  const normalized = `${brief} ${websiteType} ${audience}`
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+  const stopWords = new Set([
+    'the',
+    'and',
+    'for',
+    'with',
+    'that',
+    'this',
+    'your',
+    'from',
+    'into',
+    'have',
+    'will',
+    'are',
+    'you',
+    'our',
+    'about',
+    'site',
+    'website'
+  ])
+  const ranked = new Map()
+
+  for (const token of normalized.split(/\s+/)) {
+    if (!token || token.length < 4 || stopWords.has(token)) {
+      continue
+    }
+    ranked.set(token, (ranked.get(token) ?? 0) + 1)
+  }
+
+  return Array.from(ranked.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([word]) => word)
+}
+
+function buildFaqEntries(primaryCta, audience, websiteType) {
+  return [
+    {
+      question: 'How fast can this website concept go live?',
+      answer:
+        'Most teams can launch a production-ready first version in one to two days because the preview already maps hero, proof, offer, and conversion flow.'
+    },
+    {
+      question: `Can this be customized for ${audience}?`,
+      answer:
+        'Yes. Messaging, visuals, and calls to action are designed to be edited quickly so the final build matches your real audience and sales process.'
+    },
+    {
+      question: 'What happens after checkout?',
+      answer:
+        'After purchase, the source bundle is assigned to your checkout email so your team can deploy, extend, and optimize the experience immediately.'
+    },
+    {
+      question: `Is this suitable for a ${websiteType.replace('_', ' ')} launch?`,
+      answer: `Yes. The layout intentionally prioritizes conversion copy, trust signals, and a direct "${primaryCta}" path for high-intent traffic.`
+    }
+  ]
+}
+
+function estimateQualityScore({ brief, audience, primaryCta }) {
+  const briefLength = String(brief ?? '').trim().length
+  const audienceLength = String(audience ?? '').trim().length
+  const ctaLength = String(primaryCta ?? '').trim().length
+
+  let score = 55
+  if (briefLength >= 70) score += 12
+  if (briefLength >= 140) score += 10
+  if (audienceLength >= 8) score += 8
+  if (ctaLength >= 6) score += 7
+  if (/buy|book|start|get|launch|build/i.test(primaryCta)) score += 8
+  return Math.min(100, score)
+}
+
 function buildSectionData({ brief, audience, websiteType, primaryCta }) {
   const siteTypeLabel = {
     saas: 'Software product',
@@ -115,22 +197,87 @@ function buildSectionData({ brief, audience, websiteType, primaryCta }) {
   ]
 }
 
+function getMediaSet(websiteType) {
+  const sets = {
+    saas: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-man-working-on-a-laptop-1579/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'
+      ]
+    },
+    local_service: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-smiling-electrician-2209/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=1200&q=80'
+      ]
+    },
+    creator: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-video-production-team-discussing-1578/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80'
+      ]
+    },
+    ecommerce: {
+      heroVideo: 'https://cdn.coverr.co/videos/coverr-online-shopping-1572/1080p.mp4',
+      gallery: [
+        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1607082350899-7e105aa886ae?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80'
+      ]
+    }
+  }
+
+  return sets[websiteType] ?? sets.saas
+}
+
 function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, primaryCta }) {
   const theme = getThemePreset(websiteType, styleTone)
   const [canvas, surface, accent, ink] = theme.palette
   const sections = buildSectionData({ brief, audience, websiteType, primaryCta })
+  const mediaSet = getMediaSet(websiteType)
+  const seoKeywords = extractKeywords(brief, websiteType, audience)
+  const faqEntries = buildFaqEntries(primaryCta, audience, websiteType)
+  const qualityScore = estimateQualityScore({ brief, audience, primaryCta })
+  const seoDescription = `${title}. ${brief}`.slice(0, 158)
   const bulletPoints = [
     'Hero video or motion-ready media slot',
     'Offer stack with direct checkout hooks',
+    'SEO baseline: metadata, FAQ, and semantic structure',
+    'Affiliate CTA lane and sponsor-ready ad placement',
     'Source-ready files that can be exported after purchase'
   ]
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqEntries.map((entry) => ({
+      '@type': 'Question',
+      name: entry.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: entry.answer
+      }
+    }))
+  }
 
   const html = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeHtml(seoDescription)}" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="keywords" content="${escapeHtml(seoKeywords.join(', '))}" />
+    <meta property="og:title" content="${escapeHtml(title)}" />
+    <meta property="og:description" content="${escapeHtml(seoDescription)}" />
+    <meta property="og:type" content="website" />
     <title>${escapeHtml(title)}</title>
+    <script type="application/ld+json">${JSON.stringify(faqSchema)}</script>
     <style>
       :root {
         color-scheme: dark;
@@ -154,13 +301,13 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         background-image: ${theme.texture};
       }
       .hero {
-        padding: 72px 24px 56px;
+        padding: 64px 24px 46px;
         border-bottom: 1px solid var(--line);
       }
       .hero__inner,
       .section,
       .story-strip {
-        width: min(1040px, calc(100% - 32px));
+        width: min(1120px, calc(100% - 32px));
         margin: 0 auto;
       }
       .eyebrow {
@@ -187,8 +334,21 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
       .hero__grid {
         margin-top: 30px;
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
+        grid-template-columns: 1fr 1fr;
         gap: 18px;
+      }
+      .hero__video {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        min-height: 310px;
+        background: rgba(0,0,0,0.24);
+      }
+      .hero__video video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
       }
       .panel,
       .card,
@@ -199,7 +359,7 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         backdrop-filter: blur(14px);
       }
       .panel {
-        min-height: 420px;
+        min-height: 300px;
         padding: 26px;
         position: relative;
         overflow: hidden;
@@ -308,11 +468,36 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         gap: 18px;
         padding-bottom: 56px;
       }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .gallery-grid img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+      }
       .quote {
         padding: 24px;
       }
       .quote p {
         font-size: 1.05rem;
+      }
+      .monetization-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .ad-slot {
+        min-height: 130px;
+        border: 1px dashed var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        background: rgba(255,255,255,0.03);
       }
       .cta {
         padding: 18px 20px;
@@ -343,7 +528,11 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         }
         .hero__grid,
         .section-grid,
-        .story-strip {
+        .story-strip,
+        .gallery-grid {
+          grid-template-columns: 1fr;
+        }
+        .monetization-grid {
           grid-template-columns: 1fr;
         }
       }
@@ -357,6 +546,16 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
           <h1>${escapeHtml(title)}</h1>
           <p class="hero__lede">${escapeHtml(brief)}</p>
           <div class="hero__grid">
+            <div>
+              <div class="hero__video">
+                <video autoplay muted loop playsinline preload="metadata" poster="${escapeHtml(mediaSet.gallery[0])}">
+                  <source src="${escapeHtml(mediaSet.heroVideo)}" type="video/mp4" />
+                </video>
+              </div>
+              <div class="gallery-grid">
+                ${mediaSet.gallery.map((image) => `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)} preview image" loading="lazy" decoding="async" />`).join('')}
+              </div>
+            </div>
             <div class="panel">
               <div class="panel__screen">
                 <div class="dot-row"><span></span><span></span><span></span></div>
@@ -375,7 +574,7 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
             <div class="metrics">
               <div class="card">
                 <span class="eyebrow">Source bundle</span>
-                <h2>Files included</h2>
+                <h2>Files included • Quality ${qualityScore}/100</h2>
                 <ul class="list">${bulletPoints.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
               </div>
               <div class="quote">
@@ -399,8 +598,33 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
         </div>
       </section>
       <section class="story-strip">
-        <article class="card"><span class="eyebrow">Conversion lane</span><h2>Video, proof, offer, source delivery</h2><p>The generated build is arranged so the user can watch, inspect, and then buy the underlying source code from a productized checkout step.</p></article>
-        <article class="card"><span class="eyebrow">Delivery path</span><h2>Reserved to the checkout email</h2><p>Each preview is linked to an email address so the generated package can be assigned to the correct buyer after checkout.</p></article>
+        <article class="card"><span class="eyebrow">Conversion lane</span><h2>Premium hero, social proof, and monetization flow</h2><p>This generated preview is structured as a real high-converting landing page: rich visual media, trust sections, offer narrative, and clear CTA hierarchy.</p></article>
+        <article class="card"><span class="eyebrow">Delivery path</span><h2>Production-ready handoff for customer preview</h2><p>The generated files include a full landing page that your customer can scroll and inspect before purchase, with structure ready for final production adaptation.</p></article>
+      </section>
+      <section class="section">
+        <div class="monetization-grid">
+          <article class="card">
+            <span class="eyebrow">Affiliate monetization</span>
+            <h2>Partner CTA strip</h2>
+            <p>Embed partner links with UTM parameters and a clear recommendation block to monetize intent that does not convert on first session.</p>
+            <p><a class="button" href="https://voicetowebsite.com/pricing?utm_source=preview&utm_medium=affiliate&utm_campaign=${escapeHtml(slugify(title))}">See partner offer</a></p>
+          </article>
+          <article class="card ad-slot">
+            <span class="eyebrow">Sponsor inventory</span>
+            <h2>Ad placement placeholder</h2>
+            <p>Reserved placement for ethical sponsorships or direct ad sales. Keep one premium slot above the fold and rotate by campaign.</p>
+          </article>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-grid">
+          ${faqEntries
+            .map(
+              (item) =>
+                `<article class="card"><span class="eyebrow">FAQ</span><h2>${escapeHtml(item.question)}</h2><p>${escapeHtml(item.answer)}</p></article>`
+            )
+            .join('')}
+        </div>
       </section>
     </div>
   </body>
@@ -410,7 +634,7 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
     { path: 'index.html', content: html },
     {
       path: 'content.json',
-      content: JSON.stringify({ title, brief, audience, websiteType, styleTone, primaryCta, sections }, null, 2)
+      content: JSON.stringify({ title, brief, audience, websiteType, styleTone, primaryCta, sections, seoKeywords, qualityScore, faqEntries }, null, 2)
     },
     {
       path: 'README.md',
@@ -422,7 +646,9 @@ function buildPreviewDocument({ title, brief, audience, websiteType, styleTone, 
     title,
     summary: `${title} preview created for ${audience}.`,
     html,
-    files
+    files,
+    qualityScore,
+    seoKeywords
   }
 }
 
@@ -444,6 +670,8 @@ function summarizeRequest(request) {
     summary: request.summary,
     previewHtml: request.previewHtml,
     sourceFiles: request.sourceBundle.files.map((file) => file.path),
+    qualityScore: request.qualityScore ?? null,
+    seoKeywords: request.seoKeywords ?? [],
     recommendedOfferSlug: request.recommendedOfferSlug,
     email: request.email,
     status: request.status,
@@ -475,6 +703,8 @@ export async function createPreviewRequest(payload) {
     summary: preview.summary,
     previewHtml: preview.html,
     sourceBundle: { files: preview.files },
+    qualityScore: preview.qualityScore,
+    seoKeywords: preview.seoKeywords,
     recommendedOfferSlug: 'voice-to-website-builder',
     status: 'preview_ready',
     delivery: {
@@ -559,7 +789,11 @@ export async function fulfillPreviewSourceDelivery({ requestId, customerEmail, t
     provider: provider ?? 'stripe',
     offerSlug: offerSlug ?? request.delivery?.reservedOfferSlug ?? request.recommendedOfferSlug,
     transactionId: transactionId ?? null,
-    downloadToken: request.delivery?.downloadToken ?? buildId('source')
+    downloadToken: request.delivery?.downloadToken ?? createSecureToken(),
+    downloadIssuedAt: request.delivery?.downloadIssuedAt ?? nowIso(),
+    downloadExpiresAt:
+      request.delivery?.downloadExpiresAt ?? new Date(Date.now() + SOURCE_DOWNLOAD_TTL_MS).toISOString(),
+    downloadCount: request.delivery?.downloadCount ?? 0
   }
 
   const emailResult = await sendSourceDeliveryEmail(request)
@@ -571,13 +805,29 @@ export async function fulfillPreviewSourceDelivery({ requestId, customerEmail, t
 
 export async function getSourceBundleByToken(token) {
   const previewRequests = await readPreviewRequests()
-  const request = (previewRequests.requests ?? []).find(
+  const index = (previewRequests.requests ?? []).findIndex(
     (entry) => entry.delivery?.downloadToken === token && entry.delivery?.status === 'source_ready'
   )
 
-  if (!request) {
+  if (index < 0) {
     throw new Error('Source bundle not found.')
   }
+
+  const request = previewRequests.requests[index]
+  const expiresAt = new Date(request.delivery?.downloadExpiresAt ?? 0).getTime()
+  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+    throw new Error('Source bundle link expired.')
+  }
+
+  const downloadCount = Number(request.delivery?.downloadCount ?? 0)
+  if (downloadCount >= SOURCE_DOWNLOAD_MAX_COUNT) {
+    throw new Error('Source bundle download limit reached.')
+  }
+
+  request.delivery.downloadCount = downloadCount + 1
+  request.delivery.lastDownloadedAt = nowIso()
+  previewRequests.requests[index] = request
+  await writePreviewRequests(previewRequests)
 
   return {
     fileName: `${request.slug || 'source-pack'}-source.json`,

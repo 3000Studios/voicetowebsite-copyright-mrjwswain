@@ -1,5 +1,9 @@
+import dotenv from 'dotenv'
 import { routeCommand } from '../ai/router/commandRouter.js'
 import { bootstrapContent } from '../server/services/contentService.js'
+
+dotenv.config({ path: '.env.local' })
+dotenv.config()
 
 function parseCommand(argv) {
   const raw = argv[2]

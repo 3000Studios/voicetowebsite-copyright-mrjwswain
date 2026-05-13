@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 
 export default function CheckoutCancelPage() {
   return (
-    <div className="stack-xl">
-      <section className="section-card centered-card">
+    <div className="stack-xl page-remix">
+      <section className="section-card centered-card page-remix__hero">
         <span className="eyebrow">Checkout</span>
         <h1>Checkout canceled</h1>
         <p className="section-intro">

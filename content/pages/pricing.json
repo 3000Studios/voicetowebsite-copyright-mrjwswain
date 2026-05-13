@@ -1,70 +1,114 @@
 {
   "eyebrow": "Pricing",
-  "headline": "Choose the path that matches your stage and buying style",
-  "subheadline": "The pricing model supports self-serve adoption, implementation revenue, and enterprise expansion.",
+  "headline": "Start free. Pay only when you ship.",
+  "subheadline": "The preview engine is free forever. Upgrade only when you need to keep the source code, unlock unlimited builds, or white-label the output for clients.",
   "tiers": [
     {
-      "name": "Starter",
-      "price": "$0",
-      "description": "A lightweight entry point for exploring the platform, planning workflows, and validating fit.",
+      "name": "Preview",
+      "price": "Free",
+      "priceDetail": "Unlimited in-browser previews",
+      "description": "Generate and inspect full scrollable homepage mockups directly in the browser. No account, no credit card.",
       "features": [
-        "Core planning and positioning framework",
-        "Limited project and page management",
-        "Good for internal evaluation"
-      ]
+        "Unlimited preview generations",
+        "Four layout archetypes: SaaS, local service, creator, ecommerce",
+        "Open any preview in a new tab and share the HTML",
+        "Quality score and SEO keyword preview"
+      ],
+      "ctaLabel": "Open the generator",
+      "ctaHref": "/#website-generator"
     },
     {
-      "name": "Operator",
-      "price": "$99/mo",
-      "description": "The core software offer for founders and small teams running marketing, delivery, and internal operations.",
+      "name": "Source Pack",
+      "price": "$49",
+      "priceDetail": "One-time · per build",
+      "description": "Buy the exact source code behind a preview you like. Commercial license, delivered to your checkout email.",
       "featured": true,
       "features": [
-        "AI-managed command routing",
-        "Project, page, and workflow execution",
-        "Content and deployment operations",
-        "Designed for recurring software revenue"
-      ]
+        "Production-ready index.html, content.json, README.md",
+        "Commercial license for the generated build",
+        "Reserved to your checkout email for 48 hours",
+        "Up to 3 downloads per purchase"
+      ],
+      "ctaLabel": "Generate, then buy",
+      "ctaHref": "/#website-generator"
     },
     {
-      "name": "Launch Sprint",
-      "price": "$2,500+",
-      "description": "A done-with-you setup package for businesses that want a fast implementation instead of a blank dashboard.",
+      "name": "Studio",
+      "price": "$29",
+      "priceDetail": "per month · billed monthly",
+      "description": "Unlimited source packs for a single brand. Keep a history of every generation, iterate faster, and lock in a single seat.",
       "features": [
-        "Offer, funnel, and workflow setup",
-        "Priority implementation guidance",
-        "A faster path to first revenue outcome"
-      ]
+        "Unlimited source pack downloads",
+        "Generation history with redownload",
+        "Priority render queue when remote AI is enabled",
+        "Custom brand tokens: palette, accent, primary CTA defaults",
+        "Cancel anytime — all previously issued packs stay yours"
+      ],
+      "ctaLabel": "Start Studio",
+      "ctaHref": "/contact?plan=studio"
+    },
+    {
+      "name": "Agency",
+      "price": "$149",
+      "priceDetail": "per month · up to 5 seats",
+      "description": "Built for teams shipping client sites. White-label the output, collaborate, and keep a central library of brand kits.",
+      "features": [
+        "Everything in Studio",
+        "Up to 5 team seats with shared library",
+        "White-label output (strip all VoiceToWebsite branding)",
+        "Client-ready brand kits and reusable templates",
+        "Priority email support within 1 business day"
+      ],
+      "ctaLabel": "Start Agency",
+      "ctaHref": "/contact?plan=agency"
     },
     {
       "name": "Enterprise",
       "price": "Custom",
-      "description": "For teams that need self-hosting, governance, onboarding, and deeper operational support.",
+      "priceDetail": "Self-host · SLA · custom templates",
+      "description": "Self-hosted deployment, governance review, custom templates, and hands-on onboarding for larger teams.",
       "features": [
-        "Self-hosted deployment path",
-        "Security and control review",
-        "Support, customization, and rollout planning"
-      ]
+        "Self-hosted or VPC deployment path",
+        "SSO, audit logging, and security review",
+        "Custom templates tailored to your design system",
+        "Dedicated onboarding + priority support SLA",
+        "Volume pricing on source packs"
+      ],
+      "ctaLabel": "Talk to us",
+      "ctaHref": "/contact?plan=enterprise"
     }
   ],
-  "faqHeadline": "Pricing questions",
+  "faqHeadline": "Pricing questions buyers ask first",
   "faq": [
     {
-      "question": "Why mix subscriptions and services?",
-      "answer": "Because services create early cash flow and implementation success, while subscriptions create recurring revenue and scale over time."
+      "question": "Is the preview really free and unlimited?",
+      "answer": "Yes. The preview engine runs entirely in your browser — there is no per-request cost on our side, so you can iterate as much as you want without signing up."
     },
     {
-      "question": "Should the free plan be generous?",
-      "answer": "It should be useful enough to create trust, but limited enough that serious buyers naturally move into Operator or Launch Sprint."
+      "question": "What do I actually get with a Source Pack?",
+      "answer": "A downloadable bundle with the full generated index.html, a structured content.json, and a README. It is production-ready and you own the commercial license for that build."
+    },
+    {
+      "question": "How is Studio different from buying packs one at a time?",
+      "answer": "Studio is for anyone generating more than one site per month. You get unlimited packs, history, priority queuing, and brand defaults — it pays for itself after the second build."
+    },
+    {
+      "question": "Does Agency include white-label rights?",
+      "answer": "Yes. On Agency and above, VoiceToWebsite branding is stripped from the generated source so you can hand it directly to clients as your own work."
+    },
+    {
+      "question": "Can I upgrade or cancel any time?",
+      "answer": "Yes. Subscriptions are month-to-month, prorated on upgrade, and you keep every pack you already downloaded even after cancellation."
     }
   ],
   "cta": {
     "eyebrow": "Best next move",
-    "heading": "Use pricing to sort buyers into the right lane.",
-    "body": "Founders can start self-serve, growth-minded teams can buy implementation, and larger organizations can move into enterprise deployment.",
-    "primaryLabel": "See products",
-    "primaryHref": "/products",
-    "secondaryLabel": "Talk through fit",
+    "heading": "Generate the preview first. Pay only when you want to keep it.",
+    "body": "The fastest path to a real answer: open the generator, paste a brief, and see whether the output is worth $49 before spending a dollar.",
+    "primaryLabel": "Open the generator",
+    "primaryHref": "/#website-generator",
+    "secondaryLabel": "Talk to sales",
     "secondaryHref": "/contact"
   },
-  "updatedAt": "2026-03-20T00:00:00.000Z"
+  "updatedAt": "2026-04-16T00:00:00.000Z"
 }

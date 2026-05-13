@@ -1,6 +1,0 @@
-{
-  "name": "voicetowebsite",
-  "image": "ghcr.io/openai/codex-universal:latest",
-  "workspaceFolder": "/workspace/voicetowebsite",
-  "postCreateCommand": "bash setup.sh"
-}

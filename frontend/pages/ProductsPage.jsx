@@ -21,19 +21,18 @@ export default function ProductsPage() {
   const platformItems = productCatalog.filter((product) => product.category !== 'app')
 
   return (
-    <div className="stack-xl">
-      <section className="section-card">
-        <span className="eyebrow">App store and offers</span>
+    <div className="stack-xl page-remix">
+      <section className="section-card page-remix__hero">
+        <span className="eyebrow">Digital products marketplace</span>
         <PrismHeadline text={`${SITE_DISPLAY_NAME} app store`} />
         <p className="section-intro">
-          The storefront now combines low-friction source packs, high-demand website apps, recurring software,
-          and implementation offers instead of relying on a single product shape.
+          Browse a fully redesigned storefront with faster product scanning, cleaner conversion layout, and stronger checkout intent across devices.
         </p>
       </section>
 
-      <MediaShowcase />
+      <MediaShowcase media={{ title: 'Product showcase', description: 'Designed to convert from first scroll.', ...(appStoreItems[0]?.media ?? {}) }} />
 
-      <section className="section-card">
+      <section className="section-card page-remix__surface">
         <div className="section-heading">
           <div>
             <span className="eyebrow">Featured apps</span>
@@ -47,7 +46,12 @@ export default function ProductsPage() {
           {appStoreItems.map((product) => (
             <article key={product.slug} className="store-card">
               <div className="store-card__media">
-                <img src={getStoreArtwork(product.slug)} alt={product.name} />
+                <img
+                  src={getStoreArtwork(product.slug)}
+                  alt={product.name}
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div className="store-card__body">
                 <div className="store-card__head">
@@ -69,7 +73,7 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      <section className="card-grid">
+      <section className="card-grid page-remix__surface">
         {platformItems.map((product) => (
           <article key={product.slug} className="content-card">
             <span className="meta-line">{product.priceAnchor}</span>

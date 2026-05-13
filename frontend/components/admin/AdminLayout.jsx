@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavLink, Navigate, Outlet } from 'react-router-dom'
 import AdminChrome from './AdminChrome.jsx'
+import SiteFooter from '../SiteFooter.jsx'
 import { AdminDashboardProvider, useAdminDashboard } from '../../context/AdminDashboardContext.jsx'
 import { SITE_DISPLAY_NAME } from '../../src/siteMeta.js'
 
@@ -17,14 +18,17 @@ function AdminLayoutInner() {
 
   if (!authResolved) {
     return (
-      <div className="admin-app admin-app--login">
-        <AdminChrome />
-        <main className="admin-login">
-          <section className="auth-card admin-login__card">
-            <span className="eyebrow">Admin session</span>
-            <h2>Checking access…</h2>
-          </section>
-        </main>
+      <div className="admin-shell">
+        <div className="admin-app admin-app--login">
+          <AdminChrome />
+          <main className="admin-login">
+            <section className="auth-card admin-login__card">
+              <span className="eyebrow">Admin session</span>
+              <h2>Checking access…</h2>
+            </section>
+          </main>
+        </div>
+        <SiteFooter />
       </div>
     )
   }
@@ -34,8 +38,9 @@ function AdminLayoutInner() {
   }
 
   return (
-    <div className="admin-app">
-      <AdminChrome />
+    <div className="admin-shell">
+      <div className="admin-app">
+        <AdminChrome />
       <aside className="admin-sidebar" aria-label="Admin navigation">
         <div className="admin-sidebar__brand">
           <span className="admin-sidebar__mark" aria-hidden="true" />
@@ -90,6 +95,8 @@ function AdminLayoutInner() {
           <Outlet />
         </div>
       </div>
+      </div>
+      <SiteFooter />
     </div>
   )
 }
