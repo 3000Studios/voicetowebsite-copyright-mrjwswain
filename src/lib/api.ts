@@ -117,3 +117,25 @@ export async function postJSON<TResponse = unknown, TBody = unknown>(
     body: JSON.stringify(body),
   });
 }
+
+/**
+ * Safely parse a fetch Response as JSON without ever throwing
+ * "Unexpected end of JSON input". Returns the parsed body on success;
+ * on empty/non-JSON body returns an object containing { error } so
+ * callers can show a useful message.
+ *
+ * Used by several pages that handle their own response status checks.
+ */
+export async function parseResponse<T = unknown>(res: Response): Promise<T> {
+  const text = await res.text();
+  if (!text || !text.trim()) {
+    return ({ error: `Empty response (HTTP ${res.status})` } as unknown) as T;
+  }
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return ({
+      error: `Non-JSON response (HTTP ${res.status}): ${text.slice(0, 200)}`,
+    } as unknown) as T;
+  }
+}

@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { postJSON, ApiError } from "../lib/api";
+import { postJSON, ApiError, parseResponse } from "../lib/api";
 
 type BrowserSpeechRecognition = {
   lang: string;
@@ -492,7 +492,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
                     srcDoc={activeVariation.html}
                     title={`Preview: ${activeVariation.name}`}
                     className="w-full border-0"
-                    style={{ height: previewMode === "mobile" ? "740px" : "680px" }}
+                    style={{ height: previewMode === "mobile" ? "880px" : "820px" }}
                     sandbox="allow-scripts allow-same-origin"
                     loading="lazy"
                   />
