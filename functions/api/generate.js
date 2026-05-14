@@ -1,6 +1,8 @@
 // functions/api/generate.js — Premium Website Generator (VoiceToWebsite.com)
 // Calls Gemini 2.0 Flash with rich system prompt to produce full HTML/CSS previews
 
+import { selectMedia } from './_media.js';
+
 const SYSTEM_PROMPT = `You are an elite web designer. Given a business prompt plus media URLs, generate 3 distinct premium website variations as COMPLETE self-contained HTML documents.
 Each HTML document MUST include:
 - Sticky nav with logo + smooth-scroll links (positioned below the preview banner at top:40px)
@@ -30,8 +32,20 @@ export async function onRequestPost(context) {
     if (!prompt || prompt.trim().length < 3) return jsonR({ error: 'Prompt is required' }, 400);
 
     const geminiKey = env.GEMINI_API_KEY || '';
-    const vid = videoUrl || 'https://cdn.coverr.co/videos/coverr-working-in-a-modern-office-1565/1080p.mp4';
-    const imgs = imageUrls.length ? imageUrls : ['https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80'];
+
+    // Subject-aware media. Every site gets a hero video + 4-8 photos
+    // matched to the actual business. Free-first: Pexels -> Unsplash ->
+    // Workers AI -> Coverr default. See functions/api/_media.js.
+    let vid, imgs;
+    if (videoUrl && imageUrls.length) {
+      vid = videoUrl;
+      imgs = imageUrls;
+    } else {
+      const origin = new URL(request.url).origin;
+      const media = await selectMedia(prompt, env, origin);
+      vid = videoUrl || media.videoUrl;
+      imgs = imageUrls.length ? imageUrls : media.imageUrls;
+    }
     const brief = analyzePrompt(prompt, extractName(prompt));
 
     const enriched = `Business prompt: "${prompt}"\nHero video URL: ${vid}\nGallery images: ${imgs.join(', ')}\nGenerate 3 complete premium website variations. Write real copy specific to this business.`;

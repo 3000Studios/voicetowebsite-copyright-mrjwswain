@@ -50,3 +50,8 @@ id = "62e1beaaf1e54d09bd2dad0c81036c8a"
 # STRIPE_SECRET_KEY = ""
 # STRIPE_PUBLISHABLE_KEY = ""
 # APP_URL = ""
+
+# Workers AI binding - used by functions/api/img.js
+# Free tier: 10,000 neurons/day. No key required.
+[ai]
+binding = "AI"
