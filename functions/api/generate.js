@@ -86,7 +86,7 @@ export async function onRequestPost(context) {
       const html = match.passed ? candidateHtml : buildHtml(prompt, vid, imgs, v);
       return {
         ...v,
-        html: injectWM(html),
+        html: injectWM(enforceQuality(html, prompt)),
         promptMatch: validatePromptMatch(html, brief),
       };
     });
@@ -95,6 +95,72 @@ export async function onRequestPost(context) {
   } catch (err) {
     return jsonR({ error: 'Internal error', details: err.message }, 500);
   }
+}
+
+function enforceQuality(html, prompt) {
+  // Baseline quality gates that EVERY generated site must satisfy.
+  // Spec ref: VOICE TO WEBSITE GENERATOR — section 43 "Generator Quality Rules"
+  if (!html || typeof html !== 'string') return html;
+  let out = html;
+
+  // 1. Ensure viewport meta for mobile-first.
+  if (!/<meta\s+name=["']viewport["']/i.test(out)) {
+    out = out.replace(/<head([^>]*)>/i,
+      '<head$1><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">');
+  }
+
+  // 2. Ensure charset.
+  if (!/<meta\s+charset=/i.test(out)) {
+    out = out.replace(/<head([^>]*)>/i, '<head$1><meta charset="utf-8">');
+  }
+
+  // 3. Ensure title contains something derived from prompt if missing.
+  if (!/<title>[^<]+<\/title>/i.test(out)) {
+    const name = extractName(prompt) || 'Generated Site';
+    out = out.replace(/<head([^>]*)>/i, `<head$1><title>${esc(name)}</title>`);
+  }
+
+  // 4. Ensure meta description.
+  if (!/<meta\s+name=["']description["']/i.test(out)) {
+    const desc = prompt.slice(0, 155).replace(/"/g, '&quot;');
+    out = out.replace(/<head([^>]*)>/i, `<head$1><meta name="description" content="${desc}">`);
+  }
+
+  // 5. Ensure Open Graph tags so the site previews properly on social.
+  if (!/property=["']og:title["']/i.test(out)) {
+    const title = (out.match(/<title>([^<]+)<\/title>/i) || [])[1] || 'Site';
+    const desc = prompt.slice(0, 155).replace(/"/g, '&quot;');
+    out = out.replace(/<\/head>/i,
+      `<meta property="og:title" content="${esc(title)}">` +
+      `<meta property="og:description" content="${desc}">` +
+      `<meta property="og:type" content="website">` +
+      `<meta name="twitter:card" content="summary_large_image"></head>`);
+  }
+
+  // 6. Add alt="" to <img> tags missing alt (a11y). Empty alt is correct for
+  //    decorative images; better than nothing or unrelated text.
+  out = out.replace(/<img\b(?![^>]*\balt=)([^>]*)>/gi, '<img$1 alt="">');
+
+  // 7. Add loading="lazy" + decoding="async" to <img> tags missing them.
+  out = out.replace(/<img\b(?![^>]*\bloading=)([^>]*)>/gi, '<img$1 loading="lazy">');
+  out = out.replace(/<img\b(?![^>]*\bdecoding=)([^>]*)>/gi, '<img$1 decoding="async">');
+
+  // 8. Strip href="#" and href="" links — those are dead buttons. Replace with
+  //    role=button so the browser treats them as interactive without nav.
+  out = out.replace(/<a\b([^>]*?)\bhref=["']#?["']([^>]*)>/gi, '<a$1$2 role="button">');
+
+  // 9. Inject minimal schema.org JSON-LD so search engines understand it.
+  if (!/application\/ld\+json/i.test(out)) {
+    const ld = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: extractName(prompt) || 'Generated Site',
+      description: prompt.slice(0, 160),
+    }).replace(/<\//g, '<\/');
+    out = out.replace(/<\/head>/i, `<script type="application/ld+json">${ld}</script></head>`);
+  }
+
+  return out;
 }
 
 function injectWM(html) {

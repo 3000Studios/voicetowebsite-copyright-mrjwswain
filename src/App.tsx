@@ -278,6 +278,7 @@ const Footer = () => (
 );
 
 import { Home } from "./components/Home";
+import GlobalSearch from "./components/GlobalSearch";
 import { UniversalDeploymentPrompt } from "./pages/UniversalDeploymentPrompt";
 // --- AdSense Component (real) ---
 import { GoogleAdSense } from "./components/GoogleAdSense";
@@ -936,6 +937,7 @@ export default function App() {
         <div className="fixed inset-0 -z-10 bg-black/45 pointer-events-none" />
 
         <Navbar />
+        <GlobalSearch />
 
         <main className="flex-grow">
           <Routes>

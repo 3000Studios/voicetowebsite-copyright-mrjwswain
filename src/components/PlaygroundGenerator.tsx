@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Download,
   Eye,
+  Globe,
   Keyboard,
   Loader2,
   Maximize2,
@@ -18,6 +19,7 @@ import {
   RotateCcw,
   Save,
   Send,
+  Shuffle,
   Sparkles,
   Smartphone,
   Wand2,
@@ -117,6 +119,7 @@ function saveToExamples(prompt: string, variation: Variation, media: MediaResult
 
 export function PlaygroundGenerator({ variant = "default" }: { variant?: "default" | "hero" }) {
   const [prompt, setPrompt] = useState("");
+  const [mode, setMode] = useState<"prompt" | "renovate">("prompt");
   const [isLoading, setIsLoading] = useState(false);
   const [variations, setVariations] = useState<Variation[]>([]);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -128,10 +131,20 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
   const [brief, setBrief] = useState<PromptBrief | null>(null);
   const [error, setError] = useState("");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
+  const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
 
   const activeVariation = variations[activeIdx] ?? null;
+
+  // Cycle the placeholder every 3.5s so the input feels alive when idle.
+  useEffect(() => {
+    if (prompt || isLoading || variations.length) return;
+    const id = setInterval(() => {
+      setPlaceholderIdx((i) => (i + 1) % EXAMPLE_PROMPTS.length);
+    }, 3500);
+    return () => clearInterval(id);
+  }, [prompt, isLoading, variations.length]);
 
   const startListening = useCallback(() => {
     const SR = (window as unknown as Record<string, unknown>).SpeechRecognition as (new () => BrowserSpeechRecognition) | undefined
@@ -213,6 +226,68 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
     return () => window.removeEventListener("keydown", handler);
   }, [handleGenerate]);
 
+  // Renovate mode: call /api/renovate with a URL. Server fetches the page,
+  // extracts content, runs it through the same /api/generate pipeline, and
+  // returns the same { brief, variations } shape we already render.
+  const handleRenovate = useCallback(async (overrideUrl?: string) => {
+    const raw = (overrideUrl ?? prompt).trim();
+    if (!raw || isLoading) return;
+    setIsLoading(true);
+    setVariations([]);
+    setActiveIdx(0);
+    setMedia(null);
+    setBrief(null);
+    setError("");
+    setLoadStage(1);
+    try {
+      setLoadStage(2);
+      const data = await postJSON<{
+        brief?: PromptBrief;
+        variations?: Variation[];
+        source?: { url: string; title: string; wordCount: number };
+        error?: string;
+        details?: string;
+      }>("/api/renovate", { url: raw }, { timeoutMs: 60000 });
+      if (!data.variations?.length) throw new Error(data.error || "Renovate returned no variations");
+      setBrief(data.brief || null);
+      setVariations(data.variations);
+      setLoadStage(0);
+      // Lightweight stand-in for the media we'd normally pass to saveToExamples.
+      const stubMedia: MediaResult = {
+        imageUrl: "",
+        gallery: [],
+        videoUrl: "",
+      };
+      saveToExamples(`Renovated: ${data.source?.url || raw}`, data.variations[0], stubMedia);
+    } catch (err) {
+      console.error("Renovate failed:", err);
+      const msg = err instanceof ApiError
+        ? `${err.message}${err.status ? ` (${err.status})` : ''}`
+        : err instanceof Error
+        ? err.message
+        : "Renovate failed. Check the URL and try again.";
+      setError(msg);
+      setLoadStage(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [prompt, isLoading]);
+
+  // Surprise Me: pick a random example prompt and run it.
+  const handleSurprise = useCallback(() => {
+    if (isLoading) return;
+    const next = EXAMPLE_PROMPTS[Math.floor(Math.random() * EXAMPLE_PROMPTS.length)];
+    setMode("prompt");
+    setPrompt(next);
+    void handleGenerate(next);
+  }, [isLoading, handleGenerate]);
+
+  // Unified submit — routes to renovate or generate based on mode.
+  const handleSubmit = useCallback(() => {
+    if (mode === "renovate") void handleRenovate();
+    else void handleGenerate();
+  }, [mode, handleGenerate, handleRenovate]);
+
   const handleSave = () => {
     if (!activeVariation || !media) return;
     saveToExamples(prompt, activeVariation, media);
@@ -255,43 +330,104 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
 
   return (
     <div className={`w-full ${variant === "hero" ? "max-w-5xl" : "max-w-4xl"} mx-auto px-4`}>
+      {/* Mode toggle: Prompt vs Renovate */}
+      <div className="mb-3 flex items-center justify-between flex-wrap gap-2">
+        <div className="inline-flex rounded-xl border border-white/10 bg-white/5 p-1">
+          <button
+            type="button"
+            onClick={() => setMode("prompt")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              mode === "prompt"
+                ? "bg-gradient-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/40 text-white"
+                : "text-white/55 hover:text-white"
+            }`}
+            title="Describe a new business"
+          >
+            <Wand2 className="w-3.5 h-3.5" /> Describe
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("renovate")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              mode === "renovate"
+                ? "bg-gradient-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/40 text-white"
+                : "text-white/55 hover:text-white"
+            }`}
+            title="Renovate an existing site by URL"
+          >
+            <Globe className="w-3.5 h-3.5" /> Renovate URL
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={handleSurprise}
+          disabled={isLoading}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-xs font-semibold text-white/65 hover:text-white hover:border-white/25 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          title="Surprise me with a random idea"
+        >
+          <Shuffle className="w-3.5 h-3.5" /> Surprise me
+        </button>
+      </div>
+
       {/* Input bar */}
       <div className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden mb-4">
         <div className="flex items-center gap-3 p-4">
+          {mode === "prompt" ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (inputMode === "voice") { setInputMode("text"); stopListening(); }
+                else { setInputMode("voice"); startListening(); }
+              }}
+              className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                isListening
+                  ? "bg-red-500/20 border border-red-400/50 text-red-400 animate-pulse"
+                  : "bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/30"
+              }`}
+              title={inputMode === "voice" ? "Stop listening" : "Use voice input"}
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : inputMode === "voice" ? <Mic className="w-4 h-4" /> : <Keyboard className="w-4 h-4" />}
+            </button>
+          ) : (
+            <div
+              className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 text-cyan-300"
+              title="Renovate mode — paste a URL"
+            >
+              <Globe className="w-4 h-4" />
+            </div>
+          )}
+          {mode === "prompt" ? (
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
+              placeholder={EXAMPLE_PROMPTS[placeholderIdx]}
+              className="flex-1 bg-transparent text-white placeholder-white/35 resize-none outline-none text-sm leading-relaxed min-h-[52px] max-h-[120px]"
+              rows={2}
+            />
+          ) : (
+            <input
+              type="url"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSubmit(); } }}
+              placeholder="https://example.com — we fetch the page and rebuild it premium"
+              className="flex-1 bg-transparent text-white placeholder-white/35 outline-none text-sm leading-relaxed h-[52px]"
+              autoComplete="url"
+              spellCheck={false}
+            />
+          )}
           <button
             type="button"
-            onClick={() => {
-              if (inputMode === "voice") { setInputMode("text"); stopListening(); }
-              else { setInputMode("voice"); startListening(); }
-            }}
-            className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-              isListening
-                ? "bg-red-500/20 border border-red-400/50 text-red-400 animate-pulse"
-                : "bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/30"
-            }`}
-            title={inputMode === "voice" ? "Stop listening" : "Use voice input"}
-          >
-            {isListening ? <MicOff className="w-4 h-4" /> : inputMode === "voice" ? <Mic className="w-4 h-4" /> : <Keyboard className="w-4 h-4" />}
-          </button>
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void handleGenerate(); } }}
-            placeholder='Describe your business... e.g. "A luxury spa called Serenity Haven with a dark theme and booking form"'
-            className="flex-1 bg-transparent text-white placeholder-white/35 resize-none outline-none text-sm leading-relaxed min-h-[52px] max-h-[120px]"
-            rows={2}
-          />
-          <button
-            type="button"
-            onClick={() => void handleGenerate()}
+            onClick={handleSubmit}
             disabled={!prompt.trim() || isLoading}
             className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            {isLoading ? "Building..." : "Generate"}
+            {isLoading ? "Building..." : mode === "renovate" ? "Renovate" : "Generate"}
           </button>
         </div>
-        {!variations.length && !isLoading && (
+        {mode === "prompt" && !variations.length && !isLoading && (
           <div className="px-4 pb-4 flex flex-wrap gap-2">
             {EXAMPLE_PROMPTS.map((ex) => (
               <button

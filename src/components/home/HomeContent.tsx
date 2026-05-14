@@ -17,6 +17,7 @@ import {
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { cn } from "../../lib/utils";
+import { parseResponse } from "../../lib/api";
 
 export const HowItWorks = () => {
   const steps = [
