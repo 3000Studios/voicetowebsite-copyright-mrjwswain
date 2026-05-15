@@ -9,3 +9,6 @@ coverage/
 !.env.example
 key.json
 .aider*
+
+.claude/settings.local.json
+
