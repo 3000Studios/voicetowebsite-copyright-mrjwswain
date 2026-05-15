@@ -10,18 +10,12 @@ import { Link } from "react-router-dom";
 
 const planOrder: PlanType[] = ["starter", "pro", "enterprise", "commands"];
 
-const providerOptions = [
-  { key: "stripe" as const, label: "Stripe", hint: "Cards and wallets" },
-  { key: "paypal" as const, label: "PayPal", hint: "PayPal balance / card" },
-];
-
 export const Pricing = () => {
   const [cadence, setCadence] = React.useState<"month" | "year">("month");
   const [submitting, setSubmitting] = React.useState<PlanType | null>(null);
-  const [provider, setProvider] = React.useState<"stripe" | "paypal">("stripe");
 
   const handleUpgrade = async (plan: PlanType) => {
-    trackEvent("pricing_cta_clicked", { plan, cadence, provider });
+    trackEvent("pricing_cta_clicked", { plan, cadence });
     setSubmitting(plan);
     try {
       if (plan === "free") {
@@ -29,24 +23,21 @@ export const Pricing = () => {
         return;
       }
 
-      const endpoint = provider === "stripe" ? "/api/create-checkout-session" : "/api/create-paypal-order";
-      const query = new URLSearchParams({ plan, cadence, launch_discount: "true" }).toString();
-      const response = await fetch(`${endpoint}?${query}`, { method: "POST" });
-      trackEvent("checkout_started", { plan, provider, cadence });
+      const query = new URLSearchParams({ plan, cadence }).toString();
+      const response = await fetch(`/api/create-checkout-session?${query}`, { method: "POST" });
+      trackEvent("checkout_started", { plan, cadence });
       const data = await parseResponse<{ url?: string; error?: string }>(response);
 
       if (!response.ok || !data.url) {
-        if (provider === "stripe") {
-          const fallback =
-            plan === "commands"
-              ? STRIPE_PAYMENT_LINKS.commands.month
-              : STRIPE_PAYMENT_LINKS[plan][cadence];
-          if (fallback) {
-            window.location.href = fallback;
-            return;
-          }
+        const fallback =
+          plan === "commands"
+            ? STRIPE_PAYMENT_LINKS.commands.month
+            : STRIPE_PAYMENT_LINKS[plan][cadence];
+        if (fallback) {
+          window.location.href = fallback;
+          return;
         }
-        throw new Error(data.error || `${provider} checkout initialization failed.`);
+        throw new Error(data.error || "Stripe checkout initialization failed.");
       }
 
       window.location.href = data.url;
@@ -78,7 +69,7 @@ export const Pricing = () => {
           <span className="eyebrow justify-center">Pricing</span>
           <h1 className="section-title">Choose the plan that matches how many sites you need to launch.</h1>
           <p className="section-copy">
-            One free sandbox preview, then paid delivery for hosted sites. Launch pricing is 50 percent off, and annual billing saves more.
+            One free sandbox preview, then paid delivery for hosted sites. Annual billing saves 20%.
           </p>
         </div>
 
@@ -119,28 +110,7 @@ export const Pricing = () => {
                   );
                 })}
               </div>
-              <span className="rounded-full border border-emerald-300/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-200">50% launch discount</span>
-              {cadence === "year" ? <span className="rounded-full border border-cyan-300/20 bg-cyan-500/10 px-3 py-1 text-xs font-bold text-cyan-200">Annual saves more</span> : null}
-            </div>
-
-            <div className="mt-6">
-              <div className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400">Payment provider</div>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {providerOptions.map((option) => {
-                  const active = provider === option.key;
-                  return (
-                    <button
-                      key={option.key}
-                      type="button"
-                      onClick={() => setProvider(option.key)}
-                      className={`rounded-2xl border px-4 py-4 text-left transition ${active ? "border-cyan-300/40 bg-cyan-500/10 text-white" : "border-white/10 bg-black/20 text-slate-300 hover:border-white/20 hover:text-white"}`}
-                    >
-                      <div className="font-semibold">{option.label}</div>
-                      <div className="mt-1 text-xs text-slate-400">{option.hint}</div>
-                    </button>
-                  );
-                })}
-              </div>
+              {cadence === "year" ? <span className="rounded-full border border-cyan-300/20 bg-cyan-500/10 px-3 py-1 text-xs font-bold text-cyan-200">Annual saves 20%</span> : null}
             </div>
 
             <div className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-5">
@@ -154,9 +124,9 @@ export const Pricing = () => {
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <InfoCard title="Starter" body="$4.99 launch. 50 commands." />
-              <InfoCard title="Pro" body="$9.99 launch. Exports + 150 commands." />
-              <InfoCard title="Ultimate" body="$24.99 launch. 500 commands." />
+              <InfoCard title="Starter" body="$9.99/mo. 50 commands." />
+              <InfoCard title="Pro" body="$19.99/mo. Exports + 150 commands." />
+              <InfoCard title="Ultimate" body="$49.99/mo. 500 commands." />
             </div>
           </div>
         </div>
@@ -210,11 +180,11 @@ export const Pricing = () => {
                     disabled={submitting === plan}
                     className="hero-primary-button w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {submitting === plan ? "Redirecting…" : plan === "commands" ? `Buy command pack (${provider})` : `Choose ${config.name}`}
+                    {submitting === plan ? "Redirecting…" : plan === "commands" ? "Buy command pack" : `Choose ${config.name}`}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                   <p className="text-xs leading-5 text-slate-400">
-                    All sales are final. By purchasing, you agree to the Terms, Privacy Policy, and no-refund policy.
+                    By purchasing, you agree to the <Link to="/terms" className="underline">Terms</Link>, <Link to="/privacy" className="underline">Privacy Policy</Link>, and <Link to="/refunds" className="underline">Refund Policy</Link>.
                   </p>
                 </div>
               </motion.div>

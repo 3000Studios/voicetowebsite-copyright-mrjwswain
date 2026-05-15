@@ -170,7 +170,6 @@ export const Success = () => {
         style_preference: form.style_preference,
         plan,
         cadence: initialCadence,
-        launch_discount: "true",
       });
       const orderResponse = await fetch(`/api/order?${orderQuery.toString()}`, {
         method: "POST",

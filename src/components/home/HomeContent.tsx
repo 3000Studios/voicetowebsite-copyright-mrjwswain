@@ -241,8 +241,7 @@ export const PricingSection = () => {
     {
       id: "starter",
       name: "Starter",
-      listPrice: "9.99",
-      price: "4.99",
+      price: "9.99",
       commands: "50",
       popular: false,
       features: [
@@ -255,8 +254,7 @@ export const PricingSection = () => {
     {
       id: "pro",
       name: "Pro",
-      listPrice: "19.99",
-      price: "9.99",
+      price: "19.99",
       commands: "150",
       popular: true,
       features: [
@@ -270,8 +268,7 @@ export const PricingSection = () => {
     {
       id: "enterprise",
       name: "Ultimate",
-      listPrice: "49.99",
-      price: "24.99",
+      price: "49.99",
       commands: "500",
       popular: false,
       features: [
@@ -299,7 +296,6 @@ export const PricingSection = () => {
         body: JSON.stringify({
           plan: planId,
           cadence: "month",
-          launch_discount: true,
         }),
       });
       const data = (await parseResponse(res)) as { url?: string; error?: string };
@@ -349,15 +345,9 @@ export const PricingSection = () => {
               )}
               <h3 className="text-2xl font-black italic mb-6">{plan.name}</h3>
               <div className="mb-10">
-                <div className="mb-2 inline-flex rounded-full border border-brand-cyan/30 bg-brand-cyan/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-brand-cyan">
-                  50% launch discount
-                </div>
                 <div className="flex items-baseline gap-3">
                   <span className="text-5xl font-black">${plan.price}</span>
                   <span className="text-white/40 text-sm">/month</span>
-                </div>
-                <div className="mt-2 text-xs text-white/35">
-                  Regularly <span className="line-through">${plan.listPrice}</span>/month
                 </div>
               </div>
               <ul className="space-y-6 mb-12">
@@ -388,12 +378,6 @@ export const PricingSection = () => {
                 >
                   Get Started <CreditCard className="w-4 h-4" />
                 </button>
-                <button
-                  onClick={() => handleCheckout(plan.id, "paypal")}
-                  className="w-full py-4 rounded-2xl bg-[#0070ba] text-white font-black hover:bg-[#003087] transition-colors flex items-center justify-center gap-2"
-                >
-                  Checkout with PayPal
-                </button>
               </div>
             </div>
           ))}
@@ -405,7 +389,7 @@ export const PricingSection = () => {
             onClick={() => handleCheckout("commands", "stripe")}
             className="text-white hover:text-brand-cyan underline"
           >
-            <strong>$1.49 Launch Bundle</strong>
+            <strong>$2.99 Command Bundle</strong>
           </button>{" "}
           adds 10 extra commands on any plan.
           <br />

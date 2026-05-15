@@ -301,7 +301,6 @@ const ScrollToTop = () => {
 import { signInWithGoogle } from "./lib/firebase";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
@@ -331,43 +330,6 @@ const LoginPage = () => {
           Enter your credentials to manage your digital empire.
         </p>
 
-        <form className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase font-black tracking-[0.2em] text-white/40 ml-2">
-              Email Identity
-            </label>
-            <input
-              type="email"
-              placeholder="name@domain.com"
-              className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-brand-cyan outline-none transition-all"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase font-black tracking-[0.2em] text-white/40 ml-2">
-              Secure Key
-            </label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-brand-cyan outline-none transition-all"
-            />
-          </div>
-          <Link
-            to="/dashboard"
-            className="block w-full py-4 bg-white text-black text-center font-black rounded-2xl hover:bg-brand-cyan transition-all hover:scale-[1.02] active:scale-95"
-          >
-            Authorize Access
-          </Link>
-        </form>
-
-        <div className="mt-8 flex items-center gap-4 text-white/20">
-          <div className="flex-grow h-px bg-white/5" />
-          <span className="text-[10px] uppercase font-black">
-            Or Continue With
-          </span>
-          <div className="flex-grow h-px bg-white/5" />
-        </div>
-
         <button
           onClick={handleGoogleSignIn}
           type="button"
@@ -395,84 +357,63 @@ const LoginPage = () => {
   );
 };
 
-const SignUpPage = () => (
-  <div className="pt-40 pb-24 px-6 flex flex-col items-center min-h-screen">
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="glass-premium p-12 rounded-[3.5rem] w-full max-w-lg"
-    >
-      <h1 className="text-4xl font-black mb-2 italic">Join the Elite</h1>
-      <p className="text-white/40 text-sm mb-10">
-        Start building premium websites with voice in seconds.
-      </p>
+const SignUpPage = () => {
+  const handleGoogleSignUp = async () => {
+    try {
+      await signInWithGoogle();
+      window.location.href = "/pricing";
+    } catch (error) {
+      console.error("Sign up failed", error);
+      alert("Sign up failed");
+    }
+  };
+  return (
+    <div className="pt-40 pb-24 px-6 flex flex-col items-center min-h-screen">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-premium p-12 rounded-[3.5rem] w-full max-w-lg"
+      >
+        <h1 className="text-4xl font-black mb-2 italic">Join the Elite</h1>
+        <p className="text-white/40 text-sm mb-10">
+          Start building premium websites with voice in seconds.
+        </p>
 
-      <form className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase font-black tracking-widest text-white/40 ml-2">
-              First Name
-            </label>
-            <input
-              type="text"
-              className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-brand-cyan outline-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase font-black tracking-widest text-white/40 ml-2">
-              Last Name
-            </label>
-            <input
-              type="text"
-              className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-brand-cyan outline-none"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase font-black tracking-widest text-white/40 ml-2">
-            Email Address
-          </label>
-          <input
-            type="email"
-            className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-brand-cyan outline-none"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase font-black tracking-widest text-white/40 ml-2">
-            Password
-          </label>
-          <input
-            type="password"
-            className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:border-brand-cyan outline-none"
-          />
-        </div>
-
-        <div className="flex items-start gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
-          <input type="checkbox" className="mt-1 accent-brand-cyan" />
-          <p className="text-[10px] text-white/40 leading-relaxed">
-            I agree to the{" "}
-            <Link to="/terms" className="text-white underline">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link to="/privacy" className="text-white underline">
-              Privacy Policy
-            </Link>
-            . I understand all sales are final and generated content is my
-            responsibility.
-          </p>
-        </div>
-
-        <Link
-          to="/setup"
-          className="block w-full py-5 bg-brand-cyan text-black text-center font-black rounded-2xl hover:scale-[1.02] active:scale-95 transition-all text-lg shadow-xl shadow-brand-cyan/20"
+        <button
+          onClick={handleGoogleSignUp}
+          type="button"
+          className="w-full py-4 glass rounded-2xl flex items-center justify-center gap-3 font-bold hover:bg-white/10 transition-all"
         >
-          Create Account & Start Build
-        </Link>
-      </form>
-    </motion.div>
-  </div>
-);
+          <img
+            src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
+            alt="Google"
+            className="w-5 h-5"
+          />
+          Continue with Google
+        </button>
+
+        <p className="mt-8 text-[10px] text-white/40 leading-relaxed text-center">
+          By continuing you agree to the{" "}
+          <Link to="/terms" className="text-white underline">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link to="/privacy" className="text-white underline">
+            Privacy Policy
+          </Link>
+          . All sales are final.
+        </p>
+
+        <p className="mt-6 text-center text-xs text-white/40">
+          Already have an account?{" "}
+          <Link to="/login" className="text-brand-cyan font-bold hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </motion.div>
+    </div>
+  );
+};
 
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useAuth } from "./lib/AuthContext";
@@ -703,7 +644,7 @@ const Dashboard = () => {
   );
 };
 
-import { DMCA, PrivacyPolicy, TermsOfService } from "./components/Legal";
+import { DMCA, PrivacyPolicy, RefundPolicy, TermsOfService } from "./components/Legal";
 import {
   AboutPage,
   ExamplesPage,
@@ -962,6 +903,7 @@ export default function App() {
             <Route path="/legal" element={<TermsOfService />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/refunds" element={<RefundPolicy />} />
             <Route path="/dmca" element={<DMCA />} />
             <Route path="/signin" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />

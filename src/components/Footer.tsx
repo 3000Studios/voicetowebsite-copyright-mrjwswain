@@ -56,10 +56,15 @@ export const Footer = () => {
 
         <div className="space-y-5">
           <h3 className="footer-heading">Need help?</h3>
-          <a href="mailto:support@voicetowebsite.com" className="footer-link inline-flex min-h-11 items-center gap-2 px-1 py-2">
-            <Mail className="h-4 w-4" /> support@voicetowebsite.com
+          <a href="mailto:mr.jwswain@gmail.com" className="footer-link inline-flex min-h-11 items-center gap-2 px-1 py-2">
+            <Mail className="h-4 w-4" /> mr.jwswain@gmail.com
           </a>
-          <Link to="/legal" className="footer-link block">Terms, privacy, refunds</Link>
+          <div className="flex flex-col gap-2">
+            <Link to="/terms" className="footer-link">Terms of Service</Link>
+            <Link to="/privacy" className="footer-link">Privacy Policy</Link>
+            <Link to="/refunds" className="footer-link">Refund Policy</Link>
+            <Link to="/dmca" className="footer-link">DMCA</Link>
+          </div>
           <Link to="/pricing" className="nav-primary-button inline-flex">
             View plans
             <ArrowRight className="h-4 w-4" />

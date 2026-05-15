@@ -15,19 +15,18 @@ export interface Env {
 
 const STRIPE_SESSIONS_URL = 'https://api.stripe.com/v1/checkout/sessions';
 
-const PRICE_DATA: Record<string, { name: string; amount: number; launchAmount: number; recurring: boolean }> = {
-  starter: { name: "VoiceToWebsite.com Starter", amount: 999, launchAmount: 499, recurring: true },
-  pro: { name: "VoiceToWebsite.com Pro", amount: 1999, launchAmount: 999, recurring: true },
-  enterprise: { name: "VoiceToWebsite.com Ultimate", amount: 4999, launchAmount: 2499, recurring: true },
-  commands: { name: "VoiceToWebsite.com More Commands", amount: 299, launchAmount: 149, recurring: false },
+const PRICE_DATA: Record<string, { name: string; amount: number; recurring: boolean }> = {
+  starter: { name: "VoiceToWebsite.com Starter", amount: 999, recurring: true },
+  pro: { name: "VoiceToWebsite.com Pro", amount: 1999, recurring: true },
+  enterprise: { name: "VoiceToWebsite.com Ultimate", amount: 4999, recurring: true },
+  commands: { name: "VoiceToWebsite.com More Commands", amount: 299, recurring: false },
 };
 
-function checkoutAmount(plan: string, cadence: 'month' | 'year', launchDiscount: boolean) {
+function checkoutAmount(plan: string, cadence: 'month' | 'year') {
   const price = PRICE_DATA[plan];
   if (!price) return null;
-  const monthlyAmount = launchDiscount ? price.launchAmount : price.amount;
-  if (!price.recurring || cadence === 'month') return monthlyAmount;
-  return Math.round(monthlyAmount * 12 * 0.8);
+  if (!price.recurring || cadence === 'month') return price.amount;
+  return Math.round(price.amount * 12 * 0.8);
 }
 
 function paypalBaseUrl(env: Env) {
@@ -36,7 +35,7 @@ function paypalBaseUrl(env: Env) {
     : "https://api-m.paypal.com";
 }
 
-async function createPayPalFallback(env: Env, plan: string, appUrl: string, launchDiscount = false) {
+async function createPayPalFallback(env: Env, plan: string, appUrl: string) {
   const price = PRICE_DATA[plan];
   if (!price || !env.PAYPAL_CLIENT_ID || !env.PAYPAL_CLIENT_SECRET || !appUrl) return null;
   const credentials = btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`);
@@ -60,8 +59,8 @@ async function createPayPalFallback(env: Env, plan: string, appUrl: string, laun
       intent: "CAPTURE",
       purchase_units: [
         {
-          amount: { currency_code: "USD", value: ((launchDiscount ? price.launchAmount : price.amount) / 100).toFixed(2) },
-          description: launchDiscount ? `${price.name} - 50% launch discount` : price.name,
+          amount: { currency_code: "USD", value: (price.amount / 100).toFixed(2) },
+          description: price.name,
         },
       ],
       application_context: {
@@ -111,7 +110,6 @@ async function parseRequestBody(request: Request) {
     return {
       plan: String(url.searchParams.get('plan') || ''),
       cadence: String(url.searchParams.get('cadence') || ''),
-      launch_discount: String(url.searchParams.get('launch_discount') || '').toLowerCase() === 'true',
     };
   }
 
@@ -122,7 +120,7 @@ async function parseRequestBody(request: Request) {
     if (!raw.trim()) {
       return {};
     }
-    return JSON.parse(raw) as { plan?: string; cadence?: string; launch_discount?: boolean };
+    return JSON.parse(raw) as { plan?: string; cadence?: string };
   }
 
   if (contentType.includes('application/x-www-form-urlencoded')) {
@@ -131,7 +129,6 @@ async function parseRequestBody(request: Request) {
     return {
       plan: String(params.get('plan') || ''),
       cadence: String(params.get('cadence') || ''),
-      launch_discount: String(params.get('launch_discount') || '').toLowerCase() === 'true',
     };
   }
 
@@ -160,8 +157,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     if (!plan) return jsonResponse({ error: 'Missing plan' }, { status: 400 });
     const cadence = body.cadence?.toLowerCase() === 'year' ? 'year' : 'month';
 
-    const launchDiscount = Boolean(body.launch_discount);
-    const priceId = launchDiscount ? null : getStripePriceForPlan(context.env, plan, cadence);
+    const priceId = getStripePriceForPlan(context.env, plan, cadence);
     const fallbackUrl =
       plan === "commands"
         ? FALLBACK_STRIPE_LINKS.commands.month
@@ -195,7 +191,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       if (!priceData) return jsonResponse({ error: 'Invalid plan' }, { status: 400 });
       form.set('line_items[0][price_data][currency]', 'usd');
       form.set('line_items[0][price_data][product_data][name]', priceData.name);
-      const amount = checkoutAmount(plan, cadence, launchDiscount);
+      const amount = checkoutAmount(plan, cadence);
       if (!amount) return jsonResponse({ error: 'Invalid plan' }, { status: 400 });
       form.set('line_items[0][price_data][unit_amount]', String(amount));
       if (priceData.recurring) {
@@ -206,7 +202,6 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     form.set('client_reference_id', `voice2website_${plan}_${Date.now()}`);
     form.set('metadata[plan]', plan);
     form.set('metadata[cadence]', cadence);
-    if (launchDiscount) form.set('metadata[launch_discount]', 'true');
 
     const response = await fetch(STRIPE_SESSIONS_URL, {
       method: 'POST',
@@ -227,7 +222,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       }
     }
     if (!response.ok || !data.url) {
-      const paypalFallback = await createPayPalFallback(context.env, plan, appUrl, launchDiscount);
+      const paypalFallback = await createPayPalFallback(context.env, plan, appUrl);
       if (paypalFallback) return jsonResponse({ url: paypalFallback, fallback: "paypal" });
       if (fallbackUrl) return jsonResponse({ url: fallbackUrl, fallback: true });
       return jsonResponse({ error: data?.error?.message || 'Stripe session creation failed' }, { status: 500 });
