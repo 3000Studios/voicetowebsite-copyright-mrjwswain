@@ -649,12 +649,12 @@ import {
   AboutPage,
   ExamplesPage,
   FAQPage,
-  SetupPage,
   SitePreviewPage,
   StoriesPage,
-  SuccessPage,
   SupportPage,
 } from "./components/Pages";
+import { Success as SuccessPage } from "./pages/Success";
+import { Setup as SetupPage } from "./pages/Setup";
 
 const AdminPanel = () => {
   const { user, role, loading } = useAuth();

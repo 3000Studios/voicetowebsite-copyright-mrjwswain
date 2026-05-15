@@ -7,6 +7,11 @@ const enableAnalyzer =
   process.env.ANALYZE === "1" || process.env.VITE_ANALYZE === "1";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "src"),
+    },
+  },
   plugins: [
     react(),
     ...(enableAnalyzer
