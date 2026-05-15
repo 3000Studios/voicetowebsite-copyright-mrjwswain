@@ -8,6 +8,9 @@ interface ScrollRevealProps {
   duration?: number;
   className?: string;
   once?: boolean;
+  as?: keyof React.JSX.IntrinsicElements;
+  style?: React.CSSProperties;
+  variant?: string;
 }
 
 export const ScrollReveal: React.FC<ScrollRevealProps> = ({
@@ -17,6 +20,8 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   duration = 0.6,
   className = '',
   once = true,
+  as = 'div',
+  style,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, margin: "-100px" });
@@ -32,9 +37,10 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   };
 
   const initial = getInitialPosition();
+  const MotionTag = (motion as unknown as Record<string, React.ComponentType<Record<string, unknown>>>)[as] ?? motion.div;
 
   return (
-    <motion.div
+    <MotionTag
       ref={ref}
       initial={{ opacity: 0, ...initial }}
       animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, ...initial }}
@@ -44,9 +50,10 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
         ease: [0.16, 1, 0.3, 1],
       }}
       className={className}
+      style={style}
     >
       {children}
-    </motion.div>
+    </MotionTag>
   );
 };
 

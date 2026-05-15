@@ -182,12 +182,9 @@ export function CompetitorComparison() {
   );
 }
 
-const Cell = ({
+const Cell: React.FC<{ value: boolean; highlight?: boolean }> = ({
   value,
   highlight = false,
-}: {
-  value: boolean;
-  highlight?: boolean;
 }) => (
   <div className="flex justify-center">
     {value ? (

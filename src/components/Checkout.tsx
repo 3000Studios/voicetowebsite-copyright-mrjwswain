@@ -156,7 +156,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                 })),
               }),
             });
-            const data = await res.json();
+            const data = (await res.json()) as { id?: string; error?: string };
             if (!res.ok || !data.id)
               throw new Error(data.error || "Order creation failed");
             return data.id;
@@ -169,7 +169,7 @@ export default function Checkout({ items, onClose }: CheckoutProps) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ orderId: data.orderID }),
               });
-              const cap = await res.json();
+              const cap = (await res.json()) as { ok?: boolean; error?: string };
               if (!res.ok || !cap.ok)
                 throw new Error(cap.error || "Capture failed");
 

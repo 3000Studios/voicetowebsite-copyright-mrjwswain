@@ -92,7 +92,8 @@ export const PhysicsBackground = () => {
       <Canvas
         shadows
         camera={{ position: [0, 0, 15], fov: 50 }}
-        style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh' }}
+        gl={{ antialias: true }}
+        className="absolute! inset-0! w-screen! h-screen!"
       >
         <Scene />
       </Canvas>

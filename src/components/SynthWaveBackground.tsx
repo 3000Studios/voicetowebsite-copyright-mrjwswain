@@ -37,7 +37,7 @@ const StarField = () => {
   );
 };
 
-const SynthObject = ({ position }: { position: [number, number, number] }) => {
+const SynthObject: React.FC<{ position: [number, number, number] }> = ({ position }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [color, setColor] = useState(new THREE.Color('#6366f1'));
 

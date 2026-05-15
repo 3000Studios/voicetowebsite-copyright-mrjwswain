@@ -55,7 +55,7 @@ interface PageLayoutProps {
   className?: string;
 }
 
-const formatWallpaperLabel = (value: WallpaperVariant) =>
+const formatWallpaperLabel = (value: string) =>
   value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 const upsertMetaTag = (

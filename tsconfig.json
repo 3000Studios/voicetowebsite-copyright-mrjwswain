@@ -24,5 +24,16 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "exclude": ["migrations", "server.ts", "src/server.ts"]
+  "include": ["src", "functions"],
+  "exclude": [
+    "migrations",
+    "server.ts",
+    "src/server.ts",
+    "node_modules",
+    "dist",
+    ".wrangler",
+    "app Store apps to Sell",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }
