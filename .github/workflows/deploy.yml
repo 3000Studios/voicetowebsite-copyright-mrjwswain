@@ -1,15 +1,15 @@
 name: Deploy to Cloudflare Pages
 
-# GLOBAL DEPLOYMENT RULE
-# - Single repo, single branch (main), single Cloudflare Pages project.
-# - Every push to main deploys to production.
-# - Production domains (voicetowebsite.com, www.voicetowebsite.com) are bound
-#   in the Cloudflare dashboard for the "voicetowebsite" Pages project.
+# DISABLED 2026-05-15.
+# Cloudflare Pages' native Git integration is the deploy path now — Cloudflare
+# builds on each push to main directly, so this workflow is redundant. It was
+# also blocked by a GitHub Actions billing lock on the org account.
+#
+# To re-enable: restore the `push` trigger below and resolve GH Actions billing.
+# Make sure to disable the Cloudflare dashboard Git integration first so the
+# two paths don't double-deploy.
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 concurrency:
