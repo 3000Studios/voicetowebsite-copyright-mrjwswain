@@ -245,10 +245,10 @@ export const PricingSection = () => {
       commands: "50",
       popular: false,
       features: [
-        "Standard AI Engine",
-        "Community Support",
+        "Gemini-powered copy",
+        "Email Support",
         "Hosted Subdomain",
-        "Basic Sections",
+        "Standard Sections",
       ],
     },
     {
@@ -258,10 +258,10 @@ export const PricingSection = () => {
       commands: "150",
       popular: true,
       features: [
-        "Elite AI Engine",
+        "Gemini-powered copy",
         "Code Export (React/Vite)",
         "Custom Domain",
-        "Unlocked Premium Sections",
+        "Premium Sections",
         "No Watermarks",
       ],
     },
