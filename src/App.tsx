@@ -280,6 +280,7 @@ const Footer = () => (
 import { Home } from "./components/Home";
 import GlobalSearch from "./components/GlobalSearch";
 import { UniversalDeploymentPrompt } from "./pages/UniversalDeploymentPrompt";
+import EngineTester from "./pages/EngineTester";
 // --- AdSense Component (real) ---
 import { GoogleAdSense } from "./components/GoogleAdSense";
 export const AdContainer = ({ className, slot }: { className?: string; slot?: string }) => (
@@ -967,6 +968,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/engines" element={<EngineTester />} />
           </Routes>
         </main>
 
