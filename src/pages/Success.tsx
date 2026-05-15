@@ -10,7 +10,7 @@ import { motion } from "motion/react";
 import React, { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useSearchParams } from "react-router-dom";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, trackPurchase } from "@/lib/analytics";
 
 type SessionResponse = {
   ok?: boolean;
@@ -120,6 +120,13 @@ export const Success = () => {
         if (!response.ok)
           throw new Error(data.error || "Unable to verify checkout session.");
         trackEvent("checkout_completed", { provider: "stripe", plan: data.plan });
+        if (data.plan && sessionId) {
+          trackPurchase({
+            transactionId: sessionId,
+            plan: data.plan,
+            cadence: initialCadence,
+          });
+        }
 
         setSession(data);
         setForm((current) => ({

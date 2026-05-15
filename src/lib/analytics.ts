@@ -37,21 +37,71 @@ interface EventProperties {
   [key: string]: string | number | boolean | null | undefined;
 }
 
+type GtagFn = (command: "event" | "config" | "js" | "set", ...args: unknown[]) => void;
+declare global {
+  interface Window {
+    gtag?: GtagFn;
+    dataLayer?: unknown[];
+  }
+}
+
+export const PLAN_PRICE_USD: Record<string, number> = {
+  starter: 9.99,
+  pro: 19.99,
+  enterprise: 49.99,
+  commands: 2.99,
+};
+
 export const trackEvent = (name: EventName, properties?: EventProperties) => {
   try {
-    // 1. Log to console in development
     if (import.meta.env.DEV) {
       console.log(`[Analytics] ${name}`, properties);
     }
-
-    // 2. Dispatch custom event for browser-based observers
     window.dispatchEvent(
       new CustomEvent("analytics_event", { detail: { name, properties } }),
     );
-
-    // 3. Placeholder for future third-party integrations (GA4, Meta, etc.)
-    // if (window.gtag) window.gtag('event', name, properties);
+    if (typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("event", name, properties || {});
+    }
   } catch (err) {
     console.warn("Analytics tracking failed", err);
+  }
+};
+
+export const trackPurchase = (params: {
+  transactionId: string;
+  plan: string;
+  cadence?: "month" | "year";
+  value?: number;
+}) => {
+  try {
+    const planPrice = PLAN_PRICE_USD[params.plan] || 0;
+    const value =
+      typeof params.value === "number"
+        ? params.value
+        : params.cadence === "year"
+          ? Math.round(planPrice * 12 * 0.8 * 100) / 100
+          : planPrice;
+    const payload = {
+      transaction_id: params.transactionId,
+      value,
+      currency: "USD",
+      items: [
+        {
+          item_id: params.plan,
+          item_name: `VoiceToWebsite ${params.plan}`,
+          item_category: params.cadence || "month",
+          price: value,
+          quantity: 1,
+        },
+      ],
+    };
+    if (import.meta.env.DEV) console.log("[Analytics] purchase", payload);
+    if (typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("event", "purchase", payload);
+    }
+    window.dispatchEvent(new CustomEvent("analytics_event", { detail: { name: "purchase", properties: payload } }));
+  } catch (err) {
+    console.warn("Purchase tracking failed", err);
   }
 };

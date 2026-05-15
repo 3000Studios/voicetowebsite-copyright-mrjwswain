@@ -8,9 +8,93 @@ export interface Env {
   UNSPLASH_API_KEY?: string;
   PEXELS_API_KEY?: string;
   COVER_API_KEY?: string;
+  GEMINI_API_KEY?: string;
 }
 
-import { compileLayoutFromPrompt, type BrandAsset, type LayoutTree } from "../../src/lib/layoutCompiler";
+import { compileLayoutFromPrompt, type BrandAsset, type GeneratedCopy, type LayoutTree } from "../../src/lib/layoutCompiler";
+
+const GEMINI_MODEL = "gemini-2.0-flash-exp";
+
+async function generateCopyWithGemini(
+  apiKey: string,
+  businessDescription: string,
+  industry: string,
+  style: string,
+  brandName: string,
+): Promise<GeneratedCopy | null> {
+  const instruction = `You write conversion copy for a small-business homepage. Output STRICT JSON only, no prose, matching this TypeScript type:
+
+{
+  "headline": string,
+  "subhead": string,
+  "intro": string,
+  "services": string[],
+  "proof": string[],
+  "testimonials": string[],
+  "faqs": [string, string][]
+}
+
+Constraints:
+- headline: 4-10 words, punchy, specific to the business. No generic "turns attention into action" filler.
+- subhead: one sentence, ~15-25 words, explains the offer.
+- intro: 1-2 short sentences, conversational, ~20-40 words.
+- services: exactly 4 distinct offers as short noun phrases (3-5 words each).
+- proof: exactly 4 specific selling points or differentiators (3-6 words each).
+- testimonials: exactly 3 plausible 1-sentence customer quotes in first person. No names.
+- faqs: exactly 3 [question, answer] pairs. Questions a real prospect would ask. Answers under 30 words.
+- Do not mention "AI" or "generated".
+- Tone: ${style || "professional"}.
+
+Business: ${brandName}
+Industry: ${industry}
+Description: ${businessDescription}`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: instruction }] }],
+        generationConfig: { temperature: 0.85, responseMimeType: "application/json" },
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) return null;
+    const parsed = JSON.parse(text) as Partial<GeneratedCopy>;
+    if (
+      typeof parsed.headline !== "string" ||
+      typeof parsed.subhead !== "string" ||
+      typeof parsed.intro !== "string" ||
+      !Array.isArray(parsed.services) ||
+      !Array.isArray(parsed.proof) ||
+      !Array.isArray(parsed.testimonials) ||
+      !Array.isArray(parsed.faqs)
+    ) {
+      return null;
+    }
+    return {
+      headline: parsed.headline.slice(0, 200),
+      subhead: parsed.subhead.slice(0, 400),
+      intro: parsed.intro.slice(0, 500),
+      services: parsed.services.filter((s): s is string => typeof s === "string").slice(0, 4),
+      proof: parsed.proof.filter((s): s is string => typeof s === "string").slice(0, 4),
+      testimonials: parsed.testimonials.filter((s): s is string => typeof s === "string").slice(0, 3),
+      faqs: parsed.faqs
+        .filter((f): f is [string, string] => Array.isArray(f) && f.length === 2 && typeof f[0] === "string" && typeof f[1] === "string")
+        .slice(0, 6),
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
@@ -329,7 +413,23 @@ const _onRequestPost = async (context: { request: Request; env: Env }) => {
     fetchMediaAssets(`${order.business_description || ''} ${order.industry || ''}`, context.env),
   ]);
   const brand = { ...brandAssets, media };
-  const compiled = compileLayoutFromPrompt(prompt || 'Generate a business website with features, pricing, FAQ, and contact.', brand);
+  const geminiCopy = context.env.GEMINI_API_KEY
+    ? await generateCopyWithGemini(
+        context.env.GEMINI_API_KEY,
+        order.business_description || '',
+        order.industry || '',
+        order.style_preference || '',
+        brand.name || '',
+      )
+    : null;
+  if (geminiCopy) {
+    try { await writeAuditLog(context.env.DB, 'gemini_copy_generated', orderId, JSON.stringify({ headline: geminiCopy.headline, services_count: geminiCopy.services.length })); } catch { /* non-fatal */ }
+  }
+  const compiled = compileLayoutFromPrompt(
+    prompt || 'Generate a business website with features, pricing, FAQ, and contact.',
+    brand,
+    geminiCopy || undefined,
+  );
   const html = compiled.html.replace(
     '</footer>',
     `<div class="mt-4">Order ID: ${escapeHtml(orderId)} • Generated by VoiceToWebsite Layout Compiler • You are responsible for final content and compliance.</div></footer>`,

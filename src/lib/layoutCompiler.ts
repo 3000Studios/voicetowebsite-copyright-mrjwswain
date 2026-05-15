@@ -110,7 +110,17 @@ function requestedTone(prompt: string) {
   return "custom";
 }
 
-function copyFor(brand: string, prompt: string, industry: string) {
+export interface GeneratedCopy {
+  headline: string;
+  subhead: string;
+  intro: string;
+  services: string[];
+  proof: string[];
+  testimonials: string[];
+  faqs: Array<[string, string]>;
+}
+
+export function copyFor(brand: string, prompt: string, industry: string): GeneratedCopy {
   const subject =
     industry === "food"
       ? "memorable dining and hospitality"
@@ -166,8 +176,19 @@ function cssForVariant(variant: SiteVariant, industry: string, mediaOverride?: B
   `;
 }
 
-function variantMarkup(variant: SiteVariant, brand: BrandAsset, prompt: string, industry: string) {
-  const copy = copyFor(escapeHtml(brand.name), escapeHtml(prompt), industry);
+function variantMarkup(variant: SiteVariant, brand: BrandAsset, prompt: string, industry: string, copyOverride?: GeneratedCopy) {
+  const base = copyFor(escapeHtml(brand.name), escapeHtml(prompt), industry);
+  const copy: GeneratedCopy = copyOverride
+    ? {
+        headline: escapeHtml(copyOverride.headline || base.headline),
+        subhead: escapeHtml(copyOverride.subhead || base.subhead),
+        intro: escapeHtml(copyOverride.intro || base.intro),
+        services: (copyOverride.services?.length ? copyOverride.services : base.services).slice(0, 4),
+        proof: (copyOverride.proof?.length ? copyOverride.proof : base.proof).slice(0, 4),
+        testimonials: (copyOverride.testimonials?.length ? copyOverride.testimonials : base.testimonials).slice(0, 3),
+        faqs: (copyOverride.faqs?.length ? copyOverride.faqs : base.faqs).slice(0, 6),
+      }
+    : base;
   const image = brand.media?.imageUrl || imageByIndustry[industry] || imageByIndustry.default;
   const video = brand.media?.videoUrl || videoByIndustry[industry] || videoByIndustry.default;
   const gallery = (brand.media?.gallery?.length ? brand.media.gallery : [image, imageByIndustry[industry] || image, imageByIndustry.default]).slice(0, 3);
@@ -182,7 +203,7 @@ function variantMarkup(variant: SiteVariant, brand: BrandAsset, prompt: string, 
       <section class="shell"><div class="grid"><div class="card span-3"><div class="kpi">01</div><p class="muted">Custom page voice and copy.</p></div><div class="card span-3"><div class="kpi">02</div><p class="muted">Responsive sections with motion.</p></div><div class="card span-3"><div class="kpi">03</div><p class="muted">Relevant image and video system.</p></div><div class="card span-3"><div class="kpi">04</div><p class="muted">Lead-ready contact flow.</p></div></div></section>
       <section class="shell" id="services"><div class="section-head"><h2>What ${escapeHtml(brand.name)} offers</h2><p>Clear service content, benefit-led structure, and premium visual rhythm are written directly into the generated homepage.</p></div><div class="grid">${copy.services.map((item, i) => `<article class="card span-3 reveal" style="animation-delay:${i * 90}ms"><h3>${escapeHtml(item)}</h3><p class="muted">A focused section that explains the value, reduces friction, and gives visitors a next step.</p></article>`).join("")}</div></section>
       <section class="shell"><div class="section-head"><h2>Built to feel finished</h2><p>Every generated version includes wallpaper layers, hover lighting, typography choices, motion cues, and real section copy when the prompt does not specify them.</p></div><div class="grid"><div class="span-8 gallery-img"></div><div class="card span-4"><h3>Premium content system</h3>${copy.proof.map((item) => `<p class="muted">✓ ${escapeHtml(item)}</p>`).join("")}</div>${gallery.map((item, index) => `<div class="card span-4"><img src="${item}" alt="${escapeHtml(brand.name)} supporting image ${index + 1}" loading="lazy" style="width:100%;height:220px;object-fit:cover;border-radius:18px"/><p class="muted">Relevant page media selected for ${escapeHtml(brand.name)}.</p></div>`).join("")}</div></section>
-      <section class="shell" id="pricing"><div class="section-head"><h2>Simple ways to start</h2><p>Pricing copy is generated as part of the page so the offer is not left unfinished.</p></div><div class="grid">${["Starter", "Pro", "Ultimate"].map((plan, i) => `<article class="card span-4"><h3>${plan}</h3><div class="price">${i === 0 ? "$4.99" : i === 1 ? "$9.99" : "$24.99"}<span style="font-size:16px;color:var(--muted)">/mo</span></div><p class="muted">${i === 0 ? "50 commands per month for launch copy and landing structure." : i === 1 ? "150 commands with expanded sections and stronger conversion flow." : "500 commands for full premium homepage polish and growth-ready content."}</p><a class="btn" href="#contact">Choose ${plan}</a></article>`).join("")}</div></section>
+      <section class="shell" id="pricing"><div class="section-head"><h2>Simple ways to start</h2><p>Pricing copy is generated as part of the page so the offer is not left unfinished.</p></div><div class="grid">${["Starter", "Pro", "Ultimate"].map((plan, i) => `<article class="card span-4"><h3>${plan}</h3><div class="price">${i === 0 ? "$9.99" : i === 1 ? "$19.99" : "$49.99"}<span style="font-size:16px;color:var(--muted)">/mo</span></div><p class="muted">${i === 0 ? "50 commands per month for launch copy and landing structure." : i === 1 ? "150 commands with expanded sections and stronger conversion flow." : "500 commands for full premium homepage polish and growth-ready content."}</p><a class="btn" href="#contact">Choose ${plan}</a></article>`).join("")}</div></section>
       <section class="shell"><div class="section-head"><h2>Client confidence</h2><p>Social proof is generated in a brand-safe voice and can be replaced with verified testimonials when available.</p></div><div class="marquee-wrap"><div class="marquee">${[...copy.testimonials, ...copy.testimonials].map((quote) => `<article class="card"><p>${escapeHtml(quote)}</p><p class="muted">Verified-ready proof block</p></article>`).join("")}</div></div></section>
       <section class="shell faq" id="faq"><div class="section-head"><h2>Questions answered</h2><p>The generator writes practical FAQ content so the homepage can stand on its own.</p></div>${copy.faqs.map(([q, a], i) => `<details ${i === 0 ? "open" : ""}><summary>${escapeHtml(q)}</summary><p>${escapeHtml(a)}</p></details>`).join("")}</section>
       <section class="shell" id="contact"><div class="contact"><div class="section-head"><h2>Ready for the next customer</h2><p>Use this form section for bookings, quotes, calls, or project inquiries.</p></div><form><input class="input" placeholder="Name"/><input class="input" placeholder="Email"/><textarea class="input" rows="4" placeholder="Tell us what you need"></textarea><button class="btn" type="button">Send request</button></form></div></section>
@@ -197,7 +218,7 @@ export function compileLayoutDocument(tree: LayoutTree, variantId?: string) {
   return (tree.variants.find((variant) => variant.id === variantId) || tree.variants[0]).html;
 }
 
-export function compileLayoutFromPrompt(prompt: string, brandInput?: Partial<BrandAsset>) {
+export function compileLayoutFromPrompt(prompt: string, brandInput?: Partial<BrandAsset>, copyOverride?: GeneratedCopy) {
   const brandName = brandInput?.name || toTitle(extractBrandName(prompt));
   const brand: BrandAsset = {
     ...fallbackBrand,
@@ -213,7 +234,7 @@ export function compileLayoutFromPrompt(prompt: string, brandInput?: Partial<Bra
     { id: "studio", name: "Studio Neon", mood: "bold animated launch", fontPair: "'Trebuchet MS', Inter, ui-sans-serif, sans-serif", palette: ["#22c55e", "#06b6d4", "#0f172a"], html: "" },
   ].map((variant) => ({
     ...variant,
-    html: variantMarkup(variant, brand, prompt || "Build a premium business homepage", industry),
+    html: variantMarkup(variant, brand, prompt || "Build a premium business homepage", industry, copyOverride),
   }));
   const tree: LayoutTree = {
     name: brand.name,
