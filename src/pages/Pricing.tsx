@@ -58,20 +58,12 @@ export const Pricing = () => {
 
   const getDisplayedPrice = (plan: PlanType) => {
     const config = PLAN_LIMITS[plan];
-    if (plan === "commands") return "$1.49";
+    if (plan === "commands") return `$${config.price.toFixed(2)}`;
     if (cadence === "year") return `$${(config.price * 12 * 0.8).toFixed(2)}`;
     return `$${config.price.toFixed(2)}`;
   };
 
-  const getSlashPrice = (plan: PlanType) => {
-    if (plan === "commands") return PLAN_LIMITS[plan].regularPrice ? `$${PLAN_LIMITS[plan].regularPrice}` : null;
-    const config = PLAN_LIMITS[plan];
-    return config.regularPrice
-      ? cadence === "year"
-        ? `$${(config.regularPrice * 12 * 0.8).toFixed(2)}`
-        : `$${config.regularPrice}/mo`
-      : null;
-  };
+  const getSlashPrice = (_plan: PlanType): string | null => null;
 
   return (
     <div className="section-shell pt-14">

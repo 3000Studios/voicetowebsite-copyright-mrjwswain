@@ -21,8 +21,7 @@ const plans = [
   {
     name: "Starter",
     icon: Zap,
-    price: 4.99,
-    regularPrice: 9.99,
+    price: 9.99,
     description: "For creators and small businesses",
     features: [
       "Everything in Free, plus:",
@@ -39,8 +38,7 @@ const plans = [
   {
     name: "Pro",
     icon: Building2,
-    price: 9.99,
-    regularPrice: 19.99,
+    price: 19.99,
     description: "For agencies and power users",
     features: [
       "Everything in Starter, plus:",
@@ -54,10 +52,9 @@ const plans = [
     popular: false,
   },
   {
-    name: "Ultimate",
+    name: "Elite",
     icon: Crown,
-    price: 24.99,
-    regularPrice: 49.99,
+    price: 49.99,
     description: "For high-volume launch teams",
     features: [
       "Everything in Pro, plus:",
@@ -67,7 +64,7 @@ const plans = [
       "Advanced handoff support",
       "Agency-ready usage",
     ],
-    cta: "Get Ultimate",
+    cta: "Get Elite",
     popular: false,
   },
 ];
@@ -185,11 +182,7 @@ export function PricingV2() {
                           /month
                         </span>
                       </div>
-                      {"regularPrice" in plan ? (
-                        <div className="mt-1 text-xs text-white/45">
-                          Regularly <span className="line-through">${plan.regularPrice}</span>/month
-                        </div>
-                      ) : null}
+                      {null}
                     </>
                   ) : (
                     <span

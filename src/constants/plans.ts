@@ -5,7 +5,6 @@ export interface PlanEntitlements {
   name: string;
   description: string;
   price: number;
-  regularPrice?: number;
   commandsPerCycle: number;
   hostedSites: number;
   canExportCode: boolean;
@@ -33,9 +32,8 @@ export const PLAN_ENTITLEMENTS: Record<PlanType, PlanEntitlements> = {
     canExportCode: false,
     removeWatermark: true,
     premiumSections: false,
-    price: 4.99,
-    regularPrice: 9.99,
-    description: 'Launch pricing for solo operators who need a hosted starter site, 50 monthly commands, and a simple launch workflow.',
+    price: 9.99,
+    description: 'Solo operators: hosted starter site, 50 monthly commands, and a simple launch workflow.',
   },
   pro: {
     key: "pro",
@@ -45,21 +43,19 @@ export const PLAN_ENTITLEMENTS: Record<PlanType, PlanEntitlements> = {
     canExportCode: true,
     removeWatermark: true,
     premiumSections: true,
-    price: 9.99,
-    regularPrice: 19.99,
-    description: 'Launch pricing for consultants and small teams that need more build volume, exports, premium sections, and a cleaner handoff.',
+    price: 19.99,
+    description: 'Consultants and small teams: more build volume, exports, premium sections, and a cleaner handoff.',
   },
   enterprise: {
     key: "enterprise",
-    name: 'Ultimate',
+    name: 'Elite',
     commandsPerCycle: 500,
     hostedSites: 50,
     canExportCode: true,
     removeWatermark: true,
     premiumSections: true,
-    price: 24.99,
-    regularPrice: 49.99,
-    description: 'Launch pricing for agencies and operators launching multiple client or portfolio sites with 500 monthly commands.',
+    price: 49.99,
+    description: 'Agencies and operators launching multiple client or portfolio sites with 500 monthly commands.',
   },
   commands: {
     key: "commands",
@@ -69,9 +65,8 @@ export const PLAN_ENTITLEMENTS: Record<PlanType, PlanEntitlements> = {
     canExportCode: false,
     removeWatermark: false,
     premiumSections: false,
-    price: 1.49,
-    regularPrice: 2.99,
-    description: 'One-time $1.49 launch add-on for existing users who need more commands without changing plans.',
+    price: 2.99,
+    description: 'One-time add-on for existing users who need more commands without changing plans.',
   },
 } as const;
 
