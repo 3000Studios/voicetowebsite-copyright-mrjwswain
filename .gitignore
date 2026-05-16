@@ -13,3 +13,4 @@ key.json
 .claude/settings.local.json
 
 unblock-claude.ps1
+diag-screenshots/
