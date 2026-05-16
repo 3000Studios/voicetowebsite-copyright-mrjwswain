@@ -1,6 +1,4 @@
-/pricing /pricing/ 301
-/store /pricing/ 301
+/store /pricing 301
 
 # SPA fallback
 /* /index.html 200
-
