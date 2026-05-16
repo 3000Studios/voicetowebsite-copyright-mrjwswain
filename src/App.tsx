@@ -280,6 +280,8 @@ const Footer = () => (
 import { Home } from "./components/Home";
 import { HomeV2 } from "./components/home/v2/HomeV2";
 import { PricingV2 } from "./pages/PricingV2";
+import { Blog as BlogV2 } from "./pages/Blog";
+import { BlogPost as BlogPostV2 } from "./pages/BlogPost";
 import GlobalSearch from "./components/GlobalSearch";
 import { UniversalDeploymentPrompt } from "./pages/UniversalDeploymentPrompt";
 import EngineTester from "./pages/EngineTester";
@@ -895,8 +897,9 @@ export default function App() {
               path="/deployment-ready-prompt"
               element={<UniversalDeploymentPrompt />}
             />
-            <Route path="/blog" element={<StoriesPage />} />
-            <Route path="/stories" element={<StoriesPage />} />
+            <Route path="/blog" element={<BlogV2 />} />
+            <Route path="/blog/:slug" element={<BlogPostV2 />} />
+            <Route path="/stories" element={<BlogV2 />} />
             <Route path="/store" element={<PricingPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/faq" element={<FAQPage />} />

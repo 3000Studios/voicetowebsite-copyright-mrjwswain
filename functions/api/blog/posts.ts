@@ -4,12 +4,18 @@ import { publishNextPost } from "./_publisher";
 export const onRequestGet = async (context: {
   request: Request;
   env: Env;
+  waitUntil?: (promise: Promise<unknown>) => void;
 }) => {
   if (!context.env.DB) {
     return json({ error: "DB binding not configured" }, { status: 500 });
   }
 
-  await publishNextPost(context.env);
+  // Fire-and-forget. Publishing has its own cooldown (23h), so visitors don't
+  // wait on Gemini. If waitUntil is unavailable, skip the auto-publish on read
+  // — the /api/blog/publish endpoint and the publish-on-cron can still drive it.
+  if (typeof context.waitUntil === "function") {
+    context.waitUntil(publishNextPost(context.env).catch(() => undefined));
+  }
 
   const url = new URL(context.request.url);
   const page = Math.max(1, Number(url.searchParams.get("page") || "1"));
