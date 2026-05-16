@@ -21,7 +21,7 @@ export const Hero = () => {
 
         <h1 className="text-6xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9] italic">
           Turn Your Voice Into <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-white to-brand-purple animate-gradient">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-cyan via-white to-brand-purple animate-gradient">
             The Best Website
           </span>
         </h1>
@@ -68,9 +68,9 @@ export const Hero = () => {
         transition={{ delay: 0.2, duration: 1 }}
         className="mt-20 w-full max-w-5xl relative group"
       >
-        <div className="absolute -inset-1 bg-gradient-to-r from-brand-cyan to-brand-purple rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+        <div className="absolute -inset-1 bg-linear-to-r from-brand-cyan to-brand-purple rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
         <div className="relative glass p-4 rounded-[2.5rem] border border-white/20">
-          <div className="aspect-video rounded-[1.5rem] bg-black/60 overflow-hidden relative border border-white/5">
+          <div className="aspect-video rounded-3xl bg-black/60 overflow-hidden relative border border-white/5">
             {/* Realistic Video Placeholder */}
             <div className="h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.35),transparent_32%),radial-gradient(circle_at_80%_30%,rgba(168,85,247,0.3),transparent_30%),linear-gradient(135deg,rgba(2,6,23,0.95),rgba(15,23,42,0.72))] opacity-90" />
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors">

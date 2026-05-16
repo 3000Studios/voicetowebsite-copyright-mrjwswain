@@ -215,7 +215,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="relative rounded-[32px] border border-white/10 bg-linear-to-br from-white/8 to-transparent backdrop-blur-2xl p-8 mb-8"
+        className="relative rounded-4xl border border-white/10 bg-linear-to-br from-white/8 to-transparent backdrop-blur-2xl p-8 mb-8"
       >
         {/* Mode Toggle */}
         <div className="flex justify-center mb-8">
@@ -364,7 +364,7 @@ export const VoiceGenerator: React.FC<VoiceGeneratorProps> = ({
             <GoogleAdSense slot="preview-below" />
 
             {/* Preview Card */}
-            <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-white/8 to-transparent backdrop-blur-2xl p-8">
+            <div className="rounded-4xl border border-white/10 bg-linear-to-br from-white/8 to-transparent backdrop-blur-2xl p-8">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white flex items-center gap-3">
                   <Monitor className="w-6 h-6 text-indigo-400" />

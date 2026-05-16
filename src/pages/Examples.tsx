@@ -130,7 +130,7 @@ export default function Examples() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
                   activeCategory === cat
-                    ? "bg-gradient-to-r from-cyan-500 to-violet-600 text-white"
+                    ? "bg-linear-to-r from-cyan-500 to-violet-600 text-white"
                     : "border border-white/10 bg-white/5 text-white/60 hover:text-white hover:border-white/25"
                 }`}
               >
@@ -148,7 +148,7 @@ export default function Examples() {
           <div className="text-center mb-12">
             <Link
               to="/#generator"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500/20 to-violet-600/20 border border-cyan-400/30 text-white font-semibold hover:from-cyan-500/30 hover:to-violet-600/30 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-cyan-500/20 to-violet-600/20 border border-cyan-400/30 text-white font-semibold hover:from-cyan-500/30 hover:to-violet-600/30 transition-all"
             >
               <Sparkles className="w-4 h-4 text-cyan-400" />
               Generate Your Own Preview — Free
@@ -160,7 +160,7 @@ export default function Examples() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((site, i) => (
               <ScrollReveal key={site.id} delay={i * 0.05}>
-                <GlassCard className={`group cursor-pointer bg-gradient-to-br ${site.color} border border-white/10 hover:border-white/25 transition-all overflow-hidden`}>
+                <GlassCard className={`group cursor-pointer bg-linear-to-br ${site.color} border border-white/10 hover:border-white/25 transition-all overflow-hidden`}>
                   {/* Preview thumbnail */}
                   <div className="relative h-48 overflow-hidden bg-black/30">
                     {site.html ? (
@@ -175,7 +175,7 @@ export default function Examples() {
                     ) : (
                       <img src={site.previewImage} alt={site.title} className="w-full h-full object-cover" />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                     {site.badgeText && (
                       <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm border border-white/15 rounded-full px-3 py-1 text-xs text-white font-semibold">
                         {site.badgeText}
@@ -238,7 +238,7 @@ export default function Examples() {
             className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col"
           >
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/60 flex-shrink-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/60 shrink-0">
               <div className="flex items-center gap-3">
                 <Code2 className="w-5 h-5 text-cyan-400" />
                 <div>
@@ -249,7 +249,7 @@ export default function Examples() {
               <div className="flex items-center gap-3">
                 <Link
                   to="/pricing"
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition-all"
+                  className="px-4 py-2 rounded-xl bg-linear-to-r from-cyan-500 to-violet-600 text-white text-sm font-semibold hover:opacity-90 transition-all"
                 >
                   Get This Site
                 </Link>
@@ -274,7 +274,7 @@ export default function Examples() {
             </div>
 
             {/* Prompt bar */}
-            <div className="px-6 py-3 border-t border-white/10 bg-black/60 flex-shrink-0">
+            <div className="px-6 py-3 border-t border-white/10 bg-black/60 shrink-0">
               <p className="text-xs text-white/40 mb-1">Prompt used:</p>
               <p className="text-white/70 text-sm italic">"{selectedSite.prompt}"</p>
             </div>

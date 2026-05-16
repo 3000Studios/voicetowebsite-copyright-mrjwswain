@@ -175,7 +175,7 @@ export const PricingV2: React.FC = () => {
               <Sparkles className="h-3 w-3" /> Locked, honest pricing
             </span>
             <h1 className="mt-7 font-display text-[clamp(2.6rem,6vw,4.6rem)] font-black leading-[0.96] tracking-tight">
-              Pay for what you ship. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Nothing more.</span>
+              Pay for what you ship. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Nothing more.</span>
             </h1>
             <p className="mt-5 text-base leading-7 text-white/65 sm:text-lg sm:leading-8">
               $9.99 / $19.99 / $49.99 a month. Annual saves 20%. No "launch discount" gotcha. Cancel anytime.
@@ -192,7 +192,7 @@ export const PricingV2: React.FC = () => {
                   }}
                   className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] transition ${
                     cadence === opt
-                      ? "bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]"
+                      ? "bg-linear-to-r from-cyan-300 to-fuchsia-300 text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]"
                       : "text-white/65 hover:text-white"
                   }`}
                 >
@@ -218,13 +218,13 @@ export const PricingV2: React.FC = () => {
                 <article
                   className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border p-7 backdrop-blur-xl transition ${
                     t.featured
-                      ? "border-cyan-300/40 bg-gradient-to-b from-cyan-300/10 via-white/[0.04] to-fuchsia-400/10 shadow-[0_30px_120px_-30px_rgba(34,211,238,0.4)]"
-                      : "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.01]"
+                      ? "border-cyan-300/40 bg-linear-to-b from-cyan-300/10 via-white/4 to-fuchsia-400/10 shadow-[0_30px_120px_-30px_rgba(34,211,238,0.4)]"
+                      : "border-white/10 bg-linear-to-b from-white/6 to-white/1"
                   } ${isFocused ? "ring-2 ring-cyan-300/60" : ""}`}
                 >
-                  <div className={`pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-gradient-to-br ${t.accent} blur-3xl`} />
+                  <div className={`pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-linear-to-br ${t.accent} blur-3xl`} />
                   {t.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-cyan-300 to-fuchsia-400 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]">
                       <Sparkles className="h-3 w-3" /> {t.badge}
                     </div>
                   )}
@@ -269,7 +269,7 @@ export const PricingV2: React.FC = () => {
                     disabled={!!submitting}
                     className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black uppercase tracking-[0.18em] transition disabled:cursor-not-allowed disabled:opacity-60 ${
                       t.featured
-                        ? "bg-gradient-to-r from-cyan-300 to-fuchsia-400 text-black hover:-translate-y-[1px] hover:shadow-[0_18px_60px_-10px_rgba(34,211,238,0.6)]"
+                        ? "bg-linear-to-r from-cyan-300 to-fuchsia-400 text-black hover:-translate-y-px hover:shadow-[0_18px_60px_-10px_rgba(34,211,238,0.6)]"
                         : "border border-white/15 bg-white/5 text-white hover:border-cyan-300/40 hover:bg-white/10"
                     }`}
                   >
@@ -304,7 +304,7 @@ export const PricingV2: React.FC = () => {
                 Compare
               </span>
               <h2 className="mt-6 font-display text-[clamp(1.8rem,4vw,2.8rem)] font-black leading-tight tracking-tight">
-                Side by side. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No fine print.</span>
+                Side by side. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No fine print.</span>
               </h2>
             </div>
           </Reveal>
@@ -353,7 +353,7 @@ export const PricingV2: React.FC = () => {
       {/* TRUST BAND */}
       <section className="relative px-5 py-16 sm:px-8 lg:px-12">
         <Reveal>
-          <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.01] p-8 backdrop-blur-xl lg:p-12">
+          <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-linear-to-br from-white/[0.05] to-white/1 p-8 backdrop-blur-xl lg:p-12">
             <div className="grid gap-6 md:grid-cols-3">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.32em] text-cyan-200">Secure</div>
@@ -384,7 +384,7 @@ export const PricingV2: React.FC = () => {
                 Pricing FAQ
               </span>
               <h2 className="mt-6 font-display text-[clamp(2rem,4.6vw,3rem)] font-black leading-tight tracking-tight">
-                Real answers. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No fluff.</span>
+                Real answers. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No fluff.</span>
               </h2>
               <p className="mt-4 max-w-md text-base text-white/60">
                 Need the full FAQ?{" "}
@@ -398,7 +398,7 @@ export const PricingV2: React.FC = () => {
           <Reveal delay={0.1}>
             <ul className="space-y-3">
               {faqs.map((f) => (
-                <li key={f.q} className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+                <li key={f.q} className="rounded-2xl border border-white/10 bg-white/4 p-6 backdrop-blur-xl">
                   <div className="font-display text-base font-black leading-tight sm:text-lg">{f.q}</div>
                   <p className="mt-2 text-sm leading-7 text-white/70">{f.a}</p>
                 </li>

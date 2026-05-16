@@ -186,7 +186,7 @@ export const LivePreviewTeaser: React.FC = () => {
               Free preview · No card
             </span>
             <h2 className="mt-6 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-black leading-[1.05] tracking-tight">
-              See your homepage <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">before you pay.</span>
+              See your homepage <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">before you pay.</span>
             </h2>
             <p className="mt-4 text-base text-white/60 sm:text-lg">
               Speak the brief or pick a sample. We&apos;ll render a sandbox preview right here. Pay only when you want to host, export, or remove the watermark.
@@ -195,7 +195,7 @@ export const LivePreviewTeaser: React.FC = () => {
         </Reveal>
 
         <Reveal delay={0.15} className="mt-12">
-          <div className="relative overflow-hidden rounded-[28px] border border-white/12 bg-gradient-to-b from-white/[0.06] to-white/[0.01] p-1.5 backdrop-blur-2xl">
+          <div className="relative overflow-hidden rounded-[28px] border border-white/12 bg-linear-to-b from-white/6 to-white/1 p-1.5 backdrop-blur-2xl">
             <div className="rounded-[22px] bg-black/60 p-6 sm:p-8 lg:p-10">
               <AnimatePresence mode="wait">
                 {stage !== "preview" && (
@@ -308,7 +308,7 @@ export const LivePreviewTeaser: React.FC = () => {
                         type="button"
                         onClick={generate}
                         disabled={stage === "generating" || draft.trim().length < 12}
-                        className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:-translate-y-[1px] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="group inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {stage === "generating" ? (
                           <>
@@ -378,7 +378,7 @@ export const LivePreviewTeaser: React.FC = () => {
                     </div>
 
                     <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm text-white/80">
+                      <div className="rounded-2xl border border-white/10 bg-white/4 px-5 py-3 text-sm text-white/80">
                         <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-200/80">Heads up</span>
                         <p className="mt-1">
                           This is a sandbox build with our watermark. Host it, get a custom domain, and remove the watermark for $9.99/mo — cancel anytime.
@@ -392,7 +392,7 @@ export const LivePreviewTeaser: React.FC = () => {
                       <Link
                         to="/pricing"
                         onClick={() => ding()}
-                        className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:-translate-y-[1px]"
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:-translate-y-px"
                       >
                         Host it for $9.99 <ArrowRight className="h-4 w-4" />
                       </Link>

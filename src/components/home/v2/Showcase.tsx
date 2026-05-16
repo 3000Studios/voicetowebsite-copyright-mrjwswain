@@ -28,7 +28,7 @@ export const Showcase: React.FC = () => {
               Recent builds
             </span>
             <h2 className="mt-6 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-black leading-[1.05] tracking-tight">
-              Sites we shipped <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">this week.</span>
+              Sites we shipped <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">this week.</span>
             </h2>
           </div>
         </Reveal>
@@ -41,8 +41,8 @@ export const Showcase: React.FC = () => {
                 className="group relative aspect-[4/5] overflow-hidden rounded-3xl border border-white/10"
               >
                 <img src={t.img} alt={t.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-[0.6deg]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/0 via-cyan-400/0 to-cyan-300/0 opacity-0 transition group-hover:from-cyan-400/15 group-hover:to-fuchsia-400/20 group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-tr from-cyan-400/0 via-cyan-400/0 to-cyan-300/0 opacity-0 transition group-hover:from-cyan-400/15 group-hover:to-fuchsia-400/20 group-hover:opacity-100" />
                 <div className="relative z-10 flex h-full flex-col justify-end p-6">
                   <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-200/80">{t.category}</div>
                   <h3 className="mt-2 font-display text-2xl font-black leading-tight tracking-tight">{t.title}</h3>

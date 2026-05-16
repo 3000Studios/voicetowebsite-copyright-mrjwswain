@@ -175,7 +175,7 @@ export default function EngineTester() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Describe the website you want…"
-            className="flex-grow bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder:text-white/30 min-h-[88px] resize-none focus:border-brand-cyan/50 focus:outline-none"
+            className="grow bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder:text-white/30 min-h-[88px] resize-none focus:border-brand-cyan/50 focus:outline-none"
           />
           <button
             onClick={runEngine}

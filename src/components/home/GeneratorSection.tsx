@@ -71,7 +71,7 @@ function ThinkingBar({ stage, line }: { stage: Stage; line: string }) {
               className="text-[10px] font-mono text-brand-cyan/70 tracking-widest uppercase">{line}</motion.span>
           </div>
           <div className="w-full h-px bg-white/5 overflow-hidden rounded-full">
-            <motion.div className="h-full bg-gradient-to-r from-brand-cyan via-brand-purple to-brand-cyan"
+            <motion.div className="h-full bg-linear-to-r from-brand-cyan via-brand-purple to-brand-cyan"
               animate={{x:["-100%","100%"]}} transition={{duration:1.4,repeat:Infinity,ease:"easeInOut"}}/>
           </div>
         </motion.div>
@@ -207,7 +207,7 @@ export const GeneratorSection = () => {
           <motion.h2 initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:0.1}}
             className="text-5xl lg:text-7xl font-black italic tracking-tight mb-5">
             Speak. Watch It{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-brand-purple to-pink-500">Appear.</span>
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-cyan via-brand-purple to-pink-500">Appear.</span>
           </motion.h2>
           <motion.p initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:0.2}}
             className="text-white/35 max-w-xl mx-auto">
@@ -220,15 +220,15 @@ export const GeneratorSection = () => {
           <div className="relative group">
             {/* Glow */}
             <div className={cn("absolute -inset-px rounded-3xl transition-all duration-500 blur-sm",
-              listening ? "bg-gradient-to-r from-red-500 to-red-400 opacity-50 animate-pulse"
-              : stage==="thinking"||stage==="building" ? "bg-gradient-to-r from-brand-cyan to-brand-purple opacity-30"
-              : "opacity-0 group-focus-within:opacity-20 bg-gradient-to-r from-brand-cyan to-brand-purple"
+              listening ? "bg-linear-to-r from-red-500 to-red-400 opacity-50 animate-pulse"
+              : stage==="thinking"||stage==="building" ? "bg-linear-to-r from-brand-cyan to-brand-purple opacity-30"
+              : "opacity-0 group-focus-within:opacity-20 bg-linear-to-r from-brand-cyan to-brand-purple"
             )}/>
-            <div className="relative bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-3xl p-4">
+            <div className="relative bg-white/4 backdrop-blur-xl border border-white/10 rounded-3xl p-4">
               <div className="flex gap-3">
                 {/* Voice btn */}
                 <button onClick={toggleVoice}
-                  className={cn("relative flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
+                  className={cn("relative shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
                     listening ? "bg-red-500 text-white shadow-lg shadow-red-500/30"
                     : "bg-white/5 text-brand-cyan hover:bg-brand-cyan/10 hover:scale-105")}>
                   <Particles active={listening}/>
@@ -259,10 +259,10 @@ export const GeneratorSection = () => {
                 {/* Generate/Reset btn */}
                 <button onClick={stage==="done"||stage==="error"?reset:generate}
                   disabled={stage==="thinking"||stage==="building"||(!prompt.trim()&&stage==="idle")}
-                  className={cn("flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300",
+                  className={cn("shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300",
                     stage==="done"||stage==="error"
                     ? "bg-white/8 text-white hover:bg-white/15"
-                    : "bg-gradient-to-br from-brand-cyan to-brand-purple text-white hover:scale-105 hover:shadow-xl hover:shadow-brand-cyan/20 disabled:opacity-25 disabled:scale-100")}>
+                    : "bg-linear-to-br from-brand-cyan to-brand-purple text-white hover:scale-105 hover:shadow-xl hover:shadow-brand-cyan/20 disabled:opacity-25 disabled:scale-100")}>
                   {(stage==="thinking"||stage==="building") ? (
                     <motion.div animate={{rotate:360}} transition={{duration:1,repeat:Infinity,ease:"linear"}}
                       className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full"/>
@@ -312,7 +312,7 @@ export const GeneratorSection = () => {
                     <button key={vv.id} onClick={()=>setActiveIdx(i)}
                       className={cn("flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all",
                         activeIdx===i?"bg-white/10 border border-white/20 text-white":"bg-white/[0.03] border border-white/5 text-white/35 hover:text-white/60 hover:bg-white/6")}>
-                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{background:vv.palette[0]}}/>
+                      <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{background:vv.palette[0]}}/>
                       {vv.name}
                       {activeIdx===i&&<span className="text-[9px] text-brand-cyan font-black ml-0.5">{vv.qualityScore}%</span>}
                     </button>
@@ -329,7 +329,7 @@ export const GeneratorSection = () => {
                     ))}
                   </div>
                   <Link to="/setup"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-purple text-black text-xs font-black hover:scale-105 transition-transform shadow-lg shadow-brand-cyan/20">
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-brand-cyan to-brand-purple text-black text-xs font-black hover:scale-105 transition-transform shadow-lg shadow-brand-cyan/20">
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
@@ -368,7 +368,7 @@ export const GeneratorSection = () => {
                   View All Plans
                 </Link>
                 <Link to="/setup"
-                  className="flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-brand-cyan to-brand-purple text-black text-sm font-black hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20">
+                  className="flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-linear-to-r from-brand-cyan to-brand-purple text-black text-sm font-black hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                   </svg>

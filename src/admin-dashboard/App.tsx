@@ -565,7 +565,7 @@ const AdminDashboard: React.FC = () => {
       <header className="sticky top-0 z-40 glass-metal px-6 py-4">
         <div className="flex items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-800 flex items-center justify-center font-black text-xl shadow-2xl border border-white/20">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-400 to-blue-800 flex items-center justify-center font-black text-xl shadow-2xl border border-white/20">
               J
             </div>
             <div>

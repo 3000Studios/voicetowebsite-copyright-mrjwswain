@@ -228,7 +228,7 @@ export const Success = () => {
       </Helmet>
 
       <div className="content-grid gap-10 lg:max-w-5xl">
-        <div className="mx-auto w-full max-w-4xl rounded-[32px] border border-white/10 bg-white/5 p-6 shadow-[0_35px_120px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-8">
+        <div className="mx-auto w-full max-w-4xl rounded-4xl border border-white/10 bg-white/5 p-6 shadow-[0_35px_120px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-8">
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-300">
               <ShieldCheck className="h-4 w-4 text-emerald-300" />

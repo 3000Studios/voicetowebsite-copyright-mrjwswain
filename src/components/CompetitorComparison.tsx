@@ -142,7 +142,7 @@ export function CompetitorComparison() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="overflow-hidden rounded-[32px] border border-white/10 bg-linear-to-br from-white/5 to-transparent backdrop-blur-2xl"
+          className="overflow-hidden rounded-4xl border border-white/10 bg-linear-to-br from-white/5 to-transparent backdrop-blur-2xl"
         >
           <div className="grid grid-cols-6 gap-4 border-b border-white/10 bg-white/5 p-6 text-sm font-bold uppercase tracking-wider">
             <div className="text-slate-300">Feature</div>

@@ -163,7 +163,7 @@ function generateFallbackHTML(title: string): string {
                 <a href="#features" class="text-white/70 hover:text-white transition-colors">Features</a>
                 <a href="#testimonials" class="text-white/70 hover:text-white transition-colors">Testimonials</a>
                 <a href="#pricing" class="text-white/70 hover:text-white transition-colors">Pricing</a>
-                <button class="px-6 py-2 bg-gradient-to-r from-brand-cyan to-brand-purple rounded-full font-semibold hover:scale-105 transition-transform">
+                <button class="px-6 py-2 bg-linear-to-r from-brand-cyan to-brand-purple rounded-full font-semibold hover:scale-105 transition-transform">
                     Get Started
                 </button>
             </div>
@@ -188,7 +188,7 @@ function generateFallbackHTML(title: string): string {
                 Transform your ideas into stunning, conversion-optimized websites with AI. No coding required.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="px-8 py-4 bg-gradient-to-r from-brand-cyan to-brand-purple rounded-full font-bold text-lg hover:scale-105 transition-transform neon-glow">
+                <button class="px-8 py-4 bg-linear-to-r from-brand-cyan to-brand-purple rounded-full font-bold text-lg hover:scale-105 transition-transform neon-glow">
                     Start Building Free
                 </button>
                 <button class="px-8 py-4 glass rounded-full font-bold text-lg hover:bg-white/10 transition-colors">
@@ -277,7 +277,7 @@ function generateFallbackHTML(title: string): string {
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="glass rounded-2xl p-8 card-hover scroll-reveal">
                     <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-brand-cyan to-brand-purple"></div>
+                        <div class="w-12 h-12 rounded-full bg-linear-to-r from-brand-cyan to-brand-purple"></div>
                         <div>
                             <p class="font-bold">Sarah Johnson</p>
                             <p class="text-sm text-white/60">Entrepreneur</p>
@@ -295,7 +295,7 @@ function generateFallbackHTML(title: string): string {
 
                 <div class="glass rounded-2xl p-8 card-hover scroll-reveal" style="transition-delay: 0.1s;">
                     <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-brand-purple to-pink-500"></div>
+                        <div class="w-12 h-12 rounded-full bg-linear-to-r from-brand-purple to-pink-500"></div>
                         <div>
                             <p class="font-bold">Mike Chen</p>
                             <p class="text-sm text-white/60">Developer</p>
@@ -313,7 +313,7 @@ function generateFallbackHTML(title: string): string {
 
                 <div class="glass rounded-2xl p-8 card-hover scroll-reveal" style="transition-delay: 0.2s;">
                     <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-brand-cyan"></div>
+                        <div class="w-12 h-12 rounded-full bg-linear-to-r from-pink-500 to-brand-cyan"></div>
                         <div>
                             <p class="font-bold">Emily Davis</p>
                             <p class="text-sm text-white/60">Designer</p>
@@ -406,7 +406,7 @@ function generateFallbackHTML(title: string): string {
                             Export Code
                         </li>
                     </ul>
-                    <button class="w-full py-3 bg-gradient-to-r from-brand-cyan to-brand-purple rounded-xl font-bold hover:scale-105 transition-transform">
+                    <button class="w-full py-3 bg-linear-to-r from-brand-cyan to-brand-purple rounded-xl font-bold hover:scale-105 transition-transform">
                         Start Pro Trial
                     </button>
                 </div>
@@ -458,7 +458,7 @@ function generateFallbackHTML(title: string): string {
             <p class="text-xl text-white/70 mb-8">
                 Join thousands of creators building amazing websites with AI
             </p>
-            <button class="px-12 py-5 bg-gradient-to-r from-brand-cyan to-brand-purple rounded-full font-bold text-xl hover:scale-105 transition-transform neon-glow">
+            <button class="px-12 py-5 bg-linear-to-r from-brand-cyan to-brand-purple rounded-full font-bold text-xl hover:scale-105 transition-transform neon-glow">
                 Start Building Free
             </button>
         </div>

@@ -38,7 +38,7 @@ export const FaqTeaser: React.FC = () => {
               Frequently asked
             </span>
             <h2 className="mt-6 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-black leading-[1.05] tracking-tight">
-              Quick answers. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Before you buy.</span>
+              Quick answers. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Before you buy.</span>
             </h2>
             <p className="mt-4 max-w-md text-base text-white/60 sm:text-lg">
               Honest answers about the engine, the pricing, and what you actually get. Want the long version?{" "}
@@ -61,7 +61,7 @@ export const FaqTeaser: React.FC = () => {
             {items.map((it, i) => {
               const isOpen = open === i;
               return (
-                <li key={it.q} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+                <li key={it.q} className="overflow-hidden rounded-2xl border border-white/10 bg-white/4 backdrop-blur-xl">
                   <button
                     type="button"
                     onClick={() => {

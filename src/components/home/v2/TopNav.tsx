@@ -28,7 +28,7 @@ export const TopNav: React.FC = () => {
           onClick={() => click()}
           className="group inline-flex items-center gap-2 font-display text-lg font-black tracking-tight"
         >
-          <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-300 via-indigo-400 to-fuchsia-500 shadow-[0_8px_24px_-6px_rgba(34,211,238,0.45)]">
+          <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-linear-to-br from-cyan-300 via-indigo-400 to-fuchsia-500 shadow-[0_8px_24px_-6px_rgba(34,211,238,0.45)]">
             <span className="absolute inset-[1px] rounded-[10px] bg-black/70" />
             <span className="relative z-10 text-cyan-100">V</span>
           </span>
@@ -44,7 +44,7 @@ export const TopNav: React.FC = () => {
               className="group relative rounded-full px-4 py-2 text-sm font-medium text-white/75 transition hover:text-white"
             >
               <span className="relative z-10">{l.label}</span>
-              <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400/0 via-cyan-400/0 to-fuchsia-400/0 opacity-0 transition group-hover:from-cyan-400/15 group-hover:via-cyan-400/0 group-hover:to-fuchsia-400/15 group-hover:opacity-100" />
+              <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-r from-cyan-400/0 via-cyan-400/0 to-fuchsia-400/0 opacity-0 transition group-hover:from-cyan-400/15 group-hover:via-cyan-400/0 group-hover:to-fuchsia-400/15 group-hover:opacity-100" />
             </Link>
           ))}
         </nav>
@@ -60,7 +60,7 @@ export const TopNav: React.FC = () => {
           <Link
             to="/pricing"
             onClick={() => click()}
-            className="hidden lg:inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 to-fuchsia-400 px-5 py-2.5 text-sm font-black text-black shadow-[0_10px_40px_-8px_rgba(34,211,238,0.55)] hover:shadow-[0_14px_48px_-6px_rgba(34,211,238,0.7)] hover:-translate-y-[1px] active:translate-y-0 transition"
+            className="hidden lg:inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-5 py-2.5 text-sm font-black text-black shadow-[0_10px_40px_-8px_rgba(34,211,238,0.55)] hover:shadow-[0_14px_48px_-6px_rgba(34,211,238,0.7)] hover:-translate-y-px active:translate-y-0 transition"
           >
             Start a build
           </Link>

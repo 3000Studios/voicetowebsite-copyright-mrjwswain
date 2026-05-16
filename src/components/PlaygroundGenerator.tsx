@@ -338,7 +338,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
             onClick={() => setMode("prompt")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               mode === "prompt"
-                ? "bg-gradient-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/40 text-white"
+                ? "bg-linear-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/40 text-white"
                 : "text-white/55 hover:text-white"
             }`}
             title="Describe a new business"
@@ -350,7 +350,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
             onClick={() => setMode("renovate")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               mode === "renovate"
-                ? "bg-gradient-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/40 text-white"
+                ? "bg-linear-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/40 text-white"
                 : "text-white/55 hover:text-white"
             }`}
             title="Renovate an existing site by URL"
@@ -379,7 +379,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
                 if (inputMode === "voice") { setInputMode("text"); stopListening(); }
                 else { setInputMode("voice"); startListening(); }
               }}
-              className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                 isListening
                   ? "bg-red-500/20 border border-red-400/50 text-red-400 animate-pulse"
                   : "bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/30"
@@ -390,7 +390,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
             </button>
           ) : (
             <div
-              className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 text-cyan-300"
+              className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 text-cyan-300"
               title="Renovate mode — paste a URL"
             >
               <Globe className="w-4 h-4" />
@@ -421,7 +421,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
             type="button"
             onClick={handleSubmit}
             disabled={!prompt.trim() || isLoading}
-            className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             {isLoading ? "Building..." : mode === "renovate" ? "Renovate" : "Generate"}
@@ -489,7 +489,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
                     onClick={() => setActiveIdx(i)}
                     className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                       i === activeIdx
-                        ? "bg-gradient-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/50 text-white"
+                        ? "bg-linear-to-r from-cyan-500/30 to-violet-600/30 border border-cyan-400/50 text-white"
                         : "border border-white/10 bg-white/5 text-white/60 hover:text-white hover:border-white/25"
                     }`}
                   >
@@ -637,14 +637,14 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
             )}
 
             {/* CTA footer */}
-            <div className="p-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-cyan-500/5 to-violet-600/5">
+            <div className="p-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-linear-to-r from-cyan-500/5 to-violet-600/5">
               <div>
                 <p className="text-white font-semibold text-sm">Love what you see?</p>
                 <p className="text-white/55 text-xs mt-0.5">Purchase a plan to get your full custom-coded site — no watermark, full ownership.</p>
               </div>
               <div className="flex gap-3">
                 <Link to="/examples" className="px-4 py-2 rounded-xl border border-white/15 text-white/70 text-sm hover:text-white hover:border-white/30 transition-all">View Examples</Link>
-                <Link to="/pricing?source=generator" className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition-all">Get My Site</Link>
+                <Link to="/pricing?source=generator" className="px-5 py-2 rounded-xl bg-linear-to-r from-cyan-500 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition-all">Get My Site</Link>
               </div>
             </div>
           </motion.div>

@@ -287,7 +287,7 @@ export const FAQ = () => {
         <section className="section-shell">
           <div className="content-grid">
             <ScrollReveal>
-              <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-indigo-500/10 via-white/5 to-cyan-500/10 backdrop-blur-2xl p-12 text-center">
+              <div className="rounded-4xl border border-white/10 bg-linear-to-br from-indigo-500/10 via-white/5 to-cyan-500/10 backdrop-blur-2xl p-12 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center mx-auto mb-6">
                   <MessageCircle className="w-8 h-8 text-indigo-400" />
                 </div>

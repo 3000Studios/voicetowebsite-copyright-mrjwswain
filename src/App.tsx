@@ -62,7 +62,7 @@ const Navbar = () => {
       )}
     >
       <Link to="/" className="relative z-10 flex items-center gap-3 group" onClick={handleLogoClick}>
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan group-hover:scale-110 transition-transform">
+        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan group-hover:scale-110 transition-transform">
           <Mic className="text-white w-5 h-5 animate-pulse" />
         </div>
       </Link>
@@ -146,14 +146,14 @@ const Navbar = () => {
               <Link
                 to="/signin"
                 onClick={() => setIsOpen(false)}
-                className="block w-full py-6 glass rounded-[2rem] text-center font-black italic text-xl"
+                className="block w-full py-6 glass rounded-4xl text-center font-black italic text-xl"
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
                 onClick={() => setIsOpen(false)}
-                className="block w-full py-6 bg-brand-cyan text-black rounded-[2rem] text-center font-black italic text-xl"
+                className="block w-full py-6 bg-brand-cyan text-black rounded-4xl text-center font-black italic text-xl"
               >
                 Build Now
               </Link>
@@ -170,7 +170,7 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
       <div className="lg:col-span-2">
         <Link to="/" className="flex items-center gap-2 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center">
             <Mic className="text-white w-5 h-5" />
           </div>
           <span className="text-xl font-extrabold tracking-tighter">
@@ -328,7 +328,7 @@ const LoginPage = () => {
         className="glass-premium p-12 rounded-[3.5rem] w-full max-w-md"
       >
         <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan">
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan">
             <User className="text-white w-8 h-8" />
           </div>
         </div>
@@ -481,12 +481,12 @@ const Dashboard = () => {
             {!user ? (
               <Link
                 to="/signin"
-                className="glass px-8 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest text-brand-cyan hover:bg-white/10 transition-colors flex items-center justify-center"
+                className="glass px-8 py-4 rounded-3xl text-[10px] font-black uppercase tracking-widest text-brand-cyan hover:bg-white/10 transition-colors flex items-center justify-center"
               >
                 Sign In To Sync
               </Link>
             ) : null}
-            <div className="glass px-8 py-4 rounded-[1.5rem] flex-grow md:flex-grow-0">
+            <div className="glass px-8 py-4 rounded-3xl grow md:flex-grow-0">
               <p className="text-[8px] uppercase font-black text-white/20 mb-1">
                 Commands Remaining
               </p>
@@ -499,7 +499,7 @@ const Dashboard = () => {
             </div>
             <Link
               to="/pricing"
-              className="px-8 py-4 bg-brand-cyan text-black font-black rounded-[1.5rem] hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20 flex items-center justify-center"
+              className="px-8 py-4 bg-brand-cyan text-black font-black rounded-3xl hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20 flex items-center justify-center"
             >
               Recharge
             </Link>
@@ -543,10 +543,10 @@ const Dashboard = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="group glass p-6 rounded-[3rem] border-white/5 hover:border-brand-cyan/50 transition-all flex flex-col min-h-[340px]"
+                    className="group glass p-6 rounded-[3rem] border-white/5 hover:border-brand-cyan/50 transition-all flex flex-col min-h-85"
                   >
-                    <div className="aspect-video bg-[#0a0a0a] rounded-[2rem] mb-6 overflow-hidden relative border border-white/5">
-                      <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="aspect-video bg-[#0a0a0a] rounded-4xl mb-6 overflow-hidden relative border border-white/5">
+                      <div className="absolute inset-0 bg-linear-to-br from-brand-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-10 group-hover:scale-110 transition-transform">
                         <Globe className="w-20 h-20" />
                       </div>
@@ -554,7 +554,7 @@ const Dashboard = () => {
                         {site.status || "Draft"}
                       </div>
                     </div>
-                    <div className="px-2 flex-grow">
+                    <div className="px-2 grow">
                       <p className="text-[10px] uppercase font-black text-white/20 mb-1">
                         {site.industry || "General"} // ID:{" "}
                         {site.id.substring(0, 6)}
@@ -566,7 +566,7 @@ const Dashboard = () => {
                     <div className="flex items-center gap-2 mt-auto">
                       <Link
                         to={`/preview?id=${site.id}`}
-                        className="flex-grow py-4 text-center bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors"
+                        className="grow py-4 text-center bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors"
                       >
                         Preview
                       </Link>
@@ -630,7 +630,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="glass p-10 rounded-[3.5rem] border-brand-purple/20 bg-gradient-to-br from-brand-purple/5 to-transparent relative group">
+            <div className="glass p-10 rounded-[3.5rem] border-brand-purple/20 bg-linear-to-br from-brand-purple/5 to-transparent relative group">
               <div className="relative z-10">
                 <h3 className="text-sm font-black italic mb-2">
                   Upgrade Identity
@@ -778,7 +778,7 @@ const AdminPanel = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {statCards.map((s, i) => (
-              <div key={i} className="glass p-6 rounded-[2rem] border border-white/5">
+              <div key={i} className="glass p-6 rounded-4xl border border-white/5">
                 <s.icon className={cn("w-7 h-7 mb-3", s.color)} />
                 <p className="text-[10px] uppercase font-black tracking-widest text-white/30 mb-1">{s.label}</p>
                 <p className="text-3xl font-black text-white">{s.value}</p>
@@ -788,7 +788,7 @@ const AdminPanel = () => {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass p-6 rounded-[2rem] border border-white/5">
+          <div className="glass p-6 rounded-4xl border border-white/5">
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-white italic">
               <CreditCard className="w-5 h-5 text-cyan-400" /> Recent Orders
             </h2>
@@ -811,7 +811,7 @@ const AdminPanel = () => {
             )}
           </div>
 
-          <div className="glass p-6 rounded-[2rem] border border-white/5">
+          <div className="glass p-6 rounded-4xl border border-white/5">
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-white italic">
               <User className="w-5 h-5 text-purple-400" /> Recent Users
             </h2>
@@ -830,7 +830,7 @@ const AdminPanel = () => {
           </div>
         </div>
 
-        <div className="glass p-6 rounded-[2rem] border border-white/5">
+        <div className="glass p-6 rounded-4xl border border-white/5">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-white italic">
             <Zap className="w-5 h-5 text-purple-400" /> Live Activity Feed
           </h2>
@@ -841,7 +841,7 @@ const AdminPanel = () => {
               {activity.map((a: any, i: number) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 text-sm">
                   <div className="flex items-center gap-3">
-                    <span className={cn("w-2 h-2 rounded-full flex-shrink-0",
+                    <span className={cn("w-2 h-2 rounded-full shrink-0",
                       a.type === "order" ? "bg-green-400" : "bg-blue-400"
                     )} />
                     <span className="text-white">{a.label}</span>
@@ -853,7 +853,7 @@ const AdminPanel = () => {
           )}
         </div>
 
-        <div className="glass p-6 rounded-[2rem] border border-white/5">
+        <div className="glass p-6 rounded-4xl border border-white/5">
           <h2 className="text-lg font-bold mb-4 text-white italic">Quick Links</h2>
           <div className="flex flex-wrap gap-3">
             {[
@@ -890,7 +890,7 @@ export default function App() {
         <Navbar />
         <GlobalSearch />
 
-        <main className="flex-grow">
+        <main className="grow">
           <Routes>
             <Route path="/" element={<HomeV2 />} />
             <Route path="/v1" element={<Home />} />

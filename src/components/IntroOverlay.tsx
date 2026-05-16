@@ -67,7 +67,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
         >
           <source src={INTRO_VIDEO} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/40 to-black" />
       </div>
 
       <div className="relative z-10 text-center liquid-container flex items-center justify-center">
@@ -105,7 +105,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
           aria-label="Ignite Interface"
           className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden focus-visible:ring-4 focus-visible:ring-cyan-400 focus-visible:ring-offset-4 focus-visible:ring-offset-black outline-none"
         >
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
           {!splatterActive && (
             <motion.span
               animate={{
@@ -123,7 +123,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
 
       <div className="absolute bottom-10 md:bottom-20 w-full text-center z-10 px-4">
         <motion.h1
-          className="font-orbitron text-2xl md:text-5xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent tracking-[0.2em] md:tracking-[0.3em] uppercase"
+          className="font-orbitron text-2xl md:text-5xl font-black bg-linear-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent tracking-[0.2em] md:tracking-[0.3em] uppercase"
           initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
           animate={{
             opacity: [0, 1, 1, 0.8, 1],
@@ -171,7 +171,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
           {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
-              className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
+              className="w-2 h-2 bg-linear-to-r from-cyan-400 to-blue-500 rounded-full"
               animate={{
                 scale: [1, 1.5, 1],
                 opacity: [0.5, 1, 0.5],

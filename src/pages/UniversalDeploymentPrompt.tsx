@@ -112,7 +112,7 @@ export const UniversalDeploymentPrompt = () => (
           </p>
         </motion.div>
 
-        <div className="glass-premium rounded-[2rem] p-8 border-brand-purple/20">
+        <div className="glass-premium rounded-4xl p-8 border-brand-purple/20">
           <h2 className="text-xl font-black italic mb-5">Completion Standard</h2>
           <p className="text-sm leading-relaxed text-white/55">
             Done means the latest main branch is live on the custom production domain, critical routes and revenue flows are tested, SEO and monetization foundations are verified, and every claim has evidence.
@@ -139,7 +139,7 @@ export const UniversalDeploymentPrompt = () => (
       </div>
 
       <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <section className="glass rounded-[2rem] p-7">
+        <section className="glass rounded-4xl p-7">
           <h2 className="text-2xl font-black italic mb-6">Variable Block</h2>
           <div className="space-y-4">
             {variables.map((item) => (
@@ -151,7 +151,7 @@ export const UniversalDeploymentPrompt = () => (
           </div>
         </section>
 
-        <section className="glass rounded-[2rem] p-7">
+        <section className="glass rounded-4xl p-7">
           <h2 className="text-2xl font-black italic mb-6">Tight Execution Variant</h2>
           <p className="rounded-2xl bg-black/45 border border-white/10 p-5 font-mono text-xs leading-relaxed text-white/65 whitespace-pre-wrap">
             {tightPrompt}
@@ -159,7 +159,7 @@ export const UniversalDeploymentPrompt = () => (
         </section>
       </div>
 
-      <section className="mt-16 glass-premium rounded-[2rem] p-7 md:p-10">
+      <section className="mt-16 glass-premium rounded-4xl p-7 md:p-10">
         <h2 className="text-3xl font-black italic mb-8">Verification Matrix</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {verificationMatrix.map(([gate, proof]) => (
@@ -171,7 +171,7 @@ export const UniversalDeploymentPrompt = () => (
         </div>
       </section>
 
-      <section className="mt-16 glass rounded-[2rem] p-7 md:p-10">
+      <section className="mt-16 glass rounded-4xl p-7 md:p-10">
         <h2 className="text-3xl font-black italic mb-6">Master Prompt</h2>
         <pre className="max-h-[720px] overflow-auto rounded-2xl border border-white/10 bg-black/55 p-6 font-mono text-xs leading-relaxed text-white/70 whitespace-pre-wrap">
           {masterPrompt}

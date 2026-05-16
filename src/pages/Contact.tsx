@@ -76,7 +76,7 @@ export const Contact: React.FC = () => {
               <Sparkles className="h-3 w-3" /> Talk to a human
             </span>
             <h1 className="mt-7 font-display text-[clamp(2.4rem,5.5vw,4.4rem)] font-black leading-[0.96] tracking-tight">
-              Real answers. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Same business day.</span>
+              Real answers. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Same business day.</span>
             </h1>
             <p className="mt-5 text-base leading-7 text-white/65 sm:text-lg sm:leading-8">
               Every message hits an inbox a human reads. Most replies go out within a few hours during US business hours.
@@ -90,7 +90,7 @@ export const Contact: React.FC = () => {
           {/* Sidebar */}
           <Reveal>
             <div className="space-y-6">
-              <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-7 backdrop-blur-xl">
+              <div className="rounded-3xl border border-white/10 bg-linear-to-b from-white/[0.07] to-white/1 p-7 backdrop-blur-xl">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-300/15 text-cyan-200">
                     <Mail className="h-4 w-4" />
@@ -109,7 +109,7 @@ export const Contact: React.FC = () => {
                 </a>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-7 backdrop-blur-xl">
+              <div className="rounded-3xl border border-white/10 bg-linear-to-b from-white/[0.07] to-white/1 p-7 backdrop-blur-xl">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-fuchsia-300/15 text-fuchsia-200">
                     <MessageSquare className="h-4 w-4" />
@@ -138,7 +138,7 @@ export const Contact: React.FC = () => {
           <Reveal delay={0.1}>
             <form
               onSubmit={submit}
-              className="rounded-3xl border border-white/12 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-7 backdrop-blur-xl lg:p-10"
+              className="rounded-3xl border border-white/12 bg-linear-to-b from-white/[0.07] to-white/1 p-7 backdrop-blur-xl lg:p-10"
             >
               {stage === "sent" ? (
                 <div className="flex flex-col items-center text-center">
@@ -242,7 +242,7 @@ export const Contact: React.FC = () => {
                   <button
                     type="submit"
                     disabled={stage === "submitting"}
-                    className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:-translate-y-[1px] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mt-6 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {stage === "submitting" ? (
                       <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</>

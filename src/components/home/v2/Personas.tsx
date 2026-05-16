@@ -58,7 +58,7 @@ export const Personas: React.FC = () => {
               Pick your lane
             </span>
             <h2 className="mt-6 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-black leading-[1.05] tracking-tight">
-              One engine. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Three buyers.</span>
+              One engine. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">Three buyers.</span>
             </h2>
             <p className="mt-4 text-base text-white/60 sm:text-lg">
               Plans are priced for the build you actually need. Pick the lane, get the result, scale up when you grow.
@@ -69,8 +69,8 @@ export const Personas: React.FC = () => {
         <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {personas.map((p, i) => (
             <Reveal key={p.id} delay={i * 0.08}>
-              <article className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-7 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/25">
-                <div className={`pointer-events-none absolute -top-32 -right-24 h-64 w-64 rounded-full bg-gradient-to-br ${p.accent} blur-3xl transition group-hover:scale-125`} />
+              <article className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/[0.07] to-white/2 p-7 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/25">
+                <div className={`pointer-events-none absolute -top-32 -right-24 h-64 w-64 rounded-full bg-linear-to-br ${p.accent} blur-3xl transition group-hover:scale-125`} />
                 <div className="relative flex h-full flex-col">
                   <div className="flex items-center justify-between">
                     <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] ${p.chipClass}`}>

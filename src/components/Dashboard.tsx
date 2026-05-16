@@ -40,12 +40,12 @@ const Header = () => (
 );
 
 const ChartMock = () => (
-  <div className="h-24 bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-xl opacity-80"></div>
+  <div className="h-24 bg-linear-to-r from-indigo-500 to-cyan-400 rounded-xl opacity-80"></div>
 );
 
 const Dashboard = () => {
   return (
-    <div className="flex bg-gradient-to-br from-black via-slate-900 to-black min-h-screen text-white">
+    <div className="flex bg-linear-to-br from-black via-slate-900 to-black min-h-screen text-white">
       {/* Sidebar */}
       <Sidebar />
 
@@ -79,7 +79,7 @@ const Dashboard = () => {
               {[40, 60, 80, 50, 70, 90].map((h, i) => (
                 <div
                   key={i}
-                  className="w-6 bg-gradient-to-t from-indigo-500 to-cyan-400 rounded"
+                  className="w-6 bg-linear-to-t from-indigo-500 to-cyan-400 rounded"
                   style={{ height: `${h}px` }}
                 />
               ))}

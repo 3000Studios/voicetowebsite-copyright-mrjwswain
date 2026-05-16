@@ -23,7 +23,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
     return (
       <div className="content-grid section-shell">
-        <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-10 text-center text-slate-200 backdrop-blur-xl">
+        <div className="rounded-4xl border border-white/10 bg-white/4 p-10 text-center text-slate-200 backdrop-blur-xl">
           <div className="mx-auto mb-4 inline-flex items-center gap-3 rounded-full border border-white/12 bg-white/5 px-5 py-3">
             <span className="text-sm font-semibold tracking-wide">
               VoiceToWebsite

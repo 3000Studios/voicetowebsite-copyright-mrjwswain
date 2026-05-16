@@ -101,7 +101,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     <motion.div
       whileHover={{ y: -12 }}
       className={`
-        relative flex flex-col rounded-[32px] p-8
+        relative flex flex-col rounded-4xl p-8
         ${
           featured
             ? "bg-linear-to-b from-indigo-500/20 via-white/5 to-transparent border-2 border-indigo-500/40 shadow-[0_0_80px_-20px_rgba(99,102,241,0.3)]"

@@ -217,7 +217,7 @@ const GlobalSearch: React.FC = () => {
                   className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-gray-800/50 transition-colors text-left group"
                 >
                   <div
-                    className={`p-2 rounded-lg border ${getTypeColor(result.type)} flex-shrink-0`}
+                    className={`p-2 rounded-lg border ${getTypeColor(result.type)} shrink-0`}
                   >
                     {result.icon}
                   </div>

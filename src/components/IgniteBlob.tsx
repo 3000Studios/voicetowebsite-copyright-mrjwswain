@@ -73,7 +73,7 @@ const IgniteBlob: React.FC<IgniteBlobProps> = ({ splatterActive, onStart }) => {
       }}
       className="w-48 h-48 md:w-64 md:h-64 metallic-goo cursor-none flex flex-col items-center justify-center group relative overflow-hidden focus-visible:ring-4 focus-visible:ring-cyan-500 focus-visible:outline-none"
     >
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-tr from-white/30 via-transparent to-black/20 pointer-events-none" />
       {!splatterActive && (
         <motion.span
           animate={{

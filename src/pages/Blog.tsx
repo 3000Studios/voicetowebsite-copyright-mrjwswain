@@ -315,7 +315,7 @@ export const Blog = () => {
       <section className="section-shell pb-32">
         <div className="content-grid">
           <ScrollReveal>
-            <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-indigo-500/10 via-white/5 to-cyan-500/10 backdrop-blur-2xl p-12 text-center">
+            <div className="rounded-4xl border border-white/10 bg-linear-to-br from-indigo-500/10 via-white/5 to-cyan-500/10 backdrop-blur-2xl p-12 text-center">
               <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
                 Stay Updated
               </h2>

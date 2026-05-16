@@ -278,7 +278,7 @@ export const Features = () => {
             </ScrollReveal>
 
             <ScrollReveal className="hidden lg:block">
-              <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-white/5 to-transparent backdrop-blur-2xl overflow-hidden">
+              <div className="rounded-4xl border border-white/10 bg-linear-to-br from-white/5 to-transparent backdrop-blur-2xl overflow-hidden">
                 {/* Header */}
                 <div className="grid grid-cols-5 gap-4 p-6 bg-white/5 border-b border-white/10 text-sm font-bold uppercase tracking-wider">
                   <div className="text-slate-300">Feature</div>

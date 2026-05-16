@@ -71,13 +71,13 @@ const EnhancedAppStore: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-lg border-b border-slate-700">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-linear-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
                 App Store
               </h1>
               <p className="text-slate-300 mt-2">
@@ -135,7 +135,7 @@ const EnhancedAppStore: React.FC = () => {
               onClick={() => setSelectedCategory(category.id)}
               className={`px-4 py-2 rounded-full transition-all ${
                 selectedCategory === category.id
-                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                  ? "bg-linear-to-r from-blue-500 to-purple-600 text-white"
                   : "bg-slate-800 text-slate-300 hover:bg-slate-700"
               }`}
               whileHover={{ scale: 1.05 }}
@@ -167,14 +167,14 @@ const EnhancedAppStore: React.FC = () => {
                 {/* App Badge */}
                 {app.badge && (
                   <div className="absolute top-4 right-4 z-10">
-                    <span className="px-2 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full">
+                    <span className="px-2 py-1 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full">
                       {app.badge}
                     </span>
                   </div>
                 )}
 
                 {/* App Image */}
-                <div className="relative h-48 bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+                <div className="relative h-48 bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center">
                   <div className="text-6xl">📱</div>
                   <div className="absolute inset-0 bg-black/20" />
                 </div>
@@ -248,7 +248,7 @@ const EnhancedAppStore: React.FC = () => {
                         className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                           isInCart(app.id)
                             ? "bg-green-600 text-white"
-                            : "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
+                            : "bg-linear-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
                         }`}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -318,7 +318,7 @@ const EnhancedAppStore: React.FC = () => {
             </div>
 
             <motion.button
-              className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg"
+              className="w-full py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

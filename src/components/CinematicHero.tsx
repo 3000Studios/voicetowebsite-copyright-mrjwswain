@@ -75,7 +75,7 @@ export function CinematicHero() {
     <section className="relative -mt-24 min-h-screen overflow-hidden pt-24">
       <canvas ref={canvasRef} className="absolute inset-0 z-0 opacity-70" />
       <div className="absolute inset-0 responsive-wallpaper opacity-80" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#03040a] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#03040a] to-transparent" />
 
       <motion.div
         className="content-grid relative z-10 grid min-h-[calc(100vh-6rem)] items-center gap-12 py-16 lg:grid-cols-[0.94fr_1.06fr]"

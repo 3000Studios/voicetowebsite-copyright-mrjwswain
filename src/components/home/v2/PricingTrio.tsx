@@ -78,7 +78,7 @@ export const PricingTrio: React.FC = () => {
               Pricing
             </span>
             <h2 className="mt-6 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-black leading-[1.05] tracking-tight">
-              Locked, honest pricing. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No tricks.</span>
+              Locked, honest pricing. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No tricks.</span>
             </h2>
             <p className="mt-4 text-base text-white/60 sm:text-lg">
               Pay monthly or save 20% on annual. Cancel anytime. No surprise upcharges.
@@ -95,7 +95,7 @@ export const PricingTrio: React.FC = () => {
                   }}
                   className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] transition ${
                     cadence === opt
-                      ? "bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]"
+                      ? "bg-linear-to-r from-cyan-300 to-fuchsia-300 text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]"
                       : "text-white/65 hover:text-white"
                   }`}
                 >
@@ -118,12 +118,12 @@ export const PricingTrio: React.FC = () => {
                   transition={{ type: "spring", stiffness: 220, damping: 22 }}
                   className={`relative flex h-full flex-col overflow-hidden rounded-3xl border p-7 backdrop-blur-xl ${
                     t.featured
-                      ? "border-cyan-300/40 bg-gradient-to-b from-cyan-300/10 via-white/[0.04] to-fuchsia-400/10 shadow-[0_30px_120px_-30px_rgba(34,211,238,0.4)]"
-                      : "border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.01]"
+                      ? "border-cyan-300/40 bg-linear-to-b from-cyan-300/10 via-white/4 to-fuchsia-400/10 shadow-[0_30px_120px_-30px_rgba(34,211,238,0.4)]"
+                      : "border-white/10 bg-linear-to-b from-white/6 to-white/1"
                   }`}
                 >
                   {t.featured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-cyan-300 to-fuchsia-400 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-black shadow-[0_10px_24px_-8px_rgba(34,211,238,0.5)]">
                       <Sparkles className="h-3 w-3" /> Most chosen
                     </div>
                   )}
@@ -156,7 +156,7 @@ export const PricingTrio: React.FC = () => {
                     onClick={() => ding()}
                     className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black uppercase tracking-[0.18em] transition ${
                       t.featured
-                        ? "bg-gradient-to-r from-cyan-300 to-fuchsia-400 text-black hover:-translate-y-[1px] hover:shadow-[0_18px_60px_-10px_rgba(34,211,238,0.6)]"
+                        ? "bg-linear-to-r from-cyan-300 to-fuchsia-400 text-black hover:-translate-y-px hover:shadow-[0_18px_60px_-10px_rgba(34,211,238,0.6)]"
                         : "border border-white/15 bg-white/5 text-white hover:border-cyan-300/40 hover:bg-white/10"
                     } active:translate-y-0`}
                   >

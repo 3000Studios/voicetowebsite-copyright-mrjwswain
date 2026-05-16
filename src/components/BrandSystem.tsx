@@ -24,8 +24,8 @@ export const BrandWallpaper = ({ density = "default" }: { density?: "default" | 
           transition={{ duration: 18 + index * 4, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/[0.035] to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#03040a] to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-white/[0.035] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-64 bg-linear-to-t from-[#03040a] to-transparent" />
     </div>
   );
 };
@@ -61,7 +61,7 @@ export const Waveform = ({ className = "" }: { className?: string }) => {
       {bars.map((height, index) => (
         <motion.span
           key={index}
-          className="w-1.5 rounded-full bg-gradient-to-t from-cyan-300 via-indigo-300 to-fuchsia-300 shadow-[0_0_18px_rgba(53,226,255,0.45)]"
+          className="w-1.5 rounded-full bg-linear-to-t from-cyan-300 via-indigo-300 to-fuchsia-300 shadow-[0_0_18px_rgba(53,226,255,0.45)]"
           animate={{ height: [`${height * 0.45}%`, `${height}%`, `${height * 0.62}%`] }}
           transition={{ duration: 1.2 + index * 0.05, repeat: Infinity, ease: "easeInOut" }}
         />

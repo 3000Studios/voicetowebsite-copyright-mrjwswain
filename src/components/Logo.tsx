@@ -10,7 +10,7 @@ export const Logo = ({ className = "" }: { className?: string }) => {
 
   return (
     <div className={`group flex items-center gap-4 ${className}`}>
-      <div className="relative h-12 w-12 shrink-0 rounded-2xl border border-cyan-200/20 bg-white/[0.06] shadow-[0_0_34px_rgba(53,226,255,0.22)] backdrop-blur-xl">
+      <div className="relative h-12 w-12 shrink-0 rounded-2xl border border-cyan-200/20 bg-white/6 shadow-[0_0_34px_rgba(53,226,255,0.22)] backdrop-blur-xl">
         <motion.div
           className="absolute inset-2 rounded-xl border border-indigo-200/25 bg-[radial-gradient(circle_at_top,rgba(53,226,255,0.2),transparent_55%)]"
           animate={{ rotateZ: [0, 8, -6, 0], scale: [1, 1.03, 0.98, 1] }}

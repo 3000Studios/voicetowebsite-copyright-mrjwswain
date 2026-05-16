@@ -47,7 +47,7 @@ export const FooterV2: React.FC = () => {
     <motion.footer
       ref={ref}
       style={{ y: fold, opacity: reveal }}
-      className="relative mt-24 overflow-hidden border-t border-white/10 bg-gradient-to-b from-black via-[#06080f] to-black"
+      className="relative mt-24 overflow-hidden border-t border-white/10 bg-linear-to-b from-black via-[#06080f] to-black"
     >
       <div className="pointer-events-none absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_20%_0%,rgba(0,242,255,0.18),transparent_55%),radial-gradient(circle_at_80%_10%,rgba(157,0,255,0.18),transparent_55%)]" />
       <div className="pointer-events-none absolute -bottom-32 left-1/2 hidden h-[420px] w-[1200px] -translate-x-1/2 select-none font-display text-[18rem] font-black tracking-tighter text-white/[0.04] lg:block">
@@ -57,7 +57,7 @@ export const FooterV2: React.FC = () => {
       <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.3fr_2fr] lg:px-12 lg:py-24">
         <div>
           <Link to="/" onClick={() => click()} className="inline-flex items-center gap-2 font-display text-2xl font-black tracking-tight">
-            <span className="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-cyan-300 via-indigo-400 to-fuchsia-500 shadow-[0_8px_24px_-6px_rgba(34,211,238,0.45)]">
+            <span className="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-linear-to-br from-cyan-300 via-indigo-400 to-fuchsia-500 shadow-[0_8px_24px_-6px_rgba(34,211,238,0.45)]">
               <span className="absolute inset-[1px] rounded-[10px] bg-black/70" />
               <span className="relative z-10 text-cyan-100">V</span>
             </span>
@@ -76,7 +76,7 @@ export const FooterV2: React.FC = () => {
           <Link
             to="/pricing"
             onClick={() => click()}
-            className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 to-fuchsia-400 px-5 py-2.5 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_10px_30px_-8px_rgba(34,211,238,0.45)] transition hover:-translate-y-[1px]"
+            className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-5 py-2.5 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_10px_30px_-8px_rgba(34,211,238,0.45)] transition hover:-translate-y-px"
           >
             Start a build <ArrowUpRight className="h-4 w-4" />
           </Link>

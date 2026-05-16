@@ -85,7 +85,7 @@ export const MobileNav: React.FC = () => {
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="absolute inset-0 bg-[url('/vtw-wallpaper.png')] bg-cover bg-center" />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/75 to-black/95" />
+              <div className="absolute inset-0 bg-linear-to-b from-black/85 via-black/75 to-black/95" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,242,255,0.18),transparent_55%),radial-gradient(circle_at_70%_80%,rgba(157,0,255,0.18),transparent_55%)]" />
               <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:36px_36px]" />
             </motion.div>

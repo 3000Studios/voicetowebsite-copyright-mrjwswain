@@ -40,7 +40,7 @@ export const HowItWorks: React.FC = () => {
               How it works
             </span>
             <h2 className="mt-6 font-display text-[clamp(2rem,4.6vw,3.4rem)] font-black leading-[1.05] tracking-tight">
-              Three steps. <span className="bg-gradient-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No templates.</span>
+              Three steps. <span className="bg-linear-to-r from-cyan-200 to-fuchsia-300 bg-clip-text text-transparent">No templates.</span>
             </h2>
           </div>
         </Reveal>
@@ -51,7 +51,7 @@ export const HowItWorks: React.FC = () => {
           {!reduce && (
             <motion.div
               style={{ height: lineHeight }}
-              className="pointer-events-none absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-cyan-300 via-fuchsia-400 to-transparent md:block"
+              className="pointer-events-none absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-linear-to-b from-cyan-300 via-fuchsia-400 to-transparent md:block"
             />
           )}
 
@@ -61,9 +61,9 @@ export const HowItWorks: React.FC = () => {
               return (
                 <li key={step.id} className="relative md:grid md:grid-cols-2 md:items-center md:gap-12">
                   <Reveal direction={left ? "right" : "left"} className={left ? "md:order-1" : "md:order-2"}>
-                    <div className={`group relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-7 backdrop-blur-xl hover:border-cyan-300/30 transition ${left ? "md:mr-10" : "md:ml-10"}`}>
+                    <div className={`group relative rounded-3xl border border-white/10 bg-linear-to-b from-white/[0.07] to-white/1 p-7 backdrop-blur-xl hover:border-cyan-300/30 transition ${left ? "md:mr-10" : "md:ml-10"}`}>
                       <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300 to-fuchsia-400 text-black shadow-[0_10px_36px_-10px_rgba(34,211,238,0.5)]">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-300 to-fuchsia-400 text-black shadow-[0_10px_36px_-10px_rgba(34,211,238,0.5)]">
                           <step.icon className="h-5 w-5" />
                         </div>
                         <div>

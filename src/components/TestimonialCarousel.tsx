@@ -118,7 +118,7 @@ export const TestimonialCarousel: React.FC = () => {
             }}
             className="absolute inset-0"
           >
-            <div className="rounded-[32px] border border-white/10 bg-linear-to-br from-white/8 to-transparent backdrop-blur-2xl p-10 md:p-12">
+            <div className="rounded-4xl border border-white/10 bg-linear-to-br from-white/8 to-transparent backdrop-blur-2xl p-10 md:p-12">
               {/* Stars */}
               <div className="flex gap-1 mb-6">
                 {Array.from({ length: current.rating }).map((_, i) => (
