@@ -13,7 +13,9 @@ export interface Env {
 
 import { compileLayoutFromPrompt, type BrandAsset, type GeneratedCopy, type LayoutTree } from "../../src/lib/layoutCompiler";
 
-const GEMINI_MODEL = "gemini-2.0-flash-exp";
+// gemini-2.0-flash-exp was retired. gemini-flash-latest auto-tracks the
+// current stable flash model so we don't have to chase deprecations.
+const GEMINI_MODEL = "gemini-flash-latest";
 
 async function generateCopyWithGemini(
   apiKey: string,
