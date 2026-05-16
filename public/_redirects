@@ -1,4 +1,31 @@
-/store /pricing 301
+# SPA routes — force these to render via React Router, not the legacy static HTML entries
+# Cloudflare Pages matches in order; these MUST come before any rewrite to .html
+/pricing            /index.html  200
+/features           /index.html  200
+/examples           /index.html  200
+/about              /index.html  200
+/faq                /index.html  200
+/support            /index.html  200
+/contact            /index.html  200
+/blog               /index.html  200
+/stories            /index.html  200
+/refunds            /index.html  200
+/terms              /index.html  200
+/privacy            /index.html  200
+/dmca               /index.html  200
+/legal              /index.html  200
+/signup             /index.html  200
+/signin             /index.html  200
+/login              /index.html  200
+/success            /index.html  200
+/setup              /index.html  200
+/preview            /index.html  200
+/dashboard          /index.html  200
+/admin              /index.html  200
+/engines            /index.html  200
 
-# SPA fallback
-/* /index.html 200
+# Legacy short-link redirects
+/store              /pricing     301
+
+# SPA fallback for any other route
+/*                  /index.html  200

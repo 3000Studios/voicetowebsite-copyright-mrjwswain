@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:legacy-server": "tsx server.ts",
-    "build": "vite build",
+    "build": "vite build && node scripts/strip-spa-conflicts.mjs",
     "preview": "vite preview",
     "clean": "powershell -NoProfile -Command \"if (Test-Path dist) { Remove-Item -Recurse -Force dist }\"",
     "lint": "tsc --noEmit",
