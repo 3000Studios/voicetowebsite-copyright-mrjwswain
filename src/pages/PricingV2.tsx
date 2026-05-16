@@ -281,7 +281,7 @@ export const PricingV2: React.FC = () => {
           })}
         </div>
 
-        {errMsg && (
+        {errMsg && import.meta.env.PROD && (
           <div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-rose-400/40 bg-rose-500/10 px-5 py-3 text-center text-sm text-rose-100">
             {errMsg}
           </div>

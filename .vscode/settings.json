@@ -39,6 +39,14 @@
   "workbench.tree.renderIndentGuides": "always",
   "telemetry.telemetryLevel": "off",
 
+  // ── Extension recommendation noise ───────────────────────────────────────
+  // Workspace recommendations in .vscode/extensions.json still surface once on
+  // first open; this just kills the auto-generated "OTHER RECOMMENDATIONS"
+  // list (rust-analyzer, Kubernetes, Azure, etc.) that has nothing to do with
+  // a Vite/React/Cloudflare stack.
+  "extensions.ignoreRecommendations": true,
+  "workbench.welcomePage.walkthroughs.openOnInstall": false,
+
   // ── Files ─────────────────────────────────────────────────────────────────
   "files.autoSave": "onFocusChange",
   "files.eol": "\n",
