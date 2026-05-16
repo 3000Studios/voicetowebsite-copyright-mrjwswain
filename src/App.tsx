@@ -278,6 +278,7 @@ const Footer = () => (
 );
 
 import { Home } from "./components/Home";
+import { HomeV2 } from "./components/home/v2/HomeV2";
 import GlobalSearch from "./components/GlobalSearch";
 import { UniversalDeploymentPrompt } from "./pages/UniversalDeploymentPrompt";
 import EngineTester from "./pages/EngineTester";
@@ -883,7 +884,8 @@ export default function App() {
 
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomeV2 />} />
+            <Route path="/v1" element={<Home />} />
             <Route path="/features" element={<AboutPage />} />
             <Route path="/examples" element={<ExamplesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
