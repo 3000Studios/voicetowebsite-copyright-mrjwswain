@@ -43,7 +43,7 @@ const faqs: FAQItem[] = [
     category: "Pricing & Plans",
     question: "What's included in each plan?",
     answer:
-      "Launch pricing is 50 percent off: Starter ($4.99/month): 3 hosted sites and 50 commands per month. Pro ($9.99/month): 15 hosted sites, 150 commands per month, code export, premium sections, and watermark-free paid delivery. Ultimate ($24.99/month): 50 hosted sites and 500 commands per month with priority support.",
+      "Three locked monthly plans. Starter ($9.99/month): 1 hosted site on voicetowebsite.com/sites, 50 commands per month, Gemini-written copy, mobile-first build, email support. Pro ($19.99/month): 5 hosted sites with custom domain, 150 commands, code export, premium sections, watermark-free delivery, priority support. Ultimate ($49.99/month): 50 hosted sites, 500 commands, whitelabel client dashboard, priority generation queue, early beta access, direct-line support. Annual saves 20% on every tier.",
   },
   {
     category: "Pricing & Plans",

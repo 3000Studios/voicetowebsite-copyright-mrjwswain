@@ -166,8 +166,15 @@ const Navbar = () => {
 };
 
 const Footer = () => (
-  <footer className="site-footer-wallpaper relative overflow-hidden py-20 px-6 lg:px-12 bg-black/50 border-t border-white/5">
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+  <footer className="site-footer-wallpaper relative overflow-hidden pt-32 pb-20 px-6 lg:px-12 bg-black/50 border-t border-white/5">
+    {/* Synthwave horizon — GPU-only transforms, hidden under prefers-reduced-motion */}
+    <div className="pointer-events-none absolute inset-x-0 top-0 h-40 motion-reduce:hidden" aria-hidden="true">
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-cyan-300/70 to-transparent" />
+      <div className="absolute left-1/2 top-10 h-32 w-32 -translate-x-1/2 rounded-full bg-fuchsia-400/40 blur-3xl animate-pulse" />
+      <div className="absolute inset-x-0 bottom-0 h-24 [background:repeating-linear-gradient(90deg,transparent_0,transparent_38px,rgba(34,211,238,0.18)_38px,rgba(34,211,238,0.18)_39px)] mask-[linear-gradient(to_top,black,transparent)] perspective-near transform-[rotateX(60deg)] origin-bottom" />
+      <div className="absolute inset-x-0 bottom-0 h-24 [background:repeating-linear-gradient(0deg,transparent_0,transparent_18px,rgba(232,121,249,0.22)_18px,rgba(232,121,249,0.22)_19px)] mask-[linear-gradient(to_top,black,transparent)] perspective-near transform-[rotateX(60deg)] origin-bottom" />
+    </div>
+    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 relative">
       <div className="lg:col-span-2">
         <Link to="/" className="flex items-center gap-2 mb-6">
           <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center">
@@ -277,7 +284,6 @@ const Footer = () => (
   </footer>
 );
 
-import { Home } from "./components/Home";
 import { HomeV2 } from "./components/home/v2/HomeV2";
 import { PricingV2 } from "./pages/PricingV2";
 import { Blog as BlogV2 } from "./pages/Blog";
@@ -307,119 +313,219 @@ const ScrollToTop = () => {
 };
 
 // --- Authentication Pages ---
-import { signInWithGoogle } from "./lib/firebase";
+import { sendMagicLink, signInWithGoogle } from "./lib/firebase";
 
-const LoginPage = () => {
-  const handleGoogleSignIn = async () => {
+type AuthMode = "signin" | "signup";
+
+const AuthCard: React.FC<{ mode: AuthMode }> = ({ mode }) => {
+  const [email, setEmail] = useState("");
+  const [linkSent, setLinkSent] = useState(false);
+  const [busy, setBusy] = useState<"google" | "email" | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const successPath = mode === "signin" ? "/dashboard" : "/pricing";
+
+  const handleGoogle = async () => {
+    setErr(null);
+    setBusy("google");
     try {
       await signInWithGoogle();
-      window.location.href = "/dashboard";
+      window.location.href = successPath;
     } catch (error) {
-      console.error("Sign in failed", error);
-      alert("Sign in failed");
+      console.error("Google auth failed", error);
+      setErr(error instanceof Error ? error.message : "Google sign-in failed. Try again.");
+      setBusy(null);
     }
   };
 
+  const handleEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null);
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setErr("Enter a valid email address.");
+      return;
+    }
+    setBusy("email");
+    try {
+      await sendMagicLink(email.trim(), successPath);
+      setLinkSent(true);
+    } catch (error) {
+      console.error("Magic link failed", error);
+      setErr(error instanceof Error ? error.message : "Could not send sign-in link. Try Google instead.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const titles = {
+    signin: { h1: "Welcome back.", sub: "Sign in to manage your sites, billing, and team." },
+    signup: { h1: "Join the Elite.", sub: "Start building premium websites with voice in seconds." },
+  };
+  const t = titles[mode];
+
   return (
-    <div className="pt-40 pb-24 px-6 flex flex-col items-center min-h-screen">
+    <div className="pt-32 pb-24 px-5 sm:px-8 flex flex-col items-center min-h-screen">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="glass-premium p-12 rounded-[3.5rem] w-full max-w-md"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md overflow-hidden rounded-4xl border border-white/12 bg-linear-to-b from-white/6 to-white/2 p-8 backdrop-blur-2xl sm:p-10"
       >
-        <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan">
-            <User className="text-white w-8 h-8" />
+        <div className="flex justify-center mb-6">
+          <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-cyan-300 to-fuchsia-400 flex items-center justify-center shadow-[0_18px_60px_-15px_rgba(34,211,238,0.6)]">
+            <User className="text-black w-7 h-7" aria-hidden="true" />
           </div>
         </div>
-        <h1 className="text-3xl font-black text-center mb-2 italic">
-          Access Nexus
+        <h1 className="font-display text-3xl sm:text-4xl font-black text-center tracking-tight">
+          {t.h1}
         </h1>
-        <p className="text-center text-white/40 text-sm mb-10">
-          Enter your credentials to manage your digital empire.
+        <p className="text-center text-white/55 text-sm mt-3 mb-8 leading-6">
+          {t.sub}
         </p>
 
-        <button
-          onClick={handleGoogleSignIn}
-          type="button"
-          className="mt-6 w-full py-4 glass rounded-2xl flex items-center justify-center gap-3 font-bold hover:bg-white/10 transition-all"
-        >
-          <img
-            src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
-            alt="Google"
-            className="w-5 h-5 grayscale"
-          />
-          Google Authentication
-        </button>
+        {linkSent ? (
+          <div className="rounded-2xl border border-cyan-300/30 bg-cyan-300/8 p-5 text-center">
+            <div className="font-display text-lg font-black tracking-tight text-cyan-100">Check your inbox.</div>
+            <p className="mt-2 text-sm text-white/70 leading-6">
+              We sent a one-click sign-in link to <strong className="text-white">{email}</strong>. Open it on this device to continue.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setLinkSent(false);
+                setEmail("");
+              }}
+              className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-cyan-200 hover:text-white"
+            >
+              Use a different email
+            </button>
+          </div>
+        ) : (
+          <>
+            <button
+              onClick={handleGoogle}
+              disabled={busy !== null}
+              type="button"
+              className="w-full py-3.5 rounded-2xl bg-white text-black flex items-center justify-center gap-3 font-bold transition hover:-translate-y-px hover:shadow-[0_18px_60px_-15px_rgba(255,255,255,0.4)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <img
+                src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
+                alt=""
+                className="w-5 h-5"
+              />
+              {busy === "google" ? "Opening Google…" : "Continue with Google"}
+            </button>
 
-        <p className="mt-8 text-center text-xs text-white/40">
-          New to the future?{" "}
-          <Link
-            to="/signup"
-            className="text-brand-cyan font-bold hover:underline"
-          >
-            Create Identity
-          </Link>
+            <div className="my-6 flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1 bg-white/10" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/35">or email link</span>
+              <span className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <form onSubmit={handleEmail} className="space-y-3">
+              <label className="block">
+                <span className="sr-only">Email address</span>
+                <input
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  required
+                  placeholder="you@business.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-2xl border border-white/12 bg-black/30 px-5 py-3.5 text-sm text-white placeholder-white/35 outline-none transition focus:border-cyan-300/60 focus:bg-black/40"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={busy !== null}
+                className="w-full py-3.5 rounded-2xl bg-linear-to-r from-cyan-300 to-fuchsia-400 text-black font-black uppercase tracking-[0.18em] text-xs transition hover:-translate-y-px hover:shadow-[0_18px_60px_-15px_rgba(232,121,249,0.6)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {busy === "email" ? "Sending link…" : "Send sign-in link"}
+              </button>
+            </form>
+
+            {err && (
+              <p role="alert" className="mt-4 text-center text-xs text-rose-300">
+                {err}
+              </p>
+            )}
+          </>
+        )}
+
+        <p className="mt-8 text-[10px] text-white/40 leading-relaxed text-center">
+          By continuing you agree to the{" "}
+          <Link to="/terms" className="text-white underline">Terms of Service</Link>{" "}and{" "}
+          <Link to="/privacy" className="text-white underline">Privacy Policy</Link>.
+        </p>
+
+        <p className="mt-5 text-center text-xs text-white/55">
+          {mode === "signin" ? (
+            <>New here? <Link to="/signup" className="text-cyan-200 font-bold hover:underline">Create an account</Link></>
+          ) : (
+            <>Already have an account? <Link to="/signin" className="text-cyan-200 font-bold hover:underline">Sign in</Link></>
+          )}
         </p>
       </motion.div>
     </div>
   );
 };
 
-const SignUpPage = () => {
-  const handleGoogleSignUp = async () => {
-    try {
-      await signInWithGoogle();
-      window.location.href = "/pricing";
-    } catch (error) {
-      console.error("Sign up failed", error);
-      alert("Sign up failed");
-    }
-  };
+const LoginPage = () => <AuthCard mode="signin" />;
+const SignUpPage = () => <AuthCard mode="signup" />;
+
+const AuthCallbackPage = () => {
+  const [state, setState] = useState<"working" | "error">("working");
+  const [err, setErr] = useState<string>("");
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { completeMagicLinkSignIn, isMagicLinkUrl } = await import("./lib/firebase");
+        if (!isMagicLinkUrl()) {
+          if (!cancelled) {
+            setErr("This link isn't a valid sign-in link or has already been used.");
+            setState("error");
+          }
+          return;
+        }
+        await completeMagicLinkSignIn();
+        const url = new URL(window.location.href);
+        const next = url.searchParams.get("next") || "/dashboard";
+        window.location.replace(next);
+      } catch (error) {
+        if (!cancelled) {
+          setErr(error instanceof Error ? error.message : "Could not finish sign-in.");
+          setState("error");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
-    <div className="pt-40 pb-24 px-6 flex flex-col items-center min-h-screen">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-premium p-12 rounded-[3.5rem] w-full max-w-lg"
-      >
-        <h1 className="text-4xl font-black mb-2 italic">Join the Elite</h1>
-        <p className="text-white/40 text-sm mb-10">
-          Start building premium websites with voice in seconds.
-        </p>
-
-        <button
-          onClick={handleGoogleSignUp}
-          type="button"
-          className="w-full py-4 glass rounded-2xl flex items-center justify-center gap-3 font-bold hover:bg-white/10 transition-all"
-        >
-          <img
-            src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Continue with Google
-        </button>
-
-        <p className="mt-8 text-[10px] text-white/40 leading-relaxed text-center">
-          By continuing you agree to the{" "}
-          <Link to="/terms" className="text-white underline">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link to="/privacy" className="text-white underline">
-            Privacy Policy
-          </Link>
-          . All sales are final.
-        </p>
-
-        <p className="mt-6 text-center text-xs text-white/40">
-          Already have an account?{" "}
-          <Link to="/login" className="text-brand-cyan font-bold hover:underline">
-            Sign in
-          </Link>
-        </p>
-      </motion.div>
+    <div className="pt-32 pb-24 px-5 flex flex-col items-center min-h-screen">
+      <div className="w-full max-w-md rounded-4xl border border-white/12 bg-linear-to-b from-white/6 to-white/2 p-10 text-center backdrop-blur-2xl">
+        {state === "working" ? (
+          <>
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" aria-hidden="true" />
+            <h1 className="mt-6 font-display text-2xl font-black tracking-tight">Signing you in…</h1>
+            <p className="mt-2 text-sm text-white/60">Verifying your email link. This takes about a second.</p>
+          </>
+        ) : (
+          <>
+            <h1 className="font-display text-2xl font-black tracking-tight text-rose-200">Sign-in link problem</h1>
+            <p className="mt-2 text-sm text-white/70">{err}</p>
+            <Link
+              to="/signin"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-black"
+            >
+              Back to sign in
+            </Link>
+          </>
+        )}
+      </div>
     </div>
   );
 };
@@ -570,9 +676,14 @@ const Dashboard = () => {
                       >
                         Preview
                       </Link>
-                      <button className="p-4 bg-white/5 rounded-2xl hover:text-brand-cyan transition-colors">
+                      <Link
+                        to={`/setup?id=${site.id}`}
+                        aria-label={`Edit settings for ${site.title || "untitled site"}`}
+                        title="Edit site settings"
+                        className="p-4 bg-white/5 rounded-2xl hover:text-brand-cyan transition-colors"
+                      >
                         <Settings className="w-4 h-4" />
-                      </button>
+                      </Link>
                     </div>
                   </motion.div>
                 ))
@@ -893,11 +1004,9 @@ export default function App() {
         <main className="grow">
           <Routes>
             <Route path="/" element={<HomeV2 />} />
-            <Route path="/v1" element={<Home />} />
             <Route path="/features" element={<FeaturesReal />} />
             <Route path="/examples" element={<ExamplesReal />} />
             <Route path="/pricing" element={<PricingV2 />} />
-            <Route path="/pricing/v1" element={<PricingPage />} />
             <Route
               path="/deployment-ready-prompt"
               element={<UniversalDeploymentPrompt />}
@@ -905,7 +1014,6 @@ export default function App() {
             <Route path="/blog" element={<BlogV2 />} />
             <Route path="/blog/:slug" element={<BlogPostV2 />} />
             <Route path="/stories" element={<BlogV2 />} />
-            <Route path="/store" element={<PricingPage />} />
             <Route path="/about" element={<AboutReal />} />
             <Route path="/contact" element={<ContactReal />} />
             <Route path="/faq" element={<FAQReal />} />
@@ -921,6 +1029,7 @@ export default function App() {
             <Route path="/signin" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/engines" element={<EngineTester />} />
