@@ -1,4 +1,4 @@
-import { PLAN_LIMITS, PlanType, STRIPE_PAYMENT_LINKS } from "@/constants/plans";
+import { PLAN_LIMITS, PlanType } from "@/constants/plans";
 import { parseResponse, ApiError } from "../lib/api";
 import { GOOGLE_AI_STUDIO_APP_URL } from "@/constants/integrations";
 import { trackEvent } from "@/lib/analytics";
@@ -29,14 +29,6 @@ export const Pricing = () => {
       const data = await parseResponse<{ url?: string; error?: string }>(response);
 
       if (!response.ok || !data.url) {
-        const fallback =
-          plan === "commands"
-            ? STRIPE_PAYMENT_LINKS.commands.month
-            : STRIPE_PAYMENT_LINKS[plan][cadence];
-        if (fallback) {
-          window.location.href = fallback;
-          return;
-        }
         throw new Error(data.error || "Stripe checkout initialization failed.");
       }
 

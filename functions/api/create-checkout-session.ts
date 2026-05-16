@@ -76,23 +76,10 @@ async function createPayPalFallback(env: Env, plan: string, appUrl: string) {
   return orderRes.ok ? order.links?.find((link) => link.rel === "approve")?.href || null : null;
 }
 
-const FALLBACK_STRIPE_LINKS: Record<string, { month?: string; year?: string }> = {
-  starter: {
-    month: "https://buy.stripe.com/9B65kD2Kx5mK5le8nUbAs0u",
-    year: "https://buy.stripe.com/28E5kD70N02q7tm8nUbAs0v",
-  },
-  pro: {
-    month: "https://buy.stripe.com/dRmfZhbh35mK2927jQbAs0w",
-    year: "https://buy.stripe.com/4gM00j3OB6qO9BudIebAs0x",
-  },
-  enterprise: {
-    month: "https://buy.stripe.com/bJe7sLetfcPcdRK1ZwbAs0y",
-    year: "https://buy.stripe.com/dRm00jacZ4iG9Bu0VsbAs0z",
-  },
-  commands: {
-    month: "https://buy.stripe.com/fZubJ12Kx02q9Bu6fMbAs0A",
-  },
-};
+// Fallback links disabled 2026-05-15. Pre-created Payment Links were at the OLD
+// launch prices and were silently overcharging. Dynamic price_data is now the
+// only path; any failure surfaces as an error instead of a wrong-price charge.
+const FALLBACK_STRIPE_LINKS: Record<string, { month?: string; year?: string }> = {};
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
@@ -135,19 +122,13 @@ async function parseRequestBody(request: Request) {
   throw new Error('Unsupported content type');
 }
 
-function getStripePriceForPlan(env: Env, plan: string, cadence: 'month' | 'year') {
-  switch (plan) {
-    case 'starter':
-      return cadence === 'year' ? env.STRIPE_PRICE_STARTER_YEAR : env.STRIPE_PRICE_STARTER_MONTH;
-    case 'pro':
-      return cadence === 'year' ? env.STRIPE_PRICE_PRO_YEAR : env.STRIPE_PRICE_PRO_MONTH;
-    case 'enterprise':
-      return cadence === 'year' ? env.STRIPE_PRICE_ENTERPRISE_YEAR : env.STRIPE_PRICE_ENTERPRISE_MONTH;
-    case 'commands':
-      return env.STRIPE_PRICE_COMMANDS;
-    default:
-      return null;
-  }
+// Returns null so checkout always uses inline price_data at the locked
+// $9.99/$19.99/$49.99 amounts. The env.STRIPE_PRICE_* secrets point to old
+// $39/$99 Stripe Price objects and were silently overcharging. To re-enable
+// stored Price IDs, first rebuild them in the Stripe dashboard at the
+// locked prices, then restore the switch below.
+function getStripePriceForPlan(_env: Env, _plan: string, _cadence: 'month' | 'year') {
+  return null;
 }
 
 export const onRequestPost = async (context: { request: Request; env: Env }) => {

@@ -74,20 +74,14 @@ export const PLAN_LIMITS = PLAN_ENTITLEMENTS;
 
 export const isUnlimited = (value: number) => value === Number.MAX_SAFE_INTEGER;
 
+// DISABLED 2026-05-15. These were pre-created Stripe Payment Links at OLD prices
+// ($39 Pro / $99 Enterprise). The dynamic /api/create-checkout-session was
+// silently falling back to them and overcharging customers. The dynamic flow now
+// uses inline price_data at the locked $9.99/$19.99/$49.99 amounts. If the
+// dynamic flow ever fails we want a real error, not a wrong-price charge.
 export const STRIPE_PAYMENT_LINKS: Record<Exclude<PlanType, 'free'>, { month: string; year?: string }> = {
-  starter: {
-    month: 'https://buy.stripe.com/9B65kD2Kx5mK5le8nUbAs0u',
-    year: 'https://buy.stripe.com/28E5kD70N02q7tm8nUbAs0v',
-  },
-  pro: {
-    month: 'https://buy.stripe.com/dRmfZhbh35mK2927jQbAs0w',
-    year: 'https://buy.stripe.com/4gM00j3OB6qO9BudIebAs0x',
-  },
-  enterprise: {
-    month: 'https://buy.stripe.com/bJe7sLetfcPcdRK1ZwbAs0y',
-    year: 'https://buy.stripe.com/dRm00jacZ4iG9Bu0VsbAs0z',
-  },
-  commands: {
-    month: 'https://buy.stripe.com/fZubJ12Kx02q9Bu6fMbAs0A',
-  },
+  starter: { month: '', year: '' },
+  pro: { month: '', year: '' },
+  enterprise: { month: '', year: '' },
+  commands: { month: '' },
 };

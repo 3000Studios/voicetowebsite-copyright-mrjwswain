@@ -8,23 +8,8 @@ export interface Env {
   PAYPAL_PLAN_ENTERPRISE?: string;
 }
 
-const FALLBACK_CHECKOUT_URLS: Record<string, { month?: string; year?: string }> = {
-  starter: {
-    month: "https://buy.stripe.com/9B65kD2Kx5mK5le8nUbAs0u",
-    year: "https://buy.stripe.com/28E5kD70N02q7tm8nUbAs0v",
-  },
-  pro: {
-    month: "https://buy.stripe.com/dRmfZhbh35mK2927jQbAs0w",
-    year: "https://buy.stripe.com/4gM00j3OB6qO9BudIebAs0x",
-  },
-  enterprise: {
-    month: "https://buy.stripe.com/bJe7sLetfcPcdRK1ZwbAs0y",
-    year: "https://buy.stripe.com/dRm00jacZ4iG9Bu0VsbAs0z",
-  },
-  commands: {
-    month: "https://buy.stripe.com/fZubJ12Kx02q9Bu6fMbAs0A",
-  },
-};
+// Fallback links disabled 2026-05-15: same wrong-price problem as Stripe path.
+const FALLBACK_CHECKOUT_URLS: Record<string, { month?: string; year?: string }> = {};
 
 const PLAN_AMOUNTS: Record<string, { value: string; description: string }> = {
   starter: { value: "9.99", description: "VoiceToWebsite.com Starter - 50 commands per month" },
