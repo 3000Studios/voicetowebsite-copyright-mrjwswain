@@ -37,12 +37,34 @@ import { cn } from "./lib/utils";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const location = useLocation();
 
+  // Fold-on-scroll-down, reveal-on-scroll-up behavior. Threshold prevents
+  // jitter on small wheel deltas. Always shown at the very top of the page.
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    let lastY = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastY;
+        setIsScrolled(y > 20);
+        if (y < 80) {
+          setHidden(false);
+        } else if (delta > 6) {
+          setHidden(true);
+        } else if (delta < -6) {
+          setHidden(false);
+        }
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const navLinks = [
@@ -54,29 +76,40 @@ const Navbar = () => {
 
   return (
     <nav
+      aria-label="Primary"
       className={cn(
-        "site-header-wallpaper fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-6 lg:px-12 flex items-center justify-between overflow-hidden",
+        "site-header-wallpaper fixed top-0 left-0 right-0 z-50 transition-[transform,background-color,backdrop-filter,height,border-color] duration-500 ease-out px-5 lg:px-10 flex items-center justify-between overflow-hidden",
         isScrolled
-          ? "h-20 bg-black/60 backdrop-blur-xl border-b border-white/5"
-          : "h-28 bg-transparent",
+          ? "h-16 bg-black/65 backdrop-blur-xl border-b border-white/8"
+          : "h-24 bg-transparent border-b border-transparent",
+        hidden ? "-translate-y-full" : "translate-y-0",
       )}
     >
-      <Link to="/" className="relative z-10 flex items-center gap-3 group" onClick={handleLogoClick}>
+      <Link
+        to="/"
+        className="relative z-10 flex items-center gap-3 group"
+        onClick={handleLogoClick}
+        aria-label="VoiceToWebsite home"
+      >
         <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan group-hover:scale-110 transition-transform">
-          <Mic className="text-white w-5 h-5 animate-pulse" />
+          <Mic className="text-white w-5 h-5 animate-pulse" aria-hidden="true" />
         </div>
+        <span className="hidden sm:inline-flex font-display text-lg font-black tracking-tight text-white">
+          Voice<span className="bg-linear-to-r from-cyan-300 to-fuchsia-300 bg-clip-text text-transparent">ToWebsite</span>
+        </span>
       </Link>
 
       {/* Desktop Menu */}
-      <div className="relative z-10 hidden lg:flex items-center gap-10 text-[10px] uppercase font-black tracking-[0.2em] text-white/50">
+      <div className="relative z-10 hidden lg:flex items-center gap-9 text-[10px] uppercase font-black tracking-[0.22em] text-white/55">
         {navLinks.map((link) => (
           <Link
             key={link.path}
             to={link.path}
+            aria-current={location.pathname === link.path ? "page" : undefined}
             className={cn(
-              "transition-colors hover:text-brand-cyan relative py-2",
+              "transition-colors hover:text-cyan-200 relative py-2",
               location.pathname === link.path &&
-                "text-brand-cyan after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-brand-cyan",
+                "text-cyan-200 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-cyan-300",
             )}
           >
             {link.name}
@@ -84,16 +117,16 @@ const Navbar = () => {
         ))}
       </div>
 
-      <div className="relative z-10 hidden lg:flex items-center gap-6">
+      <div className="relative z-10 hidden lg:flex items-center gap-5">
         <Link
           to="/signin"
-          className="text-[10px] uppercase font-black tracking-widest text-white/40 hover:text-white transition-colors"
+          className="text-[10px] uppercase font-black tracking-[0.22em] text-white/55 hover:text-white transition-colors"
         >
-          Access Nexus
+          Sign in
         </Link>
         <Link
           to="/signup"
-          className="px-8 py-3 rounded-2xl bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-brand-cyan transition-all hover:scale-105 active:scale-95"
+          className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.22em] text-black transition hover:-translate-y-px hover:shadow-[0_18px_60px_-15px_rgba(34,211,238,0.6)] active:translate-y-0"
         >
           Generate Now
         </Link>
@@ -101,61 +134,102 @@ const Navbar = () => {
 
       {/* Mobile Menu Trigger */}
       <button
-        className="relative z-10 lg:hidden p-2 glass rounded-xl text-white"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded={isOpen}
+        className="relative z-10 lg:hidden p-2.5 rounded-xl bg-white/8 border border-white/10 text-white hover:bg-white/15 transition"
         onClick={() => setIsOpen(true)}
       >
-        <Menu className="w-6 h-6" />
+        <Menu className="w-5 h-5" />
       </button>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 z-60 bg-[#050505]/95 backdrop-blur-2xl flex flex-col p-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xl"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+        {isOpen && (
+          <motion.div
+            key="drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 240, damping: 30 }}
+            className="fixed inset-y-0 right-0 z-60 flex w-full max-w-sm flex-col bg-[#050507]/98 backdrop-blur-2xl border-l border-white/10 p-8"
           >
-            <div className="flex justify-between items-center mb-20">
-              <span className="text-xl font-black italic">
-                VoiceToWebsite<span className="text-brand-cyan">.com</span>
+            <div className="flex justify-between items-center mb-10">
+              <span className="font-display text-lg font-black tracking-tight">
+                Voice<span className="bg-linear-to-r from-cyan-300 to-fuchsia-300 bg-clip-text text-transparent">ToWebsite</span>
               </span>
               <button
+                type="button"
+                aria-label="Close menu"
                 onClick={() => setIsOpen(false)}
-                className="p-2 glass rounded-xl"
+                className="p-2.5 rounded-xl bg-white/8 border border-white/10 hover:bg-white/15 transition"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex flex-col gap-8 text-4xl font-black italic">
-              {navLinks.map((link) => (
-                <Link
+            <nav aria-label="Mobile" className="flex flex-col gap-1 text-2xl font-black tracking-tight">
+              {navLinks.map((link, i) => (
+                <motion.div
                   key={link.path}
-                  to={link.path}
-                  onClick={() => setIsOpen(false)}
-                  className="hover:text-brand-cyan transition-colors"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 + i * 0.05 }}
                 >
-                  {link.name}
-                </Link>
+                  <Link
+                    to={link.path}
+                    onClick={() => setIsOpen(false)}
+                    aria-current={location.pathname === link.path ? "page" : undefined}
+                    className={cn(
+                      "block rounded-2xl px-4 py-3 transition-colors hover:bg-white/5 hover:text-cyan-200",
+                      location.pathname === link.path && "bg-white/5 text-cyan-200",
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
               ))}
-              <Link to="/dashboard" onClick={() => setIsOpen(false)}>
-                Dashboard
-              </Link>
-            </div>
-            <div className="mt-auto space-y-6">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25 }}
+              >
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-2xl px-4 py-3 hover:bg-white/5 hover:text-cyan-200 transition-colors"
+                >
+                  Dashboard
+                </Link>
+              </motion.div>
+            </nav>
+            <div className="mt-auto space-y-3">
               <Link
                 to="/signin"
                 onClick={() => setIsOpen(false)}
-                className="block w-full py-6 glass rounded-4xl text-center font-black italic text-xl"
+                className="block w-full py-4 rounded-2xl border border-white/12 bg-white/5 text-center font-bold uppercase tracking-[0.18em] text-xs hover:bg-white/10 transition"
               >
-                Sign In
+                Sign in
               </Link>
               <Link
                 to="/signup"
                 onClick={() => setIsOpen(false)}
-                className="block w-full py-6 bg-brand-cyan text-black rounded-4xl text-center font-black italic text-xl"
+                className="block w-full py-4 rounded-2xl bg-linear-to-r from-cyan-300 to-fuchsia-400 text-black text-center font-black uppercase tracking-[0.18em] text-xs shadow-[0_18px_60px_-15px_rgba(232,121,249,0.5)]"
               >
-                Build Now
+                Generate Now
               </Link>
             </div>
           </motion.div>
@@ -534,233 +608,313 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { useAuth } from "./lib/AuthContext";
 import { db } from "./lib/firebase";
 
+type DashSite = {
+  id: string;
+  title?: string;
+  industry?: string;
+  status?: string;
+  url?: string;
+  ownerId?: string;
+  createdAt?: string | number | Date;
+};
+
 const Dashboard = () => {
   const { user, loading } = useAuth();
-  const [sites, setSites] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [sites, setSites] = useState<DashSite[]>([]);
+  const [sitesLoading, setSitesLoading] = useState(true);
 
   useEffect(() => {
-    if (user && db) {
-      const fetchUserSites = async () => {
-        try {
-          const q = query(
-            collection(db, "sites"),
-            where("ownerId", "==", user.uid),
-          );
-          const querySnapshot = await getDocs(q);
-          const userSites: any[] = [];
-          querySnapshot.forEach((doc) => {
-            userSites.push({ id: doc.id, ...doc.data() });
-          });
-          setSites(userSites);
-        } catch (error) {
-          console.error("Error fetching sites:", error);
-        }
-      };
-      fetchUserSites();
+    if (!user || !db) {
+      setSitesLoading(false);
+      return;
     }
+    let cancelled = false;
+    (async () => {
+      try {
+        const q = query(collection(db, "sites"), where("ownerId", "==", user.uid));
+        const snap = await getDocs(q);
+        const list: DashSite[] = [];
+        snap.forEach((d) => list.push({ id: d.id, ...(d.data() as Omit<DashSite, "id">) }));
+        if (!cancelled) setSites(list);
+      } catch (err) {
+        console.error("Error fetching sites:", err);
+      } finally {
+        if (!cancelled) setSitesLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="pt-32 pb-20 px-6 min-h-screen text-center">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center pt-32">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" />
       </div>
     );
+  }
 
-  return (
-    <div className="pt-32 pb-20 px-6 lg:px-12 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
-          <div>
-            <h1 className="text-5xl font-black italic tracking-tighter mb-2">
-              Command Center
-            </h1>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse" />
-              <p className="text-[10px] uppercase font-black tracking-widest text-white/40 italic">
-                Sync Level: <span className="text-white">Neural Maximum</span>
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-4 w-full md:w-auto">
-            {!user ? (
-              <Link
-                to="/signin"
-                className="glass px-8 py-4 rounded-3xl text-[10px] font-black uppercase tracking-widest text-brand-cyan hover:bg-white/10 transition-colors flex items-center justify-center"
-              >
-                Sign In To Sync
-              </Link>
-            ) : null}
-            <div className="glass px-8 py-4 rounded-3xl grow md:grow-0">
-              <p className="text-[8px] uppercase font-black text-white/20 mb-1">
-                Commands Remaining
-              </p>
-              <div className="flex items-center gap-2">
-                <Zap className="w-3 h-3 text-brand-purple" />
-                <p className="font-black text-brand-purple tracking-tighter">
-                  {user ? "? / ?" : "3 Demo"}
-                </p>
-              </div>
-            </div>
+  // Signed-out empty state
+  if (!user) {
+    return (
+      <section className="relative px-5 pt-28 pb-20 sm:px-8 lg:px-12 lg:pt-44">
+        <div className="mx-auto max-w-2xl rounded-4xl border border-white/12 bg-linear-to-b from-white/6 to-white/2 p-10 text-center backdrop-blur-2xl sm:p-14">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.32em] text-cyan-200">
+            <User className="h-3 w-3" /> Sign in to continue
+          </span>
+          <h1 className="mt-6 font-display text-[clamp(2rem,5vw,3.4rem)] font-black leading-[1.02] tracking-tight">
+            Sign in to see your dashboard.
+          </h1>
+          <p className="mt-4 text-base leading-7 text-white/65">
+            Your sites, command balance, and billing live here.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              to="/pricing"
-              className="px-8 py-4 bg-brand-cyan text-black font-black rounded-3xl hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20 flex items-center justify-center"
+              to="/signin"
+              className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-7 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-black"
             >
-              Recharge
+              Sign in <Plus className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] text-white/85 hover:text-white"
+            >
+              Create account
             </Link>
           </div>
         </div>
+      </section>
+    );
+  }
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Sites List */}
-          <div className="lg:col-span-2 space-y-8">
+  const firstName = (user.displayName || user.email?.split("@")[0] || "there").split(" ")[0];
+
+  return (
+    <main className="relative px-5 pt-28 pb-24 sm:px-8 lg:px-12 lg:pt-36">
+      <div className="mx-auto max-w-7xl">
+        {/* HEADER */}
+        <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-cyan-200/80">Dashboard</div>
+            <h1 className="mt-2 font-display text-[clamp(2.2rem,4.5vw,3.4rem)] font-black leading-[1.02] tracking-tight">
+              Welcome back, {firstName}.
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-white/60">
+              Manage your sites, billing, and team in one place.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:-translate-y-px hover:shadow-[0_18px_60px_-15px_rgba(232,121,249,0.5)]"
+            >
+              <Plus className="h-4 w-4" /> New site
+            </Link>
+            <Link
+              to="/pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white/85 hover:border-cyan-300/40 hover:text-white transition"
+            >
+              Manage plan
+            </Link>
+          </div>
+        </header>
+
+        {/* QUICK TILES */}
+        <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: Layout, label: "My sites", value: String(sites.length), caption: sites.length === 0 ? "Get started" : "Click a card below" },
+            { icon: Zap, label: "Commands", value: "—", caption: "Plan-based balance" },
+            { icon: BarChart3, label: "30-day visits", value: "—", caption: "Connect analytics" },
+            { icon: CreditCard, label: "Plan", value: "Active", caption: "Billing in pricing" },
+          ].map(({ icon: Icon, label, value, caption }) => (
+            <div key={label} className="group relative overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/1 p-5 backdrop-blur-xl">
+              <div className="pointer-events-none absolute -top-12 -right-10 h-32 w-32 rounded-full bg-cyan-300/8 blur-3xl transition group-hover:bg-cyan-300/15" />
+              <Icon className="h-5 w-5 text-cyan-300/80" aria-hidden="true" />
+              <div className="mt-3 font-display text-3xl font-black tracking-tight">{value}</div>
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.24em] text-white/55">{label}</div>
+              <div className="mt-1.5 text-xs text-white/55">{caption}</div>
+            </div>
+          ))}
+        </section>
+
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
+          {/* SITES */}
+          <section>
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold flex items-center gap-3 italic">
-                <Layout className="w-6 h-6 text-brand-cyan" /> Your
-                Architectures
+              <h2 className="font-display text-xl font-black tracking-tight flex items-center gap-2">
+                <Layout className="h-5 w-5 text-cyan-300" /> Your sites
               </h2>
               <Link
                 to="/"
-                className="p-3 glass rounded-full hover:bg-white/10 transition-all hover:rotate-90"
+                aria-label="Create new site"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:border-cyan-300/40 hover:text-cyan-200 transition"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="h-4 w-4" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {sites.length === 0 ? (
-                <div className="col-span-1 md:col-span-2 text-center p-12 glass border-white/5 rounded-3xl">
-                  <Globe className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                  <p className="text-white/40 text-sm">
-                    No architectures generated yet.
-                  </p>
+            {sitesLoading ? (
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {[0, 1].map((i) => (
+                  <div key={i} className="h-56 animate-pulse rounded-3xl border border-white/8 bg-white/4" />
+                ))}
+              </div>
+            ) : sites.length === 0 ? (
+              <div className="mt-6 overflow-hidden rounded-4xl border border-white/10 bg-linear-to-b from-white/5 to-white/1 p-10 text-center backdrop-blur-xl">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-300/20 to-fuchsia-400/20">
+                  <Globe className="h-6 w-6 text-cyan-200" aria-hidden="true" />
+                </div>
+                <h3 className="mt-5 font-display text-2xl font-black tracking-tight">Build your first site</h3>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-white/60">
+                  Speak a 60-second brief and we'll generate a hosted homepage with real Gemini copy. You can swap sections, edit copy, and publish in minutes.
+                </p>
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
                   <Link
                     to="/"
-                    className="mt-4 inline-block px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors"
+                    className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-cyan-300 to-fuchsia-400 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-black"
                   >
-                    Start Building
+                    Start building <Plus className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    to="/examples"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white/85 hover:text-white"
+                  >
+                    See examples
                   </Link>
                 </div>
-              ) : (
-                sites.map((site, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 30 }}
+              </div>
+            ) : (
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                {sites.map((site, i) => (
+                  <motion.article
+                    key={site.id}
+                    initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="group glass p-6 rounded-[3rem] border-white/5 hover:border-brand-cyan/50 transition-all flex flex-col min-h-85"
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ delay: i * 0.06, duration: 0.5 }}
+                    className="group relative flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 p-5 backdrop-blur-xl transition hover:border-cyan-300/40 hover:shadow-[0_30px_120px_-30px_rgba(34,211,238,0.35)]"
                   >
-                    <div className="aspect-video bg-[#0a0a0a] rounded-4xl mb-6 overflow-hidden relative border border-white/5">
-                      <div className="absolute inset-0 bg-linear-to-br from-brand-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-10 group-hover:scale-110 transition-transform">
-                        <Globe className="w-20 h-20" />
+                    <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/8 bg-linear-to-br from-cyan-300/10 to-fuchsia-400/10">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-20 transition group-hover:scale-110 group-hover:opacity-30">
+                        <Globe className="h-16 w-16" aria-hidden="true" />
                       </div>
-                      <div className="absolute top-4 right-4 px-3 py-1 glass rounded-lg text-[8px] font-black uppercase tracking-widest text-brand-cyan">
+                      <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/60 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-cyan-200 backdrop-blur">
+                        <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
                         {site.status || "Draft"}
                       </div>
                     </div>
-                    <div className="px-2 grow">
-                      <p className="text-[10px] uppercase font-black text-white/20 mb-1">
-                        {site.industry || "General"} // ID:{" "}
-                        {site.id.substring(0, 6)}
-                      </p>
-                      <h3 className="text-xl font-bold mb-6 italic">
-                        {site.title || "Untitled"}
+                    <div className="mt-4 flex-1">
+                      <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/40">
+                        {site.industry || "General"} · {site.id.substring(0, 6)}
+                      </div>
+                      <h3 className="mt-1.5 font-display text-lg font-black tracking-tight line-clamp-1">
+                        {site.title || "Untitled site"}
                       </h3>
                     </div>
-                    <div className="flex items-center gap-2 mt-auto">
+                    <div className="mt-5 flex items-center gap-2">
                       <Link
                         to={`/preview?id=${site.id}`}
-                        className="grow py-4 text-center bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors"
+                        className="grow rounded-2xl bg-white/5 py-3 text-center text-[10px] font-black uppercase tracking-[0.22em] hover:bg-white/10 transition"
                       >
                         Preview
                       </Link>
                       <Link
                         to={`/setup?id=${site.id}`}
-                        aria-label={`Edit settings for ${site.title || "untitled site"}`}
-                        title="Edit site settings"
-                        className="p-4 bg-white/5 rounded-2xl hover:text-brand-cyan transition-colors"
+                        aria-label={`Edit ${site.title || "untitled site"}`}
+                        title="Edit site"
+                        className="rounded-2xl bg-white/5 p-3 hover:text-cyan-200 hover:bg-white/10 transition"
                       >
-                        <Settings className="w-4 h-4" />
+                        <Settings className="h-4 w-4" />
                       </Link>
                     </div>
-                  </motion.div>
-                ))
-              )}
-            </div>
-          </div>
+                  </motion.article>
+                ))}
+              </div>
+            )}
 
-          {/* Sidebar / Stats */}
-          <div className="space-y-8">
-            <div className="glass-premium p-10 rounded-[3.5rem] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-cyan/5 blur-3xl rounded-full translate-x-12 -translate-y-12" />
-              <h3 className="text-[11px] uppercase font-black tracking-[0.2em] text-white/20 mb-8">
-                Neural Performance
-              </h3>
-              <div className="space-y-10">
+            {/* WHAT'S NEXT */}
+            <div className="mt-10">
+              <h2 className="font-display text-lg font-black tracking-tight">What to do next</h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  {
-                    label: "Visits / 24h",
-                    val: "0",
-                    icon: BarChart3,
-                    col: "text-brand-cyan",
-                  },
-                  {
-                    label: "Conversion rate",
-                    val: "0%",
-                    icon: Zap,
-                    col: "text-brand-purple",
-                  },
-                  {
-                    label: "Avg Load",
-                    val: "0s",
-                    icon: Cpu,
-                    col: "text-green-400",
-                  },
-                ].map((stat, i) => (
-                  <div key={i} className="flex items-center gap-5">
-                    <div
-                      className={cn(
-                        "w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center",
-                        stat.col,
-                      )}
-                    >
-                      <stat.icon className="w-6 h-6" />
+                  { title: "Connect a custom domain", body: "Pro and Ultimate plans — point your domain in Settings.", to: "/pricing" },
+                  { title: "Invite your team", body: "Whitelabel dashboards on Ultimate. Coming soon to the menu.", to: "/contact" },
+                  { title: "Read the help docs", body: "Common how-tos for editing, publishing, and SEO.", to: "/faq" },
+                ].map((c) => (
+                  <Link
+                    key={c.title}
+                    to={c.to}
+                    className="group rounded-2xl border border-white/10 bg-white/4 p-4 backdrop-blur-xl hover:border-cyan-300/40 transition"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-200/80">Tip</div>
+                    <div className="mt-1.5 font-display text-base font-black tracking-tight">{c.title}</div>
+                    <p className="mt-1 text-xs leading-5 text-white/55">{c.body}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* SIDEBAR */}
+          <aside className="space-y-6">
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-white/6 to-white/2 p-6 backdrop-blur-xl">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/55">Performance</h3>
+              <div className="mt-5 space-y-4">
+                {[
+                  { label: "Visits / 24h", val: "—", icon: BarChart3 },
+                  { label: "Conversion rate", val: "—", icon: Zap },
+                  { label: "Avg load", val: "—", icon: Cpu },
+                ].map(({ label, val, icon: Icon }) => (
+                  <div key={label} className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/6 text-cyan-200">
+                      <Icon className="h-4 w-4" />
                     </div>
-                    <div>
-                      <p className="text-xl font-black italic tracking-tighter">
-                        {stat.val}
-                      </p>
-                      <p className="text-[9px] uppercase font-black tracking-widest text-white/20">
-                        {stat.label}
-                      </p>
+                    <div className="flex-1">
+                      <div className="font-display text-xl font-black tracking-tight">{val}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">{label}</div>
                     </div>
                   </div>
                 ))}
               </div>
+              <p className="mt-4 text-[10px] leading-5 text-white/40">
+                Analytics will populate once your site has published traffic.
+              </p>
             </div>
 
-            <div className="glass p-10 rounded-[3.5rem] border-brand-purple/20 bg-linear-to-br from-brand-purple/5 to-transparent relative group">
-              <div className="relative z-10">
-                <h3 className="text-sm font-black italic mb-2">
-                  Upgrade Identity
-                </h3>
-                <p className="text-xs text-white/40 mb-8 leading-relaxed italic">
-                  Enable code export, high-speed CDN, and custom white-labeling.
+            <div className="relative overflow-hidden rounded-3xl border border-fuchsia-300/30 bg-linear-to-br from-fuchsia-400/15 via-white/4 to-cyan-300/10 p-6 backdrop-blur-xl">
+              <div className="pointer-events-none absolute -top-16 -right-12 h-44 w-44 rounded-full bg-fuchsia-400/25 blur-3xl" />
+              <div className="relative">
+                <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-fuchsia-100">Upgrade</div>
+                <h3 className="mt-2 font-display text-xl font-black tracking-tight">Unlock code export + custom domain</h3>
+                <p className="mt-2 text-xs leading-5 text-white/70">
+                  Pro is $19.99/mo. Ultimate adds 50 hosted sites and a whitelabel dashboard.
                 </p>
                 <Link
                   to="/pricing"
-                  className="block w-full py-5 bg-brand-purple text-center font-black rounded-2xl hover:scale-105 transition-transform shadow-xl shadow-brand-purple/20"
+                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-black hover:-translate-y-px transition"
                 >
-                  Expand Power
+                  See plans <Plus className="h-3 w-3" />
                 </Link>
               </div>
             </div>
-          </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/4 p-6 backdrop-blur-xl">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/55">Support</h3>
+              <p className="mt-2 text-sm leading-6 text-white/75">
+                Stuck or want a custom build? Reply to our founder.
+              </p>
+              <a
+                href="mailto:mr.jwswain@gmail.com"
+                className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white hover:border-cyan-300/40 transition"
+              >
+                <MessageSquare className="h-3.5 w-3.5" /> Contact founder
+              </a>
+            </div>
+          </aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

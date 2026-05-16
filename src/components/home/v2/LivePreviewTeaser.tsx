@@ -51,7 +51,19 @@ function getSpeechCtor(): SpeechRecognitionCtor | null {
 
 export const LivePreviewTeaser: React.FC = () => {
   const [mode, setMode] = useState<"voice" | "type">("type");
-  const [draft, setDraft] = useState(SAMPLE_PROMPTS[0]);
+  const [draft, setDraft] = useState(() => {
+    if (typeof window === "undefined") return SAMPLE_PROMPTS[0];
+    try {
+      const handoff = window.sessionStorage.getItem("vtw_hero_brief");
+      if (handoff && handoff.trim().length >= 8) {
+        window.sessionStorage.removeItem("vtw_hero_brief");
+        return handoff;
+      }
+    } catch {
+      /* fine */
+    }
+    return SAMPLE_PROMPTS[0];
+  });
   const [stage, setStage] = useState<Stage>("idle");
   const [previewHtml, setPreviewHtml] = useState<string>("");
   const [previewMeta, setPreviewMeta] = useState<{ used: number; limit: number; gemini: boolean } | null>(null);
@@ -158,6 +170,20 @@ export const LivePreviewTeaser: React.FC = () => {
   }, [click, generate]);
 
   useEffect(() => () => stopVoice(), [stopVoice]);
+
+  // Auto-generate once if the Hero handed off a brief via sessionStorage.
+  // Guarded so it only fires once on mount, not on every draft change.
+  const autoFiredRef = useRef(false);
+  useEffect(() => {
+    if (autoFiredRef.current) return;
+    if (typeof window === "undefined") return;
+    const wasHandoff = !SAMPLE_PROMPTS.includes(draft) && draft.trim().length >= 8;
+    if (wasHandoff) {
+      autoFiredRef.current = true;
+      window.setTimeout(() => generate(), 400);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Inject HTML into the iframe via srcdoc-equivalent
   useEffect(() => {
