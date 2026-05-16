@@ -522,7 +522,7 @@ export function PlaygroundGenerator({ variant = "default" }: { variant?: "defaul
             )}
 
             {brief && (
-              <div className="grid gap-4 border-b border-white/10 bg-white/[0.025] p-4 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="grid gap-4 border-b border-white/10 bg-white/2.5 p-4 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
                   <div className="mb-3 flex items-center gap-2 text-cyan-200">
                     <Wand2 className="h-4 w-4" />

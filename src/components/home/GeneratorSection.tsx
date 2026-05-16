@@ -311,7 +311,7 @@ export const GeneratorSection = () => {
                   {variations.map((vv,i)=>(
                     <button key={vv.id} onClick={()=>setActiveIdx(i)}
                       className={cn("flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all",
-                        activeIdx===i?"bg-white/10 border border-white/20 text-white":"bg-white/[0.03] border border-white/5 text-white/35 hover:text-white/60 hover:bg-white/6")}>
+                        activeIdx===i?"bg-white/10 border border-white/20 text-white":"bg-white/3 border border-white/5 text-white/35 hover:text-white/60 hover:bg-white/6")}>
                       <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{background:vv.palette[0]}}/>
                       {vv.name}
                       {activeIdx===i&&<span className="text-[9px] text-brand-cyan font-black ml-0.5">{vv.qualityScore}%</span>}
@@ -319,7 +319,7 @@ export const GeneratorSection = () => {
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex bg-white/[0.03] border border-white/8 rounded-xl p-1 gap-0.5">
+                  <div className="flex bg-white/3 border border-white/8 rounded-xl p-1 gap-0.5">
                     {(["desktop","tablet","mobile"] as DeviceMode[]).map(d=>(
                       <button key={d} onClick={()=>setDevice(d)}
                         className={cn("px-2.5 py-1.5 rounded-lg text-xs transition-all",
@@ -382,7 +382,7 @@ export const GeneratorSection = () => {
         {/* Empty state */}
         {stage==="idle"&&variations.length===0&&(
           <motion.div initial={{opacity:0}} animate={{opacity:1}} className="mt-6 text-center">
-            <div className="inline-flex flex-col items-center gap-3 p-10 rounded-3xl border border-white/[0.05] bg-white/[0.02]">
+            <div className="inline-flex flex-col items-center gap-3 p-10 rounded-3xl border border-white/5 bg-white/2">
               <motion.div animate={{y:[0,-10,0]}} transition={{duration:3.5,repeat:Infinity,ease:"easeInOut"}}
                 className="text-5xl opacity-15">🌐</motion.div>
               <p className="text-white/15 text-xs font-mono tracking-[0.25em] uppercase">Your website preview renders here</p>

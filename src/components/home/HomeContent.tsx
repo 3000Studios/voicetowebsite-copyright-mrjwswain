@@ -178,7 +178,7 @@ export const ExamplesSection = () => {
   ];
 
   return (
-    <section className="py-24 px-6 lg:px-12 bg-white/[0.02]">
+    <section className="py-24 px-6 lg:px-12 bg-white/2">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div className="max-w-xl">
@@ -208,7 +208,7 @@ export const ExamplesSection = () => {
               transition={{ delay: i * 0.1 }}
               className="group relative glass rounded-[2.5rem] p-4 border-white/10 hover:border-brand-cyan/50 transition-all overflow-hidden"
             >
-              <div className="aspect-[3/4] rounded-4xl overflow-hidden mb-6 relative">
+              <div className="aspect-3/4 rounded-4xl overflow-hidden mb-6 relative">
                 <div
                   role="img"
                   aria-label={`${ex.name} generated website preview`}

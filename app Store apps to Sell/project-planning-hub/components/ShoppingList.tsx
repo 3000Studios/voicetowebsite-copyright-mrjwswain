@@ -14,7 +14,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({ items, onToggleItem, onAppr
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full max-h-[600px]">
-      <div className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
+      <div className="p-6 bg-linear-to-br from-green-500 to-green-600 text-white">
         <h3 className="text-xl font-black flex items-center gap-2">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
           Upgrade Catalog

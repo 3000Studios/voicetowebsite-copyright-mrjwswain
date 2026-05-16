@@ -17,7 +17,7 @@ const WarpTunnel: React.FC<WarpTunnelProps> = ({ isVisible }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-10000 pointer-events-none flex items-center justify-center overflow-hidden"
         >
           {/* Central explosion flash */}
           <motion.div
@@ -65,7 +65,7 @@ const WarpTunnel: React.FC<WarpTunnelProps> = ({ isVisible }) => {
             initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
             animate={{ backgroundColor: "rgba(255, 255, 255, 1)" }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="absolute inset-0 z-[10001]"
+            className="absolute inset-0 z-10001"
           />
         </motion.div>
       )}

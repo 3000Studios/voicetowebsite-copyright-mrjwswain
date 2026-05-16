@@ -57,7 +57,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
   return (
     <section className="relative min-h-[86vh] w-full overflow-hidden">
       <div className="absolute inset-0 responsive-wallpaper" />
-      <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:68px_68px]" />
+      <div className="absolute inset-0 opacity-[0.18] bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-size-[68px_68px]" />
 
       {!videoFailed ? (
         <video
@@ -77,7 +77,7 @@ export const VideoHero: React.FC<VideoHeroProps> = ({
 
       <motion.div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/10"
+        className="absolute left-1/2 top-1/2 h-136 w-136 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/10"
         animate={{ rotate: 360, scale: [1, 1.06, 1] }}
         transition={{ rotate: { duration: 48, repeat: Infinity, ease: "linear" }, scale: { duration: 8, repeat: Infinity, ease: "easeInOut" } }}
       />

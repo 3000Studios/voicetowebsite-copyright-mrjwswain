@@ -326,7 +326,7 @@ export const PricingV2: React.FC = () => {
                   </thead>
                   <tbody>
                     {featureMatrix.map((row, i) => (
-                      <tr key={row.label} className={i % 2 === 0 ? "bg-white/[0.015]" : ""}>
+                      <tr key={row.label} className={i % 2 === 0 ? "bg-white/1.5" : ""}>
                         <td className="px-5 py-3.5 text-white/80">{row.label}</td>
                         {(["starter", "pro", "enterprise"] as const).map((k) => {
                           const v = row[k];
@@ -353,7 +353,7 @@ export const PricingV2: React.FC = () => {
       {/* TRUST BAND */}
       <section className="relative px-5 py-16 sm:px-8 lg:px-12">
         <Reveal>
-          <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-linear-to-br from-white/[0.05] to-white/1 p-8 backdrop-blur-xl lg:p-12">
+          <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-linear-to-br from-white/5 to-white/1 p-8 backdrop-blur-xl lg:p-12">
             <div className="grid gap-6 md:grid-cols-3">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.32em] text-cyan-200">Secure</div>

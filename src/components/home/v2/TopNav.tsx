@@ -29,7 +29,7 @@ export const TopNav: React.FC = () => {
           className="group inline-flex items-center gap-2 font-display text-lg font-black tracking-tight"
         >
           <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-linear-to-br from-cyan-300 via-indigo-400 to-fuchsia-500 shadow-[0_8px_24px_-6px_rgba(34,211,238,0.45)]">
-            <span className="absolute inset-[1px] rounded-[10px] bg-black/70" />
+            <span className="absolute inset-px rounded-[10px] bg-black/70" />
             <span className="relative z-10 text-cyan-100">V</span>
           </span>
           <span className="hidden sm:inline">Voice<span className="text-cyan-300">To</span>Website</span>

@@ -53,7 +53,7 @@ const Navbar = () => {
       isScrolled ? "h-20 bg-black/60 backdrop-blur-xl border-b border-white/5" : "h-28 bg-transparent"
     )}>
       <Link to="/" className="flex items-center gap-3 group">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan group-hover:scale-110 transition-transform">
+        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan group-hover:scale-110 transition-transform">
           <Mic className="text-white w-5 h-5 animate-pulse" />
         </div>
         <span className="text-xl font-black italic tracking-tighter text-white">
@@ -101,7 +101,7 @@ const Navbar = () => {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 z-[60] bg-[#050505]/95 backdrop-blur-2xl flex flex-col p-12"
+            className="fixed inset-0 z-60 bg-[#050505]/95 backdrop-blur-2xl flex flex-col p-12"
           >
             <div className="flex justify-between items-center mb-20">
                <span className="text-xl font-black italic">VoiceToWebsite<span className="text-brand-cyan">.com</span></span>
@@ -121,8 +121,8 @@ const Navbar = () => {
               <Link to="/dashboard" onClick={() => setIsOpen(false)}>Dashboard</Link>
             </div>
             <div className="mt-auto space-y-6">
-               <Link to="/signin" onClick={() => setIsOpen(false)} className="block w-full py-6 glass rounded-[2rem] text-center font-black italic text-xl">Sign In</Link>
-               <Link to="/signup" onClick={() => setIsOpen(false)} className="block w-full py-6 bg-brand-cyan text-black rounded-[2rem] text-center font-black italic text-xl">Build Now</Link>
+               <Link to="/signin" onClick={() => setIsOpen(false)} className="block w-full py-6 glass rounded-4xl text-center font-black italic text-xl">Sign In</Link>
+               <Link to="/signup" onClick={() => setIsOpen(false)} className="block w-full py-6 bg-brand-cyan text-black rounded-4xl text-center font-black italic text-xl">Build Now</Link>
             </div>
           </motion.div>
         )}
@@ -136,7 +136,7 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
       <div className="lg:col-span-2">
         <Link to="/" className="flex items-center gap-2 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center">
             <Mic className="text-white w-5 h-5" />
           </div>
           <span className="text-xl font-extrabold tracking-tighter">
@@ -220,7 +220,7 @@ const LoginPage = () => {
         className="glass-premium p-12 rounded-[3.5rem] w-full max-w-md"
       >
         <div className="flex justify-center mb-8">
-           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan">
+           <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-brand-cyan to-brand-purple flex items-center justify-center neon-glow-cyan">
              <User className="text-white w-8 h-8" />
            </div>
         </div>
@@ -253,9 +253,9 @@ const LoginPage = () => {
         </form>
 
         <div className="mt-8 flex items-center gap-4 text-white/20">
-          <div className="flex-grow h-px bg-white/5" />
+          <div className="grow h-px bg-white/5" />
           <span className="text-[10px] uppercase font-black">Or Continue With</span>
-          <div className="flex-grow h-px bg-white/5" />
+          <div className="grow h-px bg-white/5" />
         </div>
 
         <button onClick={handleGoogleSignIn} type="button" className="mt-6 w-full py-4 glass rounded-2xl flex items-center justify-center gap-3 font-bold hover:bg-white/10 transition-all">
@@ -359,14 +359,14 @@ const Dashboard = () => {
            </div>
         </div>
         <div className="flex gap-4 w-full md:w-auto">
-           <div className="glass px-8 py-4 rounded-[1.5rem] flex-grow md:flex-grow-0">
+           <div className="glass px-8 py-4 rounded-3xl grow md:grow-0">
               <p className="text-[8px] uppercase font-black text-white/20 mb-1">Commands Remaining</p>
               <div className="flex items-center gap-2">
                  <Zap className="w-3 h-3 text-brand-purple" />
                  <p className="font-black text-brand-purple tracking-tighter">? / ?</p>
               </div>
            </div>
-           <Link to="/pricing" className="px-8 py-4 bg-brand-cyan text-black font-black rounded-[1.5rem] hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20 flex items-center justify-center">
+           <Link to="/pricing" className="px-8 py-4 bg-brand-cyan text-black font-black rounded-3xl hover:scale-105 transition-transform shadow-xl shadow-brand-cyan/20 flex items-center justify-center">
               Recharge
            </Link>
         </div>
@@ -398,8 +398,8 @@ const Dashboard = () => {
                      transition={{ delay: i * 0.1 }}
                      className="group glass p-6 rounded-[3rem] border-white/5 hover:border-brand-cyan/50 transition-all flex flex-col min-h-[340px]"
                    >
-                      <div className="aspect-video bg-[#0a0a0a] rounded-[2rem] mb-6 overflow-hidden relative border border-white/5">
-                         <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="aspect-video bg-[#0a0a0a] rounded-4xl mb-6 overflow-hidden relative border border-white/5">
+                         <div className="absolute inset-0 bg-linear-to-br from-brand-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                          <div className="absolute inset-0 flex items-center justify-center opacity-10 group-hover:scale-110 transition-transform">
                             <Globe className="w-20 h-20" />
                          </div>
@@ -407,12 +407,12 @@ const Dashboard = () => {
                             {site.status || "Draft"}
                          </div>
                       </div>
-                      <div className="px-2 flex-grow">
+                      <div className="px-2 grow">
                          <p className="text-[10px] uppercase font-black text-white/20 mb-1">{site.industry || "General"} // ID: {site.id.substring(0,6)}</p>
                          <h3 className="text-xl font-bold mb-6 italic">{site.title || "Untitled"}</h3>
                       </div>
                       <div className="flex items-center gap-2 mt-auto">
-                         <Link to={`/preview?id=${site.id}`} className="flex-grow py-4 text-center bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors">Preview</Link>
+                         <Link to={`/preview?id=${site.id}`} className="grow py-4 text-center bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors">Preview</Link>
                          <button className="p-4 bg-white/5 rounded-2xl hover:text-brand-cyan transition-colors">
                            <Settings className="w-4 h-4" />
                          </button>
@@ -447,7 +447,7 @@ const Dashboard = () => {
               </div>
            </div>
 
-           <div className="glass p-10 rounded-[3.5rem] border-brand-purple/20 bg-gradient-to-br from-brand-purple/5 to-transparent relative group">
+           <div className="glass p-10 rounded-[3.5rem] border-brand-purple/20 bg-linear-to-br from-brand-purple/5 to-transparent relative group">
               <div className="relative z-10">
                 <h3 className="text-sm font-black italic mb-2">Upgrade Identity</h3>
                 <p className="text-xs text-white/40 mb-8 leading-relaxed italic">Enable code export, high-speed CDN, and custom white-labeling.</p>
@@ -531,7 +531,7 @@ export default function App() {
         
         <Navbar />
         
-        <main className="flex-grow">
+        <main className="grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/features" element={<AboutPage />} />

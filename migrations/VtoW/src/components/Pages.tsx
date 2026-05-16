@@ -231,7 +231,7 @@ export const SetupPage = () => {
                   <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-brand-cyan">
                     <Globe className="w-8 h-8" />
                   </div>
-                  <div className="flex-grow space-y-2">
+                  <div className="grow space-y-2">
                     <label className="text-[10px] uppercase font-black tracking-widest text-white/40">Business Name</label>
                     <input type="text" placeholder="e.g. Nexis Ventures" className="w-full bg-transparent text-2xl font-bold outline-none" />
                   </div>
@@ -246,7 +246,7 @@ export const SetupPage = () => {
                   <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-brand-purple">
                     <User className="w-8 h-8" />
                   </div>
-                  <div className="flex-grow space-y-2">
+                  <div className="grow space-y-2">
                     <label className="text-[10px] uppercase font-black tracking-widest text-white/40">Target Audience</label>
                     <textarea placeholder="e.g. Modern tech professionals who value efficiency..." className="w-full bg-transparent text-xl font-bold outline-none h-24" />
                   </div>
@@ -346,7 +346,7 @@ export const SitePreviewPage = () => {
             </button>
          </div>
       </div>
-      <div className="flex-grow w-full max-w-[1440px] mx-auto shadow-2xl shadow-brand-cyan/10 relative">
+      <div className="grow w-full max-w-[1440px] mx-auto shadow-2xl shadow-brand-cyan/10 relative">
          <iframe 
            srcDoc={config.html} 
            title="Website Preview"

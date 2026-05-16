@@ -50,7 +50,7 @@ export const FooterV2: React.FC = () => {
       className="relative mt-24 overflow-hidden border-t border-white/10 bg-linear-to-b from-black via-[#06080f] to-black"
     >
       <div className="pointer-events-none absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_20%_0%,rgba(0,242,255,0.18),transparent_55%),radial-gradient(circle_at_80%_10%,rgba(157,0,255,0.18),transparent_55%)]" />
-      <div className="pointer-events-none absolute -bottom-32 left-1/2 hidden h-[420px] w-[1200px] -translate-x-1/2 select-none font-display text-[18rem] font-black tracking-tighter text-white/[0.04] lg:block">
+      <div className="pointer-events-none absolute -bottom-32 left-1/2 hidden h-[420px] w-[1200px] -translate-x-1/2 select-none font-display text-[18rem] font-black tracking-tighter text-white/4 lg:block">
         voicetowebsite
       </div>
 
@@ -58,7 +58,7 @@ export const FooterV2: React.FC = () => {
         <div>
           <Link to="/" onClick={() => click()} className="inline-flex items-center gap-2 font-display text-2xl font-black tracking-tight">
             <span className="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-linear-to-br from-cyan-300 via-indigo-400 to-fuchsia-500 shadow-[0_8px_24px_-6px_rgba(34,211,238,0.45)]">
-              <span className="absolute inset-[1px] rounded-[10px] bg-black/70" />
+              <span className="absolute inset-px rounded-[10px] bg-black/70" />
               <span className="relative z-10 text-cyan-100">V</span>
             </span>
             Voice<span className="text-cyan-300">To</span>Website
@@ -92,7 +92,7 @@ export const FooterV2: React.FC = () => {
                     <Link
                       to={l.to}
                       onClick={() => click()}
-                      className="text-white/70 transition hover:text-white hover:[text-shadow:_0_0_18px_rgba(34,211,238,0.45)]"
+                      className="text-white/70 transition hover:text-white hover:[text-shadow:0_0_18px_rgba(34,211,238,0.45)]"
                     >
                       {l.label}
                     </Link>

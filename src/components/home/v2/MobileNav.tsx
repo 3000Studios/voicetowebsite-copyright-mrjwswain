@@ -40,7 +40,7 @@ export const MobileNav: React.FC = () => {
         type="button"
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
-        className="lg:hidden relative z-[60] flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/60 backdrop-blur-xl hover:border-cyan-300/40 transition"
+        className="lg:hidden relative z-60 flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/60 backdrop-blur-xl hover:border-cyan-300/40 transition"
         onClick={() => {
           click();
           setOpen((o) => !o);
@@ -87,7 +87,7 @@ export const MobileNav: React.FC = () => {
               <div className="absolute inset-0 bg-[url('/vtw-wallpaper.png')] bg-cover bg-center" />
               <div className="absolute inset-0 bg-linear-to-b from-black/85 via-black/75 to-black/95" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,242,255,0.18),transparent_55%),radial-gradient(circle_at_70%_80%,rgba(157,0,255,0.18),transparent_55%)]" />
-              <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:36px_36px]" />
+              <div className="absolute inset-0 opacity-[0.06] bg-[linear-gradient(rgba(255,255,255,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.8)_1px,transparent_1px)] bg-size-[36px_36px]" />
             </motion.div>
 
             <div className="relative z-10 flex h-full flex-col">
@@ -117,7 +117,7 @@ export const MobileNav: React.FC = () => {
                         className="group flex items-end justify-between gap-4 border-b border-white/10 py-5 transition hover:border-cyan-300/50"
                       >
                         <div>
-                          <div className="font-display text-3xl font-black tracking-tight transition group-hover:text-cyan-200 group-hover:[text-shadow:_0_0_28px_rgba(34,211,238,0.45)]">
+                          <div className="font-display text-3xl font-black tracking-tight transition group-hover:text-cyan-200 group-hover:[text-shadow:0_0_28px_rgba(34,211,238,0.45)]">
                             {link.label}
                           </div>
                           <div className="mt-1 text-xs text-white/45 uppercase tracking-[0.24em]">{link.description}</div>

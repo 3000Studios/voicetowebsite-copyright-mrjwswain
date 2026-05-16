@@ -1,39 +1,47 @@
 {
   "recommendations": [
+    // Core editor tooling
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "saoudrizwan.claude-dev",
-    "continue.continue",
     "bradlc.vscode-tailwindcss",
     "formulahendry.auto-rename-tag",
     "christian-kohler.path-intellisense",
     "usernamehw.errorlens",
+    // Git + GitHub
     "eamodio.gitlens",
     "mhutchie.git-graph",
+    "GitHub.vscode-pull-request-github",
+    "github.vscode-github-actions",
+    // Quality of life
     "streetsidesoftware.code-spell-checker",
     "wayou.vscode-todo-highlight",
     "pkief.material-icon-theme",
-    "zhuangtongfa.material-theme",
-    "ms-vscode.makefile-tools",
-    "prisma.prisma",
-    "GitHub.vscode-pull-request-github",
-    "github.vscode-github-actions",
+    // Config-file syntax
     "redhat.vscode-yaml",
     "tamasfe.even-better-toml",
     "mikestead.dotenv",
-    "quicktype.quicktype",
-    "kisstkondoros.vscode-gutter-preview",
+    // Stack-specific
     "antfu.vite",
-    "vitest.explorer",
-    "orta.vscode-jest"
+    "vitest.explorer"
   ],
   "unwantedRecommendations": [
+    // Conflicting AI extensions — using Claude Code primarily; pick ONE of
+    // continue.continue / saoudrizwan.claude-dev / geminicodeassist if you
+    // want a sidebar AI helper, not all of them.
     "tabnine.tabnine-vscode",
     "github.copilot",
     "github.copilot-chat",
     "kiteco.kite",
     "codeium.codeium",
     "replit.replit",
-    "amazonwebservices.aws-toolkit-vscode"
+    "amazonwebservices.aws-toolkit-vscode",
+    // Removed: stack mismatch
+    "ms-vscode.makefile-tools",
+    "prisma.prisma",
+    "orta.vscode-jest",
+    // Removed: visual-only, user can install personally
+    "zhuangtongfa.material-theme",
+    "quicktype.quicktype",
+    "kisstkondoros.vscode-gutter-preview"
   ]
 }

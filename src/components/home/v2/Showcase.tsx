@@ -38,7 +38,7 @@ export const Showcase: React.FC = () => {
             <Reveal key={t.title} delay={(i % 3) * 0.1}>
               <motion.article
                 style={reduce ? undefined : { x: i % 2 === 0 ? x1 : x2 }}
-                className="group relative aspect-[4/5] overflow-hidden rounded-3xl border border-white/10"
+                className="group relative aspect-4/5 overflow-hidden rounded-3xl border border-white/10"
               >
                 <img src={t.img} alt={t.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-[0.6deg]" />
                 <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent" />

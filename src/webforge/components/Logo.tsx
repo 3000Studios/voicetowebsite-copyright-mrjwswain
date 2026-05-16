@@ -5,7 +5,7 @@ const Logo: React.FC<{ className?: string }> = ({
 }) => {
   return (
     <div
-      className={`${className} relative group transition-all duration-700 hover:rotate-[360deg]`}
+      className={`${className} relative group transition-all duration-700 hover:rotate-360`}
     >
       <svg
         viewBox="0 0 512 512"

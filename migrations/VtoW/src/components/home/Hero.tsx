@@ -22,7 +22,7 @@ export const Hero = () => {
         
         <h1 className="text-6xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9] italic">
           Turn Your Voice Into <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-white to-brand-purple">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-cyan via-white to-brand-purple">
             The Best Website
           </span>
         </h1>
@@ -72,9 +72,9 @@ export const Hero = () => {
         transition={{ delay: 0.2, duration: 1 }}
         className="mt-20 w-full max-w-5xl relative group"
       >
-        <div className="absolute -inset-1 bg-gradient-to-r from-brand-cyan to-brand-purple rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+        <div className="absolute -inset-1 bg-linear-to-r from-brand-cyan to-brand-purple rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
         <div className="relative glass p-4 rounded-[2.5rem] border border-white/20">
-          <div className="aspect-video rounded-[1.5rem] bg-black/60 overflow-hidden relative border border-white/5">
+          <div className="aspect-video rounded-3xl bg-black/60 overflow-hidden relative border border-white/5">
              {/* Realistic Video Placeholder */}
              <video 
               autoPlay 

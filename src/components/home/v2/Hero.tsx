@@ -23,7 +23,7 @@ export const Hero: React.FC = () => {
     <section className="relative isolate overflow-hidden px-5 pt-32 pb-24 sm:px-8 lg:px-12 lg:pt-48 lg:pb-32">
       {/* edge framing */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-cyan-300/50 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 top-[1px] h-24 bg-linear-to-b from-cyan-300/10 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-px h-24 bg-linear-to-b from-cyan-300/10 to-transparent" />
 
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
         <div className="relative">
@@ -78,9 +78,9 @@ export const Hero: React.FC = () => {
             <Link
               to="/pricing"
               onClick={() => click()}
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-linear-to-r from-cyan-300 via-cyan-300 to-fuchsia-400 px-6 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:-translate-y-[2px] hover:shadow-[0_22px_70px_-10px_rgba(34,211,238,0.7)] active:translate-y-0"
+              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-linear-to-r from-cyan-300 via-cyan-300 to-fuchsia-400 px-6 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_18px_60px_-12px_rgba(34,211,238,0.55)] transition hover:translate-y-[-2px] hover:shadow-[0_22px_70px_-10px_rgba(34,211,238,0.7)] active:translate-y-0"
             >
-              <span className="absolute inset-0 -translate-x-full bg-white/30 [mask-image:linear-gradient(90deg,transparent,white,transparent)] transition group-hover:translate-x-full" />
+              <span className="absolute inset-0 -translate-x-full bg-white/30 mask-[linear-gradient(90deg,transparent,white,transparent)] transition group-hover:translate-x-full" />
               <span className="relative z-10 inline-flex items-center gap-2">
                 Start a build <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
               </span>
@@ -127,7 +127,7 @@ export const Hero: React.FC = () => {
               className="relative rounded-[34px] border border-white/15 bg-linear-to-br from-white/10 via-white/5 to-transparent p-1 shadow-[0_40px_120px_-24px_rgba(0,0,0,0.7)]"
             >
               <div className="rounded-[28px] overflow-hidden bg-black">
-                <div className="relative aspect-[9/16] w-full">
+                <div className="relative aspect-9/16 w-full">
                   <video
                     src="/videos/voice-to-website-demo.mp4"
                     autoPlay

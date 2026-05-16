@@ -258,7 +258,7 @@ export default function App() {
              <div className="text-[10px] uppercase font-black opacity-60 mb-3 tracking-[0.3em] flex items-center gap-2 border-b border-emerald-900/30 pb-2">
                 <MessageSquare size={12} className="text-emerald-400" /> Neural Deciphering Display
              </div>
-             <div className="text-xl md:text-3xl font-mono leading-relaxed whitespace-pre-wrap break-words drop-shadow-[0_0_8px_rgba(0,255,65,0.6)]">
+             <div className="text-xl md:text-3xl font-mono leading-relaxed whitespace-pre-wrap wrap-break-word drop-shadow-[0_0_8px_rgba(0,255,65,0.6)]">
                 {isProcessing ? (realTimeTranscript || "> DECODING SUB-SONIC SIGNALS_") : "> SYSTEM_OFFLINE [IDLE]"}
              </div>
           </div>
@@ -340,7 +340,7 @@ export default function App() {
                       className="appearance-none w-2 h-full bg-transparent absolute top-0 left-0 accent-cyan-400 cursor-pointer z-20"
                       style={{ WebkitAppearance: 'slider-vertical' } as any}
                     />
-                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-cyan-600 to-cyan-400 shadow-[0_0_15px_rgba(0,242,255,0.6)] rounded-full transition-all duration-75" style={{ height: `${((settings.eqGains[i] + 15) / 30) * 100}%` }}></div>
+                    <div className="absolute bottom-0 left-0 w-full bg-linear-to-t from-cyan-600 to-cyan-400 shadow-[0_0_15px_rgba(0,242,255,0.6)] rounded-full transition-all duration-75" style={{ height: `${((settings.eqGains[i] + 15) / 30) * 100}%` }}></div>
                   </div>
 
                   <div className="mt-4 text-[9px] font-black text-slate-500 uppercase tracking-tighter opacity-70">
@@ -454,7 +454,7 @@ export default function App() {
               }}
               disabled={!isProcessing}
               className={`mt-6 w-full py-4 rounded-2xl font-black text-[11px] tracking-[0.4em] text-white uppercase shadow-2xl transition-all relative z-10 border border-purple-500/30 active:scale-95
-                ${isProcessing ? 'bg-gradient-to-r from-purple-800 to-indigo-900 hover:from-purple-700 hover:to-indigo-800' : 'bg-slate-900 text-slate-700 cursor-not-allowed'}
+                ${isProcessing ? 'bg-linear-to-r from-purple-800 to-indigo-900 hover:from-purple-700 hover:to-indigo-800' : 'bg-slate-900 text-slate-700 cursor-not-allowed'}
               `}
             >
               INITIATE VOCAL SCAN
@@ -468,7 +468,7 @@ export default function App() {
         <a href="https://VoiceToWebsite.com" target="_blank" className="text-[12px] font-black neon-text-blue uppercase tracking-[0.4em] flex items-center gap-3 hover:scale-105 transition-transform group">
           <Globe size={16} className="group-hover:rotate-180 transition-transform duration-1000" /> VoiceToWebsite.com
         </a>
-        <div className="h-px w-32 bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
+        <div className="h-px w-32 bg-linear-to-r from-transparent via-slate-700 to-transparent"></div>
         <p className="text-[10px] font-black text-slate-700 tracking-[0.3em] uppercase italic">Audio Boost 3k | Precision Engineering by 3000 Studios</p>
       </div>
 

@@ -52,7 +52,7 @@ export const GeneratorSection = () => {
         {/* Input Bar */}
         <div className="max-w-3xl mx-auto mb-20">
           <div className="relative group">
-             <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-cyan to-brand-purple rounded-3xl blur opacity-20 group-focus-within:opacity-50 transition duration-500"></div>
+             <div className="absolute -inset-0.5 bg-linear-to-r from-brand-cyan to-brand-purple rounded-3xl blur opacity-20 group-focus-within:opacity-50 transition duration-500"></div>
              <div className="relative glass p-2 rounded-3xl flex items-center gap-2">
               <button 
                 onClick={toggleRecording}
@@ -68,7 +68,7 @@ export const GeneratorSection = () => {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Describe your website idea (e.g. 'Luxury spa in Bali')..."
-                className="flex-grow bg-transparent border-none focus:ring-0 text-lg px-4"
+                className="grow bg-transparent border-none focus:ring-0 text-lg px-4"
                 onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
               />
               <button 
@@ -157,8 +157,8 @@ export const GeneratorSection = () => {
                  </div>
 
                  {/* The Actual Generated Site Preview */}
-                 <div className="relative glass h-[600px] rounded-[2rem] overflow-hidden group">
-                    <div className="absolute inset-0 z-10 pointer-events-none border-[12px] border-[#0a0a0a] rounded-[2rem]" />
+                 <div className="relative glass h-[600px] rounded-4xl overflow-hidden group">
+                    <div className="absolute inset-0 z-10 pointer-events-none border-12 border-[#0a0a0a] rounded-4xl" />
                     <div className="h-full bg-black relative">
                        <AnimatePresence mode="wait">
                           {activeVariation !== null && (

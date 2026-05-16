@@ -8,7 +8,7 @@ export const WallpaperBg: React.FC = () => {
       {/* base gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_-10%,rgba(0,242,255,0.18),transparent_55%),radial-gradient(ellipse_at_80%_10%,rgba(157,0,255,0.18),transparent_55%),radial-gradient(ellipse_at_50%_120%,rgba(255,0,255,0.10),transparent_60%),linear-gradient(180deg,#03040a,#06080f_55%,#02030a)]" />
       {/* grid */}
-      <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_45%,transparent_75%)]" />
+      <div className="absolute inset-0 opacity-[0.06] bg-[linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)] bg-size-[48px_48px] mask-[radial-gradient(ellipse_at_center,black_45%,transparent_75%)]" />
       {/* slow orbs */}
       {!reduce && (
         <>

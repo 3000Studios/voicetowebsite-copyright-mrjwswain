@@ -114,7 +114,7 @@ const Navbar = () => {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 z-[60] bg-[#050505]/95 backdrop-blur-2xl flex flex-col p-12"
+            className="fixed inset-0 z-60 bg-[#050505]/95 backdrop-blur-2xl flex flex-col p-12"
           >
             <div className="flex justify-between items-center mb-20">
               <span className="text-xl font-black italic">
@@ -486,7 +486,7 @@ const Dashboard = () => {
                 Sign In To Sync
               </Link>
             ) : null}
-            <div className="glass px-8 py-4 rounded-3xl grow md:flex-grow-0">
+            <div className="glass px-8 py-4 rounded-3xl grow md:grow-0">
               <p className="text-[8px] uppercase font-black text-white/20 mb-1">
                 Commands Remaining
               </p>

@@ -75,7 +75,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, role, onUpdateTask, on
       </div>
 
       {isAdding && (
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border-4 border-purple-50 dark:border-slate-700 shadow-2xl animate-in fade-in zoom-in duration-300">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-8 rounded-4xl border-4 border-purple-50 dark:border-slate-700 shadow-2xl animate-in fade-in zoom-in duration-300">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-5">
               <div>
@@ -207,7 +207,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, role, onUpdateTask, on
               </div>
 
               <div className="mb-6 px-1">
-                <p className="text-[9px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.1em] text-center leading-tight">
+                <p className="text-[9px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-widest text-center leading-tight">
                   Pricing above reflects national benchmarks and is NOT a final quote.
                 </p>
               </div>

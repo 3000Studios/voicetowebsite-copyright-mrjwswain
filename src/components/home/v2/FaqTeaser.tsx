@@ -69,7 +69,7 @@ export const FaqTeaser: React.FC = () => {
                       setOpen(isOpen ? null : i);
                     }}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition hover:bg-white/[0.06]"
+                    className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition hover:bg-white/6"
                   >
                     <span className="font-display text-base font-black leading-tight sm:text-lg">{it.q}</span>
                     <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.25 }} className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white/5">

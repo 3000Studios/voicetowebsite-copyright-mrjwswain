@@ -492,7 +492,7 @@ const App: React.FC = () => {
         ) : null}
       </main>
 
-      <footer className="bg-slate-950 border-t-[10px] border-slate-900 pt-48 pb-20 relative overflow-hidden">
+      <footer className="bg-slate-950 border-t-10 border-slate-900 pt-48 pb-20 relative overflow-hidden">
         {/* Background Accent */}
         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 

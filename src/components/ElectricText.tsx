@@ -76,7 +76,7 @@ const ElectricText: React.FC<ElectricTextProps> = ({
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute bg-white h-[1px] w-6 md:w-12"
+              className="absolute bg-white h-px w-6 md:w-12"
               initial={{ opacity: 0 }}
               animate={{
                 opacity: [0, 1, 0],

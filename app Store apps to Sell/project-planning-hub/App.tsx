@@ -110,11 +110,11 @@ const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col relative overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-slate-900 text-slate-100 selection:bg-purple-900' : 'bg-slate-50 text-slate-900 selection:bg-gold-200'}`}>
-      <div className="fixed top-0 left-0 w-full h-1.5 bg-gradient-to-r from-green-500 via-purple-600 to-gold-500 z-50 shadow-sm"></div>
+      <div className="fixed top-0 left-0 w-full h-1.5 bg-linear-to-r from-green-500 via-purple-600 to-gold-500 z-50 shadow-sm"></div>
 
       <header className={`sticky top-0 z-40 backdrop-blur-xl border-b px-8 py-5 flex justify-between items-center shadow-sm transition-colors ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-100'}`}>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-700 to-purple-900 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-purple-900/20 border-2 border-purple-500">CM</div>
+          <div className="w-12 h-12 bg-linear-to-br from-purple-700 to-purple-900 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-purple-900/20 border-2 border-purple-500">CM</div>
           <div>
             <h1 className="text-2xl font-black leading-none tracking-tighter">
               The Cajun Menu <span className="text-gold-500">Planning Page</span>
@@ -179,7 +179,7 @@ const App: React.FC = () => {
                   onUpload={handleFileUpload}
                 />
 
-                <div className={`border-2 p-10 rounded-[3rem] relative overflow-hidden shadow-2xl transition-colors ${isDarkMode ? 'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-slate-700' : 'bg-gradient-to-br from-gold-50 via-white to-amber-50 border-gold-200'}`}>
+                <div className={`border-2 p-10 rounded-[3rem] relative overflow-hidden shadow-2xl transition-colors ${isDarkMode ? 'bg-linear-to-br from-slate-800 via-slate-900 to-slate-800 border-slate-700' : 'bg-linear-to-br from-gold-50 via-white to-amber-50 border-gold-200'}`}>
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
                     <div className="space-y-2">
                       <h2 className={`text-3xl font-black flex items-center gap-3 tracking-tighter ${isDarkMode ? 'text-gold-400' : 'text-amber-950'}`}>

@@ -80,7 +80,7 @@ export const SynthWaves = () => {
   }, [currentColorIndex]);
 
   return (
-    <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden mix-blend-screen opacity-40">
+    <div className="fixed inset-0 z-1 pointer-events-none overflow-hidden mix-blend-screen opacity-40">
       <canvas ref={canvasRef} className="w-full h-full" />
     </div>
   );

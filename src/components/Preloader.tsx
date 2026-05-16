@@ -27,7 +27,7 @@ export const Preloader = () => {
           initial={{ opacity: 1 }}
           exit={{ y: '-100%', opacity: 0 }}
           transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
-          className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-between p-12 lg:p-24"
+          className="fixed inset-0 z-9999 bg-black flex flex-col items-center justify-between p-12 lg:p-24"
         >
           <div className="w-full flex justify-between items-start">
             <span className="text-[10px] font-black tracking-[0.5em] uppercase opacity-40">VoiceToWebsite // System Initialization</span>

@@ -55,7 +55,7 @@ const IntroOverlay: React.FC<IntroOverlayProps> = ({ onStart, onComplete }) => {
     <motion.div
       exit={{ opacity: 0, scale: 1.1, filter: "blur(50px)" }}
       transition={{ duration: 1.5, ease: "circIn" }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black"
+      className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-black"
     >
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video

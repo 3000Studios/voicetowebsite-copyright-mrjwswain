@@ -163,7 +163,7 @@ export const LiquidFooter = () => {
   }, [baseColor]);
 
   return (
-    <div className="absolute bottom-0 left-0 w-full h-[120px] pointer-events-none z-[5] overflow-hidden">
+    <div className="absolute bottom-0 left-0 w-full h-[120px] pointer-events-none z-5 overflow-hidden">
       <canvas 
         ref={canvasRef} 
         className="w-full h-full pointer-events-auto filter blur-[20px] contrast-[20]" 

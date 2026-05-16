@@ -113,7 +113,7 @@ export function CinematicHero() {
                 loop
                 muted
                 playsInline
-                className="h-[16rem] w-full object-cover"
+                className="h-64 w-full object-cover"
               />
             </div>
             <div className="grid gap-4">

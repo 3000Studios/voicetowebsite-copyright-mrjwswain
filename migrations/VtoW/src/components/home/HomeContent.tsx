@@ -33,7 +33,7 @@ export const HowItWorks = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative">
           {steps.map((step, i) => (
             <div key={i} className="relative flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-[2rem] glass border border-brand-cyan/30 flex items-center justify-center mb-6 text-brand-cyan relative">
+              <div className="w-16 h-16 rounded-4xl glass border border-brand-cyan/30 flex items-center justify-center mb-6 text-brand-cyan relative">
                 <step.icon className="w-8 h-8" />
                 <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white text-black text-[10px] font-black flex items-center justify-center">0{i+1}</div>
               </div>
@@ -106,7 +106,7 @@ export const ExamplesSection = () => {
   ];
 
   return (
-    <section className="py-24 px-6 lg:px-12 bg-white/[0.02]">
+    <section className="py-24 px-6 lg:px-12 bg-white/2">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div className="max-w-xl">
@@ -128,9 +128,9 @@ export const ExamplesSection = () => {
               transition={{ delay: i * 0.1 }}
               className="group relative glass rounded-[2.5rem] p-4 border-white/10 hover:border-brand-cyan/50 transition-all overflow-hidden"
             >
-               <div className="aspect-[3/4] rounded-[2rem] overflow-hidden mb-6 relative">
+               <div className="aspect-3/4 rounded-4xl overflow-hidden mb-6 relative">
                   <img src={ex.img} alt={ex.name} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-60" />
                   <div className="absolute top-4 right-4 glass px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">Variation {["A", "B", "C"][i%3]}</div>
                </div>
                <p className="text-[10px] uppercase font-black text-brand-cyan mb-1 tracking-[0.2em]">{ex.industry}</p>

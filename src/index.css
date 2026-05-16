@@ -47,7 +47,7 @@ body {
 }
 
 .glass-premium {
-  @apply backdrop-blur-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+  @apply backdrop-blur-2xl bg-linear-to-br from-white/10 to-white/5 border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
 }
 
 /* Neon Accents */
