@@ -282,6 +282,11 @@ import { HomeV2 } from "./components/home/v2/HomeV2";
 import { PricingV2 } from "./pages/PricingV2";
 import { Blog as BlogV2 } from "./pages/Blog";
 import { BlogPost as BlogPostV2 } from "./pages/BlogPost";
+import { Features as FeaturesReal } from "./pages/Features";
+import { FAQ as FAQReal } from "./pages/FAQ";
+import ExamplesReal from "./pages/Examples";
+import { About as AboutReal } from "./pages/About";
+import { Contact as ContactReal } from "./pages/Contact";
 import GlobalSearch from "./components/GlobalSearch";
 import { UniversalDeploymentPrompt } from "./pages/UniversalDeploymentPrompt";
 import EngineTester from "./pages/EngineTester";
@@ -889,8 +894,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomeV2 />} />
             <Route path="/v1" element={<Home />} />
-            <Route path="/features" element={<AboutPage />} />
-            <Route path="/examples" element={<ExamplesPage />} />
+            <Route path="/features" element={<FeaturesReal />} />
+            <Route path="/examples" element={<ExamplesReal />} />
             <Route path="/pricing" element={<PricingV2 />} />
             <Route path="/pricing/v1" element={<PricingPage />} />
             <Route
@@ -901,8 +906,9 @@ export default function App() {
             <Route path="/blog/:slug" element={<BlogPostV2 />} />
             <Route path="/stories" element={<BlogV2 />} />
             <Route path="/store" element={<PricingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/faq" element={<FAQPage />} />
+            <Route path="/about" element={<AboutReal />} />
+            <Route path="/contact" element={<ContactReal />} />
+            <Route path="/faq" element={<FAQReal />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/setup" element={<SetupPage />} />
